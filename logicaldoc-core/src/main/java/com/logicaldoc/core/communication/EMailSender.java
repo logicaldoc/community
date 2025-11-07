@@ -72,6 +72,15 @@ import net.sf.jmimemagic.MagicMatch;
  */
 public class EMailSender {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static EMailSender get() {
+		return Context.get(EMailSender.class);
+	}
+
 	private static final Logger log = LoggerFactory.getLogger(EMailSender.class);
 
 	private static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";

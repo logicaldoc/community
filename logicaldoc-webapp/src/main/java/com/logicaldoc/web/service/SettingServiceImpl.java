@@ -159,7 +159,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			conf.write();
 
 			// Always update the settings for the default sender
-			EMailSender sender = Context.get(EMailSender.class);
+			EMailSender sender = EMailSender.get();
 			sender.setHost(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_HOST));
 			sender.setPort(Integer.parseInt(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_PORT)));
 			sender.setUsername(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_USERNAME));

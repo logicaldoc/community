@@ -298,7 +298,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 					recipient.setMode(Recipient.MODE_EMAIL_TO);
 					email.getRecipients().add(recipient);
 
-					Context.get(EMailSender.class).sendAsync(email, "newdevice", dictionaryMap);
+					EMailSender.get().sendAsync(email, "newdevice", dictionaryMap);
 				}
 			} catch (PersistenceException e) {
 				log.warn("Cannot record the device {}", device);

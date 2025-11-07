@@ -318,8 +318,7 @@ public class LoginThrottle {
 					recipient.setMode(Recipient.MODE_EMAIL_TO);
 					email.getRecipients().add(recipient);
 
-					EMailSender sender = Context.get(EMailSender.class);
-					sender.sendAsync(email);
+					EMailSender.get().sendAsync(email);
 				}
 			} catch (PersistenceException | AutomationException e) {
 				log.warn(e.getMessage(), e);
