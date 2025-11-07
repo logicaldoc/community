@@ -14,9 +14,9 @@ import com.logicaldoc.util.spring.Context;
 public interface SessionDAO extends PersistentObjectDAO<Session> {
 
 	/**
-	 * Gets the object loaded in the execution context
+	 * Gets the object available in the application context
 	 * 
-	 * @return the instance of this object in the execution context
+	 * @return the instance of this object in the application context
 	 */
 	public static SessionDAO get() {
 		return Context.get(SessionDAO.class);

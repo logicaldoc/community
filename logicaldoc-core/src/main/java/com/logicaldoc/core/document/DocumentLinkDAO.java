@@ -15,9 +15,9 @@ import com.logicaldoc.util.spring.Context;
 public interface DocumentLinkDAO extends PersistentObjectDAO<DocumentLink> {
 
 	/**
-	 * Gets the object loaded in the execution context
+	 * Gets the object available in the application context
 	 * 
-	 * @return the instance of this object in the execution context
+	 * @return the instance of this object in the application context
 	 */
 	public static DocumentLinkDAO get() {
 		return Context.get(DocumentLinkDAO.class);

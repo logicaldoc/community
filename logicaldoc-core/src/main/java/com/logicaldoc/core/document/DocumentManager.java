@@ -83,9 +83,9 @@ import jakarta.annotation.Resource;
 public class DocumentManager {
 
 	/**
-	 * Gets the object loaded in the execution context
+	 * Gets the object available in the application context
 	 * 
-	 * @return the instance of this object in the execution context
+	 * @return the instance of this object in the application context
 	 */
 	public static DocumentManager get() {
 		return Context.get(DocumentManager.class);

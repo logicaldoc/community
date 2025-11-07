@@ -15,9 +15,9 @@ import com.logicaldoc.util.spring.Context;
 public interface RatingDAO extends PersistentObjectDAO<Rating> {
 
 	/**
-	 * Gets the object loaded in the execution context
+	 * Gets the object available in the application context
 	 * 
-	 * @return the instance of this object in the execution context
+	 * @return the instance of this object in the application context
 	 */
 	public static RatingDAO get() {
 		return Context.get(RatingDAO.class);

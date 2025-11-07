@@ -18,9 +18,9 @@ import com.logicaldoc.util.spring.Context;
 public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 
 	/**
-	 * Gets the object loaded in the execution context
+	 * Gets the object available in the application context
 	 * 
-	 * @return the instance of this object in the execution context
+	 * @return the instance of this object in the application context
 	 */
 	public static DocumentNoteDAO get() {
 		return Context.get(DocumentNoteDAO.class);

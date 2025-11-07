@@ -15,9 +15,9 @@ import com.logicaldoc.util.spring.Context;
 public interface UserHistoryDAO extends PersistentObjectDAO<UserHistory> {
 
 	/**
-	 * Gets the object loaded in the execution context
+	 * Gets the object available in the application context
 	 * 
-	 * @return the instance of this object in the execution context
+	 * @return the instance of this object in the application context
 	 */
 	public static UserHistoryDAO get() {
 		return Context.get(UserHistoryDAO.class);
