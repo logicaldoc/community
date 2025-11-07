@@ -629,9 +629,8 @@ public class DocTool {
 	 * @param doc the document to convert
 	 */
 	public void convertPDF(Document doc) {
-		FormatConverterManager manager = Context.get(FormatConverterManager.class);
 		try {
-			manager.convertToPdf(doc, null);
+			FormatConverterManager.get().convertToPdf(doc, null);
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -653,9 +652,8 @@ public class DocTool {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
-		FormatConverterManager manager = Context.get(FormatConverterManager.class);
 		try {
-			return manager.convert(doc, null, format, transaction);
+			return FormatConverterManager.get().convert(doc, null, format, transaction);
 		} catch (IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;

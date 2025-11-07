@@ -97,8 +97,6 @@ public class XMLConverter extends AbstractFormatConverter {
 	private void convert(String sid, Document document, File dest, String destExt, File xslt, File xml,
 			String xsltOutFormat) throws TransformerFactoryConfigurationError, IOException {
 		try {
-			FormatConverterManager manager = Context.get(FormatConverterManager.class);
-
 			// Create transformer factory
 			TransformerFactory factory = TransformerFactory.newInstance();
 
@@ -145,7 +143,7 @@ public class XMLConverter extends AbstractFormatConverter {
 						removeMetaTags(transformedFile);
 					}
 
-					FormatConverter converter = manager.getConverter(xsltOutFormat, destExt);
+					FormatConverter converter = FormatConverterManager.get().getConverter(xsltOutFormat, destExt);
 					if (converter == null)
 						throw new IOException(
 								String.format("Unable to find a converter from %s to %s", xsltOutFormat, destExt));
@@ -173,8 +171,7 @@ public class XMLConverter extends AbstractFormatConverter {
 	}
 
 	private void convertFromTxt(String sid, Document document, File dest, String destExt, File xml) throws IOException {
-		FormatConverterManager manager = Context.get(FormatConverterManager.class);
-		FormatConverter converter = manager.getConverter("txt", destExt);
+		FormatConverter converter = FormatConverterManager.get().getConverter("txt", destExt);
 		if (converter == null)
 			throw new IOException(String.format("Unable to find a converter from txt to %s", destExt));
 		converter.convert(sid, document, xml, dest);

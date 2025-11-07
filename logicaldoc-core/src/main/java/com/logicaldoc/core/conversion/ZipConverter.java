@@ -36,8 +36,7 @@ public class ZipConverter extends CompressedArchiveConverter {
 		try {
 			ungzippedFile = gunzip(src,
 					(document != null && document.getFileName() != null) ? document.getFileName() : src.getName());
-			FormatConverterManager manager = Context.get(FormatConverterManager.class);
-			FormatConverter converter = manager.getConverter(ungzippedFile.getName(), dest.getName());
+			FormatConverter converter = FormatConverterManager.get().getConverter(ungzippedFile.getName(), dest.getName());
 			if (converter != null)
 				converter.convert(sid, document, ungzippedFile, dest);
 		} finally {

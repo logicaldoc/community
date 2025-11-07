@@ -7,7 +7,6 @@ import java.util.Locale;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,15 +27,13 @@ public class ConversionFormatsDataServlet extends AbstractDataServlet {
 
 		String fileName = request.getParameter("fileName");
 
-		FormatConverterManager manager = Context.get(FormatConverterManager.class);
-
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (String format : manager.getEnabledOutputFormats(fileName)) {
+		for (String format : FormatConverterManager.get().getEnabledOutputFormats(fileName)) {
 			writer.print("<format>");
 			writer.print("<extension><![CDATA[" + format + "]]></extension>");
 			writer.print("</format>");

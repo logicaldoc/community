@@ -278,9 +278,8 @@ public class ZipExport {
 		String resource = store.getResourceName(document, null, null);
 
 		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
-			FormatConverterManager manager = Context.get(FormatConverterManager.class);
 			try {
-				manager.convertToPdf(document, null);
+				FormatConverterManager.get().convertToPdf(document, null);
 			} catch (IOException e) {
 				log.warn(e.getMessage(), e);
 				return;

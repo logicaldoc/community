@@ -31,8 +31,7 @@ public class CatchAllParser extends AbstractParser {
 	 */
 	private void parse2(ParseParameters parameters, StringBuilder content) {
 		try {
-			FormatConverterManager manager = Context.get(FormatConverterManager.class);
-			manager.convertToPdf(parameters.getDocument(), parameters.getFileVersion(), null);
+			FormatConverterManager.get().convertToPdf(parameters.getDocument(), parameters.getFileVersion(), null);
 
 			Store store = Context.get(Store.class);
 			String pdfResource = store
@@ -57,7 +56,6 @@ public class CatchAllParser extends AbstractParser {
 	 * Parses without document specification
 	 */
 	private void parse1(InputStream input, ParseParameters parameters, StringBuilder content) {
-		FormatConverterManager manager = Context.get(FormatConverterManager.class);
 		File inputFile = null;
 		File outputPdf = null;
 		try {
@@ -67,7 +65,7 @@ public class CatchAllParser extends AbstractParser {
 			// Copy the input stream into a temporary file and convert into PDF
 			FileUtils.copyInputStreamToFile(input, inputFile);
 			if (inputFile.exists() && inputFile.length() > 0) {
-				manager.convertFile(inputFile, parameters.getFileName(), outputPdf, "pdf", null);
+				FormatConverterManager.get().convertFile(inputFile, parameters.getFileName(), outputPdf, "pdf", null);
 				if (outputPdf.exists() && outputPdf.length() > 0) {
 					Parser parser = ParserFactory.getParser("pdf");
 					content.append(parser.parse(outputPdf, "output.pdf", parameters.getEncoding(),

@@ -1706,8 +1706,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		if (convertToPdf) {
 			if (!"pdf".equals(FileUtil.getExtension(doc.getFileName().toLowerCase()))) {
-				FormatConverterManager manager = Context.get(FormatConverterManager.class);
-				manager.convertToPdf(doc, sid);
+				FormatConverterManager.get().convertToPdf(doc, sid);
 				resource = store.getResourceName(doc, null, "conversion.pdf");
 			}
 			att.setMimeType(MimeType.get("pdf"));
@@ -2252,8 +2251,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setEvent(DocumentEvent.STORED);
 			Document document;
 			if (StringUtils.isEmpty(content))
-				document = DocumentManager.get().create(IOUtils.toInputStream(" ", StandardCharsets.UTF_8), doc, transaction)
-						.getObject();
+				document = DocumentManager.get()
+						.create(IOUtils.toInputStream(" ", StandardCharsets.UTF_8), doc, transaction).getObject();
 			else
 				document = DocumentManager.get()
 						.create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc, transaction).getObject();
@@ -2552,8 +2551,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setComment("Text content editing");
 			transaction.setSession(session);
 
-			DocumentManager.get().checkin(docId, IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc.getFileName(), false,
-					null, transaction);
+			DocumentManager.get().checkin(docId, IOUtils.toInputStream(content, StandardCharsets.UTF_8),
+					doc.getFileName(), false, null, transaction);
 
 			return getById(docId);
 		} catch (PermissionException | PersistenceException | ServerException | IOException e) {
@@ -2680,8 +2679,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 
-			FormatConverterManager manager = Context.get(FormatConverterManager.class);
-			Document conversion = manager.convert(doc, fileVersion, format, transaction);
+			Document conversion = FormatConverterManager.get().convert(doc, fileVersion, format, transaction);
 			if (conversion == null)
 				throw new ServerException("Unable to convert");
 			return getById(conversion.getId());
@@ -2823,7 +2821,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new IOException("Attachment not found");
 
 			FileUtils.writeByteArrayToFile(tmp, attachment.getData());
-			
+
 			Document docVO = new Document();
 			docVO.setFileName(attachmentFileName);
 			docVO.setFileSize(attachment.getSize());
@@ -3103,8 +3101,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			for (long docId : docIds)
 				docs.add(docDao.findDocument(docId));
 
-			Document doc = DocumentManager.get().merge(docs, targetFolderId,
-					fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf", transaction).getObject();
+			Document doc = DocumentManager
+					.get().merge(docs, targetFolderId,
+							fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf", transaction)
+					.getObject();
 			return getDocument(session, doc.getId());
 		} catch (InvalidSessionServerException | PermissionException | PersistenceException | IOException e) {
 			return throwServerException(session, log, e);

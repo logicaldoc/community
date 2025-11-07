@@ -34,6 +34,7 @@ import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
 
@@ -49,6 +50,15 @@ import jakarta.annotation.Resource;
  */
 @Component("formatConverterManager")
 public class FormatConverterManager {
+
+	/**
+	 * Gets the object available in the application context
+	 * 
+	 * @return the instance of this object in the application context
+	 */
+	public static FormatConverterManager get() {
+		return Context.get(FormatConverterManager.class);
+	}
 
 	/*
 	 * The suffix for the document's resource that represents the PDF conversion
@@ -346,8 +356,8 @@ public class FormatConverterManager {
 			String[] inOut = key.split("-");
 			FormatConverter assignedConverter = getConverter(srcFilename, inOut[1]);
 			// The actually assigned converter must be anabled
-			if (!formats.contains(inOut[1]) && assignedConverter!=null && assignedConverter.isEnabled() && !inExt.equalsIgnoreCase(inOut[1])
-					&& inExt.equalsIgnoreCase(inOut[0]))
+			if (!formats.contains(inOut[1]) && assignedConverter != null && assignedConverter.isEnabled()
+					&& !inExt.equalsIgnoreCase(inOut[1]) && inExt.equalsIgnoreCase(inOut[0]))
 				formats.add(inOut[1]);
 		}
 		return formats;

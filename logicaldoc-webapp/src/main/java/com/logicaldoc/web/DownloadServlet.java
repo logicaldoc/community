@@ -190,9 +190,8 @@ public class DownloadServlet extends HttpServlet {
 				&& (doc.getDocRefType() != null && doc.getDocRefType().contains("pdf"))) {
 
 			// Generate the PDF conversion
-			FormatConverterManager manager = Context.get(FormatConverterManager.class);
 			try {
-				manager.convertToPdf(doc, fileVersion, session.getSid());
+				FormatConverterManager.get().convertToPdf(doc, fileVersion, session.getSid());
 			} catch (Exception e) {
 				log.error("Cannot convert to PDF the document {}", doc);
 			}

@@ -185,8 +185,7 @@ public class TicketDownload extends HttpServlet {
 		if ("pdf".equals(suffix))
 			suffix = "conversion.pdf";
 		if ("conversion.pdf".equals(suffix)) {
-			FormatConverterManager converter = Context.get(FormatConverterManager.class);
-			converter.convertToPdf(document, null);
+			FormatConverterManager.get().convertToPdf(document, null);
 			if ("pdf".equalsIgnoreCase(FileUtil.getExtension(document.getFileName())))
 				suffix = null;
 		}

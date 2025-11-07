@@ -63,7 +63,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 		store = Context.get(Store.class);
 
-		testSubject = Context.get(FormatConverterManager.class);
+		testSubject = FormatConverterManager.get();
 
 		FolderDAO folderDao = FolderDAO.get();
 
@@ -75,8 +75,8 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUserId(User.USERID_ADMIN);
 			transaction.setUsername("admin");
-			document = DocumentManager.get()
-					.create(ResourceUtil.getInputStream("data.sql"), document, transaction).get();
+			document = DocumentManager.get().create(ResourceUtil.getInputStream("data.sql"), document, transaction)
+					.get();
 		} catch (PersistenceException | InterruptedException | ExecutionException e) {
 			throw new IOException(e);
 		}
@@ -103,7 +103,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 	@Test
 	public void testConvertFile() throws IOException {
 		File file = FileUtil.createTempFile("test", ".pdf");
-		
+
 		try {
 			testSubject.convertFile(new File("src/test/resources/data.sql"), "src.txt", file, "out.pdf",
 					session.getSid());

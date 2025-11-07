@@ -276,8 +276,7 @@ public class ImageUtil {
 			File pdfFile = FileUtil.createTempFile("firstpage", ".pdf");
 			try {
 				if (!"pdf".equals(inputExt)) {
-					FormatConverterManager manager = Context.get(FormatConverterManager.class);
-					manager.convertFile(originalFile, originalFileName, pdfFile, outputExt, null);
+					FormatConverterManager.get().convertFile(originalFile, originalFileName, pdfFile, outputExt, null);
 				} else {
 					pdfFile = originalFile;
 				}

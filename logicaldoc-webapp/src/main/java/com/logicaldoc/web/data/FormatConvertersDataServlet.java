@@ -44,7 +44,8 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 		String converterSpecification = request.getParameter("converter");
 
 		MenuDAO mDao = MenuDAO.get();
-		boolean parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadAllowed(1750, session.getUserId());
+		boolean parameters = session.getTenantId() == Tenant.DEFAULT_ID
+				&& mDao.isReadAllowed(1750, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -60,7 +61,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 	}
 
 	private void printConverters(PrintWriter writer, String converterSpecification) {
-		FormatConverterManager manager = getManager();
+		FormatConverterManager manager = FormatConverterManager.get();
 
 		// Get all the possible associations of a specific converter
 		for (String inExt : manager.getAvailableInputFormats()) {
@@ -88,14 +89,14 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 	}
 
 	private void writeConverters(PrintWriter writer, String in, String out, boolean parameters) {
-		FormatConverterManager manager = getManager();
+
 		Collection<FormatConverter> converters;
 		if (in.equals("-") && out.equals("-")) {
 			// Get all configured converters
-			converters = manager.getAllConverters();
+			converters = FormatConverterManager.get().getAllConverters();
 		} else {
 			// Get possible converters for a specific couple of formats
-			converters = manager.getAvailableConverters(in, out);
+			converters = FormatConverterManager.get().getAvailableConverters(in, out);
 		}
 
 		for (FormatConverter converter : converters) {
@@ -103,14 +104,8 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 		}
 	}
 
-	private FormatConverterManager getManager() {
-		FormatConverterManager manager = Context.get(FormatConverterManager.class);
-		manager.getConverters();
-		return manager;
-	}
-
 	private void writeConverters(PrintWriter writer, boolean parameters) {
-		FormatConverterManager manager = getManager();
+		FormatConverterManager manager = FormatConverterManager.get();
 		// Get the full list of associations
 		for (String inExt : manager.getAvailableInputFormats()) {
 			for (String outExt : manager.getAllOutputFormats(inExt)) {
@@ -124,7 +119,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 			boolean parameters) {
 		ContextProperties conf = Context.get().getProperties();
 
-		if (converter==null || converter.getClass().equals(NotAvailableConverter.class))
+		if (converter == null || converter.getClass().equals(NotAvailableConverter.class))
 			return;
 
 		writer.print("<converter>");
@@ -140,8 +135,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 
 		if (parameters) {
 			for (String name : converter.getParameterNames()) {
-				String value = conf.getProperty(
-						"converter." + converter.getClass().getSimpleName() + "." + name, "");
+				String value = conf.getProperty("converter." + converter.getClass().getSimpleName() + "." + name, "");
 				writer.print("<" + name + "><![CDATA[" + value + "]]></" + name + ">");
 			}
 		}

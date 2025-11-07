@@ -319,8 +319,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findDocument(docId);
 
-		FormatConverterManager manager = Context.get(FormatConverterManager.class);
-		manager.convertToPdf(doc, fileVersion, sid);
+		FormatConverterManager.get().convertToPdf(doc, fileVersion, sid);
 	}
 
 	@Override

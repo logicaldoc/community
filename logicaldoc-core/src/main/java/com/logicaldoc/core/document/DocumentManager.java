@@ -2095,12 +2095,11 @@ public class DocumentManager {
 						&& !user.isMemberOf("publisher") && !document.isPublishing())
 					continue;
 
-				FormatConverterManager manager = Context.get(FormatConverterManager.class);
-				manager.convertToPdf(document, null);
+				FormatConverterManager.get().convertToPdf(document, null);
 
 				File pdf = new File(tempDir, nf.format(i) + ".pdf");
 
-				manager.writePdfToFile(document, null, pdf, null);
+				FormatConverterManager.get().writePdfToFile(document, null, pdf, null);
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
