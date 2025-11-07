@@ -111,8 +111,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		super.setUp();
 
 		docDao = DocumentDAO.get();
-		linkDao = Context.get(DocumentLinkDAO.class);
-		noteDao = Context.get(DocumentNoteDAO.class);
+		linkDao = DocumentLinkDAO.get();
+		noteDao = DocumentNoteDAO.get();
 		documentHistoryDao = DocumentHistoryDAO.get();
 		bookDao = BookmarkDAO.get();
 		templateDao = TemplateDAO.get();
@@ -245,8 +245,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		// exact ticket ID
 		assertEquals("http://server:port/download-ticket?ticketId=" + ticket.get(0), ticket.get(1));
 
-		TicketDAO tDao = (TicketDAO) context.getBean(TicketDAO.class);
-		Ticket t = tDao.findByTicketId(ticket.get(0));
+		Ticket t = TicketDAO.get().findByTicketId(ticket.get(0));
 		assertNotNull(t);
 		assertEquals(5L, t.getDocId());
 	}
@@ -257,7 +256,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
-		TicketDAO tDao = (TicketDAO) context.getBean(TicketDAO.class);
+		TicketDAO tDao = TicketDAO.get();
 		Ticket t = tDao.findByTicketId(ticket.get(0));
 		assertNotNull(t);
 		assertEquals(5L, t.getDocId());

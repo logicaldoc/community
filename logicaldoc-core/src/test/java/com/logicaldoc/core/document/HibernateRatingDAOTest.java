@@ -108,7 +108,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		docDao.initialize(doc);
 		assertNotNull(doc);
 
-		DocumentHistoryDAO historyDao = Context.get(DocumentHistoryDAO.class);
+		DocumentHistoryDAO historyDao = DocumentHistoryDAO.get();
 		DocumentHistory history = historyDao.findById(1L);
 		historyDao.initialize(history);
 		assertNotNull(history);

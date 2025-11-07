@@ -297,7 +297,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	private void importDocument(Folder root, FileMetadata src, Dropbox dbox, Session session)
 			throws IOException, PersistenceException {
 		DocumentDAO ddao = DocumentDAO.get();
-		DocumentManager manager = Context.get(DocumentManager.class);
+		DocumentManager manager = DocumentManager.get();
 
 		File temp = null;
 		try {

@@ -20,7 +20,6 @@ import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,7 +87,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		DateFormat df = getDateFormat();
 
 		long noteId = set.getLong(1);
-		if (!Context.get(DocumentNoteDAO.class).isReadAllowed(noteId, userId))
+		if (!DocumentNoteDAO.get().isReadAllowed(noteId, userId))
 			return;
 
 		writer.print("<post>");

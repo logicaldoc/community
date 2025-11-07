@@ -326,8 +326,7 @@ public class MailTool {
 							DocumentHistory transaction = new DocumentHistory();
 							transaction.setUser(user);
 
-							DocumentManager manager = Context.get(DocumentManager.class);
-							Document attDoc = manager.create(tmpFile, docVO, transaction).getDocument();
+							Document attDoc = DocumentManager.get().create(tmpFile, docVO, transaction).getDocument();
 							createdDocs.add(attDoc);
 						} finally {
 							if (tmpFile != null)

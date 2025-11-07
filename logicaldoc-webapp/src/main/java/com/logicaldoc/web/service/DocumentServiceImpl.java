@@ -1074,7 +1074,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void linkDocuments(List<Long> inDocIds, List<Long> outDocIds) throws ServerException {
 		Session session = validateSession();
 
-		DocumentLinkDAO linkDao = Context.get(DocumentLinkDAO.class);
+		DocumentLinkDAO linkDao = DocumentLinkDAO.get();
 		DocumentDAO docDao = DocumentDAO.get();
 		for (Long inDocId : inDocIds) {
 			for (Long outDocId : outDocIds) {
@@ -1130,9 +1130,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public void markHistoryAsRead(String event) throws ServerException {
 		Session session = validateSession();
-		DocumentHistoryDAO dao = Context.get(DocumentHistoryDAO.class);
 		try {
-			dao.markHistoriesAsRead(event, session.getUserId());
+			DocumentHistoryDAO.get().markHistoriesAsRead(event, session.getUserId());
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}
@@ -1643,7 +1642,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			/*
 			 * Save the recipients in the user's contacts
 			 */
-			ContactDAO cdao = Context.get(ContactDAO.class);
+			ContactDAO cdao = ContactDAO.get();
 			for (Recipient recipient : mail.getRecipients()) {
 				List<Contact> contacts = cdao.findByUser(session.getUserId(), recipient.getAddress());
 				if (contacts.isEmpty()) {
@@ -1761,7 +1760,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void updateBookmark(GUIBookmark bookmark) throws ServerException {
 		Session session = validateSession();
 
-		BookmarkDAO bookmarkDao = Context.get(BookmarkDAO.class);
+		BookmarkDAO bookmarkDao = BookmarkDAO.get();
 		Bookmark bk;
 		try {
 			if (bookmark.getId() != 0) {
@@ -1954,7 +1953,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
 
 			List<GUIDocumentNote> guiNotes = new ArrayList<>();
-			DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
+			DocumentNoteDAO dao = DocumentNoteDAO.get();
 
 			List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(), session.getUserId(),
 					fileVersion != null ? fileVersion : document.getFileVersion(), types);
@@ -2012,7 +2011,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	private GUIDocumentNote saveNote(Session session, Document document, GUIDocumentNote guiNote)
 			throws ServerException, PersistenceException {
 
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
+		DocumentNoteDAO dao = DocumentNoteDAO.get();
 
 		DocumentNote note = dao.findById(guiNote.getId());
 		if (note == null) {
@@ -2062,8 +2061,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		 * If the note specifies a recipient, update the user's address book
 		 */
 		if (StringUtils.isNotEmpty(note.getRecipientEmail())) {
-			ContactDAO cDao = Context.get(ContactDAO.class);
-			List<Contact> contacts = cDao.findByUser(session.getUserId(), note.getRecipientEmail());
+			List<Contact> contacts = ContactDAO.get().findByUser(session.getUserId(), note.getRecipientEmail());
 			if (contacts.isEmpty()) {
 				String firstName = note.getRecipient();
 				String lastName = null;

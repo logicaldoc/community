@@ -605,7 +605,6 @@ public class EMailSender {
 		if (folderId == null || !email.isHistoricyze())
 			return;
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		TemplateDAO templateDao = TemplateDAO.get();
 		UserDAO userDao = UserDAO.get();
 
@@ -690,7 +689,7 @@ public class EMailSender {
 			transaction.setComment("saved for history");
 			transaction.setUser(userDao.findByUsername("_system"));
 
-			manager.create(emlFile, emailDocument, transaction);
+			DocumentManager.get().create(emlFile, emailDocument, transaction);
 			log.debug("Historycizes the email with subject '{}' sent to {}", email.getSubject(),
 					email.getAllRecipientsEmails());
 		} catch (Exception t) {

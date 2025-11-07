@@ -1284,17 +1284,15 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	public GUIMenu getMenu(long menuId, String locale) throws ServerException {
 		Session session = validateSession();
 
-		GroupDAO gdao = Context.get(GroupDAO.class);
-		MenuDAO dao = MenuDAO.get();
 		try {
-			Menu menu = dao.findById(menuId);
+			Menu menu = MenuDAO.get().findById(menuId);
 			if (menu == null)
 				return null;
 
 			GUIMenu f = toGUIMenu(menu, locale);
 			List<GUIAccessControlEntry> acl = new ArrayList<>();
 			for (AccessControlEntry fg : menu.getAccessControlList()) {
-				Group group = gdao.findById(fg.getGroupId());
+				Group group = GroupDAO.get().findById(fg.getGroupId());
 				if (group == null || group.getTenantId() != session.getTenantId())
 					continue;
 

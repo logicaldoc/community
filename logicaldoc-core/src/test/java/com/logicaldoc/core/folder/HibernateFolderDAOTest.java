@@ -79,7 +79,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		docDao = DocumentDAO.get();
 		historyDao = FolderHistoryDAO.get();
 		templateDao = TemplateDAO.get();
-		docManager = Context.get(DocumentManager.class);
+		docManager = DocumentManager.get();
 	}
 
 	@Test

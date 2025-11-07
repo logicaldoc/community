@@ -65,7 +65,6 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 		testSubject = Context.get(FormatConverterManager.class);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
 		FolderDAO folderDao = FolderDAO.get();
 
 		document = new Document();
@@ -76,7 +75,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUserId(User.USERID_ADMIN);
 			transaction.setUsername("admin");
-			document = documentManager
+			document = DocumentManager.get()
 					.create(ResourceUtil.getInputStream("data.sql"), document, transaction).get();
 		} catch (PersistenceException | InterruptedException | ExecutionException e) {
 			throw new IOException(e);

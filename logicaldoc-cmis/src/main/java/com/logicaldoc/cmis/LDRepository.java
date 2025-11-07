@@ -572,12 +572,11 @@ public class LDRepository {
 		if (isLastChunk) {
 			try {
 				File mergeFile = getMergedContent(chunksFolder);
-				DocumentManager manager = Context.get(DocumentManager.class);
 
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(getSessionUser(context));
 				transaction.setSessionId(sid);
-				manager.replaceFile(doc.getId(), doc.getFileVersion(), mergeFile, transaction);
+				DocumentManager.get().replaceFile(doc.getId(), doc.getFileVersion(), mergeFile, transaction);
 			} finally {
 				FileUtil.delete(chunksFolder);
 			}

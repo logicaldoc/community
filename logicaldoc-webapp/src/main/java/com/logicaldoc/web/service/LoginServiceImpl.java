@@ -62,10 +62,6 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	@Override
 	public GUIUser getUser(String username) {
 		try {
-			UserDAO userDao = UserDAO.get();
-			UserHistoryDAO userHistoryDao = Context.get(UserHistoryDAO.class);
-			TenantDAO tenantDao = Context.get(TenantDAO.class);
-
 			User user = pickUser(username);
 
 			// Get just a few informations needed by the login
@@ -75,20 +71,20 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			usr.setUsername(user.getUsername());
 			usr.setTenant(SecurityServiceImpl.getTenant(user.getTenantId()));
 			usr.setPasswordExpires(user.getPasswordExpires() == 1);
-			usr.setPasswordExpired(userDao.isPasswordExpired(username));
+			usr.setPasswordExpired(UserDAO.get().isPasswordExpired(username));
 			usr.setEmail(user.getEmail());
 			usr.setEmail2(user.getEmail2());
 			usr.setName(user.getName());
 			usr.setFirstName(user.getFirstName());
 			usr.setSecondFactor(user.getSecondFactor());
 
-			Tenant tenant = tenantDao.findById(user.getTenantId());
+			Tenant tenant = TenantDAO.get().findById(user.getTenantId());
 
 			ContextProperties config = Context.get().getProperties();
 			usr.setPasswordMinLenght(config.getInt(tenant.getName() + ".password.size", 6));
 
 			// Retrieve the reason for the last login failure
-			List<UserHistory> failures = userHistoryDao.findByUserIdAndEvent(user.getId(),
+			List<UserHistory> failures = UserHistoryDAO.get().findByUserIdAndEvent(user.getId(),
 					UserEvent.LOGIN_FAILED.toString());
 			if (failures != null && !failures.isEmpty())
 				usr.setLastLoginFailureReason(failures.get(0).getComment());
@@ -190,10 +186,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		if (StringUtils.isEmpty(user.getSecondFactor()))
 			return false;
 
-		TenantDAO tDao = Context.get(TenantDAO.class);
 		String tenant = Tenant.SYSTEM_NAME;
 		try {
-			tenant = tDao.getTenantName(user.getTenantId());
+			tenant = TenantDAO.get().getTenantName(user.getTenantId());
 		} catch (PersistenceException e) {
 			log.warn("Cannot retrieve tenant name of user {}", user.getUsername());
 		}
@@ -206,10 +201,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		if (config.getBoolean(tenant + ".2fa.allowtrusted", true)) {
 			HttpServletRequest request = getThreadLocalRequest();
 			request.setAttribute(Device.PARAM_DEVICE, deviceId);
-
-			DeviceDAO deviceDao = Context.get(DeviceDAO.class);
 			try {
-				return !deviceDao.isTrustedDevice(user.getUsername(), request);
+				return !DeviceDAO.get().isTrustedDevice(user.getUsername(), request);
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
 				return false;
@@ -228,10 +221,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			return "";
 		}
 
-		TenantDAO tDao = Context.get(TenantDAO.class);
 		String tenant = Tenant.DEFAULT_NAME;
 		try {
-			tenant = tDao.getTenantName(user.getTenantId());
+			tenant = TenantDAO.get().getTenantName(user.getTenantId());
 		} catch (PersistenceException e) {
 			log.warn("Cannot retrieve tenant name of user {}", user.getUsername());
 		}
@@ -278,14 +270,13 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 		// Save also the user's event
 		try {
-			UserHistoryDAO hDao = Context.get(UserHistoryDAO.class);
 			UserHistory event = new UserHistory();
 			event.setUser(user);
 			event.setEvent(UserEvent.LEGAL_CONFIRMED);
 			event.setComment(
-					hDao.queryForString("select ld_title from ld_legal where ld_name = :legal", Map.of("legal", legal))
+					UserHistoryDAO.get().queryForString("select ld_title from ld_legal where ld_name = :legal", Map.of("legal", legal))
 							+ " - " + legal);
-			hDao.store(event);
+			UserHistoryDAO.get().store(event);
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 		}

@@ -1586,7 +1586,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		replicateSecurityPolicies(source, securityOption, newFolder);
 
 		DocumentDAO docDao = DocumentDAO.get();
-		DocumentManager docMan = Context.get(DocumentManager.class);
+		DocumentManager manager = DocumentManager.get();
 
 		// List source docs and create them in the new folder
 		if (!foldersOnly) {
@@ -1626,7 +1626,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 				String oldDocResource = store.getResourceName(srcDoc, null, null);
 				try (InputStream is = store.getStream(srcDoc.getId(), oldDocResource);) {
-					docMan.create(is, newDoc, documentTransaction);
+					manager.create(is, newDoc, documentTransaction);
 				} catch (IOException e) {
 					log.error(e.getMessage(), e);
 				}
@@ -2432,7 +2432,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	private void moveDocumentsOnMerge(Folder source, Folder target, FolderHistory transaction, Session session)
 			throws PersistenceException {
 		log.debug("move documents fom folder {} to folder {}", source, target);
-		DocumentManager manager = Context.get(DocumentManager.class);
+		DocumentManager manager = DocumentManager.get();
 		DocumentDAO docDao = DocumentDAO.get();
 		List<Document> docs = docDao.findByFolder(source.getId(), null);
 		for (Document document : docs) {

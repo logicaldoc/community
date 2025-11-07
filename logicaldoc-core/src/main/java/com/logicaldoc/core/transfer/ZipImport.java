@@ -168,7 +168,6 @@ public class ZipImport {
 					addEntry(files[i], folder);
 		} else if (file.length() > 0L) {
 			// creates a document
-			DocumentManager docManager = Context.get(DocumentManager.class);
 			try {
 				DocumentHistory history = new DocumentHistory();
 				history.setEvent(DocumentEvent.STORED);
@@ -182,7 +181,7 @@ public class ZipImport {
 				doc.setId(0L);
 				doc.setFolder(parent);
 
-				docManager.create(file, doc, history);
+				DocumentManager.get().create(file, doc, history);
 			} catch (Exception e) {
 				log.error("InMemoryZipImport addEntry failed", e);
 			}

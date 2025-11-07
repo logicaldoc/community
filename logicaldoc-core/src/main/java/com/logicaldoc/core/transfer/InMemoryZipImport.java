@@ -18,7 +18,6 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * This is an import utilities that imports documents stored in a zip archive.
@@ -58,7 +57,7 @@ public class InMemoryZipImport extends ZipImport {
 
 	private void extractEntries(File sourceZipFile, Folder parent, String sessionId) throws PersistenceException {
 		FolderDAO fDao = FolderDAO.get();
-		DocumentManager docManager = Context.get(DocumentManager.class);
+		DocumentManager docManager = DocumentManager.get();
 
 		// Open the Zip and list all the contents
 		try (ZipUtil zipUtil = new ZipUtil();) {

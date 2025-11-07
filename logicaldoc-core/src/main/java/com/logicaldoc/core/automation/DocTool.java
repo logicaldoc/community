@@ -170,7 +170,6 @@ public class DocTool {
 
 		User user = new SecurityTool().getUser(username);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 		try {
@@ -184,7 +183,7 @@ public class DocTool {
 			ticket.setMaxCount(maxDownloads);
 			ticket.setUrl(urlPrefix);
 
-			ticket = manager.createTicket(ticket, transaction);
+			ticket = DocumentManager.get().createTicket(ticket, transaction);
 			return ticket.getUrl();
 		} catch (PermissionException | PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -216,7 +215,6 @@ public class DocTool {
 
 		User user = new SecurityTool().getUser(username);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 		try {
@@ -231,7 +229,7 @@ public class DocTool {
 			ticket.setMaxViews(maxViews);
 			ticket.setUrl(urlPrefix);
 
-			ticket = manager.createTicket(ticket, transaction);
+			ticket = DocumentManager.get().createTicket(ticket, transaction);
 			return ticket.getUrl();
 		} catch (PermissionException | PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -308,9 +306,8 @@ public class DocTool {
 		transaction.setDate(new Date());
 		transaction.setUser(new SecurityTool().getUser(username));
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		try {
-			return manager.create(file, doc, transaction).getDocument();
+			return DocumentManager.get().create(file, doc, transaction).getDocument();
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -338,7 +335,6 @@ public class DocTool {
 	 */
 	public void move(Document doc, String targetPath, String username) throws InterruptedException {
 		User user = new SecurityTool().getUser(username);
-		DocumentManager manager = Context.get(DocumentManager.class);
 
 		Folder folder = createPath(doc, targetPath, username);
 
@@ -348,7 +344,7 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			manager.moveToFolder(doc, folder, transaction).get();
+			DocumentManager.get().moveToFolder(doc, folder, transaction).get();
 		} catch (InterruptedException ie) {
 			throw ie;
 		} catch (Exception e) {
@@ -385,8 +381,6 @@ public class DocTool {
 			String username) {
 		User user = new SecurityTool().getUser(username);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
-
 		Folder folder = createPath(doc, targetPath, username);
 
 		DocumentHistory transaction = new DocumentHistory();
@@ -394,7 +388,7 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			return manager.copyToFolder(doc, folder, transaction, links, notes, security).getDocument();
+			return DocumentManager.get().copyToFolder(doc, folder, transaction, links, notes, security).getDocument();
 		} catch (PersistenceException | IOException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -480,12 +474,11 @@ public class DocTool {
 	public Document createAlias(Document originalDoc, Folder targetFolder, String type, String username) {
 		User user = new SecurityTool().getUser(username);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
 		try {
-			return manager.createAlias(originalDoc, targetFolder, type, transaction);
+			return DocumentManager.get().createAlias(originalDoc, targetFolder, type, transaction);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -501,14 +494,12 @@ public class DocTool {
 	public void lock(long docId, String username) {
 		User user = new SecurityTool().getUser(username);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
-
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setDocId(docId);
 		transaction.setUser(user);
 
 		try {
-			manager.lock(docId, DocumentStatus.LOCKED, transaction);
+			DocumentManager.get().lock(docId, DocumentStatus.LOCKED, transaction);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -523,14 +514,12 @@ public class DocTool {
 	public void unlock(long docId, String username) {
 		User user = new SecurityTool().getUser(username);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
-
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setDocId(docId);
 		transaction.setUser(user);
 
 		try {
-			manager.unlock(docId, transaction);
+			DocumentManager.get().unlock(docId, transaction);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -589,8 +578,7 @@ public class DocTool {
 			docVO.setFolder(doc.getFolder());
 			docVO.setLanguage(doc.getLanguage());
 
-			DocumentManager manager = Context.get(DocumentManager.class);
-			return manager.create(tmpFile, docVO, transaction).getDocument();
+			return DocumentManager.get().create(tmpFile, docVO, transaction).getDocument();
 		} catch (IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -691,9 +679,8 @@ public class DocTool {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		try {
-			return manager.merge(documents, targetFolderId, fileName, transaction).getDocument();
+			return DocumentManager.get().merge(documents, targetFolderId, fileName, transaction).getDocument();
 		} catch (IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -983,8 +970,7 @@ public class DocTool {
 	 * @return the number of pages
 	 */
 	public int countPages(Document document) {
-		DocumentManager manager = Context.get(DocumentManager.class);
-		return manager.countPages(document);
+		return DocumentManager.get().countPages(document);
 	}
 
 	/**
@@ -997,9 +983,8 @@ public class DocTool {
 	 * @return the extracted texts
 	 */
 	public String parse(Document document, String fileVersion) {
-		DocumentManager manager = Context.get(DocumentManager.class);
 		try {
-			return manager.parseDocument(document, fileVersion);
+			return DocumentManager.get().parseDocument(document, fileVersion);
 		} catch (ParsingException e) {
 			log.error(e.getMessage(), e);
 			return null;

@@ -390,8 +390,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 		String deviceId = testSubject.trustDevice("myLabel");
 		assertTrue(testSubject.isTrustedDevice(deviceId));
 
-		DeviceDAO dDao = Context.get(DeviceDAO.class);
-		Device device = dDao.findByDeviceId(deviceId);
+		Device device = DeviceDAO.get().findByDeviceId(deviceId);
 		testSubject.deleteTrustedDevices(List.of(device.getId()));
 		assertFalse(testSubject.isTrustedDevice(deviceId));
 	}
