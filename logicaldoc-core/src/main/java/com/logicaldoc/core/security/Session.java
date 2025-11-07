@@ -339,8 +339,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		}
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
-		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN, historyComment, sid, client);
+		UserHistoryDAO userHistoryDAO = UserHistoryDAO.get();
+		UserHistory history = UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN, historyComment, sid, client);
 
 		// Update the last login into the DB
 		try {

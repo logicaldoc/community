@@ -163,8 +163,7 @@ public class UserUtil {
 			userDao.initialize(user);
 			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 
-			TenantDAO tenantDao = Context.get(TenantDAO.class);
-			String tenantName = tenantDao.getTenantName(user.getTenantId());
+			String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
 			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
 
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);

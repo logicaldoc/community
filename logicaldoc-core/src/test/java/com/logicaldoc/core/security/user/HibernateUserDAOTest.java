@@ -293,7 +293,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 		user = testSubject.findById(1L);
 
-		PasswordHistoryDAO pDao = (PasswordHistoryDAO) Context.get(PasswordHistoryDAO.class);
+		PasswordHistoryDAO pDao = (PasswordHistoryDAO) PasswordHistoryDAO.get();
 		assertEquals(6, pDao.findByUserId(user.getId(), null).size());
 	}
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is a DAO-service for PasswordHistory-objects.
@@ -13,6 +14,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface PasswordHistoryDAO extends PersistentObjectDAO<PasswordHistory> {
 
+    /**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static PasswordHistoryDAO get() {
+		return Context.get(PasswordHistoryDAO.class);
+	}
+	
 	/**
 	 * Gets the password used by the user in last <b>max</b> times
 	 * 

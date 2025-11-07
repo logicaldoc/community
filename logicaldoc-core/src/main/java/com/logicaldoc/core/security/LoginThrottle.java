@@ -65,7 +65,7 @@ public class LoginThrottle {
 	 */
 	public static void clearFailures(String username, String ip) {
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
-			SequenceDAO sDao = Context.get(SequenceDAO.class);
+			SequenceDAO sDao = SequenceDAO.get();
 			if (StringUtils.isNotEmpty(username))
 				try {
 					sDao.delete(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
@@ -95,7 +95,7 @@ public class LoginThrottle {
 
 		// Update the failed login counters
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
-			SequenceDAO sDao = Context.get(SequenceDAO.class);
+			SequenceDAO sDao = SequenceDAO.get();
 			if (StringUtils.isNotEmpty(username))
 				sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
 			if (StringUtils.isNotEmpty(client.getAddress()))
@@ -105,16 +105,14 @@ public class LoginThrottle {
 		}
 
 		// Record the failed login attempt
-		UserDAO uDao = UserDAO.get();
 		try {
-			User user = uDao.findByUsername(username);
+			User user = UserDAO.get().findByUsername(username);
 			if (user == null) {
 				user = new User();
 				user.setUsername(username);
 				user.setName(username);
 			}
-			UserHistoryDAO dao = Context.get(UserHistoryDAO.class);
-			dao.createUserHistory(user, UserEvent.LOGIN_FAILED, exception.getMessage(), null, client);
+			UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN_FAILED, exception.getMessage(), null, client);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}

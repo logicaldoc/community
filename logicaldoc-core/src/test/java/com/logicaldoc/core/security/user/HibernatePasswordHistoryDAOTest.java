@@ -12,7 +12,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for <code>HibernatePasswordHistoryDAO</code>
@@ -22,38 +21,35 @@ import com.logicaldoc.util.spring.Context;
  */
 public class HibernatePasswordHistoryDAOTest extends AbstractCoreTestCase {
 
-	// Instance under test
-	private PasswordHistoryDAO dao;
+	private PasswordHistoryDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernatePasswordHistoryDAO
-		dao = Context.get(PasswordHistoryDAO.class);
+		testSubject = PasswordHistoryDAO.get();
 	}
 
 	@Test
 	public void testCleanOldHistories() throws PersistenceException {
-		List<PasswordHistory> histories = dao.findByUserId(1L, null);
+		List<PasswordHistory> histories = testSubject.findByUserId(1L, null);
 		assertEquals(3, histories.size());
 
-		dao.cleanOldHistories(1L, 2);
+		testSubject.cleanOldHistories(1L, 2);
 
-		histories = dao.findByUserId(1L, null);
+		histories = testSubject.findByUserId(1L, null);
 		assertEquals(2, histories.size());
 	}
 
 	@Test
 	public void testFindByUserId() throws PersistenceException {
-		List<PasswordHistory> histories = dao.findByUserId(1L, null);
+		List<PasswordHistory> histories = testSubject.findByUserId(1L, null);
 		assertEquals(3, histories.size());
 
-		histories = dao.findByUserId(1L, 100);
+		histories = testSubject.findByUserId(1L, 100);
 		assertEquals(3, histories.size());
 
-		histories = dao.findByUserId(1L, 2);
+		histories = testSubject.findByUserId(1L, 2);
 		assertEquals(2, histories.size());
 		assertEquals("psw1", histories.get(0).getPassword());
 	}
