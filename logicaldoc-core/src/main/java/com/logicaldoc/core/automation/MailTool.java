@@ -103,7 +103,7 @@ public class MailTool {
 			att.setFileName(document.getFileName());
 			String extension = document.getFileExtension();
 			att.setMimeType(MimeType.get(extension));
-			Store store = Context.get(Store.class);
+			Store store = Store.get();
 			att.setData(store.getBytes(document.getId(), store.getResourceName(document, null, null)));
 			email.addAttachment(2 + email.getAttachments().size(), att);
 		}
@@ -224,7 +224,7 @@ public class MailTool {
 			throw new IllegalArgumentException("Filename must end with .msg or .eml");
 
 		EMail email = null;
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		try (InputStream stream = store.getStream(document.getId(), store.getResourceName(document, null, null))) {
 			if (document.getFileName().toLowerCase().endsWith(".eml"))
 				email = MailUtil.messageToMail(stream, extractAttachments);

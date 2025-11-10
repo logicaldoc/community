@@ -28,7 +28,6 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link FormatConversionManager}
@@ -61,7 +60,7 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 
 		docDao = DocumentDAO.get();
 
-		store = Context.get(Store.class);
+		store = Store.get();
 
 		testSubject = FormatConversionManager.get();
 

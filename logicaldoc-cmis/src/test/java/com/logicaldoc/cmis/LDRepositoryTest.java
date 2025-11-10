@@ -658,8 +658,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 			FileUtil.delete(content);
 		}
 
-		Store store = (Store) context.getBean("Store");
-		String mergedContent = new String(store.getBytes(5L, "1.0"));
+		String mergedContent = new String(Store.get().getBytes(5L, "1.0"));
 		assertTrue(mergedContent.contains("content1"));
 		assertTrue(mergedContent.contains("content2"));
 

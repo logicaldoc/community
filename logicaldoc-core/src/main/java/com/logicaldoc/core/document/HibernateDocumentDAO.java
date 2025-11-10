@@ -103,7 +103,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Resource(name = "documentListenerManager")
 	private DocumentListenerManager listenerManager;
 
-	@Resource(name = "Store")
+	@Resource(name = "store")
 	private Store store;
 
 	@Resource(name = "ContextProperties")

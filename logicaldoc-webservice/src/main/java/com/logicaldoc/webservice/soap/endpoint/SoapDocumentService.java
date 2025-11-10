@@ -293,7 +293,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				throw new PermissionException(String.format("The document is protected by a password %s", doc));
 		}
 
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resourceName = store.getResourceName(doc, fileVersion, suffix);
 
 		if (!store.exists(doc.getId(), resourceName)) {
@@ -328,7 +328,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		validateSession(sid);
 
 		ThumbnailManager manager = Context.get(ThumbnailManager.class);
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findDocument(docId);
 
@@ -376,7 +376,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if ("sign.p7m".equalsIgnoreCase(suffix))
 			throw new PermissionException("You cannot upload a signature");
 
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(doc, fileVersion, suffix);
 
 		log.debug("Attach file {}", resource);
@@ -775,7 +775,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	private void createAttachment(EMail email, Document doc) throws IOException {
 		EMailAttachment att = new EMailAttachment();
 		att.setIcon(doc.getIcon());
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(doc, null, null);
 		att.setData(store.getBytes(doc.getId(), resource));
 		att.setFileName(doc.getFileName());

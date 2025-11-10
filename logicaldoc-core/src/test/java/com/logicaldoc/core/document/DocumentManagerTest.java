@@ -89,7 +89,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		documentNoteDao = DocumentNoteDAO.get();
 		documentLinkDao = DocumentLinkDAO.get();
 		store = Context.get(MockStore.class);
-		store2 = Context.get(Store.class);
+		store2 = Store.get();
 
 		testSubject = DocumentManager.get();
 	}
@@ -1111,7 +1111,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 			testSubject.replaceFile(doc.getId(), "1.3", is, history);
 		}
 
-		Store str = Context.get(Store.class);
+		Store str = Store.get();
 
 		doc = docDao.findById(3L);
 		assertNotNull(doc);

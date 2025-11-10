@@ -69,7 +69,6 @@ import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractWPTestCase;
 import com.logicaldoc.web.UploadServlet;
 
@@ -117,7 +116,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		bookDao = BookmarkDAO.get();
 		templateDao = TemplateDAO.get();
 		folderDao = FolderDAO.get();
-		store = Context.get(Store.class);
+		store = Store.get();
 
 		searchEngine = SearchEngine.get();
 

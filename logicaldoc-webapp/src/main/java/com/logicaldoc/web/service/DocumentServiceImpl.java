@@ -1662,7 +1662,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private File createTile(Document doc, String sid) throws IOException {
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String tileResource = store.getResourceName(doc, doc.getFileVersion(), ThumbnailManager.SUFFIX_TILE);
 
 		// In any case try to produce the thumbnail
@@ -1687,7 +1687,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	private void createAttachment(EMail email, long docId, boolean pdfConversion, String sid)
 			throws IOException, PersistenceException {
 		DocumentDAO docDao = DocumentDAO.get();
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		Document doc = docDao.findDocument(docId);
 		String resource = store.getResourceName(doc, null, null);
 
@@ -2522,7 +2522,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				doc = docDao.findById(doc.getDocRef());
 
 			// Obtain the document's file stream
-			Store store = Context.get(Store.class);
+			Store store = Store.get();
 			String resource = store.getResourceName(doc, null, null);
 
 			return store.getString(doc.getId(), resource);
@@ -2704,7 +2704,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return throwServerException(session, log, e1);
 		}
 
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(docId, fileVersion, null);
 
 		GUIDocument guiDocument = getById(docId);
@@ -2802,7 +2802,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException("Not an email file");
 			checkPermission(Permission.WRITE, session.getUser(), doc.getFolder().getId());
 
-			Store store = Context.get(Store.class);
+			Store store = Store.get();
 			String resource = store.getResourceName(docId, fileVersion, null);
 			is = store.getStream(docId, resource);
 

@@ -47,8 +47,7 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		storeRoot.mkdir();
 		new File(storeRoot, "5/doc").mkdirs();
 
-		Store store = (Store) context.getBean("Store");
-		store.init();
+		Store.get().init();
 
 		ResourceUtil.copyResource("data.sql", new File(storeRoot, "5/doc/1.0"));
 	}

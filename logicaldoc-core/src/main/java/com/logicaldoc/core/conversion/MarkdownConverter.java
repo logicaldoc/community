@@ -9,7 +9,6 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Converter to convert Markdown files to PDF or HTML

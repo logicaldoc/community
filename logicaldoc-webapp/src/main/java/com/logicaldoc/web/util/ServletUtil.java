@@ -236,7 +236,7 @@ public class ServletUtil {
 
 		String filename = getFilename(fileName, suffix, document);
 
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(document, fileVersion, null);
 		if (!store.exists(document.getId(), resource)) {
 			throw new FileNotFoundException(resource);
@@ -733,7 +733,7 @@ public class ServletUtil {
 		if (StringUtils.isEmpty(ver))
 			ver = doc.getFileVersion();
 
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 

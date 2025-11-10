@@ -23,7 +23,6 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractFulltextTestCase;
 
 import jakarta.servlet.ServletException;
@@ -191,8 +190,7 @@ test.txt\r
 		mockRequest.setBody(body);
 
 		ServletUtil.uploadDocumentResource(mockRequest, 1L, "abc", "1.0", "1.0");
-		Store store = Context.get(Store.class);
-		assertEquals(8L, store.size(1L, store.getResourceName(1L, "1.0", "abc")));
+		assertEquals(8L, Store.get().size(1L, Store.get().getResourceName(1L, "1.0", "abc")));
 	}
 
 }

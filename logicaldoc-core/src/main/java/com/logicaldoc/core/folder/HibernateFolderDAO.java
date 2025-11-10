@@ -107,7 +107,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Resource(name = "folderHistoryDAO")
 	protected FolderHistoryDAO historyDAO;
 
-	@Resource(name = "Store")
+	@Resource(name = "store")
 	protected Store store;
 
 	@Resource(name = "folderListenerManager")

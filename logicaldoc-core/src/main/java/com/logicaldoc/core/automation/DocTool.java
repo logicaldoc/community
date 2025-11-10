@@ -563,14 +563,13 @@ public class DocTool {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
-		Store store = Context.get(Store.class);
-		String resource = store.getResourceName(doc, fileVersion, suffix);
+		String resource = Store.get().getResourceName(doc, fileVersion, suffix);
 
 		File tmpFile = null;
 
 		try {
 			tmpFile = FileUtil.createTempFile("res-", suffix);
-			store.writeToFile(doc.getId(), resource, tmpFile);
+			Store.get().writeToFile(doc.getId(), resource, tmpFile);
 
 			Document docVO = new Document();
 			docVO.setFileName(newFileName);
@@ -597,7 +596,7 @@ public class DocTool {
 	 * @return the file content as string
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(docId, fileVersion, suffix);
 		return store.getString(docId, resource);
 	}
@@ -611,7 +610,7 @@ public class DocTool {
 	 * @param outputFile the user in name of which to take this action
 	 */
 	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(docId, fileVersion, suffix);
 		try {
 			store.writeToFile(docId, resource, new File(outputFile));

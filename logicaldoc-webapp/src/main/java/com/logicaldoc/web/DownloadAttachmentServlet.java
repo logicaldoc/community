@@ -19,7 +19,6 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 import jakarta.mail.MessagingException;
@@ -82,7 +81,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 
 	private void download(HttpServletRequest request, HttpServletResponse response, long docId, String fileVersion,
 			String filename, Document doc) throws MessagingException, IOException, CMSException {
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(docId, fileVersion, null);
 
 		try (InputStream is = store.getStream(docId, resource)) {

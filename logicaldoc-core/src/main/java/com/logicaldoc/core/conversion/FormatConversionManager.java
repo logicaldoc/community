@@ -66,7 +66,7 @@ public class FormatConversionManager {
 
 	private static final Logger log = LoggerFactory.getLogger(FormatConversionManager.class);
 
-	@Resource(name = "Store")
+	@Resource(name = "store")
 	protected Store store;
 
 	@Resource(name = "tenantDAO")

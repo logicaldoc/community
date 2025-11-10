@@ -28,7 +28,6 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.Group;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Search specialization for the Full text search.

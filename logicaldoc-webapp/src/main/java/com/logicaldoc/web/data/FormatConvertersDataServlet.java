@@ -9,8 +9,8 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverter;
 import com.logicaldoc.core.conversion.FormatConversionManager;
+import com.logicaldoc.core.conversion.FormatConverter;
 import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;

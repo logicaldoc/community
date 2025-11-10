@@ -22,7 +22,7 @@ import jakarta.annotation.Resource;
 public class IndexOptimizer extends Task {
 	public static final String NAME = "IndexOptimizer";
 
-	@Resource(name = "SearchEngine")
+	@Resource(name = "searchEngine")
 	protected SearchEngine indexer;
 
 	@Resource(name = "documentDAO")

@@ -305,8 +305,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	@Override
 	public void saveStoreSettings(List<GUIParameter> settings) throws ServerException {
 		saveSettings(settings);
-		Store store = Context.get(Store.class);
-		store.init();
+		Store.get().init();
 	}
 
 	@Override
@@ -448,10 +447,9 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	public boolean testStore(int id) throws ServerException {
 		validateSession();
 		try {
-			Store manager = Context.get(Store.class);
-			Store store = manager.newStore(id);
+			Store store = Store.get().newStore(id);
 			log.info("Testing store {}", store);
-			return store.test();
+			return Store.get().test();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;

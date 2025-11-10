@@ -263,7 +263,7 @@ public class TicketDownload extends HttpServlet {
 		 */
 		DownloadServlet.processSafeHtml(suffix, null, document);
 
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String resource = store.getResourceName(document, fileVersion, suffix);
 		OutputStream os = null;
 		try (InputStream is = store.getStream(document.getId(), resource)) {

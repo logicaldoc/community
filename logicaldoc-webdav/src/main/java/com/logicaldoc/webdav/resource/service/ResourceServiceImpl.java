@@ -72,7 +72,7 @@ public class ResourceServiceImpl implements ResourceService {
 	@jakarta.annotation.Resource(name = "documentManager")
 	private transient DocumentManager documentManager;
 
-	@jakarta.annotation.Resource(name = "Store")
+	@jakarta.annotation.Resource(name = "store")
 	private transient Store store;
 
 	@jakarta.annotation.Resource(name = "userDAO")

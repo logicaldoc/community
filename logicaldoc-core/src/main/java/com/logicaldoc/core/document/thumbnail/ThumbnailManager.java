@@ -44,7 +44,7 @@ public class ThumbnailManager {
 
 	private static final Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
 
-	@Resource(name = "Store")
+	@Resource(name = "store")
 	private Store store;
 
 	// Key is the extension, value is the associated builder

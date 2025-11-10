@@ -46,10 +46,10 @@ public class StoresDataServlet extends AbstractDataServlet {
 
 		if (types) {
 			// Just list the different stores(types of stores)
-			Store manager = Context.get(Store.class);
-			Set<String> set = manager.getStoreDefinitions().keySet();
+			Store store = Store.get();
+			Set<String> set = store.getStoreDefinitions().keySet();
 			for (String type : set.stream().sorted().toList()) {
-				if (!manager.getStoreDefinitions().get(type).isEnabled())
+				if (!store.getStoreDefinitions().get(type).isEnabled())
 					continue;
 
 				writer.print(START_STORE);
@@ -102,8 +102,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 	private void printParameters(PrintWriter writer, HttpServletRequest request, Session session, int i, String type) {
 		ContextProperties conf = Context.get().getProperties();
 		if (isParameters(request, session)) {
-			Store manager = Context.get(Store.class);
-			Store st = manager.getStoreDefinitions().get(type);
+			Store st = Store.get().getStoreDefinitions().get(type);
 			if (st != null) {
 				for (String name : st.getParameterNames()) {
 					String value = conf.getProperty(STORE + i + "." + name, "");

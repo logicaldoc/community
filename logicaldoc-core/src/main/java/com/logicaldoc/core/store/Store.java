@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -19,6 +20,15 @@ import jakarta.annotation.PreDestroy;
  * @author Michael Scholz, Marco Meschieri
  */
 public interface Store extends Comparable<Store> {
+
+	/**
+	 * Gets the object available in the application context
+	 * 
+	 * @return the instance of this object in the application context
+	 */
+	public static Store get() {
+		return Context.get(Store.class);
+	}
 
 	/**
 	 * The unique identifier
@@ -207,8 +217,7 @@ public interface Store extends Comparable<Store> {
 	 * different store
 	 * 
 	 * @param docId identifier of the document to process
-	 * @param targetStoreId identifier of the store that will receive the
-	 *        files
+	 * @param targetStoreId identifier of the store that will receive the files
 	 * 
 	 * @return number of moved resources
 	 * 
@@ -282,11 +291,11 @@ public interface Store extends Comparable<Store> {
 	 * @return the created instance
 	 */
 	public Store newStore(int id);
-	
+
 	/**
-	 * Retrieves the stores definitions grouped by type 
+	 * Retrieves the stores definitions grouped by type
 	 * 
-	 * @return a map with definitions  <b>type</b> - <b>store prototype</b>
+	 * @return a map with definitions <b>type</b> - <b>store prototype</b>
 	 */
 	public Map<String, Store> getStoreDefinitions();
 }

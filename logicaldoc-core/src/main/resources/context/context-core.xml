@@ -18,9 +18,9 @@
    
    <context:component-scan base-package="com.logicaldoc.core" />
          
-   <bean id="Store" class="${store}" />
+   <bean id="store" class="${store}" />
       
-   <bean id="SearchEngine" class="${searchengine}" />
+   <bean id="searchEngine" class="${searchengine}" />
       
    <bean id="EMailSender" class="com.logicaldoc.core.communication.EMailSender" lazy-init="default">
       <property name="protocol" value="${default.smtp.protocol}" />

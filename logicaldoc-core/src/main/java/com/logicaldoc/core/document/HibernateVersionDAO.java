@@ -36,7 +36,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	private static final String DOC_ID = ".docId=";
 
-	@Resource(name = "Store")
+	@Resource(name = "store")
 	protected Store store;
 
 	@Resource(name = "folderDAO")

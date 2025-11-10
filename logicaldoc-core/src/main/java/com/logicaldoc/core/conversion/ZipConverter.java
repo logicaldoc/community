@@ -8,7 +8,6 @@ import java.util.List;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Converts a Zip file in it's listing

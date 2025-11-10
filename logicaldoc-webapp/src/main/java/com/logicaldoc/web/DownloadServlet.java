@@ -20,7 +20,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.html.HTMLSanitizer;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 import jakarta.servlet.ServletException;
@@ -224,7 +223,7 @@ public class DownloadServlet extends HttpServlet {
 
 	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException {
 		if ("safe.html".equals(suffix)) {
-			Store store = Context.get(Store.class);
+			Store store = Store.get();
 			if (doc != null) {
 				String safeResource = store.getResourceName(doc,
 						version == null ? doc.getFileVersion() : version.getFileVersion(), suffix);

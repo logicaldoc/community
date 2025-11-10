@@ -9,8 +9,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.github.mertakdut.NavPoint;
 import com.github.mertakdut.Reader;
-import com.logicaldoc.core.conversion.FormatConverter;
 import com.logicaldoc.core.conversion.FormatConversionManager;
+import com.logicaldoc.core.conversion.FormatConverter;
 import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;

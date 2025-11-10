@@ -22,7 +22,6 @@ import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.searchengine.SearchOptions;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods to do searches from within Automation

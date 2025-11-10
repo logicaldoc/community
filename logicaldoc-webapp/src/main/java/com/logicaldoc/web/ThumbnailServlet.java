@@ -72,7 +72,7 @@ public class ThumbnailServlet extends HttpServlet {
 		String suffix = request.getParameter(SUFFIX);
 
 		try {
-			Store store = Context.get(Store.class);
+			Store store = Store.get();
 
 			// 1) check if the document exists
 			String id = request.getParameter(DOC_ID);
@@ -92,13 +92,13 @@ public class ThumbnailServlet extends HttpServlet {
 			User user = session.getUser();
 
 			checkPublication(doc, user);
-			
+
 			// Check read and preview
 			DocumentDAO dDao = DocumentDAO.get();
 			Set<Permission> allowedPermissions = dDao.getAllowedPermissions(docId, user.getId());
-			if(!allowedPermissions.contains(Permission.READ) || !allowedPermissions.contains(Permission.PREVIEW))
+			if (!allowedPermissions.contains(Permission.READ) || !allowedPermissions.contains(Permission.PREVIEW))
 				throw new PermissionException(user.getUsername(), doc.toString(), Permission.PREVIEW);
-					
+
 			String resource = store.getResourceName(docId, fileVersion, suffix);
 
 			// 2) prepare the thumbnail
@@ -154,7 +154,7 @@ public class ThumbnailServlet extends HttpServlet {
 	}
 
 	private void createThumbnailImage(String sid, Document doc, String fileVersion, String resource) {
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		if (store.size(doc.getId(), resource) <= 0L) {
 			try {
 				/*
@@ -172,7 +172,7 @@ public class ThumbnailServlet extends HttpServlet {
 	}
 
 	private void createTileImage(String sid, Document doc, String fileVersion, String resource) {
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		String tileResource = store.getResourceName(doc, fileVersion, ThumbnailManager.SUFFIX_TILE);
 		if (store.size(doc.getId(), tileResource) <= 0L) {
 			try {
@@ -186,7 +186,7 @@ public class ThumbnailServlet extends HttpServlet {
 	}
 
 	private void buildThumbnail(String sid, Document doc, String fileVersion, String resource) {
-		Store store = Context.get(Store.class);
+		Store store = Store.get();
 		ThumbnailManager thumbManager = Context.get(ThumbnailManager.class);
 		String thumbResource = store.getResourceName(doc, fileVersion, ThumbnailManager.SUFFIX_THUMB);
 		if (store.size(doc.getId(), thumbResource) <= 0) {

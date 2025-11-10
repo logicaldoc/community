@@ -555,14 +555,12 @@ public class LDRepository {
 
 		NumberFormat nd = new DecimalFormat("0000000000");
 
-		Store store = Context.get(Store.class);
-
 		File chunksFolder = getChunksFolder(documentId);
-		String resourceName = store.getResourceName(doc.getId(), doc.getFileVersion(), null);
+		String resourceName = Store.get().getResourceName(doc.getId(), doc.getFileVersion(), null);
 		if (FileUtils.isEmptyDirectory(chunksFolder)) {
 			// Copy the current file's content
 			File firstChunk = new File(chunksFolder, "chunk-" + nd.format(1));
-			store.writeToFile(doc.getId(), resourceName, firstChunk);
+			Store.get().writeToFile(doc.getId(), resourceName, firstChunk);
 		}
 
 		int totalChunks = chunksFolder.list().length;
@@ -1191,13 +1189,12 @@ public class LDRepository {
 			AbstractDocument doc = getDocument(objectId);
 
 			InputStream stream = null;
-			Store store = Context.get(Store.class);
 			InputStream is = null;
 			if (doc instanceof Document document) {
-				is = store.getStream(doc.getId(), store.getResourceName(document, null, null));
+				is = Store.get().getStream(doc.getId(), Store.get().getResourceName(document, null, null));
 			} else {
 				Version v = (Version) doc;
-				is = store.getStream(v.getDocId(), store.getResourceName(v.getDocId(), v.getFileVersion(), null));
+				is = Store.get().getStream(v.getDocId(), Store.get().getResourceName(v.getDocId(), v.getFileVersion(), null));
 			}
 			stream = new BufferedInputStream(is, BUFFER_SIZE);
 

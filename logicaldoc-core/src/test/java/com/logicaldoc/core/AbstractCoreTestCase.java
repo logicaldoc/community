@@ -73,8 +73,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 		rootStoreOne = new File(Context.get().getProperties().getProperty("store.1.dir"));
 		rootStoreTwo = new File(Context.get().getProperties().getProperty("store.2.dir"));
 
-		Store store = (Store) context.getBean("Store");
-		store.init();
+		Store.get().init();
 
 		/*
 		 * In order to minimize the locks, we write the file only if really

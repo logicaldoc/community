@@ -7,7 +7,6 @@ import java.io.IOException;
 import com.logicaldoc.core.communication.PSTWorker;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Converts a PST file in it's listing

@@ -130,10 +130,10 @@ public class DocumentManager {
 	@Resource(name = "ticketDAO")
 	protected TicketDAO ticketDAO;
 
-	@Resource(name = "SearchEngine")
+	@Resource(name = "searchEngine")
 	protected SearchEngine indexer;
 
-	@Resource(name = "Store")
+	@Resource(name = "store")
 	protected Store store;
 
 	@Resource(name = "ContextProperties")

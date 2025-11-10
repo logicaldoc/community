@@ -34,7 +34,7 @@ public class IndexerTask extends AbstractDocumentProcessor {
 
 	public static final String NAME = "IndexerTask";
 
-	@Resource(name = "SearchEngine")
+	@Resource(name = "searchEngine")
 	protected SearchEngine searchEngine;
 
 	private long totalIndexedDocuments = 0;
