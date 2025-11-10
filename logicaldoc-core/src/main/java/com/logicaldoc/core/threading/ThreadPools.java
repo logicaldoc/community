@@ -53,7 +53,12 @@ public class ThreadPools {
 
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
-
+	
+	/**
+	 * Gets the object available in the application context
+	 * 
+	 * @return the instance of this object in the application context
+	 */
 	public static ThreadPools get() {
 		return Context.get(ThreadPools.class);
 	}

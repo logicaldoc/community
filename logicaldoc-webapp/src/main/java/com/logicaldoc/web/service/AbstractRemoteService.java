@@ -43,7 +43,6 @@ import com.logicaldoc.gui.common.client.ServerValidationError;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.JulianCalendarUtil;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.util.LongRunningOperationCompleteListener;
@@ -307,7 +306,6 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 */
 	protected boolean executeLongRunningOperation(String name, Callable<Void> callable, Session session)
 			throws ServerException {
-		ThreadPools pools = Context.get(ThreadPools.class);
 
 		/*
 		 * Build the notifying thread and schedule for immediate execution (1ms
@@ -316,7 +314,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		NotifyingThread<Void> task = new NotifyingThread<>(callable, name);
 		try {
 			// Schedule and wait up to 20 seconds for completion
-			pools.schedule(task, "LongRunningOperations", 1).get(20, TimeUnit.SECONDS);
+			ThreadPools.get().schedule(task, "LongRunningOperations", 1).get(20, TimeUnit.SECONDS);
 		} catch (TimeoutException e) {
 			// All ok, the task did not complete within the expected time and it
 			// will continue in background

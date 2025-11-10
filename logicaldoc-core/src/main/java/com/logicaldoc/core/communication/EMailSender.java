@@ -238,8 +238,7 @@ public class EMailSender {
 	 * @param dictionary map of variable to pass to the automation
 	 */
 	public void sendAsync(EMail email, String templateName, Map<String, Object> dictionary) {
-		ThreadPools tPools = Context.get(ThreadPools.class);
-		tPools.execute(() -> {
+		ThreadPools.get().execute(() -> {
 			try {
 				send(email, templateName, dictionary);
 			} catch (Exception e) {
@@ -295,8 +294,7 @@ public class EMailSender {
 	 * @param email the email to send
 	 */
 	public void sendAsync(EMail email) {
-		ThreadPools tPools = Context.get(ThreadPools.class);
-		tPools.execute(() -> {
+		ThreadPools.get().execute(() -> {
 			try {
 				send(email);
 			} catch (Exception e) {

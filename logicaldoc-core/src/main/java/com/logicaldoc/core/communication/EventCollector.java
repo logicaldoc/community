@@ -116,8 +116,7 @@ public class EventCollector {
 			}
 		}
 
-		ThreadPools pools = Context.get(ThreadPools.class);
-		pools.execute(() -> {
+		ThreadPools.get().execute(() -> {
 			log.debug("Notify history {}", history);
 			for (EventListener listener : listeners) {
 				listener.newEvent(history);

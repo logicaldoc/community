@@ -18,7 +18,6 @@ import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.CollectionUtil;
 import com.logicaldoc.util.concurrent.LaxSerialFuture;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
 
@@ -115,7 +114,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 				DocumentProcessorCallable<? extends DocumentProcessorStats> callable = prepareCallable(segment);
 				threads.add(callable);
-				futures.add(Context.get(ThreadPools.class).schedule(callable, getName(), 1));
+				futures.add(ThreadPools.get().schedule(callable, getName(), 1));
 				log.debug("Launched the processing for documents {}", segment);
 			}
 

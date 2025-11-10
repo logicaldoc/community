@@ -169,8 +169,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		if (call.getUri() != null)
 			call.setUri(maskCredentials(call.getUri()));
 
-		ThreadPools pools = Context.get(ThreadPools.class);
-		pools.schedule(new WebserviceCallStore(call), THREADPOOL_CALL_STORE, 5000);
+		ThreadPools.get().schedule(new WebserviceCallStore(call), THREADPOOL_CALL_STORE, 5000);
 	}
 
 	private String getURI(Message message) {
