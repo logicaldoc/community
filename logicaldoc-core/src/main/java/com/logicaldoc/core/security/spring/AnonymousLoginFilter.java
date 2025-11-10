@@ -1,6 +1,8 @@
 package com.logicaldoc.core.security.spring;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -8,10 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
+import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
 
@@ -59,6 +66,21 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 					if (anonAuthentication.isAuthenticated()) {
 						String sid = ((LDAuthenticationToken) anonAuthentication).getSid();
 						SessionManager.get().saveSid(request, response, sid);
+						
+						Session session = SessionManager.get().get(sid);
+						
+						/*
+						 * Save the authorities to make Spring happy 
+						 */
+						Collection<GrantedAuthority> authorities = new ArrayList<>();
+						for (String role : session.getUser().getGroups().stream().map(Group::getName).toList())
+							authorities.add(new SimpleGrantedAuthority(role));
+						
+						LDAuthenticationToken auth = new LDAuthenticationToken(session.getUser(), null, authorities);
+						auth.setSid(sid);
+
+						SecurityContext sc = SecurityContextHolder.getContext();
+						sc.setAuthentication(auth);
 					}
 				} catch (AuthenticationException ae) {
 					// Noting to do
