@@ -47,12 +47,11 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		init();
 
 		User user = validateAnonymousUser(username, key, client);
-		if (user != null)
-			return user;
-
+		
 		List<AuthenticationException> errors = new ArrayList<>();
-		user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
-
+		if (user == null)
+			user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
+		
 		/*
 		 * At the end we need to do in any case some default validations
 		 */
