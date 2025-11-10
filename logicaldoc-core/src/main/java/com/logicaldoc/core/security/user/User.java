@@ -720,8 +720,7 @@ public class User extends PersistentObject implements Serializable {
 	}
 
 	public void clearPassword() {
-		this.password = null;
-		this.passwordmd4 = null;
+
 	}
 
 	public Long getDefaultWorkspace() {

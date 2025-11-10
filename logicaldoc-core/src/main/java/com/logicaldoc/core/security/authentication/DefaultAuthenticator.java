@@ -173,9 +173,10 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 	}
 
 	private void markPasswordExpired(User user) {
-		user.setPasswordExpired(1);
 		try {
-			userDAO.store(user);
+			// Just update the column because we do not want to save the entire
+			// object(the password may have been cleared)
+			userDAO.jdbcUpdate("update ld_user set ld_passwordexpired = 1 where ld_id = " + user.getId());
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
