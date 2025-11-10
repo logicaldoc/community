@@ -69,7 +69,7 @@ create table ld_menu (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_deleted int not null, ld_tenantid bigint not null, ld_name nvarchar(255), 
                       ld_parentid bigint not null, ld_icon nvarchar(255), 
                       ld_type int not null, ld_description nvarchar(4000), ld_position int not null, 
-                      ld_enabled int not null, ld_routineid bigint, ld_automation varchar(4000), primary key (ld_id));
+                      ld_enabled int not null, ld_routineid bigint, ld_automation varchar(max), primary key (ld_id));
 create table ld_menu_acl (ld_menuid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, primary key (ld_menuid, ld_groupid));
 create table ld_recipient (ld_messageid bigint not null, ld_name nvarchar(255) not null, ld_address nvarchar(255) not null, ld_mode nvarchar(255) not null, ld_type int not null, ld_read int not null);
 create table ld_systemmessage (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
