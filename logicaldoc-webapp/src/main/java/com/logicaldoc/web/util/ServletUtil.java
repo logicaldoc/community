@@ -240,7 +240,7 @@ public class ServletUtil {
 		Store store = Store.get();
 
 		StoreResource resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).build();
-		if (!store.exists(document.getId(), resource.name())) {
+		if (!store.exists(resource)) {
 			throw new FileNotFoundException(resource.name());
 		}
 

@@ -41,6 +41,7 @@ import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
@@ -563,13 +564,11 @@ public class DocTool {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
-		String resource = Store.get().getResourceName(doc, fileVersion, suffix);
-
 		File tmpFile = null;
-
 		try {
 			tmpFile = FileUtil.createTempFile("res-", suffix);
-			Store.get().writeToFile(doc.getId(), resource, tmpFile);
+			Store.get().writeToFile(
+					new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(suffix).build(), tmpFile);
 
 			Document docVO = new Document();
 			docVO.setFileName(newFileName);
@@ -611,9 +610,10 @@ public class DocTool {
 	 */
 	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
 		Store store = Store.get();
-		String resource = store.getResourceName(docId, fileVersion, suffix);
+		StoreResource resource = new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix)
+				.build();
 		try {
-			store.writeToFile(docId, resource, new File(outputFile));
+			store.writeToFile(resource, new File(outputFile));
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}

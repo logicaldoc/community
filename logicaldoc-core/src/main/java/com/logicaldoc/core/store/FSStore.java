@@ -113,9 +113,9 @@ public class FSStore extends AbstractStore {
 	}
 
 	@Override
-	public void writeToFile(long docId, String resource, File out) throws IOException {
-		File container = getContainer(docId);
-		File file = new File(container, resource);
+	public void writeToFile(StoreResource resource, File out) throws IOException {
+		File container = getContainer(resource.getDocId());
+		File file = new File(container, resource.name());
 		FileUtil.copyFile(file, out);
 	}
 
@@ -175,9 +175,9 @@ public class FSStore extends AbstractStore {
 	}
 
 	@Override
-	public boolean exists(long docId, String resource) {
-		File file = getContainer(docId);
-		file = new File(file, sanitizeResourceName(resource));
+	public boolean exists(StoreResource resource) {
+		File file = getContainer(resource.getDocId());
+		file = new File(file, resource.name());
 		return file.exists();
 	}
 

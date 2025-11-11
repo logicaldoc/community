@@ -109,7 +109,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			Version version = null;
 			if (i % 2 == 0) {
 				version = Version.create(doc, user, "checkin " + i, DocumentEvent.CHECKEDIN, true);
-				store.store(ResourceUtil.getInputStream("data.sql"), 
+				store.store(ResourceUtil.getInputStream("data.sql"),
 						new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
 			} else {
 				version = Version.create(doc, user, "edit " + i, DocumentEvent.CHANGED, true);
@@ -123,11 +123,12 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		// Check if all the versions point to an existing file
 		for (Version version : versions)
-			assertTrue(store.exists(version.getDocId(), version.getFileVersion()));
+			assertTrue(store.exists(new StoreResource.Builder().version(version).build()));
 
 		// Check if no files of deleted versions are still in the store
 		Set<String> actualFileVersions = versions.stream().map(Version::getFileVersion).collect(Collectors.toSet());
-		List<StoreResource> currentResourceFiles = store.listResources(doc.getId(), null).stream().filter(r -> !r.name().contains("-")).toList();
+		List<StoreResource> currentResourceFiles = store.listResources(doc.getId(), null).stream()
+				.filter(r -> !r.name().contains("-")).toList();
 		for (StoreResource resource : currentResourceFiles)
 			assertTrue(actualFileVersions.contains(resource.name()));
 
@@ -136,13 +137,14 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		doc.setVersion("1.0");
 		doc.setFileVersion("1.0");
 		docDao.store(doc);
-		
+
 		Version version = Version.create(doc, user, "", DocumentEvent.STORED, true);
 		testSubject.store(version);
 		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
 
 		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
-			store.store(is, new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build()); 
+			store.store(is,
+					new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
 		}
 
 		doc = docDao.findById(1);
@@ -152,28 +154,26 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		assertEquals("2.0", version.getVersion());
 
 		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
-			store.store(is, new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
+			store.store(is,
+					new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
 		}
 
 		assertEquals(versionsCap, versions.size());
-		for (Version ver : versions) {
-			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			store.exists(doc.getId(), res);
-		}
+		for (Version ver : versions)
+			store.exists(new StoreResource.Builder().docId(doc.getId()).fileVersion(ver.getFileVersion()).build());
 
 		version = Version.create(doc, user, "", DocumentEvent.CHECKEDIN, false);
 		testSubject.store(version);
 		assertEquals("2.1", version.getVersion());
 
 		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
-			store.store(is, new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
+			store.store(is,
+					new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
 		}
 
 		assertEquals(versionsCap, versions.size());
-		for (Version ver : versions) {
-			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			store.exists(doc.getId(), res);
-		}
+		for (Version ver : versions)
+			store.exists(new StoreResource.Builder().docId(doc.getId()).fileVersion(ver.getFileVersion()).build());
 
 		FolderDAO folderDao = FolderDAO.get();
 		Folder folder1 = new Folder();

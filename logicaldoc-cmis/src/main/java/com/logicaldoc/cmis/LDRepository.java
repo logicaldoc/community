@@ -563,7 +563,7 @@ public class LDRepository {
 		if (FileUtils.isEmptyDirectory(chunksFolder)) {
 			// Copy the current file's content
 			File firstChunk = new File(chunksFolder, "chunk-" + nd.format(1));
-			Store.get().writeToFile(doc.getId(), resource.name(), firstChunk);
+			Store.get().writeToFile(resource, firstChunk);
 		}
 
 		int totalChunks = chunksFolder.list().length;

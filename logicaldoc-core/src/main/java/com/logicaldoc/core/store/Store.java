@@ -132,22 +132,21 @@ public interface Store extends Comparable<Store> {
 	/**
 	 * Checks if the passed resource exists in the document's container
 	 * 
-	 * @param docId ID of the document
-	 * @param resource Name of the resource
+	 * @param resource The resource
+	 * 
 	 * @return true only if the resource already exists
 	 */
-	public boolean exists(long docId, String resource);
+	public boolean exists(StoreResource resource);
 
 	/**
 	 * Writes the specified resource in a file
 	 * 
-	 * @param docId The document identifier
-	 * @param resource Name of the resource
+	 * @param resource The resource
 	 * @param out File that will receive the resource's content
 	 * 
 	 * @throws IOException error writing the file or reading the resource
 	 */
-	public void writeToFile(long docId, String resource, File out) throws IOException;
+	public void writeToFile(StoreResource resource, File out) throws IOException;
 
 	/**
 	 * Writes the specified resource in an output stream

@@ -100,13 +100,14 @@ public class FormatConversionManager {
 	 */
 	public byte[] getPdfContent(Document document, String fileVersion, String sid)
 			throws IOException, PersistenceException {
-		String resource = store.getResourceName(document.getId(), getSuitableFileVersion(document, fileVersion),
-				PDF_CONVERSION_SUFFIX);
+		StoreResource resource = new StoreResource.Builder().document(document)
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(PDF_CONVERSION_SUFFIX).build();
 		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
-			resource = store.getResourceName(document, getSuitableFileVersion(document, fileVersion), null);
-		if (!store.exists(document.getId(), resource))
+			resource = new StoreResource.Builder().document(document)
+					.fileVersion(getSuitableFileVersion(document, fileVersion)).build();
+		if (!store.exists(resource))
 			convertToPdf(document, fileVersion, sid);
-		return store.getBytes(document.getId(), resource);
+		return store.getBytes(resource.getDocId(), resource.name());
 	}
 
 	/**
@@ -128,9 +129,9 @@ public class FormatConversionManager {
 		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
 			resource = new StoreResource.Builder().docId(document.getId())
 					.fileVersion(getSuitableFileVersion(document, fileVersion)).build();
-		if (!store.exists(document.getId(), resource.name()))
+		if (!store.exists(resource))
 			convertToPdf(document, fileVersion, sid);
-		store.writeToFile(document.getId(), resource.name(), out);
+		store.writeToFile(resource, out);
 	}
 
 	/**
@@ -260,9 +261,10 @@ public class FormatConversionManager {
 	 * @param transaction informations about the session
 	 * 
 	 * @throws IOException if an error happens during the conversion
+	 * @throws PersistenceException Error in the data layer
 	 */
 	public void convertToFile(Document document, String fileVersion, File out, DocumentHistory transaction)
-			throws IOException {
+			throws IOException, PersistenceException {
 		String fileName = DocUtil.getFileName(document, fileVersion);
 		FormatConverter converter = getConverter(fileName, out.getName());
 		if (converter == null)
@@ -495,13 +497,13 @@ public class FormatConversionManager {
 	 * @return the temporary file containing the document's contents
 	 * 
 	 * @throws IOException raised if the file cannot be written
+	 * @throws PersistenceException Error in the data layer
 	 */
-	private File writeToFile(Document document, String fileVersion) throws IOException {
+	private File writeToFile(Document document, String fileVersion) throws IOException, PersistenceException {
 		File target = FileUtil.createTempFile("scr",
 				"." + AbstractFormatConverter.getExtension(document.getFileName()));
-		String fver = getSuitableFileVersion(document, fileVersion);
-		String resource = store.getResourceName(document, fver, null);
-		store.writeToFile(document.getId(), resource, target);
+		store.writeToFile(new StoreResource.Builder().document(document)
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).build(), target);
 		return target;
 	}
 

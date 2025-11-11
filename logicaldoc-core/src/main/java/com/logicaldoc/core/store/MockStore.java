@@ -92,7 +92,7 @@ public class MockStore extends FSStore {
 			targetFile.getParentFile().mkdirs();
 
 			// Extract the original file into a temporary location
-			writeToFile(docId, resource.name(), targetFile);
+			writeToFile(resource, targetFile);
 			moved++;
 
 			// Delete the original resource

@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 
@@ -34,19 +35,21 @@ public class CatchAllParser extends AbstractParser {
 			FormatConversionManager.get().convertToPdf(parameters.getDocument(), parameters.getFileVersion(), null);
 
 			Store store = Context.get(Store.class);
-			String pdfResource = store
-					.getResourceName(parameters.getDocument(),
-							parameters.getFileVersion() != null ? parameters.getFileVersion()
-									: parameters.getDocument().getFileVersion(),
-							FormatConversionManager.PDF_CONVERSION_SUFFIX);
-			if (store.exists(parameters.getDocument().getId(), pdfResource)) {
+
+			StoreResource pdfResource = new StoreResource.Builder().document(parameters.getDocument())
+					.fileVersion(parameters.getFileVersion() != null ? parameters.getFileVersion()
+							: parameters.getDocument().getFileVersion())
+					.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
+
+			if (store.exists(pdfResource)) {
 				Parser parser = ParserFactory.getParser("pdf");
-				content.append(parser.parse(store.getStream(parameters.getDocument().getId(), pdfResource),
+				content.append(parser.parse(store.getStream(pdfResource.getDocId(), pdfResource.name()),
 						new ParseParameters(null, "output.pdf", null, parameters.getEncoding(), parameters.getLocale(),
 								parameters.getTenant())));
-			} else
+			} else {
 				log.warn("Cannot convert the file {} into pdf in order to parse the contents",
 						parameters.getFileName());
+			}
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}

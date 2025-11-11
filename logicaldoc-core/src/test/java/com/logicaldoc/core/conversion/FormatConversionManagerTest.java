@@ -118,10 +118,10 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 		StoreResource pdfResource = new StoreResource.Builder().document(document)
 				.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
 		store.delete(pdfResource);
-		assertFalse(store.exists(document.getId(), pdfResource.name()));
+		assertFalse(store.exists(pdfResource));
 
 		testSubject.convertToPdf(document, session.getSid());
-		assertTrue(store.exists(document.getId(), pdfResource.name()));
+		assertTrue(store.exists(pdfResource));
 
 		assertTrue(testSubject.getPdfContent(document, document.getFileVersion(), session.getSid()).length > 0);
 	}

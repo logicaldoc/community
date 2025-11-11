@@ -295,19 +295,19 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		}
 
 		Store store = Store.get();
-		String resourceName = store.getResourceName(doc, fileVersion, suffix);
-
-		if (!store.exists(doc.getId(), resourceName)) {
-			throw new WebserviceException("Resource " + resourceName + " not found");
+		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(suffix)
+				.build();
+		if (!store.exists(resource)) {
+			throw new WebserviceException("Resource %s not found".formatted(resource));
 		}
 
-		log.debug("Attach file {}", resourceName);
+		log.debug("Attach file {}", resource);
 
 		String fileName = doc.getFileName();
 		if (StringUtils.isNotEmpty(suffix))
 			fileName = suffix;
 		String mime = MimeType.getByFilename(fileName);
-		return new DataHandler(new InputStreamDataSource(store.getStream(doc.getId(), resourceName), mime));
+		return new DataHandler(new InputStreamDataSource(store.getStream(resource.getDocId(), resource.name()), mime));
 	}
 
 	@Override
@@ -335,8 +335,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		if (!type.toLowerCase().endsWith(".png"))
 			type += ".png";
-		String resource = store.getResourceName(doc, fileVersion, type);
-		if (!store.exists(docId, resource)) {
+		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(type).build();
+		if (!store.exists(resource)) {
 			if (type.equals(ThumbnailManager.SUFFIX_THUMB))
 				manager.createTumbnail(doc, fileVersion, sid);
 			else if (type.equals(ThumbnailManager.SUFFIX_TILE))
@@ -348,7 +348,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				 * In this case the resource is like thumb450.png so we extract
 				 * the size from the name
 				 */
-				String sizeStr = resource.substring(resource.indexOf('-') + 6, resource.lastIndexOf('.'));
+				String sizeStr = resource.name().substring(resource.name().indexOf('-') + 6, resource.name().lastIndexOf('.'));
 				manager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
 			}
 		}
@@ -772,12 +772,12 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		return document;
 	}
 
-	private void createAttachment(EMail email, Document doc) throws IOException {
+	private void createAttachment(EMail email, Document doc) throws IOException, PersistenceException {
 		EMailAttachment att = new EMailAttachment();
 		att.setIcon(doc.getIcon());
-		Store store = Store.get();
-		String resource = store.getResourceName(doc, null, null);
-		att.setData(store.getBytes(doc.getId(), resource));
+		
+		StoreResource resource=new StoreResource.Builder().document(doc).build();
+		att.setData(Store.get().getBytes(resource.getDocId(), resource.name()));
 		att.setFileName(doc.getFileName());
 		String extension = doc.getFileExtension();
 		att.setMimeType(MimeType.get(extension));

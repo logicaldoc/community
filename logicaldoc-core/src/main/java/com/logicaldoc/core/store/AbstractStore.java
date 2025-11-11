@@ -214,14 +214,14 @@ public abstract class AbstractStore implements Store {
 	}
 
 	@Override
-	public void writeToFile(long docId, String resource, File out) throws IOException {
+	public void writeToFile(StoreResource resource, File out) throws IOException {
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out, false), DEFAULT_BUFFER_SIZE);
-				InputStream is = getStream(docId, resource);) {
+				InputStream is = getStream(resource.getDocId(), resource.name());) {
 			FileUtil.writeFile(is, out.getPath());
 		} catch (IOException ioe) {
 			throw ioe;
 		} catch (Exception e) {
-			log.error("Error writing document {} into {}", docId, out.getPath());
+			log.error("Error writing document {} into {}", resource.getDocId(), out.getPath());
 			log.error(e.getMessage(), e);
 		}
 	}
@@ -313,14 +313,14 @@ public abstract class AbstractStore implements Store {
 			tmpFile = FileUtil.createTempFile("st-test", ".txt");
 			FileUtil.writeFile("test", tmpFile.getAbsolutePath());
 			store(tmpFile, resource);
-			return exists(0L, resource.name());
+			return exists(resource);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;
 		} finally {
 			FileUtil.delete(tmpFile);
 			try {
-				if (exists(0L, resource.name()))
+				if (exists(resource))
 					delete(resource);
 			} catch (Exception t) {
 				// Noting to do

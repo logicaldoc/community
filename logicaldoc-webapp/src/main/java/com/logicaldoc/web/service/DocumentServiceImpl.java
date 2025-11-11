@@ -1677,9 +1677,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 		}
 
-		if (store.exists(doc.getId(), tileResource.name())) {
+		if (store.exists(tileResource)) {
 			File file = FileUtil.createTempFile("tile-", ".png");
-			store.writeToFile(doc.getId(), tileResource.name(), file);
+			store.writeToFile(tileResource, file);
 			return file;
 		}
 
@@ -1691,7 +1691,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO docDao = DocumentDAO.get();
 		Store store = Store.get();
 		Document doc = docDao.findDocument(docId);
-		String resource = store.getResourceName(doc, null, null);
+		StoreResource resource = new StoreResource.Builder().document(doc).build();
 
 		boolean convertToPdf = pdfConversion;
 		if ((doc.getDocRef() != null) && ("pdf".equals(doc.getDocRefType()))) {
@@ -1709,13 +1709,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (convertToPdf) {
 			if (!"pdf".equals(FileUtil.getExtension(doc.getFileName().toLowerCase()))) {
 				FormatConversionManager.get().convertToPdf(doc, sid);
-				resource = store.getResourceName(doc, null, "conversion.pdf");
+				resource = new StoreResource.Builder().document(doc)
+						.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
 			}
 			att.setMimeType(MimeType.get("pdf"));
 			att.setFileName(FileUtil.getBaseName(doc.getFileName()) + ".pdf");
 		}
 
-		att.setData(store.getBytes(doc.getId(), resource));
+		att.setData(store.getBytes(doc.getId(), resource.name()));
 
 		email.addAttachment(2 + email.getAttachments().size(), att);
 	}

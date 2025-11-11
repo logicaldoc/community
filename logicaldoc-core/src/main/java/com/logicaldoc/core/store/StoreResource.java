@@ -106,7 +106,7 @@ public class StoreResource {
 		private String suffix;
 
 		public Builder fileVersion(String fileVersion) {
-			this.fileVersion = fileVersion;
+			this.fileVersion = StringUtils.defaultString(fileVersion, this.fileVersion);
 			return this;
 		}
 
@@ -120,6 +120,13 @@ public class StoreResource {
 			return this;
 		}
 
+		public Builder resource(StoreResource res) {
+			this.docId=res.docId;
+			this.fileVersion=res.fileVersion;
+			this.suffix=res.suffix;
+			return this;
+		}
+		
 		public Builder name(String name) {
 			if (name.contains("-")) {
 				fileVersion = name.substring(0, name.indexOf('-')).trim();

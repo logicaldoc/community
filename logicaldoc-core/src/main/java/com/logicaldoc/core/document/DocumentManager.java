@@ -1925,7 +1925,8 @@ public class DocumentManager {
 					docVO.setTagsFromWords(tags);
 				}
 
-				store.writeToFile(document.getId(), store.getResourceName(document, ver.getFileVersion(), null), tmp);
+				store.writeToFile(
+						new StoreResource.Builder().document(document).fileVersion(ver.getFileVersion()).build(), tmp);
 				DocumentHistory checkinTransaction = new DocumentHistory(transaction);
 				checkinTransaction.setDate(new Date());
 				checkin(document.getId(), tmp, ver.getFileName(), false, docVO, checkinTransaction);

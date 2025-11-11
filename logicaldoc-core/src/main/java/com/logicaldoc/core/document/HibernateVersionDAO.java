@@ -134,10 +134,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Override
 	public void updateDigest(Version version) throws PersistenceException {
 		initialize(version);
-		String resource = store.getResourceName(version.getDocId(), version.getFileVersion(), null);
-		if (store.exists(version.getDocId(), resource)) {
+		StoreResource resource = new StoreResource.Builder().version(version).build();
+		if (store.exists(resource)) {
 
-			try (InputStream in = store.getStream(version.getDocId(), resource);) {
+			try (InputStream in = store.getStream(resource.getDocId(), resource.name());) {
 				version.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
 				log.error("Cannot retrieve the content of version {}", version);

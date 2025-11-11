@@ -229,7 +229,7 @@ public class DownloadServlet extends HttpServlet {
 				StoreResource safeResource = new StoreResource.Builder().document(doc)
 						.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).suffix(suffix)
 						.build();
-				if (!store.exists(safeResource.getDocId(), safeResource.name())) {
+				if (!store.exists(safeResource)) {
 					StoreResource unsafeResource = new StoreResource.Builder().document(doc)
 							.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).build();
 					String unsafe = store.getString(doc.getId(), unsafeResource.name());

@@ -857,6 +857,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		doc1.setFolder(folder1);
 		doc1.setFileName("doc1_name");
 		doc1.setVersion("1.0");
+		doc1.setFileVersion("1.0");
 		docDao.store(doc1);
 		assertNotNull(doc1);
 
@@ -865,10 +866,12 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		doc2.setFileName("doc2_name");
 		doc2.setDocRef(3L);
 		doc2.setVersion("1.0");
+		doc2.setFileVersion("1.0");
 		docDao.store(doc2);
 		assertNotNull(doc2);
 
-		store2.store(ResourceUtil.getInputStream("allowed-commands.txt"), new StoreResource.Builder().docId(3L).fileVersion(doc2.getFileVersion()).build());
+		store2.store(ResourceUtil.getInputStream("allowed-commands.txt"),
+				new StoreResource.Builder().docId(3L).fileVersion(doc2.getFileVersion()).build());
 
 		try {
 			testSubject.replaceAlias(doc2.getId(), transaction);
@@ -1031,7 +1034,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertTrue(store.exists(1L, store.getResourceName(doc, null, null)));
+		assertTrue(store.exists(new StoreResource.Builder().document(doc).build()));
 
 		testSubject.destroyDocument(1L, transaction);
 		assertNotNull(docDao.findById(1L));

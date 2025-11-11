@@ -49,6 +49,7 @@ import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
@@ -590,9 +591,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void updateDigest(Document doc) throws PersistenceException {
-		String resource = store.getResourceName(doc, doc.getFileVersion(), null);
-		if (store.exists(doc.getId(), resource)) {
-			try (InputStream in = store.getStream(doc.getId(), resource);) {
+		StoreResource resource=new StoreResource.Builder().document(doc).build();
+		if (store.exists(resource)) {
+			try (InputStream in = store.getStream(doc.getId(), resource.name());) {
 				doc.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
 				log.error("Cannot retrieve the content of document {}", doc);

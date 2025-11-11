@@ -32,6 +32,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxService;
@@ -188,10 +189,10 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		File temp = null;
 		try {
 			temp = FileUtil.createTempFile("dboxupload", ".tmp");
-			store.writeToFile(docId, store.getResourceName(docId, null, null), temp);
-			dropbox.uploadFile(temp, path);
-
 			Document doc = ddao.findById(docId);
+
+			store.writeToFile(new StoreResource.Builder().document(doc).build(), temp);
+			dropbox.uploadFile(temp, path);
 
 			// Add an history entry to track the download of the document
 			DocumentHistory history = new DocumentHistory();

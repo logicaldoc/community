@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.store.Store;
@@ -239,13 +240,12 @@ public class ThumbnailManager {
 	 * @return the temporary file
 	 * 
 	 * @throws IOException raised if the temporary file cannot be written
+	 * @throws PersistenceException error in the data layer
 	 */
-	private File writeToTempFile(Document document, String fileVersion) throws IOException {
+	private File writeToTempFile(Document document, String fileVersion) throws IOException, PersistenceException {
 		File target = FileUtil.createTempFile("scr",
 				"." + FileUtil.getExtension(DocUtil.getFileName(document, fileVersion)));
-		String fver = getSuitableFileVersion(document, fileVersion);
-		String resource = store.getResourceName(document, fver, null);
-		store.writeToFile(document.getId(), resource, target);
+		store.writeToFile(new StoreResource.Builder().document(document).fileVersion(getSuitableFileVersion(document, fileVersion)).build(), target);
 		return target;
 	}
 

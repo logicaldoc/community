@@ -65,7 +65,7 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 
 		StoreResource thumbResource = new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_THUMB)
 				.build();
-		assertFalse(store.exists(docId, thumbResource.name()));
+		assertFalse(store.exists(thumbResource));
 
 		doc = docDao.findById(1L);
 		testSubject.createTumbnail(doc, session.getSid());
@@ -73,7 +73,7 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 		assertTrue(size1 > 0);
 
 		store.delete(thumbResource);
-		assertFalse(store.exists(docId, thumbResource.name()));
+		assertFalse(store.exists(thumbResource));
 
 		testSubject.createTumbnail(doc, null, 250, 99, session.getSid());
 		long size2 = store.size(thumbResource);
@@ -86,6 +86,5 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 		testSubject.createMobile(doc, session.getSid());
 		assertTrue(
 				store.size(new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_TILE).build()) > 0);
-
 	}
 }
