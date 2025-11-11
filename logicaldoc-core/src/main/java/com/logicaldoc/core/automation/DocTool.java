@@ -630,7 +630,7 @@ public class DocTool {
 	public void convertPDF(Document doc) {
 		try {
 			FormatConversionManager.get().convertToPdf(doc, null);
-		} catch (IOException e) {
+		} catch (IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
 	}

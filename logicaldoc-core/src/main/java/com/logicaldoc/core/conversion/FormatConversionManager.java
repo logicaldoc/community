@@ -30,6 +30,7 @@ import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
@@ -95,8 +96,10 @@ public class FormatConversionManager {
 	 * @return The content of the PDF as bytes
 	 * 
 	 * @throws IOException If something went wrong
+	 * @throws PersistenceException Error in the persistence layer
 	 */
-	public byte[] getPdfContent(Document document, String fileVersion, String sid) throws IOException {
+	public byte[] getPdfContent(Document document, String fileVersion, String sid)
+			throws IOException, PersistenceException {
 		String resource = store.getResourceName(document.getId(), getSuitableFileVersion(document, fileVersion),
 				PDF_CONVERSION_SUFFIX);
 		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
@@ -116,15 +119,18 @@ public class FormatConversionManager {
 	 * @param sid (optional)
 	 * 
 	 * @throws IOException If something went wrong
+	 * @throws PersistenceException Error in the persistence layer
 	 */
-	public void writePdfToFile(Document document, String fileVersion, File out, String sid) throws IOException {
-		String resource = store.getResourceName(document.getId(), getSuitableFileVersion(document, fileVersion),
-				PDF_CONVERSION_SUFFIX);
+	public void writePdfToFile(Document document, String fileVersion, File out, String sid)
+			throws IOException, PersistenceException {
+		StoreResource resource = new StoreResource.Builder().docId(document.getId())
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(PDF_CONVERSION_SUFFIX).build();
 		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
-			resource = store.getResourceName(document.getId(), getSuitableFileVersion(document, fileVersion), null);
-		if (!store.exists(document.getId(), resource))
+			resource = new StoreResource.Builder().docId(document.getId())
+					.fileVersion(getSuitableFileVersion(document, fileVersion)).build();
+		if (!store.exists(document.getId(), resource.name()))
 			convertToPdf(document, fileVersion, sid);
-		store.writeToFile(document.getId(), resource, out);
+		store.writeToFile(document.getId(), resource.name(), out);
 	}
 
 	/**
@@ -137,8 +143,10 @@ public class FormatConversionManager {
 	 * @param sid (optional)
 	 * 
 	 * @throws IOException If something went wrong
+	 * @throws PersistenceException Error in the persistence layer
 	 */
-	public void convertToPdf(Document document, String fileVersion, String sid) throws IOException {
+	public void convertToPdf(Document document, String fileVersion, String sid)
+			throws IOException, PersistenceException {
 		String fileName = DocUtil.getFileName(document, fileVersion);
 
 		if ("pdf".equals(AbstractFormatConverter.getExtension(fileName))) {
@@ -146,10 +154,10 @@ public class FormatConversionManager {
 			return;
 		}
 
-		String resource = store.getResourceName(document, getSuitableFileVersion(document, fileVersion),
-				PDF_CONVERSION_SUFFIX);
+		StoreResource resource = new StoreResource.Builder().document(document)
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(PDF_CONVERSION_SUFFIX).build();
 
-		if (store.size(document.getId(), resource) > 0L) {
+		if (store.size(resource) > 0L) {
 			log.debug("Pdf conversion already available for document {}", document.getId());
 			return;
 		}
@@ -175,7 +183,7 @@ public class FormatConversionManager {
 						String.format("The converter %s was unable to convert as pdf the document: %s - %s",
 								converter.getClass().getSimpleName(), document.getId(), fileName));
 
-			store.store(dest, document.getId(), resource);
+			store.store(dest, resource);
 		} finally {
 			// Delete temporary resources
 			FileUtil.delete(src);
@@ -190,8 +198,9 @@ public class FormatConversionManager {
 	 * @param sid identifier of the session
 	 * 
 	 * @throws IOException If something went wrong
+	 * @throws PersistenceException Error in the persistence layer
 	 */
-	public void convertToPdf(Document document, String sid) throws IOException {
+	public void convertToPdf(Document document, String sid) throws IOException, PersistenceException {
 		convertToPdf(document, null, sid);
 	}
 
@@ -439,8 +448,10 @@ public class FormatConversionManager {
 		List<FormatConverter> formatConverters = getConverters().get(inOutkey);
 		if (CollectionUtils.isEmpty(formatConverters))
 			formatConverters = getConverters().get("*-pdf");
-		if (CollectionUtils.isEmpty(formatConverters))
+		if (CollectionUtils.isEmpty(formatConverters)) {
 			log.warn("No format converter for file {}", inFileName);
+			formatConverters = new ArrayList<>();
+		}
 
 		// Get the first available and enabled converter
 		FormatConverter converter = formatConverters.stream().filter(c -> c.isEnabled()).findFirst()

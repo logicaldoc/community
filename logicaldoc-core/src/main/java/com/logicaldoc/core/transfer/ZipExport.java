@@ -280,7 +280,7 @@ public class ZipExport {
 		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
 			try {
 				FormatConversionManager.get().convertToPdf(document, null);
-			} catch (IOException e) {
+			} catch (IOException | PersistenceException e) {
 				log.warn(e.getMessage(), e);
 				return;
 			}

@@ -54,6 +54,7 @@ import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.config.ContextProperties;
@@ -376,12 +377,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if ("sign.p7m".equalsIgnoreCase(suffix))
 			throw new PermissionException("You cannot upload a signature");
 
-		Store store = Store.get();
-		String resource = store.getResourceName(doc, fileVersion, suffix);
-
+		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(suffix)
+				.build();
 		log.debug("Attach file {}", resource);
 
-		store.store(content.getInputStream(), doc.getId(), resource);
+		Store.get().store(content.getInputStream(), resource);
 	}
 
 	@Override

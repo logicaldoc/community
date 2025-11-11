@@ -21,6 +21,7 @@ import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -153,49 +154,47 @@ public class ThumbnailServlet extends HttpServlet {
 			log.error("Unknow resource {}", resource);
 	}
 
-	private void createThumbnailImage(String sid, Document doc, String fileVersion, String resource) {
+	private void createThumbnailImage(String sid, Document doc, String fileVersion, String resourceName) {
 		Store store = Store.get();
-		if (store.size(doc.getId(), resource) <= 0L) {
+		if (store.size(new StoreResource.Builder().docId(doc.getId()).name(resourceName).build()) <= 0L) {
 			try {
 				/*
 				 * In this case the resource is like thumn450.png so we extract
 				 * the size from the name
 				 */
-				String sizeStr = resource.substring(resource.indexOf('-') + 6, resource.lastIndexOf('.'));
-				ThumbnailManager thumbManager = Context.get(ThumbnailManager.class);
-				thumbManager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
-				log.debug("Created custom thumbnail {}", resource);
+				String sizeStr = resourceName.substring(resourceName.indexOf('-') + 6, resourceName.lastIndexOf('.'));
+				Context.get(ThumbnailManager.class).createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null,
+						sid);
+				log.debug("Created custom thumbnail {}", resourceName);
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		}
 	}
 
-	private void createTileImage(String sid, Document doc, String fileVersion, String resource) {
+	private void createTileImage(String sid, Document doc, String fileVersion, String resourceName) {
 		Store store = Store.get();
-		String tileResource = store.getResourceName(doc, fileVersion, ThumbnailManager.SUFFIX_TILE);
-		if (store.size(doc.getId(), tileResource) <= 0L) {
-			try {
-				ThumbnailManager thumbManager = Context.get(ThumbnailManager.class);
-				thumbManager.createTile(doc, fileVersion, sid);
-				log.debug("Created tile {}", resource);
-			} catch (Exception t) {
-				log.error(t.getMessage(), t);
+		try {
+			if (store.size(new StoreResource.Builder().document(doc).fileVersion(fileVersion)
+					.suffix(ThumbnailManager.SUFFIX_TILE).build()) <= 0L) {
+				Context.get(ThumbnailManager.class).createTile(doc, fileVersion, sid);
+				log.debug("Created tile {}", resourceName);
 			}
+		} catch (Exception t) {
+			log.error(t.getMessage(), t);
 		}
 	}
 
 	private void buildThumbnail(String sid, Document doc, String fileVersion, String resource) {
 		Store store = Store.get();
-		ThumbnailManager thumbManager = Context.get(ThumbnailManager.class);
-		String thumbResource = store.getResourceName(doc, fileVersion, ThumbnailManager.SUFFIX_THUMB);
-		if (store.size(doc.getId(), thumbResource) <= 0) {
-			try {
-				thumbManager.createTumbnail(doc, fileVersion, sid);
+		try {
+			if (store.size(new StoreResource.Builder().document(doc).fileVersion(fileVersion)
+					.suffix(ThumbnailManager.SUFFIX_THUMB).build()) <= 0) {
+				Context.get(ThumbnailManager.class).createTumbnail(doc, fileVersion, sid);
 				log.debug("Created thumbnail {}", resource);
-			} catch (Exception t) {
-				log.error(t.getMessage(), t);
 			}
+		} catch (Exception t) {
+			log.error(t.getMessage(), t);
 		}
 	}
 }

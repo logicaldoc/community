@@ -173,8 +173,8 @@ insert into ld_document
 values     (4,5,'2008-10-22 00:00:00',0,0,'d','testDocVer','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'PDF',3,'en','test.doc',1356,1,0,'',1,0,0,1,1,1,5,0,0,0,0,1,0);
 
 insert into ld_document
-           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
-values     (5,4,'2008-10-22 00:00:00',0,0,'e','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'xlsx',3,'en','flexspaces.xlsx',1356,1,0,'',1,0,0,1,1,1,5,0,0,0,0,1,0);
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_fileversion,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
+values     (5,4,'2008-10-22 00:00:00',0,0,'e','1.0','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'xlsx',3,'en','flexspaces.xlsx',1356,1,0,'',1,0,0,1,1,1,5,0,0,0,0,1,0);
 
 
 insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)

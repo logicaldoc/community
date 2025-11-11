@@ -33,27 +33,27 @@ public class MockStore extends FSStore {
 	}
 
 	@Override
-	public void store(File file, long docId, String resource) throws IOException {
+	public void store(File file, StoreResource resource) throws IOException {
 		if (errorOnStore)
 			throw new IOException("error");
 		if (useDummyFile)
-			super.store(dummyFile, docId, resource);
+			super.store(dummyFile, resource);
 		else
-			super.store(file, docId, resource);
+			super.store(file, resource);
 	}
 
 	@Override
-	public void store(InputStream stream, long docId, String resource) throws IOException {
+	public void store(InputStream stream, StoreResource resource) throws IOException {
 		if (errorOnStore) {
 			stream.close();
 			throw new IOException("error");
 		}
-		
+
 		if (useDummyFile) {
 			stream.close();
-			super.store(new FileInputStream(dummyFile), docId, resource);
+			super.store(new FileInputStream(dummyFile), resource);
 		} else {
-			super.store(stream, docId, resource);
+			super.store(stream, resource);
 		}
 	}
 
@@ -81,18 +81,18 @@ public class MockStore extends FSStore {
 		int moved = 0;
 
 		// List the resources
-		List<String> resources = listResources(docId, null);
+		List<StoreResource> resources = listResources(docId, null);
 
-		for (String resource : resources) {
-			File sourceFile = new File(getContainer(docId), resource);
+		for (StoreResource resource : resources) {
+			File sourceFile = new File(getContainer(resource.getDocId()), resource.name());
 
 			File targetFile = new File(targetRoot);
 			targetFile = new File(targetFile, computeRelativePath(docId));
-			targetFile = new File(targetFile, resource);
+			targetFile = new File(targetFile, resource.name());
 			targetFile.getParentFile().mkdirs();
 
 			// Extract the original file into a temporary location
-			writeToFile(docId, resource, targetFile);
+			writeToFile(docId, resource.name(), targetFile);
 			moved++;
 
 			// Delete the original resource

@@ -19,6 +19,7 @@ import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -221,19 +222,19 @@ public class DownloadServlet extends HttpServlet {
 		}
 	}
 
-	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException {
+	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException, PersistenceException {
 		if ("safe.html".equals(suffix)) {
 			Store store = Store.get();
 			if (doc != null) {
-				String safeResource = store.getResourceName(doc,
-						version == null ? doc.getFileVersion() : version.getFileVersion(), suffix);
-				if (!store.exists(doc.getId(), safeResource)) {
-					String unsafeResource = store.getResourceName(doc,
-							version == null ? doc.getFileVersion() : version.getFileVersion(), null);
-					String unsafe = store.getString(doc.getId(), unsafeResource);
+				StoreResource safeResource = new StoreResource.Builder().document(doc)
+						.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).suffix(suffix)
+						.build();
+				if (!store.exists(safeResource.getDocId(), safeResource.name())) {
+					StoreResource unsafeResource = new StoreResource.Builder().document(doc)
+							.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).build();
+					String unsafe = store.getString(doc.getId(), unsafeResource.name());
 					String safe = HTMLSanitizer.sanitize(unsafe);
-					store.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), doc.getId(),
-							safeResource);
+					store.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), safeResource);
 				}
 			}
 		}

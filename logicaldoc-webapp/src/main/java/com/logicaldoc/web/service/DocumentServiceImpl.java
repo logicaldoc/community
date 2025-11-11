@@ -94,6 +94,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.core.transfer.InMemoryZipImport;
@@ -1575,7 +1576,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				message += "<p><img src='data:image/png;base64," + ImageUtil.encode(thumbnailFile) + "'/></p>";
 			}
 			mail.setMessageText("<html><head><meta charset='utf-8' /></head><body>" + message + "<rl /></body></html>");
-		} catch (IOException ioe) {
+		} catch (IOException | PersistenceException ioe) {
 			log.warn(ioe.getMessage());
 		} finally {
 			FileUtil.delete(thumbnailFile);
@@ -1661,12 +1662,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return new EMailSender(session.getTenantName());
 	}
 
-	private File createTile(Document doc, String sid) throws IOException {
+	private File createTile(Document doc, String sid) throws IOException, PersistenceException {
 		Store store = Store.get();
-		String tileResource = store.getResourceName(doc, doc.getFileVersion(), ThumbnailManager.SUFFIX_TILE);
+		StoreResource tileResource = new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_TILE)
+				.build();
 
 		// In any case try to produce the thumbnail
-		if (store.size(doc.getId(), tileResource) <= 0L) {
+		if (store.size(tileResource) <= 0L) {
 			ThumbnailManager thumbManager = Context.get(ThumbnailManager.class);
 			try {
 				thumbManager.createTile(doc, doc.getFileVersion(), sid);
@@ -1675,9 +1677,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 		}
 
-		if (store.exists(doc.getId(), tileResource)) {
+		if (store.exists(doc.getId(), tileResource.name())) {
 			File file = FileUtil.createTempFile("tile-", ".png");
-			store.writeToFile(doc.getId(), tileResource, file);
+			store.writeToFile(doc.getId(), tileResource.name(), file);
 			return file;
 		}
 
@@ -3161,7 +3163,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			tile = ImageUtil.encode(tileFile);
 			if (tile != null)
 				tile = "data:image/png;base64," + tile;
-		} catch (IOException e) {
+		} catch (IOException | PersistenceException e) {
 			log.warn("Cannot generate tile of document {}", doc, e);
 		} finally {
 			FileUtil.delete(tileFile);

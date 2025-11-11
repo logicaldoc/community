@@ -24,6 +24,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
@@ -108,8 +109,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			Version version = null;
 			if (i % 2 == 0) {
 				version = Version.create(doc, user, "checkin " + i, DocumentEvent.CHECKEDIN, true);
-				store.store(ResourceUtil.getInputStream("data.sql"), doc.getId(),
-						store.getResourceName(doc.getId(), version.getFileVersion(), null));
+				store.store(ResourceUtil.getInputStream("data.sql"), 
+						new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
 			} else {
 				version = Version.create(doc, user, "edit " + i, DocumentEvent.CHANGED, true);
 			}
@@ -126,9 +127,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		// Check if no files of deleted versions are still in the store
 		Set<String> actualFileVersions = versions.stream().map(Version::getFileVersion).collect(Collectors.toSet());
-		List<String> currentResourceFiles = store.listResources(doc.getId(), null).stream().filter(r -> !r.contains("-")).toList();
-		for (String file : currentResourceFiles)
-			assertTrue(actualFileVersions.contains(file));
+		List<StoreResource> currentResourceFiles = store.listResources(doc.getId(), null).stream().filter(r -> !r.name().contains("-")).toList();
+		for (StoreResource resource : currentResourceFiles)
+			assertTrue(actualFileVersions.contains(resource.name()));
 
 		// Now reset all versions
 		testSubject.deleteAll(versions);
@@ -140,9 +141,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		testSubject.store(version);
 		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
 
-		String resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
-			store.store(is, doc.getId(), resourceName);
+			store.store(is, new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build()); 
 		}
 
 		doc = docDao.findById(1);
@@ -151,9 +151,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		testSubject.store(version);
 		assertEquals("2.0", version.getVersion());
 
-		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
-			store.store(is, doc.getId(), resourceName);
+			store.store(is, new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
 		}
 
 		assertEquals(versionsCap, versions.size());
@@ -166,9 +165,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		testSubject.store(version);
 		assertEquals("2.1", version.getVersion());
 
-		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
-			store.store(is, doc.getId(), resourceName);
+			store.store(is, new StoreResource.Builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
 		}
 
 		assertEquals(versionsCap, versions.size());

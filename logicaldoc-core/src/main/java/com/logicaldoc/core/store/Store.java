@@ -51,12 +51,12 @@ public interface Store extends Comparable<Store> {
 	 * document or a new version of an existing document.
 	 * 
 	 * @param stream Document as InputStream
-	 * @param docId The document identifier
-	 * @param resource Name of the resource to be stored
+	 * @param resource Resource to be stored, make sure to provide the right
+	 *        document's ID
 	 * 
 	 * @throws IOException the content cannot be stored
 	 */
-	public void store(InputStream stream, long docId, String resource) throws IOException;
+	public void store(InputStream stream, StoreResource resource) throws IOException;
 
 	/**
 	 * Stores a file
@@ -64,12 +64,12 @@ public interface Store extends Comparable<Store> {
 	 * @see store(InputStream stream, long docId, String resource)
 	 * 
 	 * @param file the file to store
-	 * @param docId identifier of the document
-	 * @param resource name of the resource
+	 * @param resource Resource to be stored, make sure to provide the right
+	 *        document's ID
 	 * 
 	 * @throws IOException the content cannot be stored
 	 */
-	public void store(File file, long docId, String resource) throws IOException;
+	public void store(File file, StoreResource resource) throws IOException;
 
 	/**
 	 * Deletes all resources of a document from the store.
@@ -81,10 +81,9 @@ public interface Store extends Comparable<Store> {
 	/**
 	 * Deletes a specific resource of a document from the store.
 	 * 
-	 * @param docId The document identifier
-	 * @param resource Name of the resource to be deleted
+	 * @param resource The resource to be deleted
 	 */
-	public void delete(long docId, String resource);
+	public void delete(StoreResource resource);
 
 	/**
 	 * Computes the resource name inside the container
@@ -95,6 +94,7 @@ public interface Store extends Comparable<Store> {
 	 *        file)
 	 * @return The document's resource name
 	 */
+	@Deprecated
 	public String getResourceName(Document doc, String fileVersion, String suffix);
 
 	/**
@@ -106,6 +106,7 @@ public interface Store extends Comparable<Store> {
 	 *        file)
 	 * @return The document's resource name
 	 */
+	@Deprecated
 	public String getResourceName(long docId, String fileVersion, String suffix);
 
 	/**
@@ -115,19 +116,18 @@ public interface Store extends Comparable<Store> {
 	 * @param fileVersion If specified, lists the resources for that specific
 	 *        file version only
 	 * 
-	 * @return list of resource names
+	 * @return list of resources
 	 */
-	public List<String> listResources(long docId, String fileVersion);
+	public List<StoreResource> listResources(long docId, String fileVersion);
 
 	/**
 	 * Computed the size of a specific resource.
 	 * 
-	 * @param docId The document's identifier
 	 * @param resource The resource
 	 * 
 	 * @return the size in bytes
 	 */
-	public long size(long docId, String resource);
+	public long size(StoreResource resource);
 
 	/**
 	 * Checks if the passed resource exists in the document's container
@@ -167,36 +167,36 @@ public interface Store extends Comparable<Store> {
 	 * Writes the specified resource in an output stream
 	 * 
 	 * @param docId The document's identifier
-	 * @param resource Name of the resource
+	 * @param resourceName Name of the resource
 	 * @param output The output stream
 	 * 
 	 * @throws IOException error writing the stream or reading the resource
 	 */
-	public void writeToStream(long docId, String resource, OutputStream output) throws IOException;
+	public void writeToStream(long docId, String resourceName, OutputStream output) throws IOException;
 
 	/**
 	 * Obtains the document's content for the specified resource
 	 * 
 	 * @param docId The document's identifier
-	 * @param resource Name of the resource
+	 * @param resourceName Name of the resource
 	 * 
 	 * @return The document file's content
 	 * 
 	 * @throws IOException cannot open the stream
 	 */
-	public InputStream getStream(long docId, String resource) throws IOException;
+	public InputStream getStream(long docId, String resourceName) throws IOException;
 
 	/**
 	 * Obtains the document's raw bytes for the specified resource
 	 * 
 	 * @param docId The document's identifier
-	 * @param resource Name of the resource
+	 * @param resourceName Name of the resource
 	 * 
 	 * @return The document file's bytes
 	 * 
 	 * @throws IOException cannot open the resource to get the bytes
 	 */
-	public byte[] getBytes(long docId, String resource) throws IOException;
+	public byte[] getBytes(long docId, String resourceName) throws IOException;
 
 	/**
 	 * Obtains the document's raw bytes for the specified resource

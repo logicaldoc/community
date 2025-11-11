@@ -25,6 +25,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
@@ -113,16 +114,14 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testConvertToPdf() throws IOException {
-		long docId = document.getId();
-
-		String pdfResource = store.getResourceName(docId, document.getFileVersion(),
-				FormatConversionManager.PDF_CONVERSION_SUFFIX);
-		store.delete(docId, pdfResource);
-		assertFalse(store.exists(docId, pdfResource));
+	public void testConvertToPdf() throws IOException, PersistenceException {
+		StoreResource pdfResource = new StoreResource.Builder().document(document)
+				.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
+		store.delete(pdfResource);
+		assertFalse(store.exists(document.getId(), pdfResource.name()));
 
 		testSubject.convertToPdf(document, session.getSid());
-		assertTrue(store.exists(docId, pdfResource));
+		assertTrue(store.exists(document.getId(), pdfResource.name()));
 
 		assertTrue(testSubject.getPdfContent(document, document.getFileVersion(), session.getSid()).length > 0);
 	}
@@ -134,9 +133,8 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 		assertTrue(testSubject.getPdfContent(document, document.getFileVersion(), session.getSid()).length > 0);
 
 		// Remove the conversion and invoke getPdfContent
-		String pdfResource = store.getResourceName(document.getId(), document.getFileVersion(),
-				FormatConversionManager.PDF_CONVERSION_SUFFIX);
-		store.delete(document.getId(), pdfResource);
+		store.delete(new StoreResource.Builder().document(document)
+				.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build());
 		assertTrue(testSubject.getPdfContent(document, document.getFileVersion(), session.getSid()).length > 0);
 
 		// Use a PDF file
@@ -158,9 +156,8 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 			assertEquals(0L, file.length());
 
 			// Remove the conversion and invoke getPdfContent
-			String pdfResource = store.getResourceName(document.getId(), document.getFileVersion(),
-					FormatConversionManager.PDF_CONVERSION_SUFFIX);
-			store.delete(document.getId(), pdfResource);
+			store.delete(new StoreResource.Builder().document(document)
+					.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build());
 			testSubject.writePdfToFile(document, document.getFileVersion(), file, session.getSid());
 			assertTrue(file.length() > 0);
 

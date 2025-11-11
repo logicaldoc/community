@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
@@ -108,7 +109,7 @@ public class ThumbnailManager {
 	public void createTile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "tile", SUFFIX_TILE, sid);
 	}
-	
+
 	/**
 	 * Creates the tile for the specified document
 	 * 
@@ -134,10 +135,10 @@ public class ThumbnailManager {
 	public void createMobile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "mobile", SUFFIX_MOBILE, sid);
 	}
-	
+
 	/**
-	 * Creates the mobile image for the specified document. The
-	 * mobile is an image rendering of the first page only.
+	 * Creates the mobile image for the specified document. The mobile is an
+	 * image rendering of the first page only.
 	 * 
 	 * @param document The document to be treated
 	 * @param sid The session identifier(optional)
@@ -147,7 +148,6 @@ public class ThumbnailManager {
 	public void createMobile(Document document, String sid) throws IOException {
 		createImage(document, null, "mobile", SUFFIX_MOBILE, sid);
 	}
-
 
 	protected void createImage(Document document, String fileVersion, int size, Integer quality, String suffix,
 			String sid) throws IOException {
@@ -167,12 +167,13 @@ public class ThumbnailManager {
 
 			builder.buildThumbnail(sid, document, fileVersion, src, dest, size,
 					quality != null ? quality
-							: Context.get().getProperties()
-									.getInt(TenantDAO.get().getTenantName(document.getTenantId()) + ".gui.thumbnail.quality", 93));
+							: Context.get().getProperties().getInt(
+									TenantDAO.get().getTenantName(document.getTenantId()) + ".gui.thumbnail.quality",
+									93));
 
 			// Put the resource
-			String resource = store.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);
-			store.store(dest, document.getId(), resource);
+			store.store(dest, new StoreResource.Builder().document(document)
+					.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(suffix).build());
 		} catch (Exception e) {
 			log.warn("Error rendering image for document: {} - {}", document.getId(), document.getFileName(), e);
 		} finally {

@@ -18,6 +18,7 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -170,7 +171,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 					Map.of("documentid", versionToDelete.getDocId(), "fileversion", versionToDelete.getFileVersion(),
 							"currentid", versionToDelete.getId()));
 			if (referencesToFileversion == 0L)
-				store.delete(versionToDelete.getDocId(), versionToDelete.getFileVersion());
+				store.delete(new StoreResource.Builder().version(versionToDelete).build());
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}

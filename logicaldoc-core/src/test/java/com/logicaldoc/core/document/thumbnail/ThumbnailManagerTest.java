@@ -16,6 +16,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 
@@ -62,28 +63,29 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 		assertNull(testSubject.getBuilder("pippo.pluto"));
 		testSubject.createTumbnail(doc, session.getSid());
 
-		String thumbResource = store.getResourceName(docId, doc.getFileVersion(), ThumbnailManager.SUFFIX_THUMB);
-		assertFalse(store.exists(docId, thumbResource));
+		StoreResource thumbResource = new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_THUMB)
+				.build();
+		assertFalse(store.exists(docId, thumbResource.name()));
 
 		doc = docDao.findById(1L);
 		testSubject.createTumbnail(doc, session.getSid());
-		long size1 = store.size(docId, thumbResource);
+		long size1 = store.size(thumbResource);
 		assertTrue(size1 > 0);
 
-		store.delete(docId, thumbResource);
-		assertFalse(store.exists(docId, thumbResource));
+		store.delete(thumbResource);
+		assertFalse(store.exists(docId, thumbResource.name()));
 
 		testSubject.createTumbnail(doc, null, 250, 99, session.getSid());
-		long size2 = store.size(docId, thumbResource);
+		long size2 = store.size(thumbResource);
 		assertTrue(size2 > size1);
 
 		testSubject.createTile(doc, session.getSid());
-		assertTrue(store.size(docId,
-				store.getResourceName(docId, doc.getFileVersion(), ThumbnailManager.SUFFIX_TILE)) > 0);
+		assertTrue(
+				store.size(new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_TILE).build()) > 0);
 
 		testSubject.createMobile(doc, session.getSid());
-		assertTrue(store.size(docId,
-				store.getResourceName(docId, doc.getFileVersion(), ThumbnailManager.SUFFIX_MOBILE)) > 0);
+		assertTrue(
+				store.size(new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_TILE).build()) > 0);
 
 	}
 }

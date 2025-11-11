@@ -109,14 +109,14 @@ public abstract class AbstractStore implements Store {
 	}
 
 	@Override
-	public void store(File file, long docId, String resource) throws IOException {
+	public void store(File file, StoreResource resource) throws IOException {
 		checkEnabled();
 
 		try (InputStream is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE)) {
-			store(is, docId, resource);
+			store(is, resource);
 		}
 
-		checkWriteAfterStore(docId, resource, file.length());
+		checkWriteAfterStore(resource, file.length());
 	}
 
 	/**
@@ -136,20 +136,20 @@ public abstract class AbstractStore implements Store {
 	 * Checks if the stored resource matches the expected size
 	 * 
 	 * @param docId Identifier of the document
-	 * @param resource Name of the resource
+	 * @param resource The resource, make sure to specify the document's ID
 	 * @param expectedSize The expected size in bytes
 	 * 
 	 * @throws IOException raised just in case the size of the resource does not
 	 *         match the expected one+
 	 * 
 	 */
-	protected void checkWriteAfterStore(long docId, String resource, long expectedSize) throws IOException {
-		if (RunLevel.current().aspectEnabled("writeCheck") && docId != 0L) {
-			long storedSize = size(docId, resource);
+	protected void checkWriteAfterStore(StoreResource resource, long expectedSize) throws IOException {
+		if (RunLevel.current().aspectEnabled("writeCheck") && resource.getDocId() != 0L) {
+			long storedSize = size(resource);
 			if (storedSize != expectedSize)
 				throw new IOException(String.format(
 						"Wrong file size, the original file was %d bytes while the stored one is %d bytes (docId: %d,  resource: %s",
-						expectedSize, storedSize, docId, resource));
+						expectedSize, storedSize, resource.getDocId(), resource));
 		}
 	}
 
@@ -295,6 +295,7 @@ public abstract class AbstractStore implements Store {
 		}
 	}
 
+	@Deprecated
 	protected String sanitizeResourceName(String resourceName) {
 		return resourceName.replace("..", "").replaceAll("[^a-zA-Z0-9\\-\\\\.]", "");
 	}
@@ -306,21 +307,21 @@ public abstract class AbstractStore implements Store {
 
 	@Override
 	public boolean test() {
-		String resource = "test";
 		File tmpFile = null;
+		StoreResource resource = new StoreResource.Builder().docId(0L).fileVersion("test").build();
 		try {
 			tmpFile = FileUtil.createTempFile("st-test", ".txt");
 			FileUtil.writeFile("test", tmpFile.getAbsolutePath());
-			store(tmpFile, 0L, resource);
-			return exists(0L, resource);
+			store(tmpFile, resource);
+			return exists(0L, resource.name());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;
 		} finally {
 			FileUtil.delete(tmpFile);
 			try {
-				if (exists(0L, resource))
-					delete(0L, resource);
+				if (exists(0L, resource.name()))
+					delete(resource);
 			} catch (Exception t) {
 				// Noting to do
 			}
@@ -393,8 +394,10 @@ public abstract class AbstractStore implements Store {
 		history.setFilename(StringUtils.right(path, 255));
 		history.setReason("deleted from store " + getId());
 		try {
-			documentHistoryDAO.queryForResultSet("select ld_tenantid, ld_filename, ld_version, ld_fileversion, ld_color, ld_folderid from ld_document where ld_id="
-					+ docId, null, null, rows -> {
+			documentHistoryDAO.queryForResultSet(
+					"select ld_tenantid, ld_filename, ld_version, ld_fileversion, ld_color, ld_folderid from ld_document where ld_id="
+							+ docId,
+					null, null, rows -> {
 						if (rows.next()) {
 							history.setTenantId(rows.getLong(1));
 							history.setFilename(rows.getString(2));
@@ -403,8 +406,8 @@ public abstract class AbstractStore implements Store {
 							history.setColor(rows.getString(5));
 							history.setFolderId(rows.getLong(6));
 						}
-			});
-			
+					});
+
 			documentHistoryDAO.store(history);
 		} catch (PersistenceException e) {
 			log.warn("Cannot record in the database the deleteion of resource {} for document {}", path, docId, e);

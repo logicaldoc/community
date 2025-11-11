@@ -18,6 +18,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
@@ -190,7 +191,8 @@ test.txt\r
 		mockRequest.setBody(body);
 
 		ServletUtil.uploadDocumentResource(mockRequest, 1L, "abc", "1.0", "1.0");
-		assertEquals(8L, Store.get().size(1L, Store.get().getResourceName(1L, "1.0", "abc")));
+		assertEquals(8L,
+				Store.get().size(new StoreResource.Builder().docId(1L).fileVersion("1.0").suffix("abc").build()));
 	}
 
 }

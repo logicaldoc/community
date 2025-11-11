@@ -57,6 +57,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
@@ -90,7 +91,7 @@ public class DocumentManager {
 	public static DocumentManager get() {
 		return Context.get(DocumentManager.class);
 	}
-	
+
 	private static final String UPDATE_LD_DOCUMENT_SET_LD_INDEXED = "update ld_document set ld_indexed=";
 
 	private static final String NO_VALUE_OBJECT_HAS_BEEN_PROVIDED = "No value object has been provided";
@@ -192,14 +193,16 @@ public class DocumentManager {
 		Document document = documentDAO.findDocument(docId);
 
 		if (document.getImmutable() == 0 && document.getStatus() == DocumentStatus.UNLOCKED) {
-			// Remove the ancillary files of the same fileVersion
-			final String newFilerResourceName = store.getResourceName(document, fileVersion, null);
-			for (String resource : store.listResources(document.getId(), fileVersion).stream()
-					.filter(r -> !r.equals(newFilerResourceName)).toList())
-				store.delete(document.getId(), resource);
+			StoreResource newFileResource = new StoreResource.Builder().document(document).fileVersion(fileVersion)
+					.build();
+
+			// Remove the ancillary files related to the same fileVersion
+			for (StoreResource resource : store.listResources(document.getId(), fileVersion).stream()
+					.filter(r -> !r.name().equals(newFileResource.name())).toList())
+				store.delete(resource);
 
 			// Store the new file
-			store.store(newFile, document.getId(), newFilerResourceName);
+			store.store(newFile, newFileResource);
 
 			long fileSize = newFile.length();
 
@@ -525,9 +528,8 @@ public class DocumentManager {
 		log.debug("locked document {}", document);
 	}
 
-	private void storeFile(Document doc, File file) throws IOException {
-		String resource = store.getResourceName(doc, null, null);
-		store.store(file, doc.getId(), resource);
+	private void storeFile(Document doc, File file) throws IOException, PersistenceException {
+		store.store(file, new StoreResource.Builder().document(doc).build());
 	}
 
 	/**
@@ -1610,10 +1612,11 @@ public class DocumentManager {
 
 		// If no more referenced, can delete the document's resources
 		if (!referenced) {
-			List<String> resources = store.listResources(versionToDelete.getDocId(), versionToDelete.getFileVersion());
-			for (String resource : resources)
+			List<StoreResource> resources = store.listResources(versionToDelete.getDocId(),
+					versionToDelete.getFileVersion());
+			for (StoreResource resource : resources)
 				try {
-					store.delete(versionToDelete.getDocId(), resource);
+					store.delete(resource);
 				} catch (Exception t) {
 					log.warn("Unable to delete resource {} of document {}", resource, versionToDelete.getDocId());
 				}

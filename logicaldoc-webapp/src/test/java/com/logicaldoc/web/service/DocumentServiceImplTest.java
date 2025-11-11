@@ -1199,6 +1199,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		// Send the email with attached file as pdf conversion
 		guiMail.setPdfConversion(true);
+
 		retvalue = testSubject.sendAsEmail(guiMail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);
@@ -1236,7 +1237,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		GUIDocumentNote guiNote = notes.getFirst();
 		guiNote.setMessage("updated message");
 		testSubject.saveNote(guiNote);
-		
+
 		List<GUIDocumentNote> notes2 = testSubject.getNotes(4, null, null);
 		assertEquals(1, notes2.size());
 		assertEquals(notes.get(0).getId(), notes2.get(0).getId());

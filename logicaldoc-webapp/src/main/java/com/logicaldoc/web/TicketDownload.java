@@ -21,6 +21,7 @@ import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.MimeType;
@@ -177,7 +178,8 @@ public class TicketDownload extends HttpServlet {
 		return "preview-" + ticketId;
 	}
 
-	private String getSuffix(Ticket ticket, Document document, HttpServletRequest request) throws IOException {
+	private String getSuffix(Ticket ticket, Document document, HttpServletRequest request)
+			throws IOException, PersistenceException {
 		String suffix = ticket.getSuffix();
 		if (request.getParameter("suffix") != null)
 			suffix = request.getParameter("suffix");
@@ -264,14 +266,17 @@ public class TicketDownload extends HttpServlet {
 		DownloadServlet.processSafeHtml(suffix, null, document);
 
 		Store store = Store.get();
-		String resource = store.getResourceName(document, fileVersion, suffix);
+
+		StoreResource resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).suffix(suffix)
+				.build();
+
 		OutputStream os = null;
-		try (InputStream is = store.getStream(document.getId(), resource)) {
+		try (InputStream is = store.getStream(document.getId(), resource.name())) {
 			String filename = document.getFileName();
 			if (suffix != null && suffix.contains("pdf"))
 				filename = document.getFileName() + ".pdf";
 
-			long size = store.size(document.getId(), resource);
+			long size = store.size(resource);
 
 			// get the mimetype
 			String mimetype = MimeType.getByFilename(filename);

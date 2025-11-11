@@ -44,6 +44,7 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.MockStore;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
@@ -867,8 +868,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		docDao.store(doc2);
 		assertNotNull(doc2);
 
-		String resource = store.getResourceName(doc2.getId(), doc2.getFileVersion(), null);
-		store2.store(ResourceUtil.getInputStream("allowed-commands.txt"), 3L, resource);
+		store2.store(ResourceUtil.getInputStream("allowed-commands.txt"), new StoreResource.Builder().docId(3L).fileVersion(doc2.getFileVersion()).build());
 
 		try {
 			testSubject.replaceAlias(doc2.getId(), transaction);

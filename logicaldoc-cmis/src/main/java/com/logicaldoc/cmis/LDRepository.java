@@ -149,6 +149,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
@@ -556,11 +557,13 @@ public class LDRepository {
 		NumberFormat nd = new DecimalFormat("0000000000");
 
 		File chunksFolder = getChunksFolder(documentId);
-		String resourceName = Store.get().getResourceName(doc.getId(), doc.getFileVersion(), null);
+
+		StoreResource resource = new StoreResource.Builder().docId(doc.getId()).fileVersion(doc.getFileVersion())
+				.build();
 		if (FileUtils.isEmptyDirectory(chunksFolder)) {
 			// Copy the current file's content
 			File firstChunk = new File(chunksFolder, "chunk-" + nd.format(1));
-			Store.get().writeToFile(doc.getId(), resourceName, firstChunk);
+			Store.get().writeToFile(doc.getId(), resource.name(), firstChunk);
 		}
 
 		int totalChunks = chunksFolder.list().length;
@@ -1194,7 +1197,8 @@ public class LDRepository {
 				is = Store.get().getStream(doc.getId(), Store.get().getResourceName(document, null, null));
 			} else {
 				Version v = (Version) doc;
-				is = Store.get().getStream(v.getDocId(), Store.get().getResourceName(v.getDocId(), v.getFileVersion(), null));
+				is = Store.get().getStream(v.getDocId(),
+						Store.get().getResourceName(v.getDocId(), v.getFileVersion(), null));
 			}
 			stream = new BufferedInputStream(is, BUFFER_SIZE);
 

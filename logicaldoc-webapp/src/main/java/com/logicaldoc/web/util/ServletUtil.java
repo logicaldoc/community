@@ -45,6 +45,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.IOUtil;
@@ -237,17 +238,18 @@ public class ServletUtil {
 		String filename = getFilename(fileName, suffix, document);
 
 		Store store = Store.get();
-		String resource = store.getResourceName(document, fileVersion, null);
-		if (!store.exists(document.getId(), resource)) {
-			throw new FileNotFoundException(resource);
+
+		StoreResource resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).build();
+		if (!store.exists(document.getId(), resource.name())) {
+			throw new FileNotFoundException(resource.name());
 		}
 
 		if (StringUtils.isNotEmpty(suffix)) {
-			resource = store.getResourceName(document, fileVersion, suffix);
+			resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).suffix(suffix).build();
 			filename = filename + "." + suffix.substring(suffix.lastIndexOf('.') + 1);
 		}
 
-		long length = store.size(document.getId(), resource);
+		long length = store.size(resource);
 		String contentType = MimeType.getByFilename(filename);
 		long lastModified = document.getDate().getTime();
 		String eTag = document.getId() + "_" + document.getVersion() + "_" + lastModified;
@@ -290,7 +292,7 @@ public class ServletUtil {
 			if (gstreamRequired) {
 				// The browser accepts GZIP, so GZIP the content.
 				response.setHeader("Content-Encoding", "gzip");
-				store.writeToStream(docId, resource, output);
+				store.writeToStream(docId, resource.name(), output);
 			} else if (ranges.size() == 1) {
 				// Return single part of file.
 				Range r = ranges.get(0);
@@ -302,7 +304,7 @@ public class ServletUtil {
 					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
 				// Copy single part range.
-				store.writeToStream(docId, resource, output, r.start, r.length);
+				store.writeToStream(docId, resource.name(), output, r.start, r.length);
 			} else {
 				// Return multiple parts of file.
 				response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
@@ -322,7 +324,7 @@ public class ServletUtil {
 					sos.println("Content-Range: bytes " + r.start + "-" + r.end + "/" + r.total);
 
 					// Copy single part range of multi part range.
-					store.writeToStream(docId, resource, sos, r.start, r.length);
+					store.writeToStream(docId, resource.name(), sos, r.start, r.length);
 
 					// End with multipart boundary.
 					sos.println();
@@ -747,7 +749,8 @@ public class ServletUtil {
 			if (!item.isFormField()) {
 				File savedFile = writeItemToFile(item);
 				try (InputStream is = item.getInputStream();) {
-					store.store(item.getInputStream(), docId, store.getResourceName(doc, ver, suffix));
+					store.store(item.getInputStream(),
+							new StoreResource.Builder().document(doc).fileVersion(ver).suffix(suffix).build());
 				} finally {
 					FileUtils.forceDelete(savedFile);
 				}

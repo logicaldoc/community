@@ -53,11 +53,11 @@ public class FSStore extends AbstractStore {
 	}
 
 	@Override
-	public void delete(long docId, String resource) {
-		File file = new File(getContainer(docId), resource);
+	public void delete(StoreResource resource) {
+		File file = new File(getContainer(resource.getDocId()), resource.name());
 		log.info("Deleting stored file {}", file.getAbsolutePath());
 		if (FileUtil.delete(file))
-			logDeletion(docId, file.getAbsolutePath());
+			logDeletion(resource.getDocId(), file.getAbsolutePath());
 	}
 
 	/**
@@ -77,32 +77,32 @@ public class FSStore extends AbstractStore {
 	}
 
 	@Override
-	public void store(File file, long docId, String resource) throws IOException {
+	public void store(File file, StoreResource resource) throws IOException {
 		checkEnabled();
 
 		checkNotEmpty(file);
 
-		File dir = getContainer(docId);
+		File dir = getContainer(resource.getDocId());
 		FileUtils.forceMkdir(dir);
-		File dest = new File(
-				new StringBuilder(dir.getPath()).append("/").append(sanitizeResourceName(resource)).toString());
+		File dest = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
 		FileUtil.copyFile(file, dest);
 
-		checkWriteAfterStore(docId, resource, file.length());
+		checkWriteAfterStore(resource, file.length());
 	}
 
 	@Override
-	public void store(InputStream stream, long docId, String resource) throws IOException {
+	public void store(InputStream stream, StoreResource resource) throws IOException {
 		File file = null;
 		try {
 			if (!isEnabled())
 				throw new IOException("Store not enabled");
 
-			File dir = getContainer(docId);
+			File dir = getContainer(resource.getDocId());
 			FileUtils.forceMkdir(dir);
-			file = new File(
-					new StringBuilder(dir.getPath()).append("/").append(sanitizeResourceName(resource)).toString());
+			file = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
 			FileUtil.writeFile(stream, file.getPath());
+
+			checkWriteAfterStore(resource, file.length());
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
@@ -115,14 +115,14 @@ public class FSStore extends AbstractStore {
 	@Override
 	public void writeToFile(long docId, String resource, File out) throws IOException {
 		File container = getContainer(docId);
-		File file = new File(container, sanitizeResourceName(resource));
+		File file = new File(container, resource);
 		FileUtil.copyFile(file, out);
 	}
 
 	@Override
 	public InputStream getStream(long docId, String resource) throws IOException {
 		File container = getContainer(docId);
-		File file = new File(container, sanitizeResourceName(resource));
+		File file = new File(container, resource);
 
 		try {
 			return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
@@ -139,20 +139,19 @@ public class FSStore extends AbstractStore {
 		File docDir = getRoot();
 		if (docDir.exists())
 			size = FileUtils.sizeOfDirectory(docDir);
-
 		return size;
 	}
 
 	@Override
 	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException {
 		File container = getContainer(docId);
-		File file = new File(container, sanitizeResourceName(resource));
+		File file = new File(container, resource);
 		return FileUtil.toByteArray(file, start, length);
 	}
 
 	@Override
-	public List<String> listResources(long docId, final String fileVersion) {
-		List<String> resources = new ArrayList<>();
+	public List<StoreResource> listResources(long docId, String fileVersion) {
+		List<StoreResource> resources = new ArrayList<>();
 		File container = getContainer(docId);
 		File[] buf = container.listFiles((dir, name) -> {
 			if (name.startsWith("."))
@@ -163,16 +162,15 @@ public class FSStore extends AbstractStore {
 			return true;
 		});
 		if (buf != null)
-			for (File file : buf) {
-				resources.add(file.getName());
-			}
+			for (File file : buf)
+				resources.add(new StoreResource.Builder().docId(docId).name(file.getName()).build());
 		return resources;
 	}
 
 	@Override
-	public long size(long docId, String resource) {
-		File file = getContainer(docId);
-		file = new File(file, sanitizeResourceName(resource));
+	public long size(StoreResource resource) {
+		File file = getContainer(resource.getDocId());
+		file = new File(file, resource.name());
 		return file.length();
 	}
 
