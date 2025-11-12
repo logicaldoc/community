@@ -18,6 +18,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -81,10 +82,9 @@ public class DownloadAttachmentServlet extends HttpServlet {
 
 	private void download(HttpServletRequest request, HttpServletResponse response, long docId, String fileVersion,
 			String filename, Document doc) throws MessagingException, IOException, CMSException {
-		Store store = Store.get();
-		String resource = store.getResourceName(docId, fileVersion, null);
 
-		try (InputStream is = store.getStream(docId, resource)) {
+		try (InputStream is = Store.get()
+				.getStream(new StoreResource.Builder().docId(docId).fileVersion(fileVersion).build())) {
 			EMail email = null;
 
 			if (doc != null && doc.getFileName().toLowerCase().endsWith(".eml"))

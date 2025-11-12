@@ -307,7 +307,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (StringUtils.isNotEmpty(suffix))
 			fileName = suffix;
 		String mime = MimeType.getByFilename(fileName);
-		return new DataHandler(new InputStreamDataSource(store.getStream(resource.getDocId(), resource.name()), mime));
+		return new DataHandler(new InputStreamDataSource(store.getStream(resource), mime));
 	}
 
 	@Override
@@ -335,7 +335,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		if (!type.toLowerCase().endsWith(".png"))
 			type += ".png";
-		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(type).build();
+		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(type)
+				.build();
 		if (!store.exists(resource)) {
 			if (type.equals(ThumbnailManager.SUFFIX_THUMB))
 				manager.createTumbnail(doc, fileVersion, sid);
@@ -348,7 +349,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				 * In this case the resource is like thumb450.png so we extract
 				 * the size from the name
 				 */
-				String sizeStr = resource.name().substring(resource.name().indexOf('-') + 6, resource.name().lastIndexOf('.'));
+				String sizeStr = resource.name().substring(resource.name().indexOf('-') + 6,
+						resource.name().lastIndexOf('.'));
 				manager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
 			}
 		}
@@ -775,12 +777,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	private void createAttachment(EMail email, Document doc) throws IOException, PersistenceException {
 		EMailAttachment att = new EMailAttachment();
 		att.setIcon(doc.getIcon());
-		
-		StoreResource resource=new StoreResource.Builder().document(doc).build();
-		att.setData(Store.get().getBytes(resource.getDocId(), resource.name()));
+		att.setData(Store.get().getBytes(new StoreResource.Builder().document(doc).build()));
 		att.setFileName(doc.getFileName());
-		String extension = doc.getFileExtension();
-		att.setMimeType(MimeType.get(extension));
+		att.setMimeType(MimeType.get(doc.getFileExtension()));
 
 		email.addAttachment(2 + email.getAttachments().size(), att);
 	}

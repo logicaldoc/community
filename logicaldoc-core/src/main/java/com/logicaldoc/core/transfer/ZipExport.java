@@ -28,8 +28,8 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Exports a folder hierarchy and all documents in it as a zip file. Can also be
@@ -272,10 +272,10 @@ public class ZipExport {
 	 * @param path path to store the document in
 	 * @param document the document
 	 * @param pdfConversion if the PDF conversion has to be used instead
+	 * @throws PersistenceException Error in the data layer
 	 */
-	private void addDocument(String path, Document document, boolean pdfConversion) {
-		Store store = Context.get(Store.class);
-		String resource = store.getResourceName(document, null, null);
+	private void addDocument(String path, Document document, boolean pdfConversion) throws PersistenceException {
+		StoreResource resource = new StoreResource.Builder().document(document).build();
 
 		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
 			try {
@@ -284,10 +284,12 @@ public class ZipExport {
 				log.warn(e.getMessage(), e);
 				return;
 			}
-			resource = store.getResourceName(document, null, FormatConversionManager.PDF_CONVERSION_SUFFIX);
+
+			resource = new StoreResource.Builder().document(document)
+					.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
 		}
 
-		try (BufferedInputStream bis = new BufferedInputStream(store.getStream(document.getId(), resource))) {
+		try (BufferedInputStream bis = new BufferedInputStream(Store.get().getStream(resource))) {
 			String fileName = document.getFileName();
 			if (pdfConversion)
 				fileName = FileUtil.getBaseName(fileName) + ".pdf";

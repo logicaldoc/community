@@ -51,6 +51,7 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserGroup;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.spring.Context;
@@ -1624,8 +1625,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				documentTransaction.setComment(transaction.getComment());
 				documentTransaction.setEvent(DocumentEvent.STORED);
 
-				String oldDocResource = store.getResourceName(srcDoc, null, null);
-				try (InputStream is = store.getStream(srcDoc.getId(), oldDocResource);) {
+				try (InputStream is = store.getStream(new StoreResource.Builder().document(srcDoc).build());) {
 					manager.create(is, newDoc, documentTransaction);
 				} catch (IOException e) {
 					log.error(e.getMessage(), e);

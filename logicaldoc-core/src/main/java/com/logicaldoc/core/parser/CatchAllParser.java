@@ -43,9 +43,8 @@ public class CatchAllParser extends AbstractParser {
 
 			if (store.exists(pdfResource)) {
 				Parser parser = ParserFactory.getParser("pdf");
-				content.append(parser.parse(store.getStream(pdfResource.getDocId(), pdfResource.name()),
-						new ParseParameters(null, "output.pdf", null, parameters.getEncoding(), parameters.getLocale(),
-								parameters.getTenant())));
+				content.append(parser.parse(store.getStream(pdfResource), new ParseParameters(null, "output.pdf", null,
+						parameters.getEncoding(), parameters.getLocale(), parameters.getTenant())));
 			} else {
 				log.warn("Cannot convert the file {} into pdf in order to parse the contents",
 						parameters.getFileName());

@@ -33,9 +33,9 @@ import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.mail.MessagingException;
 
@@ -62,9 +62,10 @@ public class MailTool {
 	 * 
 	 * @throws MessagingException Cannot send the email
 	 * @throws IOException I/O error
+	 * @throws PersistenceException Error in the data layer
 	 */
 	public void sendDocuments(Collection<Document> documents, String from, String to, String subject, String message)
-			throws IOException, MessagingException {
+			throws IOException, MessagingException, PersistenceException {
 		sendDocuments(documents, from, Arrays.asList(to), subject, message);
 	}
 
@@ -78,10 +79,11 @@ public class MailTool {
 	 * @param message message printed in the body of the email
 	 * 
 	 * @throws IOException I/O error
+	 * @throws PersistenceException Error in the data layer
 	 * 
 	 */
 	public void sendDocuments(Collection<Document> documents, String from, Collection<String> to, String subject,
-			String message) throws IOException, MessagingException {
+			String message) throws IOException, MessagingException, PersistenceException {
 		if (documents == null || documents.isEmpty())
 			return;
 
@@ -104,7 +106,7 @@ public class MailTool {
 			String extension = document.getFileExtension();
 			att.setMimeType(MimeType.get(extension));
 			Store store = Store.get();
-			att.setData(store.getBytes(document.getId(), store.getResourceName(document, null, null)));
+			att.setData(store.getBytes(new StoreResource.Builder().document(document).build()));
 			email.addAttachment(2 + email.getAttachments().size(), att);
 		}
 
@@ -125,9 +127,10 @@ public class MailTool {
 	 * 
 	 * @throws IOException I/O error
 	 * @throws MessagingException Cannot send the email
+	 * @throws PersistenceException Error in the data layer
 	 */
 	public void sendDocument(Document document, String from, String to, String subject, String message)
-			throws IOException, MessagingException {
+			throws IOException, MessagingException, PersistenceException {
 		sendDocuments(Arrays.asList(document), from, Arrays.asList(to), subject, message);
 	}
 
@@ -142,9 +145,10 @@ public class MailTool {
 	 * 
 	 * @throws IOException I/O error
 	 * @throws MessagingException Cannot send the email
+	 * @throws PersistenceException Error in the data layer
 	 */
 	public void sendDocument(Document document, String from, Collection<String> to, String subject, String message)
-			throws IOException, MessagingException {
+			throws IOException, MessagingException, PersistenceException {
 		sendDocuments(Arrays.asList(document), from, to, subject, message);
 	}
 
@@ -225,13 +229,13 @@ public class MailTool {
 
 		EMail email = null;
 		Store store = Store.get();
-		try (InputStream stream = store.getStream(document.getId(), store.getResourceName(document, null, null))) {
+		try (InputStream stream = store.getStream(new StoreResource.Builder().document(document).build())) {
 			if (document.getFileName().toLowerCase().endsWith(".eml"))
 				email = MailUtil.messageToMail(stream, extractAttachments);
 			else
 
 				email = MailUtil.msgToMail(stream, extractAttachments);
-		} catch (CMSException e) {
+		} catch (CMSException | PersistenceException e) {
 			throw new MessagingException(e.getMessage(), e);
 		}
 		return email;
@@ -294,10 +298,7 @@ public class MailTool {
 		User user = new SecurityTool().getUser(username);
 		InputStream is = null;
 		try {
-			long docId = doc.getId();
-			Store store = Context.get(Store.class);
-			String resource = store.getResourceName(docId, doc.getFileVersion(), null);
-			is = store.getStream(docId, resource);
+			is = Store.get().getStream(new StoreResource.Builder().document(doc).build());
 
 			EMail email = null;
 

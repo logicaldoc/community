@@ -66,6 +66,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
@@ -658,7 +659,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 			FileUtil.delete(content);
 		}
 
-		String mergedContent = new String(Store.get().getBytes(5L, "1.0"));
+		String mergedContent = new String(
+				Store.get().getBytes(new StoreResource.Builder().docId(5L).fileVersion("1.0").build()));
 		assertTrue(mergedContent.contains("content1"));
 		assertTrue(mergedContent.contains("content2"));
 

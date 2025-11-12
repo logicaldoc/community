@@ -192,23 +192,22 @@ public abstract class AbstractStore implements Store {
 	}
 
 	@Override
-	public byte[] getBytes(long docId, String resource) throws IOException {
-		try (InputStream is = getStream(docId, resource);) {
+	public byte[] getBytes(StoreResource resource) throws IOException {
+		try (InputStream is = getStream(resource);) {
 			return IOUtils.toByteArray(is);
 		}
 	}
 
 	@Override
-	public void writeToStream(StoreResource resource, OutputStream output, long start, long length)
-			throws IOException {
-		try (InputStream input = getStream(resource.getDocId(), resource.name())) {
+	public void writeToStream(StoreResource resource, OutputStream output, long start, long length) throws IOException {
+		try (InputStream input = getStream(resource)) {
 			IOUtils.copyLarge(input, output, start, length);
 		}
 	}
 
 	@Override
 	public void writeToStream(StoreResource resource, OutputStream output) throws IOException {
-		try (InputStream input = getStream(resource.getDocId(), resource.name())) {
+		try (InputStream input = getStream(resource)) {
 			IOUtils.copyLarge(input, output);
 		}
 	}
@@ -216,7 +215,7 @@ public abstract class AbstractStore implements Store {
 	@Override
 	public void writeToFile(StoreResource resource, File out) throws IOException {
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out, false), DEFAULT_BUFFER_SIZE);
-				InputStream is = getStream(resource.getDocId(), resource.name());) {
+				InputStream is = getStream(resource);) {
 			FileUtil.writeFile(is, out.getPath());
 		} catch (IOException ioe) {
 			throw ioe;
@@ -229,7 +228,7 @@ public abstract class AbstractStore implements Store {
 	@Override
 	public String getString(long docId, String resource) {
 		StringWriter writer = new StringWriter();
-		try (InputStream input = getStream(docId, resource)) {
+		try (InputStream input = getStream(new StoreResource.Builder().docId(docId).name(resource).build())) {
 			IOUtils.copy(input, writer, StandardCharsets.UTF_8);
 			return writer.toString();
 		} catch (Exception e) {

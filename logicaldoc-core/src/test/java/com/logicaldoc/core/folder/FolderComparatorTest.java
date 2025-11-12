@@ -4,8 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -78,6 +81,9 @@ public class FolderComparatorTest extends AbstractCoreTestCase {
 		assertEquals(1, comparator.compare(folder1, folder2));
 		assertEquals(-1, comparator.compare(folder2, folder1));
 
+		// Force the creation date to make them well differentiated
+		folder1.setCreation(DateUtils.addHours(new Date(), 1));
+		folder2.setCreation(DateUtils.addHours(new Date(), 2));
 		comparator = FolderComparator.getComparator("creation asc");
 		assertEquals(-1, comparator.compare(folder1, folder2));
 		assertEquals(1, comparator.compare(folder2, folder1));

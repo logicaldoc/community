@@ -174,32 +174,29 @@ public interface Store extends Comparable<Store> {
 	/**
 	 * Obtains the document's content for the specified resource
 	 * 
-	 * @param docId The document's identifier
-	 * @param resourceName Name of the resource
+	 * @param resource The resource
 	 * 
 	 * @return The document file's content
 	 * 
 	 * @throws IOException cannot open the stream
 	 */
-	public InputStream getStream(long docId, String resourceName) throws IOException;
+	public InputStream getStream(StoreResource resource) throws IOException;
 
 	/**
 	 * Obtains the document's raw bytes for the specified resource
 	 * 
-	 * @param docId The document's identifier
-	 * @param resourceName Name of the resource
+	 * @param resource The resource
 	 * 
 	 * @return The document file's bytes
 	 * 
 	 * @throws IOException cannot open the resource to get the bytes
 	 */
-	public byte[] getBytes(long docId, String resourceName) throws IOException;
+	public byte[] getBytes(StoreResource resource) throws IOException;
 
 	/**
 	 * Obtains the document's raw bytes for the specified resource
 	 * 
-	 * @param docId The document's identifier
-	 * @param resource Name of the resource
+	 * @param resource The resource
 	 * @param start Index of the starting byte
 	 * @param length Total packet length
 	 * 
@@ -207,7 +204,7 @@ public interface Store extends Comparable<Store> {
 	 * 
 	 * @throws IOException cannot open the resource to get the bytes
 	 */
-	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException;
+	public byte[] getBytes(StoreResource resource, long start, long length) throws IOException;
 
 	/**
 	 * Moves all the resources of a document from it's original location to a

@@ -582,8 +582,6 @@ public class DocumentManager {
 		}
 
 		// Parses the file where it is already stored
-		Locale locale = doc.getLocale();
-		String resource = store.getResourceName(doc, fileVersion, null);
 		Parser parser = ParserFactory.getParser(doc.getFileName());
 
 		// and gets some fields
@@ -591,8 +589,10 @@ public class DocumentManager {
 			log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
 
 			try {
-				content = parser.parse(store.getStream(doc.getId(), resource), new ParseParameters(doc,
-						doc.getFileName(), fileVersion, null, locale, tenantName(doc.getTenantId())));
+				content = parser.parse(
+						store.getStream(new StoreResource.Builder().document(doc).fileVersion(fileVersion).build()),
+						new ParseParameters(doc, doc.getFileName(), fileVersion, null, doc.getLocale(),
+								tenantName(doc.getTenantId())));
 			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc);
 				log.error(e.getMessage(), e);
@@ -603,11 +603,7 @@ public class DocumentManager {
 			}
 		}
 
-		if (content == null) {
-			content = "";
-		}
-
-		return content;
+		return StringUtils.defaultString(content);
 	}
 
 	/**
@@ -1197,9 +1193,7 @@ public class DocumentManager {
 	 */
 	public int countPages(Document doc) {
 		try {
-			Parser parser = ParserFactory.getParser(doc.getFileName());
-			Store strt = Context.get(Store.class);
-			return parser.countPages(strt.getStream(doc.getId(), strt.getResourceName(doc, null, null)),
+			return ParserFactory.getParser(doc.getFileName()).countPages(store.getStream(new StoreResource.Builder().document(doc).build()),
 					doc.getFileName());
 		} catch (Exception e) {
 			log.warn("Cannot count pages of document {}", doc, e);
@@ -1233,8 +1227,7 @@ public class DocumentManager {
 		if (doc.getDocRef() != null)
 			return new DocumentFuture(createAlias(doc, folder, doc.getDocRefType(), transaction), new FutureValue<>());
 
-		String resource = store.getResourceName(doc, null, null);
-		try (InputStream is = store.getStream(doc.getId(), resource);) {
+		try (InputStream is = store.getStream(new StoreResource.Builder().document(doc).build());) {
 			Document cloned = new Document(doc);
 			cloned.setId(0);
 			cloned.setCustomId(null);

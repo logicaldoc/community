@@ -58,11 +58,11 @@ public class MockStore extends FSStore {
 	}
 
 	@Override
-	public InputStream getStream(long docId, String resource) throws IOException {
+	public InputStream getStream(StoreResource resource) throws IOException {
 		if (useDummyFile)
 			return new FileInputStream(dummyFile);
 		else
-			return super.getStream(docId, resource);
+			return super.getStream(resource);
 	}
 
 	public boolean isUseDummyFile() {

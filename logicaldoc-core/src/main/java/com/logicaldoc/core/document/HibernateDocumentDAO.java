@@ -593,7 +593,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public void updateDigest(Document doc) throws PersistenceException {
 		StoreResource resource=new StoreResource.Builder().document(doc).build();
 		if (store.exists(resource)) {
-			try (InputStream in = store.getStream(doc.getId(), resource.name());) {
+			try (InputStream in = store.getStream(resource);) {
 				doc.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
 				log.error("Cannot retrieve the content of document {}", doc);

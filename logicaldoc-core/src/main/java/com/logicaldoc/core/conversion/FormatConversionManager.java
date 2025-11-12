@@ -107,7 +107,7 @@ public class FormatConversionManager {
 					.fileVersion(getSuitableFileVersion(document, fileVersion)).build();
 		if (!store.exists(resource))
 			convertToPdf(document, fileVersion, sid);
-		return store.getBytes(resource.getDocId(), resource.name());
+		return store.getBytes(resource);
 	}
 
 	/**

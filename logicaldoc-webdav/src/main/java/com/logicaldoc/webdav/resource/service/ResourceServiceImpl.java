@@ -38,6 +38,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.cache.WebdavCache;
 import com.logicaldoc.webdav.cache.WebdavCacheFolder;
@@ -875,13 +876,11 @@ public class ResourceServiceImpl implements ResourceService {
 		InputStream is = null;
 		try {
 			if (version == null || version.equals("")) {
-				String res = store.getResourceName(document, null, null);
-				is = store.getStream(document.getId(), res);
+				is = store.getStream(new StoreResource.Builder().document(document).build());
 			} else {
-				String res = store.getResourceName(document, resource.getVersionLabel(), null);
-				is = store.getStream(document.getId(), res);
+				is = store.getStream(new StoreResource.Builder().document(document).fileVersion(resource.getVersionLabel()).build());
 			}
-		} catch (IOException e) {
+		} catch (IOException | PersistenceException e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}
 		return is;

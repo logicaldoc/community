@@ -1716,7 +1716,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			att.setFileName(FileUtil.getBaseName(doc.getFileName()) + ".pdf");
 		}
 
-		att.setData(store.getBytes(doc.getId(), resource.name()));
+		att.setData(store.getBytes(resource));
 
 		email.addAttachment(2 + email.getAttachments().size(), att);
 	}
@@ -2528,7 +2528,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			Store store = Store.get();
 			String resource = store.getResourceName(doc, null, null);
 
-			return store.getString(doc.getId(), resource);
+			return Store.get().getString(doc.getId(), resource);
 		} catch (PersistenceException | ServerException | IOException e) {
 			return throwServerException(session, log, e);
 		}
@@ -2706,13 +2706,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} catch (PersistenceException e1) {
 			return throwServerException(session, log, e1);
 		}
-
-		Store store = Store.get();
-		String resource = store.getResourceName(docId, fileVersion, null);
-
 		GUIDocument guiDocument = getById(docId);
 
-		try (InputStream is = store.getStream(emailDocument.getId(), resource)) {
+		try (InputStream is = Store.get()
+				.getStream(new StoreResource.Builder().document(emailDocument).fileVersion(fileVersion).build())) {
 			GUIEmail guiMail = new GUIEmail();
 			EMail email = readEmail(is, emailDocument.getId(), guiDocument);
 			if (email != null) {
@@ -2733,7 +2730,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				setEmailAttachments(guiDocument, email, guiMail);
 			}
 			return guiMail;
-		} catch (IOException e1) {
+		} catch (IOException | PersistenceException e1) {
 			return throwServerException(session, log, e1);
 		}
 	}
@@ -2805,9 +2802,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException("Not an email file");
 			checkPermission(Permission.WRITE, session.getUser(), doc.getFolder().getId());
 
-			Store store = Store.get();
-			String resource = store.getResourceName(docId, fileVersion, null);
-			is = store.getStream(docId, resource);
+			is = Store.get().getStream(new StoreResource.Builder().docId(docId).fileVersion(fileVersion).build());
 
 			EMail email = MailUtil.messageToMail(is, true);
 			EMailAttachment attachment = null;

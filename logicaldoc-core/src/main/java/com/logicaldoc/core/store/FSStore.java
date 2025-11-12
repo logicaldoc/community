@@ -120,9 +120,9 @@ public class FSStore extends AbstractStore {
 	}
 
 	@Override
-	public InputStream getStream(long docId, String resource) throws IOException {
-		File container = getContainer(docId);
-		File file = new File(container, resource);
+	public InputStream getStream(StoreResource resource) throws IOException {
+		File container = getContainer(resource.getDocId());
+		File file = new File(container, resource.name());
 
 		try {
 			return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
@@ -143,9 +143,9 @@ public class FSStore extends AbstractStore {
 	}
 
 	@Override
-	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException {
-		File container = getContainer(docId);
-		File file = new File(container, resource);
+	public byte[] getBytes(StoreResource resource, long start, long length) throws IOException {
+		File container = getContainer(resource.getDocId());
+		File file = new File(container, resource.name());
 		return FileUtil.toByteArray(file, start, length);
 	}
 

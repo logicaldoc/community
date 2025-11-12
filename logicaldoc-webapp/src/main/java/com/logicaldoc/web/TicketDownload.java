@@ -265,18 +265,16 @@ public class TicketDownload extends HttpServlet {
 		 */
 		DownloadServlet.processSafeHtml(suffix, null, document);
 
-		Store store = Store.get();
-
 		StoreResource resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).suffix(suffix)
 				.build();
 
 		OutputStream os = null;
-		try (InputStream is = store.getStream(document.getId(), resource.name())) {
+		try (InputStream is = Store.get().getStream(resource)) {
 			String filename = document.getFileName();
 			if (suffix != null && suffix.contains("pdf"))
 				filename = document.getFileName() + ".pdf";
 
-			long size = store.size(resource);
+			long size = Store.get().size(resource);
 
 			// get the mimetype
 			String mimetype = MimeType.getByFilename(filename);

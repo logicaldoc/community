@@ -1194,12 +1194,11 @@ public class LDRepository {
 			InputStream stream = null;
 			InputStream is = null;
 			if (doc instanceof Document document) {
-				is = Store.get().getStream(doc.getId(), Store.get().getResourceName(document, null, null));
-			} else {
-				Version v = (Version) doc;
-				is = Store.get().getStream(v.getDocId(),
-						Store.get().getResourceName(v.getDocId(), v.getFileVersion(), null));
+				is = Store.get().getStream(new StoreResource.Builder().document(document).build());
+			} else if (doc instanceof Version ver) {
+				is = Store.get().getStream(new StoreResource.Builder().version(ver).build());
 			}
+
 			stream = new BufferedInputStream(is, BUFFER_SIZE);
 
 			// Create the document history event
