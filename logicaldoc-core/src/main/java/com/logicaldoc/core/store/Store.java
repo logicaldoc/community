@@ -151,27 +151,25 @@ public interface Store extends Comparable<Store> {
 	/**
 	 * Writes the specified resource in an output stream
 	 * 
-	 * @param docId The document's identifier
-	 * @param resource Name of the resource
+	 * @param resource The resource
 	 * @param output The output stream
 	 * @param start Index of the starting byte
 	 * @param length Total packet length
 	 * 
 	 * @throws IOException error writing the stream or reading the resource
 	 */
-	public void writeToStream(long docId, String resource, OutputStream output, long start, long length)
+	public void writeToStream(StoreResource resource, OutputStream output, long start, long length)
 			throws IOException;
 
 	/**
 	 * Writes the specified resource in an output stream
 	 * 
-	 * @param docId The document's identifier
-	 * @param resourceName Name of the resource
+	 * @param resource The resource
 	 * @param output The output stream
 	 * 
 	 * @throws IOException error writing the stream or reading the resource
 	 */
-	public void writeToStream(long docId, String resourceName, OutputStream output) throws IOException;
+	public void writeToStream(StoreResource resource, OutputStream output) throws IOException;
 
 	/**
 	 * Obtains the document's content for the specified resource

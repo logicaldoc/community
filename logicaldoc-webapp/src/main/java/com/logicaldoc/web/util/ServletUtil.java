@@ -292,7 +292,7 @@ public class ServletUtil {
 			if (gstreamRequired) {
 				// The browser accepts GZIP, so GZIP the content.
 				response.setHeader("Content-Encoding", "gzip");
-				store.writeToStream(docId, resource.name(), output);
+				store.writeToStream(resource, output);
 			} else if (ranges.size() == 1) {
 				// Return single part of file.
 				Range r = ranges.get(0);
@@ -304,7 +304,7 @@ public class ServletUtil {
 					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
 				// Copy single part range.
-				store.writeToStream(docId, resource.name(), output, r.start, r.length);
+				store.writeToStream(resource, output, r.start, r.length);
 			} else {
 				// Return multiple parts of file.
 				response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
@@ -324,7 +324,7 @@ public class ServletUtil {
 					sos.println("Content-Range: bytes " + r.start + "-" + r.end + "/" + r.total);
 
 					// Copy single part range of multi part range.
-					store.writeToStream(docId, resource.name(), sos, r.start, r.length);
+					store.writeToStream(resource, sos, r.start, r.length);
 
 					// End with multipart boundary.
 					sos.println();

@@ -199,16 +199,16 @@ public abstract class AbstractStore implements Store {
 	}
 
 	@Override
-	public void writeToStream(long docId, String resource, OutputStream output, long start, long length)
+	public void writeToStream(StoreResource resource, OutputStream output, long start, long length)
 			throws IOException {
-		try (InputStream input = getStream(docId, resource)) {
+		try (InputStream input = getStream(resource.getDocId(), resource.name())) {
 			IOUtils.copyLarge(input, output, start, length);
 		}
 	}
 
 	@Override
-	public void writeToStream(long docId, String resource, OutputStream output) throws IOException {
-		try (InputStream input = getStream(docId, resource)) {
+	public void writeToStream(StoreResource resource, OutputStream output) throws IOException {
+		try (InputStream input = getStream(resource.getDocId(), resource.name())) {
 			IOUtils.copyLarge(input, output);
 		}
 	}
