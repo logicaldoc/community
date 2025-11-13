@@ -112,11 +112,11 @@ public abstract class AbstractTestCase {
 		try {
 			loadDevelSettingsInEnvironment();
 
+			initializePlugins(getPluginArchives());
+
 			updateUserHome();
 
 			createTestDirs();
-
-			initializePlugins(getPluginArchives());
 
 			context = buildApplicationContext();
 
@@ -153,7 +153,7 @@ public abstract class AbstractTestCase {
 		}
 	}
 
-	private void updateUserHome() {
+	protected void updateUserHome() {
 		System.setProperty(USER_HOME, tempDir.getPath());
 	}
 
@@ -198,6 +198,7 @@ public abstract class AbstractTestCase {
 		}
 
 		PluginRegistry registry = PluginRegistry.getInstance();
+		log.info("Initialize plugins inside {}", pluginsDir.getAbsolutePath());
 		registry.init(pluginsDir.getAbsolutePath());
 	}
 

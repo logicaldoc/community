@@ -282,6 +282,8 @@ public abstract class AbstractStore implements Store {
 	@Override
 	@PostConstruct
 	public void init() {
+		log.info("Initialize Store");
+		
 		if (!storeDefinitions.isEmpty())
 			return;
 
@@ -293,12 +295,15 @@ public abstract class AbstractStore implements Store {
 			String type = ext.getParameter("type").valueAsString();
 			String className = ext.getParameter("class").valueAsString();
 
+			log.debug("Found Store specification {} for type {}", className, type);
+			
 			try {
 				@SuppressWarnings("rawtypes")
 				Class clazz = Class.forName(className);
 				// Try to instantiate the builder
 				@SuppressWarnings("unchecked")
 				Object store = clazz.getDeclaredConstructor().newInstance();
+
 				if (!(store instanceof Store))
 					throw new ClassNotFoundException(
 							String.format("The specified store %s doesn't implement the Store interface", className));
