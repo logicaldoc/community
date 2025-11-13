@@ -111,7 +111,7 @@ public class StoreResource {
 		}
 
 		public Builder suffix(String suffix) {
-			this.suffix = suffix;
+			this.suffix = StringUtils.defaultString(suffix, null);
 			return this;
 		}
 

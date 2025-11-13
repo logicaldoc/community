@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
-import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
@@ -226,9 +224,8 @@ public abstract class AbstractStore implements Store {
 	}
 
 	@Override
-	public String getString(long docId, String resource) {
-		StringWriter writer = new StringWriter();
-		try (InputStream input = getStream(new StoreResource.Builder().docId(docId).name(resource).build())) {
+	public String getString(StoreResource resource) {
+		try (StringWriter writer = new StringWriter(); InputStream input = getStream(resource)) {
 			IOUtils.copy(input, writer, StandardCharsets.UTF_8);
 			return writer.toString();
 		} catch (Exception e) {
@@ -242,61 +239,6 @@ public abstract class AbstractStore implements Store {
 	 */
 	protected String getDir() {
 		return getConfig().getProperty(STORE + id + ".dir");
-	}
-
-	@Override
-	public String getResourceName(Document doc, String fileVersion, String suffix) {
-		DocumentDAO docDao = DocumentDAO.get();
-		Document document = doc;
-
-		/*
-		 * All versions of a document are stored in the same directory as the
-		 * current version, but the filename is the version number without
-		 * extension, e.g. "doc/2.1"
-		 */
-		String resourceName;
-		if (doc.getDocRef() != null) {
-			// The shortcut document doesn't have the 'fileversion' and the
-			// 'version'
-			try {
-				document = docDao.findById(doc.getDocRef());
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-
-		if (StringUtils.isEmpty(fileVersion))
-			resourceName = document.getFileVersion();
-		else
-			resourceName = fileVersion;
-		if (StringUtils.isEmpty(resourceName))
-			resourceName = document.getVersion();
-
-		/*
-		 * Document's related resources are stored with a suffix, e.g.
-		 * "doc/2.1-thumb.png"
-		 */
-		if (StringUtils.isNotEmpty(suffix))
-			resourceName += "-" + suffix;
-
-		return sanitizeResourceName(resourceName);
-	}
-
-	@Override
-	public String getResourceName(long docId, String fileVersion, String suffix) {
-		DocumentDAO docDao = DocumentDAO.get();
-		try {
-			Document doc = docDao.findById(docId);
-			return getResourceName(doc, fileVersion, suffix);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
-
-	@Deprecated
-	protected String sanitizeResourceName(String resourceName) {
-		return resourceName.replace("..", "").replaceAll("[^a-zA-Z0-9\\-\\\\.]", "");
 	}
 
 	@Override

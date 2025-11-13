@@ -595,9 +595,8 @@ public class DocTool {
 	 * @return the file content as string
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
-		Store store = Store.get();
-		String resource = store.getResourceName(docId, fileVersion, suffix);
-		return store.getString(docId, resource);
+		return Store.get()
+				.getString(new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build());
 	}
 
 	/**
@@ -609,11 +608,10 @@ public class DocTool {
 	 * @param outputFile the user in name of which to take this action
 	 */
 	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
-		Store store = Store.get();
-		StoreResource resource = new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix)
-				.build();
 		try {
-			store.writeToFile(resource, new File(outputFile));
+			Store.get().writeToFile(
+					new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build(),
+					new File(outputFile));
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}

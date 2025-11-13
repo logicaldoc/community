@@ -13,6 +13,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -72,11 +73,10 @@ public class ConvertPdf extends HttpServlet {
 				ver = request.getParameter(VERSION);
 			Version version = versionDao.findByVersion(docId, ver);
 
-			String suffix = null;
-
 			// Download the already stored resource
-			ServletUtil.downloadDocument(request, response, null, document.getId(), version.getFileVersion(), null,
-					suffix, session.getUser());
+			ServletUtil.downloadDocument(request, response, null,
+					new StoreResource.Builder().docId(document.getId()).fileVersion(version.getFileVersion()).build(),
+					null, session.getUser());
 		} catch (Exception r) {
 			log.error(r.getMessage(), r);
 

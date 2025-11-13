@@ -135,19 +135,22 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
 			throws InvalidSessionException, IOException, PersistenceException, ServletException {
 		Session session = ServletUtil.validateSession(mockRequest);
 		MockServletResponse mockResponse = new MockServletResponse(RESPONSE_OUTPUT);
-		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(), 1L, "1.0", "test.txt", null,
+		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(),
+				new StoreResource.Builder().docId(1L).fileVersion("1.0").build(), "test.txt",
 				ServletUtil.getSessionUser(mockRequest));
 		assertEquals(127810L, RESPONSE_OUTPUT.length());
 
 		FileUtil.delete(RESPONSE_OUTPUT);
 		mockRequest.setHeader("Range", "bytes=0-24");
-		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(), 1L, "1.0", "test.txt", null,
+		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(),
+				new StoreResource.Builder().docId(1L).fileVersion("1.0").build(), "test.txt",
 				ServletUtil.getSessionUser(mockRequest));
 		assertEquals(25L, RESPONSE_OUTPUT.length());
 
 		FileUtil.delete(RESPONSE_OUTPUT);
 		mockRequest.removeHeader("Range");
-		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(), 1L, "1.0", "test.txt",
+		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(),
+				new StoreResource.Builder().docId(1L).fileVersion("1.0").build(), "test.txt",
 				ServletUtil.getSessionUser(mockRequest));
 		assertEquals(127810L, RESPONSE_OUTPUT.length());
 	}

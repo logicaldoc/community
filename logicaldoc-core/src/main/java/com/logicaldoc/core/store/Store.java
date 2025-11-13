@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.PostConstruct;
@@ -86,30 +85,6 @@ public interface Store extends Comparable<Store> {
 	public void delete(StoreResource resource);
 
 	/**
-	 * Computes the resource name inside the container
-	 * 
-	 * @param doc The document representation
-	 * @param fileVersion The file version (use null for the latest version)
-	 * @param suffix The file suffix (use null if you want the exact document
-	 *        file)
-	 * @return The document's resource name
-	 */
-	@Deprecated
-	public String getResourceName(Document doc, String fileVersion, String suffix);
-
-	/**
-	 * Computes the resource name inside the container
-	 * 
-	 * @param docId The document identifier
-	 * @param fileVersion The file version (use null for the latest version)
-	 * @param suffix The file suffix (use null if you want the exact document
-	 *        file)
-	 * @return The document's resource name
-	 */
-	@Deprecated
-	public String getResourceName(long docId, String fileVersion, String suffix);
-
-	/**
 	 * Lists all resources in the document's container
 	 * 
 	 * @param docId The document's identifier
@@ -158,8 +133,7 @@ public interface Store extends Comparable<Store> {
 	 * 
 	 * @throws IOException error writing the stream or reading the resource
 	 */
-	public void writeToStream(StoreResource resource, OutputStream output, long start, long length)
-			throws IOException;
+	public void writeToStream(StoreResource resource, OutputStream output, long start, long length) throws IOException;
 
 	/**
 	 * Writes the specified resource in an output stream
@@ -220,14 +194,13 @@ public interface Store extends Comparable<Store> {
 	public int moveResourcesToStore(long docId, int targetStoreId) throws IOException;
 
 	/**
-	 * Obtains the document's content as string for the specified resource
+	 * Obtains the resource's content as string for the specified resource
 	 * 
-	 * @param docId The document's identifier
-	 * @param resource Name of the resource
+	 * @param resource The resource
 	 * 
 	 * @return The document file's as string representation
 	 */
-	public String getString(long docId, String resource);
+	public String getString(StoreResource resource);
 
 	/**
 	 * Computes the total size of the documents repository(in bytes)

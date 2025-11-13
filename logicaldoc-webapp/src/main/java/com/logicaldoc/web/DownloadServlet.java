@@ -137,11 +137,9 @@ public class DownloadServlet extends HttpServlet {
 				fileVersion = document.getFileVersion();
 		}
 
-		if (StringUtils.isEmpty(suffix)) {
-			suffix = "";
-		}
-
-		download(request, response, session, downloadText, docId, fileVersion, filename, suffix, document);
+		download(request, response, session, downloadText,
+				new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build(), filename,
+				document);
 	}
 
 	private Document getReferencedDocument(DocumentDAO docDao, Document document) throws PersistenceException {
@@ -208,34 +206,32 @@ public class DownloadServlet extends HttpServlet {
 	}
 
 	private void download(HttpServletRequest request, HttpServletResponse response, Session session,
-			String downloadText, Long docId, String fileVersion, String filename, String suffix, Document doc)
+			String downloadText, StoreResource resource, String filename, Document doc)
 			throws IOException, PersistenceException, ServletException {
 		if (doc != null) {
 			if ("true".equals(downloadText)) {
 				ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());
 			} else {
-				ServletUtil.downloadDocument(request, response, session.getSid(), doc.getId(), fileVersion, filename,
-						suffix, session.getUser());
+				ServletUtil.downloadDocument(request, response, session.getSid(), resource, filename,
+						session.getUser());
 			}
 		} else {
-			throw new FileNotFoundException("Cannot find document " + docId);
+			throw new FileNotFoundException("Cannot find document " + resource.getDocId());
 		}
 	}
 
 	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException, PersistenceException {
-		if ("safe.html".equals(suffix)) {
+		if ("safe.html".equals(suffix) && doc != null) {
+			StoreResource safeResource = new StoreResource.Builder().document(doc)
+					.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).suffix(suffix)
+					.build();
 			Store store = Store.get();
-			if (doc != null) {
-				StoreResource safeResource = new StoreResource.Builder().document(doc)
-						.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).suffix(suffix)
-						.build();
-				if (!store.exists(safeResource)) {
-					StoreResource unsafeResource = new StoreResource.Builder().document(doc)
-							.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).build();
-					String unsafe = store.getString(doc.getId(), unsafeResource.name());
-					String safe = HTMLSanitizer.sanitize(unsafe);
-					store.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), safeResource);
-				}
+			if (!store.exists(safeResource)) {
+				StoreResource unsafeResource = new StoreResource.Builder().document(doc)
+						.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).build();
+				String unsafe = store.getString(unsafeResource);
+				String safe = HTMLSanitizer.sanitize(unsafe);
+				store.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), safeResource);
 			}
 		}
 	}

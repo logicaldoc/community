@@ -1120,7 +1120,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertNotNull(doc);
 		assertEquals("1.3", doc.getVersion());
 		assertEquals("1.3", doc.getFileVersion());
-		assertTrue(str.getString(doc.getId(), str.getResourceName(doc, null, null)).contains("invoice calculation"));
+		assertTrue(str.getString(new StoreResource.Builder().document(doc).build()).contains("invoice calculation"));
 
 		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.replaceFile(doc.getId(), "1.3", is, null);

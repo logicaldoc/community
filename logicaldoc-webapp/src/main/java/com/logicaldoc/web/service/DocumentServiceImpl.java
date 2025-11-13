@@ -2525,10 +2525,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				doc = docDao.findById(doc.getDocRef());
 
 			// Obtain the document's file stream
-			Store store = Store.get();
-			String resource = store.getResourceName(doc, null, null);
-
-			return Store.get().getString(doc.getId(), resource);
+			return Store.get().getString(new StoreResource.Builder().document(doc).build());
 		} catch (PersistenceException | ServerException | IOException e) {
 			return throwServerException(session, log, e);
 		}

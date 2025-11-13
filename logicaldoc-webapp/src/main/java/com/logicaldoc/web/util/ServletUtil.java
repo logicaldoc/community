@@ -214,9 +214,7 @@ public class ServletUtil {
 	 * @param response the document is written to this object
 	 * @param sid Session identifier, if not provided the request parameter is
 	 *        inspected
-	 * @param docId Id of the document
-	 * @param fileVersion name of the file version; if null the latest version
-	 *        will be returned
+	 * @param resource The resource to download
 	 * @param fileName name of the file
 	 * @param suffix suffix of the linked document's resource
 	 * @param user current user
@@ -226,27 +224,25 @@ public class ServletUtil {
 	 * @throws PersistenceException error at data layer
 	 */
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
-			long docId, String fileVersion, String fileName, String suffix, User user)
+			StoreResource resource, String fileName, User user)
 			throws IOException, ServletException, PersistenceException {
 
 		Session session = getSession(request, sid);
 
 		initUser(user);
 
-		Document document = getDocument(docId, user);
+		Document document = getDocument(resource.getDocId(), user);
 
-		String filename = getFilename(fileName, suffix, document);
+		String filename = getFilename(fileName, resource.getSuffix(), document);
 
 		Store store = Store.get();
 
-		StoreResource resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).build();
 		if (!store.exists(resource)) {
 			throw new FileNotFoundException(resource.name());
 		}
 
-		if (StringUtils.isNotEmpty(suffix)) {
-			resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).suffix(suffix).build();
-			filename = filename + "." + suffix.substring(suffix.lastIndexOf('.') + 1);
+		if (StringUtils.isNotEmpty(resource.getSuffix())) {
+			filename = filename + "." + resource.getSuffix().substring(resource.getSuffix().lastIndexOf('.') + 1);
 		}
 
 		long length = store.size(resource);
@@ -255,7 +251,7 @@ public class ServletUtil {
 		String eTag = document.getId() + "_" + document.getVersion() + "_" + lastModified;
 		boolean acceptsGzip = false;
 
-		acceptsGzip = getAcceptEncoding(request, suffix);
+		acceptsGzip = getAcceptEncoding(request, resource.getSuffix());
 
 		response.setContentType(contentType);
 		setContentDisposition(request, response, filename);
@@ -336,7 +332,7 @@ public class ServletUtil {
 		/*
 		 * Save an history only if it is requested the first fragment
 		 */
-		saveHistory(request, sid, suffix, user, session, document, ranges);
+		saveHistory(request, sid, resource.getSuffix(), user, session, document, ranges);
 	}
 
 	private static void initUser(User user) {
@@ -680,30 +676,6 @@ public class ServletUtil {
 			response.getOutputStream().flush();
 			response.getOutputStream().close();
 		}
-	}
-
-	/**
-	 * Sends the specified document to the response object; the client will
-	 * receive it as a download
-	 * 
-	 * @param request the current request
-	 * @param response the document is written to this object
-	 * @param sid identifier of the session
-	 * @param docId Id of the document
-	 * @param fileVersion name of the file version; if null the latest version
-	 *        will be returned
-	 * @param fileName name of the file
-	 * @param user current user
-	 * 
-	 * @throws IOException generic I/O exception retrieving the document's file
-	 * @throws ServletException error in the servlet container
-	 * @throws NumberFormatException error if docId is not a number
-	 * @throws PersistenceException error at data layer
-	 */
-	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
-			long docId, String fileVersion, String fileName, User user)
-			throws IOException, NumberFormatException, ServletException, PersistenceException {
-		downloadDocument(request, response, sid, docId, fileVersion, fileName, null, user);
 	}
 
 	/**

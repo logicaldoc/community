@@ -54,6 +54,7 @@ import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
+import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -323,7 +324,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		doc = testSubject.getById(doc.getId());
 		assertNotNull(doc);
-		assertEquals("text content", store.getString(doc.getId(), store.getResourceName(doc.getId(), null, null)));
+		assertEquals("text content", store
+				.getString(new StoreResource.Builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
 		testSubject.checkout(List.of(doc.getId()));
 
 		doc.setId(0);
@@ -335,7 +337,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		doc = testSubject.getById(doc.getId());
 		assertNotNull(doc);
-		assertEquals(" ", store.getString(doc.getId(), store.getResourceName(doc.getId(), null, null)));
+		assertEquals(" ", store
+				.getString(new StoreResource.Builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
 		testSubject.checkout(List.of(doc.getId()));
 	}
 
