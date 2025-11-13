@@ -34,15 +34,17 @@ import jakarta.annotation.Resource;
 @Component("thumbnailManager")
 public class ThumbnailManager {
 
-	public static final String SUFFIX_PREVIEW = "conversion.pdf";
-
-	public static final String SUFFIX_TILE = "tile.png";
-
+	/**
+	 * Gets the object available in the application context
+	 * 
+	 * @return the instance of this object in the application context
+	 */
+	public static ThumbnailManager get() {
+		return Context.get(ThumbnailManager.class);
+	}
+	
 	public static final String THUMB = "thumb";
 
-	public static final String SUFFIX_THUMB = THUMB + ".png";
-
-	public static final String SUFFIX_MOBILE = "mobile.png";
 
 	private static final Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
 
@@ -63,7 +65,7 @@ public class ThumbnailManager {
 	 * @throws IOException in case an error happens during image creation
 	 */
 	public void createTumbnail(Document document, String fileVersion, String sid) throws IOException {
-		createImage(document, fileVersion, "thumbnail", SUFFIX_THUMB, sid);
+		createImage(document, fileVersion, "thumbnail", StoreResource.SUFFIX_THUMBNAIL, sid);
 	}
 
 	/**
@@ -94,7 +96,7 @@ public class ThumbnailManager {
 	 */
 	public void createTumbnail(Document document, String fileVersion, int size, Integer quality, String sid)
 			throws IOException {
-		createImage(document, fileVersion, size, quality, SUFFIX_THUMB, sid);
+		createImage(document, fileVersion, size, quality, StoreResource.SUFFIX_THUMBNAIL, sid);
 	}
 
 	/**
@@ -108,7 +110,7 @@ public class ThumbnailManager {
 	 * @throws IOException in case an error happens during image creation
 	 */
 	public void createTile(Document document, String fileVersion, String sid) throws IOException {
-		createImage(document, fileVersion, "tile", SUFFIX_TILE, sid);
+		createImage(document, fileVersion, "tile", StoreResource.SUFFIX_TILE, sid);
 	}
 
 	/**
@@ -134,7 +136,7 @@ public class ThumbnailManager {
 	 * @throws IOException in case an error happens during image creation
 	 */
 	public void createMobile(Document document, String fileVersion, String sid) throws IOException {
-		createImage(document, fileVersion, "mobile", SUFFIX_MOBILE, sid);
+		createImage(document, fileVersion, "mobile", StoreResource.SUFFIX_MOBILE_THUMBNAIL, sid);
 	}
 
 	/**
@@ -147,7 +149,7 @@ public class ThumbnailManager {
 	 * @throws IOException in case an error happens during image creation
 	 */
 	public void createMobile(Document document, String sid) throws IOException {
-		createImage(document, null, "mobile", SUFFIX_MOBILE, sid);
+		createImage(document, null, "mobile", StoreResource.SUFFIX_MOBILE_THUMBNAIL, sid);
 	}
 
 	protected void createImage(Document document, String fileVersion, int size, Integer quality, String suffix,
@@ -173,7 +175,7 @@ public class ThumbnailManager {
 									93));
 
 			// Put the resource
-			store.store(dest, new StoreResource.Builder().document(document)
+			store.store(dest, StoreResource.builder().document(document)
 					.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(suffix).build());
 		} catch (Exception e) {
 			log.warn("Error rendering image for document: {} - {}", document.getId(), document.getFileName(), e);
@@ -245,7 +247,8 @@ public class ThumbnailManager {
 	private File writeToTempFile(Document document, String fileVersion) throws IOException, PersistenceException {
 		File target = FileUtil.createTempFile("scr",
 				"." + FileUtil.getExtension(DocUtil.getFileName(document, fileVersion)));
-		store.writeToFile(new StoreResource.Builder().document(document).fileVersion(getSuitableFileVersion(document, fileVersion)).build(), target);
+		store.writeToFile(StoreResource.builder().document(document)
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).build(), target);
 		return target;
 	}
 

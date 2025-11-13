@@ -22,7 +22,6 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.store.StoreResource;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 import jakarta.servlet.ServletException;
@@ -77,7 +76,7 @@ public class ThumbnailServlet extends HttpServlet {
 			String id = request.getParameter(DOC_ID);
 			long docId = Long.parseLong(id);
 			if (StringUtils.isEmpty(suffix))
-				suffix = ThumbnailManager.SUFFIX_THUMB;
+				suffix = StoreResource.SUFFIX_THUMBNAIL;
 			DocumentDAO docDao = DocumentDAO.get();
 			Document doc = docDao.findById(docId);
 			if (doc.getDocRef() != null) {
@@ -98,7 +97,7 @@ public class ThumbnailServlet extends HttpServlet {
 			if (!allowedPermissions.contains(Permission.READ) || !allowedPermissions.contains(Permission.PREVIEW))
 				throw new PermissionException(user.getUsername(), doc.toString(), Permission.PREVIEW);
 
-			StoreResource resource = new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix)
+			StoreResource resource = StoreResource.builder().docId(docId).fileVersion(fileVersion).suffix(suffix)
 					.build();
 
 			// 2) prepare the thumbnail
@@ -141,9 +140,9 @@ public class ThumbnailServlet extends HttpServlet {
 		// In any case try to produce the thumbnail
 		buildThumbnail(sid, doc, fileVersion);
 
-		if (resourceName.endsWith(ThumbnailManager.SUFFIX_THUMB))
+		if (resourceName.endsWith(StoreResource.SUFFIX_THUMBNAIL))
 			return;
-		if (resourceName.endsWith(ThumbnailManager.SUFFIX_TILE)) {
+		if (resourceName.endsWith(StoreResource.SUFFIX_TILE)) {
 			createTileImage(sid, doc, fileVersion);
 		} else if (resourceName.contains(ThumbnailManager.THUMB)) {
 			createThumbnailImage(sid, doc, fileVersion, resourceName);
@@ -153,15 +152,14 @@ public class ThumbnailServlet extends HttpServlet {
 
 	private void createThumbnailImage(String sid, Document doc, String fileVersion, String resourceName) {
 		Store store = Store.get();
-		if (store.size(new StoreResource.Builder().docId(doc.getId()).name(resourceName).build()) <= 0L) {
+		if (store.size(StoreResource.builder().docId(doc.getId()).name(resourceName).build()) <= 0L) {
 			try {
 				/*
 				 * In this case the resource is like thumn450.png so we extract
 				 * the size from the name
 				 */
 				String sizeStr = resourceName.substring(resourceName.indexOf('-') + 6, resourceName.lastIndexOf('.'));
-				Context.get(ThumbnailManager.class).createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null,
-						sid);
+				ThumbnailManager.get().createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
 				log.debug("Created custom thumbnail {}", resourceName);
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
@@ -171,10 +169,10 @@ public class ThumbnailServlet extends HttpServlet {
 
 	private void createTileImage(String sid, Document doc, String fileVersion) {
 		try {
-			StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion)
-					.suffix(ThumbnailManager.SUFFIX_TILE).build();
+			StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffixTile()
+					.build();
 			if (Store.get().size(resource) <= 0L) {
-				Context.get(ThumbnailManager.class).createTile(doc, fileVersion, sid);
+				ThumbnailManager.get().createTile(doc, fileVersion, sid);
 				log.debug("Created tile {}", resource);
 			}
 		} catch (Exception t) {
@@ -184,10 +182,10 @@ public class ThumbnailServlet extends HttpServlet {
 
 	private void buildThumbnail(String sid, Document doc, String fileVersion) {
 		try {
-			StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion)
-					.suffix(ThumbnailManager.SUFFIX_THUMB).build();
+			StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffixThumbnail()
+					.build();
 			if (Store.get().size(resource) <= 0) {
-				Context.get(ThumbnailManager.class).createTumbnail(doc, fileVersion, sid);
+				ThumbnailManager.get().createTumbnail(doc, fileVersion, sid);
 				log.debug("Created thumbnail {}", resource);
 			}
 		} catch (Exception t) {

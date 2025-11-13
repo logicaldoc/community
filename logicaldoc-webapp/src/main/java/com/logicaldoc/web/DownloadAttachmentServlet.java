@@ -84,7 +84,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			String filename, Document doc) throws MessagingException, IOException, CMSException {
 
 		try (InputStream is = Store.get()
-				.getStream(new StoreResource.Builder().docId(docId).fileVersion(fileVersion).build())) {
+				.getStream(StoreResource.builder().docId(docId).fileVersion(fileVersion).build())) {
 			EMail email = null;
 
 			if (doc != null && doc.getFileName().toLowerCase().endsWith(".eml"))

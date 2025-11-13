@@ -36,10 +36,10 @@ public class CatchAllParser extends AbstractParser {
 
 			Store store = Context.get(Store.class);
 
-			StoreResource pdfResource = new StoreResource.Builder().document(parameters.getDocument())
+			StoreResource pdfResource = StoreResource.builder().document(parameters.getDocument())
 					.fileVersion(parameters.getFileVersion() != null ? parameters.getFileVersion()
 							: parameters.getDocument().getFileVersion())
-					.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
+					.suffixPdfConversion().build();
 
 			if (store.exists(pdfResource)) {
 				Parser parser = ParserFactory.getParser("pdf");

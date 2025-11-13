@@ -568,7 +568,7 @@ public class DocTool {
 		try {
 			tmpFile = FileUtil.createTempFile("res-", suffix);
 			Store.get().writeToFile(
-					new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(suffix).build(), tmpFile);
+					StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build(), tmpFile);
 
 			Document docVO = new Document();
 			docVO.setFileName(newFileName);
@@ -596,7 +596,7 @@ public class DocTool {
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
 		return Store.get()
-				.getString(new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build());
+				.getString(StoreResource.builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build());
 	}
 
 	/**
@@ -610,7 +610,7 @@ public class DocTool {
 	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
 		try {
 			Store.get().writeToFile(
-					new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build(),
+					StoreResource.builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build(),
 					new File(outputFile));
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
@@ -620,7 +620,7 @@ public class DocTool {
 	/**
 	 * Converts a document in PDF format and saves it as ancillary resource of
 	 * the document with suffix
-	 * {@link FormatConversionManager#PDF_CONVERSION_SUFFIX}. If the conversion
+	 * {@link FormatConversionManager#SUFFIX_PDF_CONVERSION}. If the conversion
 	 * already exists, nothing will be done.
 	 * 
 	 * @param doc the document to convert

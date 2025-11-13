@@ -1625,7 +1625,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				documentTransaction.setComment(transaction.getComment());
 				documentTransaction.setEvent(DocumentEvent.STORED);
 
-				try (InputStream is = store.getStream(new StoreResource.Builder().document(srcDoc).build());) {
+				try (InputStream is = store.getStream(StoreResource.builder().document(srcDoc).build());) {
 					manager.create(is, newDoc, documentTransaction);
 				} catch (IOException e) {
 					log.error(e.getMessage(), e);

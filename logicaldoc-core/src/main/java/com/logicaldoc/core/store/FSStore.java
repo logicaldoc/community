@@ -163,7 +163,7 @@ public class FSStore extends AbstractStore {
 		});
 		if (buf != null)
 			for (File file : buf)
-				resources.add(new StoreResource.Builder().docId(docId).name(file.getName()).build());
+				resources.add(StoreResource.builder().docId(docId).name(file.getName()).build());
 		return resources;
 	}
 

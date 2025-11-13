@@ -18,7 +18,6 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link ThumbnailManager}
@@ -51,7 +50,7 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 
 		store = Store.get();
 
-		testSubject = Context.get(ThumbnailManager.class);
+		testSubject = ThumbnailManager.get();
 	}
 
 	@Test
@@ -63,8 +62,7 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 		assertNull(testSubject.getBuilder("pippo.pluto"));
 		testSubject.createTumbnail(doc, session.getSid());
 
-		StoreResource thumbResource = new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_THUMB)
-				.build();
+		StoreResource thumbResource = StoreResource.builder().document(doc).suffixThumbnail().build();
 		assertFalse(store.exists(thumbResource));
 
 		doc = docDao.findById(1L);
@@ -80,11 +78,9 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 		assertTrue(size2 > size1);
 
 		testSubject.createTile(doc, session.getSid());
-		assertTrue(
-				store.size(new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_TILE).build()) > 0);
+		assertTrue(store.size(StoreResource.builder().document(doc).suffixTile().build()) > 0);
 
 		testSubject.createMobile(doc, session.getSid());
-		assertTrue(
-				store.size(new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_TILE).build()) > 0);
+		assertTrue(store.size(StoreResource.builder().document(doc).suffixTile().build()) > 0);
 	}
 }

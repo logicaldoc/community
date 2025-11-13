@@ -591,7 +591,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void updateDigest(Document doc) throws PersistenceException {
-		StoreResource resource=new StoreResource.Builder().document(doc).build();
+		StoreResource resource=StoreResource.builder().document(doc).build();
 		if (store.exists(resource)) {
 			try (InputStream in = store.getStream(resource);) {
 				doc.setDigest(FileUtil.computeDigest(in));

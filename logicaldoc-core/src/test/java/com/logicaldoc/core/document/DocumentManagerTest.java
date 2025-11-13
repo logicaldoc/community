@@ -871,7 +871,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertNotNull(doc2);
 
 		store2.store(ResourceUtil.getInputStream("allowed-commands.txt"),
-				new StoreResource.Builder().docId(3L).fileVersion(doc2.getFileVersion()).build());
+				StoreResource.builder().docId(3L).fileVersion(doc2.getFileVersion()).build());
 
 		try {
 			testSubject.replaceAlias(doc2.getId(), transaction);
@@ -1034,7 +1034,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertTrue(store.exists(new StoreResource.Builder().document(doc).build()));
+		assertTrue(store.exists(StoreResource.builder().document(doc).build()));
 
 		testSubject.destroyDocument(1L, transaction);
 		assertNotNull(docDao.findById(1L));
@@ -1120,7 +1120,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertNotNull(doc);
 		assertEquals("1.3", doc.getVersion());
 		assertEquals("1.3", doc.getFileVersion());
-		assertTrue(str.getString(new StoreResource.Builder().document(doc).build()).contains("invoice calculation"));
+		assertTrue(str.getString(StoreResource.builder().document(doc).build()).contains("invoice calculation"));
 
 		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.replaceFile(doc.getId(), "1.3", is, null);

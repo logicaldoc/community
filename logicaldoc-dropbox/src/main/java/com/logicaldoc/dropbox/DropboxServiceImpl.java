@@ -191,7 +191,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			temp = FileUtil.createTempFile("dboxupload", ".tmp");
 			Document doc = ddao.findById(docId);
 
-			store.writeToFile(new StoreResource.Builder().document(doc).build(), temp);
+			store.writeToFile(StoreResource.builder().document(doc).build(), temp);
 			dropbox.uploadFile(temp, path);
 
 			// Add an history entry to track the download of the document

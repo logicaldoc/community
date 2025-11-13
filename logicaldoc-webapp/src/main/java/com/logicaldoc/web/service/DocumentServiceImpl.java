@@ -1664,14 +1664,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private File createTile(Document doc, String sid) throws IOException, PersistenceException {
 		Store store = Store.get();
-		StoreResource tileResource = new StoreResource.Builder().document(doc).suffix(ThumbnailManager.SUFFIX_TILE)
-				.build();
+		StoreResource tileResource = StoreResource.builder().document(doc).suffixTile().build();
 
 		// In any case try to produce the thumbnail
 		if (store.size(tileResource) <= 0L) {
-			ThumbnailManager thumbManager = Context.get(ThumbnailManager.class);
 			try {
-				thumbManager.createTile(doc, doc.getFileVersion(), sid);
+				ThumbnailManager.get().createTile(doc, doc.getFileVersion(), sid);
 			} catch (IOException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -1691,7 +1689,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO docDao = DocumentDAO.get();
 		Store store = Store.get();
 		Document doc = docDao.findDocument(docId);
-		StoreResource resource = new StoreResource.Builder().document(doc).build();
+		StoreResource resource = StoreResource.builder().document(doc).build();
 
 		boolean convertToPdf = pdfConversion;
 		if ((doc.getDocRef() != null) && ("pdf".equals(doc.getDocRefType()))) {
@@ -1709,8 +1707,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (convertToPdf) {
 			if (!"pdf".equals(FileUtil.getExtension(doc.getFileName().toLowerCase()))) {
 				FormatConversionManager.get().convertToPdf(doc, sid);
-				resource = new StoreResource.Builder().document(doc)
-						.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
+				resource = StoreResource.builder().document(doc).suffixPdfConversion().build();
 			}
 			att.setMimeType(MimeType.get("pdf"));
 			att.setFileName(FileUtil.getBaseName(doc.getFileName()) + ".pdf");
@@ -2525,7 +2522,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				doc = docDao.findById(doc.getDocRef());
 
 			// Obtain the document's file stream
-			return Store.get().getString(new StoreResource.Builder().document(doc).build());
+			return Store.get().getString(StoreResource.builder().document(doc).build());
 		} catch (PersistenceException | ServerException | IOException e) {
 			return throwServerException(session, log, e);
 		}
@@ -2706,7 +2703,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		GUIDocument guiDocument = getById(docId);
 
 		try (InputStream is = Store.get()
-				.getStream(new StoreResource.Builder().document(emailDocument).fileVersion(fileVersion).build())) {
+				.getStream(StoreResource.builder().document(emailDocument).fileVersion(fileVersion).build())) {
 			GUIEmail guiMail = new GUIEmail();
 			EMail email = readEmail(is, emailDocument.getId(), guiDocument);
 			if (email != null) {
@@ -2799,7 +2796,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException("Not an email file");
 			checkPermission(Permission.WRITE, session.getUser(), doc.getFolder().getId());
 
-			is = Store.get().getStream(new StoreResource.Builder().docId(docId).fileVersion(fileVersion).build());
+			is = Store.get().getStream(StoreResource.builder().docId(docId).fileVersion(fileVersion).build());
 
 			EMail email = MailUtil.messageToMail(is, true);
 			EMailAttachment attachment = null;

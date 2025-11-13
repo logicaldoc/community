@@ -249,7 +249,7 @@ public abstract class AbstractStore implements Store {
 	@Override
 	public boolean test() {
 		File tmpFile = null;
-		StoreResource resource = new StoreResource.Builder().docId(0L).fileVersion("test").build();
+		StoreResource resource = StoreResource.builder().docId(0L).fileVersion("test").build();
 		try {
 			tmpFile = FileUtil.createTempFile("st-test", ".txt");
 			FileUtil.writeFile("test", tmpFile.getAbsolutePath());

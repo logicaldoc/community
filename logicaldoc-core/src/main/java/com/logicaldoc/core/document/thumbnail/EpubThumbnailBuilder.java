@@ -14,7 +14,6 @@ import com.logicaldoc.core.conversion.FormatConverter;
 import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * This builder generates the thumbnail for a .epub(e-book) document.
@@ -52,7 +51,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 				 * The eBook does not define a cover, so we create one using the
 				 * first page
 				 */
-				ThumbnailBuilder pdfBuilder = Context.get(ThumbnailManager.class).getBuilder("pdf");
+				ThumbnailBuilder pdfBuilder = ThumbnailManager.get().getBuilder("pdf");
 
 				FormatConverter pdfConverter = FormatConversionManager.get().getConverter("epub",
 						"pdf");

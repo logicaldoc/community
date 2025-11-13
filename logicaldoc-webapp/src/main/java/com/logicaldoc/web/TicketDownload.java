@@ -265,7 +265,7 @@ public class TicketDownload extends HttpServlet {
 		 */
 		DownloadServlet.processSafeHtml(suffix, null, document);
 
-		StoreResource resource = new StoreResource.Builder().document(document).fileVersion(fileVersion).suffix(suffix)
+		StoreResource resource = StoreResource.builder().document(document).fileVersion(fileVersion).suffix(suffix)
 				.build();
 
 		OutputStream os = null;

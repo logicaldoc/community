@@ -660,7 +660,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		}
 
 		String mergedContent = new String(
-				Store.get().getBytes(new StoreResource.Builder().docId(5L).fileVersion("1.0").build()));
+				Store.get().getBytes(StoreResource.builder().docId(5L).fileVersion("1.0").build()));
 		assertTrue(mergedContent.contains("content1"));
 		assertTrue(mergedContent.contains("content2"));
 

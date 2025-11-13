@@ -325,7 +325,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		doc = testSubject.getById(doc.getId());
 		assertNotNull(doc);
 		assertEquals("text content", store
-				.getString(new StoreResource.Builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
+				.getString(StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
 		testSubject.checkout(List.of(doc.getId()));
 
 		doc.setId(0);
@@ -338,7 +338,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		doc = testSubject.getById(doc.getId());
 		assertNotNull(doc);
 		assertEquals(" ", store
-				.getString(new StoreResource.Builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
+				.getString(StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
 		testSubject.checkout(List.of(doc.getId()));
 	}
 

@@ -722,7 +722,7 @@ public class ServletUtil {
 				File savedFile = writeItemToFile(item);
 				try (InputStream is = item.getInputStream();) {
 					store.store(item.getInputStream(),
-							new StoreResource.Builder().document(doc).fileVersion(ver).suffix(suffix).build());
+							StoreResource.builder().document(doc).fileVersion(ver).suffix(suffix).build());
 				} finally {
 					FileUtils.forceDelete(savedFile);
 				}

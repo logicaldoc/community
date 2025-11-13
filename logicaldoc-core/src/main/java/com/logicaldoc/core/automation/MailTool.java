@@ -106,7 +106,7 @@ public class MailTool {
 			String extension = document.getFileExtension();
 			att.setMimeType(MimeType.get(extension));
 			Store store = Store.get();
-			att.setData(store.getBytes(new StoreResource.Builder().document(document).build()));
+			att.setData(store.getBytes(StoreResource.builder().document(document).build()));
 			email.addAttachment(2 + email.getAttachments().size(), att);
 		}
 
@@ -229,7 +229,7 @@ public class MailTool {
 
 		EMail email = null;
 		Store store = Store.get();
-		try (InputStream stream = store.getStream(new StoreResource.Builder().document(document).build())) {
+		try (InputStream stream = store.getStream(StoreResource.builder().document(document).build())) {
 			if (document.getFileName().toLowerCase().endsWith(".eml"))
 				email = MailUtil.messageToMail(stream, extractAttachments);
 			else
@@ -298,7 +298,7 @@ public class MailTool {
 		User user = new SecurityTool().getUser(username);
 		InputStream is = null;
 		try {
-			is = Store.get().getStream(new StoreResource.Builder().document(doc).build());
+			is = Store.get().getStream(StoreResource.builder().document(doc).build());
 
 			EMail email = null;
 

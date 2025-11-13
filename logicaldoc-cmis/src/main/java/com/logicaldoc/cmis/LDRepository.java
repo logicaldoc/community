@@ -558,7 +558,7 @@ public class LDRepository {
 
 		File chunksFolder = getChunksFolder(documentId);
 
-		StoreResource resource = new StoreResource.Builder().docId(doc.getId()).fileVersion(doc.getFileVersion())
+		StoreResource resource = StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion())
 				.build();
 		if (FileUtils.isEmptyDirectory(chunksFolder)) {
 			// Copy the current file's content
@@ -1190,16 +1190,8 @@ public class LDRepository {
 				throw new CmisInvalidArgumentException("Offset and Length are not supported!");
 
 			AbstractDocument doc = getDocument(objectId);
-
-			InputStream stream = null;
-			InputStream is = null;
-			if (doc instanceof Document document) {
-				is = Store.get().getStream(new StoreResource.Builder().document(document).build());
-			} else if (doc instanceof Version ver) {
-				is = Store.get().getStream(new StoreResource.Builder().version(ver).build());
-			}
-
-			stream = new BufferedInputStream(is, BUFFER_SIZE);
+			InputStream is = Store.get().getStream(StoreResource.builder().document(doc).build());
+			InputStream stream = new BufferedInputStream(is, BUFFER_SIZE);
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();

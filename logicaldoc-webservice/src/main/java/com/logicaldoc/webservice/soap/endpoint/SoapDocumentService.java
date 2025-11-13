@@ -295,8 +295,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		}
 
 		Store store = Store.get();
-		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(suffix)
-				.build();
+		StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build();
 		if (!store.exists(resource)) {
 			throw new WebserviceException("Resource %s not found".formatted(resource));
 		}
@@ -328,21 +327,20 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throws AuthenticationException, WebserviceException, PersistenceException, IOException {
 		validateSession(sid);
 
-		ThumbnailManager manager = Context.get(ThumbnailManager.class);
+		ThumbnailManager manager = ThumbnailManager.get();
 		Store store = Store.get();
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findDocument(docId);
 
 		if (!type.toLowerCase().endsWith(".png"))
 			type += ".png";
-		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(type)
-				.build();
+		StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(type).build();
 		if (!store.exists(resource)) {
-			if (type.equals(ThumbnailManager.SUFFIX_THUMB))
+			if (type.equals(StoreResource.SUFFIX_THUMBNAIL))
 				manager.createTumbnail(doc, fileVersion, sid);
-			else if (type.equals(ThumbnailManager.SUFFIX_TILE))
+			else if (type.equals(StoreResource.SUFFIX_TILE))
 				manager.createTile(doc, fileVersion, sid);
-			else if (type.equals(ThumbnailManager.SUFFIX_MOBILE))
+			else if (type.equals(StoreResource.SUFFIX_MOBILE_THUMBNAIL))
 				manager.createMobile(doc, fileVersion, sid);
 			else if (type.startsWith(ThumbnailManager.THUMB)) {
 				/*
@@ -379,8 +377,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if ("sign.p7m".equalsIgnoreCase(suffix))
 			throw new PermissionException("You cannot upload a signature");
 
-		StoreResource resource = new StoreResource.Builder().document(doc).fileVersion(fileVersion).suffix(suffix)
-				.build();
+		StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build();
 		log.debug("Attach file {}", resource);
 
 		Store.get().store(content.getInputStream(), resource);
@@ -777,7 +774,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	private void createAttachment(EMail email, Document doc) throws IOException, PersistenceException {
 		EMailAttachment att = new EMailAttachment();
 		att.setIcon(doc.getIcon());
-		att.setData(Store.get().getBytes(new StoreResource.Builder().document(doc).build()));
+		att.setData(Store.get().getBytes(StoreResource.builder().document(doc).build()));
 		att.setFileName(doc.getFileName());
 		att.setMimeType(MimeType.get(doc.getFileExtension()));
 

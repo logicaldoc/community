@@ -876,9 +876,9 @@ public class ResourceServiceImpl implements ResourceService {
 		InputStream is = null;
 		try {
 			if (version == null || version.equals("")) {
-				is = store.getStream(new StoreResource.Builder().document(document).build());
+				is = store.getStream(StoreResource.builder().document(document).build());
 			} else {
-				is = store.getStream(new StoreResource.Builder().document(document).fileVersion(resource.getVersionLabel()).build());
+				is = store.getStream(StoreResource.builder().document(document).fileVersion(resource.getVersionLabel()).build());
 			}
 		} catch (IOException | PersistenceException e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);

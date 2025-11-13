@@ -1,8 +1,10 @@
 package com.logicaldoc.core.store;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.util.DocumentFormatException;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
@@ -14,6 +16,28 @@ import com.logicaldoc.core.document.Version;
  * @since 9.2.2
  */
 public class StoreResource {
+
+	/*
+	 * The suffix for the document's resource that represents the PDF conversion
+	 */
+	public static final String SUFFIX_PDF_CONVERSION = "conversion.pdf";
+
+	/*
+	 * The suffix for the document's resource that represents the tile image
+	 */
+	public static final String SUFFIX_TILE = "tile.png";
+
+	/*
+	 * The suffix for the document's resource that represents the thumbnail
+	 * image
+	 */
+	public static final String SUFFIX_THUMBNAIL = "thumb.png";
+
+	/*
+	 * The suffix for the document's resource that represents the mobile
+	 * thumbnail image
+	 */
+	public static final String SUFFIX_MOBILE_THUMBNAIL = "mobile.png";
 
 	private long docId;
 
@@ -92,6 +116,15 @@ public class StoreResource {
 	}
 
 	/**
+	 * Creates a new builder
+	 * 
+	 * @return The new builder
+	 */
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
 	 * A builder for {@link StoreResource}s
 	 * 
 	 * @author Marco Meschieri - LogicalDOC
@@ -115,18 +148,54 @@ public class StoreResource {
 			return this;
 		}
 
+		/**
+		 * Assigns the suffix of the PDF conversion
+		 * 
+		 * @return The configured builder
+		 */
+		public Builder suffixPdfConversion() {
+			return suffix(SUFFIX_PDF_CONVERSION);
+		}
+
+		/**
+		 * Assigns the suffix of the tile image
+		 * 
+		 * @return The configured builder
+		 */
+		public Builder suffixTile() {
+			return suffix(SUFFIX_TILE);
+		}
+
+		/**
+		 * Assigns the suffix of the thumbnail image
+		 * 
+		 * @return The configured builder
+		 */
+		public Builder suffixThumbnail() {
+			return suffix(SUFFIX_THUMBNAIL);
+		}
+
+		/**
+		 * Assigns the suffix of the mobile thumbnail
+		 * 
+		 * @return The configured builder
+		 */
+		public Builder suffixMobile() {
+			return suffix(SUFFIX_MOBILE_THUMBNAIL);
+		}
+
 		public Builder docId(long docId) {
 			this.docId = docId;
 			return this;
 		}
 
 		public Builder resource(StoreResource res) {
-			this.docId=res.docId;
-			this.fileVersion=res.fileVersion;
-			this.suffix=res.suffix;
+			this.docId = res.docId;
+			this.fileVersion = res.fileVersion;
+			this.suffix = res.suffix;
 			return this;
 		}
-		
+
 		public Builder name(String name) {
 			if (name.contains("-")) {
 				fileVersion = name.substring(0, name.indexOf('-')).trim();
@@ -137,7 +206,25 @@ public class StoreResource {
 			return this;
 		}
 
-		public Builder version(Version version) throws PersistenceException {
+		/**
+		 * Takes the docId and fileVersion from the given
+		 * {@link DocumentFormatException} or {@link Version}
+		 * 
+		 * @param document The document or version
+		 * 
+		 * @return The configured builder
+		 * 
+		 * @throws PersistenceException Error in the data layer
+		 */
+		public Builder document(AbstractDocument document) throws PersistenceException {
+			if (document instanceof Version ver)
+				return version(ver);
+			else if (document instanceof Document doc)
+				return document(doc);
+			return this;
+		}
+
+		private Builder version(Version version) throws PersistenceException {
 			this.docId = version.getDocId();
 			this.fileVersion = version.getFileVersion();
 			if (StringUtils.isEmpty(this.fileVersion))
@@ -145,7 +232,7 @@ public class StoreResource {
 			return this;
 		}
 
-		public Builder document(Document document) throws PersistenceException {
+		private Builder document(Document document) throws PersistenceException {
 			Document realDocument = document;
 
 			/*

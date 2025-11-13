@@ -136,21 +136,21 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
 		Session session = ServletUtil.validateSession(mockRequest);
 		MockServletResponse mockResponse = new MockServletResponse(RESPONSE_OUTPUT);
 		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(),
-				new StoreResource.Builder().docId(1L).fileVersion("1.0").build(), "test.txt",
+				StoreResource.builder().docId(1L).fileVersion("1.0").build(), "test.txt",
 				ServletUtil.getSessionUser(mockRequest));
 		assertEquals(127810L, RESPONSE_OUTPUT.length());
 
 		FileUtil.delete(RESPONSE_OUTPUT);
 		mockRequest.setHeader("Range", "bytes=0-24");
 		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(),
-				new StoreResource.Builder().docId(1L).fileVersion("1.0").build(), "test.txt",
+				StoreResource.builder().docId(1L).fileVersion("1.0").build(), "test.txt",
 				ServletUtil.getSessionUser(mockRequest));
 		assertEquals(25L, RESPONSE_OUTPUT.length());
 
 		FileUtil.delete(RESPONSE_OUTPUT);
 		mockRequest.removeHeader("Range");
 		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(),
-				new StoreResource.Builder().docId(1L).fileVersion("1.0").build(), "test.txt",
+				StoreResource.builder().docId(1L).fileVersion("1.0").build(), "test.txt",
 				ServletUtil.getSessionUser(mockRequest));
 		assertEquals(127810L, RESPONSE_OUTPUT.length());
 	}
@@ -195,7 +195,7 @@ test.txt\r
 
 		ServletUtil.uploadDocumentResource(mockRequest, 1L, "abc", "1.0", "1.0");
 		assertEquals(8L,
-				Store.get().size(new StoreResource.Builder().docId(1L).fileVersion("1.0").suffix("abc").build()));
+				Store.get().size(StoreResource.builder().docId(1L).fileVersion("1.0").suffix("abc").build()));
 	}
 
 }

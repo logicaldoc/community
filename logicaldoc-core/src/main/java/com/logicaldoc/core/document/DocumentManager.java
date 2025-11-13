@@ -193,7 +193,7 @@ public class DocumentManager {
 		Document document = documentDAO.findDocument(docId);
 
 		if (document.getImmutable() == 0 && document.getStatus() == DocumentStatus.UNLOCKED) {
-			StoreResource newFileResource = new StoreResource.Builder().document(document).fileVersion(fileVersion)
+			StoreResource newFileResource = StoreResource.builder().document(document).fileVersion(fileVersion)
 					.build();
 
 			// Remove the ancillary files related to the same fileVersion
@@ -529,7 +529,7 @@ public class DocumentManager {
 	}
 
 	private void storeFile(Document doc, File file) throws IOException, PersistenceException {
-		store.store(file, new StoreResource.Builder().document(doc).build());
+		store.store(file, StoreResource.builder().document(doc).build());
 	}
 
 	/**
@@ -590,7 +590,7 @@ public class DocumentManager {
 
 			try {
 				content = parser.parse(
-						store.getStream(new StoreResource.Builder().document(doc).fileVersion(fileVersion).build()),
+						store.getStream(StoreResource.builder().document(doc).fileVersion(fileVersion).build()),
 						new ParseParameters(doc, doc.getFileName(), fileVersion, null, doc.getLocale(),
 								tenantName(doc.getTenantId())));
 			} catch (Exception e) {
@@ -1193,7 +1193,7 @@ public class DocumentManager {
 	 */
 	public int countPages(Document doc) {
 		try {
-			return ParserFactory.getParser(doc.getFileName()).countPages(store.getStream(new StoreResource.Builder().document(doc).build()),
+			return ParserFactory.getParser(doc.getFileName()).countPages(store.getStream(StoreResource.builder().document(doc).build()),
 					doc.getFileName());
 		} catch (Exception e) {
 			log.warn("Cannot count pages of document {}", doc, e);
@@ -1227,7 +1227,7 @@ public class DocumentManager {
 		if (doc.getDocRef() != null)
 			return new DocumentFuture(createAlias(doc, folder, doc.getDocRefType(), transaction), new FutureValue<>());
 
-		try (InputStream is = store.getStream(new StoreResource.Builder().document(doc).build());) {
+		try (InputStream is = store.getStream(StoreResource.builder().document(doc).build());) {
 			Document cloned = new Document(doc);
 			cloned.setId(0);
 			cloned.setCustomId(null);
@@ -1919,7 +1919,7 @@ public class DocumentManager {
 				}
 
 				store.writeToFile(
-						new StoreResource.Builder().document(document).fileVersion(ver.getFileVersion()).build(), tmp);
+						StoreResource.builder().document(document).fileVersion(ver.getFileVersion()).build(), tmp);
 				DocumentHistory checkinTransaction = new DocumentHistory(transaction);
 				checkinTransaction.setDate(new Date());
 				checkin(document.getId(), tmp, ver.getFileName(), false, docVO, checkinTransaction);

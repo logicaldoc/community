@@ -75,7 +75,7 @@ public class ConvertPdf extends HttpServlet {
 
 			// Download the already stored resource
 			ServletUtil.downloadDocument(request, response, null,
-					new StoreResource.Builder().docId(document.getId()).fileVersion(version.getFileVersion()).build(),
+					StoreResource.builder().docId(document.getId()).fileVersion(version.getFileVersion()).build(),
 					null, session.getUser());
 		} catch (Exception r) {
 			log.error(r.getMessage(), r);

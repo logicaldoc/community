@@ -115,8 +115,7 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testConvertToPdf() throws IOException, PersistenceException {
-		StoreResource pdfResource = new StoreResource.Builder().document(document)
-				.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
+		StoreResource pdfResource = StoreResource.builder().document(document).suffixPdfConversion().build();
 		store.delete(pdfResource);
 		assertFalse(store.exists(pdfResource));
 
@@ -133,8 +132,7 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 		assertTrue(testSubject.getPdfContent(document, document.getFileVersion(), session.getSid()).length > 0);
 
 		// Remove the conversion and invoke getPdfContent
-		store.delete(new StoreResource.Builder().document(document)
-				.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build());
+		store.delete(StoreResource.builder().document(document).suffixPdfConversion().build());
 		assertTrue(testSubject.getPdfContent(document, document.getFileVersion(), session.getSid()).length > 0);
 
 		// Use a PDF file
@@ -156,8 +154,7 @@ public class FormatConversionManagerTest extends AbstractCoreTestCase {
 			assertEquals(0L, file.length());
 
 			// Remove the conversion and invoke getPdfContent
-			store.delete(new StoreResource.Builder().document(document)
-					.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build());
+			store.delete(StoreResource.builder().document(document).suffixPdfConversion().build());
 			testSubject.writePdfToFile(document, document.getFileVersion(), file, session.getSid());
 			assertTrue(file.length() > 0);
 

@@ -134,7 +134,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Override
 	public void updateDigest(Version version) throws PersistenceException {
 		initialize(version);
-		StoreResource resource = new StoreResource.Builder().version(version).build();
+		StoreResource resource = StoreResource.builder().document(version).build();
 		if (store.exists(resource)) {
 			try (InputStream in = store.getStream(resource);) {
 				version.setDigest(FileUtil.computeDigest(in));
@@ -170,7 +170,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 					Map.of("documentid", versionToDelete.getDocId(), "fileversion", versionToDelete.getFileVersion(),
 							"currentid", versionToDelete.getId()));
 			if (referencesToFileversion == 0L)
-				store.delete(new StoreResource.Builder().version(versionToDelete).build());
+				store.delete(StoreResource.builder().document(versionToDelete).build());
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}

@@ -275,7 +275,7 @@ public class ZipExport {
 	 * @throws PersistenceException Error in the data layer
 	 */
 	private void addDocument(String path, Document document, boolean pdfConversion) throws PersistenceException {
-		StoreResource resource = new StoreResource.Builder().document(document).build();
+		StoreResource resource = StoreResource.builder().document(document).build();
 
 		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
 			try {
@@ -285,8 +285,8 @@ public class ZipExport {
 				return;
 			}
 
-			resource = new StoreResource.Builder().document(document)
-					.suffix(FormatConversionManager.PDF_CONVERSION_SUFFIX).build();
+			resource = StoreResource.builder().document(document)
+					.suffixPdfConversion().build();
 		}
 
 		try (BufferedInputStream bis = new BufferedInputStream(Store.get().getStream(resource))) {

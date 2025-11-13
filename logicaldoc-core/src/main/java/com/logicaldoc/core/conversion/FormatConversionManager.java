@@ -60,11 +60,6 @@ public class FormatConversionManager {
 		return Context.get(FormatConversionManager.class);
 	}
 
-	/*
-	 * The suffix for the document's resource that represents the PDF conversion
-	 */
-	public static final String PDF_CONVERSION_SUFFIX = "conversion.pdf";
-
 	private static final Logger log = LoggerFactory.getLogger(FormatConversionManager.class);
 
 	@Resource(name = "store")
@@ -100,10 +95,10 @@ public class FormatConversionManager {
 	 */
 	public byte[] getPdfContent(Document document, String fileVersion, String sid)
 			throws IOException, PersistenceException {
-		StoreResource resource = new StoreResource.Builder().document(document)
-				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(PDF_CONVERSION_SUFFIX).build();
+		StoreResource resource = StoreResource.builder().document(document)
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffixPdfConversion().build();
 		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
-			resource = new StoreResource.Builder().document(document)
+			resource = StoreResource.builder().document(document)
 					.fileVersion(getSuitableFileVersion(document, fileVersion)).build();
 		if (!store.exists(resource))
 			convertToPdf(document, fileVersion, sid);
@@ -124,10 +119,10 @@ public class FormatConversionManager {
 	 */
 	public void writePdfToFile(Document document, String fileVersion, File out, String sid)
 			throws IOException, PersistenceException {
-		StoreResource resource = new StoreResource.Builder().docId(document.getId())
-				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(PDF_CONVERSION_SUFFIX).build();
+		StoreResource resource = StoreResource.builder().docId(document.getId())
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffixPdfConversion().build();
 		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
-			resource = new StoreResource.Builder().docId(document.getId())
+			resource = StoreResource.builder().docId(document.getId())
 					.fileVersion(getSuitableFileVersion(document, fileVersion)).build();
 		if (!store.exists(resource))
 			convertToPdf(document, fileVersion, sid);
@@ -155,8 +150,8 @@ public class FormatConversionManager {
 			return;
 		}
 
-		StoreResource resource = new StoreResource.Builder().document(document)
-				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffix(PDF_CONVERSION_SUFFIX).build();
+		StoreResource resource = StoreResource.builder().document(document)
+				.fileVersion(getSuitableFileVersion(document, fileVersion)).suffixPdfConversion().build();
 
 		if (store.size(resource) > 0L) {
 			log.debug("Pdf conversion already available for document {}", document.getId());
@@ -502,7 +497,7 @@ public class FormatConversionManager {
 	private File writeToFile(Document document, String fileVersion) throws IOException, PersistenceException {
 		File target = FileUtil.createTempFile("scr",
 				"." + AbstractFormatConverter.getExtension(document.getFileName()));
-		store.writeToFile(new StoreResource.Builder().document(document)
+		store.writeToFile(StoreResource.builder().document(document)
 				.fileVersion(getSuitableFileVersion(document, fileVersion)).build(), target);
 		return target;
 	}

@@ -138,7 +138,7 @@ public class DownloadServlet extends HttpServlet {
 		}
 
 		download(request, response, session, downloadText,
-				new StoreResource.Builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build(), filename,
+				StoreResource.builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build(), filename,
 				document);
 	}
 
@@ -194,7 +194,7 @@ public class DownloadServlet extends HttpServlet {
 				log.error("Cannot convert to PDF the document {}", doc);
 			}
 
-			suffix = FormatConversionManager.PDF_CONVERSION_SUFFIX;
+			suffix = StoreResource.SUFFIX_PDF_CONVERSION;
 		}
 		return suffix;
 	}
@@ -222,12 +222,12 @@ public class DownloadServlet extends HttpServlet {
 
 	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException, PersistenceException {
 		if ("safe.html".equals(suffix) && doc != null) {
-			StoreResource safeResource = new StoreResource.Builder().document(doc)
+			StoreResource safeResource = StoreResource.builder().document(doc)
 					.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).suffix(suffix)
 					.build();
 			Store store = Store.get();
 			if (!store.exists(safeResource)) {
-				StoreResource unsafeResource = new StoreResource.Builder().document(doc)
+				StoreResource unsafeResource = StoreResource.builder().document(doc)
 						.fileVersion(version == null ? doc.getFileVersion() : version.getFileVersion()).build();
 				String unsafe = store.getString(unsafeResource);
 				String safe = HTMLSanitizer.sanitize(unsafe);
