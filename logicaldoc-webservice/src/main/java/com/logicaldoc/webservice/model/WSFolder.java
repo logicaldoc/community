@@ -144,8 +144,8 @@ public class WSFolder implements Serializable {
 		wsFolder.setCreation(DateUtil.format(folder.getCreation()));
 		wsFolder.setCreator(folder.getCreator());
 		wsFolder.setPosition(folder.getPosition());
-		wsFolder.setTemplateLocked(folder.getTemplateLocked());
-		wsFolder.setHidden(folder.getHidden());
+		wsFolder.setTemplateLocked(folder.isTemplateLocked() ? 1 : 0);
+		wsFolder.setHidden(folder.isHidden() ? 1 : 0);
 		wsFolder.setStore(folder.getStore());
 		wsFolder.setMaxVersions(folder.getMaxVersions());
 		wsFolder.setSecurityRef(folder.getSecurityRef());
@@ -189,7 +189,7 @@ public class WSFolder implements Serializable {
 				wsAttribute.setStringValue(attr.getStringValue());
 				wsAttribute.setStringValues(attr.getStringValues());
 				wsAttribute.setType(attr.getType());
-				wsAttribute.setDependsOn(attr.getDependsOn());				
+				wsAttribute.setDependsOn(attr.getDependsOn());
 				wsAttributes.add(wsAttribute);
 			}
 		}

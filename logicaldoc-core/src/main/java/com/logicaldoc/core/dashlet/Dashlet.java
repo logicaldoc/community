@@ -46,7 +46,7 @@ public class Dashlet extends PersistentObject {
 	 * To mark that it must display just unique records
 	 */
 	@Column(name = "ld_unique", nullable = false)
-	private int unique = 0;
+	private boolean unique = false;
 
 	@Column(name = "ld_query")
 	private String query;
@@ -135,11 +135,11 @@ public class Dashlet extends PersistentObject {
 		this.columns = columns;
 	}
 
-	public int getUnique() {
+	public boolean isUnique() {
 		return unique;
 	}
 
-	public void setUnique(int unique) {
+	public void setUnique(boolean unique) {
 		this.unique = unique;
 	}
 

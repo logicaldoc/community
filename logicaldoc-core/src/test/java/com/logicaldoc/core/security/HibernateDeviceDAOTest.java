@@ -69,7 +69,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setUsername("sebastian");
 		device.setUserId(3L);
 		device.setTenantId(1L);
-		device.setTrusted(0);
+		device.setTrusted(false);
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 8");
 		device.setType("COMPUTER");
@@ -81,7 +81,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setUsername("sebastian");
 		device.setUserId(1L);
 		device.setTenantId(1L);
-		device.setTrusted(1);
+		device.setTrusted(true);
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 7");
 		device.setType("COMPUTER");

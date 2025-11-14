@@ -204,7 +204,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		if (folder.getTemplate() != null) {
 			guiFolder.setTemplateId(folder.getTemplate().getId());
 			guiFolder.setTemplate(folder.getTemplate().getName());
-			guiFolder.setTemplateLocked(folder.getTemplateLocked());
+			guiFolder.setTemplateLocked(folder.isTemplateLocked());
 			guiFolder.setAttributes(prepareGUIAttributes(folder.getTemplate(), folder));
 		}
 
@@ -638,7 +638,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 			folder.setDescription(guiFolder.getDescription());
 			folder.setTile(guiFolder.getTile());
-			folder.setTemplateLocked(guiFolder.getTemplateLocked());
+			folder.setTemplateLocked(guiFolder.isTemplateLocked());
 			folder.setQuotaDocs(guiFolder.getQuotaDocs());
 			folder.setQuotaSize(guiFolder.getQuotaSize());
 			folder.setQuotaThreshold(guiFolder.getQuotaThreshold());
@@ -962,7 +962,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		templateDao.initialize(template);
 
 		folder.setTemplate(template);
-		folder.setTemplateLocked(f.getTemplateLocked());
+		folder.setTemplateLocked(f.isTemplateLocked());
 		folder.getAttributes().clear();
 
 		for (GUIAttribute guiAttribute : f.getAttributes()) {

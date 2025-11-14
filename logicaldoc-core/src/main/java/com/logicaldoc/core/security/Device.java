@@ -73,7 +73,7 @@ public class Device extends PersistentObject implements Serializable {
 	private Date lastLogin;
 
 	@Column(name = "ld_trusted", nullable = false)
-	private int trusted = 0;
+	private boolean trusted = false;
 
 	/**
 	 * IP of last login
@@ -169,11 +169,11 @@ public class Device extends PersistentObject implements Serializable {
 		this.deviceId = deviceId;
 	}
 
-	public int getTrusted() {
+	public boolean isTrusted() {
 		return trusted;
 	}
 
-	public void setTrusted(int trusted) {
+	public void setTrusted(boolean trusted) {
 		this.trusted = trusted;
 	}
 

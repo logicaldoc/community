@@ -93,10 +93,10 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 	private Long creatorId;
 
 	/**
-	 * If 1, the users cannot change the template of the contained documents
+	 * If true, the users cannot change the template of the contained documents
 	 */
 	@Column(name = "ld_templocked", nullable = false)
-	private int templateLocked = 0;
+	private boolean templateLocked = false;
 
 	@Column(name = "ld_deleteuserid")
 	private Long deleteUserId;
@@ -105,7 +105,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 	private String deleteUser;
 
 	@Column(name = "ld_hidden", nullable = false)
-	private int hidden = 0;
+	private boolean hidden = false;
 
 	@Column(name = "ld_quotadocs")
 	private Long quotaDocs = null;
@@ -347,14 +347,6 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 		this.creatorId = creatorId;
 	}
 
-	public int getTemplateLocked() {
-		return templateLocked;
-	}
-
-	public void setTemplateLocked(int templateLocked) {
-		this.templateLocked = templateLocked;
-	}
-
 	public Long getDeleteUserId() {
 		return deleteUserId;
 	}
@@ -371,11 +363,19 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 		this.position = position;
 	}
 
-	public int getHidden() {
+	public boolean isTemplateLocked() {
+		return templateLocked;
+	}
+
+	public void setTemplateLocked(boolean templateLocked) {
+		this.templateLocked = templateLocked;
+	}
+
+	public boolean isHidden() {
 		return hidden;
 	}
 
-	public void setHidden(int hidden) {
+	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
 	}
 

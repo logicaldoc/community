@@ -92,7 +92,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 
 		if (StringUtils.isNotEmpty(requestDevice.getLabel()))
 			device.setLabel(requestDevice.getLabel());
-		device.setTrusted(1);
+		device.setTrusted(true);
 		device.setUserId(user.getId());
 		device.setUsername(user.getFullName());
 		store(device);

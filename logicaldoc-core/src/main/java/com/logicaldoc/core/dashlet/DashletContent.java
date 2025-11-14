@@ -135,7 +135,7 @@ public class DashletContent extends HttpServlet {
 
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 			List<DocumentHistory> records = DocumentHistoryDAO.get().findByObjectQuery(query.trim(),
-					(Map<String, Object>) null, dashlet.getUnique() == 0 ? dashlet.getMax() : null);
+					(Map<String, Object>) null, !dashlet.isUnique() ? dashlet.getMax() : null);
 
 			List<DocumentHistory> uniqueRecords = filterUniqueDocumentEvents(dashlet, records);
 
@@ -289,7 +289,7 @@ public class DashletContent extends HttpServlet {
 
 	private List<DocumentHistory> filterUniqueDocumentEvents(Dashlet dashlet, List<DocumentHistory> records) {
 		List<DocumentHistory> uniqueRecords = new ArrayList<>();
-		if (dashlet.getUnique() == 1) {
+		if (dashlet.isUnique()) {
 			log.debug("Ensure records uniqueness");
 
 			/*
@@ -462,7 +462,7 @@ public class DashletContent extends HttpServlet {
 
 	private List<Document> filterUniqueDocuments(Dashlet dashlet, List<Document> records) {
 		List<Document> uniqueRecords = new ArrayList<>();
-		if (dashlet.getUnique() == 1) {
+		if (dashlet.isUnique()) {
 			log.debug("Ensure records uniqueness");
 
 			/*

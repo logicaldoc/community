@@ -1388,7 +1388,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		setUniqueName(folder);
 
 		folder.setTemplate(folderVO.getTemplate());
-		folder.setTemplateLocked(folderVO.getTemplateLocked());
+		folder.setTemplateLocked(folderVO.isTemplateLocked());
 		setExtendedAttributes(folder, folderVO);
 
 		folder.setQuotaDocs(folderVO.getQuotaDocs());
@@ -2152,7 +2152,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			tr.setFolderId(folder.getId());
 
 			folder.setTemplate(parent.getTemplate());
-			folder.setTemplateLocked(parent.getTemplateLocked());
+			folder.setTemplateLocked(parent.isTemplateLocked());
 			for (String name : parent.getAttributeNames()) {
 				Attribute ext = new Attribute(parent.getAttributes().get(name));
 				folder.getAttributes().put(name, ext);

@@ -58,7 +58,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	private int type;
 
-	private int templateLocked = 0;
+	private boolean templateLocked = false;
 
 	private int position = 1;
 
@@ -265,11 +265,11 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.type = type;
 	}
 
-	public int getTemplateLocked() {
+	public boolean isTemplateLocked() {
 		return templateLocked;
 	}
 
-	public void setTemplateLocked(int templateLocked) {
+	public void setTemplateLocked(boolean templateLocked) {
 		this.templateLocked = templateLocked;
 	}
 
@@ -420,7 +420,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		document.setStartPublishing(null);
 		document.setFolder(this);
 
-		if (getTemplateLocked() == 1) {
+		if (isTemplateLocked()) {
 			document.setTemplateId(getTemplateId());
 			document.setTemplate(getTemplate());
 			document.setAttributes(getAttributes());

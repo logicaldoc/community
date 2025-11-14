@@ -72,8 +72,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		folderVO.setDescription(wsFolder.getDescription());
 		folderVO.setType(wsFolder.getType());
 		folderVO.setPosition(wsFolder.getPosition());
-		folderVO.setTemplateLocked(wsFolder.getTemplateLocked());
-		folderVO.setHidden(wsFolder.getHidden());
+		folderVO.setTemplateLocked(wsFolder.getTemplateLocked() == 1);
+		folderVO.setHidden(wsFolder.getHidden() == 1);
 		folderVO.setFoldRef(wsFolder.getFoldRef());
 		folderVO.setStore(wsFolder.getStore());
 		folderVO.setMaxVersions(wsFolder.getMaxVersions());
@@ -216,7 +216,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {
-			if (folder.getHidden() == 0) {
+			if (!folder.isHidden()) {
 				folderDao.initialize(folder);
 				wsFolders.add(WSFolder.fromFolder(folder));
 			}
@@ -489,7 +489,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folder.setColor(wsFolder.getColor());
 			folder.setTile(wsFolder.getTile());
 			folder.setDescription(wsFolder.getDescription());
-			folder.setTemplateLocked(wsFolder.getTemplateLocked());
+			folder.setTemplateLocked(wsFolder.getTemplateLocked() == 1);
 			folder.setPosition(wsFolder.getPosition());
 			folder.setSecurityRef(wsFolder.getSecurityRef());
 			folder.setFoldRef(wsFolder.getFoldRef());
@@ -506,10 +506,10 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			transaction.setUser(user);
 			transaction.setEvent(FolderEvent.CHANGED);
 			transaction.setSessionId(sid);
-			
+
 			folderDao.store(folder, transaction);
-			
-			if(!oldName.equals(name)) {
+
+			if (!oldName.equals(name)) {
 				FolderHistory renameHistory = new FolderHistory();
 				renameHistory.setUser(user);
 				renameHistory.setEvent(FolderEvent.RENAMED);

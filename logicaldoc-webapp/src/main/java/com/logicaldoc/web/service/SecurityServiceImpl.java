@@ -1545,8 +1545,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			return true;
 
 		Device device = DeviceDAO.get().findByDeviceId(deviceId);
-		return device != null && device.getUserId() == session.getUserId() && device.getTrusted() == 1;
-
+		return device != null && device.getUserId() == session.getUserId() && device.isTrusted();
 	}
 
 	@Override

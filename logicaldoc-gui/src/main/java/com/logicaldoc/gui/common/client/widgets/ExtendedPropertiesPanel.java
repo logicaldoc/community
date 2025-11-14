@@ -135,7 +135,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			templateItem.addChangedHandler(changedHandler);
 		templateItem.setMultiple(false);
 		templateItem.setDisabled(!updateEnabled || (isDocument() && ((GUIDocument) extensibleObject).getFolder() != null
-				&& ((GUIDocument) extensibleObject).getFolder().getTemplateLocked() == 1));
+				&& ((GUIDocument) extensibleObject).getFolder().isTemplateLocked()));
 		if (extensibleObject.getTemplateId() != null)
 			templateItem.setValue(extensibleObject.getTemplateId().toString());
 
@@ -360,7 +360,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	private Long getDefaultFolderForDocumentSelector() {
 		if (FolderController.get().getCurrentFolder() == null)
 			return null;
-		
+
 		long defaultFolderId = FolderController.get().getCurrentFolder().getId();
 		if (extensibleObject instanceof GUIDocument doc)
 			defaultFolderId = doc.getFolder().getId();

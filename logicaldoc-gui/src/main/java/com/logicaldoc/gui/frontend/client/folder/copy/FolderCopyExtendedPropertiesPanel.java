@@ -25,7 +25,7 @@ public class FolderCopyExtendedPropertiesPanel extends FolderDetailTab {
 		setHeight100();
 		setMembersMargin(1);
 
-		ToggleItem locked = ItemFactory.newToggleItem("locked", "templatelocked", folder.getTemplateLocked() == 1);
+		ToggleItem locked = ItemFactory.newToggleItem("locked", "templatelocked", folder.isTemplateLocked());
 		locked.setEndRow(true);
 
 		form1 = new DynamicForm();
@@ -41,11 +41,12 @@ public class FolderCopyExtendedPropertiesPanel extends FolderDetailTab {
 	@Override
 	public boolean validate() {
 		if (propertiesPanel.validate() && form1.validate()) {
-			folder.setTemplateLocked(Boolean.parseBoolean(form1.getValueAsString("locked")) ? 1 : 0);
+			folder.setTemplateLocked(Boolean.parseBoolean(form1.getValueAsString("locked")));
 			return true;
 		}
 		return false;
 	}
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

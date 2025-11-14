@@ -1295,7 +1295,7 @@ public class LDRepository {
 
 		// Filter the visible folders only
 		List<Folder> visibleChildFolders = folderDao.findChildren(folder.getId(), userId).stream()
-				.filter(f -> f.getHidden() == 0).toList();
+				.filter(f -> !f.isHidden()).toList();
 
 		// Skip the first skipCount elements
 		List<Folder> childFolders = visibleChildFolders.stream().skip(skipCount).toList();

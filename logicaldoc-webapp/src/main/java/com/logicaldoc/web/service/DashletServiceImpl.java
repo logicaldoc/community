@@ -44,7 +44,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 			dashlet.setContent(guiDashlet.getContent());
 			dashlet.setMax(guiDashlet.getMax());
 			dashlet.setColumns(guiDashlet.getColumns());
-			dashlet.setUnique(guiDashlet.isUnique() ? 1 : 0);
+			dashlet.setUnique(guiDashlet.isUnique());
 			dashlet.setQuery(guiDashlet.getQuery());
 			dashlet.setTitle(guiDashlet.getTitle());
 			dashlet.setType(guiDashlet.getType());
@@ -150,7 +150,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		dashlet.setContent(guiDashlet.getContent());
 		dashlet.setMax(guiDashlet.getMax());
 		dashlet.setColumns(guiDashlet.getColumns());
-		dashlet.setUnique(guiDashlet.isUnique() ? 1 : 0);
+		dashlet.setUnique(guiDashlet.isUnique());
 		return dashlet;
 	}
 
@@ -164,7 +164,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		guiDashlet.setContent(dashlet.getContent());
 		guiDashlet.setMax(dashlet.getMax());
 		guiDashlet.setColumns(dashlet.getColumns());
-		guiDashlet.setUnique(dashlet.getUnique() == 1);
+		guiDashlet.setUnique(dashlet.isUnique());
 		return guiDashlet;
 	}
 }
