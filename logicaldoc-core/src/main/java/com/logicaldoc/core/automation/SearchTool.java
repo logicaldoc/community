@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.core.searchengine.FulltextSearch.HitMapper;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.HitField;
 import com.logicaldoc.core.searchengine.Hits;
 import com.logicaldoc.core.searchengine.Search;
+import com.logicaldoc.core.searchengine.Search.HitMapper;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.searchengine.SearchOptions;
