@@ -47,7 +47,7 @@ public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory
 
 	@Override
 	public List<FolderHistory> findNotNotified(Integer max) throws PersistenceException {
-		return findByWhere(ENTITY + ".notified = 0", ENTITY + DATE_ASC, max);
+		return findByWhere(ENTITY + ".notified = false", ENTITY + DATE_ASC, max);
 	}
 
 	@Override

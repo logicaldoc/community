@@ -62,7 +62,7 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 
 	@Override
 	public List<DocumentHistory> findNotNotified(Integer max) throws PersistenceException {
-		return findByWhere(ENTITY + ".notified = 0", ENTITY + DATE_ASC, max);
+		return findByWhere(ENTITY + ".notified = false", ENTITY + DATE_ASC, max);
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 
 	@Override
 	public void markHistoriesAsRead(String event, long userId) throws PersistenceException {
-		String statement = "update ld_history set ld_new=0 where ld_new=1 and ld_userid=" + userId + " and ld_event='"
+		String statement = "update ld_history set ld_new = false where ld_new = true and ld_userid=" + userId + " and ld_event='"
 				+ SqlUtil.doubleQuotes(event) + "'";
 		jdbcUpdate(statement);
 	}

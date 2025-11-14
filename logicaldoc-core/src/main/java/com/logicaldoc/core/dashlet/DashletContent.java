@@ -179,7 +179,7 @@ public class DashletContent extends HttpServlet {
 		printField("comment", history.getComment(), writer);
 		printField("filename", history.getFilename(), writer);
 		printIcon(writer, history.getFilename());
-		writer.write("<new>" + (1 == history.getIsNew()) + "</new>");
+		writer.write("<new>" + history.isNew() + "</new>");
 		writer.write("<folderId>" + history.getFolderId() + "</folderId>");
 		writer.write("<docId>" + history.getDocId() + "</docId>");
 		printField("path", history.getPath(), writer);

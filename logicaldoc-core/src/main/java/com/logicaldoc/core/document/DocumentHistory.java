@@ -23,7 +23,7 @@ public class DocumentHistory extends AbstractDocumentHistory {
 	protected String color;
 
 	@Column(name = "ld_new")
-	private int isNew = 1;
+	private boolean isNew = true;
 
 	@Transient
 	private String file = null;
@@ -36,7 +36,7 @@ public class DocumentHistory extends AbstractDocumentHistory {
 		copyAttributesFrom(source);
 		this.color = source.color;
 		setFile(source.getFile());
-		setIsNew(source.getIsNew());
+		setNew(source.isNew());
 	}
 
 	public void setEvent(DocumentEvent event) {
@@ -70,11 +70,13 @@ public class DocumentHistory extends AbstractDocumentHistory {
 		this.color = color;
 	}
 
-	public int getIsNew() {
+	
+
+	public boolean isNew() {
 		return isNew;
 	}
 
-	public void setIsNew(int isNew) {
+	public void setNew(boolean isNew) {
 		this.isNew = isNew;
 	}
 

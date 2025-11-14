@@ -63,7 +63,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			Map<String, Object> params = new HashMap<>();
 			params.put(USER_ID, userId);
 
-			return findByWhere(ENTITY + ".trusted=1 and " + ENTITY + USER_ID_EQUAL_USER_ID, params,
+			return findByWhere(ENTITY + ".trusted = true and " + ENTITY + USER_ID_EQUAL_USER_ID, params,
 					ENTITY + ".lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

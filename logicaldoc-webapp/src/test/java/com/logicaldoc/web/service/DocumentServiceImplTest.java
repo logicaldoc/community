@@ -1034,15 +1034,15 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	public void testMarkHistoryAsRead() throws ServerException, PersistenceException {
 		List<DocumentHistory> histories = documentHistoryDao.findByUserIdAndEvent(1, "data test 01", null);
 		assertEquals(2, histories.size());
-		assertEquals(1, histories.get(0).getIsNew());
-		assertEquals(1, histories.get(1).getIsNew());
+		assertTrue(histories.get(0).isNew());
+		assertTrue(histories.get(1).isNew());
 
 		testSubject.markHistoryAsRead("data test 01");
 
 		histories = documentHistoryDao.findByUserIdAndEvent(1, "data test 01", null);
 		assertEquals(2, histories.size());
-		assertEquals(0, histories.get(0).getIsNew());
-		assertEquals(0, histories.get(1).getIsNew());
+		assertFalse(histories.get(0).isNew());
+		assertFalse(histories.get(1).isNew());
 	}
 
 	@Test
