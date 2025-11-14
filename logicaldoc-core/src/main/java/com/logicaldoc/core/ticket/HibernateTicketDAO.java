@@ -1,7 +1,6 @@
 package com.logicaldoc.core.ticket;
 
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -147,12 +146,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 			return;
 
 		try {
-			Collection<Ticket> coll = findByObjectQuery("from Ticket _ticket where _ticket.expired < :expired",
-					Map.of("expired", new Date()), null);
-			for (Ticket downloadTicket : coll) {
-				downloadTicket.setDeleted(1);
-				saveOrUpdate(downloadTicket);
-			}
+			jdbcUpdate("update ld_ticket set ld_deleted=1 where ld_deleted = 0 and ld_expired < :expired", Map.of("expired", new Date()));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
