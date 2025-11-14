@@ -324,8 +324,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		doc = testSubject.getById(doc.getId());
 		assertNotNull(doc);
-		assertEquals("text content", store
-				.getString(StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
+		assertEquals("text content",
+				store.getString(StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
 		testSubject.checkout(List.of(doc.getId()));
 
 		doc.setId(0);
@@ -337,8 +337,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		doc = testSubject.getById(doc.getId());
 		assertNotNull(doc);
-		assertEquals(" ", store
-				.getString(StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
+		assertEquals(" ",
+				store.getString(StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build()));
 		testSubject.checkout(List.of(doc.getId()));
 	}
 
@@ -450,12 +450,12 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	@Test
 	public void testMakeImmutable() throws ServerException {
 		GUIDocument doc = testSubject.getById(7);
-		assertEquals(0, doc.getImmutable());
+		assertFalse(doc.isImmutable());
 
 		testSubject.makeImmutable(List.of(7L), "immutable comment");
 
 		doc = testSubject.getById(7);
-		assertEquals(1, doc.getImmutable());
+		assertTrue(doc.isImmutable());
 	}
 
 	@Test
@@ -1279,7 +1279,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		List<Long> ids = List.of(4L);
 		GUIDocument vo = new GUIDocument();
-		vo.setPublished(1);
+		vo.setPublished(true);
 
 		String sDate1 = "10-21-2022";
 		Date date1 = new SimpleDateFormat("MM-dd-yyyy").parse(sDate1);
@@ -1323,7 +1323,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 		ids = List.of(5L, 6L);
 		vo = new GUIDocument();
-		vo.setPublished(0);
+		vo.setPublished(false);
 		vo.setColor("yellow");
 
 		try {

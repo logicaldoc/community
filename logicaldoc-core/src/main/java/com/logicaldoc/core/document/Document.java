@@ -86,9 +86,9 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	public Document(AbstractDocument source) {
 		copyAttributes(source);
 		setId(source.getId());
-		setOcrd(source.getOcrd());
+		setOcrd(source.isOcrd());
 		setOcrTemplateId(source.getOcrTemplateId());
-		setBarcoded(source.getBarcoded());
+		setBarcoded(source.isBarcoded());
 		setBarcodeTemplateId(source.getBarcodeTemplateId());
 		setTemplate(source.getTemplate());
 		setTemplateId(source.getTemplateId());

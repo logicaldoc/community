@@ -156,8 +156,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			return;
 
 		Document doc = findById(docId);
-		if (doc != null && doc.getImmutable() == 0
-				|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
+		if (doc != null && !doc.isImmutable()
+				|| (doc != null && doc.isImmutable() && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 
 			// Remove versions
 			removeVersions(docId, delCode);
@@ -591,7 +591,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void updateDigest(Document doc) throws PersistenceException {
-		StoreResource resource=StoreResource.builder().document(doc).build();
+		StoreResource resource = StoreResource.builder().document(doc).build();
 		if (store.exists(resource)) {
 			try (InputStream in = store.getStream(resource);) {
 				doc.setDigest(FileUtil.computeDigest(in));
@@ -967,7 +967,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException {
 		Document doc = findById(docId);
 		initialize(doc);
-		doc.setImmutable(1);
+		doc.setImmutable(true);
 		doc.setStatus(DocumentStatus.UNLOCKED);
 		store(doc, transaction);
 	}

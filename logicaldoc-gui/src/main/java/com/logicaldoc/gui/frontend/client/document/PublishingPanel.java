@@ -48,10 +48,8 @@ public class PublishingPanel extends DocumentDetailTab {
 		form1.setWrapItemTitles(false);
 
 		ToggleItem published = ItemFactory.newToggleItem(PUBLISHED, true);
-		if (document.getPublished() != -1) {
-			published.setRequired(true);
-			published.setValue(document.getPublished() == 1);
-		}
+		published.setRequired(true);
+		published.setValue(document.isPublished());
 		published.setEndRow(true);
 		published.addChangedHandler(changedHandler);
 
@@ -59,7 +57,6 @@ public class PublishingPanel extends DocumentDetailTab {
 		startPublishing.setValue(document.getStartPublishing());
 		startPublishing.addChangedHandler(changedHandler);
 		startPublishing.setDisabled(!updateEnabled);
-		startPublishing.setRequired(document.getPublished() != -1);
 		startPublishing.setUseMask(false);
 		startPublishing.setShowPickerIcon(true);
 		startPublishing.setWrapTitle(false);
@@ -103,18 +100,18 @@ public class PublishingPanel extends DocumentDetailTab {
 		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			document.setPublished(Boolean.parseBoolean(vm.getValueAsString(PUBLISHED)) ? 1 : 0);
+			document.setPublished(Boolean.parseBoolean(vm.getValueAsString(PUBLISHED)));
 			document.setStartPublishing((Date) values.get("startpublishing"));
 			document.setStopPublishing((Date) values.get("stoppublishing"));
 		}
 		return !vm.hasErrors();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

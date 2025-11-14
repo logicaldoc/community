@@ -383,7 +383,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 						List<GUIDocument> docs = DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments();
 						List<Long> unlockedIds = new ArrayList<>();
 						for (GUIDocument doc : docs)
-							if (doc.getStatus() == 0 && doc.getImmutable() == 0)
+							if (doc.getStatus() == 0 && !doc.isImmutable())
 								unlockedIds.add(doc.getId());
 						Util.openBulkCheckout(unlockedIds);
 					}));
@@ -745,12 +745,12 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

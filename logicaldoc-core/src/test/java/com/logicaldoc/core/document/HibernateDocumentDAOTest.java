@@ -432,14 +432,14 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		Collection<Long> ids = testSubject.findPublishedIds(fids);
 		assertTrue(ids.contains(doc.getId()));
 
-		doc.setPublished(0);
+		doc.setPublished(false);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
 		assertFalse(ids.contains(doc.getId()));
 
 		cal.add(Calendar.DATE, 1);
 		Date pick = cal.getTime();
-		doc.setPublished(1);
+		doc.setPublished(true);
 		doc.setStartPublishing(pick);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
@@ -524,7 +524,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		doc.setValue("object", "test");
 		testSubject.store(doc);
-		
+
 		// Check if the defaults were applied
 		assertEquals(1, doc.getTemplate().getId());
 		assertEquals("test_val_1", doc.getValue("val1"));
@@ -817,7 +817,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		transaction.setUserId(1L);
 		transaction.setNotified(0);
 		testSubject.makeImmutable(2, transaction);
-		assertEquals(1, testSubject.findById(2).getImmutable());
+		assertTrue(testSubject.findById(2).isImmutable());
 	}
 
 	@Test

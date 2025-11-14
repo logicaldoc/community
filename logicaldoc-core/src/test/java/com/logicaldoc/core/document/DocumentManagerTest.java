@@ -495,7 +495,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setComment("pippo_reason");
 		testSubject.makeImmutable(doc.getId(), transaction);
 		doc = docDao.findById(1);
-		assertEquals(1, doc.getImmutable());
+		assertTrue(doc.isImmutable());
 		doc.setFileName("ciccio");
 		docDao.initialize(doc);
 		docDao.store(doc);
@@ -915,7 +915,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		docDao.initialize(doc);
 
 		assertEquals(IndexingStatus.TO_INDEX, doc.getIndexed());
-		assertEquals(0, doc.getSigned());
+		assertFalse(doc.isSigned());
 		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 
 		testSubject.checkout(1L, transaction);

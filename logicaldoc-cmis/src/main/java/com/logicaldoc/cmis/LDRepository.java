@@ -558,8 +558,7 @@ public class LDRepository {
 
 		File chunksFolder = getChunksFolder(documentId);
 
-		StoreResource resource = StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion())
-				.build();
+		StoreResource resource = StoreResource.builder().docId(doc.getId()).fileVersion(doc.getFileVersion()).build();
 		if (FileUtils.isEmptyDirectory(chunksFolder)) {
 			// Copy the current file's content
 			File firstChunk = new File(chunksFolder, "chunk-" + nd.format(1));
@@ -1910,7 +1909,7 @@ public class LDRepository {
 		}
 
 		addPropertyId(result, typeId, filter, PropertyIds.CONTENT_STREAM_ID, null);
-		addPropertyBoolean(result, typeId, filter, PropertyIds.IS_IMMUTABLE, doc.getImmutable() != 0);
+		addPropertyBoolean(result, typeId, filter, PropertyIds.IS_IMMUTABLE, doc.isImmutable());
 
 		addPropertyString(result, typeId, filter, TypeManager.PROP_LANGUAGE, doc.getLanguage());
 

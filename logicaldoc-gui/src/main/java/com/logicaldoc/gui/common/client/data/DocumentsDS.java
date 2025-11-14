@@ -101,10 +101,10 @@ public class DocumentsDS extends DataSource {
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 		DataSourceDateTimeField published = new DataSourceDateTimeField("published");
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
-		DataSourceIntegerField immutable = new DataSourceIntegerField("immutable");
+		DataSourceBooleanField immutable = new DataSourceBooleanField("immutable");
 		DataSourceIntegerField iindexed = new DataSourceIntegerField("indexed");
-		DataSourceIntegerField signed = new DataSourceIntegerField("signed");
-		DataSourceIntegerField stamped = new DataSourceIntegerField("stamped");
+		DataSourceBooleanField signed = new DataSourceBooleanField("signed");
+		DataSourceBooleanField stamped = new DataSourceBooleanField("stamped");
 		DataSourceBooleanField bookmarked = new DataSourceBooleanField("bookmarked");
 		DataSourceBooleanField password = new DataSourceBooleanField("password");
 		DataSourceTextField lockUserId = new DataSourceTextField("lockUserId");

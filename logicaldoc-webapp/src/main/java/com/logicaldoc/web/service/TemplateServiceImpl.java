@@ -65,7 +65,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			if (template == null)
 				return;
 
-			if (template.getReadonly() == 1 || !dao.isWriteEnable(templateId, session.getUserId()))
+			if (template.isReadonly() || !dao.isWriteEnable(templateId, session.getUserId()))
 				throw new ServerException("You do not have the permission");
 
 			deleteTemplate(templateId);
@@ -103,7 +103,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		try {
 			Template template = getTemplate(guiTemplate, session, sessionUser);
 
-			if (template.getReadonly() == 0)
+			if (!template.isReadonly())
 				updateTemplate(guiTemplate, template, session);
 
 			/*
@@ -149,7 +149,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		template.setDescription(guiTemplate.getDescription());
 		template.setValidation(guiTemplate.getValidation());
 		template.setInitialization(guiTemplate.getInitialization());
-		template.setReadonly(guiTemplate.isReadonly() ? 1 : 0);
+		template.setReadonly(guiTemplate.isReadonly());
 		template.setType(guiTemplate.getType());
 
 		template.getAttributes().clear();
@@ -197,7 +197,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			template = dao.findById(guiTemplate.getId());
 			dao.initialize(template);
 			if (!sessionUser.isAdmin()
-					&& (template.getReadonly() == 1 || !dao.isWriteEnable(template.getId(), session.getUserId())))
+					&& (template.isReadonly() || !dao.isWriteEnable(template.getId(), session.getUserId())))
 				throw new ServerException("You do not have the permission");
 		} else {
 			template = newTemplate(guiTemplate, session, sessionUser);
@@ -227,7 +227,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	private void saveACL(Template template, GUITemplate guiTemplate, Session session, User sessionUser) {
 		TemplateDAO dao = TemplateDAO.get();
-		if ((template.getReadonly() == 1 || !dao.isWriteEnable(template.getId(), session.getUserId()))
+		if ((template.isReadonly() || !dao.isWriteEnable(template.getId(), session.getUserId()))
 				&& !sessionUser.isAdmin())
 			return;
 
@@ -268,7 +268,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		guiTemplate.setDescription(template.getDescription());
 		guiTemplate.setValidation(template.getValidation());
 		guiTemplate.setInitialization(template.getInitialization());
-		guiTemplate.setReadonly(template.getReadonly() == 1);
+		guiTemplate.setReadonly(template.isReadonly());
 		guiTemplate.setType(template.getType());
 
 		TemplateDAO dao = TemplateDAO.get();

@@ -20,7 +20,7 @@ public class GUIVersion extends GUIDocument {
 
 	private Date versionDate = new Date();
 
-	private int signed = 0;
+	private boolean signed = false;
 
 	// Used to show error message on the archived version
 	private String errorText;
@@ -60,12 +60,12 @@ public class GUIVersion extends GUIDocument {
 	}
 
 	@Override
-	public int getSigned() {
+	public boolean isSigned() {
 		return signed;
 	}
 
 	@Override
-	public void setSigned(int signed) {
+	public void setSigned(boolean signed) {
 		this.signed = signed;
 	}
 

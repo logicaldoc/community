@@ -861,7 +861,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setFileSize(realDoc.getFileSize());
 		guiDocument.setStartPublishing(realDoc.getStartPublishing());
 		guiDocument.setStopPublishing(realDoc.getStopPublishing());
-		guiDocument.setPublished(realDoc.getPublished());
+		guiDocument.setPublished(realDoc.isPublished());
 		guiDocument.setSigned(realDoc.isSigned());
 		guiDocument.setStamped(realDoc.isStamped());
 		guiDocument.setIndexed(realDoc.getIndexed().ordinal());
@@ -961,9 +961,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			version1.setColor(docVersion.getColor());
 			version1.setStartPublishing(docVersion.getStartPublishing());
 			version1.setStopPublishing(docVersion.getStopPublishing());
-			version1.setPublished(docVersion.getPublished());
+			version1.setPublished(docVersion.isPublished());
 			version1.setPages(docVersion.getPages());
-			version1.setOcrd(docVersion.getOcrd());
+			version1.setOcrd(docVersion.isOcrd());
 			version1.setOcrTemplateId(docVersion.getOcrTemplateId());
 
 			setGUIExtendedAttributes(docVersion, version1);
@@ -1006,9 +1006,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			version2.setColor(docVersion.getColor());
 			version2.setStartPublishing(docVersion.getStartPublishing());
 			version2.setStopPublishing(docVersion.getStopPublishing());
-			version2.setPublished(docVersion.getPublished());
+			version2.setPublished(docVersion.isPublished());
 			version2.setPages(docVersion.getPages());
-			version2.setOcrd(docVersion.getOcrd());
+			version2.setOcrd(docVersion.isOcrd());
 			version2.setOcrTemplateId(docVersion.getOcrTemplateId());
 			version2.setBarcodeTemplateId(docVersion.getBarcodeTemplateId());
 
@@ -1105,7 +1105,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			for (long id : docIds) {
 				Document doc = docDao.findById(id);
 
-				if (doc.getImmutable() == 0) {
+				if (!doc.isImmutable()) {
 					// The document of the selected documentRecord must be
 					// not locked
 					if (doc.getStatus() != DocumentStatus.UNLOCKED) {
@@ -1249,8 +1249,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			docVO.setTenantId(session.getTenantId());
 
 			// Make sure to maintain relevant flags from real document
-			docVO.setOcrd(document.getOcrd());
-			docVO.setBarcoded(document.getBarcoded());
+			docVO.setOcrd(document.isOcrd());
+			docVO.setBarcoded(document.isBarcoded());
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
@@ -1307,8 +1307,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		docVO.setColor(guiDocument.getColor());
 		docVO.setStartPublishing(guiDocument.getStartPublishing());
 		docVO.setStopPublishing(guiDocument.getStopPublishing());
-		docVO.setPublished(guiDocument.getPublished());
-		docVO.setBarcoded(guiDocument.getBarcoded());
+		docVO.setPublished(guiDocument.isPublished());
+		docVO.setBarcoded(guiDocument.isBarcoded());
 		docVO.setExtResId(guiDocument.getExtResId());
 		docVO.setPages(guiDocument.getPages());
 		docVO.setPreviewPages(guiDocument.getPreviewPages());
@@ -2135,7 +2135,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			throws ServerException {
 		GUIDocument document = getById(docId);
 
-		if (document.getImmutable() == 1 || document.getStatus() != DocumentStatus.UNLOCKED.ordinal()) {
+		if (document.isImmutable() || document.getStatus() != DocumentStatus.UNLOCKED.ordinal()) {
 			log.warn("Skip document {} because immutable or locked", docId);
 			return null;
 		}
@@ -2149,8 +2149,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		document.setComment(HTMLSanitizer.sanitizeSimpleText(model.getComment() != null ? model.getComment() : ""));
 
-		if (model.getPublished() > -1)
-			document.setPublished(model.getPublished());
+		document.setPublished(model.isPublished());
 		if (model.getStartPublishing() != null)
 			document.setStartPublishing(model.getStartPublishing());
 		if (model.getStopPublishing() != null)

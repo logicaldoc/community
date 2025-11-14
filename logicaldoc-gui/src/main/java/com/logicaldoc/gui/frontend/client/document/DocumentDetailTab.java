@@ -30,13 +30,13 @@ public abstract class DocumentDetailTab extends DetailTab {
 		this.document = document;
 		this.changedHandler = changedHandler;
 
-		if (Session.get().isAdmin() && document.getImmutable() == 0 && document.getStatus() == Constants.DOC_UNLOCKED) {
+		if (Session.get().isAdmin() && !document.isImmutable() && document.getStatus() == Constants.DOC_UNLOCKED) {
 			updateEnabled = true;
 			deleteEnabled = true;
 		} else {
-			updateEnabled = (document.getImmutable() == 0 && (document.getStatus() == Constants.DOC_UNLOCKED
+			updateEnabled = (!document.isImmutable() && (document.getStatus() == Constants.DOC_UNLOCKED
 					|| document.getLockUserId() == Session.get().getUser().getId()) && document.isWrite());
-			deleteEnabled = (document.getImmutable() == 0 && (document.getStatus() == Constants.DOC_UNLOCKED
+			deleteEnabled = (!document.isImmutable() && (document.getStatus() == Constants.DOC_UNLOCKED
 					|| document.getLockUserId() == Session.get().getUser().getId()) && document.isDelete());
 		}
 	}
@@ -44,12 +44,12 @@ public abstract class DocumentDetailTab extends DetailTab {
 	public GUIDocument getDocument() {
 		return document;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

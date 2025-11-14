@@ -839,7 +839,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	private void assertDocumentIsNotImmutable(User user, Document document) throws DavException {
-		if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
+		if (document.isImmutable() && !user.isMemberOf(Group.GROUP_ADMIN))
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
 	}
 

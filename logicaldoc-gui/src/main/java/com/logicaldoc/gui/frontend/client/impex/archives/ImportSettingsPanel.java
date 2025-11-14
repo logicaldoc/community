@@ -37,7 +37,7 @@ public class ImportSettingsPanel extends VLayout {
 		description.addChangedHandler(changedHandler);
 		description.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPEN);
 
-		ToggleItem importTemplates = ItemFactory.newToggleItem(IMPORTTEMPLATES, archive.getImportTemplate() == 1);
+		ToggleItem importTemplates = ItemFactory.newToggleItem(IMPORTTEMPLATES, archive.isImportTemplate());
 		importTemplates.addChangedHandler(changedHandler);
 		importTemplates.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPEN);
 
@@ -58,12 +58,12 @@ public class ImportSettingsPanel extends VLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			archive.setDescription(vm.getValueAsString("description"));
 			archive.setImportCustomId(Integer.parseInt(vm.getValueAsString("importcids")));
-			archive.setImportTemplate(Boolean.parseBoolean(vm.getValueAsString(IMPORTTEMPLATES)) ? 1 : 0);
+			archive.setImportTemplate(Boolean.parseBoolean(vm.getValueAsString(IMPORTTEMPLATES)));
 			return true;
 		} else
 			return false;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

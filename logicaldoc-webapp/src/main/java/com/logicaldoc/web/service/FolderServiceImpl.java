@@ -862,7 +862,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void checkImmutable(Document doc) throws PermissionException {
-		if (doc.getImmutable() == 1) {
+		if (doc.isImmutable()) {
 			throw new PermissionException("Document " + doc.getId() + " is immutable");
 		}
 	}
@@ -997,44 +997,44 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				extAttr.setValue(null);
 			} else {
 				switch (currentTemplateExtAttrType) {
-				case GUIAttribute.TYPE_DOUBLE:
-					extAttr.setValue(Double.parseDouble(guiAttribute.getValue().toString()));
-					break;
-				case GUIAttribute.TYPE_INT:
-					extAttr.setValue(Long.parseLong(guiAttribute.getValue().toString()));
-					break;
-				case GUIAttribute.TYPE_BOOLEAN:
-					extAttr.setValue(guiAttribute.getBooleanValue());
-					extAttr.setType(Attribute.TYPE_BOOLEAN);
-					break;
-				case GUIAttribute.TYPE_USER, GUIAttribute.TYPE_FOLDER, GUIAttribute.TYPE_DOCUMENT:
-					extAttr.setIntValue(guiAttribute.getIntValue());
-					extAttr.setStringValue(guiAttribute.getStringValue());
-					break;
-				default:
-					extAttr.setStringValue(guiAttribute.getStringValue());
+					case GUIAttribute.TYPE_DOUBLE:
+						extAttr.setValue(Double.parseDouble(guiAttribute.getValue().toString()));
+						break;
+					case GUIAttribute.TYPE_INT:
+						extAttr.setValue(Long.parseLong(guiAttribute.getValue().toString()));
+						break;
+					case GUIAttribute.TYPE_BOOLEAN:
+						extAttr.setValue(guiAttribute.getBooleanValue());
+						extAttr.setType(Attribute.TYPE_BOOLEAN);
+						break;
+					case GUIAttribute.TYPE_USER, GUIAttribute.TYPE_FOLDER, GUIAttribute.TYPE_DOCUMENT:
+						extAttr.setIntValue(guiAttribute.getIntValue());
+						extAttr.setStringValue(guiAttribute.getStringValue());
+						break;
+					default:
+						extAttr.setStringValue(guiAttribute.getStringValue());
 				}
 			}
 		} else {
 			switch (currentTemplateExtAttrType) {
-			case Attribute.TYPE_USER, Attribute.TYPE_FOLDER, GUIAttribute.TYPE_DOCUMENT:
-				if (guiAttribute.getValue() != null) {
-					extAttr.setStringValue(guiAttribute.getStringValue());
-					extAttr.setIntValue(guiAttribute.getIntValue());
-				} else {
-					extAttr.setStringValue(null);
-					extAttr.setIntValue(null);
-				}
-				break;
-			case Attribute.TYPE_BOOLEAN:
-				extAttr.setValue(guiAttribute.getBooleanValue());
-				break;
-			case Attribute.TYPE_DATE:
-				extAttr.setValue(fixDateForGUI(guiAttribute.getDateValue()));
-				break;
-			default:
-				extAttr.setValue(guiAttribute.getValue());
-				break;
+				case Attribute.TYPE_USER, Attribute.TYPE_FOLDER, GUIAttribute.TYPE_DOCUMENT:
+					if (guiAttribute.getValue() != null) {
+						extAttr.setStringValue(guiAttribute.getStringValue());
+						extAttr.setIntValue(guiAttribute.getIntValue());
+					} else {
+						extAttr.setStringValue(null);
+						extAttr.setIntValue(null);
+					}
+					break;
+				case Attribute.TYPE_BOOLEAN:
+					extAttr.setValue(guiAttribute.getBooleanValue());
+					break;
+				case Attribute.TYPE_DATE:
+					extAttr.setValue(fixDateForGUI(guiAttribute.getDateValue()));
+					break;
+				default:
+					extAttr.setValue(guiAttribute.getValue());
+					break;
 			}
 		}
 

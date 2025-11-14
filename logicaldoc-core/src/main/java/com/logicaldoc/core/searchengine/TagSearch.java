@@ -172,12 +172,12 @@ public class TagSearch extends Search {
 			hit.setCreation(rs.getTimestamp(9));
 			hit.setCreator(rs.getString(10));
 			hit.setFileSize(rs.getLong(11));
-			hit.setImmutable(rs.getInt(12));
+			hit.setImmutable(rs.getInt(12) == 1);
 			hit.setIndexingStatus(rs.getInt(13));
 			hit.setLockUserId(rs.getLong(14));
 			hit.setFileName(rs.getString(15));
-			hit.setStatus( rs.getInt(16));
-			hit.setSigned(rs.getInt(17));
+			hit.setStatus(rs.getInt(16));
+			hit.setSigned(rs.getInt(17) == 1);
 			hit.setType(rs.getString(18));
 			hit.setRating(rs.getInt(19));
 			hit.setFileVersion(rs.getString(20));
@@ -185,7 +185,7 @@ public class TagSearch extends Search {
 			hit.setWorkflowStatus(rs.getString(22));
 			hit.setStartPublishing(rs.getTimestamp(23));
 			hit.setStopPublishing(rs.getTimestamp(24));
-			hit.setPublished(rs.getInt(25));
+			hit.setPublished(rs.getInt(25) == 1);
 
 			Folder folder = new Folder();
 			folder.setName(rs.getString(26));
@@ -202,7 +202,7 @@ public class TagSearch extends Search {
 
 			hit.setTenantId(rs.getLong(30));
 			hit.setDocRefType(rs.getString(31));
-			hit.setStamped(rs.getInt(32));
+			hit.setStamped(rs.getInt(32) == 1);
 			hit.setPassword(rs.getString(33));
 			hit.setWorkflowStatusDisplay(rs.getString(34));
 			hit.setLanguage(rs.getString(35));

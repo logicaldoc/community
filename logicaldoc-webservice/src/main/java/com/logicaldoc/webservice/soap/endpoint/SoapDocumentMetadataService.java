@@ -134,7 +134,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			template.setName(wsTemplate.getName());
 			template.setDescription(wsTemplate.getDescription());
 
-			if (template.getReadonly() == 1 || !isWritable(sid, template.getId()))
+			if (template.isReadonly() || !isWritable(sid, template.getId()))
 				throw new PermissionException(user.getUsername(), TEMPLATE + wsTemplate.getName(), Permission.READ);
 		}
 
@@ -152,7 +152,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throw new WebserviceException("You cannot delete template with id " + templateId
 					+ " because some documents belongs to that template.");
 		Template templ = dao.findById(templateId);
-		if (templ.getReadonly() == 1 || !isWritable(sid, templateId))
+		if (templ.isReadonly() || !isWritable(sid, templateId))
 			throw new PermissionException(user.getUsername(), TEMPLATE + templ.getName(), Permission.WRITE);
 
 		dao.delete(templateId);

@@ -40,7 +40,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 	private String description;
 
 	@Column(name = "ld_readonly", nullable = false)
-	private int readonly = 0;
+	private boolean readonly = false;
 
 	@Column(name = "ld_type", nullable = false)
 	private int type = TYPE_DEFAULT;
@@ -252,11 +252,11 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 		this.description = description;
 	}
 
-	public int getReadonly() {
+	public boolean isReadonly() {
 		return readonly;
 	}
 
-	public void setReadonly(int readonly) {
+	public void setReadonly(boolean readonly) {
 		this.readonly = readonly;
 	}
 

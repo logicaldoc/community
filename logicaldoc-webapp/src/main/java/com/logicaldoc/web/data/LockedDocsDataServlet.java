@@ -73,7 +73,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 				doc.setPublisher(rs.getString(6));
 				doc.setFileSize(rs.getLong(7));
 				doc.setFileName(rs.getString(8));
-				doc.setImmutable(rs.getInt(9));
+				doc.setImmutable(rs.getInt(9) == 1);
 				Folder folder = new Folder();
 				folder.setId(rs.getLong(10));
 				folder.setTenantId(session.getTenantId());
@@ -109,7 +109,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 			writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
 			writer.print("<size>" + doc.getFileSize() + "</size>");
 			writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-			writer.print("<immutable>" + doc.getImmutable() + "</immutable>");
+			writer.print("<immutable>" + doc.isImmutable() + "</immutable>");
 			writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");
 			writer.print("<type>" + doc.getType() + "</type>");
 			writer.print("<status>" + doc.getStatus() + "</status>");

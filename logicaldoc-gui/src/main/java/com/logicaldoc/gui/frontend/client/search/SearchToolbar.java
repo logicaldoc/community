@@ -167,7 +167,6 @@ public class SearchToolbar extends ToolStrip {
 					GUIDocument metadata = new GUIDocument();
 					metadata.setBulkUpdate(true);
 					metadata.setStartPublishing(null);
-					metadata.setPublished(-1);
 					metadata.setLockUserId(Session.get().getUser().getId());
 					GUIFolder fld = new GUIFolder();
 					fld.setAllowedPermissions(new GUIAccessControlEntry(GUIAccessControlEntry.PERMISSION_READ,

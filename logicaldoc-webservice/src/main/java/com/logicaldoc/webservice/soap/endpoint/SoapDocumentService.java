@@ -157,7 +157,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO ddao = DocumentDAO.get();
 
 		Document document = ddao.findById(docId);
-		if (document.getImmutable() == 1)
+		if (document.isImmutable())
 			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
 
 		checkDocumentPermission(Permission.READ, user, docId);
@@ -201,7 +201,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(docId);
 		docDao.initialize(doc);
-		if (doc.getImmutable() == 1)
+		if (doc.isImmutable())
 			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
 
 		if (doc.getStatus() != DocumentStatus.UNLOCKED)
@@ -249,7 +249,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return;
 
-		if (doc.getImmutable() == 1)
+		if (doc.isImmutable())
 			throw new PermissionException(THE_DOCUMENT + doc.getId() + IS_IMMUTABLE);
 
 		if (doc.getStatus() != DocumentStatus.UNLOCKED && user.getId() != doc.getLockUserId())
@@ -371,7 +371,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		doc = docDao.findDocument(docId);
 
-		if (doc.getImmutable() == 1)
+		if (doc.isImmutable())
 			throw new WebserviceException("The document is immutable");
 
 		if ("sign.p7m".equalsIgnoreCase(suffix))
@@ -1222,7 +1222,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 
 		Document doc = retrieveReadableDocument(docId, user);
-		if (doc.getImmutable() == 1)
+		if (doc.isImmutable())
 			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
 
 		checkDocumentPermission(Permission.WRITE, user, doc.getId());

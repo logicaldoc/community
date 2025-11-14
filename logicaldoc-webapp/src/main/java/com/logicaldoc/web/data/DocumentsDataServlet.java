@@ -177,11 +177,11 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		writer.print("<pages>" + document.getPages() + "</pages>");
 
 		writer.print("<status>" + document.getStatus().ordinal() + "</status>");
-		writer.print("<immutable>" + document.getImmutable() + "</immutable>");
+		writer.print("<immutable>" + document.isImmutable() + "</immutable>");
 		writer.print("<indexed>" + document.getIndexed().ordinal() + "</indexed>");
 		writer.print("<password>" + StringUtils.isNotEmpty(document.getPassword()) + "</password>");
-		writer.print("<signed>" + document.getSigned() + "</signed>");
-		writer.print("<stamped>" + document.getStamped() + "</stamped>");
+		writer.print("<signed>" + document.isSigned() + "</signed>");
+		writer.print("<stamped>" + document.isStamped() + "</stamped>");
 		writer.print("<bookmarked>" + (bookmarks.contains(document.getId()) || bookmarks.contains(document.getDocRef()))
 				+ "</bookmarked>");
 		writer.print("<language>" + document.getLanguage() + "</language>");
@@ -247,11 +247,11 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 					writer.print("<ext_" + name + ">");
 
 					switch (val) {
-					case Date date -> writer.print(df.format(date));
-					case Integer intVal -> writer.print(Integer.toString(intVal));
-					case Long longVal -> writer.print(Long.toString(longVal));
-					case Double doubleVal -> writer.print(Double.toString(doubleVal));
-					default -> writer.print("<![CDATA[" + val + "]]>");
+						case Date date -> writer.print(df.format(date));
+						case Integer intVal -> writer.print(Integer.toString(intVal));
+						case Long longVal -> writer.print(Long.toString(longVal));
+						case Double doubleVal -> writer.print(Double.toString(doubleVal));
+						default -> writer.print("<![CDATA[" + val + "]]>");
 					}
 
 					writer.print("</ext_" + name + ">");
@@ -509,7 +509,7 @@ select ld_docid
 			} else {
 				doc.setStartPublishing((Date) cols[22]);
 				doc.setStopPublishing((Date) cols[23]);
-				doc.setPublished((Integer) cols[24]);
+				doc.setPublished((Integer) cols[24] == 1);
 
 				enrichPublishedDocument(doc, cols, extendedAttributes, extendedAttributesValues, user);
 			}
@@ -530,11 +530,11 @@ select ld_docid
 			doc.setCreation((Date) cols[8]);
 			doc.setCreator((String) cols[9]);
 			doc.setFileSize((Long) cols[10]);
-			doc.setImmutable((Integer) cols[11]);
+			doc.setImmutable((Integer) cols[11] ==1);
 			doc.setIndexingStatus((IndexingStatus) cols[12]);
 			doc.setLockUserId((Long) cols[13]);
 			doc.setStatus((DocumentStatus) cols[15]);
-			doc.setSigned((Integer) cols[16]);
+			doc.setSigned((Integer) cols[16]==1);
 			doc.setRating((Integer) cols[18]);
 			doc.setFileVersion((String) cols[19]);
 			doc.setComment((String) cols[20]);
@@ -543,7 +543,7 @@ select ld_docid
 			doc.setWorkflowStatus((String) cols[21]);
 			doc.setExtResId((String) cols[25]);
 			doc.setTemplateName((String) cols[26]);
-			doc.setStamped((Integer) cols[28]);
+			doc.setStamped((Integer) cols[28] == 1);
 			doc.setLockUser((String) cols[29]);
 			doc.setPassword((String) cols[30]);
 			doc.setPages((Integer) cols[31]);

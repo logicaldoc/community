@@ -125,7 +125,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 			writer.print("<created>" + df.format(doc.getCreation()) + "</created>");
 			writer.print("<size>" + doc.getFileSize() + "</size>");
 			writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-			writer.print("<immutable>" + doc.getImmutable() + "</immutable>");
+			writer.print("<immutable>" + doc.isImmutable() + "</immutable>");
 			writer.print("<deleteUserId>" + doc.getDeleteUserId() + "</deleteUserId>");
 			writer.print("<avatar>" + doc.getDeleteUserId() + "</avatar>");
 			writer.print("<deleteUser><![CDATA[" + (doc.getDeleteUser() != null ? doc.getDeleteUser() : "")

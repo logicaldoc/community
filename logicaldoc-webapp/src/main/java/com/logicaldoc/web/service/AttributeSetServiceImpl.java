@@ -123,7 +123,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			attributeSet.setName(guiAttributeSet.getName());
 			attributeSet.setLabel(guiAttributeSet.getLabel());
 			attributeSet.setDescription(guiAttributeSet.getDescription());
-			attributeSet.setReadonly(guiAttributeSet.isReadonly() ? 1 : 0);
+			attributeSet.setReadonly(guiAttributeSet.isReadonly());
 			attributeSet.setType(guiAttributeSet.getType());
 
 			saveAttributes(guiAttributeSet, attributeSet);
@@ -223,7 +223,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			attSet.setName(attributeSet.getName());
 			attSet.setLabel(attributeSet.getLabel());
 			attSet.setDescription(attributeSet.getDescription());
-			attSet.setReadonly(attributeSet.getReadonly() == 1);
+			attSet.setReadonly(attributeSet.isReadonly());
 			attSet.setType(attributeSet.getType());
 
 			List<GUIAttribute> attributes = readAttributes(attributeSet);

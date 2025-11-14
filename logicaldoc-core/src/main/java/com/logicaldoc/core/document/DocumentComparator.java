@@ -195,7 +195,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	private static final DocumentComparator PUBSTATUS_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
-			return Integer.compare(d1.getPublished(), d2.getPublished());
+			return Boolean.compare(d1.isPublished(), d2.isPublished());
 		}
 	};
 

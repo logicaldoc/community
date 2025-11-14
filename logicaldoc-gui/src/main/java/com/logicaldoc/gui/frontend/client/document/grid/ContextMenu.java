@@ -906,7 +906,7 @@ public class ContextMenu extends Menu {
 									@Override
 									public void handleSuccess(Void result) {
 										for (GUIDocument doc : selection) {
-											doc.setImmutable(1);
+											doc.setImmutable(true);
 											grid.updateDocument(doc);
 										}
 
@@ -1138,7 +1138,7 @@ public class ContextMenu extends Menu {
 
 	private boolean checkImmutablesInSelection(List<GUIDocument> selection) {
 		for (GUIDocument doc : selection)
-			if (doc.getImmutable() != 0)
+			if (doc.isImmutable())
 				return true;
 		return false;
 	}

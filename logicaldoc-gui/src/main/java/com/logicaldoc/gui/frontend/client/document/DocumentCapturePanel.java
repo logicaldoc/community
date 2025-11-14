@@ -107,11 +107,11 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		barcodeTemplate.addChangedHandler(event -> processOcr.setDisabled(true));
 
 		StaticTextItem ocrProcessed = ItemFactory.newStaticTextItem("zonalocrprocessed", "processedbyzonalocr",
-				document.getOcrd() == 1 ? I18N.message("yes") : I18N.message("no"));
+				document.isOcrd() ? I18N.message("yes") : I18N.message("no"));
 		ocrProcessed.setWrapTitle(false);
 
 		StaticTextItem barcodeProcessed = ItemFactory.newStaticTextItem("barcodeprocessed", "processedbybarcode",
-				document.getBarcoded() == 1 ? I18N.message("yes") : I18N.message("no"));
+				document.isBarcoded() ? I18N.message("yes") : I18N.message("no"));
 		barcodeProcessed.setWrapTitle(false);
 
 		if (processButton)

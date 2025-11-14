@@ -418,8 +418,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		GUIDocument document = new GUIDocument();
 		document.setBulkUpdate(true);
 		document.setStartPublishing(null);
-		document.setPublished(-1);
-
 		document.setFolder(this);
 
 		if (getTemplateLocked() == 1) {

@@ -192,9 +192,8 @@ public class DocumentManager {
 		// identify the document and folder
 		Document document = documentDAO.findDocument(docId);
 
-		if (document.getImmutable() == 0 && document.getStatus() == DocumentStatus.UNLOCKED) {
-			StoreResource newFileResource = StoreResource.builder().document(document).fileVersion(fileVersion)
-					.build();
+		if (!document.isImmutable() && document.getStatus() == DocumentStatus.UNLOCKED) {
+			StoreResource newFileResource = StoreResource.builder().document(document).fileVersion(fileVersion).build();
 
 			// Remove the ancillary files related to the same fileVersion
 			for (StoreResource resource : store.listResources(document.getId(), fileVersion).stream()
@@ -211,10 +210,10 @@ public class DocumentManager {
 			document.setFileSize(fileSize);
 			if (document.getIndexed() != IndexingStatus.SKIP)
 				document.setIndexingStatus(IndexingStatus.TO_INDEX);
-			document.setOcrd(0);
-			document.setBarcoded(0);
-			document.setSigned(0);
-			document.setStamped(0);
+			document.setOcrd(false);
+			document.setBarcoded(false);
+			document.setSigned(false);
+			document.setStamped(false);
 
 			// Now update the file size in the versions
 			List<Future<Document>> futures = new ArrayList<>();
@@ -351,10 +350,10 @@ public class DocumentManager {
 			for (DocumentListener listener : listenerManager.getListeners())
 				listener.beforeCheckin(document, transaction, dictionary);
 
-			document.setStamped(0);
-			document.setSigned(0);
-			document.setOcrd(0);
-			document.setBarcoded(0);
+			document.setStamped(false);
+			document.setSigned(false);
+			document.setOcrd(false);
+			document.setBarcoded(false);
 
 			if (document.getIndexed() != IndexingStatus.SKIP)
 				document.setIndexingStatus(IndexingStatus.TO_INDEX);
@@ -395,15 +394,15 @@ public class DocumentManager {
 				documentDAO.initialize(document);
 
 				document.copyAttributes(oldDocument);
-				document.setOcrd(oldDocument.getOcrd());
+				document.setOcrd(oldDocument.isOcrd());
 				document.setOcrTemplateId(oldDocument.getOcrTemplateId());
-				document.setBarcoded(oldDocument.getBarcoded());
+				document.setBarcoded(oldDocument.isBarcoded());
 				document.setBarcodeTemplateId(oldDocument.getBarcodeTemplateId());
 				document.setIndexingStatus(oldDocument.getIndexed());
 				document.setCustomId(oldDocument.getCustomId());
 				document.setStatus(oldDocument.getStatus());
-				document.setStamped(oldDocument.getStamped());
-				document.setSigned(oldDocument.getSigned());
+				document.setStamped(oldDocument.isStamped());
+				document.setSigned(oldDocument.isSigned());
 				document.setComment(oldDocument.getComment());
 				documentDAO.store(document);
 				throw new PersistenceException(String.format("Cannot save the new version %s into the store", document),
@@ -434,7 +433,7 @@ public class DocumentManager {
 	}
 
 	protected void checkImmutability(Document document, User user) throws PersistenceException {
-		if (document.getImmutable() == 1 && (user == null || !user.isMemberOf(Group.GROUP_ADMIN)))
+		if (document.isImmutable() && (user == null || !user.isMemberOf(Group.GROUP_ADMIN)))
 			throw new PersistenceException("Document is immutable");
 	}
 
@@ -795,8 +794,8 @@ public class DocumentManager {
 	private synchronized void synchronizedUpdate(Document document, Document docVO, DocumentHistory transaction)
 			throws PersistenceException {
 		documentDAO.initialize(document);
-		if (document.getImmutable() == 0
-				|| (document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
+		if (!document.isImmutable()
+				|| (document.isImmutable() && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 			DocumentHistory renameTransaction = checkDocumentRenamed(document, docVO, transaction);
 
 			// Check CustomId uniqueness
@@ -810,7 +809,7 @@ public class DocumentManager {
 			document.setRevision(docVO.getRevision());
 
 			// Save retention policies
-			document.setPublished(docVO.getPublished());
+			document.setPublished(docVO.isPublished());
 			document.setStartPublishing(docVO.getStartPublishing());
 			document.setStopPublishing(docVO.getStopPublishing());
 
@@ -829,7 +828,7 @@ public class DocumentManager {
 
 			if (document.getTemplate() == null) {
 				document.setOcrTemplateId(null);
-				document.setOcrd(0);
+				document.setOcrd(false);
 			}
 
 			setOcrTemplate(document, docVO);
@@ -897,9 +896,9 @@ public class DocumentManager {
 				|| (document.getBarcodeTemplateId() != null && docVO.getBarcodeTemplateId() == null)
 				|| (document.getBarcodeTemplateId() == null && docVO.getBarcodeTemplateId() == null)
 				|| !document.getBarcodeTemplateId().equals(docVO.getBarcodeTemplateId()))
-			document.setBarcoded(0);
+			document.setBarcoded(false);
 		else
-			document.setBarcoded(docVO.getBarcoded());
+			document.setBarcoded(docVO.isBarcoded());
 		document.setBarcodeTemplateId(docVO.getBarcodeTemplateId());
 	}
 
@@ -908,9 +907,9 @@ public class DocumentManager {
 				|| (document.getOcrTemplateId() != null && docVO.getOcrTemplateId() == null)
 				|| (document.getOcrTemplateId() == null && docVO.getOcrTemplateId() == null)
 				|| !document.getOcrTemplateId().equals(docVO.getOcrTemplateId()))
-			document.setOcrd(0);
+			document.setOcrd(false);
 		else
-			document.setOcrd(docVO.getOcrd());
+			document.setOcrd(docVO.isOcrd());
 		document.setOcrTemplateId(docVO.getOcrTemplateId());
 	}
 
@@ -1193,8 +1192,8 @@ public class DocumentManager {
 	 */
 	public int countPages(Document doc) {
 		try {
-			return ParserFactory.getParser(doc.getFileName()).countPages(store.getStream(StoreResource.builder().document(doc).build()),
-					doc.getFileName());
+			return ParserFactory.getParser(doc.getFileName())
+					.countPages(store.getStream(StoreResource.builder().document(doc).build()), doc.getFileName());
 		} catch (Exception e) {
 			log.warn("Cannot count pages of document {}", doc, e);
 			return 1;
@@ -1237,11 +1236,11 @@ public class DocumentManager {
 			cloned.setDate(null);
 			if (cloned.getIndexed() == IndexingStatus.INDEXED)
 				cloned.setIndexingStatus(IndexingStatus.TO_INDEX);
-			cloned.setStamped(0);
-			cloned.setSigned(0);
+			cloned.setStamped(false);
+			cloned.setSigned(false);
 			cloned.setLinks(0);
-			cloned.setOcrd(0);
-			cloned.setBarcoded(0);
+			cloned.setOcrd(false);
+			cloned.setBarcoded(false);
 
 			if (!security)
 				cloned.getAccessControlList().clear();
@@ -1326,7 +1325,7 @@ public class DocumentManager {
 			documentDAO.initialize(document);
 
 			if (transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
-				document.setImmutable(0);
+				document.setImmutable(false);
 			} else if (document.getLockUserId() == null || document.getStatus() == DocumentStatus.UNLOCKED) {
 				log.debug("The document {} is already unlocked", document);
 				return;
@@ -1892,7 +1891,7 @@ public class DocumentManager {
 
 		// identify the document and folder
 		Document document = documentDAO.findDocument(docId);
-		if (document.getImmutable() == 0 && document.getStatus() == DocumentStatus.UNLOCKED) {
+		if (!document.isImmutable() && document.getStatus() == DocumentStatus.UNLOCKED) {
 			Version ver = versionDAO.findByVersion(document.getId(), version);
 			if (ver == null)
 				throw new PersistenceException(String.format("Unexisting version %s of document %d", version, docId));
@@ -1918,8 +1917,8 @@ public class DocumentManager {
 					docVO.setTagsFromWords(tags);
 				}
 
-				store.writeToFile(
-						StoreResource.builder().document(document).fileVersion(ver.getFileVersion()).build(), tmp);
+				store.writeToFile(StoreResource.builder().document(document).fileVersion(ver.getFileVersion()).build(),
+						tmp);
 				DocumentHistory checkinTransaction = new DocumentHistory(transaction);
 				checkinTransaction.setDate(new Date());
 				checkin(document.getId(), tmp, ver.getFileName(), false, docVO, checkinTransaction);

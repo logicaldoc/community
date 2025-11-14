@@ -125,7 +125,7 @@ public class DashletContent extends HttpServlet {
 	private void handleDocumentEvent(boolean showSid, Locale locale, Dashlet dashlet,
 			Map<String, Object> dashletDictionary, Automation automation, PrintWriter writer)
 			throws PersistenceException, AutomationException {
-		
+
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 			if (StringUtils.isNotEmpty(content))
@@ -134,8 +134,8 @@ public class DashletContent extends HttpServlet {
 			writer.write(LIST_TAG);
 
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
-			List<DocumentHistory> records = DocumentHistoryDAO.get().findByObjectQuery(query.trim(), (Map<String, Object>) null,
-					dashlet.getUnique() == 0 ? dashlet.getMax() : null);
+			List<DocumentHistory> records = DocumentHistoryDAO.get().findByObjectQuery(query.trim(),
+					(Map<String, Object>) null, dashlet.getUnique() == 0 ? dashlet.getMax() : null);
 
 			List<DocumentHistory> uniqueRecords = filterUniqueDocumentEvents(dashlet, records);
 
@@ -204,11 +204,11 @@ public class DashletContent extends HttpServlet {
 			writer.write("<size>" + doc.getFileSize() + "</size>");
 
 			writer.write("<status>" + doc.getStatus() + "</status>");
-			writer.write("<immutable>" + doc.getImmutable() + "</immutable>");
+			writer.write("<immutable>" + doc.isImmutable() + "</immutable>");
 			writer.write("<indexed>" + doc.getIndexed() + "</indexed>");
 			writer.write("<password>" + StringUtils.isNotEmpty(doc.getPassword()) + "</password>");
-			writer.write("<signed>" + doc.getSigned() + "</signed>");
-			writer.write("<stamped>" + doc.getStamped() + "</stamped>");
+			writer.write("<signed>" + doc.isSigned() + "</signed>");
+			writer.write("<stamped>" + doc.isStamped() + "</stamped>");
 
 			writer.write("<pages>" + doc.getPages() + "</pages>");
 			printField("lockUserId", doc.getLockUserId(), writer);
@@ -353,7 +353,7 @@ public class DashletContent extends HttpServlet {
 
 	private void handleDocument(Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
 			Automation automation, PrintWriter writer) throws PersistenceException, AutomationException {
-		
+
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 			if (StringUtils.isNotEmpty(content))
@@ -422,11 +422,11 @@ public class DashletContent extends HttpServlet {
 		writer.write("<size>" + doc.getFileSize() + "</size>");
 
 		writer.write("<status>" + doc.getStatus() + "</status>");
-		writer.write("<immutable>" + doc.getImmutable() + "</immutable>");
+		writer.write("<immutable>" + doc.isImmutable() + "</immutable>");
 		writer.write("<indexed>" + doc.getIndexed() + "</indexed>");
 		writer.write("<password>" + StringUtils.isNotEmpty(doc.getPassword()) + "</password>");
-		writer.write("<signed>" + doc.getSigned() + "</signed>");
-		writer.write("<stamped>" + doc.getStamped() + "</stamped>");
+		writer.write("<signed>" + doc.isSigned() + "</signed>");
+		writer.write("<stamped>" + doc.isStamped() + "</stamped>");
 
 		writer.write("<pages>" + doc.getPages() + "</pages>");
 
@@ -518,7 +518,8 @@ public class DashletContent extends HttpServlet {
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 			List<DocumentNote> records = new ArrayList<>();
 			try {
-				records = DocumentNoteDAO.get().findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
+				records = DocumentNoteDAO.get().findByObjectQuery(query.trim(), (Map<String, Object>) null,
+						dashlet.getMax());
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}

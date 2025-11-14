@@ -81,7 +81,7 @@ public class VersionMetadata extends Window {
 		records.add(new MetadataRecord(I18N.message("tags"), I18N.message("tags"), version.getTagsString(), 0));
 
 		records.add(new MetadataRecord(I18N.message("published"), I18N.message("published"),
-				version.getPublished() == 1 ? I18N.message("yes") : I18N.message("no"), 0));
+				version.isPublished() ? I18N.message("yes") : I18N.message("no"), 0));
 
 		records.add(new MetadataRecord(I18N.message("startpublishing"), I18N.message("startpublishing"),
 				version.getStartPublishing() != null ? I18N.formatDate(version.getStartPublishing()) : null, 0));
@@ -133,9 +133,9 @@ public class VersionMetadata extends Window {
 				new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(GUIAccessControlEntry acl) {
-						if(acl==null)
+						if (acl == null)
 							return;
-						
+
 						long docId = selection.getAttribute().getIntValue();
 
 						MenuItem preview = new MenuItem();
@@ -148,22 +148,23 @@ public class VersionMetadata extends Window {
 										new PreviewPopup(doc).show();
 									}
 								}));
-						
+
 						MenuItem download = new MenuItem();
 						download.setTitle(I18N.message("download"));
 						download.setEnabled(acl.isDownload());
 						download.addClickHandler(click -> DocUtil.download(docId, null));
-						
+
 						MenuItem open = new MenuItem();
 						open.setTitle(I18N.message("openinfolder"));
 						open.setEnabled(acl.isRead());
 						open.addClickHandler(click -> {
 							destroy();
 
-							if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
+							if (com.logicaldoc.gui.common.client.Menu
+									.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
 								DocumentsPanel.get().openInFolder(docId);
 						});
-						
+
 						Menu contextMenu = new Menu();
 						contextMenu.setItems(preview, download, open);
 						contextMenu.showContextMenu();

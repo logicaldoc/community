@@ -303,7 +303,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		if (originalTemplate.getLabel() != null)
 			clonedTemplate.setLabel(originalTemplate.getLabel() + "-Clone");
 		clonedTemplate.setDescription(originalTemplate.getDescription());
-		clonedTemplate.setReadonly(originalTemplate.getReadonly());
+		clonedTemplate.setReadonly(originalTemplate.isReadonly());
 		clonedTemplate.setValidation(originalTemplate.getValidation());
 		clonedTemplate.setInitialization(originalTemplate.getInitialization());
 		clonedTemplate.setTemplateAttributes(originalTemplate.getTemplateAttributes().entrySet().stream()

@@ -112,7 +112,7 @@ public class DriveMenuItem extends MenuItem {
 				}
 			}
 		});
-		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
+		edit.setEnabled(document != null && !document.isImmutable() && folder != null && folder.isDownload()
 				&& folder.isWrite() && Feature.enabled(Feature.GOOGLE_DRIVE));
 		return edit;
 	}

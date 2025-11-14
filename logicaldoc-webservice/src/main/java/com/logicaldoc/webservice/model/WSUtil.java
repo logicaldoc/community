@@ -64,7 +64,7 @@ public class WSUtil {
 
 			setTemplateIntoWsDocument(document, wsDoc);
 
-			wsDoc.setImmutable(document.getImmutable());
+			wsDoc.setImmutable(document.isImmutable() ? 1 : 0);
 
 			setFolderIntoWsDocument(document, wsDoc);
 
@@ -83,15 +83,15 @@ public class WSUtil {
 			wsDoc.setDigest(document.getDigest());
 			wsDoc.setLastModified(DateUtil.format(document.getLastModified()));
 			wsDoc.setPages(document.getPages());
-			wsDoc.setSigned(document.getSigned());
-			wsDoc.setStamped(document.getStamped());
+			wsDoc.setSigned(document.isSigned() ? 1 : 0);
+			wsDoc.setStamped(document.isStamped() ? 1 : 0);
 			wsDoc.setNature(document.getNature());
 			wsDoc.setFormId(document.getFormId());
 			wsDoc.setPasswordProtected(document.isPasswordProtected() ? 1 : 0);
 			wsDoc.setOcrTemplateId(document.getOcrTemplateId());
-			wsDoc.setOcrd(document.getOcrd());
+			wsDoc.setOcrd(document.isOcrd() ? 1 : 0);
 			wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
-			wsDoc.setBarcoded(document.getBarcoded());
+			wsDoc.setBarcoded(document.isBarcoded() ? 1 : 0);
 
 			if (document instanceof Document doc) {
 				wsDoc.setDocRef(doc.getDocRef());
@@ -101,7 +101,7 @@ public class WSUtil {
 
 			setDatesIntoWsDocument(document, wsDoc);
 
-			wsDoc.setPublished(document.getPublished());
+			wsDoc.setPublished(document.isPublished() ? 1 : 0);
 
 			// Populate the attributes
 			setAttributesIntoWsDocument(document, wsDoc);
@@ -207,7 +207,7 @@ public class WSUtil {
 		doc.setCustomId(wsDoc.getCustomId());
 		doc.setRevision(wsDoc.getRevision());
 		doc.setLanguage(wsDoc.getLanguage());
-		doc.setImmutable(wsDoc.getImmutable());
+		doc.setImmutable(wsDoc.getImmutable() == 1);
 		if (wsDoc.getIndexed() != WSDocument.INDEX_INDEXED)
 			doc.setIndexingStatus(wsDoc.getIndexed());
 		doc.setVersion(wsDoc.getVersion());
@@ -231,13 +231,13 @@ public class WSUtil {
 		doc.setDocRefType(wsDoc.getDocRefType());
 		if (wsDoc.getRating() != null)
 			doc.setRating(wsDoc.getRating());
-		doc.setPublished(wsDoc.getPublished());
+		doc.setPublished(wsDoc.getPublished() == 1);
 
 		doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
 		doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
 
-		doc.setSigned(wsDoc.getSigned());
-		doc.setBarcoded(wsDoc.getBarcoded());
+		doc.setSigned(wsDoc.getSigned() == 1);
+		doc.setBarcoded(wsDoc.getBarcoded() == 1);
 
 		return doc;
 	}

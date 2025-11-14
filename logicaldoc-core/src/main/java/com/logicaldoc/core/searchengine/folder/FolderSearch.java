@@ -585,7 +585,7 @@ public class FolderSearch extends Search {
 			hit.setDate(rs.getTimestamp(6));
 			hit.setCreation(rs.getTimestamp(5));
 			hit.setComment(rs.getString(4));
-			hit.setPublished(1);
+			hit.setPublished(true);
 
 			if (rs.getLong(10) != 0) {
 				hit.setTemplateId(rs.getLong(10));

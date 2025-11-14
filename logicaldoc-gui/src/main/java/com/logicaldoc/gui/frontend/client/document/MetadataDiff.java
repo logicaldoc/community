@@ -83,8 +83,8 @@ public class MetadataDiff extends Window {
 				version2.getTagsString(), 0));
 
 		records.add(new DiffRecord(I18N.message("published"), I18N.message("published"),
-				version1.getPublished() == 1 ? I18N.message("yes") : I18N.message("no"),
-				version2.getPublished() == 1 ? I18N.message("yes") : I18N.message("no"), 0));
+				version1.isPublished() ? I18N.message("yes") : I18N.message("no"),
+				version2.isPublished() ? I18N.message("yes") : I18N.message("no"), 0));
 
 		records.add(new DiffRecord(I18N.message("startpublishing"), I18N.message("startpublishing"),
 				version1.getStartPublishing() != null ? I18N.formatDate(version1.getStartPublishing()) : null,

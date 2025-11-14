@@ -70,7 +70,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			searchEngine
 					.setIncludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.includes.metadata"));
 			searchEngine.setSkipOnError(conf.getBoolean(session.getTenantName() + ".index.skiponerror", false));
-			searchEngine.setIgnoreContentError(conf.getBoolean(session.getTenantName() + ".index.ignorecontenterror", false));
+			searchEngine.setIgnoreContentError(
+					conf.getBoolean(session.getTenantName() + ".index.ignorecontenterror", false));
 			searchEngine.setParsingTimeout(conf.getInt(session.getTenantName() + ".parser.timeout", 0));
 			searchEngine
 					.setParsingTimeoutRetain(conf.getBoolean(session.getTenantName() + ".parser.timeout.retain", true));
@@ -161,7 +162,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 					Boolean.toString(searchEngine.isSkipOnError()));
 			conf.setProperty(session.getTenantName() + ".index.ignorecontenterror",
 					Boolean.toString(searchEngine.isIgnoreContentError()));
-			
+
 			conf.setProperty(session.getTenantName() + ".parser.timeout",
 					searchEngine.getParsingTimeout() != null ? Integer.toString(searchEngine.getParsingTimeout()) : "");
 			conf.setProperty(session.getTenantName() + ".parser.timeout.retain",
@@ -405,9 +406,9 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			document.setPasswordProtected(hit.isPasswordProtected());
 			document.setLinks(hit.getLinks());
 			document.setDocAttrs(hit.getDocAttrs());
-			document.setOcrd(hit.getOcrd());
+			document.setOcrd(hit.isOcrd());
 			document.setOcrTemplateId(hit.getOcrTemplateId());
-			document.setBarcoded(hit.getBarcoded());
+			document.setBarcoded(hit.isBarcoded());
 			document.setBarcodeTemplateId(hit.getBarcodeTemplateId());
 
 			if (hit.getRating() != null)
@@ -523,12 +524,12 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			hit.setCreation(rs.getTimestamp(9));
 			hit.setCreator(rs.getString(10));
 			hit.setFileSize(rs.getLong(11));
-			hit.setImmutable(rs.getInt(12));
+			hit.setImmutable(rs.getInt(12) == 1);
 			hit.setIndexingStatus(rs.getInt(13));
 			hit.setLockUserId(rs.getLong(14));
 			hit.setFileName(rs.getString(15));
 			hit.setStatus(rs.getInt(16));
-			hit.setSigned(rs.getInt(17));
+			hit.setSigned(rs.getInt(17) == 1);
 			hit.setType(rs.getString(18));
 			hit.setRating(rs.getInt(19));
 			hit.setFileVersion(rs.getString(20));
@@ -536,7 +537,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			hit.setWorkflowStatus(rs.getString(22));
 			hit.setStartPublishing(rs.getTimestamp(23));
 			hit.setStopPublishing(rs.getTimestamp(24));
-			hit.setPublished(rs.getInt(25));
+			hit.setPublished(rs.getInt(25) == 1);
 
 			Folder folder = new Folder();
 			folder.setName(rs.getString(26));
@@ -552,7 +553,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			}
 
 			// Maintain the Tenant ID stored in the index
-			hit.setStamped(rs.getInt(33));
+			hit.setStamped(rs.getInt(33) == 1);
 			hit.setPassword(rs.getString(34));
 			hit.setWorkflowStatusDisplay(rs.getString(35));
 			// Maintain the language stored in the index

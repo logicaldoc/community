@@ -158,15 +158,15 @@ public class DocumentGridUtil {
 
 	private static void setFlags(Record rec, GUIDocument document) {
 		if (rec.getAttributeAsInt(IMMUTABLE) != null)
-			document.setImmutable(rec.getAttributeAsInt(IMMUTABLE));
+			document.setImmutable(rec.getAttributeAsBoolean(IMMUTABLE));
 
 		document.setPasswordProtected(Boolean.TRUE.equals(rec.getAttributeAsBoolean(PASSWORD)));
 
 		if (rec.getAttributeAsInt(SIGNED) != null)
-			document.setSigned(rec.getAttributeAsInt(SIGNED));
+			document.setSigned(rec.getAttributeAsBoolean(SIGNED));
 
 		if (rec.getAttributeAsInt(STAMPED) != null)
-			document.setStamped(rec.getAttributeAsInt(STAMPED));
+			document.setStamped(rec.getAttributeAsBoolean(STAMPED));
 
 		document.setBookmarked(Boolean.TRUE.equals(rec.getAttributeAsBoolean(BOOKMARKED)));
 	}
@@ -249,10 +249,10 @@ public class DocumentGridUtil {
 			rec.setAttribute("customId", doc.getCustomId());
 			rec.setAttribute("revision", doc.getRevision());
 			rec.setAttribute("type", doc.getType());
-			rec.setAttribute(IMMUTABLE, doc.getImmutable());
+			rec.setAttribute(IMMUTABLE, doc.isImmutable());
 			rec.setAttribute(PASSWORD, doc.isPasswordProtected());
-			rec.setAttribute(SIGNED, doc.getSigned());
-			rec.setAttribute(STAMPED, doc.getStamped());
+			rec.setAttribute(SIGNED, doc.isSigned());
+			rec.setAttribute(STAMPED, doc.isStamped());
 			rec.setAttribute("fileVersion", doc.getFileVersion());
 			rec.setAttribute("version", doc.getVersion());
 			rec.setAttribute(COMMENT, doc.getComment());
@@ -262,7 +262,7 @@ public class DocumentGridUtil {
 			rec.setAttribute("color", doc.getColor());
 			rec.setAttribute("startPublishing", doc.getStartPublishing());
 			rec.setAttribute("stopPublishing", doc.getStopPublishing());
-			rec.setAttribute("publishedStatus", doc.getPublished() == 1 ? "yes" : "no");
+			rec.setAttribute("publishedStatus", doc.isPublished() ? "yes" : "no");
 			if (rec.getAttribute("score") == null)
 				rec.setAttribute("score", doc.getScore());
 			rec.setAttribute(SUMMARY, doc.getSummary());

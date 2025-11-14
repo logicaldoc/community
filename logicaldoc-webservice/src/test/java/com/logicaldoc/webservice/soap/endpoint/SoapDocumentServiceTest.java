@@ -396,7 +396,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		assertNotNull(doc);
 		docDao.initialize(doc);
 
-		assertEquals(0, doc.getSigned());
+		assertFalse(doc.isSigned());
 		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 	}
 
