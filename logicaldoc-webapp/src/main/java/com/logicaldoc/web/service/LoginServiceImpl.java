@@ -67,7 +67,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			// Get just a few informations needed by the login
 			GUIUser usr = new GUIUser();
 			usr.setId(user.getId());
-			usr.setEnabled(user.getEnabled() == 1);
+			usr.setEnabled(user.isEnabled());
 			usr.setUsername(user.getUsername());
 			usr.setTenant(SecurityServiceImpl.getTenant(user.getTenantId()));
 			usr.setPasswordExpires(user.getPasswordExpires() == 1);

@@ -226,12 +226,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			user.setCreation(new Date());
 			user.setLastEnabled(user.getCreation());
 		} else {
-			int currentEnabled = queryForInt("select ld_enabled from ld_user where ld_id=" + user.getId());
-			enabledStatusChanged = currentEnabled != user.getEnabled();
+			boolean currentEnabled = queryForInt("select ld_enabled from ld_user where ld_id=" + user.getId()) == 1;
+			enabledStatusChanged = currentEnabled != user.isEnabled();
 
 			// Record the last enabled date in case the user is getting
 			// enabled
-			if (enabledStatusChanged && user.getEnabled() == 1)
+			if (enabledStatusChanged && user.isEnabled())
 				user.setLastEnabled(new Date());
 
 			// In any case the last enabled must at least equal the creation
@@ -499,7 +499,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			else {
 				enabledOrDisabledHistory.setUser(user);
 			}
-			enabledOrDisabledHistory.setEvent(user.getEnabled() == 1 ? UserEvent.ENABLED : UserEvent.DISABLED);
+			enabledOrDisabledHistory.setEvent(user.isEnabled() ? UserEvent.ENABLED : UserEvent.DISABLED);
 			enabledOrDisabledHistory.setComment(null);
 			saveUserHistory(user, enabledOrDisabledHistory);
 		}
@@ -651,7 +651,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user == null)
 			return false;
 
-		if (user.getEnabled() == 0)
+		if (!user.isEnabled())
 			return true;
 
 		String tenantName = (Context.get(TenantDAO.class)).getTenantName(user.getTenantId());

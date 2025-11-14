@@ -44,7 +44,7 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 	public static final long SETTINGS = 7;
 
 	public static final long SECURITY = 9;
-	
+
 	public static final long TOOLS = 16;
 
 	public static final long MAINMENU = 110;
@@ -182,12 +182,12 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 		this.name = name;
 	}
 
-	public int getEnabled() {
-		return enabled;
+	public boolean isEnabled() {
+		return enabled == 1;
 	}
 
-	public void setEnabled(int enabled) {
-		this.enabled = enabled;
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled ? 1 : 0;
 	}
 
 	public Long getRoutineId() {
@@ -220,10 +220,11 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 	public AccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
 	}
-	
+
 	@Override
 	public Set<AccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
-		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId())).collect(Collectors.toSet());
+		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
+				.collect(Collectors.toSet());
 	}
 
 	@Override

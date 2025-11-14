@@ -474,11 +474,11 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 	@Test
 	public void testChangeStatus() throws ServerException, PersistenceException {
 		User user = userDAO.findById(3L);
-		assertEquals(1, user.getEnabled());
+		assertTrue(user.isEnabled());
 
 		testSubject.changeStatus(3L, false);
 		user = userDAO.findById(3L);
-		assertEquals(0, user.getEnabled());
+		assertFalse(user.isEnabled());
 	}
 
 	@Test

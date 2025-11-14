@@ -176,7 +176,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
 		guiTenant.setMaxUsers(tenant.getMaxUsers());
 		guiTenant.setMaxGuests(tenant.getMaxGuests());
-		guiTenant.setEnabled(tenant.getEnabled() == 1);
+		guiTenant.setEnabled(tenant.isEnabled());
 		guiTenant.setExpire(tenant.getExpire());
 
 		return guiTenant;
@@ -435,7 +435,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
 		validateSession();
-		
+
 		try {
 			Group group = GroupDAO.get().findById(groupId);
 
@@ -479,7 +479,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setBuilding(user.getBuilding());
 				guiUser.setOrganizationalUnit(user.getOrganizationalUnit());
 				guiUser.setCompany(user.getCompany());
-				guiUser.setEnabled(user.getEnabled() == 1);
+				guiUser.setEnabled(user.isEnabled());
 				guiUser.setFirstName(user.getFirstName());
 				guiUser.setLanguage(user.getLanguage());
 				guiUser.setName(user.getName());
@@ -677,7 +677,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setDepartment(guiUser.getDepartment());
 			user.setCompany(guiUser.getCompany());
 			user.setUsername(guiUser.getUsername());
-			user.setEnabled(guiUser.isEnabled() ? 1 : 0);
+			user.setEnabled(guiUser.isEnabled());
 			user.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
 			user.setPasswordExpired(guiUser.isPasswordExpired() ? 1 : 0);
 			user.setEvalFormEnabled(guiUser.isEvalFormEnabled() ? 1 : 0);
@@ -772,7 +772,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		user.removeGroupMemberships(null);
 		for (Long groupId : guiUser.getGroups().stream().map(g -> g.getId()).toList())
 			user.addGroup(groupDao.findById(groupId));
-		
+
 		Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
 		groupDao.initialize(adminGroup);
 
@@ -1236,7 +1236,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			menu.setName(guiMenu.getName().replace("/", ""));
 			menu.setAutomation(guiMenu.getAutomation());
-			menu.setEnabled(guiMenu.isEnabled() ? 1 : 0);
+			menu.setEnabled(guiMenu.isEnabled());
 			menu.setDescription(guiMenu.getDescription());
 			menu.setPosition(guiMenu.getPosition());
 			menu.setParentId(guiMenu.getParentId());
@@ -1312,7 +1312,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		GUIMenu f = new GUIMenu();
 		f.setId(menu.getId());
 		f.setName(menu.getName());
-		f.setEnabled(menu.getEnabled() == 1);
+		f.setEnabled(menu.isEnabled());
 		f.setAutomation(menu.getAutomation());
 		f.setRoutineId(menu.getRoutineId());
 		f.setPosition(menu.getPosition());
@@ -1668,7 +1668,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			transaction.setSession(session);
 			transaction.setEvent(enabled ? UserEvent.UPDATED : UserEvent.DISABLED);
 
-			user.setEnabled(enabled ? 1 : 0);
+			user.setEnabled(enabled);
 			userDao.store(user, transaction);
 		} catch (PersistenceException | ServerException e) {
 			throwServerException(session, log, e);

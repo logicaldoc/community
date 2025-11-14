@@ -182,12 +182,12 @@ public class Ticket extends PersistentObject {
 		this.maxCount = maxCount;
 	}
 
-	public int getEnabled() {
-		return enabled;
+	public boolean isEnabled() {
+		return enabled == 1;
 	}
 
-	public void setEnabled(int enabled) {
-		this.enabled = enabled;
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled ? 1 : 0;
 	}
 
 	public int getViews() {

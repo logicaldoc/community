@@ -41,7 +41,7 @@ public class GUIImportFolder implements Serializable {
 
 	private GUIFolder target = null;
 
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	private Integer maxSize = null;
 
@@ -133,11 +133,11 @@ public class GUIImportFolder implements Serializable {
 		this.provider = provider;
 	}
 
-	public int getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(int enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 

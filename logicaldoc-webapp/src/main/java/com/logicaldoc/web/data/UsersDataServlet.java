@@ -59,7 +59,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		 */
 		UserDAO userDao = UserDAO.get();
 		for (User user : users) {
-			if (user.getType() == UserType.SYSTEM || (skipdisabled && user.getEnabled() != 1))
+			if (user.getType() == UserType.SYSTEM || (skipdisabled && user.isEnabled()))
 				continue;
 
 			userDao.initialize(user);
@@ -76,7 +76,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		writer.print("<user>");
 		writer.print("<id>" + user.getId() + "</id>");
 		writer.print("<username><![CDATA[" + user.getUsername() + "]]></username>");
-		writer.print("<eenabled>" + Boolean.toString(user.getEnabled() == 1) + "</eenabled>");
+		writer.print("<eenabled>" + Boolean.toString(user.isEnabled()) + "</eenabled>");
 		writer.print("<guest>" + user.isReadonly() + "</guest>");
 		writer.print("<name><![CDATA[" + StringUtils.defaultString(user.getName()) + "]]></name>");
 		writer.print("<firstName><![CDATA[" + StringUtils.defaultString(user.getFirstName()) + "]]></firstName>");
@@ -104,7 +104,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		writer.print("<groups><![CDATA[" + user.getGroups().stream().filter(g -> g.getType() == GroupType.DEFAULT)
 				.map(Group::getName).collect(Collectors.joining(", ")) + "]]></groups>");
 		writer.print("<avatar>" + user.getId() + "</avatar>");
-		writer.print("<sfa>" +  StringUtils.defaultString(user.getSecondFactor()) + "</sfa>");
+		writer.print("<sfa>" + StringUtils.defaultString(user.getSecondFactor()) + "</sfa>");
 
 		if (user.getTimeZone() != null)
 			writer.print("<timeZone><![CDATA[" + user.getTimeZone() + "]]></timeZone>");

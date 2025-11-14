@@ -27,7 +27,7 @@ public class GUISyndication implements Serializable {
 
 	private String apiKey;
 
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	private GUIFolder sourceFolder;
 
@@ -111,11 +111,11 @@ public class GUISyndication implements Serializable {
 		this.password = password;
 	}
 
-	public int getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(int enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 

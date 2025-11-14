@@ -332,7 +332,7 @@ public class CustomReportsPanel extends AdminPanel {
 		}
 
 		rec.setAttribute("name", report.getName());
-		rec.setAttribute(ENABLED, report.getEnabled() == 1);
+		rec.setAttribute(ENABLED, report.isEnabled());
 		rec.setAttribute("running", report.getStatus() != GUIReport.STATUS_IDLE);
 		rec.setAttribute("outputFormat", report.getOutputFormat());
 		if (report.getOutputFolder() != null) {

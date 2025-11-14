@@ -279,7 +279,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		rec.setAttribute(TEMPLATE, policy.getTemplateName() != null ? policy.getTemplateName() : null);
 		rec.setAttribute("position", "" + policy.getPosition());
 		rec.setAttribute(ACTION, "" + policy.getAction());
-		rec.setAttribute(ENABLED, policy.getEnabled() == 1);
+		rec.setAttribute(ENABLED, policy.isEnabled());
 
 		list.refreshRow(list.getRecordIndex(rec));
 	}

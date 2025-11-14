@@ -101,7 +101,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			log.error(e.getMessage(), e);
 		}
 
-		if (user.getEnabled() == 0)
+		if (!user.isEnabled())
 			throw new AccountDisabledException(this);
 
 		if (userDAO.isPasswordExpired(user.getUsername()))

@@ -246,12 +246,12 @@ public class Tenant extends PersistentObject implements Serializable {
 		this.maxRepoSize = maxRepoSize;
 	}
 
-	public int getEnabled() {
-		return enabled;
+	public boolean isEnabled() {
+		return enabled == 1;
 	}
 
-	public void setEnabled(int enabled) {
-		this.enabled = enabled;
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled ? 1 : 0;
 	}
 
 	/**

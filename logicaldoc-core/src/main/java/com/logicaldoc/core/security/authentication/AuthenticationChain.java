@@ -144,7 +144,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			transaction.setEvent(UserEvent.DISABLED);
 			transaction.setComment("inactive for too many days");
 
-			user.setEnabled(0);
+			user.setEnabled(false);
 			userDao.store(user, transaction);
 
 			throw ie;

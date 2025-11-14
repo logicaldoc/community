@@ -295,7 +295,7 @@ public class ImportFoldersPanel extends AdminPanel {
 
 		rec.setAttribute("src", importFolder.getDisplayUrl());
 
-		rec.setAttribute(ENABLED, importFolder.getEnabled() == 1);
+		rec.setAttribute(ENABLED, importFolder.isEnabled());
 
 		String type = I18N.message("localfolder");
 		if (importFolder.getProvider().startsWith("smb"))

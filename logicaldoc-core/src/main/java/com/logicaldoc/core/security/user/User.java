@@ -595,12 +595,12 @@ public class User extends PersistentObject implements Serializable {
 		return group;
 	}
 
-	public int getEnabled() {
-		return enabled;
+	public boolean isEnabled() {
+		return enabled == 1;
 	}
 
-	public void setEnabled(int enabled) {
-		this.enabled = enabled;
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled ? 1 : 0;
 	}
 
 	public String getState() {
@@ -738,8 +738,8 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	public void clearPassword() {
 		/*
-		 * We just remove the password in human-readeable form because it may be a
-		 * security hole, it is save to remove it because the field is
+		 * We just remove the password in human-readeable form because it may be
+		 * a security hole, it is save to remove it because the field is
 		 * transient. It is NOT safe to remove the password because it is
 		 * persisted and this instance may then be stored in the database during
 		 * the login process. Moreover the password is encrypted so it does not

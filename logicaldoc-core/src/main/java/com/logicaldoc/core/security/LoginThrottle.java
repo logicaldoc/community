@@ -241,8 +241,8 @@ public class LoginThrottle {
 			try {
 				UserDAO userDao = UserDAO.get();
 				User user = userDao.findByUsername(username);
-				if (user != null && user.getEnabled() == 1) {
-					user.setEnabled(0);
+				if (user != null && user.isEnabled()) {
+					user.setEnabled(false);
 
 					UserHistory transaction = new UserHistory();
 					transaction.setEvent(UserEvent.DISABLED);

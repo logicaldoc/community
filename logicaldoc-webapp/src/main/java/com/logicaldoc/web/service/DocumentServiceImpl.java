@@ -2972,7 +2972,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		TicketDAO dao = TicketDAO.get();
 		try {
 			Ticket ticket = dao.findById(ticketId);
-			ticket.setEnabled(1);
+			ticket.setEnabled(true);
 			dao.store(ticket);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -2986,7 +2986,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		TicketDAO dao = TicketDAO.get();
 		try {
 			Ticket ticket = dao.findById(ticketId);
-			ticket.setEnabled(0);
+			ticket.setEnabled(false);
 			dao.store(ticket);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);

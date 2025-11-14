@@ -256,7 +256,7 @@ public class SyndicationsPanel extends AdminPanel {
 
 		rec.setAttribute("name", syndication.getName());
 		rec.setAttribute("url", syndication.getUrl());
-		rec.setAttribute(ENABLED, syndication.getEnabled() == 1);
+		rec.setAttribute(ENABLED, syndication.isEnabled());
 		rec.setAttribute("targetPath", syndication.getTargetPath());
 		list.refreshRow(list.getRecordIndex(rec));
 	}

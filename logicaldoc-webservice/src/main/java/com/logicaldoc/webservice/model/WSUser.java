@@ -133,8 +133,8 @@ public class WSUser {
 	@WSDoc(description = "ids of the groups this user belongs to")
 	private List<Long> groupIds = new ArrayList<>();
 
-	@WSDoc(required = false, description = "if <b>1</b> the user is enabled, if <b>0</b> the user is disabled")
-	private Integer enabled = 1;
+	@WSDoc(required = true, description = "if the user is enabled")
+	private boolean enabled = true;
 
 	@WSDoc(description = "if <b>1</b> the user must confirm any change in the legals")
 	private Integer legals;
@@ -350,11 +350,11 @@ public class WSUser {
 		return "_user_" + getId();
 	}
 
-	public int getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(int enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
@@ -481,7 +481,7 @@ public class WSUser {
 			user.setBuilding(getBuilding());
 			user.setOrganizationalUnit(getOrganizationalUnit());
 			user.setUsername(getUsername());
-			user.setEnabled(getEnabled());
+			user.setEnabled(isEnabled());
 			user.setPasswordExpires(getPasswordExpires());
 			user.setEvalFormEnabled(getEvalFormEnabled());
 			user.setQuota(getQuota());
@@ -554,7 +554,7 @@ public class WSUser {
 			wsUser.setBuilding(user.getBuilding());
 			wsUser.setOrganizationalUnit(user.getOrganizationalUnit());
 			wsUser.setUsername(user.getUsername());
-			wsUser.setEnabled(user.getEnabled());
+			wsUser.setEnabled(user.isEnabled());
 			wsUser.setPasswordExpires(user.getPasswordExpires());
 			wsUser.setEvalFormEnabled(user.getEvalFormEnabled());
 			wsUser.setQuota(user.getQuota());

@@ -94,7 +94,7 @@ public class PswRecovery extends HttpServlet {
 					return;
 				} else {
 					ticket.setCount(ticket.getCount() + 1);
-					ticket.setEnabled(0);
+					ticket.setEnabled(false);
 					ticketDao.store(ticket);
 				}
 

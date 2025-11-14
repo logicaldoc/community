@@ -46,7 +46,7 @@ public class GUIRetentionPolicy implements Serializable {
 
 	private int action = ACTION_DELETE;
 
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	public String getName() {
 		return name;
@@ -112,11 +112,11 @@ public class GUIRetentionPolicy implements Serializable {
 		this.templateName = templateName;
 	}
 
-	public int getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(int enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 

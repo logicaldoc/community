@@ -35,7 +35,7 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 
 	private String pageSelection = "1";
 
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	private String name;
 
@@ -92,11 +92,11 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 		this.type = type;
 	}
 
-	public int getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(int enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
