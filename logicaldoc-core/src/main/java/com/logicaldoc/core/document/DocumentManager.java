@@ -642,7 +642,7 @@ public class DocumentManager {
 			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
-			
+
 		}
 		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);
@@ -1479,11 +1479,10 @@ public class DocumentManager {
 	 * <li>the document must be taken into consideration by the indexer (status
 	 * = {@link IndexingStatus#TO_INDEX} .</li>
 	 * <li>the document must be taken into consideration by the indexer for the
-	 * metadata only(status =
-	 * {@link IndexingStatus#TO_INDEX_METADATA}.</li>
+	 * metadata only(status = {@link IndexingStatus#TO_INDEX_METADATA}.</li>
 	 * <li>the document must not be taken into consideration by the indexer
-	 * (status = {@link IndexingStatus#SKIP}). If the document was
-	 * previously indexed it is removed from the index.</li>
+	 * (status = {@link IndexingStatus#SKIP}). If the document was previously
+	 * indexed it is removed from the index.</li>
 	 * </ol>
 	 * 
 	 * Status:
@@ -1755,6 +1754,8 @@ public class DocumentManager {
 		ticketDAO.deleteExpired();
 
 		ticket.setUrl(composeTicketUrl(ticket, ticket.getUrl()));
+
+		log.info("Created new ticket {}", ticket.getTicketId());
 
 		return ticket;
 	}
