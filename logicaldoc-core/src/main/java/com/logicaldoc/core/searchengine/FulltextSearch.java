@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -112,7 +111,7 @@ public class FulltextSearch extends Search {
 			hit.setColor(rs.getString(38));
 			hit.setLastNote(rs.getString(39));
 			hit.setRevision(rs.getString(40));
-			
+
 			return hit;
 		}
 	}
@@ -144,7 +143,7 @@ public class FulltextSearch extends Search {
 			setQueryFilters(opt, filters, tenantId, accessibleFolderIds);
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
-		} 
+		}
 
 		/*
 		 * Launch the search
@@ -153,8 +152,7 @@ public class FulltextSearch extends Search {
 		Hits results = SearchEngine.get().search(query.toString(), filters, opt.getExpressionLanguage(), null);
 		log.debug("End of Full-text search");
 		log.debug("Fulltext hits count: {}", (results != null ? results.getCount() : 0));
-		
-		
+
 		// Save here the binding between ID and Hit
 		Map<Long, Hit> hitsMap = buildHitsMap(opt, results);
 
@@ -165,30 +163,20 @@ public class FulltextSearch extends Search {
 
 		log.debug("DB search");
 
+		enrichAndPopulateHits(opt, hitsMap, tenantId, accessibleFolderIds);
+	}
+
+	private void enrichAndPopulateHits(FulltextSearchOptions opt, Map<Long, Hit> hitsMap, long tenantId,
+			Collection<Long> accessibleFolderIds) throws SearchException {
+		if (hitsMap.isEmpty())
+			return;
+
 		Set<Long> hitsIds = hitsMap.keySet();
-		StringBuilder hitsIdsCondition = new StringBuilder();
-		if (!hitsIds.isEmpty()) {
-			hitsIdsCondition.append(" and (");
-			FolderDAO fdao = FolderDAO.get();
-			if (fdao.isOracle()) {
-				/*
-				 * In Oracle The limit of 1000 elements applies to sets of
-				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
-				 * if the sets contain two or more items: (x, 0) IN ((1,0),
-				 * (2,0), (3,0), ...):
-				 */
-				hitsIdsCondition.append(" (A.ld_id,0) in ( ");
-				hitsIdsCondition
-						.append(hitsIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-				hitsIdsCondition.append(" )");
-			} else {
-				hitsIdsCondition.append(" A.ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
-			}
 
-			hitsIdsCondition.append(")");
-		}
+		// Build the condition on IDs
+		String hitsIdsCondition = buildHitsIdsCondition(hitsIds, "A.ld_id");
 
-		// Find real documents
+		// Build the main rich-query SQL
 		StringBuilder richQuery = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 		richQuery.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
@@ -212,10 +200,12 @@ public class FulltextSearch extends Search {
 			richQuery.append(" and ( A.ld_stoppublishing is null or A.ld_stoppublishing > CURRENT_TIMESTAMP )");
 		}
 		richQuery.append("  and A.ld_docref is null ");
-		richQuery.append(hitsIdsCondition.toString());
+		richQuery.append(hitsIdsCondition);
 
+		// Aliases UNION
 		if (options.isRetrieveAliases()) {
-			// Append all aliases
+			String docRefCondition = buildHitsIdsCondition(hitsIds, "A.ld_docref");
+
 			richQuery.append(
 					" UNION select A.ld_id, REF.ld_customid, A.ld_docref, REF.ld_type, REF.ld_version, REF.ld_lastmodified, ");
 			richQuery.append(
@@ -245,7 +235,7 @@ public class FulltextSearch extends Search {
 			}
 			richQuery.append("  and A.ld_docref is not null and REF.ld_deleted=0 and not A.ld_status="
 					+ DocumentStatus.ARCHIVED.ordinal() + " and A.ld_docref = REF.ld_id ");
-			richQuery.append(hitsIdsCondition.toString().replace("A.ld_id", "A.ld_docref"));
+			richQuery.append(docRefCondition);
 		}
 
 		log.debug("Execute query {}", richQuery);
@@ -257,11 +247,10 @@ public class FulltextSearch extends Search {
 			throw new SearchException(e);
 		}
 
-		// Now sort the hits by score desc
+		// Sort and populate hits
 		List<Hit> sortedHitsList = new ArrayList<>(hitsMap.values());
 		Collections.sort(sortedHitsList);
 
-		// Populate the hits list discarding unaccessible documents
 		propulateHits(opt, accessibleFolderIds, sortedHitsList);
 	}
 
@@ -299,37 +288,38 @@ public class FulltextSearch extends Search {
 		}
 	}
 
-	private void setQueryFilters(FulltextSearchOptions opt, Set<String> filters, long tenantId,
+	private void setQueryFilters(FulltextSearchOptions fulltextOptions, Set<String> filters, long tenantId,
 			Collection<Long> accessibleFolderIds) throws SearchException, PersistenceException {
 		if (searchUser != null && TenantDAO.get().count() > 1)
 			filters.add(HitField.TENANT_ID + ":" + (tenantId < 0 ? "\\" : "") + tenantId);
 
-		if (opt.getTemplate() != null)
-			filters.add(HitField.TEMPLATE_ID + ":" + (opt.getTemplate() < 0 ? "\\" : "") + opt.getTemplate());
+		if (fulltextOptions.getTemplate() != null)
+			filters.add(HitField.TEMPLATE_ID + ":" + (fulltextOptions.getTemplate() < 0 ? "\\" : "")
+					+ fulltextOptions.getTemplate());
 
-		if (StringUtils.isNotEmpty(opt.getLanguage()))
-			filters.add(HitField.LANGUAGE + ":" + opt.getLanguage());
+		if (StringUtils.isNotEmpty(fulltextOptions.getLanguage()))
+			filters.add(HitField.LANGUAGE + ":" + fulltextOptions.getLanguage());
 
-		if (opt.getSizeMin() != null)
-			filters.add(HitField.SIZE + ":[" + opt.getSizeMin() + " TO *]");
+		if (fulltextOptions.getSizeMin() != null)
+			filters.add(HitField.SIZE + ":[" + fulltextOptions.getSizeMin() + " TO *]");
 
-		if (opt.getSizeMax() != null)
-			filters.add(HitField.SIZE + COLON_STAR_TO + opt.getSizeMax() + "]");
+		if (fulltextOptions.getSizeMax() != null)
+			filters.add(HitField.SIZE + COLON_STAR_TO + fulltextOptions.getSizeMax() + "]");
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		if (opt.getDateFrom() != null)
-			filters.add(HitField.DATE + ":[" + df.format(opt.getDateFrom()) + "T00:00:00Z TO *]");
+		if (fulltextOptions.getDateFrom() != null)
+			filters.add(HitField.DATE + ":[" + df.format(fulltextOptions.getDateFrom()) + "T00:00:00Z TO *]");
 
-		if (opt.getDateTo() != null)
-			filters.add(HitField.DATE + COLON_STAR_TO + df.format(opt.getDateTo()) + "T00:00:00Z]");
+		if (fulltextOptions.getDateTo() != null)
+			filters.add(HitField.DATE + COLON_STAR_TO + df.format(fulltextOptions.getDateTo()) + "T00:00:00Z]");
 
-		if (opt.getCreationFrom() != null)
-			filters.add(HitField.CREATION + ":[" + df.format(opt.getCreationFrom()) + "T00:00:00Z TO *]");
+		if (fulltextOptions.getCreationFrom() != null)
+			filters.add(HitField.CREATION + ":[" + df.format(fulltextOptions.getCreationFrom()) + "T00:00:00Z TO *]");
 
-		if (opt.getCreationTo() != null)
-			filters.add(HitField.CREATION + COLON_STAR_TO + df.format(opt.getCreationTo()) + "T00:00:00Z]");
+		if (fulltextOptions.getCreationTo() != null)
+			filters.add(HitField.CREATION + COLON_STAR_TO + df.format(fulltextOptions.getCreationTo()) + "T00:00:00Z]");
 
-		appendFolderQueryFilter(opt, filters, accessibleFolderIds);
+		appendFolderQueryFilter(fulltextOptions, filters, accessibleFolderIds);
 	}
 
 	private void appendFolderQueryFilter(FulltextSearchOptions opt, Set<String> filters,

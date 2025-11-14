@@ -42,6 +42,8 @@ public abstract class SearchOptions implements Serializable, Comparable<SearchOp
 	public static final int TYPE_PARAMETRIC = 2;
 
 	public static final int TYPE_FOLDERS = 3;
+	
+    public static final int TYPE_SEMANTIC = 4;
 
 	private int page = 1;
 

@@ -324,6 +324,45 @@ public abstract class Search {
 	}
 
 	/**
+	 * Builds a SQL fragment that restricts the result set to a given set of
+	 * document IDs.
+	 * 
+	 * @param hitsIds The set of hits returned
+	 * @param idColumnExpression
+	 * @return
+	 */
+	protected String buildHitsIdsCondition(Set<Long> hitsIds, String idColumnExpression) {
+		if (hitsIds == null || hitsIds.isEmpty()) {
+			return "";
+		}
+
+		StringBuilder condition = new StringBuilder(" and (");
+		FolderDAO folderDao = FolderDAO.get();
+
+		if (folderDao.isOracle()) { // @formatter:off
+			condition.append(" (")
+			         .append(idColumnExpression)
+			         .append(",0) in ( ");
+
+			String inList = hitsIds.stream()
+			                       .map(id -> "(" + id + ",0)")
+			                       .collect(Collectors.joining(","));
+
+			condition.append(inList).append(" )");
+		} else {
+			// Default: standard IN clause
+			String inList = hitsIds.toString().replace('[', '(').replace(']', ')');
+			condition.append(" ")
+			         .append(idColumnExpression)
+			         .append(" in ")
+			         .append(inList); // @formatter:on
+		}
+
+		condition.append(")");
+		return condition.toString();
+	}
+
+	/**
 	 * Concrete implementations must give a particular search algorithm that
 	 * populates the hits list.
 	 */

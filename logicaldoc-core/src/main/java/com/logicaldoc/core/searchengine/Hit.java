@@ -11,10 +11,11 @@ import com.logicaldoc.core.document.Document;
  * @since 5.2
  */
 public class Hit extends Document implements Comparable<Hit> {
-
 	private static final long serialVersionUID = 1L;
 
 	private int score;
+
+	private double semanticScore;
 
 	private String content;
 
@@ -26,6 +27,14 @@ public class Hit extends Document implements Comparable<Hit> {
 
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public double getSemanticScore() {
+		return semanticScore;
+	}
+
+	public void setSemanticScore(double semanticScore) {
+		this.semanticScore = semanticScore;
 	}
 
 	public String getContent() {
@@ -49,35 +58,36 @@ public class Hit extends Document implements Comparable<Hit> {
 		if (this.equals(other))
 			return 0;
 
-		if (other.score == this.score) {
-			if (Objects.toString(this.getFileName(), "").equalsIgnoreCase(Objects.toString(other.getFileName(), "")))
-				return Long.compare(getId(), other.getId());
-			else
-				return Objects.toString(this.getFileName(), "")
-						.compareToIgnoreCase(Objects.toString(other.getFileName(), ""));
-		} else
-			return Integer.compare(other.score, this.score);
+		if (this.semanticScore > 0 && other.semanticScore > 0) {
+			int cmp = Double.compare(other.semanticScore, this.semanticScore);
+			if (cmp != 0)
+				return cmp;
+		} else if (this.score > 0 && other.score > 0) {
+			int cmp = Integer.compare(other.score, this.score);
+			if (cmp != 0)
+				return cmp;
+		}
+
+		String thisName = Objects.toString(this.getFileName(), "");
+		String otherName = Objects.toString(other.getFileName(), "");
+		if (thisName.equalsIgnoreCase(otherName)) {
+			return Long.compare(this.getId(), other.getId());
+		} else {
+			return thisName.compareToIgnoreCase(otherName);
+		}
 	}
 
 	@Override
 	public int hashCode() {
-		int result;
-		result = getClass().getName().hashCode();
-		result = 29 * result + Long.valueOf(getId()).hashCode();
-		return result;
+		return Objects.hash(getClass().getName(), getId());
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-
-		if (obj == null)
+		if (!(obj instanceof Hit other))
 			return false;
-
-		if (obj instanceof Hit other)
-			return other.getId() == this.getId();
-		else
-			return false;
+		return this.getId() == other.getId();
 	}
 }
