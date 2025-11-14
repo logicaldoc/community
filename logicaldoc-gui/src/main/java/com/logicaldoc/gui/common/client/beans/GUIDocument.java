@@ -69,17 +69,15 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private int status = DOC_UNLOCKED;
 
-	private int immutable = 0;
+	private boolean immutable = false;
 
-	private int indexed = 0;
+	private boolean signed = false;
 
-	private int signed = 0;
-
-	private int stamped = 0;
-
-	private int rating = 0;
+	private boolean stamped = false;
 
 	private boolean bookmarked = false;
+
+	private int indexed = 0;
 
 	private String comment;
 
@@ -91,7 +89,9 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String color;
 
-	private int published = 1;
+	private int rating = 0;
+
+	private boolean published = true;
 
 	private Date startPublishing = new Date();
 
@@ -132,10 +132,9 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private Long ocrTemplateId = null;
 
 	/**
-	 * Indicates if the document has been processed by the zonal OCR: <b>0</b> =
-	 * to process, <b>1</b> = processed
+	 * Indicates if the document has been processed by the zonal OCR
 	 */
-	private int ocrd = 0;
+	private boolean ocrd = false;
 
 	/**
 	 * Identifier of the barcode template to use to process this document
@@ -143,10 +142,9 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private Long barcodeTemplateId = null;
 
 	/**
-	 * Indicates if the document has been processed by the barcodes processor:
-	 * <b>0</b> = to process, <b>1</b> = processed
+	 * Indicates if the document has been processed by the barcodes processorsS
 	 */
-	private int barcoded = 0;
+	private boolean barcoded = false;
 
 	/**
 	 * Just to indicate if this document is being used for collecting the
@@ -204,6 +202,22 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void removeTag(String tag) {
 		tags.remove(tag);
+	}
+
+	public boolean isImmutable() {
+		return immutable;
+	}
+
+	public void setImmutable(boolean immutable) {
+		this.immutable = immutable;
+	}
+
+	public boolean isPublished() {
+		return published;
+	}
+
+	public void setPublished(boolean published) {
+		this.published = published;
 	}
 
 	public String getTgs() {
@@ -321,28 +335,12 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.folder = folder;
 	}
 
-	public int getImmutable() {
-		return immutable;
-	}
-
-	public void setImmutable(int immutable) {
-		this.immutable = immutable;
-	}
-
 	public String getPathExtended() {
 		return pathExtended;
 	}
 
 	public void setPathExtended(String pathExtended) {
 		this.pathExtended = pathExtended;
-	}
-
-	public int getRating() {
-		return rating;
-	}
-
-	public void setRating(int rating) {
-		this.rating = rating;
 	}
 
 	public String getComment() {
@@ -369,12 +367,44 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.workflowStatusDisplay = workflowStatusDisplay;
 	}
 
-	public int getPublished() {
-		return published;
+	public boolean isSigned() {
+		return signed;
 	}
 
-	public void setPublished(int published) {
-		this.published = published;
+	public void setSigned(boolean signed) {
+		this.signed = signed;
+	}
+
+	public boolean isStamped() {
+		return stamped;
+	}
+
+	public void setStamped(boolean stamped) {
+		this.stamped = stamped;
+	}
+
+	public boolean isOcrd() {
+		return ocrd;
+	}
+
+	public void setOcrd(boolean ocrd) {
+		this.ocrd = ocrd;
+	}
+
+	public boolean isBarcoded() {
+		return barcoded;
+	}
+
+	public void setBarcoded(boolean barcoded) {
+		this.barcoded = barcoded;
+	}
+
+	public int getRating() {
+		return rating;
+	}
+
+	public void setRating(int rating) {
+		this.rating = rating;
 	}
 
 	public Date getStartPublishing() {
@@ -393,14 +423,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.stopPublishing = stopPublishing;
 	}
 
-	public int getBarcoded() {
-		return barcoded;
-	}
-
-	public void setBarcoded(int barcoded) {
-		this.barcoded = barcoded;
-	}
-
 	public String getSummary() {
 		return summary;
 	}
@@ -415,22 +437,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setScore(int score) {
 		this.score = score;
-	}
-
-	public int getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(int indexed) {
-		this.indexed = indexed;
-	}
-
-	public int getSigned() {
-		return signed;
-	}
-
-	public void setSigned(int signed) {
-		this.signed = signed;
 	}
 
 	public Long getDocRef() {
@@ -467,14 +473,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setTagsString(String tagsString) {
 		this.tagsString = tagsString;
-	}
-
-	public int getStamped() {
-		return stamped;
-	}
-
-	public void setStamped(int stamped) {
-		this.stamped = stamped;
 	}
 
 	public int getNature() {
@@ -517,6 +515,14 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.notifyMessage = notifyMessage;
 	}
 
+	public int getIndexed() {
+		return indexed;
+	}
+
+	public void setIndexed(int indexed) {
+		this.indexed = indexed;
+	}
+
 	public boolean isPasswordProtected() {
 		return passwordProtected;
 	}
@@ -547,14 +553,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setOcrTemplateId(Long ocrTemplateId) {
 		this.ocrTemplateId = ocrTemplateId;
-	}
-
-	public int getOcrd() {
-		return ocrd;
-	}
-
-	public void setOcrd(int ocrd) {
-		this.ocrd = ocrd;
 	}
 
 	public Long getBarcodeTemplateId() {
@@ -628,7 +626,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	public boolean isCustomid() {
 		return allowedPermissions.isCustomid();
 	}
-	
+
 	public boolean isRevision() {
 		return allowedPermissions.isRevision();
 	}

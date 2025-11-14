@@ -66,7 +66,7 @@ public class GUIArchive implements Serializable {
 
 	private int mode = MODE_IMPORT;
 
-	private int importTemplate = 1;
+	private boolean importTemplate = true;
 
 	private int importCustomId = 0;
 
@@ -231,11 +231,11 @@ public class GUIArchive implements Serializable {
 		this.mode = mode;
 	}
 
-	public int getImportTemplate() {
+	public boolean isImportTemplate() {
 		return importTemplate;
 	}
 
-	public void setImportTemplate(int importTemplate) {
+	public void setImportTemplate(boolean importTemplate) {
 		this.importTemplate = importTemplate;
 	}
 

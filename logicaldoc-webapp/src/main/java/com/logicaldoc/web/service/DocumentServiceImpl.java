@@ -696,8 +696,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		transaction.setComment("");
 
 		// If it is a shortcut, we delete only the shortcut
-		if (doc.getDocRef() != null
-				|| (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
+		if (doc.getDocRef() != null || (doc.isImmutable() && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 			transaction.setEvent(DocumentEvent.SHORTCUT_DELETED);
 			dao.delete(doc.getId(), transaction);
 			return;
@@ -705,7 +704,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		// The document of the selected documentRecord must be
 		// not immutable
-		if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
+		if (doc.isImmutable() && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
 			log.debug("Document {} was not deleted because immutable", docId);
 			return;
 		}
@@ -858,13 +857,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setStatus(realDoc.getStatus().ordinal());
 		guiDocument.setWorkflowStatus(realDoc.getWorkflowStatus());
 		guiDocument.setWorkflowStatusDisplay(realDoc.getWorkflowStatusDisplay());
-		guiDocument.setImmutable(realDoc.getImmutable());
+		guiDocument.setImmutable(realDoc.isImmutable());
 		guiDocument.setFileSize(realDoc.getFileSize());
 		guiDocument.setStartPublishing(realDoc.getStartPublishing());
 		guiDocument.setStopPublishing(realDoc.getStopPublishing());
 		guiDocument.setPublished(realDoc.getPublished());
-		guiDocument.setSigned(realDoc.getSigned());
-		guiDocument.setStamped(realDoc.getStamped());
+		guiDocument.setSigned(realDoc.isSigned());
+		guiDocument.setStamped(realDoc.isStamped());
 		guiDocument.setIndexed(realDoc.getIndexed().ordinal());
 		guiDocument.setExtResId(realDoc.getExtResId());
 		guiDocument.setPages(realDoc.getPages());
@@ -875,9 +874,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setPasswordProtected(realDoc.isPasswordProtected());
 		guiDocument.setLinks(realDoc.getLinks());
 		guiDocument.setDocAttrs(realDoc.getDocAttrs());
-		guiDocument.setOcrd(realDoc.getOcrd());
+		guiDocument.setOcrd(realDoc.isOcrd());
 		guiDocument.setOcrTemplateId(realDoc.getOcrTemplateId());
-		guiDocument.setBarcoded(realDoc.getBarcoded());
+		guiDocument.setBarcoded(realDoc.isBarcoded());
 		guiDocument.setBarcodeTemplateId(realDoc.getBarcodeTemplateId());
 
 		if (realDoc.getRating() != null)

@@ -243,9 +243,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		create.addClickHandler(event -> new WebcontentCreate().show());
 
 		menu.setItems(edit, create);
-		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
-				&& folder.isWrite() && Util.isWebContentFile(document.getFileName())
-				&& Feature.enabled(Feature.WEBCONTENT));
+		edit.setEnabled(
+				document != null && !document.isImmutable() && folder != null && folder.isDownload() && folder.isWrite()
+						&& Util.isWebContentFile(document.getFileName()) && Feature.enabled(Feature.WEBCONTENT));
 		create.setEnabled(folder != null && folder.isDownload() && folder.isWrite()
 				&& Feature.enabled(Feature.WEBCONTENT) && MainPanel.get().isOnDocumentsTab());
 
@@ -284,7 +284,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		create.addClickHandler((MenuItemClickEvent event) -> new TextContentCreate().show());
 
 		menu.setItems(edit, create);
-		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
+		edit.setEnabled(document != null && !document.isImmutable() && folder != null && folder.isDownload()
 				&& folder.isWrite() && Util.isTextFile(document.getFileName()));
 		create.setEnabled(
 				folder != null && folder.isDownload() && folder.isWrite() && MainPanel.get().isOnDocumentsTab());
@@ -493,7 +493,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		menu.setItems(edit);
 
-		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
+		edit.setEnabled(document != null && !document.isImmutable() && folder != null && folder.isDownload()
 				&& folder.isWrite() && Feature.enabled(Feature.OFFICE));
 
 		MenuItem officeItem = new MenuItem(I18N.message("microsoftoffice"));
@@ -533,13 +533,13 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		menu.setItems(edit, create, fillForms);
 
-		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
+		edit.setEnabled(document != null && !document.isImmutable() && folder != null && folder.isDownload()
 				&& folder.isWrite());
 
 		create.setEnabled(folder != null && folder.isDownload() && folder.isWrite());
 
 		// enabled only on PDF
-		fillForms.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
+		fillForms.setEnabled(document != null && !document.isImmutable() && folder != null && folder.isDownload()
 				&& folder.isWrite() && (document.getType().toLowerCase().endsWith("pdf")));
 
 		MenuItem onlyOfficeItem = new MenuItem(I18N.message("onlyoffice"));

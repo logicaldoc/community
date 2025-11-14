@@ -77,7 +77,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public static final int NATURE_DOC = 0;
 
 	@Column(name = "ld_immutable", nullable = false)
-	private int immutable = 0;
+	private boolean immutable = false;
 
 	@Column(name = "ld_customid")
 	private String customId;
@@ -148,13 +148,13 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private Long barcodeTemplateId = null;
 
 	@Column(name = "ld_barcoded", nullable = false)
-	private int barcoded = 0;
+	private boolean barcoded = false;
 
 	@Column(name = "ld_signed", nullable = false)
-	private int signed = 0;
+	private boolean signed = false;
 
 	@Column(name = "ld_stamped", nullable = false)
-	private int stamped = 0;
+	private boolean stamped = false;
 
 	@Column(name = "ld_links", nullable = false)
 	private int links = 0;
@@ -193,7 +193,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private String color;
 
 	@Column(name = "ld_published")
-	private int published = 1;
+	private boolean published = true;
 
 	@Column(name = "ld_startpublishing", columnDefinition = "DATETIME(3)")
 	private Date startPublishing = new Date();
@@ -239,7 +239,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 * to process, <b>1</b> = processed
 	 */
 	@Column(name = "ld_ocrd", nullable = false)
-	private int ocrd = 0;
+	private boolean ocrd = false;
 
 	@Transient
 	private String decodedPassword;
@@ -483,19 +483,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	/**
-	 * Defines if the document is immutable
-	 * 
-	 * @return <b>1</b> = immutable, <b>0</b> = regular
-	 */
-	public int getImmutable() {
-		return immutable;
-	}
-
-	public void setImmutable(int immutable) {
-		this.immutable = immutable;
-	}
-
-	/**
 	 * The document's digest
 	 * 
 	 * @return the digest
@@ -506,19 +493,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public void setDigest(String digest) {
 		this.digest = digest;
-	}
-
-	/**
-	 * Return 1 if the document was signed
-	 * 
-	 * @return <b>1</b> = signed, <b>0</b> = not signed
-	 */
-	public int getSigned() {
-		return signed;
-	}
-
-	public void setSigned(int signed) {
-		this.signed = signed;
 	}
 
 	/**
@@ -619,14 +593,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		return indexingStatus == IndexingStatus.TO_INDEX;
 	}
 
-	public int getBarcoded() {
-		return barcoded;
-	}
-
-	public void setBarcoded(int barcoded) {
-		this.barcoded = barcoded;
-	}
-
 	public String getComment() {
 		return comment;
 	}
@@ -651,14 +617,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		this.workflowStatusDisplay = workflowStatusDisplay;
 	}
 
-	public int getPublished() {
-		return published;
-	}
-
-	public void setPublished(int published) {
-		this.published = published;
-	}
-
 	public Date getStartPublishing() {
 		return startPublishing;
 	}
@@ -677,7 +635,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public boolean isPublishing() {
 		Date now = new Date();
-		if (published != 1)
+		if (!published)
 			return false;
 		else if (startPublishing != null && now.before(startPublishing))
 			return false;
@@ -719,14 +677,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public void setPages(int pages) {
 		this.pages = pages;
-	}
-
-	public int getStamped() {
-		return stamped;
-	}
-
-	public void setStamped(int stamped) {
-		this.stamped = stamped;
 	}
 
 	public Long getFormId() {
@@ -826,14 +776,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		this.ocrTemplateId = ocrTemplateId;
 	}
 
-	public int getOcrd() {
-		return ocrd;
-	}
-
-	public void setOcrd(int ocrd) {
-		this.ocrd = ocrd;
-	}
-
 	public Long getBarcodeTemplateId() {
 		return barcodeTemplateId;
 	}
@@ -885,6 +827,54 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setRevision(String revision) {
 		this.revision = revision;
 	}
+	
+	public boolean isImmutable() {
+		return immutable;
+	}
+
+	public void setImmutable(boolean immutable) {
+		this.immutable = immutable;
+	}
+
+	public boolean isBarcoded() {
+		return barcoded;
+	}
+
+	public void setBarcoded(boolean barcoded) {
+		this.barcoded = barcoded;
+	}
+
+	public boolean isSigned() {
+		return signed;
+	}
+
+	public void setSigned(boolean signed) {
+		this.signed = signed;
+	}
+
+	public boolean isStamped() {
+		return stamped;
+	}
+
+	public void setStamped(boolean stamped) {
+		this.stamped = stamped;
+	}
+
+	public boolean isPublished() {
+		return published;
+	}
+
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+
+	public boolean isOcrd() {
+		return ocrd;
+	}
+
+	public void setOcrd(boolean ocrd) {
+		this.ocrd = ocrd;
+	}
 
 	/**
 	 * Copies in the current instance the attributes of the passed values
@@ -896,7 +886,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setTenantId(docVO.getTenantId());
 		setCustomId(docVO.getCustomId());
 		setRevision(docVO.getRevision());
-		setImmutable(docVO.getImmutable());
+		setImmutable(docVO.isImmutable());
 		setVersion(docVO.getVersion());
 		setFileVersion(docVO.getFileVersion());
 		setDate(docVO.getDate());
@@ -911,9 +901,9 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setFileName(docVO.getFileName());
 		setFileSize(docVO.getFileSize());
 		setIndexingStatus(docVO.getIndexed());
-		setBarcoded(docVO.getBarcoded());
-		setSigned(docVO.getSigned());
-		setStamped(docVO.getStamped());
+		setBarcoded(docVO.isBarcoded());
+		setSigned(docVO.isSigned());
+		setStamped(docVO.isStamped());
 		setDigest(docVO.getDigest());
 		setTemplate(docVO.getTemplate());
 		setPages(docVO.getPages());
