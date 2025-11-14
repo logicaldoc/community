@@ -287,7 +287,7 @@ public class LoginThrottle {
 					SystemMessage message = new SystemMessage();
 					message.setTenantId(user.getTenantId());
 					message.setType(Message.TYPE_SYSTEM);
-					message.setHtml(1);
+					message.setHtml(true);
 					message.setAuthor("SYSTEM");
 					message.setLocale(user.getLocale());
 					message.setMessageText(body);
@@ -307,7 +307,7 @@ public class LoginThrottle {
 					 */
 					EMail email = new EMail();
 					email.setTenantId(message.getTenantId());
-					email.setHtml(message.getHtml());
+					email.setHtml(message.isHtml());
 					email.setLocale(message.getLocale());
 					email.setAuthor(message.getAuthor());
 					email.setSubject(message.getSubject());

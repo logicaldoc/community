@@ -65,7 +65,7 @@ public abstract class Message extends PersistentObject {
 	protected Locale locale;
 
 	@Column(name = "ld_html", nullable = false)
-	protected int html = 0;
+	protected boolean html = false;
 
 	/**
 	 * A flag that can be used to specify if the message has to be notified
@@ -153,11 +153,11 @@ public abstract class Message extends PersistentObject {
 		this.locale = locale;
 	}
 
-	public int getHtml() {
+	public boolean isHtml() {
 		return html;
 	}
 
-	public void setHtml(int html) {
+	public void setHtml(boolean html) {
 		this.html = html;
 	}
 

@@ -290,7 +290,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 					EMail email = new EMail();
 					email.setTenantId(tenantId);
-					email.setHtml(1);
+					email.setHtml(true);
 					email.setLocale(user.getLocale());
 					Recipient recipient = new Recipient();
 					recipient.setAddress(user.getEmail());

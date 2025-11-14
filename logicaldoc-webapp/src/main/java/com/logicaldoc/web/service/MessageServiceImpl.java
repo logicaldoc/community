@@ -26,7 +26,6 @@ import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.logicaldoc.util.html.HTMLSanitizer;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Implementation of the MessageService
@@ -159,7 +158,6 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 	@Override
 	public List<GUIMessageTemplate> loadTemplates(String language, String type) throws ServerException {
 		Session session = validateSession();
-		Context context = Context.get();
 
 		try {
 			MessageTemplateDAO dao = MessageTemplateDAO.get();

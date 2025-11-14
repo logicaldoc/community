@@ -117,7 +117,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			log.error(e.getMessage(), e);
 		}
 
-		if (user.getEnforceWorkingTime() == 1 && !user.isInWorkingTime())
+		if (user.isEnforceWorkingTime() && !user.isInWorkingTime())
 			throw new OutsideWorkingTimeException(this);
 
 		validatePasswordStrongness(user);
@@ -157,7 +157,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 	 *         confirmed yet
 	 */
 	private void validateLegals(User user) throws UnconfirmedLegalsException {
-		if (user.getLegals() != 0) {
+		if (user.isLegals()) {
 			try {
 				int unconfirmedLegals = userDAO.queryForInt(
 						"select count(*) from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name)",

@@ -159,10 +159,10 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	private Attribute prepareAttribute(GUIAttribute attribute) {
 		Attribute att = new Attribute();
-		att.setMandatory(attribute.isMandatory() ? 1 : 0);
-		att.setHidden(attribute.isHidden() ? 1 : 0);
-		att.setReadonly(attribute.isReadonly() ? 1 : 0);
-		att.setMultiple(attribute.isMultiple() ? 1 : 0);
+		att.setMandatory(attribute.isMandatory());
+		att.setHidden(attribute.isHidden());
+		att.setReadonly(attribute.isReadonly());
+		att.setMultiple(attribute.isMultiple());
 		att.setParent(attribute.getParent());
 		att.setDependsOn(attribute.getDependsOn());
 		att.setType(attribute.getType());
@@ -313,10 +313,10 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		guiAttribute.setSetId(templateExtAttr.getSetId());
 		guiAttribute.setSet(aSet != null ? aSet.getName() : null);
 		guiAttribute.setPosition(templateExtAttr.getPosition());
-		guiAttribute.setMandatory(templateExtAttr.getMandatory() == 1);
-		guiAttribute.setHidden(templateExtAttr.getHidden() == 1);
-		guiAttribute.setReadonly(templateExtAttr.getReadonly() == 1);
-		guiAttribute.setMultiple(templateExtAttr.getMultiple() == 1);
+		guiAttribute.setMandatory(templateExtAttr.isMandatory());
+		guiAttribute.setHidden(templateExtAttr.isHidden());
+		guiAttribute.setReadonly(templateExtAttr.isReadonly());
+		guiAttribute.setMultiple(templateExtAttr.isMultiple());
 		guiAttribute.setParent(templateExtAttr.getParent());
 		guiAttribute.setDependsOn(templateExtAttr.getDependsOn());
 		guiAttribute.setStringValues(templateExtAttr.getStringValues());
@@ -461,10 +461,10 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		guiAttribute.setSetId(templateExtAttr.getSetId());
 		guiAttribute.setPosition(templateExtAttr.getPosition());
 		guiAttribute.setLabel(templateExtAttr.getLabel());
-		guiAttribute.setMandatory(templateExtAttr.getMandatory() == 1);
-		guiAttribute.setHidden(templateExtAttr.getHidden() == 1);
-		guiAttribute.setReadonly(templateExtAttr.getReadonly() == 1);
-		guiAttribute.setMultiple(templateExtAttr.getMultiple() == 1);
+		guiAttribute.setMandatory(templateExtAttr.isMandatory());
+		guiAttribute.setHidden(templateExtAttr.isHidden());
+		guiAttribute.setReadonly(templateExtAttr.isReadonly());
+		guiAttribute.setMultiple(templateExtAttr.isMultiple());
 		guiAttribute.setParent(templateExtAttr.getParent());
 		guiAttribute.setDependsOn(templateExtAttr.getDependsOn());
 		guiAttribute.setStringValues(templateExtAttr.getStringValues());

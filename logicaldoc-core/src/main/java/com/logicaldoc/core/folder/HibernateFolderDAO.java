@@ -769,7 +769,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		long rootId = root.getId();
 
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setFolderId(folder.getId());
 		transaction.setTenantId(folder.getTenantId());
 

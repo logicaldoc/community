@@ -52,7 +52,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 			message.setTrials(rs.getInt(11));
 			message.setType(rs.getInt(12));
 			message.setId(rs.getLong(13));
-			message.setHtml(rs.getInt(14));
+			message.setHtml(rs.getInt(14) == 1);
 			message.setAuthor(rs.getString(15));
 			message.setTenantId(rs.getLong(16));
 

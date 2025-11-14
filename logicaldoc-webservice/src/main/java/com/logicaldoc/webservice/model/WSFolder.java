@@ -174,10 +174,10 @@ public class WSFolder implements Serializable {
 				Attribute attr = folder.getAttribute(name);
 				WSAttribute wsAttribute = new WSAttribute();
 				wsAttribute.setName(name);
-				wsAttribute.setMandatory(attr.getMandatory());
-				wsAttribute.setHidden(attr.getHidden());
-				wsAttribute.setReadonly(attr.getReadonly());
-				wsAttribute.setMultiple(attr.getMultiple());
+				wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
+				wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
+				wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
+				wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
 				wsAttribute.setParent(attr.getParent());
 				wsAttribute.setPosition(attr.getPosition());
 				wsAttribute.setEditor(attr.getEditor());
@@ -205,10 +205,10 @@ public class WSFolder implements Serializable {
 			if (template != null && CollectionUtils.isNotEmpty(attributes)) {
 				for (WSAttribute wsAttribute : attributes) {
 					Attribute extAttribute = new Attribute();
-					extAttribute.setMandatory(wsAttribute.getMandatory());
-					extAttribute.setHidden(wsAttribute.getHidden());
-					extAttribute.setReadonly(wsAttribute.getReadonly());
-					extAttribute.setMultiple(wsAttribute.getMultiple());
+					extAttribute.setMandatory(wsAttribute.getMandatory() == 1);
+					extAttribute.setHidden(wsAttribute.getHidden() == 1);
+					extAttribute.setReadonly(wsAttribute.getReadonly() == 1);
+					extAttribute.setMultiple(wsAttribute.getMultiple() == 1);
 					extAttribute.setParent(wsAttribute.getParent());
 					extAttribute.setDependsOn(wsAttribute.getDependsOn());
 					extAttribute.setPosition(wsAttribute.getPosition());

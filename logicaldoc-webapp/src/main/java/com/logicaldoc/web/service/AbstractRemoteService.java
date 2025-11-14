@@ -376,10 +376,10 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		att.setSetId(templateExtAttr.getSetId());
 		att.setPosition(templateExtAttr.getPosition());
 		att.setLabel(templateExtAttr.getLabel());
-		att.setMandatory(templateExtAttr.getMandatory() == 1);
-		att.setHidden(templateExtAttr.getHidden() == 1);
-		att.setReadonly(templateExtAttr.getReadonly() == 1);
-		att.setMultiple(templateExtAttr.getMultiple() == 1);
+		att.setMandatory(templateExtAttr.isMandatory());
+		att.setHidden(templateExtAttr.isHidden());
+		att.setReadonly(templateExtAttr.isReadonly());
+		att.setMultiple(templateExtAttr.isMultiple());
 		att.setParent(templateExtAttr.getParent());
 		att.setStringValues(templateExtAttr.getStringValues());
 		att.setEditor(templateExtAttr.getEditor());
@@ -462,7 +462,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			c.set(Calendar.MINUTE, 0);
 			c.set(Calendar.SECOND, 0);
 			c.set(Calendar.MILLISECOND, 0);
-			
+
 		}
 		return date;
 	}

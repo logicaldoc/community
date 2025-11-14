@@ -114,7 +114,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(doc.getId());
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 		newDoc.setCustomId("xxxxxxxx");
 
@@ -168,7 +168,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		Ticket t = new Ticket();
 		t.setDocId(1L);
@@ -244,7 +244,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(doc.getId());
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 		transaction.setFilename(doc.getFileName());
 
@@ -319,7 +319,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(doc.getId());
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 
 		Folder newFolder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
@@ -491,7 +491,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(doc.getId());
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 		testSubject.makeImmutable(doc.getId(), transaction);
 		doc = docDao.findById(1);
@@ -509,7 +509,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(1L);
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.unlock(1L, transaction);
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
@@ -544,7 +544,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		User adminUser = userDao.findByUsername("admin");
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(adminUser);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		// Already locked by same user
 		try {
@@ -560,7 +560,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("boss"));
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		// Locked by a different user
 		try {
@@ -576,7 +576,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		transaction = new DocumentHistory();
 		transaction.setUser(adminUser);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.unlock(doc.getId(), transaction);
 
 		doc = docDao.findById(1);
@@ -651,7 +651,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 					transaction.setUser(user);
 					transaction.setDocId(doc.getId());
 					transaction.setUserId(1L);
-					transaction.setNotified(0);
+					transaction.setNotified(false);
 					transaction.setComment("pippo_reason");
 					doc.setCustomId("xxxxxxxxxx");
 					doc.setId(0L);
@@ -687,7 +687,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(doc.getId());
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 		doc.setCustomId("xxxxxxxxxx");
 
@@ -764,7 +764,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(doc.getId());
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 		Folder newFolder = folderDao.findById(6);
 		folderDao.initialize(newFolder);
@@ -805,7 +805,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(originalDoc.getId());
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 
 		Folder newFolder = folderDao.createPath(folderDao.findById(6), "/test", false, null);
@@ -888,7 +888,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(1L);
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 
 		testSubject.checkout(1L, transaction);
@@ -1247,7 +1247,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setDocId(1L);
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 
 		testSubject.checkout(1L, transaction);

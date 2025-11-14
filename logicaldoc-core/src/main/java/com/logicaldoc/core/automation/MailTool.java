@@ -88,7 +88,7 @@ public class MailTool {
 			return;
 
 		EMail email = new EMail();
-		email.setHtml(1);
+		email.setHtml(true);
 		email.setTenantId(documents.iterator().next().getTenantId());
 		email.setAccountId(-1);
 		email.setAuthor("_workflow");
@@ -166,7 +166,7 @@ public class MailTool {
 	public void sendMessage(long tenantId, String from, Collection<String> to, String subject, String message)
 			throws MessagingException {
 		EMail email = new EMail();
-		email.setHtml(1);
+		email.setHtml(true);
 		email.setTenantId(tenantId);
 
 		email.setAccountId(-1);

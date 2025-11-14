@@ -149,7 +149,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setBuilding(wsUser.getBuilding());
 				usr.setUsername(wsUser.getUsername());
 				usr.setEnabled(wsUser.isEnabled());
-				usr.setPasswordExpires(wsUser.getPasswordExpires());
+				usr.setPasswordExpires(wsUser.getPasswordExpires() == 1);
 				usr.setQuota(wsUser.getQuota());
 				usr.setType(wsUser.getType());
 				usr.setSource(wsUser.getSource());
@@ -160,7 +160,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setSecondFactor(wsUser.getSecondFactor());
 				usr.setTimeZone(wsUser.getTimeZone());
 				usr.setExpire(WSUtil.convertStringToDate(wsUser.getExpire()));
-				usr.setEnforceWorkingTime(wsUser.getEnforceWorkingTime());
+				usr.setEnforceWorkingTime(wsUser.getEnforceWorkingTime() == 1);
 				usr.setMaxInactivity(wsUser.getMaxInactivity());
 
 				if (CollectionUtils.isNotEmpty(wsUser.getWorkingTimes()))

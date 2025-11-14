@@ -122,7 +122,7 @@ public class User extends PersistentObject implements Serializable {
 	 * If the users must confirm changes in the legals or not
 	 */
 	@Column(name = "ld_legals", nullable = false)
-	private int legals = 0;
+	private boolean legals = false;
 
 	/**
 	 * The last time the password was changed
@@ -134,13 +134,13 @@ public class User extends PersistentObject implements Serializable {
 	 * If the password expires or not
 	 */
 	@Column(name = "ld_passwordexpires", nullable = false)
-	private int passwordExpires = 0;
+	private boolean passwordExpires = false;
 
 	/**
 	 * If the password already expired
 	 */
 	@Column(name = "ld_passwordexpired", nullable = false)
-	private int passwordExpired = 0;
+	private boolean passwordExpired = false;
 
 	/**
 	 * Only for GUI
@@ -234,7 +234,7 @@ public class User extends PersistentObject implements Serializable {
 	 * If the system must forbid the login outside the working time
 	 */
 	@Column(name = "ld_enforcewrktime", nullable = false)
-	private int enforceWorkingTime = 0;
+	private boolean enforceWorkingTime = false;
 
 	/**
 	 * Maximum number of inactivity days after which the account gets disabled.
@@ -291,15 +291,7 @@ public class User extends PersistentObject implements Serializable {
 	 * If the user wants to enable the evaluation form
 	 */
 	@Column(name = "ld_evalform", nullable = false)
-	private int evalFormEnabled = 1;
-
-	public int getEvalFormEnabled() {
-		return evalFormEnabled;
-	}
-
-	public void setEvalFormEnabled(int evalFormEnabled) {
-		this.evalFormEnabled = evalFormEnabled;
-	}
+	private boolean evalFormEnabled = true;
 
 	public String getCompany() {
 		return company;
@@ -536,10 +528,10 @@ public class User extends PersistentObject implements Serializable {
 		docsGrid = null;
 		hitsGrid = null;
 		groups = new HashSet<>();
-		passwordExpires = 0;
+		passwordExpires = false;
 		avatar = null;
 		expire = null;
-		enforceWorkingTime = 0;
+		enforceWorkingTime = false;
 		lastLogin = null;
 		workingTimes = new HashSet<>();
 		building = null;
@@ -643,13 +635,13 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * If the password expires or not
 	 * 
-	 * @return <b>1</b> if the password expires, <b>0</b> otherwise
+	 * @return <b>true</b> if the password expires, <b>false</b> otherwise
 	 */
-	public int getPasswordExpires() {
+	public boolean isPasswordExpires() {
 		return passwordExpires;
 	}
 
-	public void setPasswordExpires(int passwordExpires) {
+	public void setPasswordExpires(boolean passwordExpires) {
 		this.passwordExpires = passwordExpires;
 	}
 
@@ -702,14 +694,6 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setIpBlackList(String ipBlackList) {
 		this.ipBlackList = ipBlackList;
-	}
-
-	public int getPasswordExpired() {
-		return passwordExpired;
-	}
-
-	public void setPasswordExpired(int passwordExpired) {
-		this.passwordExpired = passwordExpired;
 	}
 
 	public String getPasswordmd4() {
@@ -913,14 +897,6 @@ public class User extends PersistentObject implements Serializable {
 		return false;
 	}
 
-	public int getEnforceWorkingTime() {
-		return enforceWorkingTime;
-	}
-
-	public void setEnforceWorkingTime(int enforceWorkingTime) {
-		this.enforceWorkingTime = enforceWorkingTime;
-	}
-
 	public Set<WorkingTime> getWorkingTimes() {
 		return workingTimes;
 	}
@@ -977,12 +953,36 @@ public class User extends PersistentObject implements Serializable {
 		this.building = building;
 	}
 
-	public int getLegals() {
+	public boolean isLegals() {
 		return legals;
 	}
 
-	public void setLegals(int legals) {
+	public void setLegals(boolean legals) {
 		this.legals = legals;
+	}
+
+	public boolean isPasswordExpired() {
+		return passwordExpired;
+	}
+
+	public void setPasswordExpired(boolean passwordExpired) {
+		this.passwordExpired = passwordExpired;
+	}
+
+	public boolean isEnforceWorkingTime() {
+		return enforceWorkingTime;
+	}
+
+	public void setEnforceWorkingTime(boolean enforceWorkingTime) {
+		this.enforceWorkingTime = enforceWorkingTime;
+	}
+
+	public boolean isEvalFormEnabled() {
+		return evalFormEnabled;
+	}
+
+	public void setEvalFormEnabled(boolean evalFormEnabled) {
+		this.evalFormEnabled = evalFormEnabled;
 	}
 
 	@Override

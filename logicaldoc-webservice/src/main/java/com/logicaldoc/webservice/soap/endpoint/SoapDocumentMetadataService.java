@@ -93,10 +93,10 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 				if (wsAttribute != null) {
 					Attribute attribute = new Attribute();
 					attribute.setPosition(wsAttribute.getPosition());
-					attribute.setMandatory(wsAttribute.getMandatory());
-					attribute.setHidden(wsAttribute.getHidden());
-					attribute.setReadonly(wsAttribute.getReadonly());
-					attribute.setMultiple(wsAttribute.getMultiple());
+					attribute.setMandatory(wsAttribute.getMandatory() == 1);
+					attribute.setHidden(wsAttribute.getHidden() == 1);
+					attribute.setReadonly(wsAttribute.getReadonly() == 1);
+					attribute.setMultiple(wsAttribute.getMultiple() == 1);
 					attribute.setParent(wsAttribute.getParent());
 					attribute.setLabel(wsAttribute.getLabel());
 					if (StringUtils.isEmpty(wsAttribute.getLabel()))
@@ -260,10 +260,10 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 				if (wsAttribute != null) {
 					Attribute attribute = new Attribute();
 					attribute.setPosition(wsAttribute.getPosition());
-					attribute.setMandatory(wsAttribute.getMandatory());
-					attribute.setHidden(wsAttribute.getHidden());
-					attribute.setReadonly(wsAttribute.getReadonly());
-					attribute.setMultiple(wsAttribute.getMultiple());
+					attribute.setMandatory(wsAttribute.getMandatory() == 1);
+					attribute.setHidden(wsAttribute.getHidden() == 1);
+					attribute.setReadonly(wsAttribute.getReadonly() == 1);
+					attribute.setMultiple(wsAttribute.getMultiple() == 1);
 					attribute.setParent(wsAttribute.getParent());
 					attribute.setLabel(wsAttribute.getLabel());
 					if (StringUtils.isEmpty(wsAttribute.getLabel()))

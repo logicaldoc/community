@@ -462,9 +462,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 					dAtt.setType(fAtt.getType());
 					dAtt.setEditor(fAtt.getEditor());
 					dAtt.setLabel(fAtt.getLabel());
-					dAtt.setMandatory(fAtt.getMandatory());
-					dAtt.setHidden(fAtt.getHidden());
-					dAtt.setMultiple(fAtt.getMultiple());
+					dAtt.setMandatory(fAtt.isMandatory());
+					dAtt.setHidden(fAtt.isHidden());
+					dAtt.setMultiple(fAtt.isMultiple());
 					dAtt.setPosition(fAtt.getPosition());
 					doc.getAttributes().put(name, dAtt);
 				}
@@ -1007,7 +1007,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			transaction.setRevision(doc.getRevision());
 			transaction.setFilename(doc.getFileName());
 			transaction.setFileSize(doc.getFileSize());
-			transaction.setNotified(0);
+			transaction.setNotified(false);
 			transaction.setDocument(doc);
 			transaction.setPath(folderDAO.computePathExtended(doc.getFolder().getId()));
 

@@ -1203,7 +1203,7 @@ public class LDRepository {
 			transaction.setFileVersion(doc.getFileVersion());
 			transaction.setFilename(doc.getFileName());
 			transaction.setFileSize(doc.getFileSize());
-			transaction.setNotified(0);
+			transaction.setNotified(false);
 			if (doc instanceof Document document)
 				transaction.setDocument(document);
 

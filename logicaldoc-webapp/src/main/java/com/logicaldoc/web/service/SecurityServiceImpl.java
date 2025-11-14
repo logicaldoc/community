@@ -344,7 +344,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			 * as expired for security reasons, so the user will change it at
 			 * first login.
 			 */
-			user.setPasswordExpired(notify || requestorUserId == null || !requestorUserId.equals(userId) ? 1 : 0);
+			user.setPasswordExpired(notify || requestorUserId == null || !requestorUserId.equals(userId));
 
 			userDao.store(user, history);
 			if (notify)
@@ -486,10 +486,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setPostalCode(user.getPostalcode());
 				guiUser.setState(user.getState());
 				guiUser.setUsername(user.getUsername());
-				guiUser.setEvalFormEnabled(user.getEvalFormEnabled() == 1);
-				guiUser.setPasswordExpires(user.getPasswordExpires() == 1);
-				guiUser.setPasswordExpired(user.getPasswordExpired() == 1);
-				guiUser.setLegals(user.getLegals() == 1);
+				guiUser.setEvalFormEnabled(user.isEvalFormEnabled());
+				guiUser.setPasswordExpires(user.isPasswordExpires());
+				guiUser.setPasswordExpired(user.isPasswordExpired());
+				guiUser.setLegals(user.isLegals());
 				guiUser.setWelcomeScreen(user.getWelcomeScreen());
 				guiUser.setDefaultWorkspace(user.getDefaultWorkspace());
 				guiUser.setIpWhitelist(user.getIpWhiteList());
@@ -508,7 +508,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setDateFormatLong(user.getDateFormatLong());
 				guiUser.setSearchPref(user.getSearchPref());
 				guiUser.setExpire(user.getExpire());
-				guiUser.setEnforceWorkingTime(user.getEnforceWorkingTime() == 1);
+				guiUser.setEnforceWorkingTime(user.isEnforceWorkingTime());
 				guiUser.setMaxInactivity(user.getMaxInactivity());
 				guiUser.setTimeZone(user.getTimeZone());
 				guiUser.setSource(user.getSource().ordinal());
@@ -678,10 +678,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setCompany(guiUser.getCompany());
 			user.setUsername(guiUser.getUsername());
 			user.setEnabled(guiUser.isEnabled());
-			user.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
-			user.setPasswordExpired(guiUser.isPasswordExpired() ? 1 : 0);
-			user.setEvalFormEnabled(guiUser.isEvalFormEnabled() ? 1 : 0);
-			user.setLegals(guiUser.isLegals() ? 1 : 0);
+			user.setPasswordExpires(guiUser.isPasswordExpires());
+			user.setPasswordExpired(guiUser.isPasswordExpired());
+			user.setEvalFormEnabled(guiUser.isEvalFormEnabled());
+			user.setLegals(guiUser.isLegals());
 			user.setWelcomeScreen(guiUser.getWelcomeScreen());
 			user.setIpWhiteList(guiUser.getIpWhitelist());
 			user.setIpBlackList(guiUser.getIpBlacklist());
@@ -698,7 +698,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setDateFormatShort(guiUser.getDateFormatShort());
 			user.setDateFormatLong(guiUser.getDateFormatLong());
 			user.setSearchPref(guiUser.getSearchPref());
-			user.setEnforceWorkingTime(guiUser.isEnforceWorkingTime() ? 1 : 0);
+			user.setEnforceWorkingTime(guiUser.isEnforceWorkingTime());
 			user.setSecondFactor(guiUser.getSecondFactor());
 			user.setMaxInactivity(guiUser.getMaxInactivity() == null || guiUser.getMaxInactivity() == 0 ? null
 					: guiUser.getMaxInactivity());
@@ -724,7 +724,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 						config.getInt(tenant + PASSWORD_DIGIT, 1), config.getInt(tenant + PASSWORD_SPECIAL, 1),
 						config.getInt(tenant + PASSWORD_SEQUENCE, 4), config.getInt(tenant + PASSWORD_OCCURRENCE, 3));
 				user.setDecodedPassword(decodedPassword);
-				user.setPasswordExpired(1);
+				user.setPasswordExpired(true);
 				user.setPasswordChanged(new Date());
 			}
 
@@ -882,7 +882,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	private void notifyAccount(User user, String password) throws MessagingException, AutomationException {
 		EMail email;
 		email = new EMail();
-		email.setHtml(1);
+		email.setHtml(true);
 		Recipient recipient = new Recipient();
 		recipient.setAddress(user.getEmail());
 		recipient.setRead(1);
@@ -953,7 +953,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setDateFormatLong(guiUser.getDateFormatLong());
 			user.setSearchPref(guiUser.getSearchPref());
 
-			user.setEvalFormEnabled(guiUser.isEvalFormEnabled() ? 1 : 0);
+			user.setEvalFormEnabled(guiUser.isEvalFormEnabled());
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);

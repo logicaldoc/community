@@ -239,10 +239,6 @@ public class EMail extends Message {
 		this.replyTo = replyTo;
 	}
 
-	public boolean isHtml() {
-		return html == 1;
-	}
-
 	public Set<String> getImages() {
 		return images;
 	}

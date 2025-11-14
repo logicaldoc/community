@@ -127,10 +127,10 @@ public class WSUtil {
 
 					WSAttribute wsAttribute = new WSAttribute();
 					wsAttribute.setName(name);
-					wsAttribute.setMandatory(attr.getMandatory());
-					wsAttribute.setHidden(attr.getHidden());
-					wsAttribute.setReadonly(attr.getReadonly());
-					wsAttribute.setMultiple(attr.getMultiple());
+					wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
+					wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
+					wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
+					wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
 					wsAttribute.setParent(attr.getParent());
 					wsAttribute.setPosition(attr.getPosition());
 					wsAttribute.setEditor(attr.getEditor());
@@ -254,10 +254,10 @@ public class WSUtil {
 				if (CollectionUtils.isNotEmpty(wsDoc.getAttributes())) {
 					for (WSAttribute wsAtt : wsDoc.getAttributes()) {
 						Attribute att = new Attribute();
-						att.setMandatory(wsAtt.getMandatory());
-						att.setHidden(wsAtt.getHidden());
-						att.setReadonly(wsAtt.getReadonly());
-						att.setMultiple(wsAtt.getMultiple());
+						att.setMandatory(wsAtt.getMandatory() == 1);
+						att.setHidden(wsAtt.getHidden() == 1);
+						att.setReadonly(wsAtt.getReadonly() == 1);
+						att.setMultiple(wsAtt.getMultiple() == 1);
 						att.setParent(wsAtt.getParent());
 						att.setDependsOn(wsAtt.getDependsOn());
 						att.setPosition(wsAtt.getPosition());
@@ -342,10 +342,10 @@ public class WSUtil {
 				WSAttribute wsAttribute = new WSAttribute();
 				wsAttribute.setName(name);
 				wsAttribute.setLabel(attr.getLabel());
-				wsAttribute.setMandatory(attr.getMandatory());
-				wsAttribute.setHidden(attr.getHidden());
-				wsAttribute.setReadonly(attr.getReadonly());
-				wsAttribute.setMultiple(attr.getMultiple());
+				wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
+				wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
+				wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
+				wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
 				wsAttribute.setParent(attr.getParent());
 				wsAttribute.setPosition(attr.getPosition());
 				wsAttribute.setStringValues(attr.getStringValues());
@@ -381,10 +381,10 @@ public class WSUtil {
 			for (WSAttribute wsAtt : wsSet.getAttributes()) {
 				Attribute att = new Attribute();
 				att.setLabel(wsAtt.getLabel());
-				att.setMandatory(wsAtt.getMandatory());
-				att.setHidden(wsAtt.getHidden());
-				att.setReadonly(wsAtt.getReadonly());
-				att.setMultiple(wsAtt.getMultiple());
+				att.setMandatory(wsAtt.getMandatory() == 1);
+				att.setHidden(wsAtt.getHidden() == 1);
+				att.setReadonly(wsAtt.getReadonly() == 1);
+				att.setMultiple(wsAtt.getMultiple() == 1);
 				att.setParent(wsAtt.getParent());
 				att.setDependsOn(wsAtt.getDependsOn());
 				att.setPosition(wsAtt.getPosition());
@@ -422,9 +422,9 @@ public class WSUtil {
 			for (WSAttribute wsAtt : wsTemplate.getAttributes()) {
 				Attribute att = new Attribute();
 				att.setLabel(wsAtt.getLabel());
-				att.setHidden(wsAtt.getHidden());
-				att.setReadonly(wsAtt.getReadonly());
-				att.setMultiple(wsAtt.getMultiple());
+				att.setHidden(wsAtt.getHidden() == 1);
+				att.setReadonly(wsAtt.getReadonly() == 1);
+				att.setMultiple(wsAtt.getMultiple() == 1);
 				att.setParent(wsAtt.getParent());
 				att.setDependsOn(wsAtt.getDependsOn());
 				att.setPosition(wsAtt.getPosition());
@@ -470,10 +470,10 @@ public class WSUtil {
 					WSAttribute attribute = new WSAttribute();
 					attribute.setName(name);
 					attribute.setLabel(attr.getLabel());
-					attribute.setMandatory(attr.getMandatory());
-					attribute.setHidden(attr.getHidden());
-					attribute.setReadonly(attr.getReadonly());
-					attribute.setMultiple(attr.getMultiple());
+					attribute.setMandatory(attr.isMandatory() ? 1 : 0);
+					attribute.setHidden(attr.isHidden() ? 1 : 0);
+					attribute.setReadonly(attr.isReadonly() ? 1 : 0);
+					attribute.setMultiple(attr.isMultiple() ? 1 : 0);
 					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());
 					attribute.setStringValue(attr.getStringValue());

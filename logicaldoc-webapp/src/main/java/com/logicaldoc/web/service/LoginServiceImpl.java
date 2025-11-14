@@ -70,7 +70,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			usr.setEnabled(user.isEnabled());
 			usr.setUsername(user.getUsername());
 			usr.setTenant(SecurityServiceImpl.getTenant(user.getTenantId()));
-			usr.setPasswordExpires(user.getPasswordExpires() == 1);
+			usr.setPasswordExpires(user.isPasswordExpires());
 			usr.setPasswordExpired(UserDAO.get().isPasswordExpired(username));
 			usr.setEmail(user.getEmail());
 			usr.setEmail2(user.getEmail2());
@@ -126,7 +126,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 			EMail email = new EMail();
 			email.setHistoricyze(false);
-			email.setHtml(1);
+			email.setHtml(true);
 			email.setTenantId(user.getTenantId());
 			Recipient recipient = new Recipient();
 			recipient.setAddress(user.getEmail());
@@ -273,9 +273,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			UserHistory event = new UserHistory();
 			event.setUser(user);
 			event.setEvent(UserEvent.LEGAL_CONFIRMED);
-			event.setComment(
-					UserHistoryDAO.get().queryForString("select ld_title from ld_legal where ld_name = :legal", Map.of("legal", legal))
-							+ " - " + legal);
+			event.setComment(UserHistoryDAO.get().queryForString("select ld_title from ld_legal where ld_name = :legal",
+					Map.of("legal", legal)) + " - " + legal);
 			UserHistoryDAO.get().store(event);
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);

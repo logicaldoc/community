@@ -35,7 +35,7 @@ public class HibernateWebserviceCallDAOTest extends AbstractWebserviceTestCase {
 		WebserviceCall call = new WebserviceCall();
 		call.setTenantId(1L);
 		call.setUserId(1L);
-		call.setNotified(0);
+		call.setNotified(false);
 		testSubject.store(call);
 
 		List<WebserviceCall> calls = testSubject.findAll(1L);

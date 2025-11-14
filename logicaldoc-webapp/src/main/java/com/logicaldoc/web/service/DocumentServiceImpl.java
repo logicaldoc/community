@@ -471,7 +471,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				Set<Recipient> recipients = entry.getValue();
 
 				EMail mail = new EMail();
-				mail.setHtml(1);
+				mail.setHtml(true);
 				mail.setTenantId(session.getTenantId());
 				mail.setAccountId(-1);
 				mail.setAuthor(session.getUser().getUsername());
@@ -516,7 +516,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				sys.setMessageText(mail.getMessageText());
 				sys.setSubject(mail.getSubject());
 				sys.setRecipients(systemRecipientsMap.get(locale));
-				sys.setHtml(1);
+				sys.setHtml(true);
 				sys.setTenantId(mail.getTenantId());
 
 				systemMessageDao.store(sys);
@@ -1051,10 +1051,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			att.setSetId(extAttr.getSetId());
 			att.setPosition(extAttr.getPosition());
 			att.setLabel(extAttr.getLabel());
-			att.setMandatory(extAttr.getMandatory() == 1);
-			att.setHidden(extAttr.getHidden() == 1);
-			att.setReadonly(extAttr.getReadonly() == 1);
-			att.setMultiple(extAttr.getMultiple() == 1);
+			att.setMandatory(extAttr.isMandatory());
+			att.setHidden(extAttr.isHidden());
+			att.setReadonly(extAttr.isReadonly());
+			att.setMultiple(extAttr.isMultiple());
 			att.setParent(extAttr.getParent());
 			att.setStringValues(extAttr.getStringValues());
 			att.setEditor(extAttr.getEditor());
@@ -1365,11 +1365,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			extAttr.setLabel(templateAttribute.getLabel());
 			extAttr.setType(templateType);
 			extAttr.setPosition(attr.getPosition());
-			extAttr.setMandatory(templateAttribute.getMandatory());
-			extAttr.setHidden(templateAttribute.getHidden());
+			extAttr.setMandatory(templateAttribute.isMandatory());
+			extAttr.setHidden(templateAttribute.isHidden());
 			extAttr.setStringValues(attr.getStringValues());
 			if (attr.getParent() == null)
-				extAttr.setMultiple(templateAttribute.getMultiple());
+				extAttr.setMultiple(templateAttribute.isMultiple());
 			extAttr.setSetId(templateAttribute.getSetId());
 
 			docVO.getAttributes().put(attr.getName(), extAttr);
@@ -1473,7 +1473,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO documentDao = DocumentDAO.get();
 
 		EMail mail = new EMail();
-		mail.setHtml(1);
+		mail.setHtml(true);
 		mail.setTenantId(session.getTenantId());
 		mail.setAccountId(-1);
 		mail.setFolder(OUTBOX);
@@ -3038,7 +3038,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		SystemMessage sys = new SystemMessage();
 		sys.setTenantId(user.getTenantId());
 		sys.setType(Message.TYPE_SYSTEM);
-		sys.setHtml(0);
+		sys.setHtml(false);
 		sys.setAuthor("SYSTEM");
 		sys.setSentDate(new Date());
 		sys.setNotify(true);
@@ -3059,7 +3059,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			emailRecipient.setRead(1);
 
 			EMail mail = new EMail();
-			mail.setHtml(0);
+			mail.setHtml(false);
 			mail.setTenantId(user.getTenantId());
 			mail.setAccountId(-1);
 			mail.setAuthor(user.getUsername());

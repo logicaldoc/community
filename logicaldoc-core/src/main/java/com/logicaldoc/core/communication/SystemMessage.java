@@ -69,7 +69,7 @@ public class SystemMessage extends Message {
 		this.trials = source.trials;
 
 		setAuthor(source.getAuthor());
-		setHtml(source.getHtml());
+		setHtml(source.isHtml());
 		setLastNotified(source.getLastNotified());
 		setLocale(source.getLocale());
 		setMessageText(source.getMessageText());

@@ -67,7 +67,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	 * Used to mark this event notified by the auditing system
 	 */
 	@Column(name = "ld_notified", nullable = false)
-	private int notified = 0;
+	private boolean notified = false;
 
 	@Column(name = "ld_sessionid", length = 255)
 	private String sessionId = "";
@@ -159,11 +159,11 @@ public abstract class History extends PersistentObject implements Comparable<His
 		this.comment = comment;
 	}
 
-	public int getNotified() {
+	public boolean isNotified() {
 		return notified;
 	}
 
-	public void setNotified(int notified) {
+	public void setNotified(boolean notified) {
 		this.notified = notified;
 	}
 
@@ -312,7 +312,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 		this.event = source.event;
 		setComment(source.getComment());
 		setPath(source.getPath());
-		setNotified(source.getNotified());
+		setNotified(source.isNotified());
 		setSessionId(source.getSessionId());
 		setUserId(source.getUserId());
 		setUsername(source.getUsername());

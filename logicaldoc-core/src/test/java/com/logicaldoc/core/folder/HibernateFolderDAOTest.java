@@ -295,7 +295,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		transaction.setFolderId(103L);
 		transaction.setUser(user);
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("pippo_reason");
 
 		Document doc = docDao.findById(1);
@@ -311,7 +311,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertNotNull(docManager.create(new FileInputStream("pom.xml"), doc, transaction));
 
 		FolderHistory tr = new FolderHistory();
-		tr.setNotified(0);
+		tr.setNotified(false);
 		tr.setComment("");
 		tr.setUser(user);
 
@@ -372,7 +372,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		source = testSubject.findByPathExtended("/Default/A", 1L);
 
 		tr = new FolderHistory();
-		tr.setNotified(0);
+		tr.setNotified(false);
 		tr.setComment("");
 		tr.setUser(userDao.findByUsername("admin"));
 		testSubject.copy(source, target, null, false, "replicate", tr);
@@ -398,7 +398,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = userDao.findByUsername("admin");
 
 		FolderHistory transaction = new FolderHistory();
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -428,7 +428,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = userDao.findByUsername("admin");
 
 		FolderHistory transaction = new FolderHistory();
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -470,7 +470,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		user = userDao.findByUsername("admin");
 
 		transaction = new FolderHistory();
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -520,7 +520,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = userDao.findByUsername("admin");
 
 		FolderHistory transaction = new FolderHistory();
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -583,7 +583,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		FolderHistory transaction = new FolderHistory();
 		transaction.setFolderId(folder.getId());
 		transaction.setUser(userDao.findById(1));
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		Folder alias = testSubject.createAlias(5L, folder.getId(), transaction);
 		assertNotNull(alias);
 
@@ -665,7 +665,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		transaction.setFolderId(folder.getId());
 		transaction.setEvent(FolderEvent.RENAMED);
 		transaction.setUser(userDao.findById(1));
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.store(folder, transaction);
 
 		assertEquals(FolderEvent.RENAMED, transaction.getEventEnum());
@@ -682,7 +682,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		transaction.setFolderId(folder.getId());
 		transaction.setEvent(FolderEvent.RENAMED);
 		transaction.setUser(userDao.findById(1));
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.store(folder, transaction);
 
 		folder = testSubject.findById(6);
@@ -882,7 +882,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = userDao.findByUsername("admin");
 
 		FolderHistory transaction = new FolderHistory();
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -1558,7 +1558,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = new User();
 		user.setId(4);
 		transaction.setUser(user);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		// The root defines it's own policies
 		Folder folder = testSubject.findById(1200);
@@ -1590,7 +1590,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = new User();
 		user.setId(4);
 		transaction.setUser(user);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		// The root defines it's own policies
 		Folder folder = testSubject.findById(1200L);
@@ -1615,7 +1615,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = new User();
 		user.setId(4);
 		transaction.setUser(user);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		// The root defines it's own policies
 		Folder folder = testSubject.findById(1200);
@@ -1646,7 +1646,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		User user = new User();
 		user.setId(4);
 		transaction.setUser(user);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		Folder folder = testSubject.findById(1200);
 		testSubject.initialize(folder);
@@ -1742,12 +1742,12 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 
 		FolderHistory fTransaction = new FolderHistory();
 		fTransaction.setUser(user);
 		fTransaction.setUserId(1L);
-		fTransaction.setNotified(0);
+		fTransaction.setNotified(false);
 
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
@@ -1830,7 +1830,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(userDao.findById(User.USERID_ADMIN));
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.applyGridToTree(1200, transaction);
 
 		folder = testSubject.findById(1201);
@@ -1854,7 +1854,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(userDao.findById(User.USERID_ADMIN));
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.applyStoreToTree(1200, transaction);
 
 		folder = testSubject.findById(1201);
@@ -1888,7 +1888,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(userDao.findById(User.USERID_ADMIN));
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.applyOCRToTree(1200, transaction);
 
 		folder = testSubject.findById(1201);

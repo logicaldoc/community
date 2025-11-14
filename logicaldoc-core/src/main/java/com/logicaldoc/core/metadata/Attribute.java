@@ -76,16 +76,16 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	protected Long setId;
 
 	@Column(name = "ld_mandatory", nullable = false)
-	protected int mandatory = 0;
+	protected boolean mandatory = false;
 
 	@Column(name = "ld_hidden", nullable = false)
-	protected int hidden = 0;
+	protected boolean hidden = false;
 
 	@Column(name = "ld_readonly", nullable = false)
-	protected int readonly = 0;
+	protected boolean readonly = false;
 
 	@Column(name = "ld_multiple", nullable = false)
-	protected int multiple = 0;
+	protected boolean multiple = false;
 
 	@Column(name = "ld_type", nullable = false)
 	protected int type = TYPE_STRING;
@@ -218,19 +218,19 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	 */
 	public Object getValue() {
 		switch (type) {
-		case TYPE_DOUBLE:
-			return getDoubleValue();
-		case TYPE_DATE:
-			return getDateValue();
-		case TYPE_USER, TYPE_FOLDER, TYPE_DOCUMENT, TYPE_INT:
-			return getIntValue();
-		case TYPE_BOOLEAN:
-			if (getIntValue() == null)
-				return null;
-			else
-				return getIntValue().intValue() == 1;
-		default:
-			return getStringValue();
+			case TYPE_DOUBLE:
+				return getDoubleValue();
+			case TYPE_DATE:
+				return getDateValue();
+			case TYPE_USER, TYPE_FOLDER, TYPE_DOCUMENT, TYPE_INT:
+				return getIntValue();
+			case TYPE_BOOLEAN:
+				if (getIntValue() == null)
+					return null;
+				else
+					return getIntValue().intValue() == 1;
+			default:
+				return getStringValue();
 		}
 	}
 
@@ -262,69 +262,70 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 		}
 
 		switch (value) {
-		case String string -> {
-			this.type = TYPE_STRING;
-			setStringValue(string);
-		}
+			case String string -> {
+				this.type = TYPE_STRING;
+				setStringValue(string);
+			}
 
-		case Integer integer -> {
-			this.type = TYPE_INT;
-			setIntValue(Long.valueOf(integer));
-		}
+			case Integer integer -> {
+				this.type = TYPE_INT;
+				setIntValue(Long.valueOf(integer));
+			}
 
-		case Long longVal -> {
-			this.type = TYPE_INT;
-			setIntValue(longVal);
-		}
+			case Long longVal -> {
+				this.type = TYPE_INT;
+				setIntValue(longVal);
+			}
 
-		case Double doubleVal -> {
-			this.type = TYPE_DOUBLE;
-			setDoubleValue(doubleVal);
-		}
+			case Double doubleVal -> {
+				this.type = TYPE_DOUBLE;
+				setDoubleValue(doubleVal);
+			}
 
-		case Date date -> {
-			this.type = TYPE_DATE;
-			setDateValue(date);
-		}
+			case Date date -> {
+				this.type = TYPE_DATE;
+				setDateValue(date);
+			}
 
-		case User user -> {
-			this.type = TYPE_USER;
-			this.intValue = user.getId();
-			this.stringValue = user.getUsername();
-		}
+			case User user -> {
+				this.type = TYPE_USER;
+				this.intValue = user.getId();
+				this.stringValue = user.getUsername();
+			}
 
-		case Folder folder -> {
-			this.type = TYPE_FOLDER;
-			this.intValue = folder.getId();
-			this.stringValue = folder.getName();
-		}
+			case Folder folder -> {
+				this.type = TYPE_FOLDER;
+				this.intValue = folder.getId();
+				this.stringValue = folder.getName();
+			}
 
-		case Document document -> {
-			this.type = TYPE_DOCUMENT;
-			this.intValue = document.getId();
-			this.stringValue = document.getFileName();
-		}
+			case Document document -> {
+				this.type = TYPE_DOCUMENT;
+				this.intValue = document.getId();
+				this.stringValue = document.getFileName();
+			}
 
-		case Boolean bool -> {
-			this.type = TYPE_BOOLEAN;
-			this.intValue = bool.booleanValue() ? 1L : 0L;
-		}
+			case Boolean bool -> {
+				this.type = TYPE_BOOLEAN;
+				this.intValue = bool.booleanValue() ? 1L : 0L;
+			}
 
-		default -> throw new IllegalArgumentException("Not a String, Long, Double, Date, Boolean, User, Folder value");
+			default -> throw new IllegalArgumentException(
+					"Not a String, Long, Double, Date, Boolean, User, Folder value");
 		}
 	}
 
 	/**
 	 * Whether an attribute value is mandatory or not.
 	 * 
-	 * @return If <b>0</b>, the attribute value is not mandatory; if <b>1</b>,
-	 *         the attribute value is mandatory.
+	 * @return If <b>false</b>, the attribute value is not mandatory; if
+	 *         <b>true</b>, the attribute value is mandatory.
 	 */
-	public int getMandatory() {
+	public boolean isMandatory() {
 		return mandatory;
 	}
 
-	public void setMandatory(int mandatory) {
+	public void setMandatory(boolean mandatory) {
 		this.mandatory = mandatory;
 	}
 
@@ -387,28 +388,12 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 		this.editor = editor;
 	}
 
-	public int getHidden() {
-		return hidden;
-	}
-
-	public void setHidden(int hidden) {
-		this.hidden = hidden;
-	}
-
 	public Long getSetId() {
 		return setId;
 	}
 
 	public void setSetId(Long setId) {
 		this.setId = setId;
-	}
-
-	public int getMultiple() {
-		return multiple;
-	}
-
-	public void setMultiple(int multiple) {
-		this.multiple = multiple;
 	}
 
 	public String getParent() {
@@ -443,14 +428,6 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 		this.dependsOn = dependsOn;
 	}
 
-	public int getReadonly() {
-		return readonly;
-	}
-
-	public void setReadonly(int readonly) {
-		this.readonly = readonly;
-	}
-
 	public String getValidation() {
 		return validation;
 	}
@@ -465,5 +442,29 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 
 	public void setInitialization(String initialization) {
 		this.initialization = initialization;
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	public boolean isReadonly() {
+		return readonly;
+	}
+
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
+	}
+
+	public boolean isMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
 	}
 }

@@ -211,12 +211,12 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		UserHistory transaction = new UserHistory();
 		transaction.setEvent(UserEvent.LOGIN);
 		transaction.setUserId(user.getId());
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.store(user, transaction);
 		assertNotNull(groupDao.findByName(user.getUserGroupName(), 1));
 
 		assertEquals("valca", user.getFirstName());
-		
+
 		user = testSubject.findById(user.getId());
 		testSubject.initialize(user);
 		user.addGroup(groupDao.findById(1L));
@@ -239,7 +239,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		transaction = new UserHistory();
 		transaction.setEvent(UserEvent.PASSWORDCHANGED);
 		transaction.setUserId(user.getId());
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.store(user, transaction);
 
 		user = testSubject.findById(1);
@@ -257,24 +257,24 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 		User user = testSubject.findById(1L);
 		testSubject.initialize(user);
-		assertEquals(0, user.getPasswordExpired());
-		assertEquals(0, user.getPasswordExpires());
+		assertFalse(user.isPasswordExpired());
+		assertFalse(user.isPasswordExpires());
 		user.setDecodedPassword(pswd);
-		
+
 		testSubject.store(user);
 
 		user = testSubject.findById(1L);
 		testSubject.initialize(user);
-		assertEquals(0, user.getPasswordExpired());
-		assertEquals(0, user.getPasswordExpires());
+		assertFalse(user.isPasswordExpired());
+		assertFalse(user.isPasswordExpires());
 		user.setDecodedPassword(pswd + "-*/!?");
 		testSubject.store(user);
 
 		// Give an already used password
 		user = testSubject.findById(1L);
 		testSubject.initialize(user);
-		assertEquals(0, user.getPasswordExpired());
-		assertEquals(0, user.getPasswordExpires());
+		assertFalse(user.isPasswordExpired());
+		assertFalse(user.isPasswordExpires());
 		user.setDecodedPassword(pswd);
 
 		try {
@@ -286,9 +286,9 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 		user = testSubject.findById(1L);
 		testSubject.initialize(user);
-		assertEquals(0, user.getPasswordExpired());
+		assertFalse(user.isPasswordExpired());
 		user.setDecodedPassword(pswd + "-#é+^");
-		user.setPasswordExpired(1);
+		user.setPasswordExpired(true);
 		testSubject.store(user);
 
 		user = testSubject.findById(1L);

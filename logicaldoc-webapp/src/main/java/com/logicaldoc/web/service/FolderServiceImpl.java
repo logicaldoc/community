@@ -1044,9 +1044,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		extAttr.setDependsOn(guiAttribute.getDependsOn());
 		extAttr.setLabel(templateAttribute.getLabel());
 		extAttr.setPosition(templateAttribute.getPosition());
-		extAttr.setMandatory(templateAttribute.getMandatory());
-		extAttr.setHidden(templateAttribute.getHidden());
-		extAttr.setMultiple(templateAttribute.getMultiple());
+		extAttr.setMandatory(templateAttribute.isMandatory());
+		extAttr.setHidden(templateAttribute.isHidden());
+		extAttr.setMultiple(templateAttribute.isMultiple());
 
 		return extAttr;
 	}

@@ -128,7 +128,7 @@ public class MailUtil {
 
 		if (StringUtils.isNotEmpty(msg.getBodyHTML()) && msg.getBodyHTML().toLowerCase().startsWith("<html")) {
 			email.setMessageText(msg.getBodyHTML());
-			email.setHtml(1);
+			email.setHtml(true);
 		}
 
 		List<Attachment> atts = msg.getAttachments();
@@ -172,12 +172,12 @@ public class MailUtil {
 
 		if (StringUtils.isEmpty(email.getMessageText()) && StringUtils.isNotEmpty(msg.getBodyRTF())) {
 			email.setMessageText(msg.getBodyRTF());
-			email.setHtml(0);
+			email.setHtml(false);
 		}
 
 		if (StringUtils.isEmpty(email.getMessageText()) && StringUtils.isNotEmpty(msg.getBodyText())) {
 			email.setMessageText(msg.getBodyText());
-			email.setHtml(0);
+			email.setHtml(false);
 		}
 
 		List<RecipientEntry> recs = msg.getCcRecipients();
@@ -417,7 +417,7 @@ public class MailUtil {
 
 	private static void setMessageText(jakarta.mail.Message msg, EMail email) throws MessagingException, IOException {
 		String body = getText(msg);
-		email.setHtml(body.charAt(0) == 'H' ? 1 : 0);
+		email.setHtml(body.charAt(0) == 'H');
 		email.setMessageText(body.substring(1));
 	}
 

@@ -166,10 +166,10 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		Attribute att = new Attribute();
 		att.setSetId(attributeSet.getId());
 		att.setPosition(attribute.getPosition());
-		att.setMandatory(attribute.isMandatory() ? 1 : 0);
-		att.setHidden(attribute.isHidden() ? 1 : 0);
-		att.setReadonly(attribute.isReadonly() ? 1 : 0);
-		att.setMultiple(attribute.isMultiple() ? 1 : 0);
+		att.setMandatory(attribute.isMandatory());
+		att.setHidden(attribute.isHidden());
+		att.setReadonly(attribute.isReadonly());
+		att.setMultiple(attribute.isMultiple());
 		att.setParent(attribute.getParent());
 		att.setDependsOn(attribute.getDependsOn());
 		att.setStringValues(attribute.getStringValues());
@@ -254,10 +254,10 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		att.setSet(attributeSet.getName());
 		att.setSetId(attributeSet.getId());
 		att.setPosition(extAttr.getPosition());
-		att.setMandatory(intToBoolean(extAttr.getMandatory()));
-		att.setHidden(intToBoolean(extAttr.getHidden()));
-		att.setReadonly(intToBoolean(extAttr.getReadonly()));
-		att.setMultiple(intToBoolean(extAttr.getMultiple()));
+		att.setMandatory(extAttr.isMandatory());
+		att.setHidden(extAttr.isHidden());
+		att.setReadonly(extAttr.isReadonly());
+		att.setMultiple(extAttr.isMultiple());
 		att.setType(extAttr.getType());
 		att.setValidation(extAttr.getValidation());
 		att.setInitialization(extAttr.getInitialization());
@@ -300,10 +300,6 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			att.setStringValue(buf);
 		}
 		att.setOptions(list);
-	}
-
-	private boolean intToBoolean(int val) {
-		return val == 1;
 	}
 
 	@Override

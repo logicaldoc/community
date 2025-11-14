@@ -239,7 +239,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			if (user.getLastEnabled() == null)
 				user.setLastEnabled(user.getCreation());
 
-			user.setPasswordExpired(isPasswordExpired(user) ? 1 : 0);
+			user.setPasswordExpired(isPasswordExpired(user));
 		}
 
 		if (StringUtils.isEmpty(user.getPassword()) && user.getSource() == UserSource.DEFAULT)
@@ -596,7 +596,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user == null || user.getSource() != UserSource.DEFAULT)
 			return false;
 
-		if (user.getPasswordExpired() == 1) {
+		if (user.isPasswordExpired()) {
 			log.warn("User {}'s password already marked as expired", user);
 			return true;
 		}
@@ -607,7 +607,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return false;
 
 		// Check if the password is already expired
-		if (user.getPasswordExpires() == 1) {
+		if (user.isPasswordExpires()) {
 			Date lastChange = user.getPasswordChanged();
 			if (lastChange == null)
 				return false;
@@ -761,7 +761,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return;
 
 		transaction.setUser(user);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		userHistoryDAO.store(transaction);
 	}
 

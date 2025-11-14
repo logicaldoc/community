@@ -129,7 +129,7 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
 		attrs.add(master);
 
 		if (values.size() > 1) {
-			master.setMultiple(1);
+			master.setMultiple(true);
 			NumberFormat nf = new DecimalFormat("0000");
 			for (int i = 1; i < values.size(); i++) {
 				Attribute attribute = setValue(name + "-" + nf.format(i), values.get(i));

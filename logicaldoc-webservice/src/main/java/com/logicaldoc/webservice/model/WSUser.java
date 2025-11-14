@@ -156,16 +156,16 @@ public class WSUser {
 
 	@WSDoc(description = "maximum allowed user's storage expressed in bytes, <b>-1</b> for no limits")
 	private long quota = -1;
-	
+
 	@WSDoc(description = " actual storage quota used by the user ")
 	private long quotaCount = 0;
 
 	@WSDoc(description = "maximum allowed user's concurrent sessions, <b>-1</b> for no limits")
 	private long sessionsQuota = -1;
-	
+
 	@WSDoc(description = " actual sessions for this userr")
 	private long sessionsQuotaCount = 0;
-	
+
 	@WSDoc(required = false)
 	private String lastModified;
 
@@ -482,8 +482,8 @@ public class WSUser {
 			user.setOrganizationalUnit(getOrganizationalUnit());
 			user.setUsername(getUsername());
 			user.setEnabled(isEnabled());
-			user.setPasswordExpires(getPasswordExpires());
-			user.setEvalFormEnabled(getEvalFormEnabled());
+			user.setPasswordExpires(getPasswordExpires() == 1);
+			user.setEvalFormEnabled(getEvalFormEnabled() == 1);
 			user.setQuota(getQuota());
 			user.setSessionsQuota(getSessionsQuota());
 			user.setType(getType());
@@ -497,13 +497,13 @@ public class WSUser {
 			user.setDateFormatLong(getDateFormatLong());
 			user.setSearchPref(getSearchPref());
 			user.setExpire(WSUtil.convertStringToDate(getExpire()));
-			user.setEnforceWorkingTime(getEnforceWorkingTime());
+			user.setEnforceWorkingTime(getEnforceWorkingTime() == 1);
 			user.setMaxInactivity(getMaxInactivity());
 			user.setTimeZone(getTimeZone());
 			user.setKey(getKey());
 			user.setSecondFactor(getSecondFactor());
 			if (getLegals() != null)
-				user.setLegals(getLegals());
+				user.setLegals(getLegals() == 1);
 
 			if (CollectionUtils.isNotEmpty(groupIds)) {
 				GroupDAO groupDao = GroupDAO.get();
@@ -555,8 +555,8 @@ public class WSUser {
 			wsUser.setOrganizationalUnit(user.getOrganizationalUnit());
 			wsUser.setUsername(user.getUsername());
 			wsUser.setEnabled(user.isEnabled());
-			wsUser.setPasswordExpires(user.getPasswordExpires());
-			wsUser.setEvalFormEnabled(user.getEvalFormEnabled());
+			wsUser.setPasswordExpires(user.isPasswordExpires() ? 1 : 0);
+			wsUser.setEvalFormEnabled(user.isEvalFormEnabled() ? 1 : 0);
 			wsUser.setQuota(user.getQuota());
 			wsUser.setType(user.getType().ordinal());
 			wsUser.setSource(user.getSource().ordinal());
@@ -573,12 +573,12 @@ public class WSUser {
 			wsUser.setDateFormatLong(user.getDateFormatLong());
 			wsUser.setSearchPref(user.getSearchPref());
 			wsUser.setExpire(DateUtil.format(user.getExpire()));
-			wsUser.setEnforceWorkingTime(user.getEnforceWorkingTime());
+			wsUser.setEnforceWorkingTime(user.isEnforceWorkingTime() ? 1 : 0);
 			wsUser.setMaxInactivity(user.getMaxInactivity());
 			wsUser.setTimeZone(user.getTimeZone());
 			wsUser.setKey(user.getKey());
 			wsUser.setSecondFactor(user.getSecondFactor());
-			wsUser.setLegals(user.getLegals());
+			wsUser.setLegals(user.isLegals() ? 1 : 0);
 			wsUser.setGroupIds(user.getGroups().stream().map(g -> g.getId()).collect(Collectors.toList()));
 
 			List<WSWorkingTime> tmp = user.getWorkingTimes().stream().map(wt -> {
@@ -592,10 +592,9 @@ public class WSUser {
 			}).collect(Collectors.toList());
 			wsUser.setWorkingTimes(tmp);
 
-			
 			wsUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
 			wsUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
-			
+
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

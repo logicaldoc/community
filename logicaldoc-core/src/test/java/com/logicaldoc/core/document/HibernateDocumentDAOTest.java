@@ -815,7 +815,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		transaction.setFolderId(103L);
 		transaction.setDocId(2L);
 		transaction.setUserId(1L);
-		transaction.setNotified(0);
+		transaction.setNotified(false);
 		testSubject.makeImmutable(2, transaction);
 		assertTrue(testSubject.findById(2).isImmutable());
 	}

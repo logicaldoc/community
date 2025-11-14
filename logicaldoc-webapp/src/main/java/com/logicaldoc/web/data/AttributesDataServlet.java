@@ -104,7 +104,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 
 		for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
 			Attribute attribute = entry.getValue();
-			if (attribute.getHidden() == 1 || (!sections && attribute.isSection()))
+			if (attribute.isHidden() || (!sections && attribute.isSection()))
 				continue;
 
 			printAttibute("ext_" + entry.getKey(),

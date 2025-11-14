@@ -176,7 +176,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 
 		DocumentHistory history = testSubject.findById(1);
 		testSubject.initialize(history);
-		history.setNotified(1);
+		history.setNotified(true);
 		testSubject.store(history);
 
 		histories = testSubject.findNotNotified(null);

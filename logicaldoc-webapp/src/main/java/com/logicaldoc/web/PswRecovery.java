@@ -122,7 +122,7 @@ public class PswRecovery extends HttpServlet {
 			AutomationException {
 
 		EMail email = new EMail();
-		email.setHtml(1);
+		email.setHtml(true);
 		Recipient recipient = new Recipient();
 		recipient.setRead(1);
 		recipient.setAddress(user.getEmail());
@@ -137,7 +137,7 @@ public class PswRecovery extends HttpServlet {
 				config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
 		user.setDecodedPassword(password);
 		user.setPasswordChanged(new Date());
-		user.setPasswordExpired(1);
+		user.setPasswordExpired(true);
 
 		UserDAO.get().store(user);
 
@@ -146,7 +146,7 @@ public class PswRecovery extends HttpServlet {
 		email.setSentDate(new Date());
 		email.setUsername(user.getUsername());
 		email.setLocale(locale);
-		email.setHtml(1);
+		email.setHtml(true);
 
 		/*
 		 * Prepare the template
