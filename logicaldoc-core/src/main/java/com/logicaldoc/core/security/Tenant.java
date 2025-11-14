@@ -47,7 +47,7 @@ public class Tenant extends PersistentObject implements Serializable {
 	private String displayName;
 
 	@Column(name = "ld_enabled", nullable = false)
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	@Column(name = "ld_expire", columnDefinition = "DATETIME(3)")
 	private Date expire;
@@ -247,11 +247,11 @@ public class Tenant extends PersistentObject implements Serializable {
 	}
 
 	public boolean isEnabled() {
-		return enabled == 1;
+		return enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled ? 1 : 0;
+		this.enabled = enabled;
 	}
 
 	/**
@@ -260,7 +260,7 @@ public class Tenant extends PersistentObject implements Serializable {
 	 * @return if it is available
 	 */
 	public boolean isAvailable() {
-		if (enabled == 0)
+		if (!enabled)
 			return false;
 		return expire == null || expire.before(new Date());
 	}

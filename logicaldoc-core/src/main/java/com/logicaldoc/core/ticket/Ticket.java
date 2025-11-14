@@ -65,7 +65,7 @@ public class Ticket extends PersistentObject {
 	private Integer maxCount;
 
 	@Column(name = "ld_enabled", nullable = false)
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	@Column(name = "ld_views", nullable = false)
 	private int views = 0;
@@ -149,12 +149,12 @@ public class Ticket extends PersistentObject {
 	}
 
 	public boolean isTicketExpired() {
-		return enabled == 0 || (expired != null && new Date().getTime() > expired.getTime())
+		return !enabled || (expired != null && new Date().getTime() > expired.getTime())
 				|| (maxCount != null && maxCount > 0 && count >= maxCount);
 	}
 
 	public boolean isTicketViewExpired() {
-		return enabled == 0 || (expired != null && new Date().getTime() > expired.getTime())
+		return !enabled || (expired != null && new Date().getTime() > expired.getTime())
 				|| (maxViews != null && maxViews > 0 && views >= maxViews);
 	}
 
@@ -183,11 +183,11 @@ public class Ticket extends PersistentObject {
 	}
 
 	public boolean isEnabled() {
-		return enabled == 1;
+		return enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled ? 1 : 0;
+		this.enabled = enabled;
 	}
 
 	public int getViews() {

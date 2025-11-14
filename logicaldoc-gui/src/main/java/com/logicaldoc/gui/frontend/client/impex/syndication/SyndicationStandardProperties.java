@@ -159,8 +159,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 			}
 		});
 
-		ToggleItem replicateCustomId = ItemFactory.newToggleItem(REPLICATECUSTOMID,
-				syndication.getReplicateCustomId() == 1);
+		ToggleItem replicateCustomId = ItemFactory.newToggleItem(REPLICATECUSTOMID, syndication.isReplicateCustomId());
 		replicateCustomId.setRequired(true);
 		replicateCustomId.addChangedHandler(changedHandler);
 
@@ -199,11 +198,11 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 				syndication.setTimeout(Integer.parseInt(form.getValueAsString(TIMEOUT)));
 
 			syndication.setStartDate((Date) form.getValue("startdate"));
-			syndication.setReplicateCustomId(Boolean.parseBoolean(form.getValueAsString(REPLICATECUSTOMID)) ? 1 : 0);
+			syndication.setReplicateCustomId(Boolean.parseBoolean(form.getValueAsString(REPLICATECUSTOMID)));
 		}
 		return !form.hasErrors();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

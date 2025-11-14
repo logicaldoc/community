@@ -116,7 +116,7 @@ public class User extends PersistentObject implements Serializable {
 	private Set<Group> groups = new HashSet<>();
 
 	@Column(name = "ld_enabled", nullable = false)
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	/**
 	 * If the users must confirm changes in the legals or not
@@ -596,11 +596,11 @@ public class User extends PersistentObject implements Serializable {
 	}
 
 	public boolean isEnabled() {
-		return enabled == 1;
+		return enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled ? 1 : 0;
+		this.enabled = enabled;
 	}
 
 	public String getState() {

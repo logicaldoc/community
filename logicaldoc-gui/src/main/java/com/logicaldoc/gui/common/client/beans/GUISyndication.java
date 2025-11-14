@@ -45,7 +45,7 @@ public class GUISyndication implements Serializable {
 
 	private Date startDate = null;
 
-	private int replicateCustomId = 1;
+	private boolean replicateCustomId = true;
 
 	public Date getStartDate() {
 		return startDate;
@@ -159,11 +159,11 @@ public class GUISyndication implements Serializable {
 		this.excludes = excludes;
 	}
 
-	public int getReplicateCustomId() {
+	public boolean isReplicateCustomId() {
 		return replicateCustomId;
 	}
 
-	public void setReplicateCustomId(int replicateCustomId) {
+	public void setReplicateCustomId(boolean replicateCustomId) {
 		this.replicateCustomId = replicateCustomId;
 	}
 

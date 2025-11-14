@@ -109,7 +109,7 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 	private int type = TYPE_DEFAULT;
 
 	@Column(name = "ld_enabled", nullable = false)
-	private int enabled = 1;
+	private boolean enabled = true;
 
 	@Column(name = "ld_description", length = 4000)
 	private String description = "";
@@ -183,11 +183,11 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 	}
 
 	public boolean isEnabled() {
-		return enabled == 1;
+		return enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled ? 1 : 0;
+		this.enabled = enabled;
 	}
 
 	public Long getRoutineId() {
