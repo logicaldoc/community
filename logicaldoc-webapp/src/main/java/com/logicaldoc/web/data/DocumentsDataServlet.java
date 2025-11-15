@@ -509,7 +509,7 @@ select ld_docid
 			} else {
 				doc.setStartPublishing((Date) cols[22]);
 				doc.setStopPublishing((Date) cols[23]);
-				doc.setPublished((Integer) cols[24] == 1);
+				doc.setPublished((Boolean) cols[24]);
 
 				enrichPublishedDocument(doc, cols, extendedAttributes, extendedAttributesValues, user);
 			}
@@ -530,11 +530,11 @@ select ld_docid
 			doc.setCreation((Date) cols[8]);
 			doc.setCreator((String) cols[9]);
 			doc.setFileSize((Long) cols[10]);
-			doc.setImmutable((Integer) cols[11] ==1);
+			doc.setImmutable((Boolean) cols[11]);
 			doc.setIndexingStatus((IndexingStatus) cols[12]);
 			doc.setLockUserId((Long) cols[13]);
 			doc.setStatus((DocumentStatus) cols[15]);
-			doc.setSigned((Integer) cols[16]==1);
+			doc.setSigned((Boolean) cols[16]);
 			doc.setRating((Integer) cols[18]);
 			doc.setFileVersion((String) cols[19]);
 			doc.setComment((String) cols[20]);
@@ -543,7 +543,7 @@ select ld_docid
 			doc.setWorkflowStatus((String) cols[21]);
 			doc.setExtResId((String) cols[25]);
 			doc.setTemplateName((String) cols[26]);
-			doc.setStamped((Integer) cols[28] == 1);
+			doc.setStamped((Boolean) cols[28]);
 			doc.setLockUser((String) cols[29]);
 			doc.setPassword((String) cols[30]);
 			doc.setPages((Integer) cols[31]);

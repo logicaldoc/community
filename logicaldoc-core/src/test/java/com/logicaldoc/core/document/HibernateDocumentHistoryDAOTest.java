@@ -195,6 +195,17 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		assertEquals(0, histories.size());
 	}
 
+	@Test
+	public void testMarkHistoriesAsRead() throws PersistenceException {
+		int count  = testSubject.queryForInt("select count(*) from ld_history where ld_new=1 and ld_userid=1 and ld_event='event.checkedin'");
+		assertEquals(1, count);
+		
+		testSubject.markHistoriesAsRead("event.checkedin", 1L);
+		
+		count  = testSubject.queryForInt("select count(*) from ld_history where ld_new=1 and ld_userid=1 and ld_event='event.checkedin'");
+		assertEquals(0, count);
+	}
+	
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindByUserIdAndEvent() throws PersistenceException {
