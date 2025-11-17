@@ -3,13 +3,16 @@ package com.logicaldoc.core.stats;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -224,13 +227,11 @@ public class StatsCollector extends Task {
 			/*
 			 * Collect sizing statistics
 			 */
-
 			long tags = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_tag");
 			long versions = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_version");
 			long histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
 			long userHistories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
 			long votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
-			long wsCalls = sequenceDAO.getCurrentValue("wscall", 0, Tenant.SYSTEM_ID);
 
 			/*
 			 * Save the last update time
@@ -284,7 +285,32 @@ public class StatsCollector extends Task {
 			statistics.add(new BasicNameValuePair("histories", Long.toString(histories)));
 			statistics.add(new BasicNameValuePair("user_histories", Long.toString(userHistories)));
 			statistics.add(new BasicNameValuePair("votes", Long.toString(votes)));
-			statistics.add(new BasicNameValuePair("wscalls", Long.toString(wsCalls)));
+
+			/*
+			 * Collect API calls statistics
+			 */
+			statistics.add(new BasicNameValuePair("wscalls",
+					Long.toString(sequenceDAO.getCurrentValue("wscall", 0, Tenant.SYSTEM_ID))));
+
+			DateFormat df = new SimpleDateFormat("yyyyMM");
+			Date date = new Date();
+			statistics.add(new BasicNameValuePair("wscalls_0",
+					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+			date = DateUtils.addMonths(date, -1);
+			statistics.add(new BasicNameValuePair("wscalls_1",
+					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+			date = DateUtils.addMonths(date, -1);
+			statistics.add(new BasicNameValuePair("wscalls_2",
+					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+			date = DateUtils.addMonths(date, -1);
+			statistics.add(new BasicNameValuePair("wscalls_3",
+					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+			date = DateUtils.addMonths(date, -1);
+			statistics.add(new BasicNameValuePair("wscalls_4",
+					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+			date = DateUtils.addMonths(date, -1);
+			statistics.add(new BasicNameValuePair("wscalls_5",
+					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
 
 			collectFeatureUsageStats(statistics);
 			next();
@@ -318,6 +344,10 @@ public class StatsCollector extends Task {
 			statistics.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
 
 			uploadStatistics(statistics);
+
+			if (log.isDebugEnabled())
+				log.debug("Send stats: {}", statistics.stream().map(st -> st.getName() + "=" + st.getValue())
+						.collect(Collectors.joining(",")));
 
 			next();
 		} catch (PersistenceException e) {
@@ -644,8 +674,9 @@ public class StatsCollector extends Task {
 		try {
 			stats[6] = documentDAO
 					.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_deleted = 0 and A.ld_indexed = "
-							+ IndexingStatus.SKIP.ordinal() + (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "")
-							+ AND_NOT_A_LD_STATUS + DocumentStatus.ARCHIVED.ordinal());
+							+ IndexingStatus.SKIP.ordinal()
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "") + AND_NOT_A_LD_STATUS
+							+ DocumentStatus.ARCHIVED.ordinal());
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -817,11 +848,11 @@ public class StatsCollector extends Task {
 			genericDAO.initialize(gen);
 
 		switch (val) {
-		case Date dateVal -> gen.setDate1(dateVal);
-		case String stringVal -> gen.setString1(stringVal);
-		case Integer intVal -> gen.setInteger1(intVal.longValue());
-		case Long longVal -> gen.setInteger1(longVal);
-		default -> gen.setInteger1(null);
+			case Date dateVal -> gen.setDate1(dateVal);
+			case String stringVal -> gen.setString1(stringVal);
+			case Integer intVal -> gen.setInteger1(intVal.longValue());
+			case Long longVal -> gen.setInteger1(longVal);
+			default -> gen.setInteger1(null);
 		}
 
 		try {

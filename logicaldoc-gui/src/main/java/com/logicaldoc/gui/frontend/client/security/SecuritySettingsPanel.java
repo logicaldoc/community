@@ -62,7 +62,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private static final String PWD_UPPER_CASE = "pwdUpperCase";
 
 	private static final String PWD_SIZE = "pwdSize";
-	
+
 	private static final String PWD_CHECKLOGIN = "pwdCheckLogin";
 
 	private ValuesManager vm = new ValuesManager();
@@ -222,6 +222,12 @@ public class SecuritySettingsPanel extends AdminPanel {
 		secureCookies.setRequired(true);
 		secureCookies.setDisabled(Session.get().isDemo());
 
+		ToggleItem previewContentCheck = ItemFactory.newToggleItem("previewContentCheck",
+				I18N.message("previewcontentcheck"), settings.isPreviewContentCheck());
+		previewContentCheck.setWrapTitle(false);
+		previewContentCheck.setRequired(true);
+		previewContentCheck.setDisabled(Session.get().isDemo());
+
 		ToggleItem forceSsl = ItemFactory.newToggleItem("forcessl", settings.isForceSsl());
 		forceSsl.setWrapTitle(false);
 		forceSsl.setRequired(true);
@@ -234,10 +240,10 @@ public class SecuritySettingsPanel extends AdminPanel {
 		contentSecurityPolicy.setHeight(150);
 
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, allowClientId,
-					cookiesSameSite, secureCookies, forceSsl, contentSecurityPolicy);
+			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, previewContentCheck, ignorelogincase,
+					allowSid, allowClientId, cookiesSameSite, secureCookies, forceSsl, contentSecurityPolicy);
 		else
-			securityForm.setFields(maxInactivity, savelogin, alertnewdevice);
+			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, previewContentCheck);
 
 		body.setMembers(passwordForm, securityForm);
 
@@ -288,6 +294,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 		SecuritySettingsPanel.this.settings.setPwdCheckLogin((Boolean) vm.getValue(PWD_CHECKLOGIN));
 		SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) vm.getValue("maxinactivity"));
 		SecuritySettingsPanel.this.settings.setSaveLogin(Boolean.valueOf(vm.getValueAsString("savelogin")));
+		SecuritySettingsPanel.this.settings
+				.setPreviewContentCheck(Boolean.valueOf(vm.getValueAsString("previewContentCheck")));
 		SecuritySettingsPanel.this.settings
 				.setEnableAnonymousLogin(Boolean.valueOf(vm.getValueAsString(ENABLEANONYMOUS)));
 		SecuritySettingsPanel.this.settings.setAlertNewDevice(Boolean.valueOf(vm.getValueAsString("alertnewdevice")));

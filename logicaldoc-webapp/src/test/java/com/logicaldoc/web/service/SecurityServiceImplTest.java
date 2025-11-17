@@ -485,14 +485,15 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 	public void testGenerateAndValidatePassword() throws ServerException {
 		ContextProperties config = Context.get().getProperties();
 		String password = testSubject.generatePassword();
+		String tenant = "default";
 
-		final int pwdSize = config.getInt("default" + SecurityServiceImpl.PASSWORD_SIZE, 8);
-		final int pwdUpperCase = config.getInt("default" + SecurityServiceImpl.PASSWORD_UPPERCASE, 2);
-		final int pwdLowerCase = config.getInt("default" + SecurityServiceImpl.PASSWORD_LOWERCASE, 2);
-		final int pwdDigit = config.getInt("default" + SecurityServiceImpl.PASSWORD_DIGIT, 1);
-		final int pwdSpecial = config.getInt("default" + SecurityServiceImpl.PASSWORD_SPECIAL, 1);
-		final int pwdSequence = config.getInt("default" + SecurityServiceImpl.PASSWORD_SEQUENCE, 4);
-		final int pwdOccurrence = config.getInt("default" + SecurityServiceImpl.PASSWORD_OCCURRENCE, 3);
+		final int pwdSize = config.getInt(SecurityServiceImpl.PASSWORD_SIZE.formatted(tenant), 8);
+		final int pwdUpperCase = config.getInt(SecurityServiceImpl.PASSWORD_UPPERCASE.formatted(tenant), 2);
+		final int pwdLowerCase = config.getInt(SecurityServiceImpl.PASSWORD_LOWERCASE.formatted(tenant), 2);
+		final int pwdDigit = config.getInt(SecurityServiceImpl.PASSWORD_DIGIT.formatted(tenant), 1);
+		final int pwdSpecial = config.getInt(SecurityServiceImpl.PASSWORD_SPECIAL.formatted(tenant), 1);
+		final int pwdSequence = config.getInt(SecurityServiceImpl.PASSWORD_SEQUENCE.formatted(tenant), 4);
+		final int pwdOccurrence = config.getInt(SecurityServiceImpl.PASSWORD_OCCURRENCE.formatted(tenant), 3);
 
 		List<String> errors = testSubject.validatePassword(password, pwdSize, pwdUpperCase, pwdLowerCase, pwdDigit,
 				pwdSpecial, pwdSequence, pwdOccurrence);

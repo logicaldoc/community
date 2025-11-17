@@ -31,9 +31,9 @@ public class GUISecuritySettings implements Serializable {
 	private int pwdOccurrence = 3;
 
 	private boolean pwdCheckLogin = false;
-	
+
 	private Integer maxInactivity;
-	
+
 	private boolean saveLogin = false;
 
 	private boolean ignoreLoginCase = false;
@@ -47,10 +47,12 @@ public class GUISecuritySettings implements Serializable {
 	private boolean forceSsl = false;
 
 	private boolean allowSidInRequest = false;
-	
+
 	private boolean allowClientId = true;
 
 	private boolean alertNewDevice = true;
+
+	private boolean previewContentCheck = true;
 
 	private GUIUser anonymousUser = null;
 
@@ -283,5 +285,13 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setPwdCheckLogin(boolean pwdCheckLogin) {
 		this.pwdCheckLogin = pwdCheckLogin;
+	}
+
+	public boolean isPreviewContentCheck() {
+		return previewContentCheck;
+	}
+
+	public void setPreviewContentCheck(boolean previewContentCheck) {
+		this.previewContentCheck = previewContentCheck;
 	}
 }

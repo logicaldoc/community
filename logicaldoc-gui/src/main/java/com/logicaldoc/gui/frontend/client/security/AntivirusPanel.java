@@ -73,7 +73,7 @@ public class AntivirusPanel extends VLayout {
 			if (form.validate()) {
 				List<GUIParameter> params = new ArrayList<>();
 				params.add(new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_ENABLED,
-						"" + ("yes".equals(form.getValueAsString(ENABLED)))));
+						"" + ("true".equals(form.getValueAsString(ENABLED)))));
 				params.add(new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_EXCLUDES,
 						form.getValueAsString("excludes").trim()));
 				params.add(new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_INCLUDES,

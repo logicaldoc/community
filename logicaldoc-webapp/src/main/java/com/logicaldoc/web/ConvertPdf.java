@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * This servlet simply download the document if it is a PDF.
+ * This servlet simply downloads the document if it is a PDF.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.4.2

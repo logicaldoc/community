@@ -17,6 +17,8 @@ import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
@@ -40,13 +42,18 @@ public class CoreWorkbench {
 	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws IOException, ParseException {
-		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
-		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
-			if (bd.isAbstract())
-				continue;
-			System.out.println(bd.getBeanClassName());
-		}
+		
+		PDDocument pdfDocument = PDDocument.load(new File("C:\\Users\\marco\\Downloads\\xssPDF-3.pdf"));
+		PDDocumentInformation information = pdfDocument.getDocumentInformation();
+		System.out.println();
+		
+//		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+//		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
+//		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
+//			if (bd.isAbstract())
+//				continue;
+//			System.out.println(bd.getBeanClassName());
+//		}
 
 //		OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 //		// What % CPU load this current JVM is taking, from 0.0-1.0
