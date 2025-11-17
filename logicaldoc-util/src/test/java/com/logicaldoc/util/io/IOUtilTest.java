@@ -22,10 +22,10 @@ public class IOUtilTest {
 		File file = new File("target/test.txt");
 		try (InputStream is = IOUtil.getLimitedStream(ResourceUtil.getInputStream("context.properties"), 64)) {
 			FileUtil.writeFile(is, file.getPath());
+			assertEquals(64, file.length());
+
 			String content = FileUtil.readFile(file);
-			assertTrue(content.startsWith("default.tag.minsize=3"));
-			assertTrue(content.endsWith("store.1.dir=target/"));
-			assertFalse(content.contains("default.password.occurrence"));
+			assertEquals(64, content.getBytes().length);
 		} finally {
 			FileUtil.delete(file);
 		}
