@@ -105,8 +105,6 @@ import jakarta.servlet.http.HttpSession;
  */
 public class SecurityServiceImpl extends AbstractRemoteService implements SecurityService {
 
-	private static final String SECURITY_PREVIEW_CONTENTCHECK = "%s.security.preview.contentcheck";
-
 	private static final String SECURITY_CSP = "security.csp";
 
 	private static final String SECURITY_GEOLOCATION_APIKEY = "security.geolocation.apikey";
@@ -117,9 +115,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	private static final String COOKIES_SAMESITE = "cookies.samesite";
 
-	private static final String ANONYMOUS_USER = ".anonymous.user";
+	private static final String ANONYMOUS_USER = "%s.anonymous.user";
 
-	private static final String ANONYMOUS_KEY = ".anonymous.key";
+	private static final String SECURITY_PREVIEW_CONTENTCHECK = "%s.security.preview.contentcheck";
+	
+	private static final String ANONYMOUS_KEY = "%s.anonymous.key";
 
 	private static final String ANONYMOUS_ENABLED = "%s.anonymous.enabled";
 
@@ -1047,11 +1047,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))))
 			securitySettings
 					.setEnableAnonymousLogin("true".equals(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))));
-		if (StringUtils.isNotEmpty(pbean.getProperty(tenant + ANONYMOUS_KEY)))
-			securitySettings.setAnonymousKey(pbean.getProperty(tenant + ANONYMOUS_KEY));
-		if (StringUtils.isNotEmpty(pbean.getProperty(tenant + ANONYMOUS_USER))) {
+		if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant))))
+			securitySettings.setAnonymousKey(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant)));
+		if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)))) {
 			try {
-				User user = userDao.findByUsername(pbean.getProperty(tenant + ANONYMOUS_USER));
+				User user = userDao.findByUsername(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)));
 				if (user != null)
 					securitySettings.setAnonymousUser(getUser(user.getId()));
 			} catch (PersistenceException e) {
@@ -1126,12 +1126,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		}
 
 		String tenant = session.getTenantName();
-		conf.setProperty(tenant + ".password.ttl", Integer.toString(settings.getPwdExpiration()));
-		conf.setProperty(tenant + ".security.user.maxinactivity",
+		conf.setProperty("%s.password.ttl".formatted(tenant), Integer.toString(settings.getPwdExpiration()));
+		conf.setProperty("%s.security.user.maxinactivity".formatted(tenant),
 				settings.getMaxInactivity() == null || settings.getMaxInactivity().intValue() <= 0 ? ""
 						: Integer.toString(settings.getMaxInactivity()));
-		conf.setProperty(tenant + ".password.enforcehistory", Integer.toString(settings.getPwdEnforceHistory()));
-		conf.setProperty(tenant + ".password.checklogin", Boolean.toString(settings.isPwdCheckLogin()));
+		conf.setProperty("%s.password.enforcehistory".formatted(tenant), Integer.toString(settings.getPwdEnforceHistory()));
+		conf.setProperty("%s.password.checklogin".formatted(tenant), Boolean.toString(settings.isPwdCheckLogin()));
 		conf.setProperty(PASSWORD_SIZE.formatted(tenant), Integer.toString(settings.getPwdSize()));
 		conf.setProperty(PASSWORD_LOWERCASE.formatted(tenant), Integer.toString(settings.getPwdLowerCase()));
 		conf.setProperty(PASSWORD_UPPERCASE.formatted(tenant), Integer.toString(settings.getPwdUpperCase()));
@@ -1140,14 +1140,14 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		conf.setProperty(PASSWORD_SEQUENCE.formatted(tenant), Integer.toString(settings.getPwdSequence()));
 		conf.setProperty(PASSWORD_OCCURRENCE.formatted(tenant), Integer.toString(settings.getPwdOccurrence()));
 		conf.setProperty(GUI_SAVELOGIN.formatted(tenant), Boolean.toString(settings.isSaveLogin()));
-		conf.setProperty(tenant + ".alertnewdevice", Boolean.toString(settings.isAlertNewDevice()));
+		conf.setProperty("%s.alertnewdevice".formatted(tenant), Boolean.toString(settings.isAlertNewDevice()));
 		conf.setProperty(ANONYMOUS_ENABLED.formatted(tenant), Boolean.toString(settings.isEnableAnonymousLogin()));
-		conf.setProperty(tenant + ANONYMOUS_KEY, settings.getAnonymousKey().trim());
+		conf.setProperty(ANONYMOUS_KEY.formatted(tenant), settings.getAnonymousKey().trim());
 		conf.setProperty(SECURITY_PREVIEW_CONTENTCHECK.formatted(tenant),
 				Boolean.toString(settings.isPreviewContentCheck()));
 
 		if (settings.getAnonymousUser() != null)
-			conf.setProperty(tenant + ANONYMOUS_USER, settings.getAnonymousUser().getUsername());
+			conf.setProperty(ANONYMOUS_USER.formatted(tenant), settings.getAnonymousUser().getUsername());
 
 		try {
 			conf.write();

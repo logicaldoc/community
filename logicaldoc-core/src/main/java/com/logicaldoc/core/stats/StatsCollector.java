@@ -232,6 +232,7 @@ public class StatsCollector extends Task {
 			long histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
 			long userHistories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
 			long votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
+			long tickets = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_ticket");
 
 			/*
 			 * Save the last update time
@@ -285,6 +286,7 @@ public class StatsCollector extends Task {
 			statistics.add(new BasicNameValuePair("histories", Long.toString(histories)));
 			statistics.add(new BasicNameValuePair("user_histories", Long.toString(userHistories)));
 			statistics.add(new BasicNameValuePair("votes", Long.toString(votes)));
+			statistics.add(new BasicNameValuePair("tickets", Long.toString(tickets)));
 
 			/*
 			 * Collect API calls statistics
@@ -346,9 +348,9 @@ public class StatsCollector extends Task {
 			uploadStatistics(statistics);
 
 			if (log.isDebugEnabled())
-				log.debug("Send stats: {}", statistics.stream().map(st -> st.getName() + "=" + st.getValue())
+				log.debug("Send statistics: {}", statistics.stream().map(st -> st.getName() + "=" + st.getValue())
 						.collect(Collectors.joining(",")));
-
+			
 			next();
 		} catch (PersistenceException e) {
 			throw new TaskException(e.getMessage(), e);
@@ -539,9 +541,21 @@ public class StatsCollector extends Task {
 			workflowHistories = folderDAO
 					.queryForLong("SELECT COUNT(ld_id) FROM ld_workflowhistory where ld_deleted=0");
 		} catch (Exception t) {
-			log.warn("Unable to calculate workflow statistics - {}", t.getMessage());
+			log.warn("Unable to calculate workflow history statistics - {}", t.getMessage());
 		}
 		postParams.add(new BasicNameValuePair("workflow_histories", Long.toString(workflowHistories)));
+
+		long workflows = 0;
+		try {
+			for (Long tenantId : tenantDAO.findAllIds()) {
+				workflows += folderDAO.queryForLong(
+						"select count(distinct(ld_name)) from ld_workflowtemplate where ld_deleted = 0 and ld_deployed = 1 and ld_tenantid = "
+								+ tenantId);
+			}
+		} catch (Exception t) {
+			log.warn("Unable to calculate workflow statistics - {}", t.getMessage());
+		}
+		postParams.add(new BasicNameValuePair("workflows", Long.toString(workflows)));
 
 		long templates = 0;
 		try {
@@ -586,7 +600,7 @@ public class StatsCollector extends Task {
 		// Collect import email account
 		long emailAccounts = 0;
 		try {
-			documentDAO.queryForLong("select count(ld_id) from ld_emailaccount where ld_deleted=0");
+			emailAccounts = documentDAO.queryForLong("select count(ld_id) from ld_emailaccount where ld_deleted=0");
 		} catch (Exception t) {
 			log.warn("Unable to calculate import email accounts - {}", t.getMessage());
 		}
@@ -595,11 +609,52 @@ public class StatsCollector extends Task {
 		// Collect calendar events
 		long calendarEvents = 0;
 		try {
-			documentDAO.queryForLong("select count(ld_id) from ld_event where ld_deleted=0");
+			calendarEvents = documentDAO.queryForLong("select count(ld_id) from ld_event where ld_deleted=0");
 		} catch (Exception t) {
 			log.warn("Unable to calculate calendar events - {}", t.getMessage());
 		}
 		postParams.add(new BasicNameValuePair("calendarevents", Long.toString(calendarEvents)));
+
+		collectAIStats(postParams);
+	}
+
+	protected void collectAIStats(List<NameValuePair> postParams) {
+		// Collect AI models
+		long aimodels = 0;
+		try {
+			aimodels = documentDAO.queryForLong("select count(ld_id) from ld_aimodel where ld_deleted=0");
+		} catch (Exception t) {
+			log.warn("Unable to calculate AI models - {}", t.getMessage());
+		}
+		postParams.add(new BasicNameValuePair("aimodels", Long.toString(aimodels)));
+
+		// Collect AI samplers
+		long samplers = 0;
+		try {
+			samplers = documentDAO.queryForLong("select count(ld_id) from ld_sampler where ld_deleted=0");
+		} catch (Exception t) {
+			log.warn("Unable to calculate samplers - {}", t.getMessage());
+		}
+		postParams.add(new BasicNameValuePair("samplers", Long.toString(samplers)));
+
+		// Collect AI embedding schemes
+		long embeddings = 0;
+		try {
+			embeddings = documentDAO
+					.queryForLong("select count(ld_id) from ld_embeddingscheme where ld_deleted=0");
+		} catch (Exception t) {
+			log.warn("Unable to calculate embedding schemes - {}", t.getMessage());
+		}
+		postParams.add(new BasicNameValuePair("embeddings", Long.toString(embeddings)));
+
+		// Collect AI robots
+		long robots = 0;
+		try {
+			robots = documentDAO.queryForLong("select count(ld_id) from ld_robot where ld_deleted=0");
+		} catch (Exception t) {
+			log.warn("Unable to calculate robots - {}", t.getMessage());
+		}
+		postParams.add(new BasicNameValuePair("robots", Long.toString(robots)));
 	}
 
 	/**
