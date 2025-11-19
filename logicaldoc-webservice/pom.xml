@@ -11,6 +11,9 @@
 	<artifactId>logicaldoc-webservice</artifactId>
 	<name>logicaldoc-webservice</name>
 	<packaging>jar</packaging>
+	<properties>
+		<cxf.swagger.v3.version>2.2.40</cxf.swagger.v3.version>
+	</properties>	
 	<dependencies>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
@@ -47,7 +50,8 @@
 
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
-			<artifactId>swagger-annotations</artifactId>
+			<artifactId>swagger-annotations-jakarta</artifactId>
+			<version>${cxf.swagger.v3.version}</version>
 		</dependency>
 
 		<dependency>
