@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 3.0
  */
 public class ContextProperties extends OrderedProperties {
+
+	public static final String LD_CONFIG = "ld.config";
 
 	private static final String UTF_8 = "UTF-8";
 
@@ -56,11 +59,9 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	public ContextProperties() throws IOException {
-		try {
-			load(ContextProperties.class.getClassLoader().getResource("context.properties"));
-		} catch (Exception e) {
-			load(ContextProperties.class.getClassLoader().getResource("/context.properties"));
-		}
+		String config = StringUtils.defaultString(System.getProperty(LD_CONFIG), "context.properties");
+		log.info("Take configuration from resource {}", config);
+		load(ContextProperties.class.getClassLoader().getResource(config));		
 	}
 
 	public ContextProperties(String filePath) throws IOException {

@@ -108,6 +108,7 @@ public abstract class AbstractTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		System.setProperty("LOGICALDOC_REPOSITORY", "target");
 		System.setProperty("java.io.tmpdir", tempDir.getAbsolutePath());
+		System.setProperty("ld.config", getConfigResource());
 
 		try {
 			loadDevelSettingsInEnvironment();
@@ -140,9 +141,7 @@ public abstract class AbstractTestCase {
 	public void tearDown() throws IOException {
 		try {
 			destroyDatabase();
-			File pluginsDir = new File(
-					Context.get().getProperties().getProperty("conf.plugindir", "target/tests-plugins"));
-			FileUtil.delete(pluginsDir);
+			FileUtil.delete(getPluginsDir());
 
 			if (context != null)
 				((AbstractApplicationContext) context).close();
@@ -151,6 +150,16 @@ public abstract class AbstractTestCase {
 		} finally {
 			restoreUserHome();
 		}
+	}
+
+	/**
+	 * Retrieves the resource name that stores the context settings, by default
+	 * this method returns context.properties
+	 * 
+	 * @return The settings resource
+	 */
+	protected String getConfigResource() {
+		return "context.properties";
 	}
 
 	protected void updateUserHome() {
@@ -188,7 +197,7 @@ public abstract class AbstractTestCase {
 		if (CollectionUtils.isEmpty(pluginArchives))
 			return;
 
-		File pluginsDir = new File(new ContextProperties().getProperty("conf.plugindir", "target/tests-plugins"));
+		File pluginsDir = getPluginsDir();
 		FileUtil.delete(pluginsDir);
 		pluginsDir.mkdir();
 
@@ -200,6 +209,10 @@ public abstract class AbstractTestCase {
 		PluginRegistry registry = PluginRegistry.getInstance();
 		log.info("Initialize plugins inside {}", pluginsDir.getAbsolutePath());
 		registry.init(pluginsDir.getAbsolutePath());
+	}
+
+	protected File getPluginsDir() throws IOException {
+		return new File(new ContextProperties().getProperty("conf.plugindir", "target/tests-plugins"));
 	}
 
 	/**

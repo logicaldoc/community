@@ -23,7 +23,7 @@
     <bean id="context" class="com.logicaldoc.util.spring.Context" />
 
     <!-- This post processor ensures placeholders substitutions -->
-	<bean id="PropertyPlaceholderConfigurer"
+	<bean id="placeholder"
 		class="com.logicaldoc.util.spring.PropertiesPlaceHolder">
 		<property name="locations">
 			<list>

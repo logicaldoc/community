@@ -32,6 +32,11 @@ public abstract class AbstractWPTestCase extends AbstractWebappTestCase {
 	}
 
 	@Override
+	protected String getConfigResource() {
+		return "contexttest.properties";
+	}
+
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

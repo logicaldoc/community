@@ -35,7 +35,7 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
 	private final static File RESPONSE_OUTPUT = new File("target/out.txt");
 
 	private final static File PLUGIN_RESOURCE = new File(
-			"target/tmp/logicaldoc/plugins/logicaldoc-core/test/resource.txt");
+			"target/tmp/repository/plugins/logicaldoc-core/test/resource.txt");
 
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {

@@ -32,13 +32,8 @@
     <bean id="context" class="com.logicaldoc.util.spring.Context" />
 
 	<!-- This post processor ensures placeholders substitutions -->
-	<bean id="PropertyPlaceholderConfigurer" class="com.logicaldoc.util.spring.PropertiesPlaceHolder">
-		<property name="locations">
-			<list>
-				<value>classpath*:context.properties</value>
-			</list>
-		</property>
-	</bean>
+	<bean id="placeholder" class="com.logicaldoc.util.spring.PropertiesPlaceHolder" />
+	
 	<bean id="ContextProperties" class="${registry}">
 		<property name="maxBackups" value="10" />
 	</bean>

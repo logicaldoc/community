@@ -23,15 +23,7 @@
     <tx:annotation-driven transaction-manager="TransactionManager" />
  
     <!-- This post processor ensures placeholders substitutions -->
-	<bean id="PropertyPlaceholderConfigurer"
-		class="com.logicaldoc.util.spring.PropertiesPlaceHolder" lazy-init="false" abstract="false"
-		autowire="default">
-		<property name="locations">
-			<list>
-				<value>classpath*:context.properties</value>
-			</list>
-		</property>
-	</bean>
+	<bean id="placeholder" class="com.logicaldoc.util.spring.PropertiesPlaceHolder" />
 	
     <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
     

@@ -153,7 +153,7 @@ insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_
 values (9,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder9',7,0,0,1,1,1,0);
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values (1200,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'test',5,0,0,1,1,1,0);
-insert into ld_folder_store(ld_folderid, ld_nodeid, ld_storeid) values (1200, '', 2);
+insert into ld_folder_store(ld_folderid, ld_nodeid, ld_storeid) values (1200, 'test', 2);
 
 
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)

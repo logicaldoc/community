@@ -8,46 +8,27 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:security="http://www.springframework.org/schema/security"
-	xsi:schemaLocation="
-            http://www.springframework.org/schema/beans 
-            http://www.springframework.org/schema/beans/spring-beans.xsd
-            http://www.springframework.org/schema/util 
-            http://www.springframework.org/schema/util/spring-util.xsd
-            http://www.springframework.org/schema/context
-            http://www.springframework.org/schema/context/spring-context.xsd
-            http://www.springframework.org/schema/tx
-            http://www.springframework.org/schema/tx/spring-tx.xsd
-            http://www.springframework.org/schema/aop
-            http://www.springframework.org/schema/aop/spring-aop.xsd
-            http://www.springframework.org/schema/security
-            http://www.springframework.org/schema/security/spring-security.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
-    <context:annotation-config />
-    
-    <tx:annotation-driven transaction-manager="TransactionManager"/>
+	<context:annotation-config />
+
+	<tx:annotation-driven transaction-manager="TransactionManager" />
 
 	<!-- This post processor ensures placeholders substitutions -->
-	<bean id="PropertyPlaceholderConfigurer"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-		lazy-init="false" abstract="false">
-		<property name="locations">
-			<list>
-				<value>classpath*:contexttest.properties</value>
-			</list>
-		</property>
-	</bean>
+	<bean id="placeholder" class="com.logicaldoc.util.spring.PropertiesPlaceHolder" />
 
-	<bean id="ContextProperties"
-		class="com.logicaldoc.util.config.ContextProperties">
-		<constructor-arg value="contexttest.properties" />
-	</bean>
+	<bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
 
-    <bean id="context" class="com.logicaldoc.util.spring.Context" />
+	<bean id="context" class="com.logicaldoc.util.spring.Context" />
 
 	<!-- DataSource -->
 	<bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
-		<property name="driverClassName"
-			value="org.hsqldb.jdbc.JDBCDriver" />
+		<property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
 		<property name="jdbcUrl" value="jdbc:hsqldb:mem:logicaldoc" />
 		<property name="username" value="sa" />
 		<property name="password" value="" />
@@ -58,31 +39,35 @@
 	</bean>
 
 	<!-- Hibernate SessionFactory -->
-    <bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
-        abstract="false" lazy-init="default" autowire="default">
-        <property name="dataSource">
-            <ref bean="DataSource" />
-        </property>
-        <property name="entityInterceptor">
-            <bean class="com.logicaldoc.core.LastModifiedInterceptor" />
-        </property>
+	<bean id="SessionFactory"
+		class="com.logicaldoc.util.spring.LocalSessionFactory"
+		abstract="false" lazy-init="default" autowire="default">
+		<property name="dataSource">
+			<ref bean="DataSource" />
+		</property>
+		<property name="entityInterceptor">
+			<bean class="com.logicaldoc.core.LastModifiedInterceptor" />
+		</property>
 
-        <property name="mappingLocations">
-            <value>classpath*:mappings/*.hbm.xml</value>
-        </property>
-        <property name="hibernateProperties">
-            <props>
+		<property name="mappingLocations">
+			<value>classpath*:mappings/*.hbm.xml</value>
+		</property>
+		<property name="hibernateProperties">
+			<props>
 				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
-                <prop key="hibernate.id.optimizer.pooled.preferred">${hibernate.id.optimizer}</prop>
-                <prop key="hibernate.generate_statistics">true</prop>
-                <prop key="hibernate.cache.use_second_level_cache">true</prop>
-                <prop key="hibernate.cache.use_query_cache">true</prop>
-                
-                <prop key="hibernate.cache.region.factory_class">org.infinispan.hibernate.cache.v62.InfinispanRegionFactory</prop>
-                <prop key="hibernate.cache.infinispan.cfg">org/infinispan/hibernate/cache/commons/builder/infinispan-configs-local.xml</prop>
-            </props>
-        </property>
-    </bean>
+				<prop key="hibernate.id.optimizer.pooled.preferred">
+					${hibernate.id.optimizer}</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+
+				<prop key="hibernate.cache.region.factory_class">
+					org.infinispan.hibernate.cache.v62.InfinispanRegionFactory</prop>
+				<prop key="hibernate.cache.infinispan.cfg">
+					org/infinispan/hibernate/cache/commons/builder/infinispan-configs-local.xml</prop>
+			</props>
+		</property>
+	</bean>
 
 
 	<!--Transaction management -->

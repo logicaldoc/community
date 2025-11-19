@@ -35,7 +35,7 @@
 	</Appenders>
 
 	<Loggers>
-		<Logger name="com.logicaldoc" level="error" />
+		<Logger name="com.logicaldoc" level="info" />
 		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource"
 			level="fatal" />
 		<Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="fatal" />

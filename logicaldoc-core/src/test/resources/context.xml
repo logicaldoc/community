@@ -25,23 +25,16 @@
     <bean id="context" class="com.logicaldoc.util.spring.Context" />
     
     <!-- This post processor ensures placeholders substitutions -->
-	<bean id="PropertyPlaceholderConfigurer"
-		class="com.logicaldoc.util.spring.PropertiesPlaceHolder">
-		<property name="locations">
-			<list>
-				<value>classpath*:context.properties</value>
-			</list>
-		</property>
-	</bean>
+	<bean id="placeholder" class="com.logicaldoc.util.spring.PropertiesPlaceHolder" />
 	
     <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
     
     <!-- DataSource -->
     <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
         <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
-        <property name="jdbcUrl" value="jdbc:hsqldb:mem:logicaldoc" />
-        <property name="username" value="sa" />
-        <property name="password" value="" />
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
     </bean>    
     <bean id="DataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
     	<constructor-arg ref="HikariConfig" />
