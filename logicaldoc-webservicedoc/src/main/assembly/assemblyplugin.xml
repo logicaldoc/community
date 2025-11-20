@@ -14,18 +14,24 @@
 				<include>org.apache.commons:commons-lang3:*</include>
 				<include>org.reflections:*</include>
 				<include>com.fasterxml.jackson.dataformat:*</include>
-				<include>javax.validation:*</include>
+				<include>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:*</include>
+				
+				<!-- Alle 18/11/2025 potrebbe essere superflua -->
+				<include>com.fasterxml.jackson.module:jackson-module-jaxb-annotations:*</include>
+				
+				<include>jakarta.validation:*</include>
 				<include>org.apache.cxf:cxf-rt-rs-service-description:*</include>
 				<include>org.apache.cxf:cxf-rt-rs-service-description-openapi-v3:*</include>
 				<include>org.apache.cxf:cxf-rt-rs-service-description-swagger-ui:*</include>
 				<include>org.apache.cxf:cxf-rt-rs-service-description-common-openapi:*</include>
-				<include>io.swagger.core.v3:swagger-integration:*</include>
-				<include>io.swagger.core.v3:swagger-jaxrs2:*</include>
-				<include>io.swagger.core.v3:swagger-models:*</include>
-				<include>io.swagger.core.v3:swagger-core:*</include>
-				<include>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:*</include>
+                <include>io.swagger.core.v3:swagger-integration-jakarta:*</include>
+				<include>io.swagger.core.v3:swagger-jaxrs2-jakarta:*</include>
+				<include>io.swagger.core.v3:swagger-models-jakarta:*</include>
+				<include>io.swagger.core.v3:swagger-core-jakarta:*</include>
+				<include>io.swagger.core.v3:swagger-annotations-jakarta:*</include>												
 				<include>io.github.classgraph:classgraph:*</include>
 				<include>org.yaml:snakeyaml:*</include>
+				<include>org.webjars:swagger-ui:*</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>
