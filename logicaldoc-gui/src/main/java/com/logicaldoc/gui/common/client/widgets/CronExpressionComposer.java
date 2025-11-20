@@ -277,7 +277,7 @@ public class CronExpressionComposer extends Window {
 		map.put("SAT", I18N.message(SATURDAY));
 		map.put("SUN", I18N.message(SUNDAY));
 
-		SelectItem days = ItemFactory.newSelectItem("weekly-days", "ddays");
+		SelectItem days = ItemFactory.newSelectItem("weekly-days", "ddayspippo");
 		days.setWidth(200);
 		days.setMultiple(true);
 		days.setValueMap(map);
@@ -290,7 +290,7 @@ public class CronExpressionComposer extends Window {
 
 		ButtonItem generate = new ButtonItem(I18N.message(GENERATE));
 		generate.setStartRow(true);
-		generate.addClickHandler((ClickEvent event) -> onGenerate());
+		generate.addClickHandler(click -> onGenerate());
 
 		form.setFields(days, startsAt, new SpacerItem(), generate);
 
@@ -508,30 +508,30 @@ public class CronExpressionComposer extends Window {
 
 		int selectedTab = topTabSet.getSelectedTabNumber();
 		switch (selectedTab) {
-		case 0:
-			vm.getItem(EXPRESSION).setValue("0 0/" + vm.getValue("minutes-minute") + " * 1/1 * ? *");
-			break;
-		case 1:
-			generateHourly();
-			break;
-		case 2: {
-			generateDaily();
-			break;
-		}
-		case 3: {
-			generateWeekly();
-			break;
-		}
-		case 4: {
-			generateMonthly();
-			break;
-		}
-		case 5: {
-			generateYearly();
-			break;
-		}
-		default:
-			// do nothing
+			case 0:
+				vm.getItem(EXPRESSION).setValue("0 0/" + vm.getValue("minutes-minute") + " * 1/1 * ? *");
+				break;
+			case 1:
+				generateHourly();
+				break;
+			case 2: {
+				generateDaily();
+				break;
+			}
+			case 3: {
+				generateWeekly();
+				break;
+			}
+			case 4: {
+				generateMonthly();
+				break;
+			}
+			case 5: {
+				generateYearly();
+				break;
+			}
+			default:
+				// do nothing
 		}
 
 		InfoService.Instance.get().getCronDescription("" + vm.getItem(EXPRESSION).getValue(), I18N.getLocale(),

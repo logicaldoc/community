@@ -224,6 +224,8 @@ public class Menu {
 	public static final long ARTIFICIAL_INTELLIGENCE = 3000;
 
 	public static final long AI_MODELS = 3001;
+	
+	public static final long EMBEDDIGNS = 3002;
 
 	public static final long ADMIN_ROBOTS = 3010;
 

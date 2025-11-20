@@ -32,6 +32,14 @@ public class AIMenu extends VLayout {
 			models.addClickHandler(click -> AdminScreen.get().setContent(new ModelsAndSamplersPanel()));
 			addMember(models);
 		}
+		
+		if (Menu.enabled(Menu.EMBEDDIGNS)) {
+			Button models = new Button(I18N.message("embeddings"));
+			models.setWidth100();
+			models.setHeight(25);
+			models.addClickHandler(click -> AdminScreen.get().setContent(new ModelsAndSamplersPanel()));
+			addMember(models);
+		}
 
 		if (Menu.enabled(Menu.ADMIN_ROBOTS)) {
 			Button robots = new Button(I18N.message("robots"));
