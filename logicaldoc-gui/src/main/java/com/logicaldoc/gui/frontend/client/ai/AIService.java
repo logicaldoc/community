@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
+import com.logicaldoc.gui.frontend.client.ai.embedding.GUIEmbeddingScheme;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIQueryResult;
 import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
@@ -54,7 +55,7 @@ public interface AIService extends RemoteService {
 	public GUISampler getSampler(long samplerId) throws ServerException;
 
 	/**
-	 * Deletes a a set of models
+	 * Deletes a set of models
 	 * 
 	 * @param modelIds identifiers of the models to delete
 	 * 
@@ -117,12 +118,12 @@ public interface AIService extends RemoteService {
 	 * @param modelId identifier of the model
 	 * @param features ordered list of feature values
 	 * 
-	 * @return the list of predictions ordered by descending score 
+	 * @return the list of predictions ordered by descending score
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
 	public List<GUIQueryResult> query(long modelId, List<String> features) throws ServerException;
-	
+
 	/**
 	 * Imports a new model
 	 * 
@@ -133,7 +134,7 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIModel importModel(String modelName) throws ServerException;
-	
+
 	/**
 	 * Clones a model
 	 * 
@@ -145,7 +146,7 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIModel cloneModel(long modelId, String newName) throws ServerException;
-	
+
 	/**
 	 * Loads the statistics from of the AI
 	 * 
@@ -157,8 +158,7 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public List<GUIParameter> getStats(Long modelId, Long tenantId) throws ServerException;
-	
-	
+
 	/**
 	 * Loads all the settings related to the vector store
 	 * 
@@ -167,7 +167,7 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public List<GUIParameter> loadVectorStore() throws ServerException;
-	
+
 	/**
 	 * Saves all the settings related to the vector store
 	 * 
@@ -176,17 +176,57 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void saveVectorStore(List<GUIParameter> settings) throws ServerException;
-	
+
 	/**
 	 * Checks the connection to the vector store
 	 * 
-	 * @param settings The vector store's settings, they are not persisted but just used to test the connection
+	 * @param settings The vector store's settings, they are not persisted but
+	 *        just used to test the connection
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
 	public boolean testVectorStore(List<GUIParameter> settings) throws ServerException;
+
+	/**
+	 * Creates or updates a scheme
+	 * 
+	 * @param scheme the scheme to save
+	 * 
+	 * @return the saved scheme
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIEmbeddingScheme saveEmbeddingScheme(GUIEmbeddingScheme scheme) throws ServerException;
+
+	/**
+	 * Retrieves a scheme from the data layer
+	 * 
+	 * @param schemeId identifier of the scheme
+	 * 
+	 * @return the scheme
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIEmbeddingScheme getEmbeddingScheme(long schemeId) throws ServerException;
+
+	/**
+	 * Retrieves all the embedding schemes
+	 * 
+	 * @return the list of schemes
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<GUIEmbeddingScheme> getEmbeddingSchemes() throws ServerException;
 	
-	
+	/**
+	 * Deletes a set of schemes
+	 * 
+	 * @param schemeIds identifiers of the schemes to delete
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void deleteEmbeddingSchemes(List<Long> schemeIds) throws ServerException;
+
 	public static class Instance {
 		private static AIServiceAsync inst;
 

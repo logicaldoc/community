@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
+import com.logicaldoc.gui.frontend.client.ai.embedding.GUIEmbeddingScheme;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIQueryResult;
 import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
@@ -42,4 +43,13 @@ public interface AIServiceAsync {
 	void saveVectorStore(List<GUIParameter> settings, AsyncCallback<Void> callback) throws ServerException;
 
 	void testVectorStore(List<GUIParameter> settings, AsyncCallback<Boolean> callaback) throws ServerException;
+
+	void saveEmbeddingScheme(GUIEmbeddingScheme scheme, AsyncCallback<GUIEmbeddingScheme> callback)
+			throws ServerException;
+
+	void getEmbeddingScheme(long schemeId, AsyncCallback<GUIEmbeddingScheme> callback) throws ServerException;
+
+	void getEmbeddingSchemes(AsyncCallback<List<GUIEmbeddingScheme>> callback) throws ServerException;
+
+	void deleteEmbeddingSchemes(List<Long> schemeIds) throws ServerException;
 }
