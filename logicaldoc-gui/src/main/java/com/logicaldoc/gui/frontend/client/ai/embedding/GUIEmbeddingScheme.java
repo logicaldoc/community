@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class GUIEmbeddingScheme implements Serializable {
 
@@ -13,31 +12,17 @@ public class GUIEmbeddingScheme implements Serializable {
 
 	private String label;
 
-	private String description;
+	private String model;
 
-	private Long embedderId;
+	private Long modelId;
 
-	private String embedderName;
+	private String modelSpec;
 
-	private int dimensions;
+	private String apiKey;
 
-	private String language;
-
-	private String tokenizer;
+	private int chunksBatch = 50;
 
 	private boolean enabled = true;
-
-	private boolean defaultScheme = false;
-
-	private long embeddingsCount;
-
-	private long documentsIndexed;
-
-	private long tenantId;
-
-	private Date created;
-
-	private Date lastModified;
 
 	public GUIEmbeddingScheme() {
 	}
@@ -71,52 +56,44 @@ public class GUIEmbeddingScheme implements Serializable {
 		this.label = label;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getModel() {
+		return model;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setModel(String model) {
+		this.model = model;
 	}
 
-	public Long getEmbedderId() {
-		return embedderId;
+	public Long getModelId() {
+		return modelId;
 	}
 
-	public void setEmbedderId(Long embedderId) {
-		this.embedderId = embedderId;
+	public void setModelId(Long modelId) {
+		this.modelId = modelId;
 	}
 
-	public String getEmbedderName() {
-		return embedderName;
+	public String getModelSpec() {
+		return modelSpec;
 	}
 
-	public void setEmbedderName(String embedderName) {
-		this.embedderName = embedderName;
+	public void setModelSpec(String modelSpec) {
+		this.modelSpec = modelSpec;
 	}
 
-	public int getDimensions() {
-		return dimensions;
+	public String getApiKey() {
+		return apiKey;
 	}
 
-	public void setDimensions(int dimensions) {
-		this.dimensions = dimensions;
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
-	public String getLanguage() {
-		return language;
+	public int getChunksBatch() {
+		return chunksBatch;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
-	public String getTokenizer() {
-		return tokenizer;
-	}
-
-	public void setTokenizer(String tokenizer) {
-		this.tokenizer = tokenizer;
+	public void setChunksBatch(int chunksBatch) {
+		this.chunksBatch = chunksBatch;
 	}
 
 	public boolean isEnabled() {
@@ -126,53 +103,4 @@ public class GUIEmbeddingScheme implements Serializable {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-
-	public boolean isDefaultScheme() {
-		return defaultScheme;
-	}
-
-	public void setDefaultScheme(boolean defaultScheme) {
-		this.defaultScheme = defaultScheme;
-	}
-
-	public long getEmbeddingsCount() {
-		return embeddingsCount;
-	}
-
-	public void setEmbeddingsCount(long embeddingsCount) {
-		this.embeddingsCount = embeddingsCount;
-	}
-
-	public long getDocumentsIndexed() {
-		return documentsIndexed;
-	}
-
-	public void setDocumentsIndexed(long documentsIndexed) {
-		this.documentsIndexed = documentsIndexed;
-	}
-
-	public long getTenantId() {
-		return tenantId;
-	}
-
-	public void setTenantId(long tenantId) {
-		this.tenantId = tenantId;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
-	public Date getLastModified() {
-		return lastModified;
-	}
-
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
-
 }
