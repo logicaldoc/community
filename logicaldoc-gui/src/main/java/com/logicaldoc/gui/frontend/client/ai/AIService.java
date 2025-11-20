@@ -158,6 +158,35 @@ public interface AIService extends RemoteService {
 	 */
 	public List<GUIParameter> getStats(Long modelId, Long tenantId) throws ServerException;
 	
+	
+	/**
+	 * Loads all the settings related to the vector store
+	 * 
+	 * @return List of settings
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<GUIParameter> loadVectorStore() throws ServerException;
+	
+	/**
+	 * Saves all the settings related to the vector store
+	 * 
+	 * @param settings The vector store's settings
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void saveVectorStore(List<GUIParameter> settings) throws ServerException;
+	
+	/**
+	 * Checks the connection to the vector store
+	 * 
+	 * @param settings The vector store's settings, they are not persisted but just used to test the connection
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public boolean testVectorStore(List<GUIParameter> settings) throws ServerException;
+	
+	
 	public static class Instance {
 		private static AIServiceAsync inst;
 
