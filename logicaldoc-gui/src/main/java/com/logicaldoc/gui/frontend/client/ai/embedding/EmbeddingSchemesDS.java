@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.model;
+package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;

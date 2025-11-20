@@ -1,0 +1,210 @@
+package com.logicaldoc.gui.frontend.client.ai.embedding;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
+import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
+import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.frontend.client.ai.AIService;
+import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
+import com.logicaldoc.gui.frontend.client.ai.sampler.SamplersDS;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
+import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.layout.Layout;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+
+/**
+ * Panel showing the list of embedding schemes
+ * 
+ * @author Giuseppe Desiato - LogicalDOC
+ * @since 9.2.2
+ */
+public class EmbeddingSchemesPanel extends VLayout {
+
+	private static final String ID = "id";
+
+	private static final String LABEL = "label";
+
+	private static final String DESCRIPTION = "description";
+
+	protected Layout detailsContainer;
+
+	protected RefreshableListGrid list;
+
+	protected Canvas details = SELECT_EMBEDDINGSCHEME;
+
+	static final Canvas SELECT_EMBEDDINGSCHEME = new HTMLPanel("&nbsp;" + I18N.message("selectanembeddingscheme"));
+
+	public EmbeddingSchemesPanel() {
+		setWidth100();
+	}
+
+	@Override
+	public void onDraw() {
+		InfoPanel infoPanel = new InfoPanel("");
+
+		final Layout listing = new VLayout();
+		detailsContainer = new VLayout();
+		details = SELECT_EMBEDDINGSCHEME;
+
+		// Initialize the listing panel
+		listing.setAlign(Alignment.CENTER);
+		listing.setHeight("55%");
+		listing.setShowResizeBar(true);
+
+		ListGridField id = new IdListGridField();
+
+		ListGridField name = new ListGridField("name", I18N.message("name"));
+		name.setCanFilter(true);
+		name.setCanSort(true);
+		name.setMinWidth(110);
+		name.setAutoFit(AutoFitWidthApproach.BOTH);
+
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);
+		label.setCanFilter(true);
+		label.setCanSort(true);
+
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 300);
+		description.setCanFilter(true);
+		description.setCanSort(false);
+
+		ListGridField samplerTypeField = new ListGridField("type", I18N.message("type"));
+		samplerTypeField
+				.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("aiembeddingschemetype." + value));
+		samplerTypeField.setAutoFit(AutoFitWidthApproach.BOTH);
+
+		list = new RefreshableListGrid();
+		list.setEmptyMessage(I18N.message("notitemstoshow"));
+		list.setShowAllRecords(true);
+		list.setAutoFetchData(true);
+		list.setWidth100();
+		list.setHeight100();
+		list.setFields(id, name, label, samplerTypeField, description);
+		list.setSelectionType(SelectionStyle.SINGLE);
+		list.setShowRecordComponents(true);
+		list.setShowRecordComponentsByCell(true);
+		list.setCanFreezeFields(true);
+		list.setFilterOnKeypress(true);
+		list.setDataSource(new SamplersDS(null));
+
+		listing.addMember(infoPanel);
+		listing.addMember(list);
+
+		ToolStrip toolStrip = new ToolStrip();
+		toolStrip.setHeight(20);
+		toolStrip.setWidth100();
+		toolStrip.addSpacer(2);
+
+		ToolStripButton refresh = new ToolStripButton();
+		refresh.setTitle(I18N.message("refresh"));
+		refresh.addClickHandler(event -> {
+			list.refresh(new SamplersDS(null));
+			detailsContainer.removeMembers(detailsContainer.getMembers());
+			details = SELECT_EMBEDDINGSCHEME;
+			detailsContainer.setMembers(details);
+		});
+		toolStrip.addButton(refresh);
+
+		ToolStripButton add = new ToolStripButton();
+		add.setTitle(I18N.message("addsembeddingscheme"));
+		toolStrip.addButton(add);
+		add.addClickHandler(event -> onAddEmbeddingScheme());
+
+		toolStrip.addFill();
+
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
+		});
+
+		list.addSelectionChangedHandler(event -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				AIService.Instance.get().getSampler(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(GUISampler sampler) {
+//						showEmbeddingSchemeDetails(sampler);
+					}
+				});
+		});
+
+		list.addDataArrivedHandler(event -> infoPanel
+				.setMessage(I18N.message("showsembeddingsechemes", Integer.toString(list.getTotalRows()))));
+
+		detailsContainer.setAlign(Alignment.CENTER);
+		detailsContainer.addMember(details);
+
+		setMembers(toolStrip, listing, detailsContainer);
+	}
+
+	private void showContextMenu() {
+		Menu contextMenu = new Menu();
+
+		final ListGridRecord[] selection = list.getSelectedRecords();
+		List<Long> ids = new ArrayList<>();
+		for (ListGridRecord rec : selection)
+			ids.add(rec.getAttributeAsLong("id"));
+
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+//		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+//			if (Boolean.TRUE.equals(confirm)) {
+//				AIService.Instance.get().deleteEmbeddingSchemes(ids, new DefaultAsyncCallback<>() {
+//					@Override
+//					public void handleSuccess(Void result) {
+//						list.removeSelectedData();
+//						list.deselectAllRecords();
+//						showEmbeddingSchemeDetails(null);
+//					}
+//				});
+//			}
+//		}));
+ 
+		contextMenu.setItems(delete);
+		contextMenu.showContextMenu();
+	}
+
+	protected void showEmbeddingSchemeDetails(GUIEmbeddingScheme embeddingScheme) {
+		detailsContainer.removeMember(details);
+//		if (embeddingScheme != null)
+//			details = new EmbeddingSchemeDetailsPanel(this);
+//		else
+//			details = SELECT_EMBEDDINGSCHEME;
+//		detailsContainer.addMember(details);
+//		((EmbeddingSchemesPanel) details).setEmbeddingScheme(embeddingScheme);
+	}
+
+	public ListGrid getList() {
+		return list;
+	}
+
+	protected void onAddEmbeddingScheme() {
+		list.deselectAllRecords();
+		showEmbeddingSchemeDetails(new GUIEmbeddingScheme());
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+}
