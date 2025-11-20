@@ -24,6 +24,12 @@ public class GUIEmbeddingScheme implements Serializable {
 
 	private boolean enabled = true;
 
+	private String type = "mariadb";
+
+	private Integer vectorSize;
+
+	private Integer batch;
+
 	public GUIEmbeddingScheme() {
 	}
 
@@ -102,5 +108,29 @@ public class GUIEmbeddingScheme implements Serializable {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Integer getVectorSize() {
+		return vectorSize;
+	}
+
+	public void setVectorSize(Integer vectorSize) {
+		this.vectorSize = vectorSize;
+	}
+
+	public Integer getBatch() {
+		return batch;
+	}
+
+	public void setBatch(Integer batch) {
+		this.batch = batch;
 	}
 }
