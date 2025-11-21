@@ -188,6 +188,16 @@ public interface AIService extends RemoteService {
 	public boolean testVectorStore(List<GUIParameter> settings) throws ServerException;
 
 	/**
+	 * Enables / Disables an embedding scheme
+	 * 
+	 * @param schemeId Identifier of the scheme
+	 * @param enabled new status
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void enableEmbeddingScheme(long schemeId, boolean enabled) throws ServerException;
+	
+	/**
 	 * Creates or updates a scheme
 	 * 
 	 * @param scheme the scheme to save

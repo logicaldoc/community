@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.ai;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.frontend.client.ai.embedding.GUIEmbeddingScheme;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
@@ -45,6 +44,8 @@ public interface AIServiceAsync {
 	void testVectorStore(List<GUIParameter> settings, AsyncCallback<Boolean> callaback);
 
 	void saveEmbeddingScheme(GUIEmbeddingScheme scheme, AsyncCallback<GUIEmbeddingScheme> callback);
+
+	void enableEmbeddingScheme(long schemeId, boolean enabled, AsyncCallback<Void> callback);
 
 	void getEmbeddingScheme(long schemeId, AsyncCallback<GUIEmbeddingScheme> callback);
 
