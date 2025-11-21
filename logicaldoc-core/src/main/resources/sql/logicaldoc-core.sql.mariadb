@@ -353,6 +353,7 @@ create index LD_UHIST_UID on ld_user_history (ld_userid);
 create index LD_TAG_TAG on ld_tag (ld_tag);
 create index LD_FTAG_TAG on ld_foldertag (ld_tag);
 create index LD_EXT_NAME on ld_document_ext (ld_name);
+create index LD_EXT_TYPE on ld_document_ext(ld_type);
 create index LD_FLD_NAME on ld_folder (ld_name);
 create index LD_FLD_PATH on ld_folder (ld_path);
 create index LD_FLD_FOLDREF on ld_folder (ld_foldref);

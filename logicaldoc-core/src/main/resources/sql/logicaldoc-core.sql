@@ -358,6 +358,7 @@ create index LD_UHIST_UID on ld_user_history (ld_userid);
 create index LD_TAG_TAG on ld_tag (ld_tag);
 create index LD_FTAG_TAG on ld_foldertag (ld_tag);
 create index LD_EXT_NAME on ld_document_ext (ld_name);
+create index LD_EXT_TYPE on ld_document_ext(ld_type);
 create index LD_FLD_NAME on ld_folder (ld_name);
 create index LD_FLD_PATH on ld_folder (ld_path);
 create index LD_FLD_FOLDREF on ld_folder (ld_foldref);
@@ -365,7 +366,6 @@ create index LD_RCP_MID_NAME on ld_recipient (ld_messageid, ld_name);
 create index LD_DEV_USERID on ld_device (ld_userid);
 create index LD_PHIST_USERID on ld_password_history (ld_userid);
 create index LD_APIKEY_USERID on ld_apikey (ld_userid);
-
 
 insert into ld_tenant(ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion)
 values     (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,'default','Default',0,1,null,1);
