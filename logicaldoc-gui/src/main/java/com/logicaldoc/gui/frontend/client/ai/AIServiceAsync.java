@@ -38,18 +38,17 @@ public interface AIServiceAsync {
 
 	void getStats(Long modelId, Long tenantId, AsyncCallback<List<GUIParameter>> callaback);
 
-	void loadVectorStore(AsyncCallback<List<GUIParameter>> callaback) throws ServerException;
+	void loadVectorStore(AsyncCallback<List<GUIParameter>> callaback);
 
-	void saveVectorStore(List<GUIParameter> settings, AsyncCallback<Void> callback) throws ServerException;
+	void saveVectorStore(List<GUIParameter> settings, AsyncCallback<Void> callback);
 
-	void testVectorStore(List<GUIParameter> settings, AsyncCallback<Boolean> callaback) throws ServerException;
+	void testVectorStore(List<GUIParameter> settings, AsyncCallback<Boolean> callaback);
 
-	void saveEmbeddingScheme(GUIEmbeddingScheme scheme, AsyncCallback<GUIEmbeddingScheme> callback)
-			throws ServerException;
+	void saveEmbeddingScheme(GUIEmbeddingScheme scheme, AsyncCallback<GUIEmbeddingScheme> callback);
 
-	void getEmbeddingScheme(long schemeId, AsyncCallback<GUIEmbeddingScheme> callback) throws ServerException;
+	void getEmbeddingScheme(long schemeId, AsyncCallback<GUIEmbeddingScheme> callback);
 
-	void getEmbeddingSchemes(AsyncCallback<List<GUIEmbeddingScheme>> callback) throws ServerException;
+	void getEmbeddingSchemes(AsyncCallback<List<GUIEmbeddingScheme>> callback);
 
-	void deleteEmbeddingSchemes(List<Long> schemeIds) throws ServerException;
+	void deleteEmbeddingSchemes(List<Long> schemeIds, AsyncCallback<Void> callback);
 }
