@@ -13,9 +13,11 @@ import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
 import com.logicaldoc.gui.frontend.client.ai.sampler.SamplersDS;
+import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.AutoFitWidthApproach;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -35,8 +37,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 9.2.2
  */
 public class EmbeddingSchemesPanel extends VLayout {
-
-	private static final String ID = "id";
 
 	private static final String LABEL = "label";
 
@@ -162,35 +162,67 @@ public class EmbeddingSchemesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-//		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
-//			if (Boolean.TRUE.equals(confirm)) {
-//				AIService.Instance.get().deleteEmbeddingSchemes(ids, new DefaultAsyncCallback<>() {
-//					@Override
-//					public void handleSuccess(Void result) {
-//						list.removeSelectedData();
-//						list.deselectAllRecords();
-//						showEmbeddingSchemeDetails(null);
-//					}
-//				});
-//			}
-//		}));
- 
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				AIService.Instance.get().deleteEmbeddingSchemes(ids, new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showEmbeddingSchemeDetails(null);
+					}
+				});
+			}
+		}));
+
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
 	}
 
 	protected void showEmbeddingSchemeDetails(GUIEmbeddingScheme embeddingScheme) {
 		detailsContainer.removeMember(details);
-//		if (embeddingScheme != null)
-//			details = new EmbeddingSchemeDetailsPanel(this);
-//		else
-//			details = SELECT_EMBEDDINGSCHEME;
-//		detailsContainer.addMember(details);
-//		((EmbeddingSchemesPanel) details).setEmbeddingScheme(embeddingScheme);
+		if (embeddingScheme != null)
+			details = new EmbeddingSchemeDetailsPanel(this);
+		else
+			details = SELECT_EMBEDDINGSCHEME;
+		detailsContainer.addMember(details);
+		((EmbeddingSchemeDetailsPanel) details).setEmbeddingScheme(embeddingScheme);
+	}
+
+	protected void showSamplerDetails(GUIEmbeddingScheme embeddingScheme) {
+		detailsContainer.removeMember(details);
+		if (embeddingScheme != null)
+			details = new EmbeddingSchemeDetailsPanel(this);
+		else
+			details = SELECT_EMBEDDINGSCHEME;
+		detailsContainer.addMember(details);
+		((EmbeddingSchemeDetailsPanel) details).setEmbeddingScheme(embeddingScheme);
 	}
 
 	public ListGrid getList() {
 		return list;
+	}
+
+	/**
+	 * Updates the selected rec with new data
+	 * 
+	 * @param embeddingScheme the embeddingScheme to take data from
+	 */
+	public void updateRecord(GUIEmbeddingScheme embeddingScheme) {
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, embeddingScheme.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", embeddingScheme.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
+		}
+
+		rec.setAttribute("name", embeddingScheme.getName());
+		rec.setAttribute(LABEL,
+				embeddingScheme.getLabel() != null ? embeddingScheme.getLabel() : embeddingScheme.getName());
+		list.refreshRow(list.getRecordIndex(rec));
+
 	}
 
 	protected void onAddEmbeddingScheme() {

@@ -2,6 +2,12 @@ package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import java.io.Serializable;
 
+/**
+ * A GUI bean representing an embedding scheme
+ * 
+ * @author Giuseppe Desiato - LogicalDOC
+ * @since 9.2.2
+ */
 public class GUIEmbeddingScheme implements Serializable {
 
 	private static final long serialVersionUID = 1L;
