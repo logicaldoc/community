@@ -16,7 +16,9 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -46,28 +48,62 @@ public class VectorStoresPanel extends VLayout {
 	}
 
 	void initGUI(List<GUIParameter> settings) {
+		// Url
 		TextItem url = ItemFactory.newTextItem("url", Util.getValue("url", settings));
+		url.setWidth(250);
 		url.setRequired(true);
 
-		DynamicForm parametersForm = new DynamicForm();
-		parametersForm.setValuesManager(vm);
-		parametersForm.setTitleOrientation(TitleOrientation.LEFT);
-		parametersForm.setNumCols(2);
-		parametersForm.setColWidths(1, "*");
-		parametersForm.setPadding(5);
-		parametersForm.setItems(url);
-		addMember(parametersForm);
+		// Username
+		TextItem username = ItemFactory.newTextItem("username", Util.getValue("username", settings));
+		username.setRequired(false);
 
+		// Password
+		PasswordItem password = ItemFactory.newPasswordItem("password", "Password", null);
+		password.setRequired(false);
+
+		DynamicForm mariadbForm = new DynamicForm();
+		mariadbForm.setValuesManager(vm);
+		mariadbForm.setTitleOrientation(TitleOrientation.LEFT);
+		mariadbForm.setNumCols(2);
+		mariadbForm.setPadding(5);
+		mariadbForm.setIsGroup(true);
+		mariadbForm.setGroupTitle("MariaDB");
+		mariadbForm.setFields(url, username, password);
+
+		addMember(mariadbForm);
+
+		HLayout buttons = new HLayout(10);
+
+		// Test button
+		IButton testButton = new IButton(I18N.message("test"));
+		testButton.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(vm.validate())) {
+				List<GUIParameter> params = collectSettings();
+
+				AIService.Instance.get().testVectorStore(params, new DefaultAsyncCallback<Boolean>() {
+					@Override
+					protected void handleSuccess(Boolean result) {
+						if (Boolean.TRUE.equals(result))
+							GuiLog.info(I18N.message("connectionok"));
+						else
+							GuiLog.error(I18N.message("connectionfailed"));
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+				});
+			}
+		});
+
+		// Save Button
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				if (Boolean.TRUE.equals(vm.validate())) {
-					List<GUIParameter> params = new ArrayList<>();
-
-					params.add(new GUIParameter("url", vm.getValueAsString("url")));
-					AIService.Instance.get().saveVectorStore(params, new DefaultAsyncCallback<Void>() {
-
+					AIService.Instance.get().saveVectorStore(collectSettings(), new DefaultAsyncCallback<Void>() {
 						@Override
 						protected void handleSuccess(Void result) {
 							GuiLog.info(I18N.message("settingssaved"), null);
@@ -87,5 +123,15 @@ public class VectorStoresPanel extends VLayout {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+
+	private List<GUIParameter> collectSettings() {
+		List<GUIParameter> params = new ArrayList<>();
+
+		params.add(new GUIParameter("url", vm.getValueAsString("url")));
+		params.add(new GUIParameter("username", vm.getValueAsString("username")));
+		params.add(new GUIParameter("password", vm.getValueAsString("password")));
+
+		return params;
 	}
 }

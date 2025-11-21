@@ -102,7 +102,7 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 					tabSet.hideSave();
 					if (embeddingScheme != null) {
 						embeddingSchemesPanel.updateRecord(embeddingScheme);
-						embeddingSchemesPanel.showSamplerDetails(embeddingScheme);
+						embeddingSchemesPanel.showEmbeddingSchemeDetails(embeddingScheme);
 					}
 				}
 			});

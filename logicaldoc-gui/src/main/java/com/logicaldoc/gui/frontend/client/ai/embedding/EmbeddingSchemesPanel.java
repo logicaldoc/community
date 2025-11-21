@@ -11,8 +11,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
-import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
-import com.logicaldoc.gui.frontend.client.ai.sampler.SamplersDS;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -83,10 +81,10 @@ public class EmbeddingSchemesPanel extends VLayout {
 		description.setCanFilter(true);
 		description.setCanSort(false);
 
-		ListGridField samplerTypeField = new ListGridField("type", I18N.message("type"));
-		samplerTypeField
+		ListGridField embeddingSchemeTypeField = new ListGridField("type", I18N.message("type"));
+		embeddingSchemeTypeField
 				.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("aiembeddingschemetype." + value));
-		samplerTypeField.setAutoFit(AutoFitWidthApproach.BOTH);
+		embeddingSchemeTypeField.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -94,13 +92,13 @@ public class EmbeddingSchemesPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, samplerTypeField, description);
+		list.setFields(id, name, label, embeddingSchemeTypeField, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new SamplersDS(null));
+		list.setDataSource(new EmbeddingSchemesDS(null));
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -113,7 +111,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		refresh.addClickHandler(event -> {
-			list.refresh(new SamplersDS(null));
+			list.refresh(new EmbeddingSchemesDS(null));
 			detailsContainer.removeMembers(detailsContainer.getMembers());
 			details = SELECT_EMBEDDINGSCHEME;
 			detailsContainer.setMembers(details);
@@ -121,7 +119,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		toolStrip.addButton(refresh);
 
 		ToolStripButton add = new ToolStripButton();
-		add.setTitle(I18N.message("addsembeddingscheme"));
+		add.setTitle(I18N.message("addembeddingscheme"));
 		toolStrip.addButton(add);
 		add.addClickHandler(event -> onAddEmbeddingScheme());
 
@@ -135,16 +133,17 @@ public class EmbeddingSchemesPanel extends VLayout {
 		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				AIService.Instance.get().getSampler(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+				AIService.Instance.get().getEmbeddingScheme(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void handleSuccess(GUISampler sampler) {
-//						showEmbeddingSchemeDetails(sampler);
+					protected void handleSuccess(GUIEmbeddingScheme result) {
+						showEmbeddingSchemeDetails(result);
+
 					}
 				});
 		});
 
 		list.addDataArrivedHandler(event -> infoPanel
-				.setMessage(I18N.message("showsembeddingsechemes", Integer.toString(list.getTotalRows()))));
+				.setMessage(I18N.message("showembeddingsechemes", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -189,7 +188,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		((EmbeddingSchemeDetailsPanel) details).setEmbeddingScheme(embeddingScheme);
 	}
 
-	protected void showSamplerDetails(GUIEmbeddingScheme embeddingScheme) {
+	protected void showEmbeddingSchemesDetails(GUIEmbeddingScheme embeddingScheme) {
 		detailsContainer.removeMember(details);
 		if (embeddingScheme != null)
 			details = new EmbeddingSchemeDetailsPanel(this);

@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.ai;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
+import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingsAndVectorStorePanel;
 import com.logicaldoc.gui.frontend.client.ai.robot.RobotsPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
@@ -37,7 +38,7 @@ public class AIMenu extends VLayout {
 			Button models = new Button(I18N.message("embeddings"));
 			models.setWidth100();
 			models.setHeight(25);
-			models.addClickHandler(click -> AdminScreen.get().setContent(new ModelsAndSamplersPanel()));
+			models.addClickHandler(click -> AdminScreen.get().setContent(new EmbeddingsAndVectorStorePanel()));
 			addMember(models);
 		}
 
