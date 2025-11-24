@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceDateTimeField;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -27,12 +27,11 @@ public class EmbeddingSchemesDS extends DataSource {
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField typeField = new DataSourceTextField("type");
-		DataSourceDateTimeField enabled = new DataSourceDateTimeField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("enabled");
 		DataSourceTextField model = new DataSourceTextField("model");
 		DataSourceTextField modelSpec = new DataSourceTextField("modelspec");
 		DataSourceTextField modelId = new DataSourceTextField("modelid");
-
-		setFields(id, name, label, enabled, typeField, model, modelSpec, modelId);
+		setFields(id, name, label, typeField, enabled, model, modelSpec, modelId);
 		setClientOnly(true);
 
 		setDataURL("data/ai.xml?object=embeddingscheme" + (type != null ? "&type=" + type : ""));

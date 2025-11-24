@@ -1,11 +1,9 @@
 package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -62,11 +60,8 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		label.addChangedHandler(changedHandler);
 
 		// Embedding model selector
-		SelectItem model = ItemFactory.newSelectItem("modelId");
-		model.setOptionDataSource(new ModelsDS());
-		model.setValueField("id");
-		model.setDisplayField("name");
-		model.setValue(embeddingScheme.getModelId());
+		TextItem model = ItemFactory.newTextItem("model", embeddingScheme.getModel());
+		model.setRequired(true);
 		model.addChangedHandler(changedHandler);
 
 		// Model Spec
@@ -101,6 +96,7 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		if (form.validate()) {
 			embeddingScheme.setName(form.getValueAsString("name"));
 			embeddingScheme.setLabel(form.getValueAsString("label"));
+			embeddingScheme.setModel(form.getValueAsString("model"));
 			embeddingScheme.setModelSpec(form.getValueAsString("modelspec"));
 			embeddingScheme.setApiKey(form.getValueAsString("apikey"));
 			embeddingScheme.setChunksBatch(Integer.parseInt(form.getValueAsString("chunksBatch")));
