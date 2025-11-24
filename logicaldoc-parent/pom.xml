@@ -4,7 +4,7 @@
     <artifactId>logicaldoc-parent</artifactId>
     <name>LogicalDOC Parent POM</name>
     <packaging>pom</packaging>
-    <version>112</version>
+    <version>113</version>
     <scm>
         <connection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</connection>
         <developerConnection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</developerConnection>
