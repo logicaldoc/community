@@ -14,7 +14,7 @@ import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.AutoFitWidthApproach;
+import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
@@ -37,8 +37,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class EmbeddingSchemesPanel extends VLayout {
 
 	private static final String LABEL = "label";
-
-	private static final String DESCRIPTION = "description";
 
 	protected Layout detailsContainer;
 
@@ -71,20 +69,22 @@ public class EmbeddingSchemesPanel extends VLayout {
 		name.setCanFilter(true);
 		name.setCanSort(true);
 		name.setMinWidth(110);
-		name.setAutoFit(AutoFitWidthApproach.BOTH);
 
-		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);
+		ListGridField label = new ListGridField("label", I18N.message("label"));
 		label.setCanFilter(true);
 		label.setCanSort(true);
 
-		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 300);
-		description.setCanFilter(true);
-		description.setCanSort(false);
+		ListGridField type = new ListGridField("type", I18N.message("type"));
+		type.setCanFilter(true);
+		type.setCanSort(true);
 
-		ListGridField embeddingSchemeTypeField = new ListGridField("type", I18N.message("type"));
-		embeddingSchemeTypeField
-				.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("aiembeddingschemetype." + value));
-		embeddingSchemeTypeField.setAutoFit(AutoFitWidthApproach.BOTH);
+		ListGridField model = new ListGridField("model", I18N.message("model"));
+		model.setCanFilter(true);
+		model.setCanSort(true);
+
+		ListGridField enabled = new ListGridField("enabled", I18N.message("enabled"));
+		enabled.setType(ListGridFieldType.BOOLEAN);
+		enabled.setWidth(90);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -92,7 +92,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, embeddingSchemeTypeField, description);
+		list.setFields(id, name, label, type, model, enabled);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);

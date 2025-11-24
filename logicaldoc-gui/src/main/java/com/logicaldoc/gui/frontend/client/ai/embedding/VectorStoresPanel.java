@@ -16,6 +16,8 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.CanvasItem;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -50,8 +52,16 @@ public class VectorStoresPanel extends VLayout {
 	void initGUI(List<GUIParameter> settings) {
 		// Url
 		TextItem url = ItemFactory.newTextItem("url", Util.getValue("url", settings));
-		url.setWidth(250);
+		url.setWidth(300);
 		url.setRequired(true);
+		url.setHint("jdbc:mariadb://host:port/database");
+		url.setShowHintInField(true);
+
+		FormItemIcon composer = new FormItemIcon();
+		composer.setPrompt(I18N.message("opencronexpressioncomposer"));
+		composer.setSrc("[SKIN]/icons/calendar-lines-pen.png");
+		composer.addFormItemClickHandler(click -> new MariaDBComposer(url).show());
+		url.setIcons(composer);
 
 		// Username
 		TextItem username = ItemFactory.newTextItem("username", Util.getValue("username", settings));
@@ -61,21 +71,8 @@ public class VectorStoresPanel extends VLayout {
 		PasswordItem password = ItemFactory.newPasswordItem("password", "Password", null);
 		password.setRequired(false);
 
-		DynamicForm mariadbForm = new DynamicForm();
-		mariadbForm.setValuesManager(vm);
-		mariadbForm.setTitleOrientation(TitleOrientation.LEFT);
-		mariadbForm.setNumCols(2);
-		mariadbForm.setPadding(5);
-		mariadbForm.setIsGroup(true);
-		mariadbForm.setGroupTitle("MariaDB");
-		mariadbForm.setFields(url, username, password);
-
-		addMember(mariadbForm);
-
-		HLayout buttons = new HLayout(10);
-
 		// Test button
-		IButton testButton = new IButton(I18N.message("test"));
+		IButton testButton = new IButton(I18N.message("Test DB Connection"));
 		testButton.addClickHandler(event -> {
 			if (Boolean.TRUE.equals(vm.validate())) {
 				List<GUIParameter> params = collectSettings();
@@ -96,6 +93,28 @@ public class VectorStoresPanel extends VLayout {
 				});
 			}
 		});
+
+		CanvasItem testItem = new CanvasItem("testButton");
+		testItem.setShowTitle(false);
+		testItem.setColSpan(2);
+		testItem.setShouldSaveValue(false);
+		testItem.setHeight(30);
+
+		// Button needs a layout container inside CanvasItem
+		HLayout testButtonLayout = new HLayout();
+		testButtonLayout.setMembers(testButton);
+		testItem.setCanvas(testButtonLayout);
+
+		DynamicForm mariadbForm = new DynamicForm();
+		mariadbForm.setValuesManager(vm);
+		mariadbForm.setTitleOrientation(TitleOrientation.LEFT);
+		mariadbForm.setNumCols(2);
+		mariadbForm.setPadding(5);
+		mariadbForm.setIsGroup(true);
+		mariadbForm.setGroupTitle("MariaDB");
+		mariadbForm.setFields(url, username, password, testItem);
+
+		addMember(mariadbForm);
 
 		// Save Button
 		IButton save = new IButton();
