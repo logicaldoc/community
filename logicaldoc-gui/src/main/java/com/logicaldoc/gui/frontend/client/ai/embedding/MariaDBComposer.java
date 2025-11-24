@@ -6,7 +6,9 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -26,9 +28,9 @@ public class MariaDBComposer extends Window {
 		this.sourceItem = sourceItem;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("mariadburlomposer"));
-		setWidth(650);
-		setHeight(400);
+		setTitle(I18N.message("mariadburlcomposer"));
+		setHeight(160);
+		setWidth(450);
 
 		setCanDragResize(true);
 		setIsModal(true);
@@ -42,16 +44,25 @@ public class MariaDBComposer extends Window {
 		host.setWidth(300);
 		host.setRequired(true);
 
+		SpinnerItem port = ItemFactory.newSpinnerItem("port", 3306);
+		port.setMin(1);
+		port.setStep(1);
+		port.setRequired(true);
+
+		TextItem database = ItemFactory.newTextItem("database", null);
+		database.setRequired(true);
+
 		DynamicForm form = new DynamicForm();
 		form.setNumCols(1);
 		form.setWidth(1);
-		form.setItems(host);
+		form.setItems(host, port, database);
 
 		ToolStripButton generate = new ToolStripButton(I18N.message("generate"));
-		generate.addClickHandler(click  -> {
+		generate.addClickHandler(click -> {
 			if (sourceItem != null) {
 				sourceItem.clearErrors();
-				sourceItem.setValue("jdbc:mariadb://%s".formatted(form.getValueAsString("host")));
+				sourceItem.setValue("jdbc:mariadb://" + form.getValueAsString("host") + ":"
+						+ form.getValueAsString("port") + "/" + form.getValueAsString("database"));
 				destroy();
 			}
 		});
@@ -65,7 +76,11 @@ public class MariaDBComposer extends Window {
 		toolStrip.addSeparator();
 		toolStrip.addButton(close);
 
+		VLayout spacer=new VLayout();
+		spacer.setHeight(8);
+		
 		addItem(form);
+		addItem(spacer);
 		addItem(toolStrip);
 	}
 }

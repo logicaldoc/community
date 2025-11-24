@@ -11,16 +11,16 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.CanvasItem;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -58,21 +58,22 @@ public class VectorStoresPanel extends VLayout {
 		url.setShowHintInField(true);
 
 		FormItemIcon composer = new FormItemIcon();
-		composer.setPrompt(I18N.message("opencronexpressioncomposer"));
-		composer.setSrc("[SKIN]/icons/calendar-lines-pen.png");
+		composer.setPrompt(I18N.message("mariadburlcomposer"));
+		composer.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
 		composer.addFormItemClickHandler(click -> new MariaDBComposer(url).show());
 		url.setIcons(composer);
 
 		// Username
-		TextItem username = ItemFactory.newTextItem("username", Util.getValue("username", settings));
+		TextItem username = ItemFactory.newTextItem("username", null);
 		username.setRequired(false);
 
 		// Password
-		PasswordItem password = ItemFactory.newPasswordItem("password", "Password", null);
+		PasswordItem password = ItemFactory.newPasswordItem("password", "Password",
+				Util.getValue("password", settings));
 		password.setRequired(false);
 
 		// Test button
-		IButton testButton = new IButton(I18N.message("Test DB Connection"));
+		ButtonItem testButton = new ButtonItem(I18N.message("testconnection"));
 		testButton.addClickHandler(event -> {
 			if (Boolean.TRUE.equals(vm.validate())) {
 				List<GUIParameter> params = collectSettings();
@@ -81,9 +82,9 @@ public class VectorStoresPanel extends VLayout {
 					@Override
 					protected void handleSuccess(Boolean result) {
 						if (Boolean.TRUE.equals(result))
-							GuiLog.info(I18N.message("connectionok"));
+							SC.say(I18N.message("connectionestablished"));
 						else
-							GuiLog.error(I18N.message("connectionfailed"));
+							SC.warn(I18N.message("connectionfailed"));
 					}
 
 					@Override
@@ -94,17 +95,6 @@ public class VectorStoresPanel extends VLayout {
 			}
 		});
 
-		CanvasItem testItem = new CanvasItem("testButton");
-		testItem.setShowTitle(false);
-		testItem.setColSpan(2);
-		testItem.setShouldSaveValue(false);
-		testItem.setHeight(30);
-
-		// Button needs a layout container inside CanvasItem
-		HLayout testButtonLayout = new HLayout();
-		testButtonLayout.setMembers(testButton);
-		testItem.setCanvas(testButtonLayout);
-
 		DynamicForm mariadbForm = new DynamicForm();
 		mariadbForm.setValuesManager(vm);
 		mariadbForm.setTitleOrientation(TitleOrientation.LEFT);
@@ -112,7 +102,7 @@ public class VectorStoresPanel extends VLayout {
 		mariadbForm.setPadding(5);
 		mariadbForm.setIsGroup(true);
 		mariadbForm.setGroupTitle("MariaDB");
-		mariadbForm.setFields(url, username, password, testItem);
+		mariadbForm.setFields(url, username, password, testButton);
 
 		addMember(mariadbForm);
 
