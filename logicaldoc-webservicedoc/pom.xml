@@ -11,11 +11,6 @@
 	<artifactId>logicaldoc-webservicedoc</artifactId>
 	<name>logicaldoc-webservicedoc</name>
 	<packaging>jar</packaging>
-	<properties>
-		<cxf.swagger.ui.version>5.30.2</cxf.swagger.ui.version>
-		<cxf.swagger.v3.version>2.2.40</cxf.swagger.v3.version>
-		<cxf.rs-service-description.version>4.0.8</cxf.rs-service-description.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
@@ -61,17 +56,17 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-			<version>${cxf.rs-service-description.version}</version>
+			<version>${cxf.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-swagger-ui</artifactId>
-			<version>${cxf.rs-service-description.version}</version>
+			<version>${cxf.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-common-openapi</artifactId>
-			<version>${cxf.rs-service-description.version}</version>
+			<version>${cxf.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jpf</groupId>
@@ -102,25 +97,25 @@
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-jaxrs2-jakarta</artifactId>
-			<version>${cxf.swagger.v3.version}</version>
+			<version>${swagger.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.xml.bind</groupId>
 					<artifactId>jaxb-api</artifactId>
 				</exclusion>
-			</exclusions>
+			</exclusions> 
 		</dependency>
 
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-annotations-jakarta</artifactId>
-			<version>${cxf.swagger.v3.version}</version>
+			<version>${swagger.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>swagger-ui</artifactId>
-			<version>${cxf.swagger.ui.version}</version>
+			<version>5.30.2</version>
 		</dependency>
 		
 		<dependency>
@@ -202,6 +197,13 @@
 			<artifactId>spring-context-support</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>2.5</version>
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>
