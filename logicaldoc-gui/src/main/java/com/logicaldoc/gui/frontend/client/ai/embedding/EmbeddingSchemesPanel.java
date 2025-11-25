@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -14,7 +15,7 @@ import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
@@ -35,6 +36,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 9.2.2
  */
 public class EmbeddingSchemesPanel extends VLayout {
+
+	private static final String ENABLED = "eenabled";
 
 	private static final String LABEL = "label";
 
@@ -63,12 +66,15 @@ public class EmbeddingSchemesPanel extends VLayout {
 		listing.setHeight("55%");
 		listing.setShowResizeBar(true);
 
+		ListGridField enabled = new EnabledListGridField();
+
 		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setCanFilter(true);
 		name.setCanSort(true);
 		name.setMinWidth(110);
+		name.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		ListGridField label = new ListGridField("label", I18N.message("label"));
 		label.setCanFilter(true);
@@ -81,10 +87,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		ListGridField model = new ListGridField("model", I18N.message("model"));
 		model.setCanFilter(true);
 		model.setCanSort(true);
-
-		ListGridField enabled = new ListGridField("enabled", I18N.message("enabled"));
-		enabled.setType(ListGridFieldType.BOOLEAN);
-		enabled.setWidth(90);
+		label.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -92,7 +95,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, type, model, enabled);
+		list.setFields(enabled, id, name, label, type, model);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -159,6 +162,8 @@ public class EmbeddingSchemesPanel extends VLayout {
 		for (ListGridRecord rec : selection)
 			ids.add(rec.getAttributeAsLong("id"));
 
+		Long selectedEmbeddingId = selection[0].getAttributeAsLong("id");
+
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
@@ -174,7 +179,31 @@ public class EmbeddingSchemesPanel extends VLayout {
 			}
 		}));
 
-		contextMenu.setItems(delete);
+		MenuItem enable = new MenuItem();
+		enable.setTitle(I18N.message("enable"));
+		enable.addClickHandler(
+				event -> AIService.Instance.get().enable(selectedEmbeddingId, true, new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(Void result) {
+						list.getSelectedRecord().setAttribute(ENABLED, true);
+						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+					}
+				}));
+		enable.setEnabled(!list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
+
+		MenuItem disable = new MenuItem();
+		disable.setTitle(I18N.message("disable"));
+		disable.addClickHandler(
+				event -> AIService.Instance.get().enable(selectedEmbeddingId, false, new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(Void result) {
+						list.getSelectedRecord().setAttribute(ENABLED, false);
+						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+					}
+				}));
+		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
+
+		contextMenu.setItems(delete, enable, disable);
 		contextMenu.showContextMenu();
 	}
 
@@ -220,6 +249,11 @@ public class EmbeddingSchemesPanel extends VLayout {
 		rec.setAttribute("name", embeddingScheme.getName());
 		rec.setAttribute(LABEL,
 				embeddingScheme.getLabel() != null ? embeddingScheme.getLabel() : embeddingScheme.getName());
+
+		rec.setAttribute("type", embeddingScheme.getType());
+		rec.setAttribute("eenabled", embeddingScheme.isEnabled());
+		rec.setAttribute("model", embeddingScheme.getModel());
+
 		list.refreshRow(list.getRecordIndex(rec));
 
 	}

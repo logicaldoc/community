@@ -52,4 +52,6 @@ public interface AIServiceAsync {
 	void getEmbeddingSchemes(AsyncCallback<List<GUIEmbeddingScheme>> callback);
 
 	void deleteEmbeddingSchemes(List<Long> schemeIds, AsyncCallback<Void> callback);
+	
+	void enable(long schemeId, boolean enable, AsyncCallback<Void> callback);
 }

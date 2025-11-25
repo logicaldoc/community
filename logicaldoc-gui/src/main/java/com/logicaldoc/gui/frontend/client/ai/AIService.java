@@ -196,7 +196,7 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void enableEmbeddingScheme(long schemeId, boolean enabled) throws ServerException;
-	
+
 	/**
 	 * Creates or updates a scheme
 	 * 
@@ -227,7 +227,17 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public List<GUIEmbeddingScheme> getEmbeddingSchemes() throws ServerException;
-	
+
+	/**
+	 * Enables/Disabled a robot
+	 * 
+	 * @param schemeId Identifier of the scheme to change
+	 * @param enable The new enabled status
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void enable(long schemeId, boolean enable) throws ServerException;
+
 	/**
 	 * Deletes a set of schemes
 	 * 

@@ -1,9 +1,11 @@
 package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -23,6 +25,8 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 
 	private DynamicForm form;
 
+	private SelectItem model; 
+	
 	private HLayout container = new HLayout();
 
 	public EmbeddingSchemeProperties(GUIEmbeddingScheme scheme, ChangedHandler changedHandler) {
@@ -60,8 +64,13 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		label.addChangedHandler(changedHandler);
 
 		// Embedding model selector
-		TextItem model = ItemFactory.newTextItem("model", embeddingScheme.getModel());
+
+		model = ItemFactory.newSelectItem("embeddingmodel");
+		model.setOptionDataSource(new EmbeddingModelsDS());
 		model.setRequired(true);
+		model.setValue(embeddingScheme.getModelId());
+		model.setValueField("id");
+		model.setDisplayField("label");
 		model.addChangedHandler(changedHandler);
 
 		// Model Spec
@@ -69,24 +78,27 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		modelSpec.setWidth(400);
 		modelSpec.setColSpan(2);
 		modelSpec.addChangedHandler(changedHandler);
+		modelSpec.setVisibleWhen(new AdvancedCriteria("model", OperatorId.EQUALS, "0"));
 
 		// API Key
 		TextItem apiKey = ItemFactory.newTextItem("apikey", embeddingScheme.getApiKey());
 		apiKey.setWidth(300);
+		modelSpec.setColSpan(2);
 		apiKey.addChangedHandler(changedHandler);
 
 		// Chunk Batch Size
-		SpinnerItem chunksBatch = ItemFactory.newSpinnerItem("chunksBatch", embeddingScheme.getChunksBatch());
+		SpinnerItem chunksBatch = ItemFactory.newSpinnerItem("chunksbatch", embeddingScheme.getChunksBatch());
 		chunksBatch.setMin(1);
 		chunksBatch.setStep(10);
 		chunksBatch.addChangedHandler(changedHandler);
 
-		// Enabled flag
-		CheckboxItem enabled = ItemFactory.newCheckbox("enabled");
-		enabled.setValue(embeddingScheme.isEnabled());
-		enabled.addChangedHandler(changedHandler);
+		// Vector Size
+		SpinnerItem vectorSize = ItemFactory.newSpinnerItem("vectorsize", embeddingScheme.getVectorSize());
+		vectorSize.setMin(1);
+		vectorSize.setStep(1);
+		vectorSize.addChangedHandler(changedHandler);
 
-		form.setItems(id, name, label, model, modelSpec, apiKey, chunksBatch, enabled);
+		form.setItems(id, name, label, model, modelSpec, apiKey, chunksBatch, vectorSize);
 
 		container.setMembersMargin(5);
 		container.addMember(form);
@@ -96,11 +108,13 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		if (form.validate()) {
 			embeddingScheme.setName(form.getValueAsString("name"));
 			embeddingScheme.setLabel(form.getValueAsString("label"));
-			embeddingScheme.setModel(form.getValueAsString("model"));
+			embeddingScheme.setModelId(Long.parseLong(form.getValueAsString("embeddingmodel")));
+			embeddingScheme.setModel(model.getSelectedRecord().getAttributeAsString("name"));
+			
 			embeddingScheme.setModelSpec(form.getValueAsString("modelspec"));
 			embeddingScheme.setApiKey(form.getValueAsString("apikey"));
-			embeddingScheme.setChunksBatch(Integer.parseInt(form.getValueAsString("chunksBatch")));
-			embeddingScheme.setEnabled(Boolean.parseBoolean(form.getValueAsString("enabled")));
+			embeddingScheme.setChunksBatch(Integer.parseInt(form.getValueAsString("chunksbatch")));
+			embeddingScheme.setVectorSize(Integer.parseInt(form.getValueAsString("vectorsize")));
 		}
 		return !form.hasErrors();
 	}

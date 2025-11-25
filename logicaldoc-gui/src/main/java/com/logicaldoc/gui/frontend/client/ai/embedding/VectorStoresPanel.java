@@ -64,7 +64,7 @@ public class VectorStoresPanel extends VLayout {
 		url.setIcons(composer);
 
 		// Username
-		TextItem username = ItemFactory.newTextItem("username", null);
+		TextItem username = ItemFactory.newTextItem("username", Util.getValue("username", settings));
 		username.setRequired(false);
 
 		// Password

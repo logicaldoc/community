@@ -27,11 +27,9 @@ public class EmbeddingSchemesDS extends DataSource {
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField typeField = new DataSourceTextField("type");
-		DataSourceBooleanField enabled = new DataSourceBooleanField("enabled");
 		DataSourceTextField model = new DataSourceTextField("model");
-		DataSourceTextField modelSpec = new DataSourceTextField("modelspec");
-		DataSourceTextField modelId = new DataSourceTextField("modelid");
-		setFields(id, name, label, typeField, enabled, model, modelSpec, modelId);
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
+		setFields(id, name, label, typeField, model, enabled);
 		setClientOnly(true);
 
 		setDataURL("data/ai.xml?object=embeddingscheme" + (type != null ? "&type=" + type : ""));
