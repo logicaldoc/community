@@ -25,8 +25,8 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 
 	private DynamicForm form;
 
-	private SelectItem model; 
-	
+	private SelectItem model;
+
 	private HLayout container = new HLayout();
 
 	public EmbeddingSchemeProperties(GUIEmbeddingScheme scheme, ChangedHandler changedHandler) {
@@ -64,7 +64,6 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		label.addChangedHandler(changedHandler);
 
 		// Embedding model selector
-
 		model = ItemFactory.newSelectItem("embeddingmodel");
 		model.setOptionDataSource(new EmbeddingModelsDS());
 		model.setRequired(true);
@@ -78,13 +77,14 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		modelSpec.setWidth(400);
 		modelSpec.setColSpan(2);
 		modelSpec.addChangedHandler(changedHandler);
-		modelSpec.setVisibleWhen(new AdvancedCriteria("model", OperatorId.EQUALS, "0"));
+		modelSpec.setVisibleWhen(new AdvancedCriteria("embeddingmodel", OperatorId.EQUALS, "0"));
 
 		// API Key
 		TextItem apiKey = ItemFactory.newTextItem("apikey", embeddingScheme.getApiKey());
 		apiKey.setWidth(300);
-		modelSpec.setColSpan(2);
+		apiKey.setColSpan(2);
 		apiKey.addChangedHandler(changedHandler);
+		apiKey.setVisibleWhen(new AdvancedCriteria("embeddingmodel", OperatorId.EQUALS, "0"));
 
 		// Chunk Batch Size
 		SpinnerItem chunksBatch = ItemFactory.newSpinnerItem("chunksbatch", embeddingScheme.getChunksBatch());
@@ -110,7 +110,7 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 			embeddingScheme.setLabel(form.getValueAsString("label"));
 			embeddingScheme.setModelId(Long.parseLong(form.getValueAsString("embeddingmodel")));
 			embeddingScheme.setModel(model.getSelectedRecord().getAttributeAsString("name"));
-			
+
 			embeddingScheme.setModelSpec(form.getValueAsString("modelspec"));
 			embeddingScheme.setApiKey(form.getValueAsString("apikey"));
 			embeddingScheme.setChunksBatch(Integer.parseInt(form.getValueAsString("chunksbatch")));

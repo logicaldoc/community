@@ -20,7 +20,6 @@ public class EmbeddingModelsDS extends DataSource {
 		id.setRequired(true);
 
 		DataSourceTextField name = new DataSourceTextField("name");
-		
 		DataSourceTextField label = new DataSourceTextField("label");
 
 		setFields(id, name, label);
