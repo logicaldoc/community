@@ -15,8 +15,6 @@ public class Hit extends Document implements Comparable<Hit> {
 
 	private int score;
 
-	private double semanticScore;
-
 	private String content;
 
 	private String summary;
@@ -27,14 +25,6 @@ public class Hit extends Document implements Comparable<Hit> {
 
 	public void setScore(int score) {
 		this.score = score;
-	}
-
-	public double getSemanticScore() {
-		return semanticScore;
-	}
-
-	public void setSemanticScore(double semanticScore) {
-		this.semanticScore = semanticScore;
 	}
 
 	public String getContent() {
@@ -58,11 +48,7 @@ public class Hit extends Document implements Comparable<Hit> {
 		if (this.equals(other))
 			return 0;
 
-		if (this.semanticScore > 0 && other.semanticScore > 0) {
-			int cmp = Double.compare(other.semanticScore, this.semanticScore);
-			if (cmp != 0)
-				return cmp;
-		} else if (this.score > 0 && other.score > 0) {
+		if (this.score > 0 && other.score > 0) {
 			int cmp = Integer.compare(other.score, this.score);
 			if (cmp != 0)
 				return cmp;
