@@ -1,7 +1,5 @@
 package com.logicaldoc.core.runtime;
 
-import javax.xml.catalog.CatalogFeatures.Feature;
-
 import com.logicaldoc.i18n.I18N;
 
 /**
@@ -34,7 +32,7 @@ public class FeatureDisabledException extends Exception {
 	public FeatureDisabledException(Feature feature, Throwable cause) {
 		this(Integer.toString(feature.ordinal() + 1), "Feature ", "feature.Feature_", cause);
 	}
-	
+
 	public FeatureDisabledException(String featureId, Throwable cause) {
 		this(featureId, "Feature ", "feature.Feature_", cause);
 	}
