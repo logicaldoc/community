@@ -229,6 +229,8 @@ public class Feature {
 
 	public static final int ARTIFICIAL_INTELLIGENCE = 108;
 	
+	public static final int SEMANTIC_SEARCHES = 109;
+	
 	private static Set<String> features = new HashSet<>();
 
 	private Feature() {

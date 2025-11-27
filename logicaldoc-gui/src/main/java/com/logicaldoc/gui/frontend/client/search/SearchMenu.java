@@ -24,6 +24,8 @@ public class SearchMenu extends SectionStack {
 
 	private static final String PARAMETRIC_SECTION = "parametric";
 
+	private static final String SEMANTIC = "semantic";
+
 	private static SearchMenu instance;
 
 	public static SearchMenu get() {
@@ -70,6 +72,14 @@ public class SearchMenu extends SectionStack {
 			foldersSection.setExpanded(false);
 			foldersSection.setItems(FoldersForm.get());
 			addSection(foldersSection);
+		} else if (SEMANTIC.equals(searchType) && Feature.visible(Feature.SEMANTIC_SEARCHES)) {
+			SectionStackSection semanticSection = new SectionStackSection(I18N.message(SEMANTIC));
+			semanticSection.setName(SEMANTIC);
+			if (Feature.enabled(Feature.SEMANTIC_SEARCHES))
+				semanticSection.setItems(new SemanticForm());
+			else
+				semanticSection.setItems(new FeatureDisabled());
+			addSection(semanticSection);
 		}
 	}
 
@@ -101,5 +111,10 @@ public class SearchMenu extends SectionStack {
 	public void openParametricSection() {
 		if (Feature.visible(Feature.PARAMETRIC_SEARCHES))
 			expandSection(PARAMETRIC_SECTION);
+	}
+
+	public void openSemanticSection() {
+		if (Feature.visible(Feature.SEMANTIC_SEARCHES))
+			expandSection(SEMANTIC);
 	}
 }

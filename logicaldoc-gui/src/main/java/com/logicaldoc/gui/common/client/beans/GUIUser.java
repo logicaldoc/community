@@ -603,7 +603,7 @@ public class GUIUser implements Serializable {
 		if (searchPref != null && !searchPref.isEmpty()) {
 			searches = Arrays.asList(searchPref.replace(" ", "").split(","));
 		} else
-			searches = Arrays.asList("fulltext", "parameters", "tags", "folders");
+			searches = Arrays.asList("fulltext", "parameters", "tags", "folders", "semantic");
 		return searches;
 	}
 
