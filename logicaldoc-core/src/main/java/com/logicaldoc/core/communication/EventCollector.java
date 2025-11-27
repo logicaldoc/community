@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.document.AbstractDocumentHistory;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.spring.Context;
 
@@ -127,6 +128,6 @@ public class EventCollector {
 	}
 
 	public static boolean isEnabled() {
-		return RunLevel.current().aspectEnabled(ASPECT);
+		return RunLevel.current().aspectEnabled(Aspect.eventsGathering);
 	}
 }

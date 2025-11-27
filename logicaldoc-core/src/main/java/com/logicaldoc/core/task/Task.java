@@ -21,12 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.lock.LockManager;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.searchengine.IndexException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -192,8 +193,8 @@ public abstract class Task implements Runnable {
 
 	@Override
 	public void run() {
-		if (!RunLevel.current().aspectEnabled("scheduledTasks")) {
-			log.debug("Aspect Scheduled Tasks not enabled");
+		if (!RunLevel.current().aspectEnabled(Aspect.scheduledTasks)) {
+			log.debug("Aspect scheduledTasks not enabled");
 			return;
 		}
 

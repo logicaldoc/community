@@ -1,4 +1,4 @@
-package com.logicaldoc.core.exception;
+package com.logicaldoc.core.runtime;
 
 /**
  * Raised when an aspect is disabled

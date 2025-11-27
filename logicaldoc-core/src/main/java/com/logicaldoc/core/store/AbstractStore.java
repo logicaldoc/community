@@ -24,10 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
@@ -142,7 +143,7 @@ public abstract class AbstractStore implements Store {
 	 * 
 	 */
 	protected void checkWriteAfterStore(StoreResource resource, long expectedSize) throws IOException {
-		if (RunLevel.current().aspectEnabled("writeCheck") && resource.getDocId() != 0L) {
+		if (RunLevel.current().aspectEnabled(Aspect.writeCheck) && resource.getDocId() != 0L) {
 			long storedSize = size(resource);
 			if (storedSize != expectedSize)
 				throw new IOException(String.format(
@@ -283,7 +284,7 @@ public abstract class AbstractStore implements Store {
 	@PostConstruct
 	public void init() {
 		log.info("Initialize Store");
-		
+
 		if (!storeDefinitions.isEmpty())
 			return;
 
@@ -296,7 +297,7 @@ public abstract class AbstractStore implements Store {
 			String className = ext.getParameter("class").valueAsString();
 
 			log.debug("Found Store specification {} for type {}", className, type);
-			
+
 			try {
 				@SuppressWarnings("rawtypes")
 				Class clazz = Class.forName(className);

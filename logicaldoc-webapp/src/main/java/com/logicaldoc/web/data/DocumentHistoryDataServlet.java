@@ -100,7 +100,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		writer.print("<icon>"
 				+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) historyRecord[5])))
 				+ "</icon>");
-		writer.print("<new>" + (1 == (Integer) historyRecord[6]) + "</new>");
+		writer.print("<new>" + historyRecord[6] + "</new>");
 		writer.print("<folderId>" + historyRecord[7] + "</folderId>");
 		writer.print("<docId>" + historyRecord[8] + "</docId>");
 		writer.print("<path><![CDATA[" + (historyRecord[9] == null ? "" : historyRecord[9]) + "]]></path>");

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.dashlet.DashletContent;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.searchengine.indexer.IndexerTask;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.config.ContextProperties;

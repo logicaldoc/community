@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.history.History;
@@ -20,6 +19,8 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 
@@ -48,7 +49,7 @@ public class Validator {
 	 */
 	public void validate(ExtensibleObject object, Template template, History transaction)
 			throws ValidationException, AutomationException {
-		if (!RunLevel.current().aspectEnabled("validation"))
+		if (!RunLevel.current().aspectEnabled(Aspect.validation))
 			return;
 
 		// Skip validation if the object is not being changed nor stored

@@ -33,12 +33,13 @@ import org.springframework.stereotype.Repository;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -309,7 +310,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				copyFolderMetadata(doc);
 			}
 
-			if (!RunLevel.current().aspectEnabled("customId")) {
+			if (!RunLevel.current().aspectEnabled(Aspect.customId)) {
 				doc.setCustomId(UUID.randomUUID().toString());
 				log.debug("Aspect customId is disabled so force the the Custom ID to a random UUID");
 			}
@@ -552,7 +553,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	 * @throws PersistenceException Error in the data layer
 	 */
 	private void setUniqueFilename(Document doc) throws PersistenceException {
-		if (!RunLevel.current().aspectEnabled("uniquenessFilename"))
+		if (!RunLevel.current().aspectEnabled(Aspect.uniquenessFilename))
 			return;
 
 		String baseName = doc.getFileName();
@@ -995,7 +996,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private void saveDocumentHistory(Document doc, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws PersistenceException {
-		if (doc == null || transaction == null || !RunLevel.current().aspectEnabled("saveHistory"))
+		if (doc == null || transaction == null || !RunLevel.current().aspectEnabled(Aspect.saveHistory))
 			return;
 
 		try {

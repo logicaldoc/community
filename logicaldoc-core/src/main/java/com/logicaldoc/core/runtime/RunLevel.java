@@ -1,4 +1,4 @@
-package com.logicaldoc.core;
+package com.logicaldoc.core.runtime;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.exception.AspectDisabledException;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
@@ -23,19 +22,13 @@ import com.logicaldoc.util.spring.Context;
  * @since 7.6.4
  */
 public enum RunLevel {
-	DEFAULT("default"), BULKLOAD("bulkload"), DEVEL("devel"), DEMO("demo"), UPDATED("updated"), SLAVE("slave");
+	DEFAULT, BULKLOAD, DEVEL, DEMO, UPDATED, SLAVE;
 
 	private static final Logger log = LoggerFactory.getLogger(RunLevel.class);
 
-	private String level;
-
-	RunLevel(String level) {
-		this.level = level;
-	}
-
 	@Override
 	public String toString() {
-		return this.level;
+		return this.name().toLowerCase();
 	}
 
 	public static RunLevel current() {
@@ -47,21 +40,29 @@ public enum RunLevel {
 	public static RunLevel fromString(String event) {
 		if (event != null)
 			for (RunLevel b : RunLevel.values())
-				if (event.equalsIgnoreCase(b.level)) {
+				if (event.equalsIgnoreCase(b.toString())) {
 					return b;
 				}
 		return DEFAULT;
 	}
 
 	private String getAspectProperty(String aspect) {
-		return "aspect." + aspect + "." + level;
+		return "aspect." + aspect + "." + toString();
 	}
 
+	public boolean aspectEnabled(Aspect aspect) {
+		return aspectEnabled(aspect.name());
+	}
+	
 	public boolean aspectEnabled(String aspect) {
 		ContextProperties config = getConfig();
 		return config != null && config.getBoolean(getAspectProperty(aspect), false);
 	}
 
+	public void checkAspect(Aspect aspect) throws AspectDisabledException {
+		checkAspect(aspect.name());
+	}
+	
 	public void checkAspect(String aspect) throws AspectDisabledException {
 		if(!aspectEnabled(aspect))
 			throw new AspectDisabledException(aspect);

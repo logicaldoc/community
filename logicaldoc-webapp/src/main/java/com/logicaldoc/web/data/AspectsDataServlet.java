@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.Session;
 
 import jakarta.servlet.http.HttpServletRequest;

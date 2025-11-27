@@ -34,7 +34,6 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.dbinit.PluginDbInit;
 import com.logicaldoc.core.document.AbstractDocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
@@ -43,6 +42,7 @@ import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.job.JobManager;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;

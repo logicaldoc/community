@@ -27,7 +27,6 @@ import org.springframework.stereotype.Repository;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -40,6 +39,8 @@ import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -760,7 +761,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	 */
 	@Override
 	public void saveFolderHistory(Folder folder, FolderHistory transaction) throws PersistenceException {
-		if (folder == null || transaction == null || !RunLevel.current().aspectEnabled("saveHistory"))
+		if (folder == null || transaction == null || !RunLevel.current().aspectEnabled(Aspect.saveHistory))
 			return;
 
 		Folder root = findRoot(folder.getTenantId());

@@ -24,8 +24,6 @@ public class WebserviceCall extends History {
 
 	public static final String REST = "rest";
 
-	public static final String ASPECT = "saveApiCall";
-
 	/**
 	 * The protocol used for the communication, can be WebserviceCall.SOAP or
 	 * WebserviceCall.REST

@@ -31,6 +31,8 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
@@ -62,8 +64,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	protected SessionFactory sessionFactory;
 
 	protected static final String ORDER_BY = " order by ";
-
-	protected static final String ASPECT_STORING = "storing";
 
 	protected static final String DEFAULT_WHERE_PREAMBLE = " " + ENTITY + " where " + ENTITY + ".deleted=0 ";
 
@@ -180,8 +180,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * Checks if the aspect for storing data is enabled
 	 */
 	protected boolean checkStoringAspect() {
-		if (!RunLevel.current().aspectEnabled(ASPECT_STORING)) {
-			log.error("Apect {} is disabled", ASPECT_STORING);
+		if (!RunLevel.current().aspectEnabled(Aspect.storing)) {
+			log.error("Apect {} is disabled", Aspect.storing.name());
 			return false;
 		}
 		return true;

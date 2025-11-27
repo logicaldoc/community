@@ -32,9 +32,7 @@ import jakarta.persistence.Transient;
  */
 @MappedSuperclass
 public abstract class History extends PersistentObject implements Comparable<History> {
-
-	public static final String ASPECT = "saveHistory";
-
+	
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = LoggerFactory.getLogger(History.class);

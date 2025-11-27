@@ -13,7 +13,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.SchedulingException;
 
-import com.logicaldoc.core.RunLevel;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 
 /**
  * Scheduler factory to enable/disable the scheduler depending on the
@@ -27,13 +28,12 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	private static final String ASPECT_DISABLED = "Aspect disabled";
 
-	private static final String SCHEDULED_TASKS = "scheduledTasks";
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultSchedulerFactory.class);
 
 	@Override
 	public void start() throws SchedulingException {
-		if (RunLevel.current().aspectEnabled(SCHEDULED_TASKS)) {
+		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks)) {
 			super.start();
 		} else
 			log.warn(ASPECT_DISABLED);
@@ -41,7 +41,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public Scheduler getObject() {
-		if (RunLevel.current().aspectEnabled(SCHEDULED_TASKS))
+		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks))
 			return super.getObject();
 		else {
 			log.debug(ASPECT_DISABLED);
@@ -51,7 +51,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public boolean isAutoStartup() {
-		if (RunLevel.current().aspectEnabled(SCHEDULED_TASKS))
+		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks))
 			return super.isAutoStartup();
 		else
 			return false;
@@ -59,7 +59,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (RunLevel.current().aspectEnabled(SCHEDULED_TASKS))
+		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks))
 			super.afterPropertiesSet();
 		else
 			log.warn(ASPECT_DISABLED);

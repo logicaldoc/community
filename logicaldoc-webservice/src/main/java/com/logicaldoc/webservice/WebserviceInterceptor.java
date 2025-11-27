@@ -26,7 +26,8 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.RunLevel;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -119,7 +120,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	private void recordWebserviceCall(Message message, Session session) {
 		String payload;
-		if (RunLevel.current().aspectEnabled(WebserviceCall.ASPECT)
+		if (RunLevel.current().aspectEnabled(Aspect.saveApiCall)
 				&& settings.getBoolean("webservice.call.record", false)) {
 			WebserviceCall call = new WebserviceCall();
 

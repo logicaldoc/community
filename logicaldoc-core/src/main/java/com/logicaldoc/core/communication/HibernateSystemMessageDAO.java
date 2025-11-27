@@ -14,7 +14,8 @@ import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
@@ -190,7 +191,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				history.setComment(message.getMessageText());
 				history.setEvent(UserEvent.MESSAGE_RECEIVED);
 				history.setAuthor(message.getAuthor());
-				history.setNotifyEvent(message.isNotify() && RunLevel.current().aspectEnabled("sendingMessages"));
+				history.setNotifyEvent(message.isNotify() && RunLevel.current().aspectEnabled(Aspect.sendingMessages));
 
 				User recipient = uDao.findByUsername(rec.getName());
 				if (recipient != null)
