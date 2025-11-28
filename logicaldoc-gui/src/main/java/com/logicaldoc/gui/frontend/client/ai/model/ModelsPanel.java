@@ -17,6 +17,7 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
+import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingSettings;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -155,7 +156,7 @@ public class ModelsPanel extends VLayout {
 		ToolStripButton settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
 		toolStrip.addButton(settings);
-		settings.addClickHandler(event -> new AISettings().show());
+		settings.addClickHandler(event -> new EmbeddingSettings().show());
 
 		ToolStripButton stats = new ToolStripButton();
 		stats.setTitle(I18N.message("stats"));

@@ -26,13 +26,13 @@ public class GUIEmbeddingScheme implements Serializable {
 
 	private String apiKey;
 
-	private int chunksBatch = 50;
+	private Integer chunksBatch = 50;
 
 	private boolean enabled = true;
 
 	private String type = "mariadb";
 
-	private int batch = 500;
+	private Integer batch = 500;
 
 	private Integer vectorSize = 300;
 
@@ -100,11 +100,11 @@ public class GUIEmbeddingScheme implements Serializable {
 		this.apiKey = apiKey;
 	}
 
-	public int getChunksBatch() {
+	public Integer getChunksBatch() {
 		return chunksBatch;
 	}
 
-	public void setChunksBatch(int chunksBatch) {
+	public void setChunksBatch(Integer chunksBatch) {
 		this.chunksBatch = chunksBatch;
 	}
 
@@ -132,11 +132,11 @@ public class GUIEmbeddingScheme implements Serializable {
 		this.vectorSize = vectorSize;
 	}
 
-	public int getBatch() {
+	public Integer getBatch() {
 		return batch;
 	}
 
-	public void setBatch(int batch) {
+	public void setBatch(Integer batch) {
 		this.batch = batch;
 	}
 }

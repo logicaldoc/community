@@ -129,6 +129,13 @@ public class EmbeddingSchemesPanel extends VLayout {
 		toolStrip.addButton(add);
 		add.addClickHandler(event -> onAddEmbeddingScheme());
 
+		toolStrip.addSeparator();
+
+		ToolStripButton settings = new ToolStripButton();
+		settings.setTitle(I18N.message("settings"));
+		toolStrip.addButton(settings);
+		settings.addClickHandler(event -> new EmbeddingSettings().show());
+
 		toolStrip.addFill();
 
 		list.addCellContextClickHandler(event -> {
