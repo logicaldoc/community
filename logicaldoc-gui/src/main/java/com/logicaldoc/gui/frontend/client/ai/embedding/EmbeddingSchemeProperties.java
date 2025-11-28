@@ -8,7 +8,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -20,8 +19,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 9.2.2
  */
 public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
-
-	private static final String ID = "id";
 
 	private DynamicForm form;
 
@@ -51,8 +48,12 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setWidth100();
 
-		StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(embeddingScheme.getId()));
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(embeddingScheme.getId()));
 		id.setVisible(embeddingScheme.getId() != 0L);
+
+		StaticTextItem modelName = ItemFactory.newStaticTextItem("modelName", "embeddingmodel",
+				embeddingScheme.getModel());
+		modelName.setVisible(embeddingScheme.getId() != 0L);
 
 		// Name
 		TextItem name = ItemFactory.newSimpleTextItem("name", embeddingScheme.getName());
@@ -71,10 +72,12 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		model.setValueField("id");
 		model.setDisplayField("label");
 		model.addChangedHandler(changedHandler);
+		model.setDisabled(embeddingScheme.getId() != 0L);
+		model.setVisible(embeddingScheme.getId() == 0L);
 
 		// Model Spec
-		TextAreaItem modelSpec = ItemFactory.newTextAreaItem("modelspec", embeddingScheme.getModelSpec());
-		modelSpec.setWidth(400);
+		TextItem modelSpec = ItemFactory.newTextItem("modelspec", embeddingScheme.getModelSpec());
+		modelSpec.setWidth(300);
 		modelSpec.setColSpan(2);
 		modelSpec.addChangedHandler(changedHandler);
 		modelSpec.setVisibleWhen(new AdvancedCriteria("embeddingmodel", OperatorId.EQUALS, "0"));
@@ -90,15 +93,25 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		SpinnerItem chunksBatch = ItemFactory.newSpinnerItem("chunksbatch", embeddingScheme.getChunksBatch());
 		chunksBatch.setMin(1);
 		chunksBatch.setStep(10);
+		chunksBatch.setRequired(true);
 		chunksBatch.addChangedHandler(changedHandler);
+
+		// Batch Size
+		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", embeddingScheme.getBatch());
+		batch.setMin(1);
+		batch.setStep(100);
+		batch.setRequired(true);
+		batch.addChangedHandler(changedHandler);
 
 		// Vector Size
 		SpinnerItem vectorSize = ItemFactory.newSpinnerItem("vectorsize", embeddingScheme.getVectorSize());
 		vectorSize.setMin(1);
 		vectorSize.setStep(1);
+		vectorSize.setRequired(true);
 		vectorSize.addChangedHandler(changedHandler);
+		vectorSize.setDisabled(embeddingScheme.getId() != 0L);
 
-		form.setItems(id, name, label, model, modelSpec, apiKey, chunksBatch, vectorSize);
+		form.setItems(id, modelName, name, label, model, modelSpec, apiKey, vectorSize, batch, chunksBatch);
 
 		container.setMembersMargin(5);
 		container.addMember(form);
@@ -114,6 +127,7 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 			embeddingScheme.setModelSpec(form.getValueAsString("modelspec"));
 			embeddingScheme.setApiKey(form.getValueAsString("apikey"));
 			embeddingScheme.setChunksBatch(Integer.parseInt(form.getValueAsString("chunksbatch")));
+			embeddingScheme.setBatch(Integer.parseInt(form.getValueAsString("batch")));
 			embeddingScheme.setVectorSize(Integer.parseInt(form.getValueAsString("vectorsize")));
 		}
 		return !form.hasErrors();

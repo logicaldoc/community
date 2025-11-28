@@ -52,7 +52,7 @@ public class VectorStoresPanel extends VLayout {
 	void initGUI(List<GUIParameter> settings) {
 		// Url
 		TextItem url = ItemFactory.newTextItem("url", Util.getValue("url", settings));
-		url.setWidth(300);
+		url.setWidth(400);
 		url.setRequired(true);
 		url.setHint("jdbc:mariadb://host:port/database");
 		url.setShowHintInField(true);

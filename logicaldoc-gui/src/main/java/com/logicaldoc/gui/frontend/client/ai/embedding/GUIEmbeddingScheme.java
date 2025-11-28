@@ -32,9 +32,9 @@ public class GUIEmbeddingScheme implements Serializable {
 
 	private String type = "mariadb";
 
-	private Integer vectorSize;
+	private int batch = 500;
 
-	private Integer batch;
+	private Integer vectorSize = 300;
 
 	public GUIEmbeddingScheme() {
 	}
@@ -132,11 +132,11 @@ public class GUIEmbeddingScheme implements Serializable {
 		this.vectorSize = vectorSize;
 	}
 
-	public Integer getBatch() {
+	public int getBatch() {
 		return batch;
 	}
 
-	public void setBatch(Integer batch) {
+	public void setBatch(int batch) {
 		this.batch = batch;
 	}
 }

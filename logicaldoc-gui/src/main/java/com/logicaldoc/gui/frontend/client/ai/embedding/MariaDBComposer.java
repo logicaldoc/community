@@ -29,7 +29,7 @@ public class MariaDBComposer extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("mariadburlcomposer"));
-		setHeight(160);
+		setHeight(150);
 		setWidth(450);
 
 		setCanDragResize(true);

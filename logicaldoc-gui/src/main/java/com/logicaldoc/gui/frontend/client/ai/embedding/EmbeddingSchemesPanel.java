@@ -26,6 +26,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -77,12 +78,14 @@ public class EmbeddingSchemesPanel extends VLayout {
 		name.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		ListGridField label = new ListGridField("label", I18N.message("label"));
+		label.setMinWidth(110);
 		label.setCanFilter(true);
 		label.setCanSort(true);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setCanFilter(true);
 		type.setCanSort(true);
+		type.setAutoFitWidth(true);
 
 		ListGridField model = new ListGridField("model", I18N.message("model"));
 		model.setCanFilter(true);
@@ -203,7 +206,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 				}));
 		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
 
-		contextMenu.setItems(delete, enable, disable);
+		contextMenu.setItems(enable, disable, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 
