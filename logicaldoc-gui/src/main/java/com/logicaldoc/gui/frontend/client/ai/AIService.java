@@ -229,16 +229,6 @@ public interface AIService extends RemoteService {
 	public List<GUIEmbeddingScheme> getEmbeddingSchemes() throws ServerException;
 
 	/**
-	 * Enables/Disabled a robot
-	 * 
-	 * @param schemeId Identifier of the scheme to change
-	 * @param enable The new enabled status
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void enable(long schemeId, boolean enable) throws ServerException;
-
-	/**
 	 * Deletes a set of schemes
 	 * 
 	 * @param schemeIds identifiers of the schemes to delete
@@ -246,6 +236,15 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void deleteEmbeddingSchemes(List<Long> schemeIds) throws ServerException;
+
+	/**
+	 * REmoves all the embeddings generated for the given scheme
+	 * 
+	 * @param schemeId Id of the scheme
+	 * 
+	 * @throws ServerException Error in the server application
+	 */
+	public void removeEmbeddings(long schemeId) throws ServerException;
 
 	public static class Instance {
 		private static AIServiceAsync inst;

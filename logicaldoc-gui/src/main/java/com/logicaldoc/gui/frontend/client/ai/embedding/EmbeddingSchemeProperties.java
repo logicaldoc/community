@@ -55,6 +55,10 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 				embeddingScheme.getModel());
 		modelName.setVisible(embeddingScheme.getId() != 0L);
 
+		StaticTextItem embeddings = ItemFactory.newStaticTextItem("embeddings",
+				Long.toString(embeddingScheme.getEmbeddings()));
+		embeddings.setVisible(embeddingScheme.getId() != 0L);
+
 		// Name
 		TextItem name = ItemFactory.newSimpleTextItem("name", embeddingScheme.getName());
 		name.setRequired(true);
@@ -111,7 +115,7 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		vectorSize.addChangedHandler(changedHandler);
 		vectorSize.setDisabled(embeddingScheme.getId() != 0L);
 
-		form.setItems(id, modelName, name, label, model, modelSpec, apiKey, vectorSize, batch, chunksBatch);
+		form.setItems(id, modelName, embeddings, name, label, model, modelSpec, apiKey, vectorSize, batch, chunksBatch);
 
 		container.setMembersMargin(5);
 		container.addMember(form);
@@ -126,9 +130,12 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 
 			embeddingScheme.setModelSpec(form.getValueAsString("modelspec"));
 			embeddingScheme.setApiKey(form.getValueAsString("apikey"));
-			embeddingScheme.setChunksBatch(Integer.parseInt(form.getValueAsString("chunksbatch")));
-			embeddingScheme.setBatch(Integer.parseInt(form.getValueAsString("batch")));
-			embeddingScheme.setVectorSize(Integer.parseInt(form.getValueAsString("vectorsize")));
+			embeddingScheme.setChunksBatch(
+					form.getValue("chunksbatch") != null ? Integer.parseInt(form.getValueAsString("chunksbatch")) : 50);
+			embeddingScheme.setBatch(
+					form.getValue("batch") != null ? Integer.parseInt(form.getValueAsString("batch")) : 10000);
+			embeddingScheme.setVectorSize(
+					form.getValue("vectorsize") != null ? Integer.parseInt(form.getValueAsString("vectorsize")) : 300);
 		}
 		return !form.hasErrors();
 	}

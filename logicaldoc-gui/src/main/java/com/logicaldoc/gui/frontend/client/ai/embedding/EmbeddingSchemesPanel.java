@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -58,7 +59,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 	public void onDraw() {
 		InfoPanel infoPanel = new InfoPanel("");
 
-		final Layout listing = new VLayout();
+		Layout listing = new VLayout();
 		detailsContainer = new VLayout();
 		details = SELECT_EMBEDDINGSCHEME;
 
@@ -81,16 +82,23 @@ public class EmbeddingSchemesPanel extends VLayout {
 		label.setMinWidth(110);
 		label.setCanFilter(true);
 		label.setCanSort(true);
+		label.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setCanFilter(true);
 		type.setCanSort(true);
 		type.setAutoFitWidth(true);
+		label.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		ListGridField model = new ListGridField("model", I18N.message("model"));
 		model.setCanFilter(true);
 		model.setCanSort(true);
-		label.setAutoFit(AutoFitWidthApproach.BOTH);
+		model.setAutoFit(AutoFitWidthApproach.BOTH);
+
+		ListGridField embeddings = new ListGridField("embeddings", I18N.message("embeddings"));
+		embeddings.setCanFilter(true);
+		embeddings.setCanSort(true);
+		embeddings.setAlign(Alignment.LEFT);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -98,7 +106,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(enabled, id, name, label, type, model);
+		list.setFields(enabled, id, name, label, type, model, embeddings);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -150,7 +158,6 @@ public class EmbeddingSchemesPanel extends VLayout {
 					@Override
 					protected void handleSuccess(GUIEmbeddingScheme result) {
 						showEmbeddingSchemeDetails(result);
-
 					}
 				});
 		});
@@ -191,8 +198,8 @@ public class EmbeddingSchemesPanel extends VLayout {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(
-				event -> AIService.Instance.get().enable(selectedEmbeddingId, true, new DefaultAsyncCallback<>() {
+		enable.addClickHandler(event -> AIService.Instance.get().enableEmbeddingScheme(selectedEmbeddingId, true,
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED, true);
@@ -203,8 +210,8 @@ public class EmbeddingSchemesPanel extends VLayout {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(
-				event -> AIService.Instance.get().enable(selectedEmbeddingId, false, new DefaultAsyncCallback<>() {
+		disable.addClickHandler(event -> AIService.Instance.get().enableEmbeddingScheme(selectedEmbeddingId, false,
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED, false);
@@ -213,7 +220,23 @@ public class EmbeddingSchemesPanel extends VLayout {
 				}));
 		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
 
-		contextMenu.setItems(enable, disable, new MenuItemSeparator(), delete);
+		MenuItem reset = new MenuItem();
+		reset.setTitle(I18N.message("removeembeddings"));
+		reset.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmremoveembeddings"), confirm -> {
+					if (Boolean.TRUE.equals(confirm)) {
+						AIService.Instance.get().removeEmbeddings(ids.get(0), new DefaultAsyncCallback<>() {
+							@Override
+							public void handleSuccess(Void result) {
+								GuiLog.info(I18N.message("embeddingsremoved"), null);
+								list.getSelectedRecord().setAttribute("embeddings", 0);
+								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+							}
+						});
+					}
+				}));
+
+		contextMenu.setItems(enable, disable, new MenuItemSeparator(), reset, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

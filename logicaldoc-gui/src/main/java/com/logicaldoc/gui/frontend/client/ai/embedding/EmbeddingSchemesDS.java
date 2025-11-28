@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -28,8 +29,9 @@ public class EmbeddingSchemesDS extends DataSource {
 		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField typeField = new DataSourceTextField("type");
 		DataSourceTextField model = new DataSourceTextField("model");
+		DataSourceIntegerField embeddings = new DataSourceIntegerField("embeddings");
 		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
-		setFields(id, name, label, typeField, model, enabled);
+		setFields(id, name, label, typeField, model, embeddings, enabled);
 		setClientOnly(true);
 
 		setDataURL("data/ai.xml?object=embeddingscheme" + (type != null ? "&type=" + type : ""));
