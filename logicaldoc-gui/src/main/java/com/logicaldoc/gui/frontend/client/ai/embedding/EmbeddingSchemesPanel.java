@@ -225,9 +225,11 @@ public class EmbeddingSchemesPanel extends VLayout {
 		reset.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmremoveembeddings"), confirm -> {
 					if (Boolean.TRUE.equals(confirm)) {
+						LD.contactingServer();
 						AIService.Instance.get().removeEmbeddings(ids.get(0), new DefaultAsyncCallback<>() {
 							@Override
 							public void handleSuccess(Void result) {
+								LD.clearPrompt();
 								GuiLog.info(I18N.message("embeddingsremoved"), null);
 								list.getSelectedRecord().setAttribute("embeddings", 0);
 								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
