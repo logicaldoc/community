@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class EmbeddingsAndVectorStorePanel extends AdminPanel {
 	public EmbeddingsAndVectorStorePanel() {
-		super("embeddings");
+		super("schemes");
 
 		body.setMembers(new EmbeddingSchemesPanel());
 

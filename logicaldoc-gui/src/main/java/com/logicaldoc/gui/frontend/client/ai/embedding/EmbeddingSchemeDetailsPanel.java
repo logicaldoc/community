@@ -19,9 +19,13 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 
 	private GUIEmbeddingScheme embeddingScheme;
 
-	private Layout standardTabPanel;
+	private Layout propertiesTabPanel;
 
-	private EmbeddingSchemeProperties standardPanel;
+	private EmbeddingSchemeProperties propertiesPanel;
+
+	private Layout embeddingsTabPanel;
+
+	private EmbeddingSchemeEntries embeddingsPanel;
 
 	private EditingTabSet tabSet;
 
@@ -51,11 +55,18 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
-		standardTabPanel = new HLayout();
-		standardTabPanel.setWidth100();
-		standardTabPanel.setHeight100();
-		propertiesTab.setPane(standardTabPanel);
+		propertiesTabPanel = new HLayout();
+		propertiesTabPanel.setWidth100();
+		propertiesTabPanel.setHeight100();
+		propertiesTab.setPane(propertiesTabPanel);
 		tabSet.addTab(propertiesTab);
+
+		Tab embeddingsTab = new Tab(I18N.message("embeddings"));
+		embeddingsTabPanel = new VLayout();
+		embeddingsTabPanel.setWidth100();
+		embeddingsTabPanel.setHeight100();
+		embeddingsTab.setPane(embeddingsTabPanel);
+		tabSet.addTab(embeddingsTab);
 
 		addMember(tabSet);
 	}
@@ -72,15 +83,23 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 	private void refresh() {
 		tabSet.hideSave();
 
-		if (standardPanel != null) {
-			standardPanel.destroy();
-			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
-				standardTabPanel.removeMember(standardPanel);
+		if (propertiesPanel != null) {
+			propertiesPanel.destroy();
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
+				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
-		standardPanel = new EmbeddingSchemeProperties(embeddingScheme, event -> onModified());
-		standardTabPanel.addMember(standardPanel);
-
+		if (embeddingsPanel != null) {
+			embeddingsPanel.destroy();
+			if (Boolean.TRUE.equals(embeddingsTabPanel.contains(embeddingsPanel)))
+				embeddingsTabPanel.removeMember(embeddingsPanel);
+		}
+		
+		propertiesPanel = new EmbeddingSchemeProperties(embeddingScheme, event -> onModified());
+		propertiesTabPanel.addMember(propertiesPanel);
+		
+		embeddingsPanel = new EmbeddingSchemeEntries(embeddingScheme, null);
+		embeddingsTabPanel.addMember(embeddingsPanel);
 	}
 
 	public void onModified() {
@@ -88,7 +107,7 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 	}
 
 	private boolean validate() {
-		boolean stdValid = standardPanel.validate();
+		boolean stdValid = propertiesPanel.validate();
 		if (!stdValid)
 			tabSet.selectTab(0);
 		return stdValid;

@@ -16,6 +16,7 @@ public class EmbeddingSchemeDetailsTab extends HLayout {
 	protected ChangedHandler changedHandler;
 
 	/**
+	 * Constructor
 	 * 
 	 * @param embeddingScheme The embeddingScheme this instance refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
