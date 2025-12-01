@@ -238,13 +238,15 @@ public interface AIService extends RemoteService {
 	public void deleteEmbeddingSchemes(List<Long> schemeIds) throws ServerException;
 
 	/**
-	 * REmoves all the embeddings generated for the given scheme
+	 * Removes the embeddings generated for the given scheme
 	 * 
 	 * @param schemeId Id of the scheme
+	 * @param docIds The list of doc Ids to delete or null if you want to delete
+	 *        all the embeddings
 	 * 
 	 * @throws ServerException Error in the server application
 	 */
-	public void removeEmbeddings(long schemeId) throws ServerException;
+	public void removeEmbeddings(long schemeId, List<Long> docIds) throws ServerException;
 
 	public static class Instance {
 		private static AIServiceAsync inst;

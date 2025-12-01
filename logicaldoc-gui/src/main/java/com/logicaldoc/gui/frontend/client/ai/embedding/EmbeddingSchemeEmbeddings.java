@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.frontend.client.ai.embedding;
 
-import com.logicaldoc.gui.common.client.data.IndexingQueueDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
@@ -28,11 +27,11 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2.2
  */
-public class EmbeddingSchemeEntries extends EmbeddingSchemeDetailsTab {
+public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 
 	private RefreshableListGrid embeddings;
 
-	public EmbeddingSchemeEntries(GUIEmbeddingScheme scheme, ChangedHandler changedHandler) {
+	public EmbeddingSchemeEmbeddings(GUIEmbeddingScheme scheme, ChangedHandler changedHandler) {
 		super(scheme, changedHandler);
 		setWidth100();
 		setHeight100();
@@ -111,7 +110,7 @@ public class EmbeddingSchemeEntries extends EmbeddingSchemeDetailsTab {
 		embeddings.setEmptyMessage(I18N.message("notitemstoshow"));
 
 		embeddings.addCellContextClickHandler(event -> {
-			showCintextMenu();
+			showContextMenu();
 			event.cancel();
 		});
 
@@ -125,23 +124,23 @@ public class EmbeddingSchemeEntries extends EmbeddingSchemeDetailsTab {
 		embeddings.setSelectionType(SelectionStyle.MULTIPLE);
 		embeddings.setShowFilterEditor(true);
 		embeddings.setFilterOnKeypress(true);
-		embeddings.setDataSource(new IndexingQueueDS(100));
+		embeddings.setDataSource(new EmbeddingsDS(embeddingScheme.getId(), 100));
 		embeddings.setFields(id, indexable, filename, size, lastModified, version, publisher, published, creator,
 				created, customId);
-		
+
 		VLayout contents = new VLayout();
 		contents.setMembers(toolStrip, infoPanel, embeddings);
 
 		addMember(contents);
 	}
 
-	private void showCintextMenu() {
+	private void showContextMenu() {
 		// TODO Auto-generated method stub
 
 	}
 
 	private void refresh(Integer max) {
-		embeddings.refresh(new IndexingQueueDS(max));
+		embeddings.refresh(new EmbeddingsDS(embeddingScheme.getId(), max));
 	}
 
 	public boolean validate() {

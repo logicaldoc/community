@@ -53,5 +53,5 @@ public interface AIServiceAsync {
 
 	void deleteEmbeddingSchemes(List<Long> schemeIds, AsyncCallback<Void> callback);
 
-	void removeEmbeddings(long schemeId, AsyncCallback<Void> callback);
+	void removeEmbeddings(long schemeId, List<Long> docIds, AsyncCallback<Void> callback);
 }

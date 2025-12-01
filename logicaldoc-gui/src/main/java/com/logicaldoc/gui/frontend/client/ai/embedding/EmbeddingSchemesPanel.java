@@ -226,7 +226,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmremoveembeddings"), confirm -> {
 					if (Boolean.TRUE.equals(confirm)) {
 						LD.contactingServer();
-						AIService.Instance.get().removeEmbeddings(ids.get(0), new DefaultAsyncCallback<>() {
+						AIService.Instance.get().removeEmbeddings(ids.get(0), null, new DefaultAsyncCallback<>() {
 							@Override
 							public void handleSuccess(Void result) {
 								LD.clearPrompt();

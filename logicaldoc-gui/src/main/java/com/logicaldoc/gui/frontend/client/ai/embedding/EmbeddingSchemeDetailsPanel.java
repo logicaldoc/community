@@ -25,7 +25,7 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 
 	private Layout embeddingsTabPanel;
 
-	private EmbeddingSchemeEntries embeddingsPanel;
+	private EmbeddingSchemeEmbeddings embeddingsPanel;
 
 	private EditingTabSet tabSet;
 
@@ -98,7 +98,7 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 		propertiesPanel = new EmbeddingSchemeProperties(embeddingScheme, event -> onModified());
 		propertiesTabPanel.addMember(propertiesPanel);
 		
-		embeddingsPanel = new EmbeddingSchemeEntries(embeddingScheme, null);
+		embeddingsPanel = new EmbeddingSchemeEmbeddings(embeddingScheme, null);
 		embeddingsTabPanel.addMember(embeddingsPanel);
 	}
 
