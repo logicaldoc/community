@@ -11,6 +11,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class EmbeddingSchemeDetailsTab extends HLayout {
 
+	protected EmbeddingSchemesPanel schemesPanel;
+
 	protected GUIEmbeddingScheme embeddingScheme;
 
 	protected ChangedHandler changedHandler;
@@ -18,14 +20,17 @@ public class EmbeddingSchemeDetailsTab extends HLayout {
 	/**
 	 * Constructor
 	 * 
-	 * @param embeddingScheme The embeddingScheme this instance refers to
+	 * @param schemesPanel The panel showing all the schemes
+	 * @param embeddingScheme The embedding scheme this instance refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        syndication
 	 */
-	protected EmbeddingSchemeDetailsTab(GUIEmbeddingScheme embeddingScheme, ChangedHandler changedHandler) {
+	protected EmbeddingSchemeDetailsTab(EmbeddingSchemesPanel schemesPanel, GUIEmbeddingScheme embeddingScheme,
+			ChangedHandler changedHandler) {
 		super();
 		this.embeddingScheme = embeddingScheme;
 		this.changedHandler = changedHandler;
+		this.schemesPanel = schemesPanel;
 	}
 
 	public GUIEmbeddingScheme getEmbeddingScheme() {

@@ -95,10 +95,10 @@ public class EmbeddingSchemeDetailsPanel extends VLayout {
 				embeddingsTabPanel.removeMember(embeddingsPanel);
 		}
 		
-		propertiesPanel = new EmbeddingSchemeProperties(embeddingScheme, event -> onModified());
+		propertiesPanel = new EmbeddingSchemeProperties(embeddingSchemesPanel, embeddingScheme, event -> onModified());
 		propertiesTabPanel.addMember(propertiesPanel);
 		
-		embeddingsPanel = new EmbeddingSchemeEmbeddings(embeddingScheme, null);
+		embeddingsPanel = new EmbeddingSchemeEmbeddings(embeddingSchemesPanel, embeddingScheme, null);
 		embeddingsTabPanel.addMember(embeddingsPanel);
 	}
 

@@ -26,8 +26,8 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 
 	private HLayout container = new HLayout();
 
-	public EmbeddingSchemeProperties(GUIEmbeddingScheme scheme, ChangedHandler changedHandler) {
-		super(scheme, changedHandler);
+	public EmbeddingSchemeProperties(EmbeddingSchemesPanel schemesPanel, GUIEmbeddingScheme scheme, ChangedHandler changedHandler) {
+		super(schemesPanel, scheme, changedHandler);
 		setWidth100();
 		setHeight100();
 

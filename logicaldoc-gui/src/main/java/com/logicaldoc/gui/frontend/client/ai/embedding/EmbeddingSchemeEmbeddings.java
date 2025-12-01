@@ -45,8 +45,9 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 
 	private RefreshableListGrid embeddings;
 
-	public EmbeddingSchemeEmbeddings(GUIEmbeddingScheme scheme, ChangedHandler changedHandler) {
-		super(scheme, changedHandler);
+	public EmbeddingSchemeEmbeddings(EmbeddingSchemesPanel schemesPanel, GUIEmbeddingScheme scheme,
+			ChangedHandler changedHandler) {
+		super(schemesPanel, scheme, changedHandler);
 		setWidth100();
 		setHeight100();
 	}
@@ -163,6 +164,9 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 											public void handleSuccess(Void result) {
 												embeddings.removeSelectedData();
 												embeddings.deselectAllRecords();
+												embeddingScheme
+														.setEmbeddings(embeddingScheme.getEmbeddings() - docIds.size());
+												schemesPanel.updateRecord(embeddingScheme);
 											}
 										});
 							}

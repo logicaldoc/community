@@ -151,16 +151,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(event -> {
-			Record rec = list.getSelectedRecord();
-			if (rec != null)
-				AIService.Instance.get().getEmbeddingScheme(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
-					@Override
-					protected void handleSuccess(GUIEmbeddingScheme result) {
-						showEmbeddingSchemeDetails(result);
-					}
-				});
-		});
+		list.addSelectionChangedHandler(event -> showSelectedScheme());
 
 		list.addDataArrivedHandler(event -> infoPanel
 				.setMessage(I18N.message("showembeddingsechemes", Integer.toString(list.getTotalRows()))));
@@ -169,6 +160,17 @@ public class EmbeddingSchemesPanel extends VLayout {
 		detailsContainer.addMember(details);
 
 		setMembers(toolStrip, listing, detailsContainer);
+	}
+
+	protected void showSelectedScheme() {
+		Record rec = list.getSelectedRecord();
+		if (rec != null)
+			AIService.Instance.get().getEmbeddingScheme(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+				@Override
+				protected void handleSuccess(GUIEmbeddingScheme result) {
+					showEmbeddingSchemeDetails(result);
+				}
+			});
 	}
 
 	private void showContextMenu() {
@@ -233,6 +235,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 								GuiLog.info(I18N.message("embeddingsremoved"), null);
 								list.getSelectedRecord().setAttribute("embeddings", 0);
 								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+								showSelectedScheme();
 							}
 						});
 					}
@@ -288,9 +291,9 @@ public class EmbeddingSchemesPanel extends VLayout {
 		rec.setAttribute("type", embeddingScheme.getType());
 		rec.setAttribute("eenabled", embeddingScheme.isEnabled());
 		rec.setAttribute("model", embeddingScheme.getModel());
-
+		rec.setAttribute("embeddings", embeddingScheme.getEmbeddings());
+		
 		list.refreshRow(list.getRecordIndex(rec));
-
 	}
 
 	protected void onAddEmbeddingScheme() {
