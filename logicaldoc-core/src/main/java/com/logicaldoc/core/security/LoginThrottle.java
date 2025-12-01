@@ -94,14 +94,18 @@ public class LoginThrottle {
 			return;
 
 		// Update the failed login counters
-		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
-			SequenceDAO sDao = SequenceDAO.get();
-			if (StringUtils.isNotEmpty(username))
-				sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
-			if (StringUtils.isNotEmpty(client.getAddress()))
-				sDao.next(LOGINFAIL_IP + client.getAddress(), 0L, Tenant.SYSTEM_ID);
-			if (StringUtils.isNotEmpty(apiKey))
-				sDao.next(LOGINFAIL_APIKEY + apiKey, 0L, Tenant.SYSTEM_ID);
+		try {
+			if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
+				SequenceDAO sDao = SequenceDAO.get();
+				if (StringUtils.isNotEmpty(username))
+					sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
+				if (StringUtils.isNotEmpty(client.getAddress()))
+					sDao.next(LOGINFAIL_IP + client.getAddress(), 0L, Tenant.SYSTEM_ID);
+				if (StringUtils.isNotEmpty(apiKey))
+					sDao.next(LOGINFAIL_APIKEY + apiKey, 0L, Tenant.SYSTEM_ID);
+			}
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
 		}
 
 		// Record the failed login attempt
@@ -136,17 +140,21 @@ public class LoginThrottle {
 
 		log.debug("Take anti brute force attack countermeasures");
 
-		// Check if the username is temporarily blocked
-		checkUsername(username);
+		try {
+			// Check if the username is temporarily blocked
+			checkUsername(username);
 
-		// Check if the IP is temporarily blocked
-		checkIp(ip);
+			// Check if the IP is temporarily blocked
+			checkIp(ip);
 
-		// Check if the IP is temporarily blocked
-		checkApikey(apikey);
+			// Check if the IP is temporarily blocked
+			checkApikey(apikey);
+		} catch (PersistenceException e) {
+			log.warn("Database error: %s".formatted(e.getMessage()), e);
+		}
 	}
 
-	private static void checkIp(String ip) throws IPBlockedException {
+	private static void checkIp(String ip) throws IPBlockedException, PersistenceException {
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -174,7 +182,7 @@ public class LoginThrottle {
 		}
 	}
 
-	private static void checkUsername(String username) throws UsernameBlockedException {
+	private static void checkUsername(String username) throws UsernameBlockedException, PersistenceException {
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -205,7 +213,7 @@ public class LoginThrottle {
 		}
 	}
 
-	private static void checkApikey(String apikey) throws ApiKeyBlockedException {
+	private static void checkApikey(String apikey) throws ApiKeyBlockedException, PersistenceException {
 		if (StringUtils.isEmpty(apikey))
 			return;
 

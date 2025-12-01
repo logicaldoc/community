@@ -108,7 +108,7 @@ public abstract class ChartServlet extends HttpServlet {
 	}
 
 	protected void drawChart(File chartFile, int width, int height, Locale locale, long objectId, long tenantId)
-			throws IOException {
+			throws IOException, PersistenceException {
 		/**
 		 * Retrieve the sequences and order them by date
 		 */

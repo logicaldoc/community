@@ -35,8 +35,10 @@ public interface SequenceDAO extends PersistentObjectDAO<Sequence> {
 	 * @param tenantId ID of the owning tenant
 	 * 
 	 * @return The next value
+	 * 
+	 * @throws PersistenceException an error happened in the database
 	 */
-	public long next(String name, long objectId, long tenantId);
+	public long next(String name, long objectId, long tenantId) throws PersistenceException;
 
 	/**
 	 * Returns the next value of the sequence by incrementing by the given
@@ -48,8 +50,10 @@ public interface SequenceDAO extends PersistentObjectDAO<Sequence> {
 	 * @param increment ID of the owning tenant
 	 * 
 	 * @return The next value
+	 * 
+	 * @throws PersistenceException an error happened in the database 
 	 */
-	public long next(String name, long objectId, long tenantId, long increment);
+	public long next(String name, long objectId, long tenantId, long increment) throws PersistenceException;
 
 	/**
 	 * Initializes the sequence value
@@ -58,8 +62,10 @@ public interface SequenceDAO extends PersistentObjectDAO<Sequence> {
 	 * @param objectId The sequence object ID
 	 * @param value The initial value
 	 * @param tenantId ID of the owning tenant
+	 * 
+	 * @throws PersistenceException an error happened in the database
 	 */
-	public void reset(String name, long objectId, long tenantId, long value);
+	public void reset(String name, long objectId, long tenantId, long value) throws PersistenceException;
 
 	/**
 	 * Deletes the sequence
@@ -80,7 +86,7 @@ public interface SequenceDAO extends PersistentObjectDAO<Sequence> {
 	 * 
 	 * @return collection of sequences
 	 */
-	public List<Sequence> findByName(String name, long tenantId);
+	public List<Sequence> findByName(String name, long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds the sequence by the given alternate key
@@ -91,7 +97,7 @@ public interface SequenceDAO extends PersistentObjectDAO<Sequence> {
 	 * 
 	 * @return the sequence object
 	 */
-	public Sequence findByAlternateKey(String name, long objectId, long tenantId);
+	public Sequence findByAlternateKey(String name, long objectId, long tenantId) throws PersistenceException;
 
 	/**
 	 * Gets the current value
@@ -101,6 +107,8 @@ public interface SequenceDAO extends PersistentObjectDAO<Sequence> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return current value of the sequence
+	 * 
+	 * @throws PersistenceException an error happened in the database
 	 */
-	public long getCurrentValue(String name, long objectId, long tenantId);
+	public long getCurrentValue(String name, long objectId, long tenantId) throws PersistenceException;
 }

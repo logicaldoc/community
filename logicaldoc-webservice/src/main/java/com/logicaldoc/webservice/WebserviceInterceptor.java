@@ -26,6 +26,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.runtime.Aspect;
 import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.Session;
@@ -244,7 +245,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		}
 	}
 
-	protected void syncCounters() {
+	protected void syncCounters() throws PersistenceException {
 		for (Map.Entry<Pair<String, Long>, AtomicLong> entry : counters.entrySet()) {
 			AtomicLong counter = entry.getValue();
 			sequenceDAO.next(entry.getKey().getKey(), 0L, entry.getKey().getValue(), counter.get());
