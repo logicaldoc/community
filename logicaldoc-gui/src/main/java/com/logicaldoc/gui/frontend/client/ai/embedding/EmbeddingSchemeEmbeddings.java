@@ -142,12 +142,10 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 				MenuItem open = new MenuItem();
 				open.setTitle(I18N.message("openinfolder"));
 				open.setEnabled(enabledPermissions.isRead());
-				open.addClickHandler(event -> {
-					destroy();
-
-					if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
-						DocumentsPanel.get().openInFolder(selectedEmbeddingFolderId, selectedEmbeddingDocId);
-				});
+				open.addClickHandler(
+						event -> DocumentsPanel.get().openInFolder(selectedEmbeddingFolderId, selectedEmbeddingDocId));
+				open.setEnabled(
+						com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS));
 
 				MenuItem download = new MenuItem();
 				download.setTitle(I18N.message("download"));
