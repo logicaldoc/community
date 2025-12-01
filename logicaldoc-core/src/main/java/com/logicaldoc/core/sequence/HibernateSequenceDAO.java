@@ -26,6 +26,7 @@ import jakarta.transaction.Transactional;
 public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence> implements SequenceDAO {
 
 	private static final String TENANTID = "tenantId";
+
 	private static final String AND = " and ";
 
 	private HibernateSequenceDAO() {
@@ -58,20 +59,31 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		synchronized (SequenceDAO.class) {
 			Sequence seq = findByAlternateKey(sequence, objectId, tenantId);
 			if (seq == null) {
-				seq = new Sequence();
+				reset(sequence, objectId, tenantId, increment);
+				return increment;
+			} else {
+				try {
+					jdbcUpdate(
+							"update ld_sequence set ld_value = ld_value + %d, ld_recordversion = ld_recordversion + 1, ld_lastmodified = CURRENT_TIMESTAMP where ld_id = %d"
+									.formatted(increment, seq.getId()));
+					evict(seq.getId());
+					return queryForLong("select ld_value from ld_sequence where ld_id = %d".formatted(seq.getId()));
+				} catch (PersistenceException e) {
+					log.error(e.getMessage(), e);
+					return seq.getValue();
+				}
 			}
-
-			seq.setName(sequence);
-			seq.setObjectId(objectId);
-			seq.setTenantId(tenantId);
-			seq.setValue(seq.getValue() + increment);
-			try {
-				store(seq);
-				flush();
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
-			return seq.getValue();
+//			seq.setName(sequence);
+//			seq.setObjectId(objectId);
+//			seq.setTenantId(tenantId);
+//			seq.setValue(seq.getValue() + increment);
+//			try {
+//				store(seq);
+//				flush();
+//			} catch (PersistenceException e) {
+//				log.error(e.getMessage(), e);
+//			}
+//			return seq.getValue();
 		}
 	}
 
@@ -133,8 +145,10 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		try {
 			long sequenceId = queryForLong(query,
 					Map.of(TENANTID, tenantId, "objectId", objectId, "name", sequenceName));
-			if (sequenceId != 0L)
+			if (sequenceId != 0L) {
 				sequence = findById(sequenceId);
+				refresh(sequence);
+			}
 		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
@@ -148,8 +162,8 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			query += AND + ENTITY + ".objectId = :objectId ";
 			query += AND + ENTITY + ".name = :name ";
 
-			sequences = findByWhere(query, Map.of(TENANTID, tenantId, "objectId", objectId, "name", sequenceName),
-					null, null);
+			sequences = findByWhere(query, Map.of(TENANTID, tenantId, "objectId", objectId, "name", sequenceName), null,
+					null);
 		} catch (Exception t) {
 			// Nothing to do
 		}
