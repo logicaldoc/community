@@ -262,7 +262,7 @@ public class EMailSender {
 	 */
 	public void send(EMail email, String templateName, Map<String, Object> dictionary)
 			throws MessagingException, AutomationException {
-		if (!RunLevel.current().aspectEnabled(Aspect.sendingMessages)) {
+		if (!RunLevel.current().aspectEnabled(Aspect.SENDINGMESSAGES)) {
 			log.warn("Aspect sendingMessages not enabled");
 			return;
 		}
@@ -314,7 +314,7 @@ public class EMailSender {
 	 * @throws MessagingException raised if the email cannot be sent
 	 */
 	public void send(EMail email) throws MessagingException {
-		if (!RunLevel.current().aspectEnabled(Aspect.sendingMessages)) {
+		if (!RunLevel.current().aspectEnabled(Aspect.SENDINGMESSAGES)) {
 			log.error("Aspect sendingMessages not enabled");
 			return;
 		}

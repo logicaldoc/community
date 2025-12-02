@@ -43,6 +43,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class TicketsReport extends ReportPanel {
 
+	private static final String PASSWORD = "password";
+
 	private static final String DOC_ID = "docId";
 
 	private static final String VALID = "valid";
@@ -122,7 +124,7 @@ public class TicketsReport extends ReportPanel {
 		maxViews.setCanFilter(false);
 		maxViews.setCanGroupBy(false);
 
-		ListGridField password = new ListGridField("password", I18N.message("password"));
+		ListGridField password = new ListGridField(PASSWORD, I18N.message(PASSWORD));
 		password.setAlign(Alignment.CENTER);
 		password.setCanEdit(false);
 
@@ -163,7 +165,7 @@ public class TicketsReport extends ReportPanel {
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler(click -> {
 			long id = Long.parseLong(rec.getAttribute(DOC_ID));
-			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
+			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<GUIDocument>() {
 				@Override
 				public void handleSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
@@ -236,13 +238,13 @@ public class TicketsReport extends ReportPanel {
 		MenuItem setPassword = new MenuItem();
 		setPassword.setTitle(I18N.message("setpassword"));
 		setPassword.addClickHandler(click -> LD.askForValue(I18N.message("question"), I18N.message("confirmdelete"),
-				null, ItemFactory.newPasswordItemPreventAutocomplete("password", "password", null, true), psw -> {
+				null, ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD, null, true), psw -> 
 					DocumentService.Instance.get().setTicketPassword(rec.getAttributeAsLong("id"), psw,
 							new DefaultAsyncCallback<>() {
 								@Override
 								public void handleSuccess(List<String> result) {
 									if (result.isEmpty())  {
-										list.getSelectedRecord().setAttribute("password", true);
+										list.getSelectedRecord().setAttribute(PASSWORD, true);
 										list.invalidateRecordComponents();
 										list.refreshRecordComponent(list.getRecordIndex(list.getSelectedRecord()));
 										list.refreshFields();
@@ -250,17 +252,17 @@ public class TicketsReport extends ReportPanel {
 										SC.warn(result.toString().replace('[', ' ').replace(']', ' '));
 									}
 								}
-							});
-				}));
+							})
+				));
 
 		MenuItem unsetPassword = new MenuItem();
 		unsetPassword.setTitle(I18N.message("unsetpassword"));
-		unsetPassword.setEnabled(list.getSelectedRecord().getAttributeAsBoolean("password"));
+		unsetPassword.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(PASSWORD));
 		unsetPassword.addClickHandler(click -> DocumentService.Instance.get()
 				.setTicketPassword(rec.getAttributeAsLong("id"), null, new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(List<String> result) {
-						list.getSelectedRecord().setAttribute("password", false);
+						list.getSelectedRecord().setAttribute(PASSWORD, false);
 						list.invalidateRecordComponents();
 						list.refreshRecordComponent(list.getRecordIndex(list.getSelectedRecord()));
 						list.refreshFields();

@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
-import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -61,7 +60,7 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCountSessions() throws PersistenceException {
+	public void testCountSessions() {
 
 		assertEquals(1, dao.countSessions(1L, Session.STATUS_OPEN));
 		assertEquals(1, dao.countSessions((Long) null, Session.STATUS_OPEN));

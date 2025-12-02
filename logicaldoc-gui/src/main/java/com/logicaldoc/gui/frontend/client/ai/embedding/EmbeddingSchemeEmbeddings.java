@@ -43,6 +43,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 
+	private static final String DOCID = "docid";
 	private RefreshableListGrid embeddings;
 
 	public EmbeddingSchemeEmbeddings(EmbeddingSchemesPanel schemesPanel, GUIEmbeddingScheme scheme,
@@ -74,7 +75,7 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 		// Prepare a panel containing a title and the documents number
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField docId = new ColoredListGridField("docid");
+		ListGridField docId = new ColoredListGridField(DOCID);
 		docId.setWidth(50);
 		docId.setHidden(true);
 
@@ -120,13 +121,13 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 		final ListGridRecord[] selection = embeddings.getSelectedRecords();
 		List<Long> docIds = new ArrayList<>();
 		for (ListGridRecord rec : selection)
-			docIds.add(rec.getAttributeAsLong("docid"));
+			docIds.add(rec.getAttributeAsLong(DOCID));
 
 		DocumentService.Instance.get().getAllowedPermissions(docIds, new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(GUIAccessControlEntry enabledPermissions) {
 				Menu contextMenu = new Menu();
-				Long selectedEmbeddingDocId = selection[0].getAttributeAsLong("docid");
+				Long selectedEmbeddingDocId = selection[0].getAttributeAsLong(DOCID);
 				Long selectedEmbeddingFolderId = selection[0].getAttributeAsLong("folderid");
 
 				MenuItem preview = new MenuItem();
@@ -183,6 +184,30 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 	}
 
 	public boolean validate() {
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		return prime * result + ((embeddings == null) ? 0 : embeddings.hashCode());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EmbeddingSchemeEmbeddings other = (EmbeddingSchemeEmbeddings) obj;
+		if (embeddings == null) {
+			if (other.embeddings != null)
+				return false;
+		} else if (!embeddings.equals(other.embeddings))
+			return false;
 		return true;
 	}
 }

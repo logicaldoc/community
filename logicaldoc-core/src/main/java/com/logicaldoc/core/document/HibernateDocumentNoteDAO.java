@@ -3,7 +3,6 @@ package com.logicaldoc.core.document;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -130,45 +130,45 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	public List<DocumentNote> findByDocIdAndTypes(long docId, long userId, String fileVersion, Collection<String> types)
 			throws PersistenceException {
 
-		List<DocumentNote> notes = new ArrayList<>();
+		List<DocumentNote> notes;
 		if (StringUtils.isEmpty(fileVersion)) {
-			if (types == null || types.isEmpty()) {
+			if (CollectionUtils.isEmpty(types)) {
 				notes = findByWhere(ENTITY + ".docId = " + docId, null, null);
 			} else {
-				Map<String, Object> params = new HashMap<>();
-				params.put(DOC_ID, docId);
-				params.put("types", types);
-
 				notes = findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + DELETED_0,
-						params, null, null);
+						Map.of(DOC_ID, docId, "types", types), null, null);
 			}
-		} else if (types == null || types.isEmpty()) {
-			Map<String, Object> params = new HashMap<>();
-			params.put(DOC_ID, docId);
-			params.put("fileVersion", fileVersion);
+		} else if (CollectionUtils.isEmpty(types)) {
 			notes = findByWhere(
 					ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY + DELETED_0,
-					params, null, null);
+					Map.of(DOC_ID, docId, "fileVersion", fileVersion), null, null);
 		} else {
-			Map<String, Object> params = new HashMap<>();
-			params.put(DOC_ID, docId);
-			params.put("fileVersion", fileVersion);
-			params.put("types", types);
-			notes = findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
-					+ ".type in (:types) and " + ENTITY + DELETED_0, params, null, null);
+			notes = findByWhere(
+					ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
+							+ ".type in (:types) and " + ENTITY + DELETED_0,
+					Map.of(DOC_ID, docId, "fileVersion", fileVersion, "types", types), null, null);
 		}
 
-		/*
-		 * @formatter:off
-		 * 
-		 * Filter the results using the user: 
-		 * 1. notes created by the specified user
-		 * 2. notes where the user is one of the participants 
-		 * 3. notes without any ACL
-		 * 4. for admin users no filter at all 
-		 * 
-		 * @formatter:on
-		 */
+		return filterNotes(userId, notes);
+	}
+
+	/**
+	 * Filters the results using the user:
+	 * <ol>
+	 * <li>notes created by the specified user</li>
+	 * <li>notes where the user is one of the participants</li>
+	 * <li>notes without any ACL</li>
+	 * <li>for admin users no filter at all</li>
+	 * </ol>
+	 * 
+	 * @param userId identifier of the current user
+	 * @param notes list of notes to filter
+	 * 
+	 * @return the suitable notes
+	 * 
+	 * @throws PersistenceException error in the database
+	 */
+	protected List<DocumentNote> filterNotes(long userId, List<DocumentNote> notes) throws PersistenceException {
 		if (userId == User.USERID_ADMIN) {
 			return notes;
 		} else {

@@ -2051,6 +2051,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		/*
 		 * If the note specifies a recipient, update the user's address book
 		 */
+		updateUserAddressBook(session, note);
+
+		return getNote(note.getId());
+	}
+
+	private void updateUserAddressBook(Session session, DocumentNote note) throws PersistenceException {
 		if (StringUtils.isNotEmpty(note.getRecipientEmail())) {
 			List<Contact> contacts = ContactDAO.get().findByUser(session.getUserId(), note.getRecipientEmail());
 			if (contacts.isEmpty()) {
@@ -2069,8 +2075,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				saveContact(contact);
 			}
 		}
-
-		return getNote(note.getId());
 	}
 
 	private void saveNote(DocumentNote note, Session session) throws ServerException {

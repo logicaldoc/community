@@ -42,7 +42,7 @@ public class Initializer {
 	 * 
 	 */
 	public void initialize(ExtensibleObject object, Template template, History transaction) {
-		if (!RunLevel.current().aspectEnabled(Aspect.initialization))
+		if (!RunLevel.current().aspectEnabled(Aspect.INITIALIZATION))
 			return;
 
 		// Skip initialization if the object has already been saved

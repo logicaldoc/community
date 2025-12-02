@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TicketDialog extends Window {
 
+	private static final String PASSWORD = "password";
+
 	private static final String MAXVIEWS = "maxviews";
 
 	private static final String ACTION = "action";
@@ -130,7 +132,7 @@ public class TicketDialog extends Window {
 		maxViews.setMin(0);
 		maxViews.setVisibleWhen(new AdvancedCriteria(ACTION, OperatorId.EQUALS, "2"));
 
-		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", null, true);
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD, null, true);
 		password.setColSpan(4);
 
 		form.setItems(action, docOrPdfConversion, duedateTimeItem, duedateTime, date, maxDownloads, maxViews, password);
@@ -143,26 +145,15 @@ public class TicketDialog extends Window {
 		String suffix = form.getValue(CONTENT).toString();
 		Date date = (Date) form.getValue("date");
 
-		Integer expireHours = null;
-		if (form.getValue(DUEDATENUMBER) != null)
-			expireHours = Integer.parseInt(form.getValueAsString(DUEDATENUMBER));
-		if (expireHours != null && "day".equals(form.getValueAsString("duedatetime")))
-			expireHours = expireHours * 24;
-
+		Integer expireHours = getExpireHours();
 		if (date == null && (expireHours == null || expireHours.intValue() < 1))
 			SC.warn(I18N.message("providexepinfo"));
 
-		Integer maxDownloads = null;
-		String val = form.getValueAsString(MAXDOWNLOADS);
-		if (val != null && !val.trim().isEmpty())
-			maxDownloads = Integer.parseInt(val.trim());
+		Integer maxDownloads = getMaxDownloads();
 
-		Integer maxViews = null;
-		val = form.getValueAsString(MAXVIEWS);
-		if (val != null && !val.trim().isEmpty())
-			maxViews = Integer.parseInt(val.trim());
+		Integer maxViews = getMaxViews();
 
-		Object psw = form.getValue("password");
+		Object psw = form.getValue(PASSWORD);
 		String password = psw != null && !psw.toString().isEmpty() ? psw.toString() : null;
 
 		DocumentService.Instance.get().createTicket(document.getId(), Integer.parseInt(form.getValueAsString(ACTION)),
@@ -180,13 +171,38 @@ public class TicketDialog extends Window {
 							List<String> errors = new ArrayList<>();
 							for (int i = 1; i<ret.size();i++ )
 							  errors.add(ret.get(i));
-							form.setFieldErrors("password", errors.toArray(new String[0]), true);
+							form.setFieldErrors(PASSWORD, errors.toArray(new String[0]), true);
 						} else {
 							destroy();
 							new TicketDisplay(ret.get(0), ret.get(1), ret.get(2)).show();
 						}
 					}
 				});
+	}
+
+	private Integer getMaxViews() {
+		Integer maxViews = null;
+		String val = form.getValueAsString(MAXVIEWS);
+		if (val != null && !val.trim().isEmpty())
+			maxViews = Integer.parseInt(val.trim());
+		return maxViews;
+	}
+
+	private Integer getMaxDownloads() {
+		Integer maxDownloads = null;
+		String val = form.getValueAsString(MAXDOWNLOADS);
+		if (val != null && !val.trim().isEmpty())
+			maxDownloads = Integer.parseInt(val.trim());
+		return maxDownloads;
+	}
+
+	private Integer getExpireHours() {
+		Integer expireHours = null;
+		if (form.getValue(DUEDATENUMBER) != null)
+			expireHours = Integer.parseInt(form.getValueAsString(DUEDATENUMBER));
+		if (expireHours != null && "day".equals(form.getValueAsString("duedatetime")))
+			expireHours = expireHours * 24;
+		return expireHours;
 	}
 
 	@Override

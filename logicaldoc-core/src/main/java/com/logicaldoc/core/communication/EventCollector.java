@@ -128,6 +128,6 @@ public class EventCollector {
 	}
 
 	public static boolean isEnabled() {
-		return RunLevel.current().aspectEnabled(Aspect.eventsGathering);
+		return RunLevel.current().aspectEnabled(Aspect.EVENTSGATHERING);
 	}
 }

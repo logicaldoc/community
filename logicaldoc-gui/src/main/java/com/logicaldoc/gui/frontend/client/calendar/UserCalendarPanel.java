@@ -97,7 +97,7 @@ public class UserCalendarPanel extends VLayout {
 							enableSynchronization.setValue("1".equals(settings.get(2)));
 							enableSynchronization
 									.addChangedHandler(changed -> GoogleService.Instance.get().enableCalendar(
-											enableSynchronization.getValueAsBoolean(), new EmptyAsyncCallback<Void>()));
+											enableSynchronization.getValueAsBoolean(), new EmptyAsyncCallback<>()));
 						}
 					});
 		}

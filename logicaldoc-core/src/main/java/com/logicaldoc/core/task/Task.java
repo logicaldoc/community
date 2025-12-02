@@ -193,7 +193,7 @@ public abstract class Task implements Runnable {
 
 	@Override
 	public void run() {
-		if (!RunLevel.current().aspectEnabled(Aspect.scheduledTasks)) {
+		if (!RunLevel.current().aspectEnabled(Aspect.SCHEDULEDTASKS)) {
 			log.debug("Aspect scheduledTasks not enabled");
 			return;
 		}

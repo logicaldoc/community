@@ -44,6 +44,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class ParametricForm extends VLayout implements SearchObserver {
+	private static final String MATCH = "match";
+
+	private static final String SUBFOLDERS = "subfolders";
+
+	private static final String ALIASES = "aliases";
+
 	private static final String TEMPLATE = "template";
 
 	private static final String TYPE = "type:";
@@ -137,10 +143,10 @@ public class ParametricForm extends VLayout implements SearchObserver {
 
 		CheckboxItem casesensitive = new CheckboxItem(CASESENSITIVE, I18N.message(CASESENSITIVE));
 		casesensitive.setValue(true);
-		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
+		CheckboxItem aliases = new CheckboxItem(ALIASES, I18N.message("retrievealiases"));
 		aliases.setValue(true);
 
-		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders2"));
+		CheckboxItem subfolders = new CheckboxItem(SUBFOLDERS, I18N.message("searchinsubfolders2"));
 		subfolders.setColSpan(2);
 		subfolders.setEndRow(true);
 
@@ -150,7 +156,7 @@ public class ParametricForm extends VLayout implements SearchObserver {
 		matchMap.put("and", I18N.message("matchall"));
 		matchMap.put("or", I18N.message("matchany"));
 		matchMap.put("not", I18N.message("matchnone"));
-		RadioGroupItem match = new RadioGroupItem("match");
+		RadioGroupItem match = new RadioGroupItem(MATCH);
 		match.setDefaultValue("and");
 		match.setShowTitle(false);
 		match.setValueMap(matchMap);
@@ -225,7 +231,7 @@ public class ParametricForm extends VLayout implements SearchObserver {
 		options.setSource(this);
 
 		options.setMaxHits(Search.get().getMaxHits());
-		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")));
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString(ALIASES)));
 		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString(CASESENSITIVE)));
 
 		options.setType(GUISearchOptions.TYPE_PARAMETRIC);
@@ -234,7 +240,7 @@ public class ParametricForm extends VLayout implements SearchObserver {
 
 		setTemplateCondition(values, options);
 
-		options.setTopOperator((String) values.get("match"));
+		options.setTopOperator((String) values.get(MATCH));
 
 		setFolderCondition(options);
 
@@ -394,7 +400,7 @@ public class ParametricForm extends VLayout implements SearchObserver {
 			options.setFolder(folder.getFolderId());
 			options.setFolderName(folder.getFolderName());
 		}
-		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
+		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString(SUBFOLDERS)));
 	}
 
 	private void setTemplateCondition(Map<String, Object> values, GUISearchOptions options) {
@@ -425,7 +431,7 @@ public class ParametricForm extends VLayout implements SearchObserver {
 		if (options.getType() == GUISearchOptions.TYPE_PARAMETRIC) {
 			defaultOptions = options;
 			SearchMenu.get().openParametricSection();
-			if (isDrawn())
+			if (Boolean.TRUE.equals(isDrawn()))
 				applyOptions(options);
 		}
 	}
@@ -436,17 +442,17 @@ public class ParametricForm extends VLayout implements SearchObserver {
 
 		folder.setFolder(options.getFolder(), options.getFolderName());
 
-		vm.setValue("subfolders", options.isSearchInSubPath());
-		vm.setValue("aliases", options.isRetrieveAliases());
+		vm.setValue(SUBFOLDERS, options.isSearchInSubPath());
+		vm.setValue(ALIASES, options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
 
 		vm.setValue(CASESENSITIVE, options.isCaseSensitive());
-		vm.setValue("match", options.getTopOperator());
+		vm.setValue(MATCH, options.getTopOperator());
 
 		conditionsLayout.removeMembers(conditionsLayout.getMembers());
 
 		if (options.getTemplate() != null) {
-			vm.setValue("template", Long.toString(options.getTemplate()));
+			vm.setValue(TEMPLATE, Long.toString(options.getTemplate()));
 			TemplateService.Instance.get().getTemplate(options.getTemplate(), new DefaultAsyncCallback<>() {
 				@Override
 				public void handleSuccess(GUITemplate result) {

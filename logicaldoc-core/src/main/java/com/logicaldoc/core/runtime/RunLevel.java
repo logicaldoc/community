@@ -47,7 +47,7 @@ public enum RunLevel {
 	}
 
 	private String getAspectProperty(String aspect) {
-		return "aspect." + aspect + "." + toString();
+		return "aspect." + aspect.toLowerCase() + "." + toString();
 	}
 
 	public boolean aspectEnabled(Aspect aspect) {

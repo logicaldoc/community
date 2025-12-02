@@ -28,8 +28,6 @@ public class LogPanel extends VLayout {
 
 	private String appender;
 
-	private HTMLPane htmlPane;
-
 	public LogPanel(String appender) {
 		this.appender = appender;
 		setHeight100();
@@ -37,7 +35,7 @@ public class LogPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		htmlPane = new HTMLPane();
+		HTMLPane htmlPane = new HTMLPane();
 		htmlPane.setPrefix("sdar");
 		htmlPane.setWidth100();
 		htmlPane.setHeight100();
@@ -113,7 +111,7 @@ public class LogPanel extends VLayout {
 		toolStrip.addFill();
 		addMember(toolStrip);
 		addMember(htmlPane);
-		
+
 		scrollBottom();
 	}
 

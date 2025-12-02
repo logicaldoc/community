@@ -156,7 +156,7 @@ public class AclDataServlet extends AbstractDataServlet {
 					writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
 					writer.print(AVATAR + userId + AVATAR_CLOSED);
 				}
-				writer.print("<write>" + (rows.getInt(4) == 1) + "</write>");
+				writer.print(WRITE + (rows.getInt(4) == 1) + WRITE_CLOSED);
 				writer.print(READ + (rows.getInt(5) == 1) + READ_CLOSED);
 				writer.print(TYPE + groupType + TYPE_CLOSED);
 				writer.print(ACE_CLOSED);
@@ -340,7 +340,7 @@ public class AclDataServlet extends AbstractDataServlet {
 				writer.print("<delete>" + intToBoolean(rows.getInt(6)) + "</delete>");
 				writer.print("<security>" + intToBoolean(rows.getInt(6)) + "</security>");
 				writer.print(TYPE + groupType + TYPE_CLOSED);
-				
+
 				writer.print(ACE_CLOSED);
 			}
 		});
@@ -367,33 +367,38 @@ public class AclDataServlet extends AbstractDataServlet {
 			writer.print(AVATAR + userId + AVATAR_CLOSED);
 		}
 
-		writer.print("<write>" + intToBoolean(set.getInt(4)) + "</write>");
-		writer.print("<add>" + intToBoolean(set.getInt(5)) + "</add>");
-		writer.print("<security>" + intToBoolean(set.getInt(6)) + "</security>");
-		writer.print("<immutable>" + intToBoolean(set.getInt(7)) + "</immutable>");
-		writer.print("<delete>" + intToBoolean(set.getInt(8)) + "</delete>");
-		writer.print("<rename>" + intToBoolean(set.getInt(9)) + "</rename>");
-		writer.print("<import>" + intToBoolean(set.getInt(10)) + "</import>");
-		writer.print("<export>" + intToBoolean(set.getInt(11)) + "</export>");
-		writer.print("<sign>" + intToBoolean(set.getInt(12)) + "</sign>");
-		writer.print("<archive>" + intToBoolean(set.getInt(13)) + "</archive>");
-		writer.print("<workflow>" + intToBoolean(set.getInt(14)) + "</workflow>");
-		writer.print("<download>" + intToBoolean(set.getInt(15)) + "</download>");
-		writer.print("<calendar>" + intToBoolean(set.getInt(16)) + "</calendar>");
-		writer.print("<subscription>" + intToBoolean(set.getInt(17)) + "</subscription>");
-		writer.print("<print>" + intToBoolean(set.getInt(18)) + "</print>");
-		writer.print("<password>" + intToBoolean(set.getInt(19)) + "</password>");
-		writer.print("<move>" + intToBoolean(set.getInt(20)) + "</move>");
-		writer.print("<email>" + intToBoolean(set.getInt(21)) + "</email>");
-		writer.print("<automation>" + intToBoolean(set.getInt(22)) + "</automation>");
-		writer.print("<store>" + intToBoolean(set.getInt(23)) + "</store>");
-		writer.print("<readingreq>" + intToBoolean(set.getInt(24)) + "</readingreq>");
-		writer.print(READ + intToBoolean(set.getInt(25)) + READ_CLOSED);
-		writer.print("<preview>" + intToBoolean(set.getInt(26)) + "</preview>");
-		writer.print("<customid>" + intToBoolean(set.getInt(27)) + "</customid>");
-		writer.print("<revision>" + intToBoolean(set.getInt(28)) + "</revision>");
+		printPermission("write", writer, intToBoolean(set.getInt(4)));
+		printPermission("add", writer, intToBoolean(set.getInt(5)));
+		printPermission("security", writer, intToBoolean(set.getInt(6)));
+		printPermission("immutable", writer, intToBoolean(set.getInt(7)));
+		printPermission("delete", writer, intToBoolean(set.getInt(8)));
+		printPermission("rename", writer, intToBoolean(set.getInt(9)));
+		printPermission("import", writer, intToBoolean(set.getInt(10)));
+		printPermission("export", writer, intToBoolean(set.getInt(11)));
+		printPermission("sign", writer, intToBoolean(set.getInt(12)));
+		printPermission("archive", writer, intToBoolean(set.getInt(13)));
+		printPermission("workflow", writer, intToBoolean(set.getInt(14)));
+		printPermission("download", writer, intToBoolean(set.getInt(15)));
+		printPermission("calendar", writer, intToBoolean(set.getInt(16)));
+		printPermission("subscription", writer, intToBoolean(set.getInt(17)));
+		printPermission("print", writer, intToBoolean(set.getInt(18)));
+		printPermission("password", writer, intToBoolean(set.getInt(19)));
+		printPermission("move", writer, intToBoolean(set.getInt(20)));
+		printPermission("email", writer, intToBoolean(set.getInt(21)));
+		printPermission("automation", writer, intToBoolean(set.getInt(22)));
+		printPermission("store", writer, intToBoolean(set.getInt(23)));
+		printPermission("readingreq", writer, intToBoolean(set.getInt(24)));
+		printPermission("read", writer, intToBoolean(set.getInt(25)));
+		printPermission("preview", writer, intToBoolean(set.getInt(26)));
+		printPermission("customid", writer, intToBoolean(set.getInt(27)));
+		printPermission("revision", writer, intToBoolean(set.getInt(28)));
+		
 		writer.print(TYPE + groupType + TYPE_CLOSED);
 		writer.print(ACE_CLOSED);
+	}
+
+	private void printPermission(String permission, PrintWriter writer, boolean enabled) throws SQLException {
+		writer.print(String.format("<%s>%b</%s>", permission, enabled, permission));
 	}
 
 	private boolean intToBoolean(int val) {

@@ -121,7 +121,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	private void recordWebserviceCall(Message message, Session session) {
 		String payload;
-		if (RunLevel.current().aspectEnabled(Aspect.saveApiCall)
+		if (RunLevel.current().aspectEnabled(Aspect.SAVEAPICALL)
 				&& settings.getBoolean("webservice.call.record", false)) {
 			WebserviceCall call = new WebserviceCall();
 

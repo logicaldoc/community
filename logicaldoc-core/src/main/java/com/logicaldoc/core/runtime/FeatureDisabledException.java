@@ -10,6 +10,10 @@ import com.logicaldoc.i18n.I18N;
  */
 public class FeatureDisabledException extends Exception {
 
+	private static final String MESSAGE_PREFIX = "Feature ";
+
+	private static final String BUNDLE_PREFIX = "feature.Feature_";
+	
 	private static final long serialVersionUID = 1L;
 
 	protected FeatureDisabledException(String featureId, String messagePrefix, String featureKeyPrefix,
@@ -22,18 +26,18 @@ public class FeatureDisabledException extends Exception {
 	}
 
 	public FeatureDisabledException(Feature feature) {
-		this(Integer.toString(feature.ordinal() + 1), "Feature ", "feature.Feature_");
+		this(Integer.toString(feature.ordinal() + 1), MESSAGE_PREFIX, BUNDLE_PREFIX);
 	}
 
 	public FeatureDisabledException(String featureId) {
-		this(featureId, "Feature ", "feature.Feature_");
+		this(featureId, MESSAGE_PREFIX, BUNDLE_PREFIX);
 	}
 
 	public FeatureDisabledException(Feature feature, Throwable cause) {
-		this(Integer.toString(feature.ordinal() + 1), "Feature ", "feature.Feature_", cause);
+		this(Integer.toString(feature.ordinal() + 1), MESSAGE_PREFIX, BUNDLE_PREFIX, cause);
 	}
 
 	public FeatureDisabledException(String featureId, Throwable cause) {
-		this(featureId, "Feature ", "feature.Feature_", cause);
+		this(featureId, MESSAGE_PREFIX, BUNDLE_PREFIX, cause);
 	}
 }

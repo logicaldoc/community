@@ -36,6 +36,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -108,10 +109,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	}
 
 	public class CreateDocumentMultipartRequest {
-		@Schema(implementation = WSDocument.class, required = true, description = "The document metadata provided as WSDocument object encoded in JSON/XML format")
+		@Schema(implementation = WSDocument.class, requiredMode = RequiredMode.REQUIRED, description = "The document metadata provided as WSDocument object encoded in JSON/XML format")
 		public WSDocument document;
 
-		@Schema(type = "string", format = "binary", required = true, description = "File data")
+		@Schema(type = "string", format = "binary", requiredMode = RequiredMode.REQUIRED, description = "File data")
 		public Attachment content;
 	}
 
@@ -182,17 +183,17 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 	public class CheckinDocumentMultipartRequest {
 
-		@Schema(type = "integer", required = true, description = "The ID of an existing document to update")
+		@Schema(type = "integer", requiredMode = RequiredMode.REQUIRED, description = "The ID of an existing document to update")
 		public String docId;
 
-		@Schema(type = "string", required = false, description = "An optional comment")
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, description = "An optional comment")
 		public String comment;
 
-		@Schema(type = "string", required = false, allowableValues = { "true",
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, allowableValues = { "true",
 				"false" }, description = "Indicates whether to create or not a new major release of")
 		public String release;
 
-		@Schema(type = "string", required = true, description = "File name")
+		@Schema(type = "string", requiredMode = RequiredMode.REQUIRED, description = "File name")
 		public String filename;
 
 		@Schema(type = "string", format = "binary", required = true, description = "File data")
@@ -242,20 +243,20 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 	public class UploadDocumentMultipartRequest {
 
-		@Schema(type = "integer", required = false, description = "The ID of an existing document to update")
+		@Schema(type = "integer", requiredMode = RequiredMode.NOT_REQUIRED, description = "The ID of an existing document to update")
 		public String docId;
 
-		@Schema(type = "string", required = false, description = "Folder ID where to place the document")
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, description = "Folder ID where to place the document")
 		public String folderId;
 
-		@Schema(type = "string", required = false, allowableValues = { "true",
+		@Schema(type = "string", requiredMode = RequiredMode.REQUIRED, allowableValues = { "true",
 				"false" }, description = "Indicates whether to create or not a new major release of an updated document")
 		public String release;
 
-		@Schema(type = "string", required = true, description = "File name")
+		@Schema(type = "string", requiredMode = RequiredMode.REQUIRED, description = "File name")
 		public String filename;
 
-		@Schema(type = "string", required = false, defaultValue = "en", description = "Language of the document (ISO 639-2)")
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, defaultValue = "en", description = "Language of the document (ISO 639-2)")
 		public String language;
 
 		@Schema(type = "string", format = "binary", required = true, description = "File data")
@@ -299,13 +300,13 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 	public class ReplaceFileMultipartRequest {
 
-		@Schema(type = "integer", required = true, description = "The ID of an existing document to update")
+		@Schema(type = "integer", requiredMode = RequiredMode.REQUIRED, description = "The ID of an existing document to update")
 		public String docId;
 
-		@Schema(type = "string", required = false, description = "The file version")
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, description = "The file version")
 		public String fileVersion;
 
-		@Schema(type = "string", required = false, description = "Comment")
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, description = "Comment")
 		public String comment;
 
 		@Schema(type = "string", format = "binary", required = true, description = "File data")

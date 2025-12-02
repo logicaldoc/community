@@ -49,7 +49,7 @@ public class Validator {
 	 */
 	public void validate(ExtensibleObject object, Template template, History transaction)
 			throws ValidationException, AutomationException {
-		if (!RunLevel.current().aspectEnabled(Aspect.validation))
+		if (!RunLevel.current().aspectEnabled(Aspect.VALIDATION))
 			return;
 
 		// Skip validation if the object is not being changed nor stored

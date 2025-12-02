@@ -229,10 +229,7 @@ public class ParameterConditionRow extends HLayout {
 			map.put(NOTEQUAL, I18N.message(NOTEQUAL).toLowerCase());
 			map.put("null", I18N.message(ISNULL).toLowerCase());
 			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
-		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
-				|| criteriaField.equals("date") || criteriaField.equals("creation")
-				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
-				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DATE)) {
+		} else if (isDate(criteriaField)) {
 			map.put(GREATERTHAN, I18N.message(GREATERTHAN).toLowerCase());
 			map.put(LESSTHAN, I18N.message(LESSTHAN).toLowerCase());
 			map.put("null", I18N.message(ISNULL).toLowerCase());
@@ -272,10 +269,7 @@ public class ParameterConditionRow extends HLayout {
 	}
 
 	private FormItem valueItemFor(String criteriaField) {
-		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
-				|| criteriaField.equals("rating") || criteriaField.equals("template")
-				|| criteriaField.equals("published") || criteriaField.equals("indexed")
-				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT)) {
+		if (isInteger(criteriaField)) {
 			return ItemFactory.newIntegerItem(VALUE_STR, "integer",
 					criterion != null ? criterion.getLongValue() : null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
@@ -315,10 +309,7 @@ public class ParameterConditionRow extends HLayout {
 			if (criterion != null)
 				item.setDocument(criterion.getLongValue(), criterion.getStringValue());
 			return item;
-		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
-				|| criteriaField.equals("date") || criteriaField.equals("creation")
-				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
-				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DATE)) {
+		} else if (isDate(criteriaField)) {
 			DateItem item = ItemFactory.newDateItem(VALUE_STR, "date");
 			if (criterion != null)
 				item.setValue(criterion.getDateValue());
@@ -329,6 +320,20 @@ public class ParameterConditionRow extends HLayout {
 		} else {
 			return ItemFactory.newTextItem(VALUE_STR, criterion != null ? criterion.getStringValue() : null);
 		}
+	}
+
+	private boolean isInteger(String criteriaField) {
+		return criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
+				|| criteriaField.equals("rating") || criteriaField.equals("template")
+				|| criteriaField.equals("published") || criteriaField.equals("indexed")
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT);
+	}
+
+	private boolean isDate(String criteriaField) {
+		return criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
+				|| criteriaField.equals("date") || criteriaField.equals("creation")
+				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DATE);
 	}
 
 	private String attributeName(String criteriaField) {

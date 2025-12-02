@@ -32,6 +32,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 9.2.2
  */
 public class SemanticForm extends VLayout implements SearchObserver {
+	private static final String THRESHOLD = "threshold";
+
+	private static final String ALIASES = "aliases";
+
+	private static final String SUBFOLDERS = "subfolders";
+
 	private static final String SEARCH = "search";
 
 	private static final String LANGUAGE = "language";
@@ -135,18 +141,17 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		if (Search.get().getOptions().getFolder() != null)
 			folder.setFolder(Search.get().getOptions().getFolder(), Search.get().getOptions().getFolderName());
 
-		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders"));
+		CheckboxItem subfolders = new CheckboxItem(SUBFOLDERS, I18N.message("searchinsubfolders"));
 
-		SpinnerItem threshold = new SpinnerItem("threshold", I18N.message("threshold"));
+		SpinnerItem threshold = ItemFactory.newSpinnerItem(THRESHOLD, 50); 
 		threshold.setMin(0);
 		threshold.setStep(1);
-		threshold.setWidth(100);
 		threshold.setMax(100);
-		threshold.setDefaultValue(50);
+		threshold.setRequired(true);
 
-		CheckboxItem searchinhits = new CheckboxItem(SEARCHINHITS, I18N.message(SEARCHINHITS));
+		CheckboxItem searchinhits = ItemFactory.newCheckbox(SEARCHINHITS);
 
-		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
+		CheckboxItem aliases = ItemFactory.newCheckbox(ALIASES, I18N.message("retrievealiases"));
 		aliases.setValue(true);
 
 		DynamicForm form = new DynamicForm();
@@ -191,9 +196,9 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		options.setFolder(folder.getFolderId());
 		options.setFolderName(folder.getFolderName());
 
-		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")));
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString(ALIASES)));
 
-		options.setThreshold(Integer.parseInt(vm.getValueAsString("threshold")));
+		options.setThreshold(Integer.parseInt(vm.getValueAsString(THRESHOLD)));
 
 		setSubfolderCondition(options);
 
@@ -202,7 +207,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 	}
 
 	private void setSubfolderCondition(GUISearchOptions options) {
-		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
+		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString(SUBFOLDERS)));
 		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS)))
 			options.setFilterIds(
 					Search.get().getLastResult().stream().map(doc -> doc.getId()).collect(Collectors.toList()));
@@ -252,18 +257,18 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		folder.setFolder(options.getFolder(), options.getFolderName());
 
 		vm.setValue(EXPRESSION_STR, options.getExpression());
-		vm.setValue("subfolders", options.isSearchInSubPath());
-		vm.setValue("aliases", options.isRetrieveAliases());
+		vm.setValue(SUBFOLDERS, options.isSearchInSubPath());
+		vm.setValue(ALIASES, options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
 		if (options.getSizeMax() != null) {
-			vm.setValue("size", options.getSizeMax() / 1024);
+			vm.setValue("size", options.getSizeMax() / 1024D);
 			vm.setValue("sizeOperator", LESSTHAN);
 		}
 		if (options.getSizeMin() != null) {
-			vm.setValue("size", options.getSizeMin() / 1024);
+			vm.setValue("size", options.getSizeMin() / 1024D);
 			vm.setValue("sizeOperator", "greaterthan");
 		}
-		vm.setValue("threshold", options.getThreshold());
+		vm.setValue(THRESHOLD, options.getThreshold());
 	}
 
 	@Override

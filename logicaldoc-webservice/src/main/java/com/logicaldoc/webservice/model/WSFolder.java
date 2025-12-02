@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,29 +170,32 @@ public class WSFolder implements Serializable {
 
 	private static void fillAttributes(Folder folder, WSFolder wsFolder) {
 		List<WSAttribute> wsAttributes = new ArrayList<>();
-		if (folder.getTemplate() != null && folder.getAttributes() != null && folder.getAttributes().size() > 0) {
-			for (String name : folder.getAttributeNames()) {
-				Attribute attr = folder.getAttribute(name);
-				WSAttribute wsAttribute = new WSAttribute();
-				wsAttribute.setName(name);
-				wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
-				wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
-				wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
-				wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
-				wsAttribute.setParent(attr.getParent());
-				wsAttribute.setPosition(attr.getPosition());
-				wsAttribute.setEditor(attr.getEditor());
-				wsAttribute.setValidation(attr.getValidation());
-				wsAttribute.setSetId(attr.getSetId());
-				wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
-				wsAttribute.setDoubleValue(attr.getDoubleValue());
-				wsAttribute.setIntValue(attr.getIntValue());
-				wsAttribute.setStringValue(attr.getStringValue());
-				wsAttribute.setStringValues(attr.getStringValues());
-				wsAttribute.setType(attr.getType());
-				wsAttribute.setDependsOn(attr.getDependsOn());
-				wsAttributes.add(wsAttribute);
-			}
+		if (folder.getTemplate() == null || MapUtils.isEmpty(folder.getAttributes())) {
+			wsFolder.setAttributes(wsAttributes);
+			return;
+		}
+
+		for (String name : folder.getAttributeNames()) {
+			Attribute attr = folder.getAttribute(name);
+			WSAttribute wsAttribute = new WSAttribute();
+			wsAttribute.setName(name);
+			wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
+			wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
+			wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
+			wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
+			wsAttribute.setParent(attr.getParent());
+			wsAttribute.setPosition(attr.getPosition());
+			wsAttribute.setEditor(attr.getEditor());
+			wsAttribute.setValidation(attr.getValidation());
+			wsAttribute.setSetId(attr.getSetId());
+			wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
+			wsAttribute.setDoubleValue(attr.getDoubleValue());
+			wsAttribute.setIntValue(attr.getIntValue());
+			wsAttribute.setStringValue(attr.getStringValue());
+			wsAttribute.setStringValues(attr.getStringValues());
+			wsAttribute.setType(attr.getType());
+			wsAttribute.setDependsOn(attr.getDependsOn());
+			wsAttributes.add(wsAttribute);
 		}
 		wsFolder.setAttributes(wsAttributes);
 	}

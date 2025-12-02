@@ -39,6 +39,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class SamplerProperties extends SamplerDetailsTab {
 
+	private static final String MAXWORDS = "maxwords";
+
 	private static final String LABEL = "label";
 
 	private static final String TAKEATTRIBUTES = "takeattributes";
@@ -142,7 +144,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		recursive.setValue(sampler.isRecursive());
 		recursive.addChangedHandler(changedHandler);
 
-		SpinnerItem maxWords = ItemFactory.newSpinnerItem("maxwords", sampler.getMaxWords());
+		SpinnerItem maxWords = ItemFactory.newSpinnerItem(MAXWORDS, sampler.getMaxWords());
 		maxWords.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CONTENT));
 		maxWords.setStep(10);
 		maxWords.addChangedHandler(changedHandler);
@@ -362,7 +364,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 			sampler.setFeatures(form.getValueAsString("features"));
 			sampler.setAutomation(form.getValueAsString("automation"));
 			sampler.setMaxWords(
-					form.getValue("maxwords") != null ? Integer.parseInt(form.getValueAsString("maxwords")) : null);
+					form.getValue(MAXWORDS) != null ? Integer.parseInt(form.getValueAsString(MAXWORDS)) : null);
 
 			if (CHAIN.equals(sampler.getType()) && Boolean.TRUE.equals(chainGrid.getRecordList().isEmpty())) {
 				GuiLog.error("samplerchainempty");

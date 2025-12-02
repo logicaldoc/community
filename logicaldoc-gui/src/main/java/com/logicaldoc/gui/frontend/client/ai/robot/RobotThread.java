@@ -133,7 +133,7 @@ public class RobotThread extends Window {
 			return robot.getLabel();
 	}
 
-	private void init() {
+	private void initGUI() {
 		if (contents != null)
 			return;
 
@@ -159,7 +159,7 @@ public class RobotThread extends Window {
 
 	public void ask(String question) {
 		restore();
-		init();
+		initGUI();
 		
 		appendMessage(question, "user");
 		appendMessage("", "robot");

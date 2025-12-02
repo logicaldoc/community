@@ -96,20 +96,8 @@ public class ReportDetailsPanel extends VLayout {
 		}
 
 		/*
-		 * Prepare the security properties tab
+		 * Prepare the security tab
 		 */
-		if (securityPanel != null) {
-			securityPanel.destroy();
-			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
-				securityTabPanel.removeMember(securityPanel);
-		}
-
-		if (propertiesPanel != null) {
-			propertiesPanel.destroy();
-			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
-				propertiesTabPanel.removeMember(propertiesPanel);
-		}
-
 		if (securityPanel != null) {
 			securityPanel.destroy();
 			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))

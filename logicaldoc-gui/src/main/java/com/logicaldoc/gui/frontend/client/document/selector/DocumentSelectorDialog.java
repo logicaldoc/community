@@ -15,15 +15,14 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 8.8.6
  */
 public abstract class DocumentSelectorDialog extends StickyWindow {
-private Long defaultFolderId;
-	
-	
+
+	private Long defaultFolderId;
+
 	protected DocumentSelectorDialog(Long defaultFolderId) {
 		super("documentselector");
-		this.defaultFolderId=defaultFolderId;
+		this.defaultFolderId = defaultFolderId;
 	}
 
-	
 	protected DocumentSelectorDialog() {
 		super("documentselector");
 	}
@@ -46,5 +45,29 @@ private Long defaultFolderId;
 		toolStrip.setWidth100();
 		toolStrip.addButton(confirmSelection);
 		addItem(toolStrip);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		return prime * result + ((defaultFolderId == null) ? 0 : defaultFolderId.hashCode());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentSelectorDialog other = (DocumentSelectorDialog) obj;
+		if (defaultFolderId == null) {
+			if (other.defaultFolderId != null)
+				return false;
+		} else if (!defaultFolderId.equals(other.defaultFolderId))
+			return false;
+		return true;
 	}
 }

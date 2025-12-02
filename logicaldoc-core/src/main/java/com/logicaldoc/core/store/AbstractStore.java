@@ -143,7 +143,7 @@ public abstract class AbstractStore implements Store {
 	 * 
 	 */
 	protected void checkWriteAfterStore(StoreResource resource, long expectedSize) throws IOException {
-		if (RunLevel.current().aspectEnabled(Aspect.writeCheck) && resource.getDocId() != 0L) {
+		if (RunLevel.current().aspectEnabled(Aspect.WRITECHECK) && resource.getDocId() != 0L) {
 			long storedSize = size(resource);
 			if (storedSize != expectedSize)
 				throw new IOException(String.format(

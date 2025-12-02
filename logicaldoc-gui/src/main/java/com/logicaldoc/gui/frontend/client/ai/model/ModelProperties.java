@@ -39,6 +39,10 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ModelProperties extends ModelDetailsTab {
 
+	private static final String MINCHUNKSIZE = "minchunksize";
+
+	private static final String TOKENS = "tokens";
+
 	private static final String MOMENTUM = "momentum";
 
 	private static final String EPSILON = "epsilon";
@@ -230,20 +234,20 @@ public class ModelProperties extends ModelDetailsTab {
 		setEmbedderVisibility(minWordFrequency);
 
 		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", model.getChunking().getChunkSize());
-		chunkSize.setHint(I18N.message("tokens").toLowerCase());
+		chunkSize.setHint(I18N.message(TOKENS).toLowerCase());
 		chunkSize.setMin(100);
 		chunkSize.setStep(10);
 		chunkSize.addChangedHandler(changedHandler);
 		setEmbedderVisibility(chunkSize);
 
-		SpinnerItem minChunkSize = ItemFactory.newSpinnerItem("minchunksize", model.getChunking().getMinChunkSize());
-		minChunkSize.setHint(I18N.message("tokens").toLowerCase());
+		SpinnerItem minChunkSize = ItemFactory.newSpinnerItem(MINCHUNKSIZE, model.getChunking().getMinChunkSize());
+		minChunkSize.setHint(I18N.message(TOKENS).toLowerCase());
 		minChunkSize.setMin(5);
 		minChunkSize.setStep(5);
 		minChunkSize.addChangedHandler(changedHandler);
 		setEmbedderVisibility(minChunkSize);
 
-		SpinnerItem minChunkSizeChars = ItemFactory.newSpinnerItem("minchunksizechars", "minchunksize",
+		SpinnerItem minChunkSizeChars = ItemFactory.newSpinnerItem("minchunksizechars", MINCHUNKSIZE,
 				model.getChunking().getMinChunkSizeChars());
 		minChunkSizeChars.setHint(I18N.message("chars").toLowerCase());
 		minChunkSizeChars.setMin(100);
@@ -288,7 +292,7 @@ public class ModelProperties extends ModelDetailsTab {
 		model.setMinWordFrequency(Integer.parseInt(form.getValueAsString("minwordfrequency")));
 
 		model.getChunking().setChunkSize(Integer.parseInt(form.getValueAsString("chunksize")));
-		model.getChunking().setMinChunkSize(Integer.parseInt(form.getValueAsString("minchunksize")));
+		model.getChunking().setMinChunkSize(Integer.parseInt(form.getValueAsString(MINCHUNKSIZE)));
 		model.getChunking().setMinChunkSizeChars(Integer.parseInt(form.getValueAsString("minchunksizechars")));
 		model.getChunking().setMaxChunks(Integer.parseInt(form.getValueAsString("maxchunks")));
 
@@ -337,7 +341,7 @@ public class ModelProperties extends ModelDetailsTab {
 	private void setNLPVisibility(FormItem item) {
 		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
 				new Criterion[] { new AdvancedCriteria(TYPE, OperatorId.EQUALS, "classifier"),
-						new AdvancedCriteria(TYPE, OperatorId.EQUALS, "tokens") });
+						new AdvancedCriteria(TYPE, OperatorId.EQUALS, TOKENS) });
 
 		item.setVisibleWhen(criteria);
 		item.setRequiredWhen(criteria);

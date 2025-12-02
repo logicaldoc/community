@@ -13,8 +13,6 @@ import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -30,6 +28,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 9.2.2
  */
 public class VectorStoresPanel extends VLayout {
+
+	private static final String PASSWORD = "password";
+
+	private static final String USERNAME = "username";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -64,17 +66,16 @@ public class VectorStoresPanel extends VLayout {
 		url.setIcons(composer);
 
 		// Username
-		TextItem username = ItemFactory.newTextItem("username", Util.getValue("username", settings));
+		TextItem username = ItemFactory.newTextItem(USERNAME, Util.getValue(USERNAME, settings));
 		username.setRequired(false);
 
 		// Password
-		PasswordItem password = ItemFactory.newPasswordItem("password", "Password",
-				Util.getValue("password", settings));
+		PasswordItem password = ItemFactory.newPasswordItem(PASSWORD, PASSWORD, Util.getValue(PASSWORD, settings));
 		password.setRequired(false);
 
 		// Test button
 		ButtonItem testButton = new ButtonItem(I18N.message("testconnection"));
-		testButton.addClickHandler(event -> {
+		testButton.addClickHandler(click -> {
 			if (Boolean.TRUE.equals(vm.validate())) {
 				List<GUIParameter> params = collectSettings();
 
@@ -109,16 +110,14 @@ public class VectorStoresPanel extends VLayout {
 		// Save Button
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (Boolean.TRUE.equals(vm.validate())) {
-					AIService.Instance.get().saveVectorStore(collectSettings(), new DefaultAsyncCallback<Void>() {
-						@Override
-						protected void handleSuccess(Void result) {
-							GuiLog.info(I18N.message("settingssaved"), null);
-						}
-					});
-				}
+		save.addClickHandler(click -> {
+			if (Boolean.TRUE.equals(vm.validate())) {
+				AIService.Instance.get().saveVectorStore(collectSettings(), new DefaultAsyncCallback<Void>() {
+					@Override
+					protected void handleSuccess(Void result) {
+						GuiLog.info(I18N.message("settingssaved"), null);
+					}
+				});
 			}
 		});
 		addMember(save);
@@ -138,8 +137,8 @@ public class VectorStoresPanel extends VLayout {
 		List<GUIParameter> params = new ArrayList<>();
 
 		params.add(new GUIParameter("url", vm.getValueAsString("url")));
-		params.add(new GUIParameter("username", vm.getValueAsString("username")));
-		params.add(new GUIParameter("password", vm.getValueAsString("password")));
+		params.add(new GUIParameter(USERNAME, vm.getValueAsString(USERNAME)));
+		params.add(new GUIParameter(PASSWORD, vm.getValueAsString(PASSWORD)));
 
 		return params;
 	}

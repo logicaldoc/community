@@ -50,6 +50,8 @@ import jakarta.annotation.Resource;
  * @since 6.0
  */
 public class StatsCollector extends Task {
+	private static final String WSCALL_HIPHEN = "wscall-";
+
 	private static final String AND_NOT_A_LD_STATUS = " and not A.ld_status=";
 
 	private static final String AND_A_LD_TENANTID = " and A.ld_tenantid=";
@@ -297,22 +299,22 @@ public class StatsCollector extends Task {
 			DateFormat df = new SimpleDateFormat("yyyyMM");
 			Date date = new Date();
 			statistics.add(new BasicNameValuePair("wscalls_0",
-					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+					Long.toString(sequenceDAO.getCurrentValue(WSCALL_HIPHEN + df.format(date), 0, Tenant.SYSTEM_ID))));
 			date = DateUtils.addMonths(date, -1);
 			statistics.add(new BasicNameValuePair("wscalls_1",
-					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+					Long.toString(sequenceDAO.getCurrentValue(WSCALL_HIPHEN + df.format(date), 0, Tenant.SYSTEM_ID))));
 			date = DateUtils.addMonths(date, -1);
 			statistics.add(new BasicNameValuePair("wscalls_2",
-					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+					Long.toString(sequenceDAO.getCurrentValue(WSCALL_HIPHEN + df.format(date), 0, Tenant.SYSTEM_ID))));
 			date = DateUtils.addMonths(date, -1);
 			statistics.add(new BasicNameValuePair("wscalls_3",
-					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+					Long.toString(sequenceDAO.getCurrentValue(WSCALL_HIPHEN + df.format(date), 0, Tenant.SYSTEM_ID))));
 			date = DateUtils.addMonths(date, -1);
 			statistics.add(new BasicNameValuePair("wscalls_4",
-					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+					Long.toString(sequenceDAO.getCurrentValue(WSCALL_HIPHEN + df.format(date), 0, Tenant.SYSTEM_ID))));
 			date = DateUtils.addMonths(date, -1);
 			statistics.add(new BasicNameValuePair("wscalls_5",
-					Long.toString(sequenceDAO.getCurrentValue("wscall-" + df.format(date), 0, Tenant.SYSTEM_ID))));
+					Long.toString(sequenceDAO.getCurrentValue(WSCALL_HIPHEN + df.format(date), 0, Tenant.SYSTEM_ID))));
 
 			collectFeatureUsageStats(statistics);
 			next();

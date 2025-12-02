@@ -39,6 +39,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class FulltextForm extends VLayout implements SearchObserver {
+	private static final String START = "start";
+
+	private static final String SIZE_OPERATOR = "sizeOperator";
+
+	private static final String ALIASES = "aliases";
+
+	private static final String SUBFOLDERS = "subfolders";
+
 	private static final String SEARCH = "search";
 
 	private static final String TEMPLATE = "template";
@@ -134,9 +142,9 @@ public class FulltextForm extends VLayout implements SearchObserver {
 				prepareFieldsSelector(null);
 		});
 
-		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders"));
+		CheckboxItem subfolders = new CheckboxItem(SUBFOLDERS, I18N.message("searchinsubfolders"));
 
-		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
+		CheckboxItem aliases = new CheckboxItem(ALIASES, I18N.message("retrievealiases"));
 		aliases.setValue(true);
 		aliases.setEndRow(true);
 
@@ -147,7 +155,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		if (Search.get().getOptions().getFolder() != null)
 			folder.setFolder(Search.get().getOptions().getFolder(), Search.get().getOptions().getFolderName());
 
-		SelectItem sizeOperator = ItemFactory.newSizeOperator("sizeOperator", "size");
+		SelectItem sizeOperator = ItemFactory.newSizeOperator(SIZE_OPERATOR, "size");
 		sizeOperator.setTitleVAlign(VerticalAlignment.CENTER);
 		IntegerItem size = ItemFactory.newIntegerItem("size", " ", (Integer) null);
 		size.setWidth(50);
@@ -219,7 +227,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		options.setFolder(folder.getFolderId());
 		options.setFolderName(folder.getFolderName());
 
-		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")));
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString(ALIASES)));
 
 		setSubfolderCondition(options);
 
@@ -229,7 +237,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	}
 
 	private void setSubfolderCondition(GUISearchOptions options) {
-		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
+		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString(SUBFOLDERS)));
 		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS)))
 			options.setFilterIds(
 					Search.get().getLastResult().stream().map(doc -> doc.getId()).collect(Collectors.toList()));
@@ -246,7 +254,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		@SuppressWarnings("rawtypes")
 		Map range = (Map) values.get(PUBLICATION_DATE_RANGE);
 		if (range != null) {
-			Date start = (Date) range.get("start");
+			Date start = (Date) range.get(START);
 			if (start != null)
 				options.setDateFrom(start);
 
@@ -260,7 +268,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		@SuppressWarnings("rawtypes")
 		Map range = (Map) values.get(CREATION_DATE_RANGE);
 		if (range != null) {
-			Date start = (Date) range.get("start");
+			Date start = (Date) range.get(START);
 			if (start != null)
 				options.setCreationFrom(start);
 
@@ -273,7 +281,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	private void setSizeCondition(GUISearchOptions options) {
 		Long size = vm.getValueAsString("size") != null ? Long.parseLong(vm.getValueAsString("size")) : null;
 		if (size != null) {
-			if (LESSTHAN.equals(vm.getValueAsString("sizeOperator")))
+			if (LESSTHAN.equals(vm.getValueAsString(SIZE_OPERATOR)))
 				options.setSizeMax(size * 1024);
 			else
 				options.setSizeMin(size * 1024);
@@ -350,7 +358,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		if (options.getType() == GUISearchOptions.TYPE_FULLTEXT) {
 			defaultOptions = options;
 			SearchMenu.get().openFulltextSection();
-			if (isDrawn())
+			if (Boolean.TRUE.equals(isDrawn()))
 				applyOptions(options);
 		}
 	}
@@ -362,34 +370,34 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		folder.setFolder(options.getFolder(), options.getFolderName());
 
 		vm.setValue(EXPRESSION_STR, options.getExpression());
-		vm.setValue("subfolders", options.isSearchInSubPath());
-		vm.setValue("aliases", options.isRetrieveAliases());
+		vm.setValue(SUBFOLDERS, options.isSearchInSubPath());
+		vm.setValue(ALIASES, options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
 		if (options.getSizeMax() != null) {
-			vm.setValue("size", options.getSizeMax() / 1024);
-			vm.setValue("sizeOperator", LESSTHAN);
+			vm.setValue("size", options.getSizeMax() / 1024D);
+			vm.setValue(SIZE_OPERATOR, LESSTHAN);
 		}
 		if (options.getSizeMin() != null) {
-			vm.setValue("size", options.getSizeMin() / 1024);
-			vm.setValue("sizeOperator", "greaterthan");
+			vm.setValue("size", options.getSizeMin() / 1024D);
+			vm.setValue(SIZE_OPERATOR, "greaterthan");
 		}
 
 		Map<String, Date> range = new HashMap<>();
 		if (options.getCreationFrom() != null)
-			range.put("start", options.getCreationFrom());
+			range.put(START, options.getCreationFrom());
 		if (options.getCreationTo() != null)
 			range.put("end", options.getCreationTo());
 		vm.setValue(CREATION_DATE_RANGE, range);
 
 		range = new HashMap<>();
 		if (options.getDateFrom() != null)
-			range.put("start", options.getDateFrom());
+			range.put(START, options.getDateFrom());
 		if (options.getDateTo() != null)
 			range.put("end", options.getDateTo());
 		vm.setValue(PUBLICATION_DATE_RANGE, range);
 
 		if (options.getTemplate() != null) {
-			vm.setValue("template", Long.toString(options.getTemplate()));
+			vm.setValue(TEMPLATE, Long.toString(options.getTemplate()));
 			prepareFieldsSelector(options.getTemplate());
 		}
 	}

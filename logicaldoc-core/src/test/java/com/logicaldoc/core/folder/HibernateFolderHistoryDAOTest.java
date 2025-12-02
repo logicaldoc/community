@@ -99,17 +99,16 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 		assertEquals(0, histories.size());
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void testCreateFolderHistory() throws PersistenceException {
+		int count = dao.findByFolderId(5L).size();
+
 		FolderHistory history = new FolderHistory();
 		history.setDocId(1L);
 		history.setFolderId(5L);
 		history.setFilename("pippo");
 		history.setVersion("2.0");
-
 		history.setPath("/" + "paperino");
-
 		history.setDate(new Date());
 		history.setUserId(1L);
 		history.setUsername("mario");
@@ -118,9 +117,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 		dao.store(history);
 
-		Collection histories = dao.findByFolderId(5);
-		assertNotNull(histories);
-		assertEquals(3, histories.size());
+		assertEquals(count + 1, dao.findByFolderId(5L).size());
 	}
 
 	@Test

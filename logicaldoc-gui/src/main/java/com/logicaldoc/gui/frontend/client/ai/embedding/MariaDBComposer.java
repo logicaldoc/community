@@ -76,11 +76,35 @@ public class MariaDBComposer extends Window {
 		toolStrip.addSeparator();
 		toolStrip.addButton(close);
 
-		VLayout spacer=new VLayout();
+		VLayout spacer = new VLayout();
 		spacer.setHeight(8);
-		
+
 		addItem(form);
 		addItem(spacer);
 		addItem(toolStrip);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		return prime * result + ((sourceItem == null) ? 0 : sourceItem.hashCode());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MariaDBComposer other = (MariaDBComposer) obj;
+		if (sourceItem == null) {
+			if (other.sourceItem != null)
+				return false;
+		} else if (!sourceItem.equals(other.sourceItem))
+			return false;
+		return true;
 	}
 }

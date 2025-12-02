@@ -44,7 +44,7 @@ public abstract class HibernateHistoryDAO<T extends History> extends HibernatePe
 	@Override
 	public void store(T history) throws PersistenceException {
 		// Write only if the history is enabled
-		if (!RunLevel.current().aspectEnabled(Aspect.saveHistory))
+		if (!RunLevel.current().aspectEnabled(Aspect.SAVEHISTORY))
 			return;
 
 		if (history.getDate() == null)

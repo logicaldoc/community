@@ -83,7 +83,7 @@ public class SqlUtil {
 		if (resultSet.getObject(column) instanceof Integer intg)
 			lgn = intg.longValue();
 		else if (resultSet.getObject(column) instanceof BigDecimal bigDec)
-			lgn = bigDec != null ? bigDec.longValue() : 0L;
+			lgn = bigDec.longValue();
 		else
 			lgn = resultSet.getLong(column);
 		return lgn;

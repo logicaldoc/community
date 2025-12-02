@@ -51,21 +51,9 @@ public class SearchMenu extends SectionStack {
 			fulltextSection.setItems(new FulltextForm());
 			addSection(fulltextSection);
 		} else if ("tags".equals(searchType) && Feature.visible(Feature.TAGS)) {
-			SectionStackSection tagsSection = new SectionStackSection(I18N.message("tags"));
-			tagsSection.setName(TAGS_SECTION);
-			if (Feature.enabled(Feature.TAGS))
-				tagsSection.setItems(TagsForm.get());
-			else
-				tagsSection.setItems(new FeatureDisabled());
-			addSection(tagsSection);
+			addTags();
 		} else if ("parameters".equals(searchType) && Feature.visible(Feature.PARAMETRIC_SEARCHES)) {
-			SectionStackSection parametricSection = new SectionStackSection(I18N.message("parameters"));
-			parametricSection.setName(PARAMETRIC_SECTION);
-			if (Feature.enabled(Feature.PARAMETRIC_SEARCHES))
-				parametricSection.setItems(ParametricForm.get());
-			else
-				parametricSection.setItems(new FeatureDisabled());
-			addSection(parametricSection);
+			addParameters();
 		} else if (FOLDERS.equals(searchType)) {
 			SectionStackSection foldersSection = new SectionStackSection(I18N.message(FOLDERS));
 			foldersSection.setName(FOLDERS);
@@ -73,14 +61,38 @@ public class SearchMenu extends SectionStack {
 			foldersSection.setItems(FoldersForm.get());
 			addSection(foldersSection);
 		} else if (SEMANTIC.equals(searchType) && Feature.visible(Feature.SEMANTIC_SEARCHES)) {
-			SectionStackSection semanticSection = new SectionStackSection(I18N.message(SEMANTIC));
-			semanticSection.setName(SEMANTIC);
-			if (Feature.enabled(Feature.SEMANTIC_SEARCHES))
-				semanticSection.setItems(new SemanticForm());
-			else
-				semanticSection.setItems(new FeatureDisabled());
-			addSection(semanticSection);
+			addSemantic();
 		}
+	}
+
+	private void addSemantic() {
+		SectionStackSection semanticSection = new SectionStackSection(I18N.message(SEMANTIC));
+		semanticSection.setName(SEMANTIC);
+		if (Feature.enabled(Feature.SEMANTIC_SEARCHES))
+			semanticSection.setItems(new SemanticForm());
+		else
+			semanticSection.setItems(new FeatureDisabled());
+		addSection(semanticSection);
+	}
+
+	private void addParameters() {
+		SectionStackSection parametricSection = new SectionStackSection(I18N.message("parameters"));
+		parametricSection.setName(PARAMETRIC_SECTION);
+		if (Feature.enabled(Feature.PARAMETRIC_SEARCHES))
+			parametricSection.setItems(ParametricForm.get());
+		else
+			parametricSection.setItems(new FeatureDisabled());
+		addSection(parametricSection);
+	}
+
+	private void addTags() {
+		SectionStackSection tagsSection = new SectionStackSection(I18N.message("tags"));
+		tagsSection.setName(TAGS_SECTION);
+		if (Feature.enabled(Feature.TAGS))
+			tagsSection.setItems(TagsForm.get());
+		else
+			tagsSection.setItems(new FeatureDisabled());
+		addSection(tagsSection);
 	}
 
 	private void addSavedSearchesSection() {

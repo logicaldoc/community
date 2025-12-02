@@ -224,7 +224,7 @@ public class StoreResource {
 			return this;
 		}
 
-		private Builder version(Version version) throws PersistenceException {
+		private Builder version(Version version) {
 			this.docId = version.getDocId();
 			this.fileVersion = version.getFileVersion();
 			if (StringUtils.isEmpty(this.fileVersion))

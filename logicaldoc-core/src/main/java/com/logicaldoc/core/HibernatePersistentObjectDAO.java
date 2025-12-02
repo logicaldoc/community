@@ -180,8 +180,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * Checks if the aspect for storing data is enabled
 	 */
 	protected boolean checkStoringAspect() {
-		if (!RunLevel.current().aspectEnabled(Aspect.storing)) {
-			log.error("Apect {} is disabled", Aspect.storing.name());
+		if (!RunLevel.current().aspectEnabled(Aspect.STORING)) {
+			log.error("Apect {} is disabled", Aspect.STORING.name());
 			return false;
 		}
 		return true;

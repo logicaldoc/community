@@ -38,7 +38,7 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest rec, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
-				
+
 		HttpServletRequest request = (HttpServletRequest) rec;
 		HttpServletResponse response = (HttpServletResponse) res;
 
@@ -50,47 +50,47 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 		request.setAttribute(FILTER_APPLIED, Boolean.TRUE);
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
 		if ((authentication == null || !authentication.isAuthenticated())
-				&& "login".equals(request.getParameter("anonymous"))) {
-
-			String tenant = getTenant(request);
-
-			ContextProperties config = Context.get().getProperties();
-			if (config.getBoolean(tenant + ".anonymous.enabled")) {
-				LDAuthenticationToken authToken = new LDAuthenticationToken(
-						config.getProperty(tenant + ".anonymous.user"));
-				AuthenticationManager authenticationManager = Context.get(AuthenticationManager.class);
-				try {
-					Authentication anonAuthentication = authenticationManager.authenticate(authToken);
-					if (anonAuthentication.isAuthenticated()) {
-						String sid = ((LDAuthenticationToken) anonAuthentication).getSid();
-						SessionManager.get().saveSid(request, response, sid);
-						
-						Session session = SessionManager.get().get(sid);
-						
-						/*
-						 * Save the authorities to make Spring happy 
-						 */
-						Collection<GrantedAuthority> authorities = new ArrayList<>();
-						for (String role : session.getUser().getGroups().stream().map(Group::getName).toList())
-							authorities.add(new SimpleGrantedAuthority(role));
-						
-						LDAuthenticationToken auth = new LDAuthenticationToken(session.getUser(), null, authorities);
-						auth.setSid(sid);
-
-						SecurityContext sc = SecurityContextHolder.getContext();
-						sc.setAuthentication(auth);
-					}
-				} catch (AuthenticationException ae) {
-					// Noting to do
-				} catch (Exception t) {
-					log.error(t.getMessage(), t);
-				}
-			}
-		}
+				&& "login".equals(request.getParameter("anonymous")))
+			tryAnonymousLogin(request, response);
 
 		chain.doFilter(request, response);
+	}
+
+	protected void tryAnonymousLogin(HttpServletRequest request, HttpServletResponse response) {
+		String tenant = getTenant(request);
+
+		ContextProperties config = Context.get().getProperties();
+		if (config.getBoolean(tenant + ".anonymous.enabled", false)) {
+			LDAuthenticationToken authToken = new LDAuthenticationToken(config.getProperty(tenant + ".anonymous.user"));
+			AuthenticationManager authenticationManager = Context.get(AuthenticationManager.class);
+			try {
+				Authentication anonAuthentication = authenticationManager.authenticate(authToken);
+				if (anonAuthentication.isAuthenticated()) {
+					String sid = ((LDAuthenticationToken) anonAuthentication).getSid();
+					SessionManager.get().saveSid(request, response, sid);
+
+					Session session = SessionManager.get().get(sid);
+
+					/*
+					 * Save the authorities to make Spring happy
+					 */
+					Collection<GrantedAuthority> authorities = new ArrayList<>();
+					for (String role : session.getUser().getGroups().stream().map(Group::getName).toList())
+						authorities.add(new SimpleGrantedAuthority(role));
+
+					LDAuthenticationToken auth = new LDAuthenticationToken(session.getUser(), null, authorities);
+					auth.setSid(sid);
+
+					SecurityContext sc = SecurityContextHolder.getContext();
+					sc.setAuthentication(auth);
+				}
+			} catch (AuthenticationException ae) {
+				// Noting to do
+			} catch (Exception t) {
+				log.error(t.getMessage(), t);
+			}
+		}
 	}
 
 	private String getTenant(HttpServletRequest request) {

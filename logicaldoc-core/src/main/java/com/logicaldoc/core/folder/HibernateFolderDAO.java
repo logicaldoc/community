@@ -761,7 +761,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	 */
 	@Override
 	public void saveFolderHistory(Folder folder, FolderHistory transaction) throws PersistenceException {
-		if (folder == null || transaction == null || !RunLevel.current().aspectEnabled(Aspect.saveHistory))
+		if (folder == null || transaction == null || !RunLevel.current().aspectEnabled(Aspect.SAVEHISTORY))
 			return;
 
 		Folder root = findRoot(folder.getTenantId());

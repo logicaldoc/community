@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -191,10 +192,10 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	}
 
 	public class SetAttributeOptionsMultipartRequest {
-		@Schema(type = "integer", required = true, format = "int64", description = "Attribute set ID")
+		@Schema(type = "integer", requiredMode = RequiredMode.REQUIRED, format = "int64", description = "Attribute set ID")
 		private String setId;
 
-		@Schema(type = "string", required = true, description = "Attribute name")
+		@Schema(type = "string", requiredMode = RequiredMode.REQUIRED, description = "Attribute name")
 		private String attribute;
 
 		private List<WSAttributeOption> options;

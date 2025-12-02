@@ -719,14 +719,12 @@ public class DocumentManager {
 		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);
 
-		if (exception instanceof ParsingException) {
-			if (Context.get().getProperties().getBoolean(tenantName(document.getTenantId()) + ".index.skiponerror",
-					false)) {
-				DocumentDAO dDao = DocumentDAO.get();
-				dDao.initialize(document);
-				document.setIndexingStatus(IndexingStatus.SKIP);
-				dDao.store(document);
-			}
+		if (exception instanceof ParsingException && Context.get().getProperties()
+				.getBoolean(tenantName(document.getTenantId()) + ".index.skiponerror", false)) {
+			DocumentDAO dDao = DocumentDAO.get();
+			dDao.initialize(document);
+			document.setIndexingStatus(IndexingStatus.SKIP);
+			dDao.store(document);
 		}
 	}
 

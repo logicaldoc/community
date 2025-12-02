@@ -18,6 +18,8 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> implements SessionDAO {
 
+	private static final String ONE_EQ_ONE = " 1 = 1 ";
+
 	private static final String AND = " and ";
 
 	protected HibernateSessionDAO() {
@@ -45,7 +47,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 
 	@Override
 	public int countSessions(Long tenantId, Integer status) {
-		StringBuilder query = new StringBuilder(" 1=1 ");
+		StringBuilder query = new StringBuilder(ONE_EQ_ONE);
 		if (tenantId != null)
 			query.append(AND + ENTITY + ".tenantId = " + tenantId);
 		if (status != null) {
@@ -74,7 +76,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 				query.append(AND + ENTITY + ".finished is null ");
 		}
 
-		try {	
+		try {
 			List<Session> sessions = findByWhere(query.toString(),
 					username != null ? Map.of("username", StringUtils.defaultString(username)) : null, null, null);
 			return sessions.size();

@@ -47,7 +47,7 @@ public class FoldersForm extends FolderSearchForm implements SearchObserver {
 		if (options.getType() == GUISearchOptions.TYPE_FOLDERS) {
 			defaultOptions = options;
 			SearchMenu.get().openFoldersSection();
-			if (isDrawn())
+			if (Boolean.TRUE.equals(isDrawn()))
 				applyOptions(options);
 		}
 	}

@@ -310,7 +310,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				copyFolderMetadata(doc);
 			}
 
-			if (!RunLevel.current().aspectEnabled(Aspect.customId)) {
+			if (!RunLevel.current().aspectEnabled(Aspect.CUSTOMID)) {
 				doc.setCustomId(UUID.randomUUID().toString());
 				log.debug("Aspect customId is disabled so force the the Custom ID to a random UUID");
 			}
@@ -553,7 +553,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	 * @throws PersistenceException Error in the data layer
 	 */
 	private void setUniqueFilename(Document doc) throws PersistenceException {
-		if (!RunLevel.current().aspectEnabled(Aspect.uniquenessFilename))
+		if (!RunLevel.current().aspectEnabled(Aspect.UNIQUENESSFILENAME))
 			return;
 
 		String baseName = doc.getFileName();
@@ -996,7 +996,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private void saveDocumentHistory(Document doc, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws PersistenceException {
-		if (doc == null || transaction == null || !RunLevel.current().aspectEnabled(Aspect.saveHistory))
+		if (doc == null || transaction == null || !RunLevel.current().aspectEnabled(Aspect.SAVEHISTORY))
 			return;
 
 		try {

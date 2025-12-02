@@ -630,7 +630,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 			boolean expired = lastChange.before(date);
 			if (expired)
-				log.warn("User {}'s password expired because last changed on {}", lastChange);
+				log.warn("User {}'s password expired because last changed on {}", user.getUsername(), lastChange);
 			return expired;
 		} else
 			return false;

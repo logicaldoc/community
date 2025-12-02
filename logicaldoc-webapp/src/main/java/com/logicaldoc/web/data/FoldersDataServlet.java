@@ -38,6 +38,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class FoldersDataServlet extends AbstractDataServlet {
 
+	private static final String FOLDER_CLOSED = "</folder>";
+
+	private static final String FOLDER = "<folder>";
+
 	private static final long serialVersionUID = 1L;
 
 	private static final String PARENT = "parent";
@@ -69,7 +73,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 		long parentFolderId = getParentFolderId(parent);
 
-		Folder parentFolder = getParentFolder(response, parent, parentFolderId);
+		Folder parentFolder = getParentFolder(parent, parentFolderId);
 		boolean root = parentFolder.getParentId() == parentFolder.getId();
 
 		UserDAO udao = UserDAO.get();
@@ -87,22 +91,20 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		if (parentFolder != null) {
-			if ("/".equals(request.getParameter(PARENT)) && withroot) {
-				writer.print("<folder>");
-				writer.print("<id>" + parentFolder.getId() + "</id>");
-				writer.print("<folderId>" + parentFolder.getId() + "</folderId>");
-				writer.print("<parentId>" + parentFolder.getId() + "</parentId>");
-				writer.print("<parent>" + parent + "</parent>");
-				writer.print("<name><![CDATA[" + parentFolder.getName() + "]]></name>");
-				writer.print("<type>" + parentFolder.getType() + "</type>");
-				writer.print("<status>0</status>");
-				writer.print("<publishedStatus>yes</publishedStatus>");
-				writer.print("</folder>");
-			} else {
-				printFolders(writer, session, tenantId, tenantName, parent, parentFolder, user,
-						root ? null : startRecord, root ? null : endRecord);
-			}
+		if ("/".equals(request.getParameter(PARENT)) && withroot) {
+			writer.print(FOLDER);
+			writer.print("<id>%d</id>".formatted(parentFolder.getId()));
+			writer.print("<folderId>%d</folderId>".formatted(parentFolder.getId()));
+			writer.print("<parentId>%d</parentId>".formatted(parentFolder.getId()));
+			writer.print("<parent>%s</parent>".formatted(parent));
+			writer.print("<name><![CDATA[%s]]></name>".formatted(parentFolder.getName()));
+			writer.print("<type>%d</type>".formatted(parentFolder.getType()));
+			writer.print("<status>0</status>");
+			writer.print("<publishedStatus>yes</publishedStatus>");
+			writer.print(FOLDER_CLOSED);
+		} else {
+			printFolders(writer, session, tenantId, tenantName, parent, parentFolder, user, root ? null : startRecord,
+					root ? null : endRecord);
 		}
 
 		if (request.getParameter("withdocs") != null) {
@@ -125,20 +127,20 @@ public class FoldersDataServlet extends AbstractDataServlet {
 							continue;
 						}
 
-						writer.print("<folder>");
-						writer.print("<id>" + parent + "-" + rows.getLong(1) + "</id>");
-						writer.print("<folderId>" + rows.getLong(1) + "</folderId>");
-						writer.print("<parentId>" + rows.getLong(2) + "</parentId>");
-						writer.print("<parent>" + parent + "</parent>");
-						writer.print("<name><![CDATA[" + rows.getString(3) + "]]></name>");
-						writer.print("<type>" + rows.getInt(4) + "</type>");
+						writer.print(FOLDER);
+						writer.print("<id>%s-%d</id>".formatted(parent, rows.getLong(1)));
+						writer.print("<folderId>%d</folderId>".formatted(rows.getLong(1)));
+						writer.print("<parentId>%d</parentId>".formatted(rows.getLong(2)));
+						writer.print("<parent>%s</parent>".formatted(parent));
+						writer.print("<name><![CDATA[%s]]></name>".formatted(rows.getString(3)));
+						writer.print("<type>%d</type>".formatted(rows.getInt(4)));
 						printFoldRef(writer, rows);
 						printCustomIcon(writer, rows);
 						writer.print("<status>0</status>");
 						writer.print("<publishedStatus>yes</publishedStatus>");
 						printColor(writer, rows);
-						writer.print("<position>" + rows.getInt(7) + "</position>");
-						writer.print("</folder>");
+						writer.print("<position>%d</position>".formatted(rows.getInt(7)));
+						writer.print(FOLDER_CLOSED);
 
 						i++;
 					}
@@ -187,7 +189,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			Date now = new Date();
 			boolean published = (rs.getInt(4) == 1) && (rs.getDate(5) == null || now.after(rs.getDate(5)))
 					&& (rs.getDate(6) == null || now.before(rs.getDate(6)));
-			writer.print("<folder>");
+			writer.print(FOLDER);
 			writer.print("<id>d-" + rs.getLong(1) + "</id>");
 			writer.print("<folderId>d-" + rs.getLong(1) + "</folderId>");
 			writer.print("<parentId>" + parentId + "</parentId>");
@@ -203,7 +205,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			if (StringUtils.isNotEmpty(rs.getString(8)))
 				writer.print("<color><![CDATA[" + rs.getString(8) + "]]></color>");
 			writer.print("<position>0</position>");
-			writer.print("</folder>");
+			writer.print(FOLDER_CLOSED);
 		}
 	}
 
@@ -290,20 +292,15 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		return new Long[] { startRecord, endRecord };
 	}
 
-	private Folder getParentFolder(HttpServletResponse response, String parent, long parentFolderId)
-			throws PersistenceException {
+	private Folder getParentFolder(String parent, long parentFolderId) throws PersistenceException {
 		FolderDAO fDao = FolderDAO.get();
 		Folder parentFolder = fDao.findFolder(parentFolderId);
 		if (parentFolder == null) {
-			String message = String.format("No folder found with ID=%d parent %s", parentFolderId, parent);
-			log.error(message);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
-			} catch (IOException e) {
-				// Nothing to do
-			}
+			throw new PersistenceException(
+					String.format("No folder found with ID=%d parent %s", parentFolderId, parent));
+		} else {
+			return parentFolder;
 		}
-		return parentFolder;
 	}
 
 	private long getParentFolderId(String parent) {

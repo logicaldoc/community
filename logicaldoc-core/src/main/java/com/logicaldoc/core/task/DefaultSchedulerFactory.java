@@ -33,7 +33,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public void start() throws SchedulingException {
-		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks)) {
+		if (RunLevel.current().aspectEnabled(Aspect.SCHEDULEDTASKS)) {
 			super.start();
 		} else
 			log.warn(ASPECT_DISABLED);
@@ -41,7 +41,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public Scheduler getObject() {
-		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks))
+		if (RunLevel.current().aspectEnabled(Aspect.SCHEDULEDTASKS))
 			return super.getObject();
 		else {
 			log.debug(ASPECT_DISABLED);
@@ -51,7 +51,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public boolean isAutoStartup() {
-		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks))
+		if (RunLevel.current().aspectEnabled(Aspect.SCHEDULEDTASKS))
 			return super.isAutoStartup();
 		else
 			return false;
@@ -59,7 +59,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (RunLevel.current().aspectEnabled(Aspect.scheduledTasks))
+		if (RunLevel.current().aspectEnabled(Aspect.SCHEDULEDTASKS))
 			super.afterPropertiesSet();
 		else
 			log.warn(ASPECT_DISABLED);

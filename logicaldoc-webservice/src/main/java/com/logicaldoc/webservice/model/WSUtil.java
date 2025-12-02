@@ -120,34 +120,35 @@ public class WSUtil {
 
 	private static void setAttributesIntoWsDocument(AbstractDocument document, WSDocument wsDoc) {
 		List<WSAttribute> attributes = new ArrayList<>();
-		try {
-			if (MapUtils.isNotEmpty(document.getAttributes())) {
-				for (String name : document.getAttributeNames()) {
-					Attribute attr = document.getAttribute(name);
+		if (MapUtils.isEmpty(document.getAttributes())) {
+			wsDoc.setAttributes(attributes);
+			return;
+		}
 
-					WSAttribute wsAttribute = new WSAttribute();
-					wsAttribute.setName(name);
-					wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
-					wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
-					wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
-					wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
-					wsAttribute.setParent(attr.getParent());
-					wsAttribute.setPosition(attr.getPosition());
-					wsAttribute.setEditor(attr.getEditor());
-					wsAttribute.setValidation(attr.getValidation());
-					wsAttribute.setSetId(attr.getSetId());
-					wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
-					wsAttribute.setDoubleValue(attr.getDoubleValue());
-					wsAttribute.setIntValue(attr.getIntValue());
-					wsAttribute.setStringValue(attr.getStringValue());
-					wsAttribute.setStringValues(attr.getStringValues());
-					wsAttribute.setType(attr.getType());
-					wsAttribute.setDependsOn(attr.getDependsOn());
-					attributes.add(wsAttribute);
-				}
+		if (MapUtils.isNotEmpty(document.getAttributes())) {
+			for (String name : document.getAttributeNames()) {
+				Attribute attr = document.getAttribute(name);
+
+				WSAttribute wsAttribute = new WSAttribute();
+				wsAttribute.setName(name);
+				wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
+				wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
+				wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
+				wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
+				wsAttribute.setParent(attr.getParent());
+				wsAttribute.setPosition(attr.getPosition());
+				wsAttribute.setEditor(attr.getEditor());
+				wsAttribute.setValidation(attr.getValidation());
+				wsAttribute.setSetId(attr.getSetId());
+				wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
+				wsAttribute.setDoubleValue(attr.getDoubleValue());
+				wsAttribute.setIntValue(attr.getIntValue());
+				wsAttribute.setStringValue(attr.getStringValue());
+				wsAttribute.setStringValues(attr.getStringValues());
+				wsAttribute.setType(attr.getType());
+				wsAttribute.setDependsOn(attr.getDependsOn());
+				attributes.add(wsAttribute);
 			}
-		} catch (Exception t) {
-			// Nothing to do
 		}
 		wsDoc.setAttributes(attributes);
 	}
