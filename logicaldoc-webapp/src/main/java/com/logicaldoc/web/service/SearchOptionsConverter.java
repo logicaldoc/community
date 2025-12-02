@@ -25,7 +25,7 @@ public class SearchOptionsConverter {
 	 * 
 	 * @returnthe converted options
 	 */
-	public GUISearchOptions toGUIOptions(SearchOptions searchOptions) {
+	public GUISearchOptions toGUISearchOptions(SearchOptions searchOptions) {
 		GUISearchOptions guiOptions = new GUISearchOptions();
 		guiOptions.setType(searchOptions.getType());
 		guiOptions.setDescription(searchOptions.getDescription());

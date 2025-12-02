@@ -16,8 +16,8 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 public class FulltextOptionsConverter extends SearchOptionsConverter {
 
 	@Override
-	public GUISearchOptions toGUIOptions(SearchOptions searchOptions) {
-		GUISearchOptions guiOptions = super.toGUIOptions(searchOptions);
+	public GUISearchOptions toGUISearchOptions(SearchOptions searchOptions) {
+		GUISearchOptions guiOptions = super.toGUISearchOptions(searchOptions);
 
 		if (searchOptions instanceof FulltextSearchOptions fulltext) {
 			guiOptions.setDateFrom(fulltext.getDateFrom());
@@ -52,6 +52,7 @@ public class FulltextOptionsConverter extends SearchOptionsConverter {
 			fulltext.setSizeMax(guiOptions.getSizeMax());
 			fulltext.setSizeMin(guiOptions.getSizeMin());
 		}
+		
 		return searchOptions;
 	}
 }

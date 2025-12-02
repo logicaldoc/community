@@ -26,7 +26,7 @@ public class GUISearchOptions implements Serializable {
 	public static final int TYPE_PARAMETRIC = 2;
 
 	public static final int TYPE_FOLDERS = 3;
-	
+
 	public static final int TYPE_SEMANTIC = 4;
 
 	private int maxHits = 40;
@@ -82,6 +82,10 @@ public class GUISearchOptions implements Serializable {
 	private List<GUICriterion> criteria = new ArrayList<>();
 
 	private List<String> fields = Constants.getFulltextDefaultFields();
+
+	private Integer threshold;
+
+	private Long embeddingSchemeId;
 
 	// The eventual observer that originated such search options
 	private transient SearchObserver source;
@@ -326,5 +330,21 @@ public class GUISearchOptions implements Serializable {
 
 	public void setRetrieveAliases(boolean retrieveAliases) {
 		this.retrieveAliases = retrieveAliases;
-	}	
+	}
+
+	public Integer getThreshold() {
+		return threshold;
+	}
+
+	public void setThreshold(Integer threshold) {
+		this.threshold = threshold;
+	}
+
+	public Long getEmbeddingSchemeId() {
+		return embeddingSchemeId;
+	}
+
+	public void setEmbeddingSchemeId(Long id) {
+		this.embeddingSchemeId = id;
+	}
 }

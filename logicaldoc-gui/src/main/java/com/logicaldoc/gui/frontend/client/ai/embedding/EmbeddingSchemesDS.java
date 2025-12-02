@@ -18,6 +18,14 @@ public class EmbeddingSchemesDS extends DataSource {
 	}
 
 	public EmbeddingSchemesDS(String type) {
+		this(type, false);
+	}
+
+	public EmbeddingSchemesDS(boolean enabledOnly) {
+		this(null, enabledOnly);
+	}
+
+	public EmbeddingSchemesDS(String type, boolean onlyEnabled) {
 		setRecordXPath("/list/scheme");
 
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -31,9 +39,17 @@ public class EmbeddingSchemesDS extends DataSource {
 		DataSourceTextField model = new DataSourceTextField("model");
 		DataSourceIntegerField embeddings = new DataSourceIntegerField("embeddings");
 		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
+
 		setFields(id, name, label, typeField, model, embeddings, enabled);
 		setClientOnly(true);
 
-		setDataURL("data/ai.xml?object=embeddingscheme" + (type != null ? "&type=" + type : ""));
+		String url = "data/ai.xml?object=embeddingscheme";
+		if (type != null)
+			url += "&type=" + type;
+		if (onlyEnabled)
+			url += "&enabledOnly=true";
+
+		setDataURL(url);
 	}
+
 }

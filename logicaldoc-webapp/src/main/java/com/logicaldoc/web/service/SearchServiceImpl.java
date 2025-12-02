@@ -245,7 +245,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 					.findByUserIdAndName(session.getUserId(), name);
 
 			SearchOptions options = search.readOptions();
-			GUISearchOptions guiOptions = converters.get(options.getType()).toGUIOptions(search.readOptions());
+			GUISearchOptions guiOptions = converters.get(options.getType()).toGUISearchOptions(search.readOptions());
 			if (guiOptions.getFolder() != null) {
 				Folder fld = FolderDAO.get().findById(guiOptions.getFolder());
 				if (fld != null)

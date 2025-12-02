@@ -19,8 +19,8 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 public class FolderOptionsConverter extends SearchOptionsConverter {
 
 	@Override
-	public GUISearchOptions toGUIOptions(SearchOptions searchOptions) {
-		GUISearchOptions guiOptions = super.toGUIOptions(searchOptions);
+	public GUISearchOptions toGUISearchOptions(SearchOptions searchOptions) {
+		GUISearchOptions guiOptions = super.toGUISearchOptions(searchOptions);
 
 		if (searchOptions instanceof FolderSearchOptions folder) {
 			List<GUICriterion> criteria = new ArrayList<>();
