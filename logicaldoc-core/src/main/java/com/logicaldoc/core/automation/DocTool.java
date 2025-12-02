@@ -595,8 +595,14 @@ public class DocTool {
 	 * @return the file content as string
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
-		return Store.get()
-				.getString(StoreResource.builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build());
+		try {
+			Document doc=findById(docId);
+			return Store.get()
+					.getString(StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build());
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -609,10 +615,11 @@ public class DocTool {
 	 */
 	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
 		try {
+			Document doc=findById(docId);
 			Store.get().writeToFile(
-					StoreResource.builder().docId(docId).fileVersion(fileVersion).suffix(suffix).build(),
+					StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build(),
 					new File(outputFile));
-		} catch (IOException e) {
+		} catch (PersistenceException | IOException e) {
 			log.error(e.getMessage(), e);
 		}
 	}
