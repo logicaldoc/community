@@ -47,11 +47,11 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		init();
 
 		User user = validateAnonymousUser(username, key, client);
-		
+
 		List<AuthenticationException> errors = new ArrayList<>();
 		if (user == null)
 			user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
-		
+
 		/*
 		 * At the end we need to do in any case some default validations
 		 */
@@ -71,14 +71,13 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 		if (user != null) {
 			initializeUser(user);
-		} else if (!errors.isEmpty()) {
+		} else {
 			// In case of multiple errors, we consider the first one that is
 			// not a UserNotFound exception because it is normal that some
 			// authenticator does not find this user because not in it's domain
-			if (errors.size() > 1)
-				for (AuthenticationException err : errors)
-					if (!(err instanceof AccountNotFoundException))
-						throw err;
+			for (AuthenticationException err : errors)
+				if (!(err instanceof AccountNotFoundException))
+					throw err;
 			throw errors.get(0);
 		}
 

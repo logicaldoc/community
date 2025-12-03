@@ -196,7 +196,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		@Schema(type = "string", requiredMode = RequiredMode.REQUIRED, description = "File name")
 		public String filename;
 
-		@Schema(type = "string", format = "binary", required = true, description = "File data")
+		@Schema(type = "string", format = "binary", requiredMode = RequiredMode.REQUIRED, description = "File data")
 		public Attachment filedata;
 	}
 
@@ -259,7 +259,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, defaultValue = "en", description = "Language of the document (ISO 639-2)")
 		public String language;
 
-		@Schema(type = "string", format = "binary", required = true, description = "File data")
+		@Schema(type = "string", format = "binary", requiredMode = RequiredMode.REQUIRED, description = "File data")
 		public Attachment filedata;
 	}
 
@@ -279,17 +279,17 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			@ApiResponse(responseCode = "401", description = "Authentication failed"),
 			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
 	@RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = ReplaceFileMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-	public void replaceFile(
-			@Multipart(value = "docId", required = true) String docId, 
-			@Multipart(value = "fileVersion", required = false)	String fileVersion, 
-			@Multipart(value = "comment", required = false)	String comment, 
-			@Multipart(value = "filedata", required = true)	Attachment filedataDetail) {
+	public void replaceFile(@Multipart(value = "docId", required = true)
+	String docId, @Multipart(value = "fileVersion", required = false)
+	String fileVersion, @Multipart(value = "comment", required = false)
+	String comment, @Multipart(value = "filedata", required = true)
+	Attachment filedataDetail) {
 
 		String sid = validateSessionREST();
 
 		try {
 			DataHandler datah = filedataDetail.getDataHandler();
-			
+
 			Long docIdLong = Long.parseLong(docId);
 
 			super.replaceFile(sid, docIdLong, fileVersion, comment, datah);
@@ -309,7 +309,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, description = "Comment")
 		public String comment;
 
-		@Schema(type = "string", format = "binary", required = true, description = "File data")
+		@Schema(type = "string", format = "binary", requiredMode = RequiredMode.REQUIRED, description = "File data")
 		public Attachment filedata;
 	}
 
@@ -334,7 +334,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String sid = validateSessionREST();
 		return super.listDocuments(sid, folderId, null);
 	}
-	
+
 	/**
 	 * Gets the documents in a specific folder
 	 * 
@@ -420,11 +420,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@PUT
 	@Path("/update")
 	@Operation(summary = "Updates an existing document", description = "Updates the metadata of an existing document. The ID of the document must be specified in the WSDocument value object. The provided example moves document with ID 1111111 to folder 3435433")
-	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "204", description = "Successful operation"),
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Successful operation"),
 			@ApiResponse(responseCode = "401", description = "Operation failed, authentication error. See system logs"),
 			@ApiResponse(responseCode = "406", description = "Operation failed, the server could not produce a response matching the list of acceptable values defined in the request"),
-			@ApiResponse(responseCode = "500", description = "Operation failed, there may be a problem with the data provided for the update. Please see system logs")})	
+			@ApiResponse(responseCode = "500", description = "Operation failed, there may be a problem with the data provided for the update. Please see system logs") })
 	public void update(
 			@Parameter(description = "Document object that needs to be updated", required = true, example = "{ \"id\": 1111111, \"folderId\": 3435433 }")
 			WSDocument document) throws AuthenticationException, PermissionException, WebserviceException,
@@ -631,8 +630,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	String expireDate, @FormParam("maxDownloads")
 	@Parameter(description = "maximum number of allowed downloads")
 	Integer maxDownloads, @Parameter(description = "Optional password")
-	String password)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	String password) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSessionREST();
 		return super.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, password);
 	}
@@ -807,12 +805,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Operation(summary = "Uploads a new resource of the document", description = "Uploads a new resource attached to the given document. If the resource already exists it is overwritten")
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "successful operation") })
 	@RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadResourceMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-	public void uploadResource(
-			@Multipart(value = "docId", required = true) String docId, 
-			@Multipart(value = "fileVersion", required = false) String fileVersion, 
-			@Multipart(value = "suffix", required = true) String suffix, 
-			@Multipart(value = "content", required = true) Attachment contentDetail) 
-					throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	public void uploadResource(@Multipart(value = "docId", required = true)
+	String docId, @Multipart(value = "fileVersion", required = false)
+	String fileVersion, @Multipart(value = "suffix", required = true)
+	String suffix, @Multipart(value = "content", required = true)
+	Attachment contentDetail) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, IOException {
 
 		String sid = validateSessionREST();
 
@@ -825,16 +823,16 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 	public class UploadResourceMultipartRequest {
 
-		@Schema(type = "integer", required = true, description = "The document ID")
+		@Schema(type = "integer", requiredMode = RequiredMode.REQUIRED, description = "The document ID")
 		public String docId;
 
-		@Schema(type = "string", required = false, description = "the specific file version")
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, description = "the specific file version")
 		public String fileVersion;
 
-		@Schema(type = "string", required = false, description = "suffix specification(it cannot be empty, use 'conversion.pdf' to put the PDF conversion)")
+		@Schema(type = "string", requiredMode = RequiredMode.NOT_REQUIRED, description = "suffix specification(it cannot be empty, use 'conversion.pdf' to put the PDF conversion)")
 		public String suffix;
 
-		@Schema(type = "string", format = "binary", required = true, description = "raw content of the file")
+		@Schema(type = "string", format = "binary", requiredMode = RequiredMode.REQUIRED, description = "raw content of the file")
 		public Attachment content;
 	}
 
@@ -965,24 +963,24 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 		DataHandler dh = null;
 		try {
-			dh = super.getResource(sid, doc.getId(), doc.getFileVersion(), type);			
+			dh = super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
 		} catch (Exception e) {
 			super.createThumbnail(sid, doc.getId(), doc.getFileVersion(), type);
 			dh = super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
 		}
-		
-		Response resp = Response.ok(dh.getInputStream()).build();        
-        resp.getHeaders().add("Cache-Control", "max-age=86400, must-revalidate");
-        resp.getHeaders().add("Pragma", "no-cache");   
-        resp.getHeaders().add("Content-Type", dh.getContentType());
-        
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.HOUR, 24);
-        Date expdate = cal.getTime();
-        ZonedDateTime date = ZonedDateTime.ofInstant(expdate.toInstant(), ZoneId.systemDefault());
-            
-        resp.getHeaders().add("Expires", date.format(DateTimeFormatter.RFC_1123_DATE_TIME));      
-        
+
+		Response resp = Response.ok(dh.getInputStream()).build();
+		resp.getHeaders().add("Cache-Control", "max-age=86400, must-revalidate");
+		resp.getHeaders().add("Pragma", "no-cache");
+		resp.getHeaders().add("Content-Type", dh.getContentType());
+
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.HOUR, 24);
+		Date expdate = cal.getTime();
+		ZonedDateTime date = ZonedDateTime.ofInstant(expdate.toInstant(), ZoneId.systemDefault());
+
+		resp.getHeaders().add("Expires", date.format(DateTimeFormatter.RFC_1123_DATE_TIME));
+
 		return resp;
 	}
 

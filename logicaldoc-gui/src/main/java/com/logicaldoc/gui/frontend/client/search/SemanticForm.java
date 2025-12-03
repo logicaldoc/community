@@ -46,8 +46,6 @@ public class SemanticForm extends VLayout implements SearchObserver {
 
 	private static final String SEARCHINHITS = "searchinhits";
 
-	private static final String LESSTHAN = "lessthan";
-
 	private static final String NO_LANGUAGE = "";
 
 	private ValuesManager vm = new ValuesManager();
@@ -143,7 +141,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 
 		CheckboxItem subfolders = new CheckboxItem(SUBFOLDERS, I18N.message("searchinsubfolders"));
 
-		SpinnerItem threshold = ItemFactory.newSpinnerItem(THRESHOLD, 50); 
+		SpinnerItem threshold = ItemFactory.newSpinnerItem(THRESHOLD, 50);
 		threshold.setMin(0);
 		threshold.setStep(1);
 		threshold.setMax(100);
@@ -179,7 +177,6 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		options.setExpression(vm.getValueAsString(EXPRESSION_STR));
 
 		setLanguageCondition(options);
-		setSizeCondition(options);
 
 		List<String> fields = new ArrayList<>();
 		Collections.addAll(fields, searchinItem.getValues());
@@ -215,16 +212,6 @@ public class SemanticForm extends VLayout implements SearchObserver {
 			options.setFilterIds(new ArrayList<>());
 	}
 
-	private void setSizeCondition(GUISearchOptions options) {
-		Long size = vm.getValueAsString("size") != null ? Long.parseLong(vm.getValueAsString("size")) : null;
-		if (size != null) {
-			if (LESSTHAN.equals(vm.getValueAsString("sizeOperator")))
-				options.setSizeMax(size * 1024);
-			else
-				options.setSizeMin(size * 1024);
-		}
-	}
-
 	private void setLanguageCondition(GUISearchOptions options) {
 		if (NO_LANGUAGE.equals(vm.getValueAsString(LANGUAGE)) || vm.getValue(LANGUAGE) == null) {
 			options.setLanguage(null);
@@ -245,7 +232,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		if (options.getType() == GUISearchOptions.TYPE_SEMANTIC) {
 			defaultOptions = options;
 			SearchMenu.get().openSemanticSection();
-			if (isDrawn())
+			if (Boolean.TRUE.equals(isDrawn()))
 				applyOptions(options);
 		}
 	}
@@ -260,14 +247,6 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		vm.setValue(SUBFOLDERS, options.isSearchInSubPath());
 		vm.setValue(ALIASES, options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
-		if (options.getSizeMax() != null) {
-			vm.setValue("size", options.getSizeMax() / 1024D);
-			vm.setValue("sizeOperator", LESSTHAN);
-		}
-		if (options.getSizeMin() != null) {
-			vm.setValue("size", options.getSizeMin() / 1024D);
-			vm.setValue("sizeOperator", "greaterthan");
-		}
 		vm.setValue(THRESHOLD, options.getThreshold());
 	}
 

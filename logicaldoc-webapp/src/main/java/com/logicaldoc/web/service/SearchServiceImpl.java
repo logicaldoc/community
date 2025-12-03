@@ -54,7 +54,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	 * A map for the {@link GUISearchOptions} - {@link SearchOptions}
 	 * converters, key is the search type
 	 */
-	private final static Map<Integer, SearchOptionsConverter> converters = new HashMap<>();
+	private static final Map<Integer, SearchOptionsConverter> converters = new HashMap<>();
 
 	public static void registerConverter(Integer type, SearchOptionsConverter converter) {
 		converters.put(type, converter);

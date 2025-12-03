@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class ParametricForm extends VLayout implements SearchObserver {
+	
 	private static final String MATCH = "match";
 
 	private static final String SUBFOLDERS = "subfolders";
@@ -462,7 +463,7 @@ public class ParametricForm extends VLayout implements SearchObserver {
 			});
 		} else {
 			selectedTemplate = null;
-			vm.setValue("template", (String) null);
+			vm.setValue(TEMPLATE, (String) null);
 			applyCriteria(options);
 		}
 	}

@@ -2394,11 +2394,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				dummy.setUsername("dummy");
 				dummy.setTenantId(transaction.getTenantId());
 				dummy.setLocale(Locale.ENGLISH);
-				try {
-					dummy.setDecodedPassword(password);
-				} catch (NoSuchAlgorithmException e) {
-					throw new PasswordWeakException(List.of(e.getMessage()));
-				}
+				setDecodedPassword(password, dummy);
 				UserDAO.get().checkPasswordCompliance(dummy);
 			}
 
@@ -2408,6 +2404,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return pwe.getMessages();
 		} catch (PersistenceException | NoSuchAlgorithmException e) {
 			return throwServerException(session, log, e);
+		}
+	}
+
+	private void setDecodedPassword(String decodedPassword, User user) {
+		try {
+			user.setDecodedPassword(decodedPassword);
+		} catch (NoSuchAlgorithmException e) {
+			throw new PasswordWeakException(List.of(e.getMessage()));
 		}
 	}
 

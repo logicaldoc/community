@@ -392,12 +392,12 @@ public class AclDataServlet extends AbstractDataServlet {
 		printPermission("preview", writer, intToBoolean(set.getInt(26)));
 		printPermission("customid", writer, intToBoolean(set.getInt(27)));
 		printPermission("revision", writer, intToBoolean(set.getInt(28)));
-		
+
 		writer.print(TYPE + groupType + TYPE_CLOSED);
 		writer.print(ACE_CLOSED);
 	}
 
-	private void printPermission(String permission, PrintWriter writer, boolean enabled) throws SQLException {
+	private void printPermission(String permission, PrintWriter writer, boolean enabled) {
 		writer.print(String.format("<%s>%b</%s>", permission, enabled, permission));
 	}
 
