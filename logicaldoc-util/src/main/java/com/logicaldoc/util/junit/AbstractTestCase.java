@@ -193,7 +193,7 @@ public abstract class AbstractTestCase {
 	 * @throws IOException I/O error retrieving the plugin archives
 	 * @throws PluginException Error during plugin initialization
 	 */
-	private void initializePlugins(List<String> pluginArchives) throws IOException, PluginException {
+	protected void initializePlugins(List<String> pluginArchives) throws IOException, PluginException {
 		if (CollectionUtils.isEmpty(pluginArchives))
 			return;
 
