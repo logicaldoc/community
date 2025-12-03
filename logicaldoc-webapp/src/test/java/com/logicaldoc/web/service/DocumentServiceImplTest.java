@@ -107,6 +107,11 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	protected SearchEngine searchEngine;
 
 	@Override
+	protected List<String> getPluginArchives() {
+		return List.of("/logicaldoc-core-plugin.jar");
+	}
+
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
@@ -711,8 +716,6 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testConvert() throws ServerException, IOException, PluginException {
-		initializePlugins(List.of("/logicaldoc-core-plugin.jar"));
-
 		GUIDocument doc = testSubject.getById(7);
 		GUIDocument conversion = testSubject.convert(doc.getId(), doc.getFileVersion(), "pdf");
 		conversion = testSubject.getById(conversion.getId());
