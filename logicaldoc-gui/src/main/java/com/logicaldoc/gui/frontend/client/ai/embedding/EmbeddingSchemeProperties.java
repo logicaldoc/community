@@ -120,8 +120,8 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 
 		// Vector Size
 		SpinnerItem vectorSize = ItemFactory.newSpinnerItem(VECTORSIZE, embeddingScheme.getVectorSize());
-		vectorSize.setMin(1);
-		vectorSize.setStep(1);
+		vectorSize.setMin(100);
+		vectorSize.setStep(100);
 		vectorSize.setRequired(true);
 		vectorSize.addChangedHandler(changedHandler);
 		vectorSize.setDisabled(embeddingScheme.getId() != 0L);

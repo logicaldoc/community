@@ -502,7 +502,7 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="Embedder_WEB" fileName="${root}/digestprocessor_web.log.html" filePattern="${root}/embedder.log.html.%i">
+    <RollingFile name="Embedder_WEB" fileName="${root}/embedder_web.log.html" filePattern="${root}/embedder.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
