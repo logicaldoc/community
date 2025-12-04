@@ -1,13 +1,12 @@
 package com.logicaldoc.gui.frontend.client.search;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
@@ -19,7 +18,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
-import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -32,6 +30,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 9.2.2
  */
 public class SemanticForm extends VLayout implements SearchObserver {
+
 	private static final String THRESHOLD = "threshold";
 
 	private static final String ALIASES = "aliases";
@@ -49,8 +48,6 @@ public class SemanticForm extends VLayout implements SearchObserver {
 	private static final String NO_LANGUAGE = "";
 
 	private ValuesManager vm = new ValuesManager();
-
-	private MultiComboBoxItem searchinItem = null;
 
 	private static SemanticForm instance;
 
@@ -164,6 +161,8 @@ public class SemanticForm extends VLayout implements SearchObserver {
 	}
 
 	private void search() {
+		GuiLog.info("//// SEARCH CLICKED ////");
+
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
@@ -178,28 +177,18 @@ public class SemanticForm extends VLayout implements SearchObserver {
 
 		setLanguageCondition(options);
 
-		List<String> fields = new ArrayList<>();
-		Collections.addAll(fields, searchinItem.getValues());
-
-		if (fields.contains(Constants.FULLTEXT_FIELD_FILENAME) && !fields.contains(Constants.FULLTEXT_FIELD_TITLE))
-			fields.add(Constants.FULLTEXT_FIELD_TITLE);
-		if (fields.contains(Constants.FULLTEXT_FIELD_TITLE) && !fields.contains(Constants.FULLTEXT_FIELD_FILENAME))
-			fields.add(Constants.FULLTEXT_FIELD_FILENAME);
-
-		options.setFields(fields);
-
 		options.setEmbeddingSchemeId(Long.parseLong(vm.getValueAsString("embeddingscheme")));
 
 		options.setFolder(folder.getFolderId());
 		options.setFolderName(folder.getFolderName());
 
 		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString(ALIASES)));
-
 		options.setThreshold(Integer.parseInt(vm.getValueAsString(THRESHOLD)));
 
 		setSubfolderCondition(options);
 
 		Search.get().setOptions(options);
+
 		Search.get().search();
 	}
 
