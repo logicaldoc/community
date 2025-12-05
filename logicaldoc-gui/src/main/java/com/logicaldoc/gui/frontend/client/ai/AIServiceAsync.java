@@ -27,6 +27,8 @@ public interface AIServiceAsync {
 
 	void trainModel(long modelId, AsyncCallback<Void> callback);
 
+	void stopTraining(long modelId, AsyncCallback<Void> callback);
+
 	void evaluateModel(long modelId, AsyncCallback<Void> callback);
 
 	void query(long modelId, List<String> features, AsyncCallback<List<GUIQueryResult>> callback);

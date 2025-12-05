@@ -104,6 +104,15 @@ public interface AIService extends RemoteService {
 	public void trainModel(long modelId) throws ServerException;
 
 	/**
+	 * Stops the training of a model
+	 * 
+	 * @param modelId identifier of the model to stop training
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void stopTraining(long modelId) throws ServerException;
+	
+	/**
 	 * Evaluated a neural network model
 	 * 
 	 * @param modelId identifier of the neural network model to evaluate

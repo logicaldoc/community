@@ -253,6 +253,17 @@ public class ModelsPanel extends VLayout {
 		}));
 		train.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING));
 
+		MenuItem stopTraining = new MenuItem();
+		stopTraining.setTitle(I18N.message("stoptraining"));
+		stopTraining
+				.addClickHandler(event -> AIService.Instance.get().stopTraining(ids.get(0), new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(Void result) {
+						// Nothing to do
+					}
+				}));
+		stopTraining.setEnabled(selection[0].getAttributeAsBoolean(TRAINING));
+
 		MenuItem evaluate = new MenuItem();
 		evaluate.setTitle(I18N.message("startevaluation"));
 		evaluate.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmevaluation"), confirm -> {
@@ -305,8 +316,8 @@ public class ModelsPanel extends VLayout {
 		iimport.addClickHandler(
 				click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-		contextMenu.setItems(query, train, evaluate, new MenuItemSeparator(), clone, iimport, export,
-				new MenuItemSeparator(), delete);
+		contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(), clone, iimport,
+				export, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

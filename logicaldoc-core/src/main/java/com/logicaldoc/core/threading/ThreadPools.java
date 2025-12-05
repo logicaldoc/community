@@ -51,9 +51,14 @@ public class ThreadPools {
 
 	private Map<String, ThreadPoolExecutor> pools = new HashMap<>();
 
+	/**
+	 * Map of those active futures that extends {@link MonitoredCallable}
+	 */
+	private Map<String, Future<?>> monitoredFutures = new HashMap<>();
+
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
-	
+
 	/**
 	 * Gets the object available in the application context
 	 * 
@@ -106,12 +111,17 @@ public class ThreadPools {
 	public <T> Future<T> schedule(Callable<T> task, String poolName, long delay) {
 		try {
 			ExecutorService pool = getPool(poolName);
+			Future<T> future;
 			if (pool instanceof ScheduledExecutorService executorService)
-				return executorService.schedule(task, delay, TimeUnit.MILLISECONDS);
+				future = executorService.schedule(task, delay, TimeUnit.MILLISECONDS);
 			else {
 				log.debug("Pool {} does not support scheduling so the task has been started immediately", poolName);
-				return execute(task, poolName);
+				future = execute(task, poolName);
 			}
+
+			cacheFuture(task, future);
+
+			return future;
 		} catch (ThreadPoolNotAvailableException e) {
 			log.error(e.getMessage());
 			return null;
@@ -127,11 +137,50 @@ public class ThreadPools {
 	public <T> Future<T> execute(Callable<T> task, String poolName) {
 		try {
 			ExecutorService pool = getPool(poolName);
-			return pool.submit(task);
+			Future<T> future = pool.submit(task);
+
+			cacheFuture(task, future);
+
+			return future;
 		} catch (ThreadPoolNotAvailableException e) {
 			log.error(e.getMessage());
 			return null;
 		}
+	}
+
+	private <T> void cacheFuture(Callable<?> task, Future<T> future) {
+		// clear from completed threads
+		monitoredFutures.entrySet().removeIf(entry -> entry.getValue().isDone() || entry.getValue().isCancelled());
+
+		if (task instanceof MonitoredCallable monitored)
+			monitoredFutures.put(monitored.getName(), future);
+	}
+
+	/**
+	 * Kills a task
+	 * 
+	 * @param taskName Name of the thread
+	 */
+	public void kill(String taskName) {
+		Future<?> task = monitoredFutures.get(taskName);
+		if (task != null) {
+			task.cancel(true);
+		}
+	}
+
+	/**
+	 * Gets the running status of a task
+	 * 
+	 * @param taskName Name of the thread
+	 * 
+	 * @return If it is running
+	 */
+	public boolean isRunning(String taskName) {
+		Future<?> task = monitoredFutures.get(taskName);
+		if (task != null) {
+			return task.isDone();
+		} else
+			return false;
 	}
 
 	/**
