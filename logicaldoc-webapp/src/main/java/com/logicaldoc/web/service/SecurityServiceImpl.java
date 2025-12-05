@@ -58,6 +58,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
+import com.logicaldoc.core.security.user.UserSource;
 import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.core.sequence.Sequence;
@@ -747,7 +748,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			setGroups(user, guiUser);
 
 			// Notify the user by email
-			user.setDecodedPassword(decodedPassword);
+			if(createNew && user.getSource().equals(UserSource.DEFAULT))
+				user.setDecodedPassword(decodedPassword);
 			notifyUser(guiUser, user, createNew);
 		} catch (MessagingException me) {
 			log.warn(me.getMessage(), me);
