@@ -61,7 +61,8 @@
 						<include name="**/DocumentService*.class" />
 						<include name="**/RestDocumentService*.class" />
 						<include name="**/FolderService*.class" />
-						<include name="**/RestFolderService*.class" />						
+						<include name="**/RestFolderService*.class" />	
+						<include name="**/context-webservice.xml" />
 					</fileset>
 				</copy>
 			</sequential>
