@@ -52,7 +52,7 @@ public class ModelDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+		tabSet = new EditingTabSet(save -> onSave(), cancel -> {
 			if (model.getId() != 0) {
 				AIService.Instance.get().getModel(model.getId(), new DefaultAsyncCallback<>() {
 

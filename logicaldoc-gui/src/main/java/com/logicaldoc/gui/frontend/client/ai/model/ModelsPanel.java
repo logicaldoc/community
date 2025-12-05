@@ -339,6 +339,7 @@ public class ModelsPanel extends VLayout {
 			list.selectRecord(rec);
 		}
 
+		rec.setAttribute("type", model.getType());
 		rec.setAttribute("name", model.getName());
 		rec.setAttribute(LABEL,
 				model.getLabel() != null && !model.getLabel().trim().isEmpty() ? model.getLabel() : model.getName());
