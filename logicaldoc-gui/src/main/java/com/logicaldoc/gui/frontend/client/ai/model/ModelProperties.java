@@ -22,6 +22,7 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.form.validator.FloatRangeValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -123,13 +124,23 @@ public class ModelProperties extends ModelDetailsTab {
 		description.setColSpan(4);
 		description.setWidth("*");
 
+		SpinnerItem windowSize = ItemFactory.newSpinnerItem("windowsize", model.getWindowSize());
+		windowSize.setMin(2);
+		windowSize.setStep(1);
+		windowSize.addChangedHandler(changedHandler);
+		setEmbedderVisibility(windowSize);
+
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new ModelTypesDS());
 		type.setValueField(VALUE);
 		type.setDisplayField(LABEL);
 		type.setValue(model.getType());
 		type.addChangedHandler(changedHandler);
-		type.addChangedHandler(changed -> layersStack.setVisible(NEURAL.equals(type.getValueAsString())));
+		type.addChangedHandler(changed -> {
+			layersStack.setVisible(NEURAL.equals(type.getValueAsString()));
+			if (EMBEDDER.equals(type.getValueAsString()))
+				windowSize.setValue(10);
+		});
 		type.setRequired(true);
 		type.setDisabled(model.getId() != 0L);
 		type.setVisible(model.getId() == 0L);
@@ -257,14 +268,32 @@ public class ModelProperties extends ModelDetailsTab {
 
 		SpinnerItem maxChunks = ItemFactory.newSpinnerItem("maxchunks", model.getChunking().getMaxChunks());
 		maxChunks.setMin(1);
-		maxChunks.setStep(1000);
+		maxChunks.setStep(10);
 		maxChunks.addChangedHandler(changedHandler);
 		setEmbedderVisibility(maxChunks);
 
+		SpinnerItem workers = ItemFactory.newSpinnerItem("workers", model.getWorkers());
+		workers.setMin(1);
+		workers.setStep(1);
+		workers.addChangedHandler(changedHandler);
+		setEmbedderVisibility(windowSize);
+
+		FloatRangeValidator rangevalidator = new FloatRangeValidator();
+		rangevalidator.setMin(0);
+		rangevalidator.setMax(1);
+		DoubleItem alpha = ItemFactory.newDoubleItem("alpha", model.getAlpha());
+		alpha.setValidators(rangevalidator);
+		alpha.addChangedHandler(changedHandler);
+		setEmbedderVisibility(alpha);
+		DoubleItem minAlpha = ItemFactory.newDoubleItem("minalpha", model.getAlpha());
+		minAlpha.setValidators(rangevalidator);
+		minAlpha.addChangedHandler(changedHandler);
+		setEmbedderVisibility(minAlpha);
+
 		form.setItems(id, typeValue, type, name, label, features, categories, activationSelector, weightInit, loss,
 				updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
-				minWordFrequency, chunkSize, minChunkSize, minChunkSizeChars, maxChunks,
-				description);
+				minWordFrequency, windowSize, chunkSize, minChunkSize, minChunkSizeChars, maxChunks, workers, alpha,
+				minAlpha, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -290,6 +319,10 @@ public class ModelProperties extends ModelDetailsTab {
 		model.setSeed(Long.parseLong(form.getValueAsString(SEED)));
 		model.setVectorSize(Integer.parseInt(form.getValueAsString("vectorsize")));
 		model.setMinWordFrequency(Integer.parseInt(form.getValueAsString("minwordfrequency")));
+		model.setWindowSize(Integer.parseInt(form.getValueAsString("windowsize")));
+		model.setWorkers(Integer.parseInt(form.getValueAsString("workers")));
+		model.setAlpha(Double.parseDouble(form.getValueAsString("alpha")));
+		model.setMinAlpha(Double.parseDouble(form.getValueAsString("minalpha")));
 
 		model.getChunking().setChunkSize(Integer.parseInt(form.getValueAsString("chunksize")));
 		model.getChunking().setMinChunkSize(Integer.parseInt(form.getValueAsString(MINCHUNKSIZE)));

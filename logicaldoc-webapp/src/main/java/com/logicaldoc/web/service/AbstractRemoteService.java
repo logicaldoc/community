@@ -326,8 +326,14 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		}
 
 		if (task.isOver() && task.getError() != null) {
-			// In case it already completed with error, re-throw the exception
-			throw new ServerException(task.getError());
+			if (task.getError() instanceof InterruptedException) {
+				log.debug("Operation interrupted");
+				return false;
+			} else {
+				// In case it already completed with error, re-throw the
+				// exception
+				throw new ServerException(task.getError());
+			}
 		} else if (!task.isOver()) {
 			// Otherwise detach the current thread but add a listener to notify
 			// the pending users

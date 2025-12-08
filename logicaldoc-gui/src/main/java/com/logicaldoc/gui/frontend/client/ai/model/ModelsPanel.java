@@ -243,10 +243,11 @@ public class ModelsPanel extends VLayout {
 		train.setTitle(I18N.message("starttraining"));
 		train.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmtraining"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
+				LD.contactingServer();
 				AIService.Instance.get().trainModel(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
-						// Nothing to do
+						LD.clearPrompt();
 					}
 				});
 			}
@@ -268,10 +269,11 @@ public class ModelsPanel extends VLayout {
 		evaluate.setTitle(I18N.message("startevaluation"));
 		evaluate.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmevaluation"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
+				LD.contactingServer();
 				AIService.Instance.get().evaluateModel(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
-						// Nothing to do
+						LD.clearPrompt();
 					}
 				});
 			}

@@ -54,6 +54,12 @@ public class GUIModel implements Serializable {
 
 	private int windowSize = 5;
 
+	private int workers = 1;
+
+	double alpha = 0.025D;
+
+	double minAlpha = 0.0001D;
+
 	/**
 	 * Words that do not appear this minimum number of times must be discarded
 	 */
@@ -279,5 +285,29 @@ public class GUIModel implements Serializable {
 
 	public void setMinWordFrequency(int minWordFrequency) {
 		this.minWordFrequency = minWordFrequency;
+	}
+
+	public int getWorkers() {
+		return workers;
+	}
+
+	public void setWorkers(int workers) {
+		this.workers = workers;
+	}
+
+	public double getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(double alpha) {
+		this.alpha = alpha;
+	}
+
+	public double getMinAlpha() {
+		return minAlpha;
+	}
+
+	public void setMinAlpha(double minAlpha) {
+		this.minAlpha = minAlpha;
 	}
 }

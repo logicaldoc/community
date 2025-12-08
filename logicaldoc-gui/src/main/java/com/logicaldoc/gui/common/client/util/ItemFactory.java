@@ -532,7 +532,8 @@ public class ItemFactory {
 
 	public static FolderSelector newFolderSelectorForAttribute(String name, String title,
 			List<FormItemIcon> additionalIcons) {
-		final FolderSelector item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), additionalIcons);
+		final FolderSelector item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER),
+				additionalIcons);
 		if (title != null)
 			item.setTitle(I18N.message(title));
 		return item;
@@ -2511,6 +2512,18 @@ public class ItemFactory {
 		iv.setErrorMessage(I18N.message(WHOLENUMBER));
 		item.setValidators(iv);
 		return item;
+	}
+
+	/**
+	 * Creates a new DoubleItem.
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param value The item value (optional)
+	 * 
+	 * @return the new item
+	 */
+	public static DoubleItem newDoubleItem(String name, Double value) {
+		return newDoubleItem(name, I18N.message(name), value);
 	}
 
 	/**

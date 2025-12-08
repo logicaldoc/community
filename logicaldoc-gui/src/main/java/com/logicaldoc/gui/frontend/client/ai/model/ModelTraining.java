@@ -1,12 +1,15 @@
 package com.logicaldoc.gui.frontend.client.ai.model;
 
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.logicaldoc.gui.frontend.client.ai.sampler.SamplerSelector;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -59,7 +62,7 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 				model.getTraining().isSaveSamples());
 		saveSamples.setWrapTitle(false);
 		saveSamples.addChangedHandler(changedHandler);
-		
+
 		TextItem cron = ItemFactory.newCronExpressionItem("cron", "schedule", model.getTraining().getCron(),
 				changedHandler);
 		AdvancedCriteria visibleCriteria = new AdvancedCriteria(ENABLED, OperatorId.EQUALS, true);
@@ -90,6 +93,21 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 		report = ItemFactory.newTextAreaItem("report", model.getTraining().getReport());
 		report.setWidth("*");
 		onModelChanged(model);
+
+		FormItemIcon refresh = new FormItemIcon();
+		refresh.setSrc("[SKIN]/icons/arrows-rotate.png");
+		refresh.setPrompt(I18N.message("refresh"));
+		refresh.setWidth(12);
+		refresh.setHeight(12);
+		refresh.addFormItemClickHandler(
+				event -> AIService.Instance.get().getModel(model.getId(), new DefaultAsyncCallback<GUIModel>() {
+
+					@Override
+					protected void handleSuccess(GUIModel result) {
+						report.setValue(result.getTraining().getReport());
+					}
+				}));
+		report.setIcons(refresh);
 
 		DynamicForm reportForm = new DynamicForm();
 		reportForm.setWidth100();
