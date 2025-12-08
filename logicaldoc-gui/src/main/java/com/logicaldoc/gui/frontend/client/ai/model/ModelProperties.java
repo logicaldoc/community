@@ -285,7 +285,7 @@ public class ModelProperties extends ModelDetailsTab {
 		alpha.setValidators(rangevalidator);
 		alpha.addChangedHandler(changedHandler);
 		setEmbedderVisibility(alpha);
-		DoubleItem minAlpha = ItemFactory.newDoubleItem("minalpha", model.getAlpha());
+		DoubleItem minAlpha = ItemFactory.newDoubleItem("minalpha", model.getMinAlpha());
 		minAlpha.setValidators(rangevalidator);
 		minAlpha.addChangedHandler(changedHandler);
 		setEmbedderVisibility(minAlpha);
