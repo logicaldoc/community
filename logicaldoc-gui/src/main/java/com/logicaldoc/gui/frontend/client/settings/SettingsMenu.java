@@ -34,7 +34,7 @@ public class SettingsMenu extends VLayout {
 
 		addSearchAndIndexing();
 
-		addRepositories();
+		addStores();
 
 		addGuiSettings();
 
@@ -187,13 +187,13 @@ public class SettingsMenu extends VLayout {
 			addMember(guiSettings);
 	}
 
-	private void addRepositories() {
-		Button repositories = new Button(I18N.message("repositories"));
-		repositories.setWidth100();
-		repositories.setHeight(25);
-		repositories.addClickHandler(event -> AdminScreen.get().setContent(new RepositoriesPanel()));
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.REPOSITORIES))
-			addMember(repositories);
+	private void addStores() {
+		Button stores = new Button(I18N.message("stores"));
+		stores.setWidth100();
+		stores.setHeight(25);
+		stores.addClickHandler(event -> AdminScreen.get().setContent(new RepositoriesPanel()));
+		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.STORES))
+			addMember(stores);
 	}
 
 	private void addSearchAndIndexing() {

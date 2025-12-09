@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
- * This panel shows the Folders settings.
+ * This panel shows the stores and other folders used as repositories.
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
@@ -31,7 +31,7 @@ public class RepositoriesPanel extends AdminPanel {
 	private DynamicForm foldersForm = new DynamicForm();
 
 	public RepositoriesPanel() {
-		super("repositories");
+		super("stores");
 	}
 
 	@Override
@@ -49,8 +49,7 @@ public class RepositoriesPanel extends AdminPanel {
 		tabs.addTab(foldersTab);
 
 		SettingService.Instance.get().loadSettingsByNames(Arrays.asList("conf.dbdir", "conf.exportdir",
-				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir"),
-				new DefaultAsyncCallback<>() {
+				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir"), new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(List<GUIParameter> folderParameters) {
 						List<FormItem> items = new ArrayList<>();
@@ -96,7 +95,7 @@ public class RepositoriesPanel extends AdminPanel {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

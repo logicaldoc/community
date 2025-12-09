@@ -125,7 +125,7 @@ public class Menu {
 
 	public static final long OCR = 104;
 
-	public static final long REPOSITORIES = 105;
+	public static final long STORES = 105;
 
 	public static final long AUDITING = 106;
 

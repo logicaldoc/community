@@ -488,7 +488,7 @@ values     (103,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'outgoingemail',7,'outgoin
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (105,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'repositories',7,'repositories.png',1,1,1,6,1);
+values     (105,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'stores',7,'repositories.png',1,1,1,6,1);
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
