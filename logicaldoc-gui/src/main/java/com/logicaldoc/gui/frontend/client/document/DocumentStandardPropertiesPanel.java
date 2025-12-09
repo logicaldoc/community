@@ -120,7 +120,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		color.setDisabled(!updateEnabled);
 
 		StaticTextItem permaLink = preparePermaLink();
-
+		
 		TextItem customId = ItemFactory.newTextItem("customid", document.getCustomId());
 		if (changedHandler != null)
 			customId.addChangedHandler(changedHandler);
@@ -437,6 +437,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			document.setColor((String) values.get(COLOR));
 			document.setTags(Arrays.asList(tagItem.getValues()));
 			document.setRevision((String) values.get("revision"));
+			document.setCustomId((String) values.get("customid"));
 		}
 		return !vm.hasErrors();
 	}
