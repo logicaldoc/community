@@ -43,7 +43,7 @@ public class SaveSearchDialog extends Window {
 		form.setWidth(350);
 		form.setMargin(5);
 
-		TextItem name = ItemFactory.newSimpleTextItemWithHyphen("name", null);
+		TextItem name = ItemFactory.newSimpleTextItemWithHyphen("name", Search.get().getOptions().getName());
 		name.setRequired(true);
 		name.setWidth(200);
 

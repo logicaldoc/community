@@ -203,7 +203,11 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		try {
 			SearchOptions opt = converters.get(options.getType()).toSearchOptions(options);
 
-			com.logicaldoc.core.searchengine.saved.SavedSearch search = new com.logicaldoc.core.searchengine.saved.SavedSearch();
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = SearchDAO.get()
+					.findByUserIdAndName(session.getUserId(), options.getName());
+			if (search == null)
+				search = new com.logicaldoc.core.searchengine.saved.SavedSearch();
+
 			search.setName(options.getName());
 			search.setUserId(session.getUserId());
 			search.setTenantId(session.getTenantId());
@@ -250,6 +254,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				if (fld != null)
 					guiOptions.setFolderName(fld.getName());
 			}
+			guiOptions.setName(name);
 
 			return guiOptions;
 		} catch (Exception t) {

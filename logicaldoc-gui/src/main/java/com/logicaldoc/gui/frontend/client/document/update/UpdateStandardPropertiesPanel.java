@@ -95,6 +95,11 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		color.setDisabled(!updateEnabled);
 		items.add(color);
 
+		TextItem customId = ItemFactory.newTextItem("customid", document.getCustomId());
+		customId.setDisabled(!updateEnabled || (document.getId() != 0L && !document.isCustomid()));
+		if (Feature.enabled(Feature.CUSTOMID))
+			items.add(customId);
+
 		if (Feature.enabled(Feature.TAGS)) {
 			String mode = Session.get().getConfig("tag.mode");
 			final DataSource ds = new TagsDS(null, true, document.getId(), null);
@@ -203,6 +208,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			document.setLanguage(vm.getValueAsString(LANGUAGE));
 			document.setColor(vm.getValueAsString("color"));
+			document.setCustomId(vm.getValueAsString("customid"));
 			document.setTags(Arrays.asList(tagItem.getValues()));
 		}
 		return !vm.hasErrors();

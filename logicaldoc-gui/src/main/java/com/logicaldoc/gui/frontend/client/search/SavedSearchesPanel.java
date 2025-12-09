@@ -66,7 +66,7 @@ public class SavedSearchesPanel extends VLayout {
 			ListGridRecord rec = doubleClick.getRecord();
 			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 				@Override
-				public void handleSuccess(GUISearchOptions options) {
+				public void handleSuccess(GUISearchOptions options) {			
 					Search.get().setOptions(options);
 				}
 			});
