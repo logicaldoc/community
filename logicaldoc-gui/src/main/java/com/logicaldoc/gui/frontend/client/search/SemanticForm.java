@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
@@ -161,8 +160,6 @@ public class SemanticForm extends VLayout implements SearchObserver {
 	}
 
 	private void search() {
-		GuiLog.info("//// SEARCH CLICKED ////");
-
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 

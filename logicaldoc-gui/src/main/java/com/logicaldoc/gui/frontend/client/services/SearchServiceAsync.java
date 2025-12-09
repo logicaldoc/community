@@ -10,7 +10,7 @@ public interface SearchServiceAsync {
 
 	void search(GUISearchOptions options, AsyncCallback<GUIResult> callback);
 
-	void save(GUISearchOptions options, AsyncCallback<Boolean> callback);
+	void save(GUISearchOptions options, AsyncCallback<Void> callback);
 
 	void load(String name, AsyncCallback<GUISearchOptions> callback);
 

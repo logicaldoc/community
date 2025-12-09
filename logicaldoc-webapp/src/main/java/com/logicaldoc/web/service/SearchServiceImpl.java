@@ -197,7 +197,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	}
 
 	@Override
-	public boolean save(GUISearchOptions options) throws ServerException {
+	public void save(GUISearchOptions options) throws ServerException {
 		Session session = validateSession();
 
 		try {
@@ -213,9 +213,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			SearchDAO.get().store(search);
 
 			log.debug("Saved search {}", opt.getName());
-			return true;
 		} catch (Exception t) {
-			return throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 

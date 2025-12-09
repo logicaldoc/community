@@ -36,11 +36,9 @@ public interface SearchService extends RemoteService {
 	 * 
 	 * @param options The search options
 	 * 
-	 * @return true if the operation was successful and there were no duplicates
-	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public boolean save(GUISearchOptions options) throws ServerException;
+	public void save(GUISearchOptions options) throws ServerException;
 
 	/**
 	 * Shares a search among a set of users and groups

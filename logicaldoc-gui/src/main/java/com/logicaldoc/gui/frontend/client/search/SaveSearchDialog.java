@@ -69,11 +69,9 @@ public class SaveSearchDialog extends Window {
 		options.setDescription(vm.getValueAsString(DESCRIPTION));
 		SearchService.Instance.get().save(options, new DefaultAsyncCallback<>() {
 			@Override
-			public void handleSuccess(Boolean b) {
-				if (Boolean.TRUE.equals(b)) {
-					SavedSearchesPanel.get().refresh();
-					destroy();
-				}
+			public void handleSuccess(Void b) {
+				destroy();
+				SavedSearchesPanel.get().refresh();
 			}
 		});
 	}
