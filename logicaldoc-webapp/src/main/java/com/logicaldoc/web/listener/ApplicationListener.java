@@ -200,6 +200,10 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 				Logger console = LoggerFactory.getLogger("console");
 				console.warn("The application has to be restarted");
+			} else {
+				log.info("Application started and ready");
+				Logger console = LoggerFactory.getLogger("console");
+				console.info("Application started and ready");
 			}
 		} finally {
 			writePidFile();
