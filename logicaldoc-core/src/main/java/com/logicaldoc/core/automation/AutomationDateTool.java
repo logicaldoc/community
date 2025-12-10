@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.tools.generic.ComparisonDateTool;
 
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.time.TimeDiff;
 
 /**
  * Utility class to handle dates from inside the Automation
@@ -507,5 +508,16 @@ public class AutomationDateTool extends org.apache.velocity.tools.generic.DateTo
 	 */
 	public void sleep(long milliseconds) throws InterruptedException {
 		Thread.sleep(milliseconds);
+	}
+
+	/**
+	 * Prints the duration in the format HH:MM:ss.SSS
+	 * 
+	 * @param diffMillis Duration expressed in milliseconds
+	 *
+	 * @return The formatted output
+	 */
+	public static String printDuration(long diffMillis) {
+		return TimeDiff.printDuration(diffMillis);
 	}
 }

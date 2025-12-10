@@ -246,14 +246,14 @@ public class ModelProperties extends ModelDetailsTab {
 
 		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", model.getChunking().getChunkSize());
 		chunkSize.setHint(I18N.message(TOKENS).toLowerCase());
-		chunkSize.setMin(100);
+//		chunkSize.setMin(100);
 		chunkSize.setStep(10);
 		chunkSize.addChangedHandler(changedHandler);
 		setEmbedderVisibility(chunkSize);
 
 		SpinnerItem minChunkSize = ItemFactory.newSpinnerItem(MINCHUNKSIZE, model.getChunking().getMinChunkSize());
 		minChunkSize.setHint(I18N.message(TOKENS).toLowerCase());
-		minChunkSize.setMin(5);
+//		minChunkSize.setMin(5);
 		minChunkSize.setStep(5);
 		minChunkSize.addChangedHandler(changedHandler);
 		setEmbedderVisibility(minChunkSize);
@@ -261,7 +261,7 @@ public class ModelProperties extends ModelDetailsTab {
 		SpinnerItem minChunkSizeChars = ItemFactory.newSpinnerItem("minchunksizechars", MINCHUNKSIZE,
 				model.getChunking().getMinChunkSizeChars());
 		minChunkSizeChars.setHint(I18N.message("chars").toLowerCase());
-		minChunkSizeChars.setMin(100);
+//		minChunkSizeChars.setMn(100);
 		minChunkSizeChars.setStep(10);
 		minChunkSizeChars.addChangedHandler(changedHandler);
 		setEmbedderVisibility(minChunkSizeChars);

@@ -17,6 +17,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
@@ -37,6 +38,8 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 6.0
  */
 public class TasksPanel extends AdminPanel {
+
+	private static final String DURATION = "duration";
 
 	private static final String COMPLETION = "completion";
 
@@ -179,6 +182,10 @@ public class TasksPanel extends AdminPanel {
 		ListGridField lastStart = new DateListGridField("lastStart", "laststart");
 
 		ListGridField nextStart = new DateListGridField("nextStart", "nextstart");
+		
+		ListGridField duration = new ListGridField(DURATION, I18N.message(DURATION));
+		duration.setAutoFitWidth(true);
+		duration.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
 		ListGridField scheduling = new ListGridField(SCHEDULING, I18N.message(SCHEDULING), 130);
 		scheduling.setCanFilter(false);
@@ -199,7 +206,7 @@ public class TasksPanel extends AdminPanel {
 
 		tasksGrid.setWidth100();
 		tasksGrid.setHeight100();
-		tasksGrid.setFields(enabled, running, label, description, lastStart, nextStart, scheduling, progressbar,
+		tasksGrid.setFields(enabled, running, label, description, lastStart, duration, nextStart, scheduling, progressbar,
 				completion);
 		tasksGrid.setSelectionType(SelectionStyle.SINGLE);
 		tasksGrid.setShowRecordComponents(true);
@@ -330,8 +337,7 @@ public class TasksPanel extends AdminPanel {
 					} else {
 						p.setPercentDone(guiTask.getCompletionPercentage());
 					}
-					p.redraw();
-
+					p.redraw();					
 					updateRecord(guiTask);
 				}
 			}
@@ -344,12 +350,14 @@ public class TasksPanel extends AdminPanel {
 			if (rec.getAttribute("name").equals(guiTask.getName()) && guiTask.getStatus() != GUITask.STATUS_IDLE) {
 				rec.setAttribute(RUNNING, true);
 				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
+				rec.setAttribute(DURATION, guiTask.getScheduling().getLastDuration());
 				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 				found = true;
 			} else if (rec.getAttribute("name").equals(guiTask.getName())
 					&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
 				rec.setAttribute(RUNNING, false);
 				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
+				rec.setAttribute(DURATION, guiTask.getScheduling().getLastDuration());
 				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 				found = true;
 			}

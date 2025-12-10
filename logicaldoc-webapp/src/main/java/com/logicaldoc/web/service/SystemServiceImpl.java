@@ -77,6 +77,7 @@ import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
+import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.data.LogDataServlet;
 import com.logicaldoc.web.listener.ApplicationListener;
@@ -409,44 +410,45 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		validateSession();
 
 		TaskManager manager = Context.get(TaskManager.class);
-		List<GUITask> tasks = new ArrayList<>();
+		List<GUITask> guiTasks = new ArrayList<>();
 
-		for (Task t : manager.getTasks()) {
-			GUITask task = new GUITask();
-			task.setName(t.getName());
-			task.setStatus(t.getStatus());
-			task.setProgress((int) t.getProgress());
-			task.setSize(t.getSize());
-			task.setIndeterminate(t.isIndeterminate());
-			task.setCompletionPercentage(t.getCompletionPercentage());
-
-			GUIScheduling scheduling = new GUIScheduling(t.getName());
-			scheduling.setEnabled(t.getScheduling().isEnabled());
-			scheduling.setMode(t.getScheduling().getMode());
-			if (t.getScheduling().getMode().equals(TaskTrigger.MODE_SIMPLE)) {
-				scheduling.setSimple(true);
-				scheduling.setDelay(t.getScheduling().getDelay());
-				scheduling.setInterval(t.getScheduling().getIntervalSeconds());
-				task.setSchedulingLabel(I18N.message("each", locale) + " " + t.getScheduling().getIntervalSeconds()
+		for (Task task : manager.getTasks()) {
+			GUITask guiTask = new GUITask();
+			guiTask.setName(task.getName());
+			guiTask.setStatus(task.getStatus());
+			guiTask.setProgress((int) task.getProgress());
+			guiTask.setSize(task.getSize());
+			guiTask.setIndeterminate(task.isIndeterminate());
+			guiTask.setCompletionPercentage(task.getCompletionPercentage());
+			
+			GUIScheduling guiScheduling = new GUIScheduling(task.getName());
+			guiScheduling.setEnabled(task.getScheduling().isEnabled());
+			guiScheduling.setMode(task.getScheduling().getMode());
+			if (task.getScheduling().getMode().equals(TaskTrigger.MODE_SIMPLE)) {
+				guiScheduling.setSimple(true);
+				guiScheduling.setDelay(task.getScheduling().getDelay());
+				guiScheduling.setInterval(task.getScheduling().getIntervalSeconds());
+				guiTask.setSchedulingLabel(I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds()
 						+ " " + I18N.message(SECONDS, locale).toLowerCase());
-			} else if (t.getScheduling().getMode().equals(TaskTrigger.MODE_CRON)) {
-				scheduling.setSimple(false);
-				scheduling.setCronExpression(t.getScheduling().getCronExpression());
-				task.setSchedulingLabel(t.getScheduling().getCronExpression());
+			} else if (task.getScheduling().getMode().equals(TaskTrigger.MODE_CRON)) {
+				guiScheduling.setSimple(false);
+				guiScheduling.setCronExpression(task.getScheduling().getCronExpression());
+				guiTask.setSchedulingLabel(task.getScheduling().getCronExpression());
 			}
 
-			scheduling.setMaxLength(t.getScheduling().getMaxLength());
-			scheduling.setPreviousFireTime(t.getScheduling().getPreviousFireTime());
-			scheduling.setNextFireTime(t.getScheduling().getNextFireTime());
+			guiScheduling.setMaxLength(task.getScheduling().getMaxLength());
+			guiScheduling.setPreviousFireTime(task.getScheduling().getPreviousFireTime());
+			guiScheduling.setNextFireTime(task.getScheduling().getNextFireTime());
+			guiScheduling.setLastDuration(TimeDiff.printDuration(task.getScheduling().getLastDuration()));
+			
+			guiTask.setScheduling(guiScheduling);
 
-			task.setScheduling(scheduling);
+			guiTask.setSendActivityReport(task.isSendActivityReport());
 
-			task.setSendActivityReport(t.isSendActivityReport());
-
-			tasks.add(task);
+			guiTasks.add(guiTask);
 		}
 
-		return tasks;
+		return guiTasks;
 
 	}
 

@@ -17,6 +17,7 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import com.logicaldoc.core.system.SystemLoadMonitor;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
+import com.logicaldoc.util.time.TimeDiff;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -215,13 +217,17 @@ public abstract class Task implements Runnable {
 		setProgress(0);
 		lastRunError = null;
 
+		StopWatch stopWatch = new StopWatch();
 		try {
 			/*
 			 * Need to acquire the lock
 			 */
 			transactionId = UUID.randomUUID().toString();
-			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId)))
+			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId))) {
+				stopWatch.start();
 				runTask();
+				getScheduling().setLastDuration(stopWatch.getTime());
+			}
 		} catch (InterruptedException ie) {
 			log.error("The task gets interrupted");
 			Thread.currentThread().interrupt();
@@ -230,6 +236,8 @@ public abstract class Task implements Runnable {
 			log.error("The task is stopped");
 			lastRunError = e;
 		} finally {
+			stopWatch.stop();
+
 			// In any case release the lock
 			try {
 				if (lockManager != null)
@@ -241,7 +249,8 @@ public abstract class Task implements Runnable {
 			setStatus(STATUS_IDLE);
 			interruptRequested = false;
 			saveWork();
-			log.info("Task {} finished", getName());
+			getScheduling().setLastDuration(stopWatch.getTime());
+			log.info("Task {} completed in {}", getName(), TimeDiff.printDuration(getScheduling().getLastDuration()));
 			if (isSendActivityReport() && StringUtils.isNotEmpty(getReportRecipients()))
 				notifyReport();
 			transactionId = null;
@@ -392,11 +401,12 @@ public abstract class Task implements Runnable {
 			dictionary.put("task", I18N.message("task.name." + name, recipient.getLocale()));
 			dictionary.put("started", scheduling.getPreviousFireTime());
 			dictionary.put("ended", new Date());
+			dictionary.put("duration", getScheduling().getLastDuration());
 			dictionary.put("error", (lastRunError != null ? lastRunError.getMessage() : null));
 			dictionary.put("report",
 					StringUtils.defaultString(prepareReport(recipient.getLocale())).replace("\\n", "<br />"));
 
-			// Send the email..eeee
+			// Send the email...
 			try {
 				sender.send(email, "task.report", dictionary);
 				log.info("Report sent to: {}", recipient.getEmail());

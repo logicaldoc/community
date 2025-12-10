@@ -38,6 +38,8 @@ public class TaskScheduling {
 	private String cronExpression = "* 10 * * * ? *";
 
 	private Date previousFireTime;
+	
+	private long lastDuration = 0;
 
 	// Maximum duration expressed in seconds
 	private long maxLength = -1;
@@ -223,5 +225,13 @@ public class TaskScheduling {
 
 	public void setCronExpression(String cronExpression) {
 		this.cronExpression = cronExpression;
+	}
+	
+	public long getLastDuration() {
+		return lastDuration;
+	}
+
+	public void setLastDuration(long lastDuration) {
+		this.lastDuration = lastDuration;
 	}
 }

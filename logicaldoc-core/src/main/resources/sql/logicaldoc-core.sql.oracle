@@ -751,15 +751,15 @@ values (2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,4,1,CURRENT_TIMESTAMP,'admi
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'task.report','system','en', '$product - $task',
-'$task<br/>
-$I18N.get(''startedon''): <b>$DateTool.format($started, true)</b><br/>
-$I18N.get(''finishedon''): <b>$DateTool.format($ended, true)</b><br/>
-<hr/>
-#if( $error )
-$I18N.get(''error''): <b>$error</b>
+'<p>$I18N.get(''startedon''): <b>$DateTool.format($started, true)</b><br />
+$I18N.get(''finishedon''): <b>$DateTool.format($ended, true)</b><br />
+$I18N.get(''completedin''): <b>$DateTool.printDuration($duration)</b></p>
+
 <hr />
-#end
-$report',1,1);
+<p>#if( $error ) $I18N.get(''error''): <b>$error</b></p>
+
+<hr />
+<p>#end $report</p>',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'psw.rec1','system','en', '$product - $I18N.get(''emailnotifyaccountobject'')', 

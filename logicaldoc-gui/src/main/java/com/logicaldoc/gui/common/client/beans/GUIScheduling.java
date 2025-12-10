@@ -33,6 +33,8 @@ public class GUIScheduling implements Serializable {
 	private boolean simple = true;
 
 	private String cronExpression = "* 10 * * * ? *";
+	
+	private String lastDuration;
 
 	public GUIScheduling() {
 	}
@@ -119,5 +121,13 @@ public class GUIScheduling implements Serializable {
 
 	public void setCronExpression(String cronExpression) {
 		this.cronExpression = cronExpression;
+	}
+
+	public String getLastDuration() {
+		return lastDuration;
+	}
+
+	public void setLastDuration(String lastDuration) {
+		this.lastDuration = lastDuration;
 	}
 }
