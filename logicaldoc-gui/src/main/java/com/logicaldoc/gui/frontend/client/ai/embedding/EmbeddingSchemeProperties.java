@@ -95,7 +95,7 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		modelSpec.setWidth(300);
 		modelSpec.setColSpan(2);
 		modelSpec.addChangedHandler(changedHandler);
-		modelSpec.setVisibleWhen(new AdvancedCriteria(EMBEDDINGMODEL, OperatorId.EQUALS, "0"));
+		modelSpec.setDisabled(embeddingScheme.getId() != 0L);
 
 		// API Key
 		TextItem apiKey = ItemFactory.newTextItem("apikey", embeddingScheme.getApiKey());
@@ -143,8 +143,8 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 			embeddingScheme.setApiKey(form.getValueAsString("apikey"));
 			embeddingScheme.setChunksBatch(
 					form.getValue(CHUNKSBATCH) != null ? Integer.parseInt(form.getValueAsString(CHUNKSBATCH)) : 50);
-			embeddingScheme.setBatch(
-					form.getValue(BATCH) != null ? Integer.parseInt(form.getValueAsString(BATCH)) : 10000);
+			embeddingScheme
+					.setBatch(form.getValue(BATCH) != null ? Integer.parseInt(form.getValueAsString(BATCH)) : 10000);
 			embeddingScheme.setVectorSize(
 					form.getValue(VECTORSIZE) != null ? Integer.parseInt(form.getValueAsString(VECTORSIZE)) : 300);
 		}
