@@ -715,7 +715,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	}
 
 	@Test
-	public void testConvert() throws ServerException, IOException, PluginException {
+	public void testConvert() throws ServerException {
 		GUIDocument doc = testSubject.getById(7);
 		GUIDocument conversion = testSubject.convert(doc.getId(), doc.getFileVersion(), "pdf");
 		conversion = testSubject.getById(conversion.getId());

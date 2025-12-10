@@ -57,7 +57,6 @@ public class LongRunningOperationCompleteListener<T> implements ThreadCompleteLi
 
 	@Override
 	public void completed(NotifyingThread<T> thread) {
-		SystemMessageDAO smdao = SystemMessageDAO.get();
 		UserDAO uDao = UserDAO.get();
 		Date now = new Date();
 
@@ -90,8 +89,8 @@ public class LongRunningOperationCompleteListener<T> implements ThreadCompleteLi
 			} else {
 				String errorMessage = thread.getError().getMessage();
 				if (thread.getError() instanceof InterruptedException
-						|| thread.getError() instanceof CancellationException || (thread.getError().getCause() != null
-								&& thread.getError().getCause() instanceof InterruptedException))
+						|| thread.getError() instanceof CancellationException
+						|| thread.getError().getCause() instanceof InterruptedException)
 					errorMessage = I18N.message("interrupted", user.getLocale());
 
 				sysmess.setMessageText(
@@ -107,11 +106,15 @@ public class LongRunningOperationCompleteListener<T> implements ThreadCompleteLi
 			sysmess.setConfirmation(0);
 			sysmess.setDateScope(1);
 
-			try {
-				smdao.store(sysmess);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
+			saveMessage(sysmess);
+		}
+	}
+
+	private void saveMessage(SystemMessage message) {
+		try {
+			SystemMessageDAO.get().store(message);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 }

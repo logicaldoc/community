@@ -250,7 +250,8 @@ public abstract class Task implements Runnable {
 			interruptRequested = false;
 			saveWork();
 			getScheduling().setLastDuration(stopWatch.getTime());
-			log.info("Task {} completed in {}", getName(), TimeDiff.printDuration(getScheduling().getLastDuration()));
+			if(log.isErrorEnabled())
+				log.info("Task {} completed in {}", getName(), TimeDiff.printDuration(getScheduling().getLastDuration()));
 			if (isSendActivityReport() && StringUtils.isNotEmpty(getReportRecipients()))
 				notifyReport();
 			transactionId = null;

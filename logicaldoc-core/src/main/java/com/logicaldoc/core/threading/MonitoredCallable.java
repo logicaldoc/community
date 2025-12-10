@@ -25,7 +25,7 @@ public abstract class MonitoredCallable<V> implements Callable<V> {
 
 	private boolean running = true;
 
-	public MonitoredCallable(String name) {
+	protected MonitoredCallable(String name) {
 		this.name = name;
 	}
 
@@ -38,7 +38,7 @@ public abstract class MonitoredCallable<V> implements Callable<V> {
 	}
 
 	@Override
-	public V call() throws Exception {
+	public V call() {
 		log.info("Callable {} is starting", name);
 
 		StopWatch stopWatch = new StopWatch();
@@ -50,7 +50,8 @@ public abstract class MonitoredCallable<V> implements Callable<V> {
 		} finally {
 			stopWatch.stop();
 			running = false;
-			log.info("Callable {} completed in {}", name, TimeDiff.printDuration(stopWatch.getTime()));
+			if (log.isInfoEnabled())
+				log.info("Callable {} completed in {}", name, TimeDiff.printDuration(stopWatch.getTime()));
 		}
 	}
 
@@ -59,5 +60,5 @@ public abstract class MonitoredCallable<V> implements Callable<V> {
 		return name;
 	}
 
-	protected abstract V internalCall() throws Exception;
+	protected abstract V internalCall();
 }

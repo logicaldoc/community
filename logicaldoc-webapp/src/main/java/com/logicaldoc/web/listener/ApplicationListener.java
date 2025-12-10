@@ -39,6 +39,8 @@ import jakarta.servlet.http.HttpSessionListener;
  */
 public class ApplicationListener implements ServletContextListener, HttpSessionListener {
 
+	private static final String CONSOLE = "console";
+
 	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
 	private static final String JDBC_URL = "jdbc.url";
@@ -198,11 +200,11 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				restartRequired();
 				log.warn("The application has to be restarted");
 
-				Logger console = LoggerFactory.getLogger("console");
+				Logger console = LoggerFactory.getLogger(CONSOLE);
 				console.warn("The application has to be restarted");
 			} else {
 				log.info("Application started and ready");
-				Logger console = LoggerFactory.getLogger("console");
+				Logger console = LoggerFactory.getLogger(CONSOLE);
 				console.info("Application started and ready");
 			}
 		} finally {
@@ -317,7 +319,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		} catch (IOException e) {
 			log.warn(e.getMessage());
 
-			Logger console = LoggerFactory.getLogger("console");
+			Logger console = LoggerFactory.getLogger(CONSOLE);
 			console.warn("Cannot create pid file {}", pidFile.getAbsolutePath());
 		}
 	}

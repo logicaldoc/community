@@ -152,7 +152,7 @@ public class ThreadPools {
 		// clear from completed threads
 		monitoredFutures.entrySet().removeIf(entry -> entry.getValue().isDone() || entry.getValue().isCancelled());
 
-		if (task instanceof MonitoredCallable monitored)
+		if (task instanceof MonitoredCallable<?> monitored)
 			monitoredFutures.put(monitored.getName(), future);
 	}
 
