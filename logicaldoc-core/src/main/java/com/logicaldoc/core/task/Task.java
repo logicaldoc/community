@@ -404,7 +404,7 @@ public abstract class Task implements Runnable {
 			dictionary.put("duration", getScheduling().getLastDuration());
 			dictionary.put("error", (lastRunError != null ? lastRunError.getMessage() : null));
 			dictionary.put("report",
-					StringUtils.defaultString(prepareReport(recipient.getLocale())).replace("\\n", "<br />"));
+					StringUtils.defaultString(prepareReport(recipient.getLocale())).replace("\n", "<br />"));
 
 			// Send the email...
 			try {

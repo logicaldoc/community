@@ -755,7 +755,7 @@ insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted,
 values(1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'task.report','system','en', '$product - $task',
 '<p>$I18N.get(''startedon''): <b>$DateTool.format($started, true)</b><br />
 $I18N.get(''finishedon''): <b>$DateTool.format($ended, true)</b><br />
-$I18N.get(''completedin''): <b>$DateTool.printDuration($duration)</b></p>
+$I18N.get(''duration''): <b>$DateTool.printDuration($duration)</b></p>
 
 <hr />
 <p>#if( $error ) $I18N.get(''error''): <b>$error</b></p>
