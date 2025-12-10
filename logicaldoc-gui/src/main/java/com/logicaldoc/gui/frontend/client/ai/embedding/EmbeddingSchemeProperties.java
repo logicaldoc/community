@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.data.Criterion;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -96,6 +97,7 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		modelSpec.setColSpan(2);
 		modelSpec.addChangedHandler(changedHandler);
 		modelSpec.setDisabled(embeddingScheme.getId() != 0L);
+		modelSpec.setVisibleWhen(new AdvancedCriteria(EMBEDDINGMODEL, OperatorId.EQUALS, "0"));
 
 		// API Key
 		TextItem apiKey = ItemFactory.newTextItem("apikey", embeddingScheme.getApiKey());
@@ -124,9 +126,16 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		vectorSize.setStep(100);
 		vectorSize.setRequired(true);
 		vectorSize.addChangedHandler(changedHandler);
-		vectorSize.setDisabled(embeddingScheme.getId() != 0L);
+		vectorSize.setVisibleWhen(new AdvancedCriteria(OperatorId.AND,
+				new Criterion[] { new AdvancedCriteria(EMBEDDINGMODEL, OperatorId.EQUALS, "0"),
+						new AdvancedCriteria("id", OperatorId.EQUALS, "0") }));
 
-		form.setItems(id, modelName, embeddings, name, label, model, modelSpec, apiKey, vectorSize, batch, chunksBatch);
+		StaticTextItem vectorSizeValue = ItemFactory.newStaticTextItem("vectorsizedisplay", VECTORSIZE,
+				Long.toString(embeddingScheme.getVectorSize() != null ? embeddingScheme.getVectorSize() : 0L));
+		vectorSizeValue.setVisible(embeddingScheme.getId() != 0L);
+
+		form.setItems(id, modelName, vectorSizeValue, embeddings, name, label, model, modelSpec, apiKey, vectorSize,
+				batch, chunksBatch);
 
 		container.setMembersMargin(5);
 		container.addMember(form);
