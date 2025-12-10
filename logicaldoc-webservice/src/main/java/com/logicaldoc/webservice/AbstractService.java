@@ -96,8 +96,9 @@ public class AbstractService {
 			user.setId(User.USERID_ADMIN);
 			user.setTenantId(Tenant.DEFAULT_ID);
 			user.setName("admin");
+			user.setUsername("admin");
 			Set<Group> groups = new HashSet<>();
-			groups.add(GroupDAO.get().findById(1));
+			groups.add(GroupDAO.get().findById(Group.GROUPID_ADMIN));
 			user.setGroups(groups);
 			return user;
 		}
@@ -152,18 +153,17 @@ public class AbstractService {
 		User user = validateSession(sid);
 		MenuDAO dao = MenuDAO.get();
 		if (!dao.isReadAllowed(menuId, user.getId())) {
-			String message = String.format("User %s cannot access menu %s", user.getUsername(), menuId);
+			String message = String.format("User %s cannot access menu %d", user, menuId);
 			log.error(message);
-			throw new PermissionException(user.getUsername(), "menu " + menuId, Permission.READ);
+			throw new PermissionException(user.getUsername(), "menu %d".formatted(menuId), Permission.READ);
 		}
 	}
 
 	protected void checkFolderPermission(Permission permission, User user, long folderId)
 			throws PersistenceException, PermissionException {
-		FolderDAO dao = FolderDAO.get();
-		if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
-			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
-					permission.name(), folderId);
+		if (!FolderDAO.get().isPermissionAllowed(permission, folderId, user.getId())) {
+			String message = String.format("User %s doesn't have permission %s on folder %d", user, permission.name(),
+					folderId);
 			log.error(message);
 			throw new PermissionException(user.getUsername(), FOLDER + folderId, permission);
 		}
@@ -171,22 +171,21 @@ public class AbstractService {
 
 	protected void checkDocumentPermission(Permission permission, User user, long docId)
 			throws PersistenceException, PermissionException {
-		DocumentDAO dao = DocumentDAO.get();
-		if (!dao.isPermissionAllowed(permission, docId, user.getId())) {
-			String message = String.format("User %s doesn't have permission %s on document %s", user.getUsername(),
-					permission.name(), docId);
+		if (!DocumentDAO.get().isPermissionAllowed(permission, docId, user.getId())) {
+			String message = String.format("User %s doesn't have permission %s on document %d", user, permission.name(),
+					docId);
 			log.error(message);
-			throw new PermissionException(user.getUsername(), "document " + docId, permission);
+			throw new PermissionException(user.getUsername(), "document %d".formatted(docId), permission);
 		}
 	}
 
 	protected void checkMenu(User user, long menuId) throws PermissionException {
 		MenuDAO dao = MenuDAO.get();
 		if (!dao.isReadAllowed(menuId, user.getId())) {
-			String message = String.format("User %s doesn't have read permission on menu %s", user.getUsername(),
-					menuId);
+			String message = String.format("User %s doesn't have %s permission on menu %d", user,
+					Permission.READ.name(), menuId);
 			log.error(message);
-			throw new PermissionException(user.getUsername(), "menu " + menuId, Permission.READ);
+			throw new PermissionException(user.getUsername(), "menu %d".formatted(menuId), Permission.READ);
 		}
 	}
 

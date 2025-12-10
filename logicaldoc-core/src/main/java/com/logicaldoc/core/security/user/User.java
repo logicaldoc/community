@@ -512,35 +512,6 @@ public class User extends PersistentObject implements Serializable {
 		this.sessionsQuota = sessionsQuota;
 	}
 
-	public void reset() {
-		username = "";
-		password = "";
-		passwordmd4 = "";
-		name = "";
-		firstName = "";
-		street = "";
-		postalcode = "";
-		city = "";
-		country = "";
-		language = "";
-		email = "";
-		telephone = "";
-		docsGrid = null;
-		hitsGrid = null;
-		groups = new HashSet<>();
-		passwordExpires = false;
-		avatar = null;
-		expire = null;
-		enforceWorkingTime = false;
-		lastLogin = null;
-		workingTimes = new HashSet<>();
-		building = null;
-		organizationalUnit = null;
-		department = null;
-		quota = -1;
-		sessionsQuota = -1;
-	}
-
 	@Override
 	public String toString() {
 		return getUsername();

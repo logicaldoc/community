@@ -81,16 +81,6 @@ import jakarta.mail.MessagingException;
  */
 public class SoapDocumentService extends AbstractService implements DocumentService {
 
-	private static final String DOCUMENT_WITH_ID = "Document with ID ";
-
-	private static final String NOT_FOUND_OR_NOT_ACCESSIBLE = " not found or not accessible";
-
-	private static final String IS_LOCKED = " is locked";
-
-	private static final String IS_IMMUTABLE = " is immutable";
-
-	private static final String THE_DOCUMENT = "The document ";
-
 	private static final Logger log = LoggerFactory.getLogger(SoapDocumentService.class);
 
 	@Override
@@ -157,10 +147,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO ddao = DocumentDAO.get();
 
 		Document document = ddao.findById(docId);
-		if (document.isImmutable())
-			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
-
-		checkDocumentPermission(Permission.READ, user, docId);
+		checkUnlocked(user, document);
+		checkDocumentPermission(Permission.WRITE, user, docId);
 
 		document = ddao.findDocument(docId);
 
@@ -201,12 +189,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(docId);
 		docDao.initialize(doc);
-		if (doc.isImmutable())
-			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
-
-		if (doc.getStatus() != DocumentStatus.UNLOCKED)
-			throw new PermissionException("The document is locked or already checked out");
-
+		checkUnlocked(user, doc);
 		checkDocumentPermission(Permission.WRITE, user, docId);
 		checkDocumentPermission(Permission.DOWNLOAD, user, docId);
 
@@ -231,7 +214,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(docId);
-		checkLocked(user, doc);
+		checkUnlocked(user, doc);
 		checkFolderPermission(Permission.DELETE, user, doc.getFolder().getId());
 		checkPublished(user, doc);
 
@@ -245,15 +228,15 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		docDao.delete(docId, transaction);
 	}
 
-	private void checkLocked(User user, Document doc) throws PermissionException {
+	private void checkUnlocked(User user, Document doc) throws PermissionException {
 		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return;
 
 		if (doc.isImmutable())
-			throw new PermissionException(THE_DOCUMENT + doc.getId() + IS_IMMUTABLE);
+			throw new PermissionException("The document %s is immutable".formatted(doc));
 
 		if (doc.getStatus() != DocumentStatus.UNLOCKED && user.getId() != doc.getLockUserId())
-			throw new PermissionException(THE_DOCUMENT + doc.getId() + IS_LOCKED);
+			throw new PermissionException("The document %s is locked".formatted(doc));
 	}
 
 	@Override
@@ -291,14 +274,13 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (doc.isPasswordProtected()) {
 			Session session = SessionManager.get().get(sid);
 			if (!session.getUnprotectedDocs().containsKey(doc.getId()))
-				throw new PermissionException(String.format("The document is protected by a password %s", doc));
+				throw new PermissionException(String.format("The document %s is protected by a password", doc));
 		}
 
 		Store store = Store.get();
 		StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build();
-		if (!store.exists(resource)) {
+		if (!store.exists(resource))
 			throw new WebserviceException("Resource %s not found".formatted(resource));
-		}
 
 		log.debug("Attach file {}", resource);
 
@@ -366,13 +348,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(docId);
 
+		checkUnlocked(user, doc);
 		checkDocumentPermission(Permission.READ, user, doc.getId());
 		checkDocumentPermission(Permission.WRITE, user, doc.getId());
 
 		doc = docDao.findDocument(docId);
-
-		if (doc.isImmutable())
-			throw new WebserviceException("The document is immutable");
 
 		if ("sign.p7m".equalsIgnoreCase(suffix))
 			throw new PermissionException("You cannot upload a signature");
@@ -413,8 +393,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = retrieveReadableDocument(docId, user);
-		checkLocked(user, doc);
-
+		checkUnlocked(user, doc);
 		checkDocumentPermission(Permission.WRITE, user, docId);
 
 		doc = docDao.findDocument(docId);
@@ -449,7 +428,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		FolderDAO dao = FolderDAO.get();
 		Folder folder = dao.findById(folderId);
-		checkLocked(user, doc);
+		checkUnlocked(user, doc);
 		checkFolderPermission(Permission.WRITE, user, folder.getId());
 
 		// Create the document history event
@@ -499,8 +478,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 
 		Document doc = retrieveReadableDocument(docId, user);
-		checkFolderPermission(Permission.RENAME, user, doc.getFolder().getId());
+		checkDocumentPermission(Permission.RENAME, user, docId);
 		checkPublished(user, doc);
+		checkUnlocked(user, doc);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
@@ -526,7 +506,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 
 		Document doc = retrieveReadableDocument(docId, user);
-		checkLocked(user, doc);
+		checkUnlocked(user, doc);
 
 		// Document is already unlocked, no need to do anything else
 		if (doc.getStatus() == DocumentStatus.UNLOCKED)
@@ -553,7 +533,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 
 		Document doc = retrieveReadableDocument(document.getId(), user);
-		checkLocked(user, doc);
+		checkUnlocked(user, doc);
 		checkDocumentPermission(Permission.WRITE, user, doc.getId());
 		checkPublished(user, doc);
 
@@ -1011,8 +991,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 
 		Document doc = retrieveReadableDocument(docId, user);
-
-		checkFolderPermission(Permission.PASSWORD, user, doc.getFolder().getId());
+		checkUnlocked(user, doc);
+		checkDocumentPermission(Permission.PASSWORD, user, docId);
 
 		DocumentDAO dao = DocumentDAO.get();
 		doc = dao.findDocument(docId);
@@ -1032,8 +1012,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
 		User user = validateSession(sid);
 		Document doc = retrieveReadableDocument(docId, user);
-
-		checkFolderPermission(Permission.PASSWORD, user, doc.getFolder().getId());
+		checkUnlocked(user, doc);
+		checkDocumentPermission(Permission.PASSWORD, user, docId);
 
 		DocumentDAO dao = DocumentDAO.get();
 		doc = dao.findDocument(docId);
@@ -1063,9 +1043,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public WSNote addNote(String sid, long docId, String note) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		User user = validateSession(sid);
-		WSDocument document = getDocument(sid, docId);
-		if (document == null)
-			throw new PermissionException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
+
+		WSDocument document = retrieveExistingWSDocument(docId, sid);
 
 		DocumentNote newNote = new DocumentNote();
 		newNote.setDocId(document.getId());
@@ -1090,9 +1069,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public WSNote saveNote(String sid, long docId, WSNote wsNote) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		User user = validateSession(sid);
-		WSDocument document = getDocument(sid, docId);
-		if (document == null)
-			throw new PermissionException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
+		retrieveExistingWSDocument(docId, sid);
 
 		DocumentNoteDAO dao = DocumentNoteDAO.get();
 		DocumentNote note = dao.findById(wsNote.getId());
@@ -1129,6 +1106,15 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		return WSNote.fromDocumentNote(note);
 	}
 
+	private WSDocument retrieveExistingWSDocument(long docId, String sid)
+			throws WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
+		WSDocument document = getDocument(sid, docId);
+		if (document == null)
+			throw new PermissionException("Document %d not found or not accessible".formatted(docId));
+		else
+			return document;
+	}
+
 	@Override
 	public void deleteNote(String sid, long noteId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
@@ -1162,7 +1148,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 		WSDocument document = getDocument(sid, docId);
 		if (document == null)
-			throw new WebserviceException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
+			throw new WebserviceException("Document %d not found or not accessible".formatted(docId));
 
 		List<DocumentNote> notes = DocumentNoteDAO.get().findByDocId(docId, user.getId(), document.getFileVersion());
 		List<WSNote> wsNotes = new ArrayList<>();
@@ -1178,7 +1164,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 		WSDocument document = getDocument(sid, docId);
 		if (document == null)
-			throw new WebserviceException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
+			throw new WebserviceException("Document %d not found or not accessible".formatted(docId));
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
@@ -1204,7 +1190,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		validateSession(sid);
 		WSDocument document = getDocument(sid, docId);
 		if (document == null)
-			throw new WebserviceException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
+			throw new WebserviceException("Document %d not found or not accessible".formatted(docId));
 
 		List<Rating> ratings = RatingDAO.get().findByDocId(docId);
 		List<WSRating> wsRatings = new ArrayList<>();
@@ -1222,15 +1208,12 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 
 		Document doc = retrieveReadableDocument(docId, user);
-		if (doc.isImmutable())
-			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
-
-		checkDocumentPermission(Permission.WRITE, user, doc.getId());
+		checkUnlocked(user, doc);
+		checkDocumentPermission(Permission.WRITE, user, docId);
 
 		DocumentDAO ddao = DocumentDAO.get();
 		doc = ddao.findDocument(docId);
-		if (doc.getStatus() != DocumentStatus.UNLOCKED)
-			throw new PermissionException(THE_DOCUMENT + docId + IS_LOCKED);
+		checkUnlocked(user, doc);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setComment(comment);
@@ -1247,12 +1230,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 		Document doc = retrieveReadableDocument(docId, user);
 
-		checkDocumentPermission(Permission.WRITE, user, doc.getId());
+		checkDocumentPermission(Permission.WRITE, user, docId);
 
 		DocumentDAO ddao = DocumentDAO.get();
 		doc = ddao.findDocument(docId);
-		if (doc.getStatus() != DocumentStatus.UNLOCKED)
-			throw new PermissionException(THE_DOCUMENT + docId + IS_LOCKED);
+		checkUnlocked(user, doc);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
@@ -1307,7 +1289,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(docId);
 		if (doc == null)
-			throw new UnexistingResourceException(user.getUsername(), "Document " + docId);
+			throw new UnexistingResourceException(user.getUsername(), "Document %d".formatted(docId));
 		checkDocumentPermission(Permission.READ, user, docId);
 		doc = docDao.findDocument(docId);
 		return doc;
@@ -1322,7 +1304,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Check if the session user has the Security Permission of this
 		// document
 		if (!documentDao.isPermissionAllowed(Permission.SECURITY, docId, sessionUser.getId()))
-			throw new PermissionException(sessionUser.getUsername(), "Document " + docId, Permission.SECURITY);
+			throw new PermissionException(sessionUser.getUsername(), "Document %d".formatted(docId),
+					Permission.SECURITY);
 
 		Document document = documentDao.findById(docId);
 		documentDao.initialize(document);
