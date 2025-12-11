@@ -1146,9 +1146,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public List<WSNote> getNotes(String sid, long docId) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		User user = validateSession(sid);
-		WSDocument document = getDocument(sid, docId);
-		if (document == null)
-			throw new WebserviceException("Document %d not found or not accessible".formatted(docId));
+		WSDocument document = retrieveExistingWSDocument(docId, sid);
 
 		List<DocumentNote> notes = DocumentNoteDAO.get().findByDocId(docId, user.getId(), document.getFileVersion());
 		List<WSNote> wsNotes = new ArrayList<>();
@@ -1162,9 +1160,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public WSRating rateDocument(String sid, long docId, int vote) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		User user = validateSession(sid);
-		WSDocument document = getDocument(sid, docId);
-		if (document == null)
-			throw new WebserviceException("Document %d not found or not accessible".formatted(docId));
+		retrieveExistingWSDocument(docId, sid);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
@@ -1188,9 +1184,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public List<WSRating> getRatings(String sid, long docId) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		validateSession(sid);
-		WSDocument document = getDocument(sid, docId);
-		if (document == null)
-			throw new WebserviceException("Document %d not found or not accessible".formatted(docId));
+		retrieveExistingWSDocument(docId, sid);
 
 		List<Rating> ratings = RatingDAO.get().findByDocId(docId);
 		List<WSRating> wsRatings = new ArrayList<>();
@@ -1232,8 +1226,6 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		checkDocumentPermission(Permission.WRITE, user, docId);
 
-		DocumentDAO ddao = DocumentDAO.get();
-		doc = ddao.findDocument(docId);
 		checkUnlocked(user, doc);
 
 		DocumentHistory transaction = new DocumentHistory();

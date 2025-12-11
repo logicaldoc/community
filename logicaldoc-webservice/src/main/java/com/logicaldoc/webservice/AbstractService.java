@@ -45,6 +45,8 @@ import jakarta.ws.rs.WebApplicationException;
 @Component
 public class AbstractService {
 
+	private static final String ADMIN = "admin";
+
 	private static final String FOLDER = "folder ";
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractService.class);
@@ -95,8 +97,8 @@ public class AbstractService {
 			User user = new User();
 			user.setId(User.USERID_ADMIN);
 			user.setTenantId(Tenant.DEFAULT_ID);
-			user.setName("admin");
-			user.setUsername("admin");
+			user.setName(ADMIN);
+			user.setUsername(ADMIN);
 			Set<Group> groups = new HashSet<>();
 			groups.add(GroupDAO.get().findById(Group.GROUPID_ADMIN));
 			user.setGroups(groups);
@@ -145,7 +147,7 @@ public class AbstractService {
 	 * @throws WebserviceException the user is not member of admin
 	 */
 	protected void checkAdministrator(String sid) throws WebserviceException, PersistenceException {
-		checkGroup(sid, "admin");
+		checkGroup(sid, ADMIN);
 	}
 
 	protected void checkMenu(String sid, long menuId)

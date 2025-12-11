@@ -54,7 +54,7 @@ public class GUIModel implements Serializable {
 
 	private int windowSize = 5;
 
-	private int workers = 1;
+	private int workers = 2;
 
 	double alpha = 0.025D;
 
