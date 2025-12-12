@@ -33,7 +33,7 @@ public interface AIServiceAsync {
 
 	void query(long modelId, List<String> features, AsyncCallback<List<GUIQueryResult>> callback);
 
-	void importModel(String modelName, AsyncCallback<GUIModel> callback);
+	void importModel(String modelName, boolean includeTrainingData, AsyncCallback<GUIModel> callback);
 
 	void cloneModel(long modelId, String newName, AsyncCallback<GUIModel> callback);
 

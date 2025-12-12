@@ -13,6 +13,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -37,7 +38,7 @@ public class ModelImporter extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadmodel"));
 		setWidth(430);
-		setHeight(200);
+		setHeight(230);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -48,11 +49,13 @@ public class ModelImporter extends Window {
 		save = new IButton(I18N.message("import"));
 		save.addClickHandler(click -> onUpload());
 
+		CheckboxItem includeTrainingData = ItemFactory.newCheckbox("includetrainingdata");
+		
 		TextItem name = ItemFactory.newSimpleTextItem("name", "name", modelName != null ? modelName : "newmodel");
 		name.setRequired(true);
 		name.setVisible(modelName == null);
 
-		form.setItems(name);
+		form.setItems(name, includeTrainingData);
 
 		uploader = new Upload(save);
 
@@ -90,7 +93,7 @@ public class ModelImporter extends Window {
 
 		LD.contactingServer();
 		save.setDisabled(true);
-		AIService.Instance.get().importModel(form.getValueAsString("name"), new DefaultAsyncCallback<>() {
+		AIService.Instance.get().importModel(form.getValueAsString("name"), Boolean.parseBoolean(form.getValueAsString("includetrainingdata")) , new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

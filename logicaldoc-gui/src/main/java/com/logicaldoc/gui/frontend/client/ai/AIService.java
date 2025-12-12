@@ -137,12 +137,13 @@ public interface AIService extends RemoteService {
 	 * Imports a new model
 	 * 
 	 * @param modelName Name to give to the new imported model
+	 * @param includeTrainingData Id training data must be imported as well
 	 * 
 	 * @return The created model
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIModel importModel(String modelName) throws ServerException;
+	public GUIModel importModel(String modelName, boolean includeTrainingData) throws ServerException;
 
 	/**
 	 * Clones a model

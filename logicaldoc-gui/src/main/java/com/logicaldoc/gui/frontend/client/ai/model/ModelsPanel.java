@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
@@ -256,8 +255,8 @@ public class ModelsPanel extends VLayout {
 
 		MenuItem stopTraining = new MenuItem();
 		stopTraining.setTitle(I18N.message("stoptraining"));
-		stopTraining
-				.addClickHandler(event -> AIService.Instance.get().stopTraining(ids.get(0), new DefaultAsyncCallback<>() {
+		stopTraining.addClickHandler(
+				event -> AIService.Instance.get().stopTraining(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
 						// Nothing to do
@@ -310,16 +309,15 @@ public class ModelsPanel extends VLayout {
 
 		MenuItem export = new MenuItem();
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(
-				click -> Util.download(Util.contextPath() + "ai/controller?command=export&modelId=" + selectedModelId));
+		export.addClickHandler(click -> new ModelExporter(selection[0].getAttributeAsLong("id")).show());
 
 		MenuItem iimport = new MenuItem();
 		iimport.setTitle(I18N.message("import"));
 		iimport.addClickHandler(
 				click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-		contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(), clone, iimport,
-				export, new MenuItemSeparator(), delete);
+		contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(),
+				clone, iimport, export, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 
