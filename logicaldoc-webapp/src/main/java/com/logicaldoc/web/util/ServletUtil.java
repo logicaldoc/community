@@ -216,7 +216,6 @@ public class ServletUtil {
 	 *        inspected
 	 * @param resource The resource to download
 	 * @param fileName name of the file
-	 * @param suffix suffix of the linked document's resource
 	 * @param user current user
 	 * 
 	 * @throws ServletException error in the servlet container

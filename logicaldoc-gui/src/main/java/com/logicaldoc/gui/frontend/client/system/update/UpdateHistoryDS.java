@@ -13,11 +13,6 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class UpdateHistoryDS extends DataSource {
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param parameters the parameters for the data source
-	 */
 	public UpdateHistoryDS() {
 		setTitleField("name");
 		setRecordXPath("/list/update");

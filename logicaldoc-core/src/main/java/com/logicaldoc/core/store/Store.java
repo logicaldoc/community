@@ -60,8 +60,6 @@ public interface Store extends Comparable<Store> {
 	/**
 	 * Stores a file
 	 * 
-	 * @see store(InputStream stream, long docId, String resource)
-	 * 
 	 * @param file the file to store
 	 * @param resource Resource to be stored, make sure to provide the right
 	 *        document's ID

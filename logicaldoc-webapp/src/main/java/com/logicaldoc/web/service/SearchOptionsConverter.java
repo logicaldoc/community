@@ -23,7 +23,7 @@ public class SearchOptionsConverter {
 	 * 
 	 * @param searchOptions the search options
 	 * 
-	 * @returnthe converted options
+	 * @return the converted options
 	 */
 	public GUISearchOptions toGUISearchOptions(SearchOptions searchOptions) {
 		GUISearchOptions guiOptions = new GUISearchOptions();

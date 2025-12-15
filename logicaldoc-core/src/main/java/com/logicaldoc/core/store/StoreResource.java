@@ -64,9 +64,9 @@ public class StoreResource {
 	}
 
 	/**
-	 * Name of the resource as <code><b>fileVersion</b>-<b>suffix</b><code>
+	 * Name of the resource as <code><b>fileVersion</b>-<b>suffix</b></code>
 	 * 
-	 * @return
+	 * @return The resource's name
 	 */
 	public String name() {
 		return sanitizeResourceName(fileVersion + (StringUtils.isEmpty(suffix) ? "" : "-" + suffix));

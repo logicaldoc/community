@@ -596,7 +596,7 @@ public class DocTool {
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
 		try {
-			Document doc=findById(docId);
+			Document doc = findById(docId);
 			return Store.get()
 					.getString(StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build());
 		} catch (PersistenceException e) {
@@ -615,7 +615,7 @@ public class DocTool {
 	 */
 	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
 		try {
-			Document doc=findById(docId);
+			Document doc = findById(docId);
 			Store.get().writeToFile(
 					StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build(),
 					new File(outputFile));
@@ -626,9 +626,8 @@ public class DocTool {
 
 	/**
 	 * Converts a document in PDF format and saves it as ancillary resource of
-	 * the document with suffix
-	 * {@link FormatConversionManager#SUFFIX_PDF_CONVERSION}. If the conversion
-	 * already exists, nothing will be done.
+	 * the document with suffix <b>conversion-pdf</b>. If the conversion already
+	 * exists, nothing will be done.
 	 * 
 	 * @param doc the document to convert
 	 */
