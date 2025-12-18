@@ -1156,7 +1156,7 @@ public class DocumentManager {
 
 		docVO.setStatus(DocumentStatus.UNLOCKED);
 		docVO.setType(type);
-		docVO.setVersion(config.getProperty("document.startversion"));
+		docVO.setVersion(config.getProperty("document.startversion", "1.0"));
 		docVO.setFileVersion(docVO.getVersion());
 		docVO.setFileSize(file.length());
 		docVO.setId(0L);
