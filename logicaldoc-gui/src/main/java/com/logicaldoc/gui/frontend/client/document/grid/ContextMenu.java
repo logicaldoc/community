@@ -27,6 +27,7 @@ import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.ComparisonWindow;
 import com.logicaldoc.gui.frontend.client.document.ConversionDialog;
@@ -100,6 +101,10 @@ public class ContextMenu extends Menu {
 
 	private MenuItem markIndexable;
 
+	private MenuItem markUnembeddable;
+
+	private MenuItem markEmbeddable;
+	
 	private MenuItem index;
 
 	private MenuItem sign;
@@ -178,6 +183,10 @@ public class ContextMenu extends Menu {
 		markUnindexable = prepareMarkUnindexableItem(selection);
 
 		markIndexable = prepareMarkIndexableItem(selection);
+		
+		markUnembeddable = prepareMarkUnembeddableItem(selection);
+
+		markEmbeddable = prepareMarkEmbeddableItem(selection);
 
 		MenuItem markIndexableMetadataOnly = markIndexableMetadataOnlyItem(selection);
 
@@ -239,8 +248,16 @@ public class ContextMenu extends Menu {
 		MenuItem indexing = new MenuItem(I18N.message("indexing"));
 		indexing.setSubmenu(indexingMenu);
 
+		
+		Menu embeddingMenu = new Menu();
+		embeddingMenu.setItems(markEmbeddable, markUnembeddable);
+		
+		MenuItem embedding = new MenuItem(I18N.message("embedding"));
+		embedding.setSubmenu(embeddingMenu);
+		embedding.setEnabled(Feature.enabled(Feature.SEMANTIC_SEARCHES));
+		
 		Menu moreMenu = new Menu();
-		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
+		moreMenu.setItems(indexing, embedding, immutable, setPassword, unsetPassword, ticket, replaceAlias);
 
 		removeOfficeItem(office);
 
@@ -300,6 +317,8 @@ public class ContextMenu extends Menu {
 
 		applyIndexableSecurity(allowedPermissions, selection, someSelection, immutablesInSelection);
 
+		applyEmbeddingSecurity(allowedPermissions, selection, someSelection, immutablesInSelection);
+		
 		applyIndexSecurity(selection, someSelection, immutablesInSelection);
 
 		applyPasswordSecurity(allowedPermissions, selection, justOneSelected, immutablesInSelection);
@@ -370,6 +389,14 @@ public class ContextMenu extends Menu {
 		markIndexable.setEnabled(someSelection && !immutablesInSelection
 				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
 		markUnindexable.setEnabled(someSelection && !immutablesInSelection
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
+	}
+	
+	private void applyEmbeddingSecurity(GUIAccessControlEntry enabledPermissions, List<GUIDocument> selection,
+			boolean someSelection, boolean immutablesInSelection) {
+		markEmbeddable.setEnabled(someSelection && !immutablesInSelection
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
+		markUnembeddable.setEnabled(someSelection && !immutablesInSelection
 				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
 	}
 
@@ -626,6 +653,60 @@ public class ContextMenu extends Menu {
 							}
 						}
 					});
+		});
+		return item;
+	}
+
+	private MenuItem prepareMarkUnembeddableItem(final List<GUIDocument> selection) {
+		MenuItem item = new MenuItem();
+		item.setTitle(I18N.message("markunembeddable"));
+		item.addClickHandler(event -> {
+			if (selection.isEmpty())
+				return;
+
+			AIService.Instance.get().markUnembeddable(getSelectionIds(selection), new DefaultAsyncCallback<>() {
+
+				@Override
+				public void handleSuccess(Void result) {
+					for (GUIDocument doc : selection) {
+						doc.setEmbedded(Constants.EMBED_SKIP);
+						if (DocumentController.get().getCurrentDocument() != null
+								&& DocumentController.get().getCurrentDocument().getId() == doc.getId()) {
+							DocumentController.get().getCurrentDocument().setEmbedded(Constants.EMBED_SKIP);
+							DocumentController.get().modified(DocumentController.get().getCurrentDocument());
+						} else {
+							DocumentController.get().modified(doc);
+						}
+					}
+				}
+			});
+		});
+		return item;
+	}
+	
+	private MenuItem prepareMarkEmbeddableItem(List<GUIDocument> selection) {
+		MenuItem item = new MenuItem();
+		item.setTitle(I18N.message("markembeddable"));
+		item.addClickHandler(event -> {
+			if (selection.isEmpty())
+				return;
+
+			AIService.Instance.get().markEmbeddable(getSelectionIds(selection), new DefaultAsyncCallback<>() {
+
+				@Override
+				public void handleSuccess(Void result) {
+					for (GUIDocument doc : selection) {
+						doc.setEmbedded(Constants.EMBED_TO_EMBED);
+						if (DocumentController.get().getCurrentDocument() != null
+								&& DocumentController.get().getCurrentDocument().getId() == doc.getId()) {
+							DocumentController.get().getCurrentDocument().setEmbedded(Constants.EMBED_TO_EMBED);
+							DocumentController.get().modified(DocumentController.get().getCurrentDocument());
+						} else {
+							DocumentController.get().modified(doc);
+						}
+					}
+				}
+			});
 		});
 		return item;
 	}

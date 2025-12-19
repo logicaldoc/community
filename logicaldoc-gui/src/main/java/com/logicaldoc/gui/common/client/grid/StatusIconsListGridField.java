@@ -23,6 +23,8 @@ public class StatusIconsListGridField extends ColoredListGridField {
 	private static final String IMMUTABLE = "immutable";
 
 	private static final String INDEXED = "indexed";
+	
+	private static final String EMBEDDED = "embedded";
 
 	private static final String FILE_VERSION = "fileVersion";
 
@@ -48,6 +50,9 @@ public class StatusIconsListGridField extends ColoredListGridField {
 		// Put the indexing icon
 		content = putIndexedStatusIcon(rec, color, content);
 
+		// Put the embedding icon
+		content = putEmbeddedStatusIcon(rec, color, content);
+		
 		// Put the status icon
 		if (rec.getAttribute("status") != null) {
 			Integer status = rec.getAttributeAsInt("status");
@@ -105,6 +110,16 @@ public class StatusIconsListGridField extends ColoredListGridField {
 			if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
 					&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
 				content += AwesomeFactory.getIndexedIconButtonHTML(rec.getAttributeAsLong("id"), indexed, color);
+			}
+		}
+		return content;
+	}
+	
+	private String putEmbeddedStatusIcon(ListGridRecord rec, String color, String content) {
+		if (rec.getAttribute(EMBEDDED) != null) {
+			Integer embedded = rec.getAttributeAsInt(EMBEDDED);
+			if (embedded != null) {
+				content += AwesomeFactory.getEmbeddedIconButtonHTML(embedded, color);
 			}
 		}
 		return content;

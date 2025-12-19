@@ -123,6 +123,10 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	@Enumerated(EnumType.ORDINAL)
 	private IndexingStatus indexingStatus = IndexingStatus.TO_INDEX;
 
+	@Column(name = "ld_embedded", nullable = false)
+	@Enumerated(EnumType.ORDINAL)
+	private EmbeddingStatus embeddingStatus = EmbeddingStatus.TO_EMBED;
+
 	@Column(name = "ld_type", length = 255)
 	private String type;
 
@@ -293,8 +297,12 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		this.status = DocumentStatus.values()[status];
 	}
 
-	public IndexingStatus getIndexed() {
+	public IndexingStatus getIndexingStatus() {
 		return indexingStatus;
+	}
+	
+	public IndexingStatus getIndexed() {
+		return getIndexingStatus();
 	}
 
 	public void setIndexingStatus(IndexingStatus indexingStatus) {
@@ -303,6 +311,14 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public void setIndexingStatus(int indexingStatus) {
 		this.indexingStatus = IndexingStatus.values()[indexingStatus];
+	}
+	
+	public EmbeddingStatus getEmbeddingStatus() {
+		return embeddingStatus;
+	}
+
+	public void setEmbeddingStatus(EmbeddingStatus embeddingStatus) {
+		this.embeddingStatus = embeddingStatus;
 	}
 
 	/**
@@ -827,7 +843,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setRevision(String revision) {
 		this.revision = revision;
 	}
-	
+
 	public boolean isImmutable() {
 		return immutable;
 	}

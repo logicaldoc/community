@@ -96,7 +96,7 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 
 		if (source.getIndexed() != IndexingStatus.INDEXED)
 			setIndexingStatus(source.getIndexed());
-
+		
 		try {
 			if (source instanceof Document doc)
 				for (DocumentAccessControlEntry ace : doc.getAccessControlList())

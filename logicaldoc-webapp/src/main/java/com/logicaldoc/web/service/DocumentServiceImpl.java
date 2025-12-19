@@ -865,6 +865,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setSigned(realDoc.isSigned());
 		guiDocument.setStamped(realDoc.isStamped());
 		guiDocument.setIndexed(realDoc.getIndexed().ordinal());
+		guiDocument.setEmbedded(realDoc.getEmbeddingStatus().ordinal());
 		guiDocument.setExtResId(realDoc.getExtResId());
 		guiDocument.setPages(realDoc.getPages());
 		guiDocument.setPreviewPages(realDoc.getPreviewPages());

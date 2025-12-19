@@ -54,7 +54,13 @@ public class WSDocument implements Serializable {
 
 	@WSDoc(documented = false)
 	public static final int INDEX_SKIP = 2;
+	
+	@WSDoc(documented = false)
+	public static final int EMBED_TO_EMBED = 0;
 
+	@WSDoc(documented = false)
+	public static final int EMBED_SKIP = 0;
+	
 	@WSDoc(description = "unique identifier ")
 	private long id;
 
@@ -108,6 +114,9 @@ public class WSDocument implements Serializable {
 	@WSDoc(required = false, description = "<b>0</b> = to index, <b>1</b> = indexed, <b>2</b> = skip indexing")
 	private int indexed = INDEX_TO_INDEX;
 
+	@WSDoc(required = false, description = "<b>0</b> = to embed, <b>1</b> = skip embedding")
+	private int embedded = EMBED_TO_EMBED;
+	
 	@WSDoc(required = false)
 	private int signed = 0;
 
@@ -682,5 +691,13 @@ public class WSDocument implements Serializable {
 
 	public void setRevision(String revision) {
 		this.revision = revision;
+	}
+
+	public int getEmbedded() {
+		return embedded;
+	}
+
+	public void setEmbedded(int embedded) {
+		this.embedded = embedded;
 	}
 }

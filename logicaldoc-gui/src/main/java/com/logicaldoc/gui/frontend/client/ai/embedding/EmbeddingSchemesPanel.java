@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
@@ -145,8 +146,9 @@ public class EmbeddingSchemesPanel extends VLayout {
 
 		ToolStripButton settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
-		toolStrip.addButton(settings);
 		settings.addClickHandler(event -> new EmbeddingSettings().show());
+		if (Session.get().isDefaultTenant())
+			toolStrip.addButton(settings);
 
 		toolStrip.addFill();
 

@@ -117,7 +117,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		UserDAO userDao = UserDAO.get();
 		GroupDAO groupDao = GroupDAO.get();
 
-		if (groupIdOrName != null && !groupIdOrName.trim().isEmpty()) {
+		if (StringUtils.isNotEmpty(groupIdOrName)) {
 			Group group = null;
 			try {
 				group = groupDao.findById(Long.parseLong(groupIdOrName));

@@ -26,6 +26,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.EmbeddingStatus;
 import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -179,6 +180,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		writer.print("<status>" + document.getStatus().ordinal() + "</status>");
 		writer.print("<immutable>" + document.isImmutable() + "</immutable>");
 		writer.print("<indexed>" + document.getIndexed().ordinal() + "</indexed>");
+		writer.print(String.format("<embedded>%d</embedded>", document.getEmbeddingStatus().ordinal()));
 		writer.print("<password>" + StringUtils.isNotEmpty(document.getPassword()) + "</password>");
 		writer.print("<signed>" + document.isSigned() + "</signed>");
 		writer.print("<stamped>" + document.isStamped() + "</stamped>");
@@ -367,7 +369,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		/*
 		 * Execute the Query
 		 */
-		List<Document> documents = exeucuteQuey(request, extendedAttributes, extendedAttributesValues, sessionUser,
+		List<Document> documents = exeucuteQuery(request, extendedAttributes, extendedAttributesValues, sessionUser,
 				folderId, formId, filename);
 
 		// If a sorting is specified sort the collection of documents
@@ -380,7 +382,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		return retrieveHiliteDoc(documentsInCurrentPage, folderId, hiliteDocId);
 	}
 
-	private List<Document> exeucuteQuey(HttpServletRequest request, List<String> extendedAttributes,
+	private List<Document> exeucuteQuery(HttpServletRequest request, List<String> extendedAttributes,
 			final Map<String, Object> extendedAttributesValues, User user, Long folderId, Long formId, String filename)
 			throws PersistenceException {
 
@@ -388,7 +390,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder("""
 select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexingStatus, A.lockUserId, A.fileName, A.status,
        A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
-       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote, A.revision
+       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote, A.revision, A.embeddingStatus
   from Document as A
   left outer join A.template as B
  where A.deleted = 0
@@ -477,7 +479,8 @@ select ld_docid
 			doc.setColor((String) cols[38]);
 			doc.setTenantId((Long) cols[40]);
 			doc.setIndexingStatus((IndexingStatus) cols[12]);
-
+			doc.setEmbeddingStatus((EmbeddingStatus) cols[43]);
+			
 			Folder f = new Folder();
 			f.setId((Long) cols[39]);
 			doc.setFolder(f);
@@ -490,7 +493,8 @@ select ld_docid
 				String aliasFileName = doc.getFileName();
 				String aliasColor = doc.getColor();
 				String aliasType = doc.getType();
-				int aliasIndexed = doc.getIndexed().ordinal();
+				IndexingStatus aliasIndexed = doc.getIndexed();
+				EmbeddingStatus aliasEmbedded = doc.getEmbeddingStatus();
 				doc = dao.findById(aliasDocRef);
 
 				if (doc != null) {
@@ -502,6 +506,7 @@ select ld_docid
 					doc.setColor(aliasColor);
 					doc.setType(aliasType);
 					doc.setIndexingStatus(aliasIndexed);
+					doc.setEmbeddingStatus(aliasEmbedded);
 
 					enrichAliasExtendedAttributes(doc, aliasId, extendedAttributes, extendedAttributesValues);
 				} else
@@ -532,6 +537,7 @@ select ld_docid
 			doc.setFileSize((Long) cols[10]);
 			doc.setImmutable((Boolean) cols[11]);
 			doc.setIndexingStatus((IndexingStatus) cols[12]);
+			doc.setEmbeddingStatus((EmbeddingStatus) cols[43]);
 			doc.setLockUserId((Long) cols[13]);
 			doc.setStatus((DocumentStatus) cols[15]);
 			doc.setSigned((Boolean) cols[16]);

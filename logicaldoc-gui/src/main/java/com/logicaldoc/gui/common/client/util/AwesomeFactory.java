@@ -186,6 +186,19 @@ public class AwesomeFactory {
 		return button;
 	}
 
+	public static String getEmbeddedIconButtonHTML(Integer embedded, String color) {
+		if (embedded == null || embedded.intValue() == Constants.EMBED_TO_EMBED)
+			return "";
+
+		String button = DIV_CLASS_STATUS_ICON
+				+ (embedded != Constants.EMBED_SKIP ? TITLE + I18N.message("embedded") + "' " : "")
+				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "");
+		button += " >";
+		button += getEmbeddedIcon(embedded);
+		button += CLOSE_DIV;
+		return button;
+	}
+
 	public static String getStampedIconButtonHTML(long docId, String fileVersion, String tooltip, String color) {
 		String button = DIV_CLASS_STATUS_ICON + (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
 				+ (tooltip != null && !tooltip.isEmpty() ? TITLE + I18N.message(tooltip) + "'" : "")
@@ -225,8 +238,22 @@ public class AwesomeFactory {
 			return "";
 		String html = AwesomeFactory.getIconHtml("database");
 		if (indexed == Constants.INDEX_SKIP) {
-			html = "<span class='fa-stack' style='width: 13px; height: 12px;'><i class='" + getCssClassPrefix() + " fa-database fa-stack-1x fa-" + STYLE
-					+ "' aria-hidden='true' ></i>";
+			html = "<span class='fa-stack' style='width: 13px; height: 12px;'><i class='" + getCssClassPrefix()
+					+ " fa-database fa-stack-1x fa-" + STYLE + "' aria-hidden='true' ></i>";
+			html += I_CLASS + AwesomeFactory.getCssClassPrefix()
+					+ " fa-times fa-stack-1x' style='color: red' ></i></span>";
+		}
+		return html;
+	}
+
+	public static String getEmbeddedIcon(Integer embedded) {
+		if (embedded == null || embedded.intValue() == Constants.EMBED_TO_EMBED)
+			return "";
+
+		String html = AwesomeFactory.getIconHtml("brain-circuit");
+		if (embedded == Constants.EMBED_SKIP) {
+			html = "<span class='fa-stack' style='width: 13px; height: 12px;'><i class='" + getCssClassPrefix()
+					+ " fa-brain-circuit fa-stack-1x fa-" + STYLE + "' aria-hidden='true' ></i>";
 			html += I_CLASS + AwesomeFactory.getCssClassPrefix()
 					+ " fa-times fa-stack-1x' style='color: red' ></i></span>";
 		}

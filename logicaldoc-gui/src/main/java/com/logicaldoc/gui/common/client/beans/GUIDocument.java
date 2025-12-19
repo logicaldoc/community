@@ -78,6 +78,8 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private boolean bookmarked = false;
 
 	private int indexed = 0;
+	
+	private int embedded = 0;
 
 	private String comment;
 
@@ -521,6 +523,14 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setIndexed(int indexed) {
 		this.indexed = indexed;
+	}
+	
+	public int getEmbedded() {
+		return embedded;
+	}
+
+	public void setEmbedded(int embedded) {
+		this.embedded = embedded;
 	}
 
 	public boolean isPasswordProtected() {

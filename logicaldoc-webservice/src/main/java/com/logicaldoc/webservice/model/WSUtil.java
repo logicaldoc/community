@@ -24,7 +24,9 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentAccessControlEntry;
+import com.logicaldoc.core.document.EmbeddingStatus;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
@@ -69,6 +71,7 @@ public class WSUtil {
 			setFolderIntoWsDocument(document, wsDoc);
 
 			wsDoc.setIndexed(document.getIndexed().ordinal());
+			wsDoc.setEmbedded(document.getEmbeddingStatus().ordinal());
 			wsDoc.setVersion(document.getVersion());
 			wsDoc.setFileVersion(document.getFileVersion());
 			wsDoc.setPublisher(document.getPublisher());
@@ -212,6 +215,7 @@ public class WSUtil {
 		doc.setImmutable(wsDoc.getImmutable() == 1);
 		
 		setIndexingStatus(wsDoc, doc);
+		doc.setEmbeddingStatus(EmbeddingStatus.values()[wsDoc.getEmbedded()]);
 		
 		doc.setVersion(wsDoc.getVersion());
 		doc.setFileVersion(wsDoc.getFileVersion());

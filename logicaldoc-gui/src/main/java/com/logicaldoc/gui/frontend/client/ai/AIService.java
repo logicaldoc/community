@@ -257,6 +257,24 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException Error in the server application
 	 */
 	public void removeEmbeddings(long schemeId, List<Long> docIds) throws ServerException;
+	
+	/**
+	 * Marks a set of documents as unembeddable
+	 * 
+	 * @param docIds identifiers of the documents
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void markUnembeddable(List<Long> docIds) throws ServerException;
+
+	/**
+	 * Marks a set of documents as embeddable
+	 * 
+	 * @param docIds identifiers of the documents
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void markEmbeddable(List<Long> docIds) throws ServerException;
 
 	public static class Instance {
 		private static AIServiceAsync inst;

@@ -271,6 +271,7 @@ public class DocumentGridUtil {
 			rec.setAttribute(LOCK_USER_ID, doc.getLockUserId());
 			rec.setAttribute(LOCK_USER, doc.getLockUser());
 			rec.setAttribute(INDEXED, doc.getIndexed());
+			rec.setAttribute("embedded", doc.getEmbedded());
 			rec.setAttribute(STATUS, doc.getStatus());
 			rec.setAttribute(BOOKMARKED, doc.isBookmarked());
 			rec.setAttribute("extResId", doc.getExtResId());

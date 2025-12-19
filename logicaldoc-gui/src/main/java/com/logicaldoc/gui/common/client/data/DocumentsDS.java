@@ -103,6 +103,7 @@ public class DocumentsDS extends DataSource {
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
 		DataSourceBooleanField immutable = new DataSourceBooleanField("immutable");
 		DataSourceIntegerField iindexed = new DataSourceIntegerField("indexed");
+		DataSourceIntegerField embedded = new DataSourceIntegerField("embedded");
 		DataSourceBooleanField signed = new DataSourceBooleanField("signed");
 		DataSourceBooleanField stamped = new DataSourceBooleanField("stamped");
 		DataSourceBooleanField bookmarked = new DataSourceBooleanField("bookmarked");
@@ -157,6 +158,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(revision);
 		fields.add(immutable);
 		fields.add(iindexed);
+		fields.add(embedded);
 		fields.add(signed);
 		fields.add(stamped);
 		fields.add(bookmarked);
