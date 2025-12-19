@@ -23,25 +23,27 @@ public class EmbeddingsDS extends DataSource {
 		id.setHidden(true);
 		id.setRequired(true);
 
-		DataSourceTextField docid = new DataSourceTextField("docid");
-		docid.setPrimaryKey(true);
-		docid.setHidden(true);
-		docid.setRequired(true);
+		DataSourceTextField docId = new DataSourceTextField("docId");
+		docId.setPrimaryKey(true);
+		docId.setHidden(true);
+		docId.setRequired(true);
 
-		DataSourceTextField folderid = new DataSourceTextField("folderid");
-		folderid.setPrimaryKey(true);
-		folderid.setHidden(true);
-		folderid.setRequired(true);
+		DataSourceTextField folderId = new DataSourceTextField("folderId");
+		folderId.setPrimaryKey(true);
+		folderId.setHidden(true);
+		folderId.setRequired(true);
 
-		DataSourceTextField filename = new DataSourceTextField("filename");
+		DataSourceTextField fileName = new DataSourceTextField("filename");
+
+		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
 
 		DataSourceTextField icon = new DataSourceTextField("icon");
 		icon.setHidden(true);
 
-		DataSourceFloatField size = new DataSourceFloatField("size");
+		DataSourceFloatField fileSize = new DataSourceFloatField("size");
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 
-		setFields(id, docid, folderid, icon, filename, size, date);
+		setFields(id, docId, folderId, icon, fileName, fileVersion, fileSize, date);
 		setClientOnly(true);
 
 		setDataURL("data/ai.xml?object=embedding&schemeId=" + schemeId + "&max=" + (max != null ? max : DEFAULT_MAX));

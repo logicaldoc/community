@@ -43,7 +43,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 
-	private static final String DOCID = "docid";
+	private static final String DOCID = "docId";
+	
 	private RefreshableListGrid embeddings;
 
 	public EmbeddingSchemeEmbeddings(EmbeddingSchemesPanel schemesPanel, GUIEmbeddingScheme scheme,
@@ -79,7 +80,7 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 		docId.setWidth(50);
 		docId.setHidden(true);
 
-		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
+		ListGridField fileSize = new FileSizeListGridField("size", I18N.message("size"));
 
 		ListGridField fileVersion = new FileVersionListGridField();
 		fileVersion.setAutoFitWidth(true);
@@ -87,7 +88,7 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 
 		ListGridField published = new DateListGridField("date", "publishedon");
 
-		ListGridField filename = new FileNameListGridField();
+		ListGridField fileName = new FileNameListGridField();
 
 		ListGridField icon = new TypeIconGridField();
 
@@ -101,7 +102,7 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 		embeddings.setShowFilterEditor(true);
 		embeddings.setFilterOnKeypress(true);
 		embeddings.setDataSource(new EmbeddingsDS(embeddingScheme.getId(), 100));
-		embeddings.setFields(docId, icon, filename, size, fileVersion, published);
+		embeddings.setFields(docId, icon, fileName, fileSize, fileVersion, published);
 
 		embeddings.addCellContextClickHandler(event -> {
 			showContextMenu();
@@ -128,7 +129,7 @@ public class EmbeddingSchemeEmbeddings extends EmbeddingSchemeDetailsTab {
 			public void handleSuccess(GUIAccessControlEntry enabledPermissions) {
 				Menu contextMenu = new Menu();
 				Long selectedEmbeddingDocId = selection[0].getAttributeAsLong(DOCID);
-				Long selectedEmbeddingFolderId = selection[0].getAttributeAsLong("folderid");
+				Long selectedEmbeddingFolderId = selection[0].getAttributeAsLong("folderId");
 
 				MenuItem preview = new MenuItem();
 				preview.setTitle(I18N.message("preview"));
