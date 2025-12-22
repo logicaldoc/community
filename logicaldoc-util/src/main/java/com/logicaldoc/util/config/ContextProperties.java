@@ -60,8 +60,9 @@ public class ContextProperties extends OrderedProperties {
 
 	public ContextProperties() throws IOException {
 		String config = StringUtils.defaultString(System.getProperty(LD_CONFIG), "context.properties");
-		log.info("Take configuration from resource {}", config);
-		load(ContextProperties.class.getClassLoader().getResource(config));		
+		if (log.isDebugEnabled())
+			log.debug("Take configuration from resource {}", config);
+		load(ContextProperties.class.getClassLoader().getResource(config));
 	}
 
 	public ContextProperties(String filePath) throws IOException {
