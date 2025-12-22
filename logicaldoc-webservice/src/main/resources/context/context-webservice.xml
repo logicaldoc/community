@@ -189,14 +189,12 @@
 
     <!-- to support Java-to-JSON and vice-versa conversion -->    
     <!-- JAXRS providers -->
- 
-<bean id="cxfJsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
-     <property name="dropRootElement" value="true" /> 
-     <property name="supportUnwrapped" value="true" /> 
-</bean>
+    <bean id="cxfJsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+      <property name="dropRootElement" value="${webservice.json.droproot}" /> 
+      <property name="supportUnwrapped" value="true" /> 
+    </bean>
  
 <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
-    
     <jaxrs:server id="commentservice" address="/mobile/comments">
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
