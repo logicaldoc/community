@@ -24,7 +24,7 @@ public interface SearchService {
 
 	@POST
 	@Path("/find")
-	WSSearchResult find(WSSearchOptions opt)
+	public WSSearchResult find(WSSearchOptions opt)
 			throws AuthenticationException, PersistenceException, WebserviceException, SearchException;
 
 	/**

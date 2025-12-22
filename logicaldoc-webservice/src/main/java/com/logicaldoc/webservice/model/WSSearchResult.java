@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.util.SnippetStripper;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
 /**
@@ -13,6 +14,7 @@ import jakarta.xml.bind.annotation.XmlType;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
+@XmlRootElement(name = "searchresult")
 @XmlType(name = "WSSearchResult")
 public class WSSearchResult {
 	private long time = 0;

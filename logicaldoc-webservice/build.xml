@@ -58,10 +58,19 @@
 						<include name="**/Rest*.class" />
 						<include name="**/context-webservice.xml" />
 						-->
+						<!--
 						<include name="**/DocumentService*.class" />
 						<include name="**/RestDocumentService*.class" />
 						<include name="**/FolderService*.class" />
-						<include name="**/RestFolderService*.class" />						
+						<include name="**/RestFolderService*.class" />	-->	
+						<include name="**/context-webservice.xml" />
+						<include name="**/CxfObjectMapperFactory.class" />
+						<include name="**/RestSearchService.class" />
+						<include name="**/SearchService.class" />
+						<include name="**/WSSearchResult.class" />
+						<include name="**/WSAttributeOption.class" />
+						<include name="**/WSSystemInfo.class" />						
+						<include name="**/WSDocument.class" />
 					</fileset>
 				</copy>
 			</sequential>
