@@ -93,9 +93,9 @@ public class ServletUtil {
 	public static Session validateSession(String sid) throws InvalidSessionException {
 		Session session = SessionManager.get().get(sid);
 		if (session == null)
-			throw new InvalidSessionException("Invalid Session " + sid);
+			throw new InvalidSessionException("Invalid Session %s".formatted(sid));
 		if (!SessionManager.get().isOpen(sid))
-			throw new InvalidSessionException("Invalid or expired Session " + sid);
+			throw new InvalidSessionException("Invalid or expired Session %s".formatted(sid));
 		SessionManager.get().renew(sid);
 		return session;
 	}
