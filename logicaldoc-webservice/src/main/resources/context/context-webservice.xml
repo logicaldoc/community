@@ -189,12 +189,8 @@
     
     <!-- to support Java-to-JSON and vice-versa conversion -->    
     <!-- JAXRS providers -->
-    <bean id="jsonProvider" class="${webservice.json.provider}">
-      <property name="dropRootElement" value="${webservice.json.droproot}" />
-      <property name="supportUnwrapped" value="true" />
-    </bean>    
-    <!--  <bean id="jsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />  -->
-    <!--  <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" /> -->
+    <bean id="jsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+<!--     <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" /> -->
     
     <jaxrs:server id="commentservice" address="/mobile/comments">
         <jaxrs:inInterceptors>
