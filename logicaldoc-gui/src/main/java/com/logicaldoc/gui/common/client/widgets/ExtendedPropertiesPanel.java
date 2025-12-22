@@ -657,6 +657,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 		SelectItem userItem = (SelectItem) attributesForm.getItem(itemName);
 		if (userItem.getValue() != null && !"".equals(userItem.getValue())) {
 			ListGridRecord sel = userItem.getSelectedRecord();
+			if (sel == null) {
+				// If selected record is null here it is because the current Id
+				// refers to an unexisting user
+				userItem.setErrors(I18N.message("unexistinguser"));
+				return;
+			}
 
 			// Prepare a dummy user to set as
 			// attribute value
@@ -671,6 +677,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			at.setIntValue(dummy.getId());
 			at.setStringValue(dummy.getUsername());
 			at.setUsername(dummy.getUsername());
+			at.setType(GUIAttribute.TYPE_USER);
 		} else {
 			GUIAttribute at = extensibleObject.getAttribute(attributeName);
 			at.setIntValue(null);
