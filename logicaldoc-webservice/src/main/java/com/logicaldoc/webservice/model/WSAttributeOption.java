@@ -13,7 +13,7 @@ import jakarta.xml.bind.annotation.XmlType;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.2
  */
-@XmlRootElement(name = "attribute")
+@XmlRootElement(name = "attributeoption")
 @XmlType(name = "WSAttributeOption")
 public class WSAttributeOption implements Serializable {
 

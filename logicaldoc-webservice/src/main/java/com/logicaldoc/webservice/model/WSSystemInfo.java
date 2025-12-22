@@ -5,8 +5,10 @@ import java.util.List;
 
 import com.logicaldoc.webservice.doc.WSDoc;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+@XmlRootElement(name = "systeminfo")
 @XmlType(name = "WSSystemInfo")
 public class WSSystemInfo {
 
