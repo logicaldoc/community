@@ -261,7 +261,8 @@
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestFolderService" />
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <ref bean="jacksonJsonProvider" />
+		    <ref bean="cxfJsonProvider"/>		    
+			<ref bean="jacksonJsonProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
     
