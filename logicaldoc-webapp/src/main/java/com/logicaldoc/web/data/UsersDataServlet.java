@@ -59,7 +59,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		 */
 		UserDAO userDao = UserDAO.get();
 		for (User user : users) {
-			if (user.getType() == UserType.SYSTEM || (skipdisabled && user.isEnabled()))
+			if (user.getType() == UserType.SYSTEM || (skipdisabled && !user.isEnabled()))
 				continue;
 
 			userDao.initialize(user);
