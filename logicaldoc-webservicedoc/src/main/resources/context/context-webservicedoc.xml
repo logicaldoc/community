@@ -36,7 +36,7 @@
     <bean class="com.logicaldoc.webservicedoc.ContextStartupListener" />
     
     <!-- JAXRS providers -->
-    <bean id="jsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+    <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
     <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" />
     <bean id="originFilter" class="demo.jaxrs.openapi.server.ApiOriginFilter" />
     
@@ -60,7 +60,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestDocumentSwagger" />
         </jaxrs:serviceBeans>        
        <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="multipartProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
@@ -74,7 +74,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestFolderSwagger" />
         </jaxrs:serviceBeans>        
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>
@@ -87,7 +87,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestSearchSwagger" />
         </jaxrs:serviceBeans>        
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>
@@ -100,7 +100,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestTagSwagger" />
         </jaxrs:serviceBeans>        
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>
@@ -113,7 +113,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestBookmarkSwagger" />
         </jaxrs:serviceBeans>        
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>
@@ -126,7 +126,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestSystemSwagger" />
         </jaxrs:serviceBeans>        
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>
@@ -139,7 +139,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestDocumentMetadataSwagger" />
         </jaxrs:serviceBeans>        
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>
@@ -152,7 +152,7 @@
             <bean class="com.logicaldoc.webservicedoc.RestAuthSwagger" />
         </jaxrs:serviceBeans>        
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <ref bean="jacksonJsonProvider" />
             <ref bean="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>

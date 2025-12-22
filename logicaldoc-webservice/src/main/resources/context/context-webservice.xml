@@ -193,8 +193,8 @@
       <property name="dropRootElement" value="${webservice.json.droproot}" /> 
       <property name="supportUnwrapped" value="true" /> 
     </bean>
- 
-<bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+    <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+    
     <jaxrs:server id="commentservice" address="/mobile/comments">
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
