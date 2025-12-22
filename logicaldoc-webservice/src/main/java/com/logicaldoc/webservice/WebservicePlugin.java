@@ -28,7 +28,6 @@ public class WebservicePlugin extends LogicalDOCPlugin {
 			pbean.setProperty("webservice.call.gridRecord", "true");
 			pbean.setProperty("webservice.call.ttl", "90");
 			pbean.setProperty("webservice.call.gridRecord", "true");
-			pbean.setProperty("webservice.json.provider", JacksonJsonProvider.class.getName());
 			pbean.setProperty("webservice.json.droproot", "true");
 
 			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_STORE + ".max", "20");
