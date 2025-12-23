@@ -111,7 +111,7 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 		Document doc = documentDAO
 				.findByFileNameAndParentFolderId(target.getId(), fileName, null, transaction.getTenantId(), null)
 				.stream().findFirst().orElse(null);
-		if (doc == null)
+		if (doc == null) {
 			try (InputStream is = ResourceUtil.getInputStream(resourcePath)) {
 				Document trainingDoc = new Document();
 				trainingDoc.setTenantId(transaction.getTenantId());
@@ -120,6 +120,10 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 				trainingDoc.setLanguage("en");
 				doc = documentManager.create(is, trainingDoc, transaction).get();
 			}
+		}
+		
+		documentDAO.initialize(doc);
+		
 		return doc;
 	}
 }
