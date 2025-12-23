@@ -745,7 +745,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			user = userDao.findById(user.getId());
 			userDao.initialize(user);
-			setGroups(user, guiUser);
+			setGroups(user, guiUser, transaction);
 
 			// Notify the user by email
 			if (createNew && user.getSource().equals(UserSource.DEFAULT))
@@ -772,9 +772,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 	}
 
-	private void setGroups(User user, GUIUser guiUser) throws PersistenceException {
+	private void setGroups(User user, GUIUser guiUser, UserHistory transaction) throws PersistenceException {
 		UserDAO userDao = Context.get(UserDAO.class);
 		GroupDAO groupDao = Context.get(GroupDAO.class);
+
 		user.removeGroupMemberships(null);
 		for (Long groupId : guiUser.getGroups().stream().map(g -> g.getId()).toList())
 			user.addGroup(groupDao.findById(groupId));
@@ -786,7 +787,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (ADMIN.equals(guiUser.getUsername()) && !guiUser.isMemberOf(Group.GROUP_ADMIN))
 			user.addGroup(adminGroup);
 
-		userDao.store(user);
+		// Use a fake transaction just to avoid event triggering
+		UserHistory fakeTransaction = new UserHistory(transaction);
+		fakeTransaction.setNotifyEvent(false);
+		userDao.store(user, fakeTransaction);
 	}
 
 	private void setExpire(User usr, GUIUser guiUser) {
