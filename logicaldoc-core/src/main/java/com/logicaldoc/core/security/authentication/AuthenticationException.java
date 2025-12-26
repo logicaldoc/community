@@ -54,6 +54,5 @@ public class AuthenticationException extends RuntimeException {
 			return baseString;
 		else
 			return authenticator.getClass().getSimpleName() + " > " + baseString;
-
 	}
 }
