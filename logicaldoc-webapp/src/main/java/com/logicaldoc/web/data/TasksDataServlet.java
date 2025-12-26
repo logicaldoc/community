@@ -53,14 +53,7 @@ public class TasksDataServlet extends AbstractDataServlet {
 		writer.print(String.format("<description><![CDATA[%s]]></description>",
 				I18N.message("task.description." + task.getName(), locale)));
 
-		if (task.getScheduling().isEnabled()) {
-			writer.print("<eenabled>true</eenabled>");
-			writer.print("<enabledIcon>bullet_green</enabledIcon>");
-		} else {
-			writer.print("<eenabled>false</eenabled>");
-			writer.print("<enabledIcon>bullet_red</enabledIcon>");
-		}
-
+		writer.print(String.format("<eenabled>%b</eenabled>", task.getScheduling().isEnabled()));
 		writer.print(String.format("<status>%d</status>", task.getStatus()));
 		writer.print(String.format("<scheduling>%s</scheduling>", switch (task.getScheduling().getMode()) {
 			case TaskTrigger.MODE_CRON -> task.getScheduling().getCronExpression();
@@ -77,10 +70,7 @@ public class TasksDataServlet extends AbstractDataServlet {
 			writer.print(String.format("<completion>%d</completion>", task.getCompletionPercentage()));
 		writer.print(String.format("<progress>%d</progress>", task.getProgress()));
 		writer.print(String.format("<size>%d</size>", task.getSize()));
-		writer.print(String.format("<runningIcon>%s</runningIcon>", switch (task.getStatus()) {
-			case Task.STATUS_IDLE -> "idle_task";
-			default -> "running_task";
-		}));
+		writer.print(String.format("<running>%b</running>", task.getStatus() != Task.STATUS_IDLE));
 
 		Date previousFireTime = task.getScheduling().getPreviousFireTime();
 		if (previousFireTime != null)

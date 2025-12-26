@@ -182,7 +182,7 @@ public class TasksPanel extends AdminPanel {
 		ListGridField lastStart = new DateListGridField("lastStart", "laststart");
 
 		ListGridField nextStart = new DateListGridField("nextStart", "nextstart");
-		
+
 		ListGridField duration = new ListGridField(DURATION, I18N.message(DURATION));
 		duration.setAutoFitWidth(true);
 		duration.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
@@ -206,8 +206,8 @@ public class TasksPanel extends AdminPanel {
 
 		tasksGrid.setWidth100();
 		tasksGrid.setHeight100();
-		tasksGrid.setFields(enabled, running, label, description, lastStart, duration, nextStart, scheduling, progressbar,
-				completion);
+		tasksGrid.setFields(enabled, running, label, description, lastStart, duration, nextStart, scheduling,
+				progressbar, completion);
 		tasksGrid.setSelectionType(SelectionStyle.SINGLE);
 		tasksGrid.setShowRecordComponents(true);
 		tasksGrid.setShowRecordComponentsByCell(true);
@@ -250,7 +250,7 @@ public class TasksPanel extends AdminPanel {
 							public void handleSuccess(GUITask task) {
 								rec.setAttribute(STATUS, task.getStatus());
 								rec.setAttribute(ENABLED, task.getScheduling().isEnabled());
-								rec.setAttribute(RUNNING,task.getStatus() != GUITask.STATUS_IDLE);
+								rec.setAttribute(RUNNING, task.getStatus() != GUITask.STATUS_IDLE);
 								tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 								showContextMenu();
 							}
@@ -337,7 +337,7 @@ public class TasksPanel extends AdminPanel {
 					} else {
 						p.setPercentDone(guiTask.getCompletionPercentage());
 					}
-					p.redraw();					
+					p.redraw();
 					updateRecord(guiTask);
 				}
 			}

@@ -4,7 +4,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
-import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
@@ -26,7 +25,6 @@ public class TasksDS extends DataSource {
 		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField description = new DataSourceTextField("description");
 		DataSourceTextField duration = new DataSourceTextField("duration");
-		DataSourceImageField enabledIcon = new DataSourceImageField("enabledIcon");
 		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 		DataSourceIntegerField status = new DataSourceIntegerField("status");
 		DataSourceTextField scheduling = new DataSourceTextField("scheduling");
@@ -39,10 +37,10 @@ public class TasksDS extends DataSource {
 		DataSourceDateTimeField nextStart = new DataSourceDateTimeField("nextStart");
 		nextStart.setRequired(false);
 		DataSourceBooleanField indeterminate = new DataSourceBooleanField("indeterminate");
-		DataSourceImageField runningIcon = new DataSourceImageField("runningIcon");
+		DataSourceBooleanField running = new DataSourceBooleanField("running");
 
-		setFields(name, label, description, enabledIcon, enabled, status, scheduling, progress, progressbar, completion,
-				size, lastStart, duration, nextStart, indeterminate, runningIcon);
+		setFields(name, label, description, enabled, status, scheduling, progress, progressbar, completion, size,
+				lastStart, duration, nextStart, indeterminate, running);
 		setClientOnly(false);
 		setDataURL("data/tasks.xml?locale=" + I18N.getLocale());
 	}
