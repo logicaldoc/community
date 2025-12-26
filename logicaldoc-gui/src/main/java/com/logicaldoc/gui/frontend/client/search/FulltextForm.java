@@ -320,6 +320,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		fieldsForm = new DynamicForm();
 		fieldsForm.setTitleOrientation(TitleOrientation.TOP);
 		fieldsForm.setWidth100();
+		fieldsForm.setValuesManager(vm);
 		addMember(fieldsForm);
 
 		searchinItem = ItemFactory.newMultiComboBoxItem("searchin", "searchin", null, null);
@@ -373,6 +374,8 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		vm.setValue(SUBFOLDERS, options.isSearchInSubPath());
 		vm.setValue(ALIASES, options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
+		vm.getItem("searchin").setValue(options.getFields());
+
 		if (options.getSizeMax() != null) {
 			vm.setValue("size", options.getSizeMax() / 1024D);
 			vm.setValue(SIZE_OPERATOR, LESSTHAN);
