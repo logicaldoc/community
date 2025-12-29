@@ -49,8 +49,8 @@ public class AccessControlListDS extends DataSource {
 		DataSourceBooleanField automation = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_AUTOMATION.toLowerCase());
 		DataSourceBooleanField store = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_STORE.toLowerCase());
 		DataSourceBooleanField readingreq = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_READINGREQ.toLowerCase());
-		DataSourceBooleanField customid = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_CUSTOMID);
-		DataSourceBooleanField revision = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_REVISION);
+		DataSourceBooleanField customid = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_CUSTOMID.toLowerCase());
+		DataSourceBooleanField revision = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_REVISION.toLowerCase());
 		DataSourceTextField type = new DataSourceTextField("type");
 
 		setFields(entityId, entity, read, preview, print, write, customid, revision, delete, move, add, workflow, sign, importField, export, rename,
