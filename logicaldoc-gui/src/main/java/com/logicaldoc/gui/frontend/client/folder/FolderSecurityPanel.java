@@ -524,6 +524,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase())));
 			ace.setCustomid(Boolean.TRUE
 					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_CUSTOMID.toLowerCase())));
+			ace.setRevision(Boolean.TRUE
+					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_REVISION.toLowerCase())));
 			ace.setDelete(Boolean.TRUE
 					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_DELETE.toLowerCase())));
 			ace.setAdd(
