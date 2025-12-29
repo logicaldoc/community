@@ -30,11 +30,11 @@ public class GUIEmbeddingScheme implements Serializable {
 
 	private String type = "mariadb";
 
-	private Integer batch;
+	private Integer batch = 50;
 
 	private Integer vectorSize;
 
-	private Integer chunksBatch;
+	private Integer chunksBatch = 50;
 	
 	private long embeddings = 0L;
 
