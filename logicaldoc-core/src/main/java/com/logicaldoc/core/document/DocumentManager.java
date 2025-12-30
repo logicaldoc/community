@@ -358,6 +358,9 @@ public class DocumentManager {
 			if (document.getIndexed() != IndexingStatus.SKIP)
 				document.setIndexingStatus(IndexingStatus.TO_INDEX);
 
+			if (document.getEmbeddingStatus() != EmbeddingStatus.SKIP)
+				document.setEmbeddingStatus(EmbeddingStatus.TO_EMBED);
+
 			documentDAO.store(document);
 
 			document = documentDAO.findById(document.getId());
