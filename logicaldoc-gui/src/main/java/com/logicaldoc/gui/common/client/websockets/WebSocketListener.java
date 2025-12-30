@@ -2,11 +2,9 @@ package com.logicaldoc.gui.common.client.websockets;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 
 import org.realityforge.gwt.websockets.client.WebSocket;
 import org.realityforge.gwt.websockets.client.WebSocketListenerAdapter;
@@ -46,21 +44,9 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 
 	private static final String COMMAND = "command";
 
-	private static Set<String> moniteredEvents = new HashSet<>();
-
 	// Maintain a fifos for the history IDs. Key is the class name, value is a
 	// FIFO queue
 	private Map<String, Queue<Long>> fifos = new HashMap<>();
-
-	static {
-		moniteredEvents.addAll(Arrays.asList("event.changed", "event.renamed", "event.checkedin", "event.checkedout",
-				"event.locked", "event.unlocked", "event.immutable", "event.signed", "event.stamped", "event.indexed",
-				"event.password.protected", "event.password.unprotected", "event.stored", "event.moved",
-				"event.deleted", "event.folder.renamed", "event.folder.changed", "event.folder.deleted",
-				"event.folder.created", "event.folder.moved", "event.workflowstatus", "event.user.message.received",
-				"event.chat.newmessage", "event.user.login", "event.user.logout", "event.user.timeout",
-				"event.reading.confirmed", "event.reading.requested", COMMAND));
-	}
 
 	/**
 	 * A callback handler that fills the ACL of the document and then takes an
@@ -151,9 +137,6 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 	private void onEvent(WebsocketMessage event) {
 		// Skip events related to other tenants
 		if (event.getTenantId() != Session.get().getInfo().getTenant().getId())
-			return;
-
-		if (!moniteredEvents.contains(event.getEvent()))
 			return;
 
 		if (!rememberHistory(event))
@@ -277,8 +260,8 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 				|| "event.checkedin".equals(event.getEvent()) || "event.checkedout".equals(event.getEvent())
 				|| "event.locked".equals(event.getEvent()) || "event.unlocked".equals(event.getEvent())
 				|| "event.immutable".equals(event.getEvent()) || "event.signed".equals(event.getEvent())
-				|| "event.indexed".equals(event.getEvent()) || "event.stamped".equals(event.getEvent())
-				|| "event.password.protected".equals(event.getEvent())
+				|| "event.indexed".equals(event.getEvent()) || "event.embedded".equals(event.getEvent())
+				|| "event.stamped".equals(event.getEvent()) || "event.password.protected".equals(event.getEvent())
 				|| "event.password.unprotected".equals(event.getEvent())
 				|| "event.workflowstatus".equals(event.getEvent());
 	}

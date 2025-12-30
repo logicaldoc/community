@@ -64,13 +64,13 @@ public class EventEndpoint implements EventListener {
 			DocumentEvent.IMMUTABLE.toString(), DocumentEvent.LOCKED.toString(), DocumentEvent.UNLOCKED.toString(),
 			DocumentEvent.SIGNED.toString(), DocumentEvent.STAMPED.toString(), DocumentEvent.MOVED.toString(),
 			DocumentEvent.DELETED.toString(), DocumentEvent.RENAMED.toString(), DocumentEvent.INDEXED.toString(),
-			DocumentEvent.RESTORED.toString(), DocumentEvent.PASSWORD_PROTECTED.toString(),
-			DocumentEvent.MOVED.toString(), DocumentEvent.PASSWORD_UNPROTECTED.toString(),
-			DocumentEvent.READING_CONFIRMED.toString(), DocumentEvent.READING_REQUESTED.toString(),
-			FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(), FolderEvent.CHANGED.toString(),
-			FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(), UserEvent.MESSAGE_RECEIVED.toString(),
-			UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(), UserEvent.TIMEOUT.toString(),
-			"event.chat.newmessage"));
+			DocumentEvent.EMBEDDED.toString(), DocumentEvent.RESTORED.toString(),
+			DocumentEvent.PASSWORD_PROTECTED.toString(), DocumentEvent.MOVED.toString(),
+			DocumentEvent.PASSWORD_UNPROTECTED.toString(), DocumentEvent.READING_CONFIRMED.toString(),
+			DocumentEvent.READING_REQUESTED.toString(), FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(),
+			FolderEvent.CHANGED.toString(), FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(),
+			UserEvent.MESSAGE_RECEIVED.toString(), UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(),
+			UserEvent.TIMEOUT.toString(), "event.chat.newmessage"));
 
 	private static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
 
@@ -112,9 +112,9 @@ public class EventEndpoint implements EventListener {
 	@OnOpen
 	public void onOpen(final Session session) {
 		if (!registered) {
-			EventCollector eventCollector = Context.get(EventCollector.class);
-			eventCollector.addListener(this);
+			Context.get(EventCollector.class).addListener(this);
 			registered = true;
+			log.info("Registered websockets endpoint as events listener");
 		}
 
 		log.debug("onOpen({})", session.getId());
