@@ -70,6 +70,8 @@ public class BruteForcePanel extends AdminPanel {
 
 	private DynamicForm form = new DynamicForm();
 
+	private MultiComboBoxItem recipients;
+	
 	public BruteForcePanel() {
 		super("bruteforceprevention");
 
@@ -151,7 +153,7 @@ public class BruteForcePanel extends AdminPanel {
 		apikeyWait.setWrapTitle(false);
 		apikeyWait.setHint(I18N.message(MINUTES));
 
-		MultiComboBoxItem recipients = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
+		recipients = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
 				new UsersDS(null, false, false),
 				params.get(THROTTLE_ALERT_RECIPIENTS) != null && !params.get(THROTTLE_ALERT_RECIPIENTS).trim().isEmpty()
 						? params.get(THROTTLE_ALERT_RECIPIENTS).trim().split(",")
@@ -253,11 +255,10 @@ public class BruteForcePanel extends AdminPanel {
 		params.add(new GUIParameter(THROTTLE_APIKEY_WAIT, form.getValueAsString("apikeywait")));
 		params.add(new GUIParameter(THROTTLE_USERNAME_DISABLEUSER, form.getValueAsString("usernamedisableuser")));
 
-		if (form.getValueAsString(RECIPIENTS) != null) {
-			@SuppressWarnings("unchecked")
-			ArrayList<String> usernames = (ArrayList<String>) form.getValue(RECIPIENTS);
-			params.add(
-					new GUIParameter(THROTTLE_ALERT_RECIPIENTS, usernames.stream().collect(Collectors.joining(","))));
+		String[] usernames = recipients.getValues();
+		if (usernames != null && usernames.length > 0) {
+			params.add(new GUIParameter(THROTTLE_ALERT_RECIPIENTS,
+					Arrays.asList(usernames).stream().collect(Collectors.joining(","))));
 		} else {
 			params.add(new GUIParameter(THROTTLE_ALERT_RECIPIENTS, ""));
 		}
@@ -269,7 +270,7 @@ public class BruteForcePanel extends AdminPanel {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
