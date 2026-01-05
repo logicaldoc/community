@@ -223,6 +223,8 @@ public abstract class Task implements Runnable {
 			 * Need to acquire the lock
 			 */
 			transactionId = UUID.randomUUID().toString();
+			if(log.isDebugEnabled())
+				log.debug("Task {} acquiring lock {}", getName(), transactionId);
 			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId))) {
 				stopWatch.start();
 				runTask();
@@ -236,20 +238,20 @@ public abstract class Task implements Runnable {
 			log.error("The task is stopped");
 			lastRunError = e;
 		} finally {
-			stopWatch.stop();
+			setStatus(STATUS_IDLE);
+			interruptRequested = false;
 
 			// In any case release the lock
 			try {
 				if (lockManager != null)
 					lockManager.release(getName(), transactionId);
 			} catch (Exception t) {
-				// Nothing to do
+				log.warn("Task {} could not release the lock {}", getName(), transactionId);
 			}
-
-			setStatus(STATUS_IDLE);
-			interruptRequested = false;
-			saveWork();
+			
+			stopWatch.stop();
 			getScheduling().setLastDuration(stopWatch.getTime());
+			saveWork();
 			if(log.isErrorEnabled())
 				log.info("Task {} completed in {}", getName(), TimeDiff.printDuration(getScheduling().getLastDuration()));
 			if (isSendActivityReport() && StringUtils.isNotEmpty(getReportRecipients()))
