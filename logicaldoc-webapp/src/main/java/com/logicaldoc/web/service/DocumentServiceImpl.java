@@ -241,7 +241,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		final Session session = validateSession();
 		checkMenu(Menu.DESTROY_DOCUMENTS);
 
-		log.info("User {} requested the permanent deletion of docuemnts {}", session.getUsername(), docIds);
+		log.info("User {} requested the permanent deletion of documents {}", session.getUsername(), docIds);
 
 		DocumentManager manager = DocumentManager.get();
 
