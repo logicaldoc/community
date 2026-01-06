@@ -59,9 +59,9 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 				reset(sequence, objectId, tenantId, increment);
 				return increment;
 			} else {
-				jdbcUpdate(
-						"update ld_sequence set ld_value = ld_value + %d, ld_recordversion = ld_recordversion + 1, ld_lastmodified = CURRENT_TIMESTAMP where ld_id = %d"
-								.formatted(increment, seq.getId()));
+					jdbcUpdate(
+							"update ld_sequence set ld_value = ld_value + %d, ld_recordversion = ld_recordversion + 1, ld_lastmodified = CURRENT_TIMESTAMP where ld_id = %d"
+									.formatted(increment, seq.getId()));
 				evict(seq.getId());
 				return queryForLong("select ld_value from ld_sequence where ld_id = %d".formatted(seq.getId()));
 			}
@@ -75,11 +75,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 
 	@Override
 	public long getCurrentValue(String sequence, long objectId, long tenantId) throws PersistenceException {
-		Sequence seq = findByAlternateKey(sequence, objectId, tenantId);
-		if (seq == null)
-			return 0L;
-		else
-			return seq.getValue();
+		return queryForLong("select ld_value from ld_sequence where ld_deleted = 0 and ld_name = :name and ld_objectid = :objectId and ld_tenantid = :tenantId", Map.of(TENANTID, tenantId, "name", sequence, "objectId", objectId));
 	}
 
 	@Override
@@ -128,7 +124,8 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		return sequence;
 	}
 
-	private List<Sequence> findSequences(String sequenceName, long objectId, long tenantId) throws PersistenceException {
+	private List<Sequence> findSequences(String sequenceName, long objectId, long tenantId)
+			throws PersistenceException {
 		String query = " " + ENTITY + ".tenantId = :tenantId ";
 		query += AND + ENTITY + ".objectId = :objectId ";
 		query += AND + ENTITY + ".name = :name ";
