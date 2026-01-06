@@ -305,11 +305,6 @@ public class StandardSearchEngine implements SearchEngine {
 		return baos.toString(StandardCharsets.UTF_8);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#deleteHit(long)
-	 */
 	@Override
 	public synchronized void deleteHit(long id) {
 		try {
@@ -320,12 +315,6 @@ public class StandardSearchEngine implements SearchEngine {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#deleteHits(java.util.
-	 * Collection )
-	 */
 	@Override
 	public synchronized void deleteHits(Collection<Long> ids) {
 		try {
@@ -336,11 +325,6 @@ public class StandardSearchEngine implements SearchEngine {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#getHit(long)
-	 */
 	@Override
 	public Hit getHit(long id) {
 		SolrQuery query = new SolrQuery();
