@@ -59,11 +59,10 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 				reset(sequence, objectId, tenantId, increment);
 				return increment;
 			} else {
-					jdbcUpdate(
-							"update ld_sequence set ld_value = ld_value + %d, ld_recordversion = ld_recordversion + 1, ld_lastmodified = CURRENT_TIMESTAMP where ld_id = %d"
-									.formatted(increment, seq.getId()));
+				seq.setValue(seq.getValue()+increment);
+				store(seq);				
 				evict(seq.getId());
-				return queryForLong("select ld_value from ld_sequence where ld_id = %d".formatted(seq.getId()));
+				return seq.getValue();
 			}
 		}
 	}
