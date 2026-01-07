@@ -102,9 +102,6 @@ public class EmbeddingSchemesPanel extends VLayout {
 		model.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		ListGridField embeddings = new IntegerListGridField(EMBEDDINGS, I18N.message(EMBEDDINGS));
-		embeddings.setCanFilter(true);
-		embeddings.setCanSort(true);
-		embeddings.setAlign(Alignment.LEFT);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));

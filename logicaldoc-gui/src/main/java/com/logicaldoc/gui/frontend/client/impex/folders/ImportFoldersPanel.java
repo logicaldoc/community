@@ -81,7 +81,6 @@ public class ImportFoldersPanel extends AdminPanel {
 		type.setAutoFitWidth(true);
 
 		IntegerListGridField importedDocs = new IntegerListGridField("docs", I18N.message("importeddocuments"));
-		importedDocs.setAutoFitWidth(true);
 
 		ListGridField enabled = new EnabledListGridField();
 

@@ -77,7 +77,6 @@ public class EmailAccountsPanel extends AdminPanel {
 		ListGridField enabled = new EnabledListGridField();
 
 		IntegerListGridField emails = new IntegerListGridField("emails", I18N.message("importedemails"));
-		emails.setAutoFitWidth(true);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -165,19 +164,18 @@ public class EmailAccountsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(click -> LD.ask(I18N.message(QUESTION),
-				I18N.message("confirmdelete"), choice -> {
-					if (Boolean.TRUE.equals(choice)) {
-						EmailAccountService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
-							@Override
-							public void handleSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								showDetails(null);
-							}
-						});
+		delete.addClickHandler(click -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				EmailAccountService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showDetails(null);
 					}
-				}));
+				});
+			}
+		}));
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));

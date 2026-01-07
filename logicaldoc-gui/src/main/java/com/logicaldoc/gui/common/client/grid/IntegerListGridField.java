@@ -3,6 +3,7 @@ package com.logicaldoc.gui.common.client.grid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -17,11 +18,13 @@ public class IntegerListGridField extends ColoredListGridField {
 	public IntegerListGridField(String name, String title) {
 		this(name, I18N.message(title), 40);
 	}
-	
+
 	public IntegerListGridField(String name, String title, int width) {
 		super(name, I18N.message(title), width);
 		setType(ListGridFieldType.INTEGER);
 		setAlign(Alignment.CENTER);
+		setAutoFitWidth(true);
+		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		setCellFormatter(new LongCellFormatter());
 	}
 
@@ -39,11 +42,11 @@ public class IntegerListGridField extends ColoredListGridField {
 				return "";
 
 			String val = null;
-			if(value instanceof Integer)
-				val=Util.formatInt(Integer.parseInt(value.toString()));
+			if (value instanceof Integer)
+				val = Util.formatInt(Integer.parseInt(value.toString()));
 			else
-				val=Util.formatLong(Long.parseLong(value.toString()));
-			
+				val = Util.formatLong(Long.parseLong(value.toString()));
+
 			return super.format(val, rec, rowNum, colNum);
 		}
 	}
