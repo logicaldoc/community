@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.ai.embedding;
 
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Criterion;
 import com.smartgwt.client.types.OperatorId;
@@ -68,7 +69,7 @@ public class EmbeddingSchemeProperties extends EmbeddingSchemeDetailsTab {
 		modelName.setVisible(embeddingScheme.getId() != 0L);
 
 		StaticTextItem embeddings = ItemFactory.newStaticTextItem("embeddings",
-				Long.toString(embeddingScheme.getEmbeddings()));
+				Util.formatLong(embeddingScheme.getEmbeddings()));
 		embeddings.setVisible(embeddingScheme.getId() != 0L);
 
 		// Name

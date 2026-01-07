@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
+import com.logicaldoc.gui.common.client.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -100,7 +101,7 @@ public class EmbeddingSchemesPanel extends VLayout {
 		model.setCanSort(true);
 		model.setAutoFit(AutoFitWidthApproach.BOTH);
 
-		ListGridField embeddings = new ListGridField(EMBEDDINGS, I18N.message(EMBEDDINGS));
+		ListGridField embeddings = new IntegerListGridField(EMBEDDINGS, I18N.message(EMBEDDINGS));
 		embeddings.setCanFilter(true);
 		embeddings.setCanSort(true);
 		embeddings.setAlign(Alignment.LEFT);

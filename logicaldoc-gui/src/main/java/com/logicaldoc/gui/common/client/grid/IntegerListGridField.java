@@ -43,6 +43,7 @@ public class IntegerListGridField extends ColoredListGridField {
 				val=Util.formatInt(Integer.parseInt(value.toString()));
 			else
 				val=Util.formatLong(Long.parseLong(value.toString()));
+			
 			return super.format(val, rec, rowNum, colNum);
 		}
 	}
