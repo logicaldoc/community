@@ -82,9 +82,9 @@ public class TaskEditor extends Window {
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoCenter(true);
 		setMargin(3);
 		setWidth(650);
-		centerInPage();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		propertiesTab.setPane(preparePropertiesPanel());

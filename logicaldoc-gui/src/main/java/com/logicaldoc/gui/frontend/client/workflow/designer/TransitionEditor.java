@@ -38,10 +38,10 @@ public class TransitionEditor extends Window {
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoCenter(true);
 		setMargin(3);
-		setWidth(600);
-		setAutoSize(true);
-		centerInPage();
+		setWidth(650);
+		setHeight(350);
 	}
 
 	@Override
