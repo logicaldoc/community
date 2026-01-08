@@ -30,6 +30,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class SemanticForm extends VLayout implements SearchObserver {
 
+	private static final String EMBEDDINGSCHEME = "embeddingscheme";
+
 	private static final String THRESHOLD = "threshold";
 
 	private static final String ALIASES = "aliases";
@@ -40,7 +42,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 
 	private static final String LANGUAGE = "language";
 
-	private static final String EXPRESSION_STR = "expression";
+	private static final String EXPRESSION = "expression";
 
 	private static final String SEARCHINHITS = "searchinhits";
 
@@ -103,7 +105,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 			event.cancel();
 		});
 
-		expression = ItemFactory.newTextAreaItem(EXPRESSION_STR, "");
+		expression = ItemFactory.newTextAreaItem(EXPRESSION, "");
 		expression.setHint(I18N.message(SEARCH) + "...");
 		expression.setShowHintInField(true);
 		expression.setWidth("*");
@@ -122,7 +124,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		language.setDefaultValue(NO_LANGUAGE);
 
-		SelectItem embeddingScheme = ItemFactory.newSelectItem("embeddingscheme");
+		SelectItem embeddingScheme = ItemFactory.newSelectItem(EMBEDDINGSCHEME);
 		embeddingScheme.setOptionDataSource(new EmbeddingSchemesDS(true));
 		embeddingScheme.setValueField("id");
 		embeddingScheme.setDisplayField("label");
@@ -170,11 +172,11 @@ public class SemanticForm extends VLayout implements SearchObserver {
 
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setType(GUISearchOptions.TYPE_SEMANTIC);
-		options.setExpression(vm.getValueAsString(EXPRESSION_STR));
+		options.setExpression(vm.getValueAsString(EXPRESSION));
 
 		setLanguageCondition(options);
 
-		options.setEmbeddingSchemeId(Long.parseLong(vm.getValueAsString("embeddingscheme")));
+		options.setEmbeddingSchemeId(Long.parseLong(vm.getValueAsString(EMBEDDINGSCHEME)));
 
 		options.setFolder(folder.getFolderId());
 		options.setFolderName(folder.getFolderName());
@@ -229,7 +231,8 @@ public class SemanticForm extends VLayout implements SearchObserver {
 
 		folder.setFolder(options.getFolder(), options.getFolderName());
 
-		vm.setValue(EXPRESSION_STR, options.getExpression());
+		vm.setValue(EXPRESSION, options.getExpression());
+		vm.setValue(EMBEDDINGSCHEME,Long.toString(options.getEmbeddingSchemeId()));
 		vm.setValue(SUBFOLDERS, options.isSearchInSubPath());
 		vm.setValue(ALIASES, options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());

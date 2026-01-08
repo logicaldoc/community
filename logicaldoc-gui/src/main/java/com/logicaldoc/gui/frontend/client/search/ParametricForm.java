@@ -101,7 +101,7 @@ public class ParametricForm extends VLayout implements SearchObserver {
 		if (getMembers() != null)
 			removeMembers(getMembers());
 
-		final DynamicForm languageForm = new DynamicForm();
+		DynamicForm languageForm = new DynamicForm();
 		languageForm.setValuesManager(vm);
 		languageForm.setTitleOrientation(TitleOrientation.TOP);
 		languageForm.setNumCols(1);
