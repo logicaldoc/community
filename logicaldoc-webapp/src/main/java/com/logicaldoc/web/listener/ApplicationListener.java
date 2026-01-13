@@ -40,8 +40,6 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 	private static final String CONSOLE = "console";
 
-	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
-
 	private static final String JDBC_URL = "jdbc.url";
 
 	private static final Logger log = LoggerFactory.getLogger(ApplicationListener.class);
@@ -220,7 +218,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			log.warn(e.getMessage());
 		}
 
-		tempDirToDelete = new File(System.getProperty(JAVA_IO_TMPDIR) + "/upload");
+		tempDirToDelete = new File(FileUtil.tempDir(), "upload");
 		try {
 			if (tempDirToDelete.exists())
 				FileUtils.forceDelete(tempDirToDelete);
@@ -228,7 +226,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			log.warn(e.getMessage());
 		}
 
-		tempDirToDelete = new File(System.getProperty(JAVA_IO_TMPDIR) + "/convertjpg");
+		tempDirToDelete = new File(FileUtil.tempDir(), "convertjpg");
 		try {
 			if (tempDirToDelete.exists())
 				FileUtils.forceDelete(tempDirToDelete);

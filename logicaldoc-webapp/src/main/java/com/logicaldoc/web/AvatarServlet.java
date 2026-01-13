@@ -68,7 +68,7 @@ public class AvatarServlet extends HttpServlet {
 				content = user.getAvatar();
 			}
 
-			String fileName = "avatar-" + id + "." + getExtension(content);
+			String fileName = "avatar-%s.%s".formatted(id, getExtension(content));
 
 			response.setContentType(MimeType.getByFilename(fileName));
 			ServletUtil.setContentDisposition(request, response, fileName);

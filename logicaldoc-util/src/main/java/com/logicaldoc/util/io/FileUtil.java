@@ -753,4 +753,13 @@ public class FileUtil {
 		Path path = Files.createTempDirectory(prefix);
 		return path.toFile();
 	}
+	
+	/**
+	 * Gets the temporary folder for the current JVM, normally it is specified in the property called java.io.tmpdir
+	 * 
+	 * @return The default java temporary directory
+	 */
+	public static File tempDir() {
+		return new File(System.getProperty("java.io.tmpdir"));
+	}
 }

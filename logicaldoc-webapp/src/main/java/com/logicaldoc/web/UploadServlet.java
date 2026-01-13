@@ -90,7 +90,8 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @return the upload folder
 	 */
 	protected static File getUploadDir(String sid) {
-		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + sid);
+		File dir = new File(FileUtil.tempDir(), "upload");
+		dir = new File(dir, sid);
 		dir.mkdirs();
 		dir.mkdir();
 		return dir;
@@ -104,7 +105,8 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @return the upload folder
 	 */
 	private static File getUploadDir(HttpSession httpSession) {
-		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/http-" + httpSession.getId());
+		File dir = new File(FileUtil.tempDir(), "upload");
+		dir = new File(dir, "http-%s".formatted(httpSession.getId()));
 		dir.mkdirs();
 		dir.mkdir();
 		return dir;

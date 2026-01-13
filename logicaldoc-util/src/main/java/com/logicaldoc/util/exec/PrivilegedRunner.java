@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 
 /**
@@ -57,22 +58,19 @@ public class PrivilegedRunner {
 	}
 
 	protected File extractVistaElevator() throws IOException {
-		String path = System.getProperty("java.io.tmpdir") + File.separator + "Elevator.js";
-		File elevator = new File(path);
+		File elevator = new File(FileUtil.tempDir(), "Elevator.js");
 
-		FileOutputStream out = new FileOutputStream(elevator);
-		InputStream in = getClass().getResourceAsStream("/com/logicaldoc/util/exec/windows/elevate.js");
-		copyStream(out, in);
-		in.close();
-		out.close();
+		try (FileOutputStream out = new FileOutputStream(elevator);
+				InputStream in = getClass().getResourceAsStream("/com/logicaldoc/util/exec/windows/elevate.js")) {
+			copyStream(out, in);
+		}
 
 		elevator.deleteOnExit();
 		return elevator;
 	}
 
 	protected File extractMacElevator() throws IOException {
-		String path = System.getProperty("java.io.tmpdir") + File.separator + "Elevator";
-		File elevator = new File(path);
+		File elevator = new File(FileUtil.tempDir(), "Elevator");
 
 		try (FileOutputStream out = new FileOutputStream(elevator);
 				InputStream in = ResourceUtil
@@ -80,9 +78,8 @@ public class PrivilegedRunner {
 			copyStream(out, in);
 		}
 
-		if (!elevator.setExecutable(true)) {
-			throw new IOException("Failed to set execute permission on " + path);
-		}
+		if (!elevator.setExecutable(true))
+			throw new IOException("Failed to set execute permission on %s".formatted(elevator.getAbsolutePath()));
 
 		elevator.deleteOnExit();
 		return elevator;
