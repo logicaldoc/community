@@ -36,4 +36,11 @@ public interface Secure<T extends AccessControlEntry> extends Serializable {
 	 * @param ace the access control entry to add
 	 */
 	public void addAccessControlEntry(T ace);
+
+	/**
+	 * Removes all the ACEs related to the given group.
+	 * 
+	 * @param groupId Identifier of the group
+	 */
+	public void removeAccessControlEntries(long groupId);
 }

@@ -103,6 +103,11 @@ public class Template extends AbstractAttributeSet implements Secure<AccessContr
 			getAccessControlList().add(ace);
 		}
 	}
+	
+	@Override
+	public void removeAccessControlEntries(long groupId) {
+		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
+	}
 
 	@Override
 	public int hashCode() {

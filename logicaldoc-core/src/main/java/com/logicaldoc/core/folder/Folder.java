@@ -282,6 +282,11 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 	public void setAccessControlList(Set<FolderAccessControlEntry> accessControlList) {
 		this.accessControlList = accessControlList;
 	}
+	
+	@Override
+	public void removeAccessControlEntries(long groupId) {
+		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
+	}
 
 	public boolean isWorkspace() {
 		return type == TYPE_WORKSPACE;

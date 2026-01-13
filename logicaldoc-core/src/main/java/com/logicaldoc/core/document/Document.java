@@ -345,6 +345,11 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	}
 
 	@Override
+	public void removeAccessControlEntries(long groupId) {
+		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
+	}
+	
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();

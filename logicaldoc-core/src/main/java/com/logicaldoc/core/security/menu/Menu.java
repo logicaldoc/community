@@ -236,6 +236,11 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 	}
 
 	@Override
+	public void removeAccessControlEntries(long groupId) {
+		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
+	}
+
+	@Override
 	public int compareTo(Menu other) {
 		if (this.equals(other))
 			return 0;

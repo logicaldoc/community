@@ -374,6 +374,11 @@ public class DocumentNote extends PersistentObject implements Secure<NoteAccessC
 	}
 
 	@Override
+	public void removeAccessControlEntries(long groupId) {
+		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
+	}
+	
+	@Override
 	public String toString() {
 		return StringUtils.abbreviate(message, 40) + "(" + getId() + ")";
 	}
