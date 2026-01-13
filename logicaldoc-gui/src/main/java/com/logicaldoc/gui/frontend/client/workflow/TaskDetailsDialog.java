@@ -53,6 +53,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -439,39 +440,45 @@ public class TaskDetailsDialog extends Window {
 			window.setIsModal(true);
 			window.setShowModalMask(true);
 			window.setAutoSize(true);
-			window.centerInPage();
+			window.setAutoCenter(true);
 
-			DynamicForm reassignUserForm = new DynamicForm();
-			reassignUserForm.setTitleOrientation(TitleOrientation.TOP);
-			reassignUserForm.setNumCols(1);
-			reassignUserForm.setValuesManager(vm);
 			user = ItemFactory.newUserSelector("user", I18N.message("user"), null, true, true);
 			user.setWidth(250);
 			user.setShowTitle(true);
 			user.setDisplayField("username");
 
-			SubmitItem saveButton = new SubmitItem("save", I18N.message("save"));
-			saveButton.setAlign(Alignment.LEFT);
-			saveButton.addClickHandler(saveClick -> {
+			CheckboxItem reassignAll = ItemFactory.newCheckbox("reassignalltasks");
+			reassignAll.setVisible(Session.get().isAdmin()
+					|| workflow.getSupervisors().stream().anyMatch(s -> s.getId() == Session.get().getUser().getId()));
+
+			SubmitItem submit = new SubmitItem("submit", I18N.message("submit"));
+			submit.setAlign(Alignment.LEFT);
+			submit.addClickHandler(saveClick -> {
 				if (user.getSelectedRecord() == null)
 					return;
 				setUser(user.getSelectedRecord().getAttribute("id"));
 
+				LD.contactingServer();
 				WorkflowService.Instance.get().reassignTask(workflow.getSelectedTask().getId(),
-						user.getSelectedRecord().getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+						user.getSelectedRecord().getAttributeAsLong("id"), reassignAll.getValueAsBoolean(),
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void handleSuccess(GUIWorkflow result) {
 								if (result != null) {
 									window.destroy();
-									workflow = result;
-									reload(workflow);
-									workflowDashboard.refresh(workflow.getId());
+									workflowDashboard.refresh(result.getId());
+									TaskDetailsDialog.this.destroy();
+									new TaskDetailsDialog(workflowDashboard, result, readOnly).show();
 								}
 							}
 						});
 			});
 
-			reassignUserForm.setItems(user, saveButton);
+			DynamicForm reassignUserForm = new DynamicForm();
+			reassignUserForm.setTitleOrientation(TitleOrientation.TOP);
+			reassignUserForm.setNumCols(1);
+			reassignUserForm.setValuesManager(vm);
+			reassignUserForm.setItems(user, reassignAll, submit);
 
 			window.addItem(reassignUserForm);
 			window.show();

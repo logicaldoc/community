@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.DeferredSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 public class LDDeferredSecurityContext implements DeferredSecurityContext {
+
+	private static final Logger log = LoggerFactory.getLogger(LDDeferredSecurityContext.class);
 
 	static Map<String, HttpSession> servletSessionMapping = new HashMap<>();
 
@@ -68,6 +72,8 @@ public class LDDeferredSecurityContext implements DeferredSecurityContext {
 	public static void bindServletSession(String sid, HttpSession servletSession) {
 		servletSession.setAttribute(SessionManager.PARAM_SID, sid);
 		servletSessionMapping.put(sid, servletSession);
+		if (log.isDebugEnabled())
+			log.debug("Bound SID {} to session {}", sid, servletSession.getId());
 	}
 
 	public static HttpSession getServletSession(String sid) {

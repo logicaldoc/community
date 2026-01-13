@@ -206,13 +206,24 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @param taskId identifier of the task
 	 * @param userId identifier of the user
+	 * @param allTasks if all the other active tasks assigned to same user must be re-assined too
 	 * 
 	 * @return the workflow definition
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public GUIWorkflow reassignTask(String taskId, long userId) throws ServerException;
+	public GUIWorkflow reassignTask(String taskId, long userId, boolean allTasks) throws ServerException;
 
+	/**
+	 * The tasks gets assigned to a specified user user
+	 * 
+	 * @param taskIds identifier of the tasks
+	 * @param userId identifier of the user
+	 * 
+	 * @throws ServerException an error happened in the server applications
+	 */
+	public void assignTasks(List<String> taskIds, long userId) throws ServerException;
+	
 	/**
 	 * The task is reassigned to the pooled users
 	 * 

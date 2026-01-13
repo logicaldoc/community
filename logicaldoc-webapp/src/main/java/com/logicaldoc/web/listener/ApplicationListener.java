@@ -26,7 +26,6 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 
@@ -279,32 +278,9 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		// Nothing to do
 	}
 
-	/**
-	 * Frees temporary upload folders.
-	 */
 	@Override
 	public void sessionDestroyed(HttpSessionEvent event) {
-		HttpSession session = event.getSession();
-		String id = session.getId();
-
-		// Remove the upload folders
-		File uploadFolder = new File(session.getServletContext().getRealPath("upload"));
-		uploadFolder = new File(uploadFolder, id);
-		try {
-			if (uploadFolder.exists())
-				FileUtils.forceDelete(uploadFolder);
-		} catch (Exception e) {
-			log.warn(e.getMessage());
-		}
-
-		String sid = (String) session.getAttribute("sid");
-		File uploadDir = new File(System.getProperty(JAVA_IO_TMPDIR) + "/upload/" + sid);
-		try {
-			if (uploadDir.exists())
-				FileUtils.forceDelete(uploadDir);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+		// Nothing to do
 	}
 
 	private void writePidFile() {

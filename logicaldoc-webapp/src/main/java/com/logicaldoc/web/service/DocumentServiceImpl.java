@@ -1791,10 +1791,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void cleanUploadedFileFolder() throws ServerException {
 		Session session = validateSession();
 		UploadServlet.cleanUploads(session.getSid());
-
-		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + session.getSid());
-		if (dir.exists())
-			FileUtil.delete(dir);
 	}
 
 	@Override

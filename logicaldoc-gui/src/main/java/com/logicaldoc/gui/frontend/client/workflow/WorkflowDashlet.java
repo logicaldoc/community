@@ -26,9 +26,13 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
+import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.HeaderControl;
+import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.Portlet;
@@ -247,7 +251,7 @@ public class WorkflowDashlet extends Portlet {
 		 */
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
+		delete.addClickHandler(click -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
 				ArrayList<String> ids = new ArrayList<>();
 				ListGridRecord[] selectedRecords = list.getSelectedRecords();
@@ -257,10 +261,60 @@ public class WorkflowDashlet extends Portlet {
 			}
 		}));
 
-		if (!Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN))
-			delete.setEnabled(false);
+		MenuItem assign = new MenuItem();
+		assign.setTitle(I18N.message("assign"));
+		assign.addClickHandler(click -> {
+				ArrayList<String> ids = new ArrayList<>();
+				ListGridRecord[] selectedRecords = list.getSelectedRecords();
+				for (ListGridRecord rec : selectedRecords)
+					ids.add(rec.getAttributeAsString("id"));
 
-		contextMenu.setItems(delete);
+				Window window = new Window();
+				window.setTitle(I18N.message("workflowtaskreassign"));
+				window.setCanDragResize(true);
+				window.setIsModal(true);
+				window.setShowModalMask(true);
+				window.setAutoSize(true);
+				window.setAutoCenter(true);
+				
+				SelectItem user = ItemFactory.newUserSelector("user", I18N.message("user"), null, true, true);
+				user.setWidth(250);
+				user.setShowTitle(true);
+				user.setDisplayField("username");
+
+				SubmitItem submit = new SubmitItem("submit", I18N.message("submit"));
+				submit.setAlign(Alignment.LEFT);
+				submit.addClickHandler(saveClick -> {
+					if (user.getSelectedRecord() == null)
+						return;
+					LD.contactingServer();
+					WorkflowService.Instance.get().assignTasks(ids, user.getSelectedRecord().getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+
+						@Override
+						public void handleSuccess(Void result) {
+							window.destroy();
+							workflowDashboard.refresh(null);
+						}
+					});
+				});
+				
+				
+				DynamicForm assignForm = new DynamicForm();
+				assignForm.setTitleOrientation(TitleOrientation.TOP);
+				assignForm.setNumCols(1);
+				assignForm.setItems(user, submit);
+				
+				
+				window.addItem(assignForm);
+				window.show();
+		});
+
+		if (!Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
+			delete.setEnabled(false);
+			assign.setEnabled(false);
+		}
+
+		contextMenu.setItems(assign, delete);
 		contextMenu.showContextMenu();
 	}
 
