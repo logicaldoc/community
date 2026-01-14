@@ -22,6 +22,7 @@ import com.logicaldoc.core.security.SessionListener;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
+import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 
@@ -103,7 +104,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @return the upload folder
 	 */
 	private static File getUploadDir(HttpSession httpSession) {
-		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + httpSession.getId());
+		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/http-" + httpSession.getId());
 		dir.mkdirs();
 		dir.mkdir();
 		return dir;
@@ -190,7 +191,16 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @param sid The current session ID
 	 */
 	public static void cleanUploads(String sid) {
-		FileUtil.delete(getUploadDir(sid));
+		if (StringUtils.isBlank(sid)) {
+			log.warn("Empty SID, cannot identify the upload folder to clear");
+			return;
+		}
+
+		File uploadDir = getUploadDir(sid);
+		if (log.isDebugEnabled())
+			log.debug("Clean temporary upload folder {} - {}", uploadDir.getAbsolutePath(),
+					SystemUtil.printStackTrace());
+		FileUtil.delete(uploadDir);
 		Map<String, File> receivedFiles = getUploads(sid);
 		receivedFiles.clear();
 	}
@@ -201,7 +211,11 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @param httpSession The current session
 	 */
 	public static void cleanUploads(HttpSession httpSession) {
-		FileUtil.delete(getUploadDir(httpSession));
+		File uploadDir = getUploadDir(httpSession);
+		if (log.isDebugEnabled())
+			log.debug("Clean temporary upload folder {} - {}", uploadDir.getAbsolutePath(),
+					SystemUtil.printStackTrace());
+		FileUtil.delete(uploadDir);
 		getUploads(httpSession).clear();
 	}
 
@@ -226,7 +240,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			disallow = disallow.toLowerCase().replace(" ", "");
 			List<String> disallowedExtensions = Arrays.asList(disallow.toLowerCase().split(","));
 			if (disallowedExtensions.contains(extension))
-				throw new ServletException("Disallowed extension: " + extension);
+				throw new ServletException("Disallowed extension: %s".formatted(extension));
 		}
 	}
 
@@ -293,7 +307,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 					fi.write(file);
 					if (uploadedFiles != null)
 						uploadedFiles.put(fileName, file);
-					out.println("Uploaded Filename: " + fileName + "<br>");
+					out.println("Uploaded Filename: %s<br>".formatted(fileName));
 				}
 			}
 
@@ -317,10 +331,13 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 	@Override
 	public void onSessionClosed(Object sid) {
+		File uploadDir = getUploadDir(sid.toString());
 		try {
-			FileUtils.forceDelete(getUploadDir(sid.toString()));
+			if (log.isDebugEnabled())
+				log.debug("Delete temprary upload folder {} on session {} closed", uploadDir.getAbsolutePath(), sid);
+			FileUtils.forceDelete(uploadDir);
 		} catch (Exception e) {
-			log.warn("Unable to clean the upload folder for session {}", sid);
+			log.warn("Unable to clean the upload folder {} for SID {}", uploadDir.getAbsolutePath(), sid);
 		}
 	}
 }

@@ -8,13 +8,6 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Set;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionEvent;
-import jakarta.servlet.http.HttpSessionListener;
-
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +22,13 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.web.UploadServlet;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * Listener that initializes relevant system stuffs during application startup
@@ -38,6 +38,8 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 3.0
  */
 public class ApplicationListener implements ServletContextListener, HttpSessionListener {
+
+	private static final String CONSOLE = "console";
 
 	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
@@ -198,8 +200,12 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				restartRequired();
 				log.warn("The application has to be restarted");
 
-				Logger console = LoggerFactory.getLogger("console");
+				Logger console = LoggerFactory.getLogger(CONSOLE);
 				console.warn("The application has to be restarted");
+			} else {
+				log.info("Application started and ready");
+				Logger console = LoggerFactory.getLogger(CONSOLE);
+				console.info("Application started and ready");
 			}
 		} finally {
 			writePidFile();
@@ -273,32 +279,9 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		// Nothing to do
 	}
 
-	/**
-	 * Frees temporary upload folders.
-	 */
 	@Override
 	public void sessionDestroyed(HttpSessionEvent event) {
-		HttpSession session = event.getSession();
-		String id = session.getId();
-
-		// Remove the upload folders
-		File uploadFolder = new File(session.getServletContext().getRealPath("upload"));
-		uploadFolder = new File(uploadFolder, id);
-		try {
-			if (uploadFolder.exists())
-				FileUtils.forceDelete(uploadFolder);
-		} catch (Exception e) {
-			log.warn(e.getMessage());
-		}
-
-		String sid = (String) session.getAttribute("sid");
-		File uploadDir = new File(System.getProperty(JAVA_IO_TMPDIR) + "/upload/" + sid);
-		try {
-			if (uploadDir.exists())
-				FileUtils.forceDelete(uploadDir);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+		UploadServlet.cleanUploads((String)event.getSession().getAttribute("sid"));
 	}
 
 	private void writePidFile() {
@@ -313,7 +296,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		} catch (IOException e) {
 			log.warn(e.getMessage());
 
-			Logger console = LoggerFactory.getLogger("console");
+			Logger console = LoggerFactory.getLogger(CONSOLE);
 			console.warn("Cannot create pid file {}", pidFile.getAbsolutePath());
 		}
 	}
