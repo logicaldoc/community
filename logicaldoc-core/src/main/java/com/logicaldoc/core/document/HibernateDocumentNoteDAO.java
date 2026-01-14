@@ -184,8 +184,8 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				for (DocumentNote note : notes)
 					initialize(note);
 				return notes.stream()
-						.filter(note -> note.getUserId() == userId || note.getAccessControlList().isEmpty() || note
-								.getAccessControlEntries(userGroups).stream().anyMatch(ace -> ace.getRead() == 1))
+						.filter(note -> note.getUserId() == userId || note.getAccessControlList().isEmpty()
+								|| note.getAccessControlEntries(userGroups).stream().anyMatch(ace -> ace.isRead()))
 						.toList();
 			}
 		}

@@ -1911,10 +1911,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		for (NoteAccessControlEntry ace : note.getAccessControlList()) {
 			GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
 			guiAce.setEntityId(ace.getGroupId());
-			guiAce.setRead(ace.getRead() == 1);
-			guiAce.setWrite(ace.getWrite() == 1);
-			guiAce.setDelete(ace.getDelete() == 1);
-			guiAce.setSecurity(ace.getSecurity() == 1);
+			guiAce.setRead(ace.isRead());
+			guiAce.setWrite(ace.isWrite());
+			guiAce.setDelete(ace.isDelete());
+			guiAce.setSecurity(ace.isSecurity());
 			guiNote.getAccessControlList().add(guiAce);
 		}
 
@@ -2036,10 +2036,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		for (GUIAccessControlEntry guiAce : guiNote.getAccessControlList()) {
 			NoteAccessControlEntry ace = new NoteAccessControlEntry();
 			ace.setGroupId(guiAce.getEntityId());
-			ace.setRead(guiAce.isRead() ? 1 : 0);
-			ace.setWrite(guiAce.isWrite() ? 1 : 0);
-			ace.setDelete(guiAce.isDelete() ? 1 : 0);
-			ace.setSecurity(guiAce.isSecurity() ? 1 : 0);
+			ace.setRead(guiAce.isRead());
+			ace.setWrite(guiAce.isWrite());
+			ace.setDelete(guiAce.isDelete());
+			ace.setSecurity(guiAce.isSecurity());
 			note.addAccessControlEntry(ace);
 		}
 
@@ -3173,10 +3173,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentServiceImpl.emailSender = emailSender;
 	}
 
-	private int booleanToInt(boolean bool) {
-		return bool ? 1 : 0;
-	}
-
 	@Override
 	public void saveACL(GUIDocument guiDocument) throws ServerException {
 		Session session = validateSession();
@@ -3193,27 +3189,27 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			for (GUIAccessControlEntry guiAce : guiDocument.getAccessControlList()) {
 				DocumentAccessControlEntry ace = new DocumentAccessControlEntry();
 				ace.setGroupId(guiAce.getEntityId());
-				ace.setRead(booleanToInt(guiAce.isRead()));
-				ace.setPreview(booleanToInt(guiAce.isPreview()));
-				ace.setPrint(booleanToInt(guiAce.isPrint()));
-				ace.setWrite(booleanToInt(guiAce.isWrite()));
-				ace.setSecurity(booleanToInt(guiAce.isSecurity()));
-				ace.setImmutable(booleanToInt(guiAce.isImmutable()));
-				ace.setDelete(booleanToInt(guiAce.isDelete()));
-				ace.setRename(booleanToInt(guiAce.isRename()));
-				ace.setArchive(booleanToInt(guiAce.isArchive()));
-				ace.setWorkflow(booleanToInt(guiAce.isWorkflow()));
-				ace.setSign(booleanToInt(guiAce.isSign()));
-				ace.setDownload(booleanToInt(guiAce.isDownload()));
-				ace.setCalendar(booleanToInt(guiAce.isCalendar()));
-				ace.setSubscription(booleanToInt(guiAce.isSubscription()));
-				ace.setPassword(booleanToInt(guiAce.isPassword()));
-				ace.setMove(booleanToInt(guiAce.isMove()));
-				ace.setEmail(booleanToInt(guiAce.isEmail()));
-				ace.setAutomation(booleanToInt(guiAce.isAutomation()));
-				ace.setReadingreq(booleanToInt(guiAce.isReadingreq()));
-				ace.setCustomid(booleanToInt(guiAce.isCustomid()));
-				ace.setRevision(booleanToInt(guiAce.isRevision()));
+				ace.setRead(guiAce.isRead());
+				ace.setPreview(guiAce.isPreview());
+				ace.setPrint(guiAce.isPrint());
+				ace.setWrite(guiAce.isWrite());
+				ace.setSecurity(guiAce.isSecurity());
+				ace.setImmutable(guiAce.isImmutable());
+				ace.setDelete(guiAce.isDelete());
+				ace.setRename(guiAce.isRename());
+				ace.setArchive(guiAce.isArchive());
+				ace.setWorkflow(guiAce.isWorkflow());
+				ace.setSign(guiAce.isSign());
+				ace.setDownload(guiAce.isDownload());
+				ace.setCalendar(guiAce.isCalendar());
+				ace.setSubscription(guiAce.isSubscription());
+				ace.setPassword(guiAce.isPassword());
+				ace.setMove(guiAce.isMove());
+				ace.setEmail(guiAce.isEmail());
+				ace.setAutomation(guiAce.isAutomation());
+				ace.setReadingreq(guiAce.isReadingreq());
+				ace.setCustomid(guiAce.isCustomid());
+				ace.setRevision(guiAce.isRevision());
 				acl.add(ace);
 			}
 

@@ -20,79 +20,79 @@ public class WSAccessControlEntry {
 	private long userId;
 
 	@WSDoc(description = "permission to read")
-	private int read = 1;
+	private boolean read = true;
 
 	@WSDoc(description = "permission to preview")
-	private int preview = 1;
+	private boolean preview = true;
 
 	@WSDoc(description = "permission to edit")
-	private int write = 0;
+	private boolean write = false;
 
 	@WSDoc(description = "permission to download")
-	private int download = 1;
+	private boolean download = true;
 
 	@WSDoc(description = "permission to add child elements")
-	private int add = 0;
+	private boolean add = false;
 
 	@WSDoc(description = "permission to change security policies")
-	private int security = 0;
+	private boolean security = false;
 
 	@WSDoc(description = "permission to delete")
-	private int delete = 0;
+	private boolean delete = false;
 
 	@WSDoc(description = "permission to rename")
-	private int rename = 0;
+	private boolean rename = false;
 
 	@WSDoc(description = "permission to mark a document as immutable")
-	private int immutable = 0;
+	private boolean immutable = false;
 
 	@WSDoc(description = "permission to import")
-	private int iimport = 0;
+	private boolean iimport = false;
 
 	@WSDoc(description = "permission to export")
-	private int export = 0;
+	private boolean export = false;
 
 	@WSDoc(description = "permission to digitally sign")
-	private int sign = 0;
+	private boolean sign = false;
 
 	@WSDoc(description = "permission to archive")
-	private int archive = 0;
+	private boolean archive = false;
 
 	@WSDoc(description = "permission to handle the workflow")
-	private int workflow = 0;
+	private boolean workflow = false;
 
 	@WSDoc(description = "permission to handle calendar events")
-	private int calendar = 0;
+	private boolean calendar = false;
 
 	@WSDoc(description = "permission to handle events subscription")
-	private int subscription = 0;
+	private boolean subscription = false;
 
 	@WSDoc(description = "permission to put a password")
-	private int password = 0;
+	private boolean password = false;
 
-	@WSDoc(description = "permission to print")
-	private int print = 1;
+	@WSDoc(description = "permission to prboolean")
+	private boolean prboolean = true;
 
 	@WSDoc(description = "permission to move")
-	private int move = 0;
+	private boolean move = false;
 
 	@WSDoc(description = "permission to send emails")
-	private int email = 1;
+	private boolean email = true;
 
 	@WSDoc(description = "permission to handle the automation")
-	private int automation = 0;
+	private boolean automation = false;
 
 	@WSDoc(description = "permission to handle the store")
-	private int store = 0;
+	private boolean store = false;
 
 	@WSDoc(description = "permission to send reading requests")
-	private int readingreq = 0;
+	private boolean readingreq = false;
 
 	@WSDoc(description = "permission to edit the Custom ID")
-	private int customid = 0;
+	private boolean customid = false;
 
 	@WSDoc(description = "permission to edit the Revision")
-	private int revision = 0;
+	private boolean revision = false;
 
 	public long getGroupId() {
 		return groupId;
@@ -100,182 +100,6 @@ public class WSAccessControlEntry {
 
 	public void setGroupId(long groupId) {
 		this.groupId = groupId;
-	}
-
-	public int getRead() {
-		return read;
-	}
-
-	public void setRead(int read) {
-		this.read = read;
-	}
-
-	public int getWrite() {
-		return write;
-	}
-
-	public void setWrite(int write) {
-		this.write = write;
-	}
-
-	public int getDownload() {
-		return download;
-	}
-
-	public void setDownload(int download) {
-		this.download = download;
-	}
-
-	public int getAdd() {
-		return add;
-	}
-
-	public void setAdd(int add) {
-		this.add = add;
-	}
-
-	public int getSecurity() {
-		return security;
-	}
-
-	public void setSecurity(int security) {
-		this.security = security;
-	}
-
-	public int getDelete() {
-		return delete;
-	}
-
-	public void setDelete(int delete) {
-		this.delete = delete;
-	}
-
-	public int getRename() {
-		return rename;
-	}
-
-	public void setRename(int rename) {
-		this.rename = rename;
-	}
-
-	public int getImmutable() {
-		return immutable;
-	}
-
-	public void setImmutable(int immutable) {
-		this.immutable = immutable;
-	}
-
-	public int getIimport() {
-		return iimport;
-	}
-
-	public void setIimport(int iimport) {
-		this.iimport = iimport;
-	}
-
-	public int getExport() {
-		return export;
-	}
-
-	public void setExport(int export) {
-		this.export = export;
-	}
-
-	public int getSign() {
-		return sign;
-	}
-
-	public void setSign(int sign) {
-		this.sign = sign;
-	}
-
-	public int getArchive() {
-		return archive;
-	}
-
-	public void setArchive(int archive) {
-		this.archive = archive;
-	}
-
-	public int getWorkflow() {
-		return workflow;
-	}
-
-	public void setWorkflow(int workflow) {
-		this.workflow = workflow;
-	}
-
-	public int getCalendar() {
-		return calendar;
-	}
-
-	public void setCalendar(int calendar) {
-		this.calendar = calendar;
-	}
-
-	public int getSubscription() {
-		return subscription;
-	}
-
-	public void setSubscription(int subscription) {
-		this.subscription = subscription;
-	}
-
-	public int getPassword() {
-		return password;
-	}
-
-	public void setPassword(int password) {
-		this.password = password;
-	}
-
-	public int getPrint() {
-		return print;
-	}
-
-	public void setPrint(int print) {
-		this.print = print;
-	}
-
-	public int getMove() {
-		return move;
-	}
-
-	public void setMove(int move) {
-		this.move = move;
-	}
-
-	public int getEmail() {
-		return email;
-	}
-
-	public void setEmail(int email) {
-		this.email = email;
-	}
-
-	public int getAutomation() {
-		return automation;
-	}
-
-	public void setAutomation(int automation) {
-		this.automation = automation;
-	}
-
-	public int getStore() {
-		return store;
-	}
-
-	public void setStore(int store) {
-		this.store = store;
-	}
-
-	public int getReadingreq() {
-		return readingreq;
-	}
-
-	public void setReadingreq(int readingreq) {
-		this.readingreq = readingreq;
 	}
 
 	public long getUserId() {
@@ -286,27 +110,203 @@ public class WSAccessControlEntry {
 		this.userId = userId;
 	}
 
-	public int getPreview() {
+	public boolean isRead() {
+		return read;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+
+	public boolean isPreview() {
 		return preview;
 	}
 
-	public void setPreview(int preview) {
+	public void setPreview(boolean preview) {
 		this.preview = preview;
 	}
 
-	public int getCustomid() {
+	public boolean isWrite() {
+		return write;
+	}
+
+	public void setWrite(boolean write) {
+		this.write = write;
+	}
+
+	public boolean isDownload() {
+		return download;
+	}
+
+	public void setDownload(boolean download) {
+		this.download = download;
+	}
+
+	public boolean isAdd() {
+		return add;
+	}
+
+	public void setAdd(boolean add) {
+		this.add = add;
+	}
+
+	public boolean isSecurity() {
+		return security;
+	}
+
+	public void setSecurity(boolean security) {
+		this.security = security;
+	}
+
+	public boolean isDelete() {
+		return delete;
+	}
+
+	public void setDelete(boolean delete) {
+		this.delete = delete;
+	}
+
+	public boolean isRename() {
+		return rename;
+	}
+
+	public void setRename(boolean rename) {
+		this.rename = rename;
+	}
+
+	public boolean isImmutable() {
+		return immutable;
+	}
+
+	public void setImmutable(boolean immutable) {
+		this.immutable = immutable;
+	}
+
+	public boolean isIimport() {
+		return iimport;
+	}
+
+	public void setIimport(boolean iimport) {
+		this.iimport = iimport;
+	}
+
+	public boolean isExport() {
+		return export;
+	}
+
+	public void setExport(boolean export) {
+		this.export = export;
+	}
+
+	public boolean isSign() {
+		return sign;
+	}
+
+	public void setSign(boolean sign) {
+		this.sign = sign;
+	}
+
+	public boolean isArchive() {
+		return archive;
+	}
+
+	public void setArchive(boolean archive) {
+		this.archive = archive;
+	}
+
+	public boolean isWorkflow() {
+		return workflow;
+	}
+
+	public void setWorkflow(boolean workflow) {
+		this.workflow = workflow;
+	}
+
+	public boolean isCalendar() {
+		return calendar;
+	}
+
+	public void setCalendar(boolean calendar) {
+		this.calendar = calendar;
+	}
+
+	public boolean isSubscription() {
+		return subscription;
+	}
+
+	public void setSubscription(boolean subscription) {
+		this.subscription = subscription;
+	}
+
+	public boolean isPassword() {
+		return password;
+	}
+
+	public void setPassword(boolean password) {
+		this.password = password;
+	}
+
+	public boolean isPrboolean() {
+		return prboolean;
+	}
+
+	public void setPrboolean(boolean prboolean) {
+		this.prboolean = prboolean;
+	}
+
+	public boolean isMove() {
+		return move;
+	}
+
+	public void setMove(boolean move) {
+		this.move = move;
+	}
+
+	public boolean isEmail() {
+		return email;
+	}
+
+	public void setEmail(boolean email) {
+		this.email = email;
+	}
+
+	public boolean isAutomation() {
+		return automation;
+	}
+
+	public void setAutomation(boolean automation) {
+		this.automation = automation;
+	}
+
+	public boolean isStore() {
+		return store;
+	}
+
+	public void setStore(boolean store) {
+		this.store = store;
+	}
+
+	public boolean isReadingreq() {
+		return readingreq;
+	}
+
+	public void setReadingreq(boolean readingreq) {
+		this.readingreq = readingreq;
+	}
+
+	public boolean isCustomid() {
 		return customid;
 	}
 
-	public void setCustomid(int customid) {
+	public void setCustomid(boolean customid) {
 		this.customid = customid;
 	}
 
-	public int getRevision() {
+	public boolean isRevision() {
 		return revision;
 	}
 
-	public void setRevision(int revision) {
+	public void setRevision(boolean revision) {
 		this.revision = revision;
 	}
 }

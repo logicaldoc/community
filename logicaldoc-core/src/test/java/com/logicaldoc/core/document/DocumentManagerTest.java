@@ -843,8 +843,8 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		Set<FolderAccessControlEntry> acl = new HashSet<>();
 		FolderAccessControlEntry ace = new FolderAccessControlEntry();
 		ace.setGroupId(2L);
-		ace.setRead(1);
-		ace.setWrite(0);
+		ace.setRead(true);
+		ace.setWrite(false);
 		acl.add(ace);
 
 		Folder folder1 = new Folder();

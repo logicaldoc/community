@@ -119,7 +119,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	private static final String ANONYMOUS_USER = "%s.anonymous.user";
 
 	private static final String SECURITY_PREVIEW_CONTENTCHECK = "%s.security.preview.contentcheck";
-	
+
 	private static final String ANONYMOUS_KEY = "%s.anonymous.key";
 
 	private static final String ANONYMOUS_ENABLED = "%s.anonymous.enabled";
@@ -748,7 +748,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			setGroups(user, guiUser, transaction);
 
 			// Notify the user by email
-			if(createNew && user.getSource().equals(UserSource.DEFAULT))
+			if (createNew && user.getSource().equals(UserSource.DEFAULT))
 				user.setDecodedPassword(decodedPassword);
 			notifyUser(guiUser, user, createNew);
 		} catch (MessagingException me) {
@@ -1135,7 +1135,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		conf.setProperty("%s.security.user.maxinactivity".formatted(tenant),
 				settings.getMaxInactivity() == null || settings.getMaxInactivity().intValue() <= 0 ? ""
 						: Integer.toString(settings.getMaxInactivity()));
-		conf.setProperty("%s.password.enforcehistory".formatted(tenant), Integer.toString(settings.getPwdEnforceHistory()));
+		conf.setProperty("%s.password.enforcehistory".formatted(tenant),
+				Integer.toString(settings.getPwdEnforceHistory()));
 		conf.setProperty("%s.password.checklogin".formatted(tenant), Boolean.toString(settings.isPwdCheckLogin()));
 		conf.setProperty(PASSWORD_SIZE.formatted(tenant), Integer.toString(settings.getPwdSize()));
 		conf.setProperty(PASSWORD_LOWERCASE.formatted(tenant), Integer.toString(settings.getPwdLowerCase()));
@@ -1188,8 +1189,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			AccessControlEntry ace = new AccessControlEntry();
 			ace.setGroupId(right.getEntityId());
-			ace.setRead(right.isRead() ? 1 : 0);
-			ace.setWrite(right.isWrite() ? 1 : 0);
+			ace.setRead(right.isRead());
+			ace.setWrite(right.isWrite());
 			grps.add(ace);
 		}
 
@@ -1343,7 +1344,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		for (AccessControlEntry mg : menu.getAccessControlList()) {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setEntityId(mg.getGroupId());
-			ace.setWrite(mg.getWrite() == 1);
+			ace.setWrite(mg.isWrite());
 
 			Group group = gdao.findById(mg.getGroupId());
 			if (group == null)

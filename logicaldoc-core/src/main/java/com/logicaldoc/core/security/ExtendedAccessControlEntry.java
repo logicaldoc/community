@@ -25,61 +25,61 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 	private AccessControlEntry ace = new AccessControlEntry();
 
 	@Column(name = "ld_preview", nullable = false)
-	protected int preview = 1;
+	protected boolean preview = true;
 
 	@Column(name = "ld_download", nullable = false)
-	protected int download = 1;
+	protected boolean download = true;
 
 	@Column(name = "ld_security", nullable = false)
-	protected int security = 0;
+	protected boolean security = false;
 
 	@Column(name = "ld_delete", nullable = false)
-	protected int delete = 0;
+	protected boolean delete = false;
 
 	@Column(name = "ld_rename", nullable = false)
-	protected int rename = 0;
+	protected boolean rename = false;
 
 	@Column(name = "ld_immutable", nullable = false)
-	protected int immutable = 0;
+	protected boolean immutable = false;
 
 	@Column(name = "ld_sign", nullable = false)
-	protected int sign = 0;
+	protected boolean sign = false;
 
 	@Column(name = "ld_archive", nullable = false)
-	protected int archive = 0;
+	protected boolean archive = false;
 
 	@Column(name = "ld_workflow", nullable = false)
-	protected int workflow = 0;
+	protected boolean workflow = false;
 
 	@Column(name = "ld_calendar", nullable = false)
-	protected int calendar = 0;
+	protected boolean calendar = false;
 
 	@Column(name = "ld_subscription", nullable = false)
-	protected int subscription = 0;
+	protected boolean subscription = false;
 
 	@Column(name = "ld_password", nullable = false)
-	protected int password = 0;
+	protected boolean password = false;
 
 	@Column(name = "ld_print", nullable = false)
-	protected int print = 1;
+	protected boolean print = true;
 
 	@Column(name = "ld_move", nullable = false)
-	protected int move = 0;
+	protected boolean move = false;
 
 	@Column(name = "ld_email", nullable = false)
-	protected int email = 1;
+	protected boolean email = true;
 
 	@Column(name = "ld_automation", nullable = false)
-	protected int automation = 0;
+	protected boolean automation = false;
 
 	@Column(name = "ld_readingreq", nullable = false)
-	protected int readingreq = 0;
+	protected boolean readingreq = false;
 
 	@Column(name = "ld_customid", nullable = false)
-	protected int customid = 0;
+	protected boolean customid = false;
 
 	@Column(name = "ld_revision", nullable = false)
-	protected int revision = 0;
+	protected boolean revision = false;
 
 	public ExtendedAccessControlEntry() {
 	}
@@ -121,194 +121,172 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		this.ace = ace;
 	}
 
-	protected void grantedBasicPermissions(Set<Permission> granted) {
-		if (read == 1)
-			granted.add(Permission.READ);
-		if (preview == 1)
-			granted.add(Permission.PREVIEW);
-		if (write == 1)
-			granted.add(Permission.WRITE);
-		if (rename == 1)
-			granted.add(Permission.RENAME);
-		if (delete == 1)
-			granted.add(Permission.DELETE);
-		if (download == 1)
-			granted.add(Permission.DOWNLOAD);
-		if (move == 1)
-			granted.add(Permission.MOVE);
-		if (print == 1)
-			granted.add(Permission.PRINT);
-		if (email == 1)
-			granted.add(Permission.EMAIL);
+	public boolean isRead() {
+		return ace.isRead();
 	}
 
-	@Override
-	public void grantPermissions(Set<Permission> permissions) {
-		super.grantPermissions(permissions);
-		ace.grantPermissions(permissions);
-		preview = booleanToInt(permissions.contains(Permission.PREVIEW));
-		download = booleanToInt(permissions.contains(Permission.DOWNLOAD));
-		security = booleanToInt(permissions.contains(Permission.SECURITY));
-		delete = booleanToInt(permissions.contains(Permission.DELETE));
-		rename = booleanToInt(permissions.contains(Permission.RENAME));
-		immutable = booleanToInt(permissions.contains(Permission.IMMUTABLE));
-		sign = booleanToInt(permissions.contains(Permission.SIGN));
-		archive = booleanToInt(permissions.contains(Permission.ARCHIVE));
-		workflow = booleanToInt(permissions.contains(Permission.WORKFLOW));
-		calendar = booleanToInt(permissions.contains(Permission.CALENDAR));
-		subscription = booleanToInt(permissions.contains(Permission.SUBSCRIPTION));
-		password = booleanToInt(permissions.contains(Permission.PASSWORD));
-		print = booleanToInt(permissions.contains(Permission.PRINT));
-		move = booleanToInt(permissions.contains(Permission.MOVE));
-		email = booleanToInt(permissions.contains(Permission.EMAIL));
-		automation = booleanToInt(permissions.contains(Permission.AUTOMATION));
-		readingreq = booleanToInt(permissions.contains(Permission.READINGREQ));
-		customid = booleanToInt(permissions.contains(Permission.CUSTOMID));
-		revision = booleanToInt(permissions.contains(Permission.REVISION));
+	public void setRead(boolean read) {
+		ace.setRead(read);
 	}
 
-	public int getPreview() {
+	public boolean isWrite() {
+		return ace.isWrite();
+	}
+
+	public void setWrite(boolean write) {
+		ace.setWrite(write);
+	}
+
+	public boolean isPreview() {
 		return preview;
 	}
 
-	public void setPreview(int preview) {
+	public void setPreview(boolean preview) {
 		this.preview = preview;
 	}
 
-	public int getDownload() {
+	public boolean isDownload() {
 		return download;
 	}
 
-	public void setDownload(int download) {
+	public void setDownload(boolean download) {
 		this.download = download;
 	}
 
-	public int getSecurity() {
+	public boolean isSecurity() {
 		return security;
 	}
 
-	public void setSecurity(int security) {
+	public void setSecurity(boolean security) {
 		this.security = security;
 	}
 
-	public int getDelete() {
+	public boolean isDelete() {
 		return delete;
 	}
 
-	public void setDelete(int delete) {
+	public void setDelete(boolean delete) {
 		this.delete = delete;
 	}
 
-	public int getRename() {
+	public boolean isRename() {
 		return rename;
 	}
 
-	public void setRename(int rename) {
+	public void setRename(boolean rename) {
 		this.rename = rename;
 	}
 
-	public int getImmutable() {
+	public boolean isImmutable() {
 		return immutable;
 	}
 
-	public void setImmutable(int immutable) {
+	public void setImmutable(boolean immutable) {
 		this.immutable = immutable;
 	}
 
-	public int getSign() {
+	public boolean isSign() {
 		return sign;
 	}
 
-	public void setSign(int sign) {
+	public void setSign(boolean sign) {
 		this.sign = sign;
 	}
 
-	public int getArchive() {
+	public boolean isArchive() {
 		return archive;
 	}
 
-	public void setArchive(int archive) {
+	public void setArchive(boolean archive) {
 		this.archive = archive;
 	}
 
-	public int getWorkflow() {
+	public boolean isWorkflow() {
 		return workflow;
 	}
 
-	public void setWorkflow(int workflow) {
+	public void setWorkflow(boolean workflow) {
 		this.workflow = workflow;
 	}
 
-	public int getCalendar() {
+	public boolean isCalendar() {
 		return calendar;
 	}
 
-	public void setCalendar(int calendar) {
+	public void setCalendar(boolean calendar) {
 		this.calendar = calendar;
 	}
 
-	public int getSubscription() {
+	public boolean isSubscription() {
 		return subscription;
 	}
 
-	public void setSubscription(int subscription) {
+	public void setSubscription(boolean subscription) {
 		this.subscription = subscription;
 	}
 
-	public int getPassword() {
+	public boolean isPassword() {
 		return password;
 	}
 
-	public void setPassword(int password) {
+	public void setPassword(boolean password) {
 		this.password = password;
 	}
 
-	public int getPrint() {
+	public boolean isPrint() {
 		return print;
 	}
 
-	public void setPrint(int print) {
+	public void setPrint(boolean print) {
 		this.print = print;
 	}
 
-	public int getMove() {
+	public boolean isMove() {
 		return move;
 	}
 
-	public void setMove(int move) {
+	public void setMove(boolean move) {
 		this.move = move;
 	}
 
-	public int getEmail() {
+	public boolean isEmail() {
 		return email;
 	}
 
-	public void setEmail(int email) {
+	public void setEmail(boolean email) {
 		this.email = email;
 	}
 
-	public int getAutomation() {
+	public boolean isAutomation() {
 		return automation;
 	}
 
-	public void setAutomation(int automation) {
+	public void setAutomation(boolean automation) {
 		this.automation = automation;
 	}
 
-	public int getReadingreq() {
+	public boolean isReadingreq() {
 		return readingreq;
 	}
 
-	public void setReadingreq(int readingreq) {
+	public void setReadingreq(boolean readingreq) {
 		this.readingreq = readingreq;
 	}
 
-	public int getCustomid() {
+	public boolean isCustomid() {
 		return customid;
 	}
 
-	public void setCustomid(int customid) {
+	public void setCustomid(boolean customid) {
 		this.customid = customid;
+	}
+
+	public boolean isRevision() {
+		return revision;
+	}
+
+	public void setRevision(boolean revision) {
+		this.revision = revision;
 	}
 
 	@Override
@@ -317,83 +295,101 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 	}
 
 	@Override
-	public int getWrite() {
-		return ace.getWrite();
-	}
-
-	@Override
 	public void setGroupId(long groupId) {
 		ace.setGroupId(groupId);
 	}
 
-	@Override
-	public void setWrite(int write) {
-		ace.setWrite(write);
+	protected void grantedBasicPermissions(Set<Permission> granted) {
+		if (read)
+			granted.add(Permission.READ);
+		if (preview)
+			granted.add(Permission.PREVIEW);
+		if (write)
+			granted.add(Permission.WRITE);
+		if (rename)
+			granted.add(Permission.RENAME);
+		if (delete)
+			granted.add(Permission.DELETE);
+		if (download)
+			granted.add(Permission.DOWNLOAD);
+		if (move)
+			granted.add(Permission.MOVE);
+		if (print)
+			granted.add(Permission.PRINT);
+		if (email)
+			granted.add(Permission.EMAIL);
 	}
 
 	@Override
-	public int getRead() {
-		return ace.getRead();
-	}
-
-	@Override
-	public void setRead(int read) {
-		ace.setRead(read);
-	}
-
-	public int getRevision() {
-		return revision;
-	}
-
-	public void setRevision(int revision) {
-		this.revision = revision;
+	public void grantPermissions(Set<Permission> permissions) {
+		super.grantPermissions(permissions);
+		ace.grantPermissions(permissions);
+		preview = permissions.contains(Permission.PREVIEW);
+		download = permissions.contains(Permission.DOWNLOAD);
+		security = permissions.contains(Permission.SECURITY);
+		delete = permissions.contains(Permission.DELETE);
+		rename = permissions.contains(Permission.RENAME);
+		immutable = permissions.contains(Permission.IMMUTABLE);
+		sign = permissions.contains(Permission.SIGN);
+		archive = permissions.contains(Permission.ARCHIVE);
+		workflow = permissions.contains(Permission.WORKFLOW);
+		calendar = permissions.contains(Permission.CALENDAR);
+		subscription = permissions.contains(Permission.SUBSCRIPTION);
+		password = permissions.contains(Permission.PASSWORD);
+		print = permissions.contains(Permission.PRINT);
+		move = permissions.contains(Permission.MOVE);
+		email = permissions.contains(Permission.EMAIL);
+		automation = permissions.contains(Permission.AUTOMATION);
+		readingreq = permissions.contains(Permission.READINGREQ);
+		customid = permissions.contains(Permission.CUSTOMID);
+		revision = permissions.contains(Permission.REVISION);
 	}
 
 	@Override
 	public Set<Permission> grantedPermissions() {
 		Set<Permission> granted = ace.grantedPermissions();
-		if (preview == 1)
+		if (preview)
 			granted.add(Permission.PREVIEW);
-		if (download == 1)
+		if (download)
 			granted.add(Permission.DOWNLOAD);
-		if (security == 1)
+		if (security)
 			granted.add(Permission.SECURITY);
-		if (delete == 1)
+		if (delete)
 			granted.add(Permission.DELETE);
-		if (rename == 1)
+		if (rename)
 			granted.add(Permission.RENAME);
-		if (immutable == 1)
+		if (immutable)
 			granted.add(Permission.IMMUTABLE);
-		if (sign == 1)
+		if (sign)
 			granted.add(Permission.SIGN);
-		if (archive == 1)
+		if (archive)
 			granted.add(Permission.ARCHIVE);
-		if (workflow == 1)
+		if (workflow)
 			granted.add(Permission.WORKFLOW);
 		grantedMorePermissions(granted);
 		return granted;
 	}
 
 	private void grantedMorePermissions(Set<Permission> granted) {
-		if (calendar == 1)
+		if (calendar)
 			granted.add(Permission.CALENDAR);
-		if (subscription == 1)
+		if (subscription)
 			granted.add(Permission.SUBSCRIPTION);
-		if (password == 1)
+		if (password)
 			granted.add(Permission.PASSWORD);
-		if (print == 1)
+		if (print)
 			granted.add(Permission.PRINT);
-		if (move == 1)
+		if (move)
 			granted.add(Permission.MOVE);
-		if (email == 1)
+		if (email)
 			granted.add(Permission.EMAIL);
-		if (automation == 1)
+		if (automation)
 			granted.add(Permission.AUTOMATION);
-		if (readingreq == 1)
+		if (readingreq)
 			granted.add(Permission.READINGREQ);
-		if (customid == 1)
+		if (customid)
 			granted.add(Permission.CUSTOMID);
-		if (revision == 1)
+		if (revision)
 			granted.add(Permission.REVISION);
 	}
 

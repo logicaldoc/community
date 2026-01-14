@@ -19,10 +19,10 @@ public class AccessControlEntry implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Column(name = "ld_read", nullable = false)
-	protected int read = 1;
+	protected boolean read = true;
 
 	@Column(name = "ld_write", nullable = false)
-	protected int write = 0;
+	protected boolean write = false;
 
 	@Column(name = "ld_groupid", nullable = false)
 	protected long groupId;
@@ -40,50 +40,46 @@ public class AccessControlEntry implements Serializable {
 		this.groupId = groupId;
 	}
 
-	public long getGroupId() {
-		return groupId;
-	}
-
-	public int getWrite() {
-		return write;
-	}
-
 	public void setGroupId(long groupId) {
 		this.groupId = groupId;
 	}
 
-	public void setWrite(int write) {
-		this.write = write;
+	public long getGroupId() {
+		return groupId;
 	}
-
-	public int getRead() {
+	
+	public boolean isRead() {
 		return read;
 	}
 
-	public void setRead(int read) {
+	public void setRead(boolean read) {
 		this.read = read;
+	}
+
+	public boolean isWrite() {
+		return write;
+	}
+
+	public void setWrite(boolean write) {
+		this.write = write;
 	}
 
 	public Set<Permission> grantedPermissions() {
 		HashSet<Permission> granted = new HashSet<>();
-		if (read == 1)
+		if (read)
 			granted.add(Permission.READ);
 
-		if (write == 1)
+		if (write)
 			granted.add(Permission.WRITE);
 
 		return granted;
 	}
 
 	public void grantPermissions(Set<Permission> permissions) {
-		read = booleanToInt(permissions.contains(Permission.READ));
-		write = booleanToInt(permissions.contains(Permission.WRITE));
+		read = permissions.contains(Permission.READ);
+		write = permissions.contains(Permission.WRITE);
 	}
 
-	protected int booleanToInt(boolean bool) {
-		return bool ? 1 : 0;
-	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof AccessControlEntry ace)

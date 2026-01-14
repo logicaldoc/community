@@ -351,27 +351,27 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			for (FolderAccessControlEntry ace : securityRef.getAccessControlList()) {
 				GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
 				guiAce.setEntityId(ace.getGroupId());
-				guiAce.setAdd(ace.getAdd() == 1);
-				guiAce.setWrite(ace.getWrite() == 1);
-				guiAce.setCustomid(ace.getCustomid() == 1);
-				guiAce.setRevision(ace.getRevision() == 1);
-				guiAce.setSecurity(ace.getSecurity() == 1);
-				guiAce.setImmutable(ace.getImmutable() == 1);
-				guiAce.setDelete(ace.getDelete() == 1);
-				guiAce.setRename(ace.getRename() == 1);
-				guiAce.setImport(ace.getImport() == 1);
-				guiAce.setExport(ace.getExport() == 1);
-				guiAce.setSign(ace.getSign() == 1);
-				guiAce.setArchive(ace.getArchive() == 1);
-				guiAce.setWorkflow(ace.getWorkflow() == 1);
-				guiAce.setDownload(ace.getDownload() == 1);
-				guiAce.setCalendar(ace.getCalendar() == 1);
-				guiAce.setSubscription(ace.getSubscription() == 1);
-				guiAce.setPassword(ace.getPassword() == 1);
-				guiAce.setMove(ace.getMove() == 1);
-				guiAce.setEmail(ace.getEmail() == 1);
-				guiAce.setAutomation(ace.getAutomation() == 1);
-				guiAce.setStore(ace.getStore() == 1);
+				guiAce.setAdd(ace.isAdd());
+				guiAce.setWrite(ace.isWrite());
+				guiAce.setCustomid(ace.isCustomid());
+				guiAce.setRevision(ace.isRevision());
+				guiAce.setSecurity(ace.isSecurity());
+				guiAce.setImmutable(ace.isImmutable());
+				guiAce.setDelete(ace.isDelete());
+				guiAce.setRename(ace.isRename());
+				guiAce.setImport(ace.isImport());
+				guiAce.setExport(ace.isExport());
+				guiAce.setSign(ace.isSign());
+				guiAce.setArchive(ace.isArchive());
+				guiAce.setWorkflow(ace.isWorkflow());
+				guiAce.setDownload(ace.isDownload());
+				guiAce.setCalendar(ace.isCalendar());
+				guiAce.setSubscription(ace.isSubscription());
+				guiAce.setPassword(ace.isPassword());
+				guiAce.setMove(ace.isMove());
+				guiAce.setEmail(ace.isEmail());
+				guiAce.setAutomation(ace.isAutomation());
+				guiAce.setStore(ace.isStore());
 
 				acl.add(guiAce);
 			}
@@ -736,10 +736,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	}
 
-	private int booleanToInt(boolean bool) {
-		return bool ? 1 : 0;
-	}
-
 	private void saveACL(Session session, Folder folder, List<GUIAccessControlEntry> acl) throws PersistenceException {
 		FolderDAO fdao = FolderDAO.get();
 
@@ -752,31 +748,31 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			fg.setGroupId(ace.getEntityId());
 			grps.add(fg);
 
-			fg.setRead(booleanToInt(ace.isRead()));
-			fg.setPreview(booleanToInt(ace.isPreview()));
-			fg.setPrint(booleanToInt(ace.isPrint()));
-			fg.setWrite(booleanToInt(ace.isWrite()));
-			fg.setAdd(booleanToInt(ace.isAdd()));
-			fg.setSecurity(booleanToInt(ace.isSecurity()));
-			fg.setImmutable(booleanToInt(ace.isImmutable()));
-			fg.setDelete(booleanToInt(ace.isDelete()));
-			fg.setRename(booleanToInt(ace.isRename()));
-			fg.setImport(booleanToInt(ace.isImport()));
-			fg.setExport(booleanToInt(ace.isExport()));
-			fg.setArchive(booleanToInt(ace.isArchive()));
-			fg.setWorkflow(booleanToInt(ace.isWorkflow()));
-			fg.setSign(booleanToInt(ace.isSign()));
-			fg.setDownload(booleanToInt(ace.isDownload()));
-			fg.setCalendar(booleanToInt(ace.isCalendar()));
-			fg.setSubscription(booleanToInt(ace.isSubscription()));
-			fg.setPassword(booleanToInt(ace.isPassword()));
-			fg.setMove(booleanToInt(ace.isMove()));
-			fg.setEmail(booleanToInt(ace.isEmail()));
-			fg.setAutomation(booleanToInt(ace.isAutomation()));
-			fg.setStore(booleanToInt(ace.isStore()));
-			fg.setReadingreq(booleanToInt(ace.isReadingreq()));
-			fg.setCustomid(booleanToInt(ace.isCustomid()));
-			fg.setRevision(booleanToInt(ace.isRevision()));
+			fg.setRead(ace.isRead());
+			fg.setPreview(ace.isPreview());
+			fg.setPrint(ace.isPrint());
+			fg.setWrite(ace.isWrite());
+			fg.setAdd(ace.isAdd());
+			fg.setSecurity(ace.isSecurity());
+			fg.setImmutable(ace.isImmutable());
+			fg.setDelete(ace.isDelete());
+			fg.setRename(ace.isRename());
+			fg.setImport(ace.isImport());
+			fg.setExport(ace.isExport());
+			fg.setArchive(ace.isArchive());
+			fg.setWorkflow(ace.isWorkflow());
+			fg.setSign(ace.isSign());
+			fg.setDownload(ace.isDownload());
+			fg.setCalendar(ace.isCalendar());
+			fg.setSubscription(ace.isSubscription());
+			fg.setPassword(ace.isPassword());
+			fg.setMove(ace.isMove());
+			fg.setEmail(ace.isEmail());
+			fg.setAutomation(ace.isAutomation());
+			fg.setStore(ace.isStore());
+			fg.setReadingreq(ace.isReadingreq());
+			fg.setCustomid(ace.isCustomid());
+			fg.setRevision(ace.isRevision());
 		}
 
 		folder.getAccessControlList().clear();

@@ -144,7 +144,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 		dao.inheritACLs(group, 2);
 		menu = menuDao.findById(5L);
 		menuDao.initialize(menu);
-		assertEquals(1, menu.getAccessControlEntry(group.getId()).getRead());
+		assertTrue(menu.getAccessControlEntry(group.getId()).isRead());
 
 		menu = menuDao.findById(2L);
 		menuDao.initialize(menu);

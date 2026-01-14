@@ -178,40 +178,40 @@ public class SoapDocumentMetadataServiceTest extends AbstractWebserviceTestCase 
 
 		assertNull(testSubject.getAttributeSetById("", -1L));
 	}
-	
+
 	@Test
 	public void testGetAccessControlList() throws Exception {
 		List<WSAccessControlEntry> acl = testSubject.getAccessControlList("", -1);
 		assertEquals(2, acl.size());
-		
-		WSAccessControlEntry ace=new WSAccessControlEntry();
+
+		WSAccessControlEntry ace = new WSAccessControlEntry();
 		ace.setGroupId(-4);
-		ace.setRead(1);
+		ace.setRead(true);
 		acl.add(ace);
-		
+
 		testSubject.setAccessControlList("", -1, acl);
-		
+
 		acl = testSubject.getAccessControlList("", -1);
 		assertEquals(3, acl.size());
 	}
-	
+
 	@Test
 	public void testGetAttributeOptionsByCategory() throws Exception {
 		List<String> options = testSubject.getAttributeOptions("", -1, "multi");
 		assertEquals(3, options.size());
-		
+
 		options = testSubject.getAttributeOptions("", -1, "unexisting");
 		assertEquals(0, options.size());
-		
+
 		List<WSAttributeOption> opts = testSubject.getAttributeOptionsByCategory("", -1, "multi", "country");
 		assertEquals(2, opts.size());
-		
+
 		opts = testSubject.getAttributeOptionsByCategory("", -1, "multi", "city");
 		assertEquals(1, opts.size());
-		
+
 		opts = testSubject.getAttributeOptionsByCategory("", -1, "multi", "unexisting");
 		assertEquals(0, opts.size());
-		
+
 		opts = testSubject.getAttributeOptionsByCategory("", -1, "unexisting", "country");
 		assertEquals(0, opts.size());
 	}

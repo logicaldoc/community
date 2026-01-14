@@ -430,22 +430,22 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		List<WSAccessControlEntry> acl = new ArrayList<>();
 		WSAccessControlEntry ace = new WSAccessControlEntry();
 		ace.setGroupId(2L);
-		ace.setRead(1);
-		ace.setWrite(1);
+		ace.setRead(true);
+		ace.setWrite(true);
 		acl.add(ace);
 
 		ace = new WSAccessControlEntry();
 		ace.setGroupId(3L);
-		ace.setRead(1);
-		ace.setWrite(0);
+		ace.setRead(true);
+		ace.setWrite(false);
 		acl.add(ace);
 
 		testSubject.setAccessControlList(session.getSid(), 1L, acl);
 
 		acl = testSubject.getAccessControlList(session.getSid(), 1L);
 		assertEquals(2, acl.size());
-		assertTrue(acl.stream().anyMatch(a -> a.getGroupId() == 2L && a.getWrite() == 1));
-		assertTrue(acl.stream().anyMatch(a -> a.getGroupId() == 3L && a.getWrite() == 0));
+		assertTrue(acl.stream().anyMatch(a -> a.getGroupId() == 2L && a.isWrite()));
+		assertTrue(acl.stream().anyMatch(a -> a.getGroupId() == 3L && !a.isWrite()));
 	}
 
 	@Test

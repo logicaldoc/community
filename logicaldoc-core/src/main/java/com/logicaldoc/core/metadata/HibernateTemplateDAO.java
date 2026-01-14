@@ -160,7 +160,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		jdbcUpdate("delete from ld_template_acl where ld_templateid=" + template.getId());
 		for (AccessControlEntry ace : template.getAccessControlList()) {
 			jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_write, ld_read) values ("
-					+ template.getId() + ", " + ace.getGroupId() + ", " + ace.getWrite() + ", " + ace.getRead() + ")");
+					+ template.getId() + ", " + ace.getGroupId() + ", " + (ace.isWrite() ? "1" : "0") + ", " + (ace.isRead() ? "1" : "0" )+ ")");
 		}
 
 		if (log.isDebugEnabled())
@@ -174,7 +174,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		for (AccessControlEntry ace : template.getAccessControlList()) {
 			Group group = gDao.findById(ace.getGroupId());
 			if (group != null && group.isGuest()) {
-				ace.setWrite(0);
+				ace.setWrite(false);
 			}
 		}
 	}
@@ -214,8 +214,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 					null, null, rows -> {
 						while (rows.next()) {
 							AccessControlEntry ace = new AccessControlEntry(rows.getLong(1));
-							ace.setWrite(rows.getInt(2));
-							ace.setRead(rows.getInt(3));
+							ace.setWrite(rows.getInt(2) == 1);
+							ace.setRead(rows.getInt(3) == 1);
 							template.addAccessControlEntry(ace);
 						}
 					});

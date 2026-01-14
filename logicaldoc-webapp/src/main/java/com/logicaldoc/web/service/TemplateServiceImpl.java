@@ -214,7 +214,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			// this
 			// template
 			AccessControlEntry ace = new AccessControlEntry(session.getUser().getUserGroup().getId());
-			ace.setWrite(1);
+			ace.setWrite(true);
 			template.addAccessControlEntry(ace);
 
 			GUIAccessControlEntry r = new GUIAccessControlEntry();
@@ -235,8 +235,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		for (GUIAccessControlEntry guiAce : guiTemplate.getAccessControlList()) {
 			AccessControlEntry ace = new AccessControlEntry();
 			ace.setGroupId(guiAce.getEntityId());
-			ace.setRead(guiAce.isRead() ? 1 : 0);
-			ace.setWrite(guiAce.isWrite() ? 1 : 0);
+			ace.setRead(guiAce.isRead());
+			ace.setWrite(guiAce.isWrite());
 			template.getAccessControlList().add(ace);
 		}
 	}
@@ -286,8 +286,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		for (AccessControlEntry tg : template.getAccessControlList()) {
 			GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
 			guiAce.setEntityId(tg.getGroupId());
-			guiAce.setRead(tg.getRead() == 1);
-			guiAce.setWrite(tg.getWrite() == 1);
+			guiAce.setRead(tg.isRead());
+			guiAce.setWrite(tg.isWrite());
 			guiTemplate.getAccessControlList().add(guiAce);
 		}
 

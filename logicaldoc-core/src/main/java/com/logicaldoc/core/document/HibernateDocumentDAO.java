@@ -379,18 +379,18 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		for (DocumentAccessControlEntry ace : document.getAccessControlList()) {
 			Group group = groupDAO.findById(ace.getGroupId());
 			if (group != null && group.isGuest()) {
-				ace.setArchive(0);
-				ace.setAutomation(0);
-				ace.setCalendar(0);
-				ace.setDelete(0);
-				ace.setImmutable(0);
-				ace.setMove(0);
-				ace.setPassword(0);
-				ace.setRename(0);
-				ace.setSecurity(0);
-				ace.setSign(0);
-				ace.setWorkflow(0);
-				ace.setWrite(0);
+				ace.setArchive(false);
+				ace.setAutomation(false);
+				ace.setCalendar(false);
+				ace.setDelete(false);
+				ace.setImmutable(false);
+				ace.setMove(false);
+				ace.setPassword(false);
+				ace.setRename(false);
+				ace.setSecurity(false);
+				ace.setSign(false);
+				ace.setWorkflow(false);
+				ace.setWrite(false);
 			}
 		}
 	}

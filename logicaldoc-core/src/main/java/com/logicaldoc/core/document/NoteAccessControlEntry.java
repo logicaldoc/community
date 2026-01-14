@@ -24,10 +24,10 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 	private AccessControlEntry ace = new AccessControlEntry();
 
 	@Column(name = "ld_security", nullable = false)
-	protected int security = 0;
+	protected boolean security = false;
 
 	@Column(name = "ld_delete", nullable = false)
-	protected int delete = 0;
+	protected boolean delete = false;
 
 	public NoteAccessControlEntry() {
 	}
@@ -56,23 +56,23 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 	public void grantPermissions(Set<Permission> permissions) {
 		super.grantPermissions(permissions);
 		ace.grantPermissions(permissions);
-		security = booleanToInt(permissions.contains(Permission.SECURITY));
-		delete = booleanToInt(permissions.contains(Permission.DELETE));
+		security = permissions.contains(Permission.SECURITY);
+		delete = permissions.contains(Permission.DELETE);
 	}
 
-	public int getSecurity() {
+	public boolean isSecurity() {
 		return security;
 	}
 
-	public void setSecurity(int security) {
+	public void setSecurity(boolean security) {
 		this.security = security;
 	}
 
-	public int getDelete() {
+	public boolean isDelete() {
 		return delete;
 	}
 
-	public void setDelete(int delete) {
+	public void setDelete(boolean delete) {
 		this.delete = delete;
 	}
 
@@ -81,37 +81,24 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 		return ace.getGroupId();
 	}
 
-	@Override
-	public int getWrite() {
-		return ace.getWrite();
-	}
-
-	@Override
 	public void setGroupId(long groupId) {
 		ace.setGroupId(groupId);
 	}
 
-	@Override
-	public void setWrite(int write) {
-		ace.setWrite(write);
+	public boolean isRead() {
+		return ace.isRead();
 	}
 
-	@Override
-	public int getRead() {
-		return ace.getRead();
-	}
-
-	@Override
-	public void setRead(int read) {
-		ace.setRead(read);
+	public boolean isWrite() {
+		return ace.isWrite();
 	}
 
 	@Override
 	public Set<Permission> grantedPermissions() {
 		Set<Permission> granted = ace.grantedPermissions();
-		if (security == 1)
+		if (security)
 			granted.add(Permission.SECURITY);
-		if (delete == 1)
+		if (delete)
 			granted.add(Permission.DELETE);
 		return granted;
 	}
@@ -121,7 +108,8 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((ace == null) ? 0 : ace.hashCode());
-		return result;
+		result = prime * result + (delete ? 1231 : 1237);
+		return prime * result + (security ? 1231 : 1237);
 	}
 
 	@Override
@@ -138,7 +126,9 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 				return false;
 		} else if (!ace.equals(other.ace))
 			return false;
-		return true;
+		if (delete != other.delete)
+			return false;
+		return security == other.security;
 	}
 
 	@Override

@@ -204,24 +204,24 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		for (FolderAccessControlEntry ace : folder.getAccessControlList()) {
 			Group group = gDao.findById(ace.getGroupId());
 			if (group != null && group.isGuest()) {
-				ace.setAdd(0);
-				ace.setArchive(0);
-				ace.setAutomation(0);
-				ace.setCalendar(0);
-				ace.setDelete(0);
-				ace.setExport(0);
-				ace.setImmutable(0);
-				ace.setImport(0);
-				ace.setMove(0);
-				ace.setPassword(0);
-				ace.setRename(0);
-				ace.setSecurity(0);
-				ace.setSign(0);
-				ace.setWorkflow(0);
-				ace.setWrite(0);
-				ace.setCustomid(0);
-				ace.setRevision(0);
-				ace.setReadingreq(0);
+				ace.setAdd(false);
+				ace.setArchive(false);
+				ace.setAutomation(false);
+				ace.setCalendar(false);
+				ace.setDelete(false);
+				ace.setExport(false);
+				ace.setImmutable(false);
+				ace.setImport(false);
+				ace.setMove(false);
+				ace.setPassword(false);
+				ace.setRename(false);
+				ace.setSecurity(false);
+				ace.setSign(false);
+				ace.setWorkflow(false);
+				ace.setWrite(false);
+				ace.setCustomid(false);
+				ace.setRevision(false);
+				ace.setReadingreq(false);
 			}
 		}
 	}
@@ -1024,7 +1024,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * folder outside.
 		 */
 		StringBuilder query1 = new StringBuilder(
-				"select distinct(A.ld_folderid) from ld_folder_acl A where A.ld_read=1 ");
+				"select distinct(A.ld_folderid) from ld_folder_acl A where A.ld_read = 1 ");
 
 		List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).toList();
 		if (!groupIds.isEmpty()) {
@@ -1040,7 +1040,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		/*
 		 * Now search for those folders that are or reference the masterIds
 		 */
-		StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted=0 and ( ");
+		StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted = 0 and ( ");
 		if (isOracle()) {
 			/*
 			 * In Oracle The limit of 1000 elements applies to sets of single
@@ -1105,9 +1105,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (tree) {
 				return findFolderIdInTree(parentId, false);
 			} else {
-				StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted=0 ");
-				query.append(" and (ld_id=" + parentId);
-				query.append(" or ld_parentid=" + parentId);
+				StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted = 0 ");
+				query.append(" and (ld_id = " + parentId);
+				query.append(" or ld_parentid = " + parentId);
 				query.append(") ");
 				return queryForList(query.toString(), Long.class);
 			}
@@ -1119,9 +1119,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * folder outside.
 		 */
 		StringBuilder query1 = new StringBuilder(
-				"select distinct(A.ld_folderid) from ld_folder_acl A where A.ld_read=1 ");
+				"select distinct(A.ld_folderid) from ld_folder_acl A where A.ld_read = 1 ");
 		if (permission != Permission.READ)
-			query1.append(" and A.ld_" + permission.name().toLowerCase() + "=1 ");
+			query1.append(" and A.ld_" + permission.name().toLowerCase() + " = 1 ");
 
 		appendUserGroupIdsCondition(user, query1);
 
@@ -1134,7 +1134,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		/*
 		 * Now search for those folders that are or reference the masterIds
 		 */
-		StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted=0 ");
+		StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted = 0 ");
 		query2.append(" and ( B.ld_id in " + masterIdsString);
 		query2.append(" or B.ld_securityref in " + masterIdsString + ") ");
 
@@ -1411,15 +1411,15 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (!user.isMemberOf(Group.GROUP_ADMIN)) {
 				Group userGroup = user.getUserGroup();
 				FolderAccessControlEntry ace = new FolderAccessControlEntry(userGroup.getId());
-				ace.setAdd(1);
-				ace.setDelete(1);
-				ace.setDownload(1);
-				ace.setEmail(1);
-				ace.setSecurity(1);
-				ace.setRead(1);
-				ace.setSecurity(1);
-				ace.setRename(1);
-				ace.setWrite(1);
+				ace.setAdd(true);
+				ace.setDelete(true);
+				ace.setDownload(true);
+				ace.setEmail(true);
+				ace.setSecurity(true);
+				ace.setRead(true);
+				ace.setSecurity(true);
+				ace.setRename(true);
+				ace.setWrite(true);
 				folder.addAccessControlEntry(ace);
 			}
 		}

@@ -40,234 +40,188 @@ public class DocumentAccessControlEntry extends ExtendedAccessControlEntry {
 		return ace;
 	}
 
-	@Override
-	public long getGroupId() {
-		return ace.getGroupId();
-	}
-
-	@Override
-	public int getWrite() {
-		return ace.getWrite();
-	}
-
-	@Override
 	public void setGroupId(long groupId) {
 		ace.setGroupId(groupId);
 	}
 
-	@Override
-	public void setWrite(int write) {
-		ace.setWrite(write);
+	public long getGroupId() {
+		return ace.getGroupId();
 	}
 
-	@Override
-	public int getRead() {
-		return ace.getRead();
+	public boolean isRead() {
+		return ace.isRead();
 	}
 
-	@Override
-	public void setRead(int read) {
+	public void setRead(boolean read) {
 		ace.setRead(read);
 	}
 
-	@Override
-	public Set<Permission> grantedPermissions() {
-		return ace.grantedPermissions();
+	public boolean isWrite() {
+		return ace.isWrite();
 	}
 
-	@Override
+	public void setWrite(boolean write) {
+		ace.setWrite(write);
+	}
+
+	public boolean isPreview() {
+		return ace.isPreview();
+	}
+
+	public void setPreview(boolean preview) {
+		ace.setPreview(preview);
+	}
+
+	public boolean isDownload() {
+		return ace.isDownload();
+	}
+
+	public void setDownload(boolean download) {
+		ace.setDownload(download);
+	}
+
+	public boolean isSecurity() {
+		return ace.isSecurity();
+	}
+
+	public void setSecurity(boolean security) {
+		ace.setSecurity(security);
+	}
+
+	public boolean isDelete() {
+		return ace.isDelete();
+	}
+
+	public void setDelete(boolean delete) {
+		ace.setDelete(delete);
+	}
+
+	public boolean isRename() {
+		return ace.isRename();
+	}
+
+	public void setRename(boolean rename) {
+		ace.setRename(rename);
+	}
+
+	public boolean isImmutable() {
+		return ace.isImmutable();
+	}
+
+	public void setImmutable(boolean immutable) {
+		ace.setImmutable(immutable);
+	}
+
+	public boolean isSign() {
+		return ace.isSign();
+	}
+
+	public void setSign(boolean sign) {
+		ace.setSign(sign);
+	}
+
+	public boolean isArchive() {
+		return ace.isArchive();
+	}
+
+	public void setArchive(boolean archive) {
+		ace.setArchive(archive);
+	}
+
+	public boolean isWorkflow() {
+		return ace.isWorkflow();
+	}
+
+	public void setWorkflow(boolean workflow) {
+		ace.setWorkflow(workflow);
+	}
+
+	public boolean isCalendar() {
+		return ace.isCalendar();
+	}
+
+	public void setCalendar(boolean calendar) {
+		ace.setCalendar(calendar);
+	}
+
+	public boolean isSubscription() {
+		return ace.isSubscription();
+	}
+
+	public void setSubscription(boolean subscription) {
+		ace.setSubscription(subscription);
+	}
+
+	public boolean isPassword() {
+		return ace.isPassword();
+	}
+
+	public void setPassword(boolean password) {
+		ace.setPassword(password);
+	}
+
+	public boolean isPrint() {
+		return ace.isPrint();
+	}
+
+	public void setPrint(boolean print) {
+		ace.setPrint(print);
+	}
+
+	public boolean isMove() {
+		return ace.isMove();
+	}
+
+	public void setMove(boolean move) {
+		ace.setMove(move);
+	}
+
+	public boolean isEmail() {
+		return ace.isEmail();
+	}
+
+	public void setEmail(boolean email) {
+		ace.setEmail(email);
+	}
+
+	public boolean isAutomation() {
+		return ace.isAutomation();
+	}
+
+	public void setAutomation(boolean automation) {
+		ace.setAutomation(automation);
+	}
+
+	public boolean isReadingreq() {
+		return ace.isReadingreq();
+	}
+
+	public void setReadingreq(boolean readingreq) {
+		ace.setReadingreq(readingreq);
+	}
+
+	public boolean isCustomid() {
+		return ace.isCustomid();
+	}
+
+	public void setCustomid(boolean customid) {
+		ace.setCustomid(customid);
+	}
+
+	public boolean isRevision() {
+		return ace.isRevision();
+	}
+
+	public void setRevision(boolean revision) {
+		ace.setRevision(revision);
+	}
+
 	public void grantPermissions(Set<Permission> permissions) {
 		ace.grantPermissions(permissions);
 	}
 
-	@Override
-	public int getPreview() {
-		return ace.getPreview();
-	}
-
-	@Override
-	public void setPreview(int preview) {
-		ace.setPreview(preview);
-	}
-
-	@Override
-	public int getDownload() {
-		return ace.getDownload();
-	}
-
-	@Override
-	public void setDownload(int download) {
-		ace.setDownload(download);
-	}
-
-	@Override
-	public int getSecurity() {
-		return ace.getSecurity();
-	}
-
-	@Override
-	public void setSecurity(int security) {
-		ace.setSecurity(security);
-	}
-
-	@Override
-	public int getDelete() {
-		return ace.getDelete();
-	}
-
-	@Override
-	public void setDelete(int delete) {
-		ace.setDelete(delete);
-	}
-
-	@Override
-	public int getRename() {
-		return ace.getRename();
-	}
-
-	@Override
-	public void setRename(int rename) {
-		ace.setRename(rename);
-	}
-
-	@Override
-	public int getImmutable() {
-		return ace.getImmutable();
-	}
-
-	@Override
-	public void setImmutable(int immutable) {
-		ace.setImmutable(immutable);
-	}
-
-	@Override
-	public int getSign() {
-		return ace.getSign();
-	}
-
-	@Override
-	public void setSign(int sign) {
-		ace.setSign(sign);
-	}
-
-	@Override
-	public int getArchive() {
-		return ace.getArchive();
-	}
-
-	@Override
-	public void setArchive(int archive) {
-		ace.setArchive(archive);
-	}
-
-	@Override
-	public int getWorkflow() {
-		return ace.getWorkflow();
-	}
-
-	@Override
-	public void setWorkflow(int workflow) {
-		ace.setWorkflow(workflow);
-	}
-
-	@Override
-	public int getCalendar() {
-		return ace.getCalendar();
-	}
-
-	@Override
-	public void setCalendar(int calendar) {
-		ace.setCalendar(calendar);
-	}
-
-	@Override
-	public int getSubscription() {
-		return ace.getSubscription();
-	}
-
-	@Override
-	public void setSubscription(int subscription) {
-		ace.setSubscription(subscription);
-	}
-
-	@Override
-	public int getPassword() {
-		return ace.getPassword();
-	}
-
-	@Override
-	public void setPassword(int password) {
-		ace.setPassword(password);
-	}
-
-	@Override
-	public int getPrint() {
-		return ace.getPrint();
-	}
-
-	@Override
-	public void setPrint(int print) {
-		ace.setPrint(print);
-	}
-
-	@Override
-	public int getMove() {
-		return ace.getMove();
-	}
-
-	@Override
-	public void setMove(int move) {
-		ace.setMove(move);
-	}
-
-	@Override
-	public int getEmail() {
-		return ace.getEmail();
-	}
-
-	@Override
-	public void setEmail(int email) {
-		ace.setEmail(email);
-	}
-
-	@Override
-	public int getAutomation() {
-		return ace.getAutomation();
-	}
-
-	@Override
-	public void setAutomation(int automation) {
-		ace.setAutomation(automation);
-	}
-
-	@Override
-	public int getReadingreq() {
-		return ace.getReadingreq();
-	}
-
-	@Override
-	public void setReadingreq(int readingreq) {
-		ace.setReadingreq(readingreq);
-	}
-
-	@Override
-	public int getCustomid() {
-		return ace.getCustomid();
-	}
-
-	@Override
-	public void setCustomid(int customid) {
-		ace.setCustomid(customid);
-	}
-
-	@Override
-	public int getRevision() {
-		return ace.getRevision();
-	}
-
-	@Override
-	public void setRevision(int revision) {
-		ace.setRevision(revision);
+	public Set<Permission> grantedPermissions() {
+		return ace.grantedPermissions();
 	}
 
 	@Override
