@@ -22,6 +22,7 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.web.UploadServlet;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
@@ -278,7 +279,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent event) {
-		// Nothing to do
+		UploadServlet.cleanUploads((String) event.getSession().getAttribute("sid"));
 	}
 
 	private void writePidFile() {
