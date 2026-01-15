@@ -425,25 +425,6 @@
 			</Policies>
 			<DefaultRolloverStrategy max="5" />
 		</RollingFile>
-		<RollingFile name="FSCleaner_WEB"
-			fileName="${root}/fscleaner_web.log.html"
-			filePattern="${root}/fscleaner_web.log.html.%i">
-			<LDHtmlLayout datePattern="${dateformat}" />
-			<Policies>
-				<SizeBasedTriggeringPolicy size="5 MB" />
-			</Policies>
-			<DefaultRolloverStrategy max="5" />
-		</RollingFile>
-		<RollingFile name="FSCleaner" fileName="${root}/fscleaner.log"
-			filePattern="${root}/fscleaner.log.%i">
-			<PatternLayout>
-				<Pattern>${pattern}</Pattern>
-			</PatternLayout>
-			<Policies>
-				<SizeBasedTriggeringPolicy size="5 MB" />
-			</Policies>
-			<DefaultRolloverStrategy max="5" />
-		</RollingFile>
 		<RollingFile name="DB" fileName="${root}/db.log"
 			filePattern="${root}/db.log.%i">
 			<PatternLayout>
@@ -628,11 +609,6 @@
 			level="info" additivity="false">
 			<Appender-Ref ref="Cleaner" />
 			<Appender-Ref ref="Cleaner_WEB" />
-		</Logger>
-		<Logger name="com.logicaldoc.enterprise.store.FSCleanerTask"
-			level="info" additivity="false">
-			<Appender-Ref ref="FSCleaner" />
-			<Appender-Ref ref="FSCleaner_WEB" />
 		</Logger>
 		<Logger name="com.logicaldoc.email.EmailCrawler" level="info"
 			additivity="false">

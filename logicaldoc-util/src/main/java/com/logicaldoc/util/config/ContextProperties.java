@@ -420,6 +420,15 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	/**
+	 * Gets all the keys whose name starts with the given prefix.
+	 * 
+	 * @param prefix property's prefix
+	 */
+	public List<String> getKeys(String prefix) {
+		return getKeys().stream().filter(k -> k.startsWith(prefix)).toList();
+	}
+	
+	/**
 	 * Removes all the properties of a specific tenant
 	 * 
 	 * @param tenant name of the tenant

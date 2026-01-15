@@ -374,22 +374,7 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="FSCleaner_WEB" fileName="${root}/fscleaner_web.log.html" filePattern="${root}/fscleaner_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" />
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
-    <RollingFile name="FSCleaner" fileName="${root}/fscleaner.log" filePattern="${root}/fscleaner.log.%i">
-      <PatternLayout>
-        <Pattern>${pattern}</Pattern>
-      </PatternLayout>
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
+
     <RollingFile name="DB_WEB" fileName="${root}/db_web.log.html" filePattern="${root}/db_web.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
@@ -642,10 +627,6 @@
       <AppenderRef ref="GoogleCalendar" />
       <AppenderRef ref="GoogleCalendar_WEB" />
     </Logger>
-    <Logger name="com.logicaldoc.enterprise.store.FSCleanerTask" additivity="false" level="info">
-      <AppenderRef ref="FSCleaner" />
-      <AppenderRef ref="FSCleaner_WEB" />
-    </Logger>
     <Logger name="com.logicaldoc.conversion.HTMLConverter" additivity="true" level="debug" />
     <Logger name="com.logicaldoc.util.io" additivity="true" level="debug" />
     <Logger name="com.logicaldoc.stamp" additivity="false" level="debug" />
@@ -686,10 +667,6 @@
     <Logger name="com.logicaldoc.enterprise.cleaner.CleanerTask" level="info" additivity="false">
       <AppenderRef ref="Cleaner" />
       <AppenderRef ref="Cleaner_WEB" />
-    </Logger>
-    <Logger name="com.logicaldoc.enterprise.storer.FSCleanerTask" level="info" additivity="false">
-      <AppenderRef ref="FSCleaner" />
-      <AppenderRef ref="FSCleaner_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.email.EmailCrawler" level="info" additivity="false">
       <AppenderRef ref="EmailCrawler" />
