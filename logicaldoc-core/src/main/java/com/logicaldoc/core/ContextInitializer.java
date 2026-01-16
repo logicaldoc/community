@@ -36,7 +36,7 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 
 	private static final Logger log = LoggerFactory.getLogger(ContextInitializer.class);
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	@Resource(name = "documentManager")

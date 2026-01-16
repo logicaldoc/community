@@ -32,7 +32,7 @@
 		</property>
 	</bean>
 
-    <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
+    <bean id="config" class="com.logicaldoc.util.config.ContextProperties" />
 
     <!-- DataSource -->
     <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">

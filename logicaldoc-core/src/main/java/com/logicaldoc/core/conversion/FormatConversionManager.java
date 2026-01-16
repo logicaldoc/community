@@ -71,7 +71,7 @@ public class FormatConversionManager {
 	@Resource(name = "documentManager")
 	protected DocumentManager documentManager;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	// Key is the src_extension-dst_extension, value is a collection of

@@ -40,7 +40,7 @@ class Indexer extends DocumentProcessorCallable<IndexerStats> {
 
 	Indexer(List<Long> docIds, IndexerTask task, Logger log) {
 		super(docIds, task, log);
-		this.config = Context.get().getProperties();
+		this.config = Context.get().getConfig();
 		this.documentDao = DocumentDAO.get();
 		this.tenantDao = TenantDAO.get();
 		this.documentManager = DocumentManager.get();

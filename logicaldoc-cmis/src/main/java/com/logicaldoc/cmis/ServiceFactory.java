@@ -50,7 +50,7 @@ public class ServiceFactory extends AbstractServiceFactory {
 			log.debug("Using session {} for user {}", session.getSid(), session.getUsername());
 			wrapperService = new ConformanceCmisServiceWrapper(new LDCmisService(context, session.getSid()),
 					DEFAULT_MAX_ITEMS_TYPES,
-					BigInteger.valueOf(Context.get().getProperties().getInt("cmis.maxitems", 200)),
+					BigInteger.valueOf(Context.get().getConfig().getInt("cmis.maxitems", 200)),
 					DEFAULT_MAX_ITEMS_OBJECTS, DEFAULT_DEPTH_OBJECTS);
 
 		} else {

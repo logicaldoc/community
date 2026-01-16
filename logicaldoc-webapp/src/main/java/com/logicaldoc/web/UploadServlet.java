@@ -237,7 +237,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 	protected void checkIfAllowedForUpload(String tenant, String fileName) throws ServletException {
 		String extension = FileUtil.getExtension(fileName).toLowerCase();
-		String disallow = Context.get().getProperties().getString(tenant + ".upload.disallow");
+		String disallow = Context.get().getConfig().getString(tenant + ".upload.disallow");
 		if (disallow != null && !disallow.isEmpty()) {
 			disallow = disallow.toLowerCase().replace(" ", "");
 			List<String> disallowedExtensions = Arrays.asList(disallow.toLowerCase().split(","));
@@ -285,7 +285,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			ServletFileUpload upload = new ServletFileUpload(factory);
 
 			// maximum file size to be uploaded (in bytes)
-			upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
+			upload.setFileSizeMax(Context.get().getConfig().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
 
 			Map<String, File> uploadedFiles = getUploads(request);
 

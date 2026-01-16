@@ -76,7 +76,7 @@ public abstract class Task implements Runnable {
 
 	protected Throwable lastRunError = null;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	@Resource(name = "EMailSender")
@@ -471,7 +471,7 @@ public abstract class Task implements Runnable {
 	 */
 	public void save() throws IOException, ParseException {
 		getScheduling().save();
-		ContextProperties props = Context.get().getProperties();
+		ContextProperties props = Context.get().getConfig();
 		props.setProperty("task.recipients." + name, getReportRecipients());
 		props.setProperty("task.sendreport." + name, isSendActivityReport() ? "true" : "false");
 		props.write();

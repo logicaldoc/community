@@ -48,7 +48,7 @@ public class GhostUtil {
 	 * @return list of page files
 	 */
 	public static List<File> print(File srcPdf, File dst, Integer page, Integer dpi) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String ghostCommand = config.getProperty("converter.GhostscriptConverter.path");
 
 		List<File> pages = new ArrayList<>();

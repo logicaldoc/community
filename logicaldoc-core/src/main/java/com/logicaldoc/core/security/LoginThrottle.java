@@ -64,7 +64,7 @@ public class LoginThrottle {
 	 * @param ip the IP address from which the login intent comes from
 	 */
 	public static void clearFailures(String username, String ip) {
-		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
+		if (Context.get().getConfig().getBoolean(THROTTLE_ENABLED)) {
 			SequenceDAO sDao = SequenceDAO.get();
 			if (StringUtils.isNotEmpty(username))
 				try {
@@ -95,7 +95,7 @@ public class LoginThrottle {
 
 		// Update the failed login counters
 		try {
-			if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
+			if (Context.get().getConfig().getBoolean(THROTTLE_ENABLED)) {
 				SequenceDAO sDao = SequenceDAO.get();
 				if (StringUtils.isNotEmpty(username))
 					sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
@@ -132,7 +132,7 @@ public class LoginThrottle {
 	 * @throws AuthenticationException if the authentication fails
 	 */
 	public static void checkLoginThrottle(String username, String apikey, String ip) throws AuthenticationException {
-		if (!Context.get().getProperties().getBoolean(THROTTLE_ENABLED))
+		if (!Context.get().getConfig().getBoolean(THROTTLE_ENABLED))
 			return;
 
 		if ("admin".equals(username) && ("127.0.0.1".equals(ip) || "::1".equals(ip)))
@@ -157,7 +157,7 @@ public class LoginThrottle {
 	private static void checkIp(String ip) throws IPBlockedException, PersistenceException {
 		Calendar cal = Calendar.getInstance();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		int wait = config.getInt("throttle.ip.wait", 0);
 		int maxTrials = config.getInt("throttle.ip.max", 0);
 
@@ -185,7 +185,7 @@ public class LoginThrottle {
 	private static void checkUsername(String username) throws UsernameBlockedException, PersistenceException {
 		Calendar cal = Calendar.getInstance();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		int wait = config.getInt("throttle.username.wait", 0);
 		int maxTrials = config.getInt("throttle.username.max", 0);
 
@@ -219,7 +219,7 @@ public class LoginThrottle {
 
 		Calendar cal = Calendar.getInstance();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		int wait = config.getInt("throttle.apikey.wait", 0);
 		int maxTrials = config.getInt("throttle.apikey.max", 0);
 
@@ -245,7 +245,7 @@ public class LoginThrottle {
 	}
 
 	protected static void disableUser(String username) {
-		if (Context.get().getProperties().getBoolean("throttle.username.disableuser", false)) {
+		if (Context.get().getConfig().getBoolean("throttle.username.disableuser", false)) {
 			try {
 				UserDAO userDao = UserDAO.get();
 				User user = userDao.findByUsername(username);
@@ -337,7 +337,7 @@ public class LoginThrottle {
 
 	private static List<User> getRecipients() throws PersistenceException {
 		List<User> recipients = new ArrayList<>();
-		String setting = Context.get().getProperties().getProperty("throttle.alert.recipients", "");
+		String setting = Context.get().getConfig().getProperty("throttle.alert.recipients", "");
 		if (StringUtils.isNotEmpty(setting)) {
 			UserDAO uDao = UserDAO.get();
 			String[] usernames = setting.split(",");

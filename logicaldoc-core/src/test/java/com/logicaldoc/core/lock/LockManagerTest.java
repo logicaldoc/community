@@ -40,7 +40,7 @@ public class LockManagerTest extends AbstractCoreTestCase {
 
 		testSubject = Context.get(LockManager.class);
 		dao = GenericDAO.get();
-		config = Context.get().getProperties();
+		config = Context.get().getConfig();
 	}
 
 	@Test

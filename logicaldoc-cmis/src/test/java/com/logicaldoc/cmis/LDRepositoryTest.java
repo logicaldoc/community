@@ -465,7 +465,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		Document doc2 = ddao.findById(2L);
 		String doc2Name = doc2.getFileName();
 
-		String storePath = Context.get().getProperties().getProperty("store.1.dir");
+		String storePath = Context.get().getConfig().getProperty("store.1.dir");
 		File store = new File(storePath);
 		File folder1 = new File(store, "1");
 		File docFolder = new File(folder1, "doc");

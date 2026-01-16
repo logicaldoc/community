@@ -34,7 +34,7 @@
 	<!-- This post processor ensures placeholders substitutions -->
 	<bean id="placeholder" class="com.logicaldoc.util.spring.PropertiesPlaceHolder" />
 	
-	<bean id="ContextProperties" class="${registry}">
+	<bean id="config" class="${registry}">
 		<property name="maxBackups" value="10" />
 	</bean>
 	
@@ -93,7 +93,7 @@
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.region.factory_class">org.infinispan.hibernate.cache.v62.InfinispanRegionFactory</prop>
-                <prop key="hibernate.cache.infinispan.cfg">#{ContextProperties.get('cluster.enabled') == 'true' ? 'infinispan-cluster.xml' : 'infinispan.xml'}</prop>
+                <prop key="hibernate.cache.infinispan.cfg">#{config.get('cluster.enabled') == 'true' ? 'infinispan-cluster.xml' : 'infinispan.xml'}</prop>
             </props>
 		</property>
 	</bean>

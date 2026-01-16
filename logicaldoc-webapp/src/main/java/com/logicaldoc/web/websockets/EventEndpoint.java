@@ -139,7 +139,7 @@ public class EventEndpoint implements EventListener {
 
 	@Override
 	public void newEvent(History event) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		try {
 			if (event.getTenant() == null)

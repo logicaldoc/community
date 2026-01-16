@@ -37,7 +37,7 @@ public class ConditionalBasicAuthenticationFilter extends BasicAuthenticationFil
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		if (Context.get().getProperties().getBoolean(enableParam, false)
+		if (Context.get().getConfig().getBoolean(enableParam, false)
 				|| SessionManager.get().getSessionId(request) != null)
 			super.doFilterInternal(request, response, chain);
 		else

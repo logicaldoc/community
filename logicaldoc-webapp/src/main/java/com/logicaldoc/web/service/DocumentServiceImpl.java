@@ -476,7 +476,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				mail.setAccountId(-1);
 				mail.setAuthor(session.getUser().getUsername());
 
-				ContextProperties config = Context.get().getProperties();
+				ContextProperties config = Context.get().getConfig();
 				if (config.getBoolean(session.getTenantName() + SMTP_USERASFROM, true))
 					mail.setAuthorAddress(session.getUser().getEmail());
 
@@ -1538,7 +1538,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private void setAuthorAddress(EMail mail, GUIEmail guiMail, Session session) {
 		mail.setAuthor(session.getUser().getUsername());
-		if (Context.get().getProperties().getBoolean(session.getTenantName() + SMTP_USERASFROM, true)) {
+		if (Context.get().getConfig().getBoolean(session.getTenantName() + SMTP_USERASFROM, true)) {
 			if (guiMail.getFrom() != null)
 				mail.setAuthorAddress(guiMail.getFrom().getEmail());
 			else
@@ -2443,7 +2443,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			result.add(ticket.getTicketId());
 			result.add(ticket.getUrl());
 			result.add(
-					new URI(ticket.getUrl().replace(urlPrefix, Context.get().getProperties().getProperty("server.url")))
+					new URI(ticket.getUrl().replace(urlPrefix, Context.get().getConfig().getProperty("server.url")))
 							.normalize().toString());
 			return result;
 		} catch (PasswordWeakException pwe) {

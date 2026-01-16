@@ -64,7 +64,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	@Resource(name = "sequenceDAO")
 	private SequenceDAO sequenceDAO;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	private ContextProperties settings;
 
 	/**
@@ -125,7 +125,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 				&& settings.getBoolean("webservice.call.record", false)) {
 			WebserviceCall call = new WebserviceCall();
 
-			if (Context.get().getProperties().getBoolean("webservice.call.record.payload", false)) {
+			if (Context.get().getConfig().getBoolean("webservice.call.record.payload", false)) {
 				/*
 				 * Retrieve the full payload
 				 */

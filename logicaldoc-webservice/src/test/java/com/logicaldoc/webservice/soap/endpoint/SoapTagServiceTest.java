@@ -56,7 +56,7 @@ public class SoapTagServiceTest extends AbstractWebserviceTestCase {
 		assertNotNull(tags);
 		assertEquals(0, tags.size());
 
-		Context.get().getProperties().setProperty("default.tag.mode", "preset");
+		Context.get().getConfig().setProperty("default.tag.mode", "preset");
 		tags = testSubject.getTagsPreset(session.getSid());
 		assertNotNull(tags);
 		assertEquals(2, tags.size());

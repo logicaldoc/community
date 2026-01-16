@@ -29,7 +29,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> implements TenantDAO {
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	private ContextProperties config;
 
 	@Resource(name = "folderDAO")

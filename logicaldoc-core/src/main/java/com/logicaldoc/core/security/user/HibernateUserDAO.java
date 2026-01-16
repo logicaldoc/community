@@ -67,7 +67,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Resource(name = "userListenerManager")
 	private UserListenerManager userListenerManager;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	private ContextProperties config;
 
 	private HibernateUserDAO() {
@@ -76,7 +76,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	public static boolean ignoreCaseLogin() {
-		return "true".equals(Context.get().getProperties().getProperty("login.ignorecase"));
+		return "true".equals(Context.get().getConfig().getProperty("login.ignorecase"));
 	}
 
 	@Override

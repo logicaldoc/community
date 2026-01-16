@@ -115,7 +115,7 @@ public class IndexerTask extends AbstractDocumentProcessor {
 	 * @return array composed by the query to execute and the sorting expression
 	 */
 	public static String[] prepareQuery() {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		// Determine the sorting
 		String sorting = config.getProperty("index.sorting");

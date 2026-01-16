@@ -141,7 +141,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			Cookie scookie = new Cookie("ldoc-sid", session.getSid());
 			scookie.setMaxAge(1800);
 			scookie.setHttpOnly(true);
-			scookie.setSecure(Context.get().getProperties().getBoolean("cookies.secure", false));
+			scookie.setSecure(Context.get().getConfig().getBoolean("cookies.secure", false));
 			
 			webdavResponse.addCookie(scookie);
 
@@ -483,7 +483,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		int propfindType = request.getPropFindType();
 
-		int depth = Context.get().getProperties().getInt("webdav.depth", 1);
+		int depth = Context.get().getConfig().getInt("webdav.depth", 1);
 		String headerDepth = request.getHeader("Depth");
 		if (StringUtils.isNotEmpty(headerDepth)) {
 			if ("infinity".equals(headerDepth))

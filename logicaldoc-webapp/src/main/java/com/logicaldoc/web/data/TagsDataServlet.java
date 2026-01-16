@@ -35,7 +35,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String mode = config.getProperty(session.getTenantName() + ".tag.mode");
 
 		String firstLetter = request.getParameter("firstLetter");

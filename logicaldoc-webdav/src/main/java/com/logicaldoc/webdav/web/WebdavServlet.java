@@ -112,7 +112,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
-		ContextProperties settings = Context.get().getProperties();
+		ContextProperties settings = Context.get().getConfig();
 
 		// Check if the service is enabled
 		if ("true".equals(settings.get("webdav.enabled")))

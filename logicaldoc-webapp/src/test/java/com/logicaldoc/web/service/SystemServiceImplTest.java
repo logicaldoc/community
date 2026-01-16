@@ -49,7 +49,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		Context.get().getProperties().setMaxBackups(0);
+		Context.get().getConfig().setMaxBackups(0);
 
 		File testWebappFolder = new File("target/webapp");
 		testWebappFolder.mkdir();
@@ -138,7 +138,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testSetGUILanguageStatus() throws ServerException {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		boolean oldEnabled = "enabled".equals(config.getProperty("default.lang.it.gui"));
 		testSubject.setGUILanguageStatus("it", !oldEnabled);
 		boolean newEnabled = "enabled".equals(config.getProperty("default.lang.it.gui"));
@@ -147,7 +147,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testRestart() throws ServerException {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		testSubject.restart();
 		File restartFile = new File(config.getProperty("LDOCHOME") + "/updates/restart");
 		try {
@@ -159,7 +159,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testConfirmUpdate() throws ServerException, IOException {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		try {
 			assertEquals("default", config.getProperty("runlevel"));

@@ -40,7 +40,7 @@ public class LanguagesDataServlet extends AbstractDataServlet {
 		writer.print("<list>");
 
 		if (gui) {
-			ContextProperties pbean = Context.get().getProperties();
+			ContextProperties pbean = Context.get().getConfig();
 			List<String> installedLocales = I18N.getLocales();
 			for (String loc : installedLocales) {
 				Locale lc = LocaleUtil.toLocale(loc);

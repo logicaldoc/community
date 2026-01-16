@@ -81,7 +81,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 	public List<GUIParameter> getSettings() throws ServerException {
 		Session session = validateSession();
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		List<GUIParameter> params = new ArrayList<>();
 		for (Object name : conf.keySet()) {
 			if (name.toString().startsWith(session.getTenantName() + ".tag.")

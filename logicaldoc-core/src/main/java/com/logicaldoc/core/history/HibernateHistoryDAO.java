@@ -30,7 +30,7 @@ import jakarta.annotation.Resource;
 public abstract class HibernateHistoryDAO<T extends History> extends HibernatePersistentObjectDAO<T>
 		implements PersistentObjectDAO<T> {
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	// A cache of tenant names to minimize the DB accesses

@@ -242,7 +242,7 @@ public class Automation {
 
 	private void putServerUrl(Map<String, Object> clientDictionary) {
 		if (Context.get() != null)
-			clientDictionary.put(SERVER_URL, Context.get().getProperties().get("server.url"));
+			clientDictionary.put(SERVER_URL, Context.get().getConfig().get("server.url"));
 		else
 			try {
 				clientDictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));

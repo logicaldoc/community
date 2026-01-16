@@ -33,7 +33,7 @@ public class TokenFiltersDataServlet extends AbstractDataServlet {
 
 		String filter = request.getParameter("filter");
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		PrintWriter writer = response.getWriter();
 		writer.print("<list>");

@@ -68,7 +68,7 @@ public class DocTool {
 	 * @return the download permalink
 	 */
 	public String downloadUrl(long docId) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String url = config.getProperty(SERVER_URL);
 		if (!url.endsWith("/"))
 			url += "/";
@@ -85,7 +85,7 @@ public class DocTool {
 	 * @return the display permalink
 	 */
 	public String displayUrl(long tenantId, long docId) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String url = config.getProperty(SERVER_URL);
 		if (!url.endsWith("/"))
 			url += "/";
@@ -164,7 +164,7 @@ public class DocTool {
 	public String downloadTicket(final long docId, boolean pdfConversion, Integer expireHours, Date expireDate,
 			Integer maxDownloads, String username) {
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String urlPrefix = config.getProperty(SERVER_URL);
 		if (!urlPrefix.endsWith("/"))
 			urlPrefix += "/";
@@ -209,7 +209,7 @@ public class DocTool {
 	public String viewTicket(final long docId, boolean pdfConversion, Integer expireHours, Date expireDate,
 			Integer maxDownloads, Integer maxViews, String username) {
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String urlPrefix = config.getProperty(SERVER_URL);
 		if (!urlPrefix.endsWith("/"))
 			urlPrefix += "/";

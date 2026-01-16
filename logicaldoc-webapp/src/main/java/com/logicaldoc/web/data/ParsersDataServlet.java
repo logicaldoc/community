@@ -50,7 +50,7 @@ public class ParsersDataServlet extends AbstractDataServlet {
 			writer.print(
 					"<name><![CDATA[" + ParserFactory.getParsers().get(ext).getClass().getSimpleName() + "]]></name>");
 
-			String aliasProp = Context.get().getProperties().getProperty("parser.alias." + ext.toLowerCase());
+			String aliasProp = Context.get().getConfig().getProperty("parser.alias." + ext.toLowerCase());
 			writer.print("<aliases><![CDATA[" + (aliasProp != null ? aliasProp : "") + "]]></aliases>");
 			writer.print("</parser>");
 		}

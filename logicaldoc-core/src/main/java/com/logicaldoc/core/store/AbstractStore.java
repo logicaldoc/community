@@ -55,7 +55,7 @@ public abstract class AbstractStore implements Store {
 
 	protected static Logger deletionsLog = LoggerFactory.getLogger("STORE_DELETIONS");
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	protected int id = 1;
@@ -70,7 +70,7 @@ public abstract class AbstractStore implements Store {
 
 	public ContextProperties getConfig() {
 		if (config == null)
-			config = Context.get().getProperties();
+			config = Context.get().getConfig();
 		return config;
 	}
 

@@ -70,7 +70,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 	private static final Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	private ContextProperties config;
 
 	@Resource(name = "documentDAO")

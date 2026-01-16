@@ -488,7 +488,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	private String getSessionIdFromClient(HttpServletRequest request) {
-		if (request == null || !Context.get().getProperties().getBoolean("security.useclientid", false))
+		if (request == null || !Context.get().getConfig().getBoolean("security.useclientid", false))
 			return null;
 
 		Client client = buildClient(request);
@@ -527,7 +527,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 		String sid = null;
 		if (StringUtils.isNotEmpty(request.getParameter(PARAM_SID))
-				&& Context.get().getProperties().getBoolean("security.acceptsid", false)) {
+				&& Context.get().getConfig().getBoolean("security.acceptsid", false)) {
 			log.debug("Got SID in request {}", PARAM_SID);
 			sid = request.getParameter(PARAM_SID);
 		} else if (StringUtils.isNotEmpty(request.getHeader(PARAM_SID))) {

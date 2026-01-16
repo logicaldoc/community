@@ -63,7 +63,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 		this.setType(opt.getType());
 
 		String tenantName = TenantDAO.get().getTenantName(getTenantId());
-		String charset = Context.get().getProperties().getProperty(tenantName + ".charset", "UTF-8");
+		String charset = Context.get().getConfig().getProperty(tenantName + ".charset", "UTF-8");
 
 		setOptions(IOUtil.serialize(opt, charset));
 	}

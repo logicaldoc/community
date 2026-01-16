@@ -106,7 +106,7 @@ public class UserUtil {
 	public static File getUsersDir() {
 		File userpath = new File("");
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			userpath = new File(conf.getProperty("conf.userdir"));
 			FileUtils.forceMkdir(userpath);
 		} catch (Exception t) {
@@ -133,7 +133,7 @@ public class UserUtil {
 			} else {
 				// In case of raster image we crop and resize
 				String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
-				int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
+				int size = Context.get().getConfig().getInt(tenantName + ".gui.avatar.size", 128);
 				tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 				BufferedImage avatar = ImageIO.read(avatarImageFile);
 				avatar = ImageUtil.cropCenterSquare(avatar, size);
@@ -164,7 +164,7 @@ public class UserUtil {
 			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 
 			String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
-			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
+			int size = Context.get().getConfig().getInt(tenantName + ".gui.avatar.size", 128);
 
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
 			if (avatar != null) {
@@ -203,7 +203,7 @@ public class UserUtil {
 	}
 
 	protected static BufferedImage getImageFromGravatar(User user, int size) {
-		if (!Context.get().getProperties().getBoolean("gravatar.enabled", false))
+		if (!Context.get().getConfig().getBoolean("gravatar.enabled", false))
 			return null;
 
 		BufferedImage avatarImage = null;

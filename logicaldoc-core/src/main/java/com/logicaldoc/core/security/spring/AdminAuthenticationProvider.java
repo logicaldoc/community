@@ -83,7 +83,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 			// If the database is not available, get the password from the
 			// configuration file
 			try {
-				ContextProperties config = Context.get().getProperties();
+				ContextProperties config = Context.get().getConfig();
 				adminPasswd = config.getProperty("adminpasswd");
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);

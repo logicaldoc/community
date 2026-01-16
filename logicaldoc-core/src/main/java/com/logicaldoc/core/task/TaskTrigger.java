@@ -34,7 +34,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
 	public static final String MODE_SIMPLE = "simple";
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	private Task task;

@@ -80,7 +80,7 @@ public class Geolocation {
 	}
 
 	public boolean isEnabled() {
-		return Context.get().getProperties().getBoolean("security.geolocation.enabled", false);
+		return Context.get().getConfig().getBoolean("security.geolocation.enabled", false);
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class Geolocation {
 			return;
 		log.info("Try to read the geolocation database {}", database);
 
-		if (Context.get().getProperties().getBoolean("security.geolocation.cache", false))
+		if (Context.get().getConfig().getBoolean("security.geolocation.cache", false))
 			dbReader = new DatabaseReader.Builder(database).withCache(new CHMCache()).build();
 		else
 			dbReader = new DatabaseReader.Builder(database).build();

@@ -92,7 +92,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			List<GUIMessage> alerts = new ArrayList<>();
 
 			// Checks if LogicalDOC has been initialized
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			boolean needSetup = config.getProperty("jdbc.url").startsWith("jdbc:hsqldb:mem:");
 			if (!needSetup)
 				needSetup = !config.getBoolean("initialized", true);
@@ -195,7 +195,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		ArrayList<GUIValue> supportedLanguages = new ArrayList<>();
 		List<String> installedLocales = I18N.getLocales();
 		for (String loc : installedLocales) {
-			if (ENABLED.equals(Context.get().getProperties().getProperty(tenantName + LANG + loc + ".gui"))) {
+			if (ENABLED.equals(Context.get().getConfig().getProperty(tenantName + LANG + loc + ".gui"))) {
 				Locale lc = LocaleUtil.toLocale(loc);
 				GUIValue l = new GUIValue();
 				l.setCode(loc);
@@ -215,7 +215,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	 * @return bean carrying informations about the User Interface
 	 */
 	public static GUIInfo getInfo(String tenantName) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		String tname = tenantName;
 		if (tname == null)
@@ -332,7 +332,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		 */
 		List<String> installedLocales = I18N.getLocales();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		Locale locale = null;
 		for (String loc : installedLocales) {

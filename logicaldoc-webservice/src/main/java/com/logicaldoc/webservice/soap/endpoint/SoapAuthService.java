@@ -18,7 +18,7 @@ public class SoapAuthService extends AbstractService implements AuthService {
 	public String login(String username, String password) throws AuthenticationException {
 		if (!isWebserviceEnabled())
 			throw new AuthenticationException("Webservices are disabled");
-		if (Context.get().getProperties().getBoolean("webservice.basicauth.enabled", false))
+		if (Context.get().getConfig().getBoolean("webservice.basicauth.enabled", false))
 			return SessionManager.get().newSession(username, password, getCurrentRequest()).getSid();
 		else
 			throw new AuthenticationException("Basic Authentication is disabled");

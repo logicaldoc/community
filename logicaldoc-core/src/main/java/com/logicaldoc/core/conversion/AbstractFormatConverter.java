@@ -60,7 +60,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	protected ContextProperties config() {
 		ContextProperties config = null;
 		try {
-			config = Context.get().getProperties();
+			config = Context.get().getConfig();
 		} catch (Exception t) {
 			try {
 				config = new ContextProperties();
@@ -145,7 +145,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 		if (fileNameOrExtension.contains("."))
 			ext = FileUtil.getExtension(fileNameOrExtension.toLowerCase());
 
-		String alias = Context.get().getProperties().getProperty("converter.alias." + ext);
+		String alias = Context.get().getConfig().getProperty("converter.alias." + ext);
 		if (StringUtils.isNotEmpty(alias))
 			ext = alias;
 

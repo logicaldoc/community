@@ -110,7 +110,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		for (Object[] cols : records) {
 			if (!FileUtil.matches(cols[14].toString(),
 					config.getProperty(session.getTenantName() + ".barcode.includes"),

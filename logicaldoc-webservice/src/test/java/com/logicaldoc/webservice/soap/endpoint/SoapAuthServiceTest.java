@@ -74,11 +74,11 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 		boolean isValid = soapAuthServiceImpl.valid(sid);
 		assertTrue(isValid);
 
-		Context.get().getProperties().setProperty("webservice.enabled", "false");
+		Context.get().getConfig().setProperty("webservice.enabled", "false");
 		isValid = soapAuthServiceImpl.valid(sid);
 		assertFalse(isValid);
 
-		Context.get().getProperties().setProperty("webservice.enabled", "true");
+		Context.get().getConfig().setProperty("webservice.enabled", "true");
 
 		// Now using an invalid sid
 		sid = "106a106d-a440-43b9-a3fd-4acb85543a0e";

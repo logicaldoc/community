@@ -483,7 +483,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testGenerateAndValidatePassword() throws ServerException {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String password = testSubject.generatePassword();
 		String tenant = "default";
 

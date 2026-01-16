@@ -134,7 +134,7 @@ public class SystemInfo {
 		 */
 		try {
 			// Read some informations from the context
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			info.setRelease(config.getProperty("product.release"));
 			info.setYear(config.getProperty("product.year"));
 			info.setRunLevel(config.getProperty("runlevel"));

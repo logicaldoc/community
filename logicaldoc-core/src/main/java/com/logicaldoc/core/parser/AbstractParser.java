@@ -82,12 +82,12 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	private boolean getTimeoutRetain(String tenant) {
-		return Context.get().getProperties().getBoolean(tenant + ".parser.timeout.retain", true);
+		return Context.get().getConfig().getBoolean(tenant + ".parser.timeout.retain", true);
 	}
 
 	private int getTimeout(String tenant) {
 		try {
-			return Context.get().getProperties().getInt(tenant + ".parser.timeout", 120);
+			return Context.get().getConfig().getInt(tenant + ".parser.timeout", 120);
 		} catch (Exception e) {
 			return 120;
 		}

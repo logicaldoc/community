@@ -76,7 +76,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 	}
 
 	private void printStores(PrintWriter writer, HttpServletRequest request, Session session) {
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		for (int i = 1; i <= 99; i++) {
 			String path = conf.getProperty(STORE + i + ".dir");
 			if (StringUtils.isEmpty(path))
@@ -100,7 +100,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 	}
 
 	private void printParameters(PrintWriter writer, HttpServletRequest request, Session session, int i, String type) {
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		if (isParameters(request, session)) {
 			Store st = Store.get().getStoreDefinitions().get(type);
 			if (st != null) {

@@ -130,7 +130,7 @@ public class PswRecovery extends HttpServlet {
 		email.setFolder("outbox");
 
 		// Generate a new password
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
 				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
 				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1),

@@ -191,7 +191,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 	@Test
 	public void testTimeout() {
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		int timeout = 1;
 		conf.setProperty("default.session.timeout", String.valueOf(timeout));
 

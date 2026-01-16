@@ -148,7 +148,7 @@ public abstract class Search {
 
 		internalSearch();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String extattrs;
 		try {
 			extattrs = config.getProperty(TenantDAO.get().getTenantName(searchUser.getTenantId()) + ".search.extattr");

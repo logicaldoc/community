@@ -80,7 +80,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 			Tenant tenant = TenantDAO.get().findById(user.getTenantId());
 
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			usr.setPasswordMinLenght(config.getInt(tenant.getName() + ".password.size", 6));
 
 			// Retrieve the reason for the last login failure
@@ -193,7 +193,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			log.warn("Cannot retrieve tenant name of user {}", user.getUsername());
 		}
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		if (!config.getBoolean(tenant + ".2fa.enabled", false)
 				|| !config.getBoolean(tenant + ".2fa." + user.getSecondFactor().toLowerCase() + ".enabled", false))
 			return false;
@@ -229,7 +229,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		}
 
 		// Generate an initial password(that must be changed)
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		return PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
 				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
 				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1),

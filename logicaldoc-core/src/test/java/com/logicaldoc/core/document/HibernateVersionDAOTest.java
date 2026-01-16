@@ -104,7 +104,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		Store store = Store.get();
 
-		int versionsCap = Context.get().getProperties().getInt("document.maxversions");
+		int versionsCap = Context.get().getConfig().getInt("document.maxversions");
 		for (int i = 0; i < versionsCap * 2; i++) {
 			Version version = null;
 			if (i % 2 == 0) {

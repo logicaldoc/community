@@ -155,7 +155,7 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 				tenant = request.getParameter("tenant");
 
 			authentication
-					.setAuthenticated(Context.get().getProperties().getBoolean(tenant + ".anonymous.enabled", false));
+					.setAuthenticated(Context.get().getConfig().getBoolean(tenant + ".anonymous.enabled", false));
 		}
 
 		return authentication;

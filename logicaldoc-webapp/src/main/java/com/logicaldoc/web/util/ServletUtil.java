@@ -497,7 +497,7 @@ public class ServletUtil {
 		boolean acceptsGzip;
 		String acceptEncoding = request.getHeader("Accept-Encoding");
 		acceptsGzip = acceptEncoding != null && accepts(acceptEncoding, "gzip");
-		acceptsGzip = acceptsGzip && "true".equals(Context.get().getProperties().getProperty("download.gzip"));
+		acceptsGzip = acceptsGzip && "true".equals(Context.get().getConfig().getProperty("download.gzip"));
 
 		// Don't compress if we have to serve a thumbnail
 		acceptsGzip = acceptsGzip

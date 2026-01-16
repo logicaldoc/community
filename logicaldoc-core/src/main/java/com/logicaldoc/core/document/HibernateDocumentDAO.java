@@ -108,7 +108,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Resource(name = "store")
 	private Store store;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	private ContextProperties config;
 
 	private HibernateDocumentDAO() {
@@ -1282,7 +1282,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<TagCloud> getTagCloud(String sid) throws PersistenceException {
 		Session session = SessionManager.get().get(sid);
-		int maxTags = Context.get().getProperties().getInt(session.getTenantName() + ".tagcloud.maxtags", 30);
+		int maxTags = Context.get().getConfig().getInt(session.getTenantName() + ".tagcloud.maxtags", 30);
 		return getTagCloud(session.getTenantId(), maxTags);
 	}
 

@@ -102,7 +102,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 		GUIEmailSettings emailSettings = new GUIEmailSettings();
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 
 			emailSettings.setProtocol(conf.getProperty(session.getTenantName() + SMTP_PROTOCOL, "smtp"));
 			emailSettings.setServer(conf.getProperty(session.getTenantName() + SMTP_HOST));
@@ -133,7 +133,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 
 			conf.setProperty(session.getTenantName() + SMTP_PROTOCOL, settings.getProtocol());
 			conf.setProperty(session.getTenantName() + SMTP_HOST, settings.getServer());
@@ -184,7 +184,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 
 		TreeSet<String> sortedSet = new TreeSet<>();
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		for (Object key : conf.keySet()) {
 			String name = key.toString();
 
@@ -229,7 +229,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	public List<GUIParameter> loadProtocolSettings() throws ServerException {
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		List<GUIParameter> params = new ArrayList<>();
 		for (Object key : conf.keySet())
 			if (key.toString().startsWith("webservice.") || key.toString().startsWith("webdav.")
@@ -246,7 +246,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		try {
 			GenericDAO genericDao = GenericDAO.get();
 			int counter = 0;
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			for (GUIParameter setting : settings) {
 				saveSetting(setting, session, genericDao, conf);
 				counter++;
@@ -293,7 +293,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		saveSettings(settings);
 
 		HttpFirewall firewall = Context.get(HttpFirewall.class);
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		firewall.setAllowBackSlash(config.getBoolean("firewall.allowBackSlash", false));
 		firewall.setAllowSemicolon(config.getBoolean("firewall.allowSemicolon", false));
@@ -313,7 +313,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			if (storeId == config.getInt("store.write"))
 				throw new ServerException(
 						"You cannot delete the store " + storeId + " because it is the current default");
@@ -356,7 +356,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 		List<GUIParameter> values = new ArrayList<>();
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 
 			for (String name : names) {
 				if (name.endsWith("*")) {
@@ -377,7 +377,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		String tenantName = session.getTenantName();
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 
 		List<GUIParameter> params = new ArrayList<>();
 		for (Object name : conf.keySet()) {
@@ -418,7 +418,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	public boolean testEmail(String email) throws ServerException {
 		Session session = validateSession();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		EMailSender sender = new EMailSender(session.getTenantName());
 
 		try {
@@ -462,7 +462,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = validateSession();
 
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			conf.setProperty("reg.name", name != null ? name : "");
 			conf.setProperty("reg.email", email != null ? email : "");
 			conf.setProperty("reg.organization", organization != null ? organization : "");
@@ -497,7 +497,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = validateSession();
 
 		try {
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			Map<String, String> aliasMap = config.getProperties(CONVERTER_ALIAS);
 
 			// Get all the keys that correspond to the same target
@@ -557,7 +557,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = checkMenu(getThreadLocalRequest(), Menu.AUDITING);
 		String tenantName = session.getTenantName();
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 
 		List<GUIParameter> params = new ArrayList<>();
 		for (Object name : conf.keySet()) {

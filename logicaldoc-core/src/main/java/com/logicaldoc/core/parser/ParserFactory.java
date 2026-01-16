@@ -255,7 +255,7 @@ public class ParserFactory {
 	 * @param aliases Array of extension aliases (eg. test, acme ...)
 	 */
 	public static void setAliases(String ext, String[] aliases) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String pAlias = PARSER_ALIAS + ext.toLowerCase();
 		if (aliases == null || aliases.length == 0) {
 			config.setProperty(pAlias, "");
@@ -284,7 +284,7 @@ public class ParserFactory {
 		if (Context.get() == null)
 			return;
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		for (Object key : config.keySet()) {
 			if (key.toString().startsWith(PARSER_ALIAS)) {
 				String ext = key.toString().substring(PARSER_ALIAS.length());

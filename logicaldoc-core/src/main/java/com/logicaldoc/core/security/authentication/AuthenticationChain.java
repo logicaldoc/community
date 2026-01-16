@@ -194,7 +194,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			tenant = t.getName();
 
 		if (key != null) {
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			if ("true".equals(config.getProperty(tenant + ".anonymous.enabled"))
 					&& username.equals(config.getProperty(tenant + ".anonymous.user"))
 					&& key.equals(config.getProperty(tenant + ".anonymous.key")))

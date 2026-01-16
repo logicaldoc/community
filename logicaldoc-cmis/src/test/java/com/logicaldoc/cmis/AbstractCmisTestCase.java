@@ -39,7 +39,7 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		/*
 		 * Prepare a test store file
 		 */
-		String storePath = Context.get().getProperties().getProperty("store.1.dir");
+		String storePath = Context.get().getConfig().getProperty("store.1.dir");
 		File storeRoot = new File(storePath);
 
 		FileUtil.delete(storeRoot);

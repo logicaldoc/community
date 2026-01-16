@@ -666,7 +666,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		DocumentDAO docDao = DocumentDAO.get();
 		FolderDAO folderDao = FolderDAO.get();
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		Session session = SessionManager.get().get(sid);
 
 		EMail mail = new EMail();

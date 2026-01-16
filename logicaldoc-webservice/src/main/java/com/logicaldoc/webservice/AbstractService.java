@@ -202,7 +202,7 @@ public class AbstractService {
 	}
 
 	protected boolean isWebserviceEnabled() {
-		return "true".equals(Context.get().getProperties().get("webservice.enabled"));
+		return "true".equals(Context.get().getConfig().get("webservice.enabled"));
 	}
 
 	/**

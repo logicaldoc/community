@@ -170,7 +170,7 @@ public class ThumbnailManager {
 
 			builder.buildThumbnail(sid, document, fileVersion, src, dest, size,
 					quality != null ? quality
-							: Context.get().getProperties().getInt(
+							: Context.get().getConfig().getInt(
 									TenantDAO.get().getTenantName(document.getTenantId()) + ".gui.thumbnail.quality",
 									93));
 
@@ -190,8 +190,8 @@ public class ThumbnailManager {
 			throws IOException {
 		String tenantName = DocUtil.getTenantName(document);
 		createImage(document, fileVersion,
-				Context.get().getProperties().getInt(tenantName + ".gui." + type + ".size", 200),
-				Context.get().getProperties().getInt(tenantName + ".gui." + type + ".quality", 93), suffix, sid);
+				Context.get().getConfig().getInt(tenantName + ".gui." + type + ".size", 200),
+				Context.get().getConfig().getInt(tenantName + ".gui." + type + ".quality", 93), suffix, sid);
 	}
 
 	/**

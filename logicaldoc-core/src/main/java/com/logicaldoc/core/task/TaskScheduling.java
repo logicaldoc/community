@@ -101,7 +101,7 @@ public class TaskScheduling {
 	 * @throws ParseException error parsing the scheduling expression
 	 */
 	public void load() throws IOException, ParseException {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		this.enabled = config.getBoolean("schedule.enabled." + taskName, false);
 		setCronExpression(config.getProperty("schedule.cron." + taskName));
 		setMode(config.getProperty("schedule.mode." + taskName));
@@ -126,7 +126,7 @@ public class TaskScheduling {
 		TaskTrigger trigger = (TaskTrigger) Context.get("&" + taskName + "Trigger");
 		String expression = getCronExpression();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		config.setProperty("schedule.cron." + taskName, expression);
 		config.setProperty("schedule.enabled." + taskName, enabled ? "true" : "false");
 		config.setProperty("schedule.length." + taskName, Long.toString(maxLength));

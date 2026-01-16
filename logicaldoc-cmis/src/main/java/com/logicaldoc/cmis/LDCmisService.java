@@ -163,7 +163,7 @@ public class LDCmisService extends AbstractCmisService {
 	protected String getLatestChangeLogToken(String repositoryId) throws PersistenceException {
 		log.debug("** getLatestChangeLogToken: {}", repositoryId);
 
-		ContextProperties settings = Context.get().getProperties();
+		ContextProperties settings = Context.get().getConfig();
 		if (!"true".equals(settings.getProperty("cmis.changelog"))) {
 			return null;
 		}

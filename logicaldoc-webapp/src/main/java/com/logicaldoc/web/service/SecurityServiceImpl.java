@@ -267,7 +267,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			session.getDictionary().put(LOCALE, user.getLocale());
 			session.getDictionary().put(USER, user);
 
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(session.getTenantName()), 12));
 
 			return guiSession;
@@ -537,7 +537,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 				guiUser.setTenant(getTenant(user.getTenantId()));
 
-				ContextProperties config = Context.get().getProperties();
+				ContextProperties config = Context.get().getConfig();
 				guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(guiUser.getTenant().getName()), 12));
 
 				loadDashlets(guiUser);
@@ -721,7 +721,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				String tenant = session.getTenantName();
 
 				// Generate an initial password(that must be changed)
-				ContextProperties config = Context.get().getProperties();
+				ContextProperties config = Context.get().getConfig();
 				decodedPassword = PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
 						config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
 						config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),
@@ -908,7 +908,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		 * Prepare the template
 		 */
 		Map<String, Object> dictionary = new HashMap<>();
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String address = config.getProperty("server.url");
 		dictionary.put("url", address);
 		dictionary.put("user", user);
@@ -1029,7 +1029,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		GUISecuritySettings securitySettings = new GUISecuritySettings();
 
 		UserDAO userDao = UserDAO.get();
-		ContextProperties pbean = Context.get().getProperties();
+		ContextProperties pbean = Context.get().getConfig();
 
 		String tenant = session.getTenantName();
 		securitySettings.setPwdExpiration(pbean.getInt("%s.password.ttl".formatted(tenant), 90));
@@ -1091,7 +1091,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		boolean restartRequired = false;
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 
 		if (session.getTenantId() == Tenant.DEFAULT_ID) {
 			conf.setProperty("login.ignorecase", Boolean.toString(settings.isIgnoreLoginCase()));
@@ -1408,7 +1408,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (session.getTenantId() != Tenant.DEFAULT_ID)
 			return new ArrayList<>();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		List<Sequence> seqs = new ArrayList<>();
 		long max = config.getInt("throttle.username.max", 0);
 		Calendar cal = Calendar.getInstance();
@@ -1577,9 +1577,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	@Override
 	public String syncGeolocationDB(String key) throws ServerException {
 		Session session = validateSession();
-		Context.get().getProperties().setProperty(SECURITY_GEOLOCATION_APIKEY, key != null ? key : "");
+		Context.get().getConfig().setProperty(SECURITY_GEOLOCATION_APIKEY, key != null ? key : "");
 		try {
-			Context.get().getProperties().write();
+			Context.get().getConfig().write();
 
 			Geolocation.get().syncDB(key);
 			return Geolocation.get().getDatabaseVersion();
@@ -1694,7 +1694,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		String tenant = session.getTenantName();
 
 		// Generate an initial password(that must be changed)
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		return PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
 				config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
 				config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),

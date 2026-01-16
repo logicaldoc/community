@@ -143,7 +143,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 * Retrieves the timeout in minutes
 	 */
 	protected int getTimeout() {
-		return Context.get().getProperties().getInt(getTenantName() + ".session.timeout", -1);
+		return Context.get().getConfig().getInt(getTenantName() + ".session.timeout", -1);
 	}
 
 	public boolean isOpen() {
@@ -280,7 +280,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 				UserHistoryDAO.get().store(history);
 
 				// Send an email alert to the user in case of new device
-				if (newDevice && Context.get().getProperties().getBoolean(tenantName + ".alertnewdevice", true)) {
+				if (newDevice && Context.get().getConfig().getBoolean(tenantName + ".alertnewdevice", true)) {
 					Map<String, Object> dictionaryMap = new HashMap<>();
 					dictionaryMap.put("user", user);
 					dictionaryMap.put("device", device);

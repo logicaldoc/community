@@ -140,7 +140,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		Session session = SessionManager.get().get(sid);
 		List<String> tags = new ArrayList<>();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String mode = config.getProperty(session.getTenantName() + ".tag.mode");
 		if ("preset".equals(mode)) {
 			GenericDAO gDao = GenericDAO.get();

@@ -55,7 +55,7 @@ public class JobManager {
 	@Resource(name = "Scheduler")
 	protected Scheduler scheduler;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	/**

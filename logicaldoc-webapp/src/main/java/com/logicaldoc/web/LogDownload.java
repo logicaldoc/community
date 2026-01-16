@@ -271,7 +271,7 @@ public class LogDownload extends HttpServlet {
 	}
 
 	private void writeConfigFiles(ZipOutputStream out) throws IOException {
-		File confDir = new File(Context.get().getProperties().getProperty("LDOCHOME") + "/conf");
+		File confDir = new File(Context.get().getConfig().getProperty("LDOCHOME") + "/conf");
 		File[] files = confDir.listFiles();
 		for (File file : files) {
 			if (file.isDirectory())
@@ -421,7 +421,7 @@ public class LogDownload extends HttpServlet {
 	private Properties loadBuildProperties() throws IOException {
 		Properties buildProperties = new Properties();
 		try (InputStream is = new FileInputStream(
-				new File(Context.get().getProperties().getProperty("LDOCHOME") + "/conf/build.properties"))) {
+				new File(Context.get().getConfig().getProperty("LDOCHOME") + "/conf/build.properties"))) {
 			buildProperties.load(is);
 		}
 		return buildProperties;
@@ -438,7 +438,7 @@ public class LogDownload extends HttpServlet {
 	 */
 	private OrderedProperties writeContextPropertiesDump(ZipOutputStream out) throws IOException {
 		File buf = FileUtil.createTempFile("context", DOT_PROPERTIES);
-		ContextProperties cp = Context.get().getProperties();
+		ContextProperties cp = Context.get().getConfig();
 		OrderedProperties prop = new OrderedProperties();
 		for (String key : cp.getKeys()) {
 			if (!key.contains("password"))

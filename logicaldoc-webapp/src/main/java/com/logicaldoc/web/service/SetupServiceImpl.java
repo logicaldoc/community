@@ -139,7 +139,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		// Reload the application context in order to obtain the new value
 		Context.get().refresh();
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 
 		SearchEngine indexer = SearchEngine.get();
 		indexer.close();
@@ -186,7 +186,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		FileUtils.forceMkdir(new File(logDir));
 		String dbDirectory = FilenameUtils.separatorsToSystem(repoFolder.getPath() + "/db/");
 
-		ContextProperties pbean = Context.get().getProperties();
+		ContextProperties pbean = Context.get().getConfig();
 		pbean.setProperty("store.1.dir", docDir);
 		pbean.setProperty("store.write", "1");
 		pbean.setProperty("index.dir", indexDir);

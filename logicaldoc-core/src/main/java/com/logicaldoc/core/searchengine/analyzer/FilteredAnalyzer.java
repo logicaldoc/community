@@ -69,7 +69,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 		Map<String, String> filters = getTokenFilters();
 		List<String> order = getTokenFilterNames(true);
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		/*
 		 * Iterate over the configured filters and progressively create a new
@@ -128,7 +128,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 					 * This class may need initialization from files
 					 */
 					ResourceLoader loader = new FilesystemResourceLoader(
-							new File(Context.get().getProperties().getProperty("index.dir") + "/logicaldoc/conf")
+							new File(Context.get().getConfig().getProperty("index.dir") + "/logicaldoc/conf")
 									.toPath(),
 							this.getClass().getClassLoader());
 					wdFactory.inform(loader);
@@ -179,7 +179,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 	 * @return list of token names
 	 */
 	public static List<String> getTokenFilterNames(boolean justActives) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		Map<String, String> filters = getTokenFilters();
 		ArrayList<String> names = new ArrayList<>();
 		if (!justActives)

@@ -33,7 +33,7 @@ public class LockManager {
 	@Resource(name = "genericDAO")
 	protected GenericDAO genericDao;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	/**

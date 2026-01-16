@@ -124,7 +124,7 @@ public class ResourceServiceImpl implements ResourceService {
 			resource.setRequestedPerson((Long) session.getObject("id"));
 		}
 
-		if (Context.get().getProperties().getBoolean("webdav.cache.enabled", false)) {
+		if (Context.get().getConfig().getBoolean("webdav.cache.enabled", false)) {
 			// update folder path
 			wdc.setFolderPath(folder);
 
@@ -218,7 +218,7 @@ public class ResourceServiceImpl implements ResourceService {
 			resourceList.add(marshallDocument(document, parentResource.getSession()));
 		}
 
-		if (Context.get().getProperties().getBoolean("webdav.cache.enabled", false)) {
+		if (Context.get().getConfig().getBoolean("webdav.cache.enabled", false)) {
 			log.debug("getID: {}, folderName: {},  Size: {}", parentResource.getID(), parentResource.getName(),
 					folderSize);
 

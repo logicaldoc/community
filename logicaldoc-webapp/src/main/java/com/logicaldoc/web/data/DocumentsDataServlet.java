@@ -188,7 +188,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 				+ "</bookmarked>");
 		writer.print("<language>" + document.getLanguage() + "</language>");
 		writer.print("<links>" + (document.getLinks()
-				+ (Context.get().getProperties().getBoolean(tenant + ".gui.showdocattrsaslinks", false)
+				+ (Context.get().getConfig().getBoolean(tenant + ".gui.showdocattrsaslinks", false)
 						? document.getDocAttrs()
 						: 0))
 				+ "</links>");
@@ -704,7 +704,7 @@ select ld_docid
 
 	private String prepareExtendedAttributes(HttpServletRequest request, Session session,
 			List<String> extendedAttributes) {
-		String extAttributeNames = Context.get().getProperties()
+		String extAttributeNames = Context.get().getConfig()
 				.getProperty(session.getTenantName() + ".search.extattr");
 		if (request.getParameter("extattr") != null)
 			extAttributeNames = request.getParameter("extattr");

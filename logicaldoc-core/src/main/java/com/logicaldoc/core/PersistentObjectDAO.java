@@ -634,7 +634,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @return the database identifier
 	 */
 	public default String getDbms() {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		return config.getProperty("jdbc.dbms", "mysql").toLowerCase();
 	}
 

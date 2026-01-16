@@ -217,7 +217,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			addReadConditions(query, session, parentFolder);
 		}
 		query.append(" order by ld_position asc, ");
-		if ("name".equals(Context.get().getProperties().getProperty(tenantName + ".gui.folder.sorting")))
+		if ("name".equals(Context.get().getConfig().getProperty(tenantName + ".gui.folder.sorting")))
 			query.append(" ld_name asc ");
 		else
 			query.append(" ld_creation desc ");
@@ -273,7 +273,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 			// Go with the default page size
 			if (endRecord == null)
-				endRecord = Context.get().getProperties().getLong(session.getTenantName() + ".gui.folder.maxchildren",
+				endRecord = Context.get().getConfig().getLong(session.getTenantName() + ".gui.folder.maxchildren",
 						2000L);
 
 			Integer[] pagination = new Integer[] {

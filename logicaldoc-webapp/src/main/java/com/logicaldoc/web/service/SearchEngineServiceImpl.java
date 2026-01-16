@@ -62,7 +62,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			SearchEngine indexer = SearchEngine.get();
 			searchEngine.setLocked(indexer.isLocked());
 
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			searchEngine.setExcludePatterns(conf.getProperty(session.getTenantName() + ".index.excludes"));
 			searchEngine.setIncludePatterns(conf.getProperty(session.getTenantName() + ".index.includes"));
 			searchEngine
@@ -149,7 +149,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession();
 
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			conf.setProperty(session.getTenantName() + ".index.excludes",
 					searchEngine.getExcludePatters() != null ? searchEngine.getExcludePatters() : "");
 			conf.setProperty(session.getTenantName() + ".index.includes",
@@ -191,7 +191,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession();
 
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			conf.setProperty(session.getTenantName() + ".lang." + language, active ? "enabled" : "disabled");
 			conf.write();
 		} catch (Exception t) {
@@ -229,7 +229,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	public void reorderTokenFilters(List<String> filters) throws ServerException {
 		Session session = validateSession();
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			int i = 1;
 			for (String filter : filters)
 				conf.setProperty(INDEX_TOKENFILTER + filter + ".position", Integer.toString(i++));
@@ -244,7 +244,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession();
 		try {
 			String prefix = INDEX_TOKENFILTER + filter + ".";
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			for (GUIParameter setting : settings)
 				conf.setProperty(prefix + setting.getName(), setting.getValue().trim());
 			conf.write();
@@ -257,7 +257,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	public void setTokenFilterStatus(String filter, boolean active) throws ServerException {
 		Session session = validateSession();
 		try {
-			ContextProperties conf = Context.get().getProperties();
+			ContextProperties conf = Context.get().getConfig();
 			conf.setProperty(INDEX_TOKENFILTER + filter, active ? "enabled" : "disabled");
 			conf.write();
 		} catch (Exception t) {

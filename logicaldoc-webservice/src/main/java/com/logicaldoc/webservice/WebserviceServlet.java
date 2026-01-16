@@ -23,7 +23,7 @@ public class WebserviceServlet extends CXFServlet {
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			// Check if the service is enabled
-			if (Context.get().getProperties().getBoolean("webservice.enabled", false))
+			if (Context.get().getConfig().getBoolean("webservice.enabled", false))
 				super.service(request, response);
 			else
 				response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);

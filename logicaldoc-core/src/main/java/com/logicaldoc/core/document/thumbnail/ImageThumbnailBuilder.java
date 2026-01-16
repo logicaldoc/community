@@ -29,7 +29,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 			int size, int quality) throws IOException {
 
 		String outExt = FileUtil.getExtension(dest.getName().toLowerCase());
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		List<String> commandLine = new ArrayList<>();
 		commandLine.add(conf.getProperty("converter.ImageConverter.path"));
 		if ("png".equals(outExt)) {

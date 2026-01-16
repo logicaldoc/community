@@ -392,8 +392,8 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		Document doc = docDao.findById(1);
 		testSubject.moveToFolder(doc, folder, transaction);
 
-		String storeRoot = Context.get().getProperties().getProperty("store.1.dir");
-		String store2Root = Context.get().getProperties().getProperty("store.2.dir");
+		String storeRoot = Context.get().getConfig().getProperty("store.1.dir");
+		String store2Root = Context.get().getConfig().getProperty("store.2.dir");
 
 		assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
 		FileUtil.delete(new File(store2Root + "/1/doc/"));

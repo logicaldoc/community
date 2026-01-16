@@ -22,7 +22,7 @@
 	<!-- This post processor ensures placeholders substitutions -->
 	<bean id="placeholder" class="com.logicaldoc.util.spring.PropertiesPlaceHolder" />
 
-	<bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
+	<bean id="config" class="com.logicaldoc.util.config.ContextProperties" />
 
 	<bean id="context" class="com.logicaldoc.util.spring.Context" />
 

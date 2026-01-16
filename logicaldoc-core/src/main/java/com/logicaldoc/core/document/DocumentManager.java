@@ -137,7 +137,7 @@ public class DocumentManager {
 	@Resource(name = "store")
 	protected Store store;
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	/**
@@ -722,7 +722,7 @@ public class DocumentManager {
 		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);
 
-		if (exception instanceof ParsingException && Context.get().getProperties()
+		if (exception instanceof ParsingException && Context.get().getConfig()
 				.getBoolean(tenantName(document.getTenantId()) + ".index.skiponerror", false)) {
 			DocumentDAO dDao = DocumentDAO.get();
 			dDao.initialize(document);

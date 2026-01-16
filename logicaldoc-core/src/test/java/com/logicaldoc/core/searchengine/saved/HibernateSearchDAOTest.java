@@ -89,7 +89,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		opt.setCreationFrom(new Date());
 
 		Charset ch = Charset.forName("windows-1252");
-		Context.get().getProperties().setProperty("default.charset", ch.name());
+		Context.get().getConfig().setProperty("default.charset", ch.name());
 		SavedSearch saved = new SavedSearch();
 		saved.setName("manca l'umiltà");
 		saved.saveOptions(opt);
@@ -100,7 +100,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		saved.setOptions(xml);
 
 		ch = StandardCharsets.UTF_8;
-		Context.get().getProperties().setProperty("default.charset", ch.name());
+		Context.get().getConfig().setProperty("default.charset", ch.name());
 		saved = new SavedSearch();
 		saved.setName("manca l'umiltà");
 		saved.saveOptions(opt);
@@ -112,7 +112,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 
 		opt.setExpression("我正在寻找每月200欧元的工人，没有人回答：缺乏谦虚");
 		ch = StandardCharsets.UTF_8;
-		Context.get().getProperties().setProperty("default.charset", ch.name());
+		Context.get().getConfig().setProperty("default.charset", ch.name());
 		saved = new SavedSearch();
 		saved.setName("缺乏谦卑");
 		saved.saveOptions(opt);

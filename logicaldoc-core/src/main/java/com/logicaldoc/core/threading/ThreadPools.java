@@ -56,7 +56,7 @@ public class ThreadPools {
 	 */
 	private Map<String, Future<?>> monitoredFutures = new HashMap<>();
 
-	@Resource(name = "ContextProperties")
+	@Resource(name = "config")
 	protected ContextProperties config;
 
 	/**

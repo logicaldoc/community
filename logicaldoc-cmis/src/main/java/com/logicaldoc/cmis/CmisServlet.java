@@ -25,7 +25,7 @@ public class CmisServlet extends CmisAtomPubServlet {
 
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ContextProperties settings = Context.get().getProperties();
+		ContextProperties settings = Context.get().getConfig();
 
 		if ("true".equals(settings.get("cmis.enabled")))
 			super.service(request, response);

@@ -40,7 +40,7 @@ public class FolderTool {
 	 * @return the display URL
 	 */
 	public String displayUrl(long tenantId, long folderId) {
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		String url = config.getProperty("server.url");
 		if (!url.endsWith("/"))
 			url += "/";

@@ -80,7 +80,7 @@ public enum RunLevel {
 		try {
 			Context context = Context.get();
 			if (context != null)
-				conf = context.getProperties();
+				conf = context.getConfig();
 		} catch (Exception t) {
 			// Nothing to do
 		}

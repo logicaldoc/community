@@ -33,7 +33,7 @@ public class ExtensionAliasesDataServlet extends AbstractDataServlet {
 
 		FormatConversionManager.get().getConverters();
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 
 		Map<String, String> aliasMap = config.getProperties("converter.alias");
 

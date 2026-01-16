@@ -167,7 +167,7 @@ public class EMailSender {
 
 	private void loadSettings(String tenant) {
 		try {
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 
 			protocol = config.getProperty(tenant + ".smtp.protocol");
 			host = config.getProperty(tenant + ".smtp.host");
@@ -367,7 +367,7 @@ public class EMailSender {
 
 		boolean noSend = false;
 		try {
-			noSend = Context.get().getProperties().getBoolean("smtp.nosend", false);
+			noSend = Context.get().getConfig().getBoolean("smtp.nosend", false);
 		} catch (Exception e) {
 			// Context has not been initialized
 			try {
@@ -463,7 +463,7 @@ public class EMailSender {
 	private void cleanAuthorAddress(EMail email) {
 		try {
 			String tenantName = TenantDAO.get().getTenantName(email.getTenantId());
-			if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
+			if (!Context.get().getConfig().getBoolean(tenantName + ".smtp.userasfrom", false))
 				email.setAuthorAddress(null);
 		} catch (Exception e) {
 			// Nothing to do, when using outside a Spring context this code

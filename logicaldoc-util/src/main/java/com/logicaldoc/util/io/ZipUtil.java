@@ -70,9 +70,9 @@ public class ZipUtil implements Closeable {
 
 	public ZipUtil() {
 		try {
-			maxEntries = Context.get().getProperties().getInt("zip.maxentries", 100000);
-			maxSize = Context.get().getProperties().getInt("zip.maxsize", 1024) * 1024 * 1024;
-			maxCompressionRatio = Context.get().getProperties().getDouble("zip.maxratio", 30D);
+			maxEntries = Context.get().getConfig().getInt("zip.maxentries", 100000);
+			maxSize = Context.get().getConfig().getInt("zip.maxsize", 1024) * 1024 * 1024;
+			maxCompressionRatio = Context.get().getConfig().getDouble("zip.maxratio", 30D);
 		} catch (Exception t) {
 			// Nothing to do
 		}

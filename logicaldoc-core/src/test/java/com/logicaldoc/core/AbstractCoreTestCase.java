@@ -70,8 +70,8 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 		 * For each test we must prepare different stores folders because
 		 * re-using the same paths cause locks
 		 */
-		rootStoreOne = new File(Context.get().getProperties().getProperty("store.1.dir"));
-		rootStoreTwo = new File(Context.get().getProperties().getProperty("store.2.dir"));
+		rootStoreOne = new File(Context.get().getConfig().getProperty("store.1.dir"));
+		rootStoreTwo = new File(Context.get().getConfig().getProperty("store.2.dir"));
 
 		Store.get().init();
 

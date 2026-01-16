@@ -286,7 +286,7 @@ public abstract class AbstractTestCase {
 		try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
 			devSettings.load(reader);
 			for (Map.Entry<Object, Object> entry : devSettings.entrySet())
-				Context.get().getProperties().setProperty(entry.getKey().toString(), entry.getValue().toString());
+				Context.get().getConfig().setProperty(entry.getKey().toString(), entry.getValue().toString());
 		}
 	}
 

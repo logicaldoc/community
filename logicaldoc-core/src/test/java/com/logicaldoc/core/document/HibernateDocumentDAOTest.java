@@ -496,7 +496,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	public void testStoreMassive() throws PersistenceException {
 		assertEquals(0L, testSubject.queryForLong("select count(*) from ld_document where ld_filename like 'test-%'"));
 
-		int total = Context.get().getProperties().getInt("maxdocsperfolder") - 100;
+		int total = Context.get().getConfig().getInt("maxdocsperfolder") - 100;
 		Document master = testSubject.findById(1);
 		testSubject.initialize(master);
 		for (int i = 0; i < total; i++) {
@@ -560,7 +560,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		testSubject.store(doc);
 
 		// The document has id == 0 and number of documents in the folder > 0
-		Context.get().getProperties().setProperty("maxdocsperfolder", "3");
+		Context.get().getConfig().setProperty("maxdocsperfolder", "3");
 		Folder folder2 = folderDao.findById(6);
 		doc = new Document();
 		doc.setFileName("newDoc");

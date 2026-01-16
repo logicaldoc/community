@@ -47,7 +47,7 @@ public class HttpUtil {
 		ContextProperties config = null;
 		try {
 			// Try to get the config of the application context
-			config = Context.get().getProperties();
+			config = Context.get().getConfig();
 		} catch (Exception e) {
 			// Ignore
 		}

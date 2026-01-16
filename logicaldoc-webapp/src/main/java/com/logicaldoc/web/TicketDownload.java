@@ -75,7 +75,7 @@ public class TicketDownload extends HttpServlet {
 
 			String behavior = request.getParameter("behavior");
 			if (behavior == null)
-				behavior = Context.get().getProperties().getProperty(tenantName + ".downloadticket.behavior",
+				behavior = Context.get().getConfig().getProperty(tenantName + ".downloadticket.behavior",
 						"download");
 			request.setAttribute("open", Boolean.toString("display".equals(behavior)));
 

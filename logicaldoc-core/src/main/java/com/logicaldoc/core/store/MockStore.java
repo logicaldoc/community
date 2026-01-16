@@ -76,7 +76,7 @@ public class MockStore extends FSStore {
 	@Override
 	public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
 
-		String targetRoot = Context.get().getProperties().getProperty("store." + targetStoreId + ".dir");
+		String targetRoot = Context.get().getConfig().getProperty("store." + targetStoreId + ".dir");
 
 		int moved = 0;
 

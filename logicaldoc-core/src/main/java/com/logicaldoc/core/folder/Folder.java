@@ -415,7 +415,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 	 */
 	public Integer getStore() {
 		try {
-			return stores.get(Context.get().getProperties().get("id"));
+			return stores.get(Context.get().getConfig().get("id"));
 		} catch (Exception t) {
 			return null;
 		}
@@ -428,7 +428,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 	 */
 	public void setStore(Integer store) {
 		try {
-			String nodeId = Context.get().getProperties().getProperty("id");
+			String nodeId = Context.get().getConfig().getProperty("id");
 			if (store == null)
 				stores.remove(nodeId);
 			else

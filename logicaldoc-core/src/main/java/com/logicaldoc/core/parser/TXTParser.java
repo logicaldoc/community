@@ -73,7 +73,7 @@ public class TXTParser extends AbstractParser {
 	}
 
 	private InputStream getLimitedStream(InputStream input, String tenant) {
-		long maxBytes = Context.get().getProperties().getInt(tenant + ".parser.txt.maxsize", 1024) * 1024L;
+		long maxBytes = Context.get().getConfig().getInt(tenant + ".parser.txt.maxsize", 1024) * 1024L;
 		return IOUtil.getLimitedStream(input, maxBytes);
 	}
 }

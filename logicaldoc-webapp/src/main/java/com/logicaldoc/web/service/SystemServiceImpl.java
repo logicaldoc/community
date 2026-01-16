@@ -532,7 +532,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	public void setGUILanguageStatus(String language, boolean active) throws ServerException {
 		Session session = validateSession();
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		conf.setProperty(session.getTenantName() + ".lang." + language + ".gui", active ? "enabled" : "disabled");
 		try {
 			conf.write();
@@ -545,7 +545,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	public void confirmUpdate() throws ServerException {
 		Session session = validateSession();
 
-		ContextProperties conf = Context.get().getProperties();
+		ContextProperties conf = Context.get().getConfig();
 		String prevRunLevel = conf.getProperty("runlevel.back", RunLevel.DEFAULT.toString());
 		conf.setProperty("runlevel", prevRunLevel);
 		try {
@@ -578,7 +578,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			log.warn(e.getMessage());
 		}
 
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getConfig();
 		File restartFile = new File(config.getProperty("LDOCHOME") + "/updates/restart");
 		if (restartFile.exists())
 			FileUtils.deleteQuietly(restartFile);
@@ -924,7 +924,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			/*
 			 * Initialize the database
 			 */
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			PluginDbInit dbInit = new PluginDbInit();
 			dbInit.setDbms(config.getProperty("jdbc.dbms"));
 			dbInit.setDriver(config.getProperty("jdbc.driver"));
@@ -960,7 +960,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		try (ZipUtil zipUtil = new ZipUtil();) {
 			File pluginPackage = uploadedFilesMap.values().iterator().next();
 
-			ContextProperties config = Context.get().getProperties();
+			ContextProperties config = Context.get().getConfig();
 			File rootFolder;
 			if (getThreadLocalRequest() != null)
 				rootFolder = new File(getThreadLocalRequest().getSession().getServletContext().getRealPath("/"));
