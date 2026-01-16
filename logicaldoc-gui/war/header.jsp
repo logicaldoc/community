@@ -20,8 +20,7 @@
     
     public String getProperty(String name){
       try{
-        ContextProperties config=Context.get().getProperties();
-        return config.getProperty(name);
+        return Context.get().getConfig().getProperty(name);
       }catch(Throwable t){
       }  
       return null;
