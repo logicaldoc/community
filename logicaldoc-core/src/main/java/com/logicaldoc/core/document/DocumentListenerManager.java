@@ -2,8 +2,6 @@ package com.logicaldoc.core.document;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.java.plugin.registry.Extension;
@@ -30,46 +28,34 @@ public class DocumentListenerManager {
 	private static final Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
 
 	private List<DocumentListener> listeners = new ArrayList<>();
-	
+
 	@PostConstruct
 	public synchronized void init() {
 		if (!listeners.isEmpty())
 			return;
 
-		// Acquire the 'DocumentListener' extensions of the core plugin
-		PluginRegistry registry = PluginRegistry.getInstance();
-		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "DocumentListener");
-
-		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<>();
-		for (Extension extension : exts) {
-			sortedExts.add(extension);
-		}
-		Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
-			int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
-			int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
-			if (position1 < position2)
-				return -1;
-			else if (position1 > position2)
-				return 1;
-			else
-				return 0;
-		});
-
-		for (Extension ext : sortedExts) {
+		// Acquire the 'DocumentListener' extensions of the core plugin sorted
+		// by position
+		for (Extension ext : PluginRegistry.getInstance().getExtensions("logicaldoc-core", "DocumentListener").stream()
+				.sorted((e1, e2) -> Integer.valueOf(e1.getParameter("position").valueAsString())
+						.compareTo(Integer.valueOf(e2.getParameter("position").valueAsString())))
+				.toList()) {
 			String className = ext.getParameter("class").valueAsString();
 
 			try {
 				Class<?> clazz = Class.forName(className);
 				// Try to instantiate the listener
 				Object listener = clazz.getDeclaredConstructor().newInstance();
-				if (!(listener instanceof DocumentListener))
+				if (listener instanceof DocumentListener l) {
+					listeners.add(l);
+					if (log.isInfoEnabled())
+						log.info("Added document listener {} position {}", className,
+								ext.getParameter(POSITION).valueAsString());
+				} else {
 					throw new ClassNotFoundException(
-							"The specified listener " + className + " doesn't implement DocumentListener interface");
-				listeners.add((DocumentListener) listener);
-				if (log.isInfoEnabled())
-					log.info("Added new document listener {} position {}", className,
-							ext.getParameter(POSITION).valueAsString());
+							"The specified listener %s doesn't implement DocumentListener interface"
+									.formatted(className));
+				}
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException e) {
 				log.error(e.getMessage());

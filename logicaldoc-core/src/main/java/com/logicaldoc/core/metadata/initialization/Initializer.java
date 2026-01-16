@@ -36,8 +36,8 @@ public class Initializer {
 	 * Initializes an object instance taking the initialization logic from a
 	 * given template
 	 * 
-	 * @param object the instance to validate
-	 * @param template the template that contains the validation logic
+	 * @param object the instance to initialize.
+	 * @param template the template that contains the initialization logic
 	 * @param transaction the current transaction
 	 * 
 	 */

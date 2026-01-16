@@ -11,7 +11,7 @@
 		<echo message="Deploying ${pom.artifactId}" />
 
 		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
-		  <arg line="-o -Dmaven.test.skip=true install"/>
+		  <arg line="-o -Dmaven.test.skip=true -Dmaven.javadoc.skip=true install"/>
 		</exec>
 		
 		<for list="${logicaldoc.webroot}" param="webroot">

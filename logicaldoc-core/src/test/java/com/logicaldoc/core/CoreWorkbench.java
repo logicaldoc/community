@@ -45,7 +45,7 @@ public class CoreWorkbench {
 		
 		PDDocument pdfDocument = PDDocument.load(new File("C:\\Users\\marco\\Downloads\\xssPDF-3.pdf"));
 		PDDocumentInformation information = pdfDocument.getDocumentInformation();
-		System.out.println();
+		System.out.println(information);
 		
 //		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 //		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));

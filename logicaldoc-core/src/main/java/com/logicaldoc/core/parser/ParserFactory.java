@@ -144,7 +144,7 @@ public class ParserFactory {
 		parsers.put("mdtext", markdown);
 		parsers.put("markdown", markdown);
 
-		// Acquire the 'Parse' extensions of the core plugin and add defined
+		// Acquire the 'Parser' extensions of the core plugin and add defined
 		// parsers
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Parser");
@@ -155,11 +155,13 @@ public class ParserFactory {
 			try {
 				// Try to instantiate the parser
 				Object parser = Class.forName(className).getDeclaredConstructor().newInstance();
-				if (!(parser instanceof Parser))
+				if (parser instanceof Parser p) {
+					parsers.put(ext, p);
+					log.info("Added new parser {} for extension {}", className, ext);
+				} else {
 					throw new ClassNotFoundException(
-							String.format("The specified parser %s doesn't implement Parser interface", className));
-				parsers.put(ext, (Parser) parser);
-				log.info("Added new parser {} for extension {}", className, ext);
+							"The specified parser %s doesn't implement DocumentListener interface".formatted(className));
+				}
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException e) {
 				log.error(e.getMessage());

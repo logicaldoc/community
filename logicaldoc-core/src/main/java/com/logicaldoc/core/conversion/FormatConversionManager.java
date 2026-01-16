@@ -282,7 +282,7 @@ public class FormatConversionManager {
 
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.CONVERTED);
-				transaction.setComment("format: " + FileUtil.getExtension(out.getName()));
+				transaction.setComment("format: %s".formatted(FileUtil.getExtension(out.getName())));
 				DocumentDAO dao = DocumentDAO.get();
 				try {
 					dao.initialize(document);
@@ -334,7 +334,7 @@ public class FormatConversionManager {
 
 				history.setSession(session);
 				history.setEvent(UserEvent.FILE_CONVERSION);
-				history.setFilename(FileUtil.getBaseName(inFilename) + "." + outFormat.toLowerCase());
+				history.setFilename("%s.%s".formatted(FileUtil.getBaseName(inFilename), outFormat.toLowerCase()));
 				history.setFileSize(in.length());
 				history.setComment(String.format("%s -> %s", inFilename, history.getFilename()));
 				history.setIp(session.getClient().getAddress());
@@ -360,7 +360,7 @@ public class FormatConversionManager {
 		for (String key : getConverters().keySet()) {
 			String[] inOut = key.split("-");
 			FormatConverter assignedConverter = getConverter(srcFilename, inOut[1]);
-			// The actually assigned converter must be anabled
+			// The actually assigned converter must be enabled
 			if (!formats.contains(inOut[1]) && assignedConverter != null && assignedConverter.isEnabled()
 					&& !inExt.equalsIgnoreCase(inOut[1]) && inExt.equalsIgnoreCase(inOut[0]))
 				formats.add(inOut[1]);
@@ -456,7 +456,7 @@ public class FormatConversionManager {
 
 		// Check if a special binding is configured and points to an enabled
 		// converter
-		String currentConverter = config.getProperty("converter." + inOutkey);
+		String currentConverter = config.getProperty("converter.%s".formatted(inOutkey));
 
 		if (StringUtils.isNotEmpty(currentConverter) && formatConverters.size() > 1)
 			converter = formatConverters.stream()

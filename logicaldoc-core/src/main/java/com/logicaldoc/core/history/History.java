@@ -1,5 +1,6 @@
 package com.logicaldoc.core.history;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -32,7 +33,7 @@ import jakarta.persistence.Transient;
  */
 @MappedSuperclass
 public abstract class History extends PersistentObject implements Comparable<History> {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = LoggerFactory.getLogger(History.class);
@@ -96,6 +97,18 @@ public abstract class History extends PersistentObject implements Comparable<His
 	 */
 	@Transient
 	private boolean notifyEvent = true;
+
+	/**
+	 * Some histories are strictly related to a local file
+	 */
+	@Transient
+	private File file = null;
+	
+	/**
+	 * Marks if the object related to this event must be auto-filled
+	 */
+	@Transient
+	private boolean fill = false;
 
 	public String getPath() {
 		return path;
@@ -171,6 +184,22 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+	
+	public boolean isFill() {
+		return fill;
+	}
+
+	public void setFill(boolean fill) {
+		this.fill = fill;
 	}
 
 	public User getUser() {
@@ -321,6 +350,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setDevice(source.getDevice());
 		setGeolocation(source.getGeolocation());
 		setKeyLabel(source.getKeyLabel());
+		setFile(source.getFile());
 	}
 
 	@Override

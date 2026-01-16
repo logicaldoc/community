@@ -4,7 +4,6 @@ import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 /**
  * Registers an event on folder or document
@@ -25,9 +24,6 @@ public class DocumentHistory extends AbstractDocumentHistory {
 	@Column(name = "ld_new")
 	private boolean isNew = true;
 
-	@Transient
-	private String file = null;
-
 	public DocumentHistory() {
 		super();
 	}
@@ -35,7 +31,6 @@ public class DocumentHistory extends AbstractDocumentHistory {
 	public DocumentHistory(DocumentHistory source) {
 		copyAttributesFrom(source);
 		this.color = source.color;
-		setFile(source.getFile());
 		setNew(source.isNew());
 	}
 
@@ -54,14 +49,6 @@ public class DocumentHistory extends AbstractDocumentHistory {
 		return DocumentEvent.fromKey(event);
 	}
 
-	public String getFile() {
-		return file;
-	}
-
-	public void setFile(String file) {
-		this.file = file;
-	}
-
 	public String getColor() {
 		return color;
 	}
@@ -69,8 +56,6 @@ public class DocumentHistory extends AbstractDocumentHistory {
 	public void setColor(String color) {
 		this.color = color;
 	}
-
-	
 
 	public boolean isNew() {
 		return isNew;

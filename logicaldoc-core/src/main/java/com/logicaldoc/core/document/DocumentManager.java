@@ -298,7 +298,8 @@ public class DocumentManager {
 			throw new IllegalArgumentException("File name is mandatory");
 
 		transaction.setEvent(DocumentEvent.CHECKEDIN);
-		transaction.setFile(file.getAbsolutePath());
+		transaction.setFile(file);
+		transaction.setFilename(filename);
 
 		/*
 		 * Better to synchronize this block because under high multi-threading
@@ -682,7 +683,6 @@ public class DocumentManager {
 			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
-
 		}
 		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);
@@ -1056,9 +1056,10 @@ public class DocumentManager {
 			if (docVO.getTemplate() == null && docVO.getTemplateId() != null)
 				docVO.setTemplate(templateDAO.findById(docVO.getTemplateId()));
 
-			transaction.setFile(file.getAbsolutePath());
+			transaction.setFile(file);
+			transaction.setFilename(docVO.getFileName());
 
-			// Create the gridRecord
+			// Create the record
 			transaction.setEvent(DocumentEvent.STORED);
 			documentDAO.store(docVO, transaction);
 

@@ -231,6 +231,8 @@ public class Feature {
 	
 	public static final int SEMANTIC_SEARCHES = 109;
 	
+	public static final int AUTOFILL = 110;
+	
 	private static Set<String> features = new HashSet<>();
 
 	private Feature() {

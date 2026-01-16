@@ -159,6 +159,10 @@
     <parameter-def id="class" />
     <parameter-def id="protocols" />
   </extension-point>
+  <extension-point id="Filler">
+    <parameter-def id="class" />
+    <parameter-def id="position" />
+  </extension-point>  
 
   <extension plugin-id="logicaldoc-core" point-id="Authentication" id="DefaultAuthentication">
     <parameter id="authenticatorId" value="DefaultAuthenticator" />
@@ -418,6 +422,9 @@
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="Feature" id="fwd97">
 	    <parameter id="name" value="Feature_97" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Feature" id="f110">
+	<parameter id="name" value="Feature_110" />
   </extension>  
   
   <extension plugin-id="logicaldoc-core" point-id="Task" id="taskStatsCollector">
@@ -470,6 +477,9 @@
     <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspSendingMessages">
     <parameter id="code" value="sendingMessages" />
   </extension> 
+  <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspAutofill">
+    <parameter id="code" value="autofill" />
+  </extension>
 
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">
 		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd,webp,heic"/>
