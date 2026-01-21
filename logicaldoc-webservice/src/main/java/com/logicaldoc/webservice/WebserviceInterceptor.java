@@ -1,6 +1,8 @@
 package com.logicaldoc.webservice;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -8,6 +10,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +45,8 @@ import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -62,21 +69,23 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	private static final Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
 
 	@Resource(name = "sequenceDAO")
-	private SequenceDAO sequenceDAO;
+	protected SequenceDAO sequenceDAO;
 
 	@Resource(name = "config")
-	private ContextProperties settings;
+	protected ContextProperties config;
 
 	/**
 	 * A cache of counters: key=countername-tenantId name value=actual total
 	 * calls
 	 */
-	private static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<>();
+	protected static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<>();
 
 	/**
-	 * Last time a database synchronization of the coutners has done
+	 * Last time a database synchronization of the counters has done
 	 */
-	private Date lastSync;
+	protected Instant lastSync = Instant.MIN;
+
+	private ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
 
 	/**
 	 * Last time the oldest calls were cleaned
@@ -89,7 +98,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	@Override
 	public void handleMessage(Message message) throws Fault {
-		if (!settings.getBoolean("webservice.enabled", false)) {
+		if (!config.getBoolean("webservice.enabled", false)) {
 			final ResourceBundle bundle = BundleUtils.getBundle(WebserviceInterceptor.class);
 			throw new Fault(new org.apache.cxf.common.i18n.Message("Webservices not enabled", bundle));
 		}
@@ -102,6 +111,8 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
+
+		validateCall(session, payload);
 
 		/**
 		 * Increase the counters
@@ -119,10 +130,22 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		}
 	}
 
+	/**
+	 * Put here your own logic that validates the incoming call
+	 * 
+	 * @param session current session
+	 * @param payload the call's payload
+	 * 
+	 * @throws Fault raised incase the validation did not pass
+	 */
+	protected void validateCall(Session session, String payload) throws Fault {
+		// Nothing to do by default
+	}
+
 	private void recordWebserviceCall(Message message, Session session) {
 		String payload;
 		if (RunLevel.current().aspectEnabled(Aspect.SAVEAPICALL)
-				&& settings.getBoolean("webservice.call.record", false)) {
+				&& config.getBoolean("webservice.call.record", false)) {
 			WebserviceCall call = new WebserviceCall();
 
 			if (Context.get().getConfig().getBoolean("webservice.call.record.payload", false)) {
@@ -226,37 +249,61 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	 * @param session the current session if any
 	 */
 	protected void increaseCounters(Session session) {
-		String currentMonth = getCurrentMonth();
 		increaseCounter(WSCALL, Tenant.SYSTEM_ID);
-		increaseCounter(WSCALL_HYPHEN + currentMonth, Tenant.SYSTEM_ID);
+		increaseCounter(currentMonthSequenceName(), Tenant.SYSTEM_ID);
 		if (session != null) {
 			increaseCounter(WSCALL, session.getTenantId());
-			increaseCounter(WSCALL_HYPHEN + currentMonth, session.getTenantId());
-		}
-
-		Date now = new Date();
-		if (lastSync == null)
-			lastSync = new Date(1);
-
-		long timeSinceLastSync = ChronoUnit.MINUTES.between(lastSync.toInstant(), now.toInstant());
-		if (timeSinceLastSync >= 10) {
-			ThreadPools pools = Context.get(ThreadPools.class);
-			pools.schedule(new WebserviceCallCounterSync(), THREADPOOL_CALL_COUNTER, 5000);
+			increaseCounter(currentMonthSequenceName(), session.getTenantId());
 		}
 	}
 
-	protected void syncCounters() throws PersistenceException {
+	private int syncFrequency() {
+		int freq = config.getInt("webservice.call.syncfreq", 300);
+		if (freq > 1200)
+			freq = 1200;
+		if (freq < 1)
+			freq = 1;
+		return freq;
+	}
+
+	protected void syncCounters() throws PersistenceException, IOException {
 		for (Map.Entry<Pair<String, Long>, AtomicLong> entry : counters.entrySet()) {
 			AtomicLong counter = entry.getValue();
 			sequenceDAO.next(entry.getKey().getKey(), 0L, entry.getKey().getValue(), counter.get());
-			counter.set(0L);
+			
+			// Reset the counter so it will start counting the new arrivals
+			counter.getAndSet(0L);
 		}
-		lastSync = new Date();
 	}
 
+	@PostConstruct
+	public void init() {
+		syncExecutor.scheduleAtFixedRate(() -> {
+			try {
+				// Proceed only in case at least one counter is > 0
+				if (counters.values().stream().anyMatch(v -> v.get() > 0L)) {
+					long timeSinceLastSync = ChronoUnit.SECONDS.between(lastSync, Instant.now());
+					System.out.println("freq " + syncFrequency()+" > since last: " + timeSinceLastSync);
+					if (timeSinceLastSync >= syncFrequency()) {
+						System.out.println("sync 2 " + Instant.now());
+						System.out.println(counters.entrySet().stream().map(ent -> ent.getKey().getKey()+"."+ent.getKey().getValue() + " = " + ent.getValue().get()).toList());
+						
+						syncCounters();
+						lastSync = Instant.now();
+					}
+				}
+			} catch (Exception t) {
+				log.warn(t.getMessage(), t);
+			}
+		}, syncFrequency(), syncFrequency(), TimeUnit.SECONDS);
+	}
+	
+	
+	@PreDestroy
 	public void shutdown() {
 		try {
 			syncCounters();
+			syncExecutor.shutdown();
 		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
@@ -318,7 +365,11 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		return null;
 	}
 
-	private static String getCurrentMonth() {
+	public static String currentMonthSequenceName() {
+		return WSCALL_HYPHEN + getCurrentMonth();
+	}
+
+	protected static String getCurrentMonth() {
 		LocalDate date = LocalDate.now();
 		StringBuilder sb = new StringBuilder(Integer.toString(date.getYear()));
 		int month = date.getMonthValue();
@@ -328,22 +379,22 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		return sb.toString();
 	}
 
-	/**
-	 * This runnable takes care of synchronizing the counters into the database
-	 */
-	class WebserviceCallCounterSync implements Callable<Void> {
-
-		@Override
-		public Void call() {
-			try {
-				syncCounters();
-				lastSync = new Date();
-			} catch (Exception t) {
-				log.warn(t.getMessage(), t);
-			}
-			return null;
-		}
-	}
+//	/**
+//	 * This runnable takes care of synchronizing the counters into the database
+//	 */
+//	class WebserviceCallCounterSync implements Callable<Void> {
+//
+//		@Override
+//		public Void call() {
+//			try {
+//				syncCounters();
+//				lastSync = Instant.now();
+//			} catch (Exception t) {
+//				log.warn(t.getMessage(), t);
+//			}
+//			return null;
+//		}
+//	}
 
 	/**
 	 * This runnable takes care of writing a call into the database
@@ -368,7 +419,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 				long timeSinceLastClean = TimeDiff.getTimeDifference(lastClean, now, TimeField.HOUR);
 				if (timeSinceLastClean >= 24)
-					dao.cleanOldCalls(settings.getInt("webservice.call.ttl", 90));
+					dao.cleanOldCalls(config.getInt("webservice.call.ttl", 90));
 
 				dao.store(wsCall);
 			} catch (Exception t) {
@@ -383,6 +434,6 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	}
 
 	public void setSettings(ContextProperties settings) {
-		this.settings = settings;
+		this.config = settings;
 	}
 }

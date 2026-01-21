@@ -59,6 +59,8 @@ public class GUITenant implements Serializable {
 	 */
 	private Long maxRepoSize;
 
+	private Long maxApiCalls;
+
 	private boolean enabled = true;
 
 	private Date expire;
@@ -73,6 +75,8 @@ public class GUITenant implements Serializable {
 	private long size;
 
 	private long sessions;
+
+	private long apiCalls;
 
 	private GUIBranding branding;
 
@@ -221,6 +225,14 @@ public class GUITenant implements Serializable {
 		this.maxRepoSize = maxRepoSize;
 	}
 
+	public Long getMaxApiCalls() {
+		return maxApiCalls;
+	}
+
+	public void setMaxApiCalls(Long maxApiCalls) {
+		this.maxApiCalls = maxApiCalls;
+	}
+
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -327,5 +339,13 @@ public class GUITenant implements Serializable {
 
 	public void setGuests(long guests) {
 		this.guests = guests;
+	}
+
+	public long getApiCalls() {
+		return apiCalls;
+	}
+
+	public void setApiCalls(long apiCalls) {
+		this.apiCalls = apiCalls;
 	}
 }

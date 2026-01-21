@@ -37,7 +37,7 @@
     <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.ThresholdGZIPOutInterceptor">
         <property name="threshold" value="${webservice.gzip}" />
     </bean>
-    <bean id="WebserviceInterceptor" class="${webservice.interceptor}" destroy-method="shutdown" />
+    <bean id="WebserviceInterceptor" class="${webservice.interceptor}" />
     <bean id="WebserviceFaultInterceptor" class="com.logicaldoc.webservice.WebserviceFaultInterceptor" />
     
     

@@ -89,6 +89,12 @@ public class Tenant extends PersistentObject implements Serializable {
 	private Long maxRepoDocs;
 
 	/**
+	 * Maximum monthly API calls
+	 */
+	@Column(name = "ld_maxapicalls", nullable = true)
+	private Long maxApiCalls;
+
+	/**
 	 * Maximum repository size expressed in MB
 	 */
 	@Column(name = "ld_maxreposize", nullable = true)
@@ -122,6 +128,7 @@ public class Tenant extends PersistentObject implements Serializable {
 		this.enabled = source.enabled;
 		this.expire = source.expire;
 		this.maxRepoSize = source.maxRepoSize;
+		this.maxApiCalls = source.maxApiCalls;
 		this.quotaThreshold = source.quotaThreshold;
 		this.quotaAlertRecipients = source.quotaAlertRecipients;
 
@@ -244,6 +251,14 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	public void setMaxRepoSize(Long maxRepoSize) {
 		this.maxRepoSize = maxRepoSize;
+	}
+
+	public Long getMaxApiCalls() {
+		return maxApiCalls;
+	}
+
+	public void setMaxApiCalls(Long maxApiCalls) {
+		this.maxApiCalls = maxApiCalls;
 	}
 
 	public boolean isEnabled() {

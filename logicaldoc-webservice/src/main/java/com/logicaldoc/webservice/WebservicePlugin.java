@@ -2,7 +2,6 @@ package com.logicaldoc.webservice;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 import com.logicaldoc.util.plugin.PluginException;
@@ -28,6 +27,7 @@ public class WebservicePlugin extends LogicalDOCPlugin {
 			pbean.setProperty("webservice.call.gridRecord", "true");
 			pbean.setProperty("webservice.call.ttl", "90");
 			pbean.setProperty("webservice.call.gridRecord", "true");
+			pbean.setProperty("webservice.call.syncfreq", "300");
 			pbean.setProperty("webservice.json.droproot", "true");
 
 			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_STORE + ".max", "20");

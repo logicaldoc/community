@@ -58,7 +58,7 @@ public class SoapWorkbench {
 		System.out.println("Sid: " + sid);
 
 		try {
-			System.out.println(info.getInfo().getProductName() + "  " + info.getInfo().getDate());
+		//	System.out.println(info.getInfo().getProductName() + "  " + info.getInfo().getDate());
 
 //			systemStuff(sid);
 
@@ -70,7 +70,7 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-			documentStuff(sid);
+			// documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
@@ -159,7 +159,7 @@ public class SoapWorkbench {
 			// System.out.println("**************************************");
 			// }
 
-			massiveInsert(sid);
+			// massiveInsert(sid);
 		} finally {
 			auth.logout(sid);
 		}

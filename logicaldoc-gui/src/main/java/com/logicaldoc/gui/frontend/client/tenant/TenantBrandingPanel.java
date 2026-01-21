@@ -306,13 +306,20 @@ public class TenantBrandingPanel extends HLayout {
 
 		TextItem support = ItemFactory.newEmailItem(SUPPORT, SUPPORT, false);
 		support.setValue(tenant.getBranding().getSupport());
+		support.setColSpan(2);
+		support.setEndRow(true);
+		support.setStartRow(true);
+		support.setWidth(360);
 		support.setDisabled(readonlyOrNotFullBranding);
 		support.setVisible(Feature.enabled(Feature.TECHNICAL_SUPPORT));
 		support.addChangedHandler(changedHandler);
 
 		TextItem sales = ItemFactory.newEmailItem(SALES, SALES, false);
 		sales.setValue(tenant.getBranding().getSales());
+		sales.setColSpan(2);
 		sales.setEndRow(true);
+		sales.setStartRow(true);
+		sales.setWidth(360);
 		sales.setDisabled(readonlyOrNotFullBranding);
 		sales.addChangedHandler(changedHandler);
 

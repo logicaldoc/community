@@ -23,6 +23,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class TenantQuotaPanel extends HLayout {
+	private static final String MONTHLYAPICALLSQUOTA = "monthlyapicallsquota";
+
 	private static final String QUOTA_THRESHOLD = "quotaThreshold";
 
 	private static final String SIZEQUOTA = "sizequota";
@@ -108,6 +110,15 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			sessionsQuota.addChangedHandler(changedHandler);
 
+		SpinnerItem monthlyApiCallsQuota = ItemFactory.newSpinnerItem(MONTHLYAPICALLSQUOTA, tenant.getMaxApiCalls());
+		monthlyApiCallsQuota.setDisabled(readonly);
+		monthlyApiCallsQuota.setRequired(false);
+		monthlyApiCallsQuota.setMin(0);
+		monthlyApiCallsQuota.setStep(10);
+		monthlyApiCallsQuota.setWidth(100);
+		if (!readonly)
+			monthlyApiCallsQuota.addChangedHandler(changedHandler);
+		
 		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, tenant.getMaxRepoDocs());
 		documentsQuota.setDisabled(readonly);
 		documentsQuota.setRequired(false);
@@ -149,12 +160,13 @@ public class TenantQuotaPanel extends HLayout {
 
 		StaticTextItem documents = ItemFactory.newStaticTextItem("documents", Util.formatLong(tenant.getDocuments()));
 		StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", Util.formatLong(tenant.getSessions()));
+		StaticTextItem apicalls = ItemFactory.newStaticTextItem("monthlyapicalls", Util.formatLong(tenant.getApiCalls()));
 		StaticTextItem users = ItemFactory.newStaticTextItem("users", Util.formatLong(tenant.getUsers()));
 		StaticTextItem guests = ItemFactory.newStaticTextItem("guests", "readonlyusers",
 				Util.formatLong(tenant.getGuests()));
 
 		form.setItems(usersQuota, users, guestsQuota, guests, sessionsQuota, sessions, documentsQuota, documents,
-				sizeQuota, size, quotaThreshold, recipients);
+				sizeQuota, size, monthlyApiCallsQuota, apicalls, quotaThreshold, recipients);
 		addMember(layout);
 	}
 
@@ -174,6 +186,11 @@ public class TenantQuotaPanel extends HLayout {
 		else
 			tenant.setMaxRepoSize(Long.parseLong(values.get(SIZEQUOTA).toString()));
 
+		if (values.get(MONTHLYAPICALLSQUOTA) == null)
+			tenant.setMaxApiCalls(null);
+		else
+			tenant.setMaxApiCalls(Long.parseLong(values.get(MONTHLYAPICALLSQUOTA).toString()));
+		
 		if (values.get(USERSQUOTA) == null)
 			tenant.setMaxUsers(null);
 		else
@@ -192,8 +209,8 @@ public class TenantQuotaPanel extends HLayout {
 		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);
 		else
-			tenant.setQuotaThreshold(Integer.parseInt(values.get(QUOTA_THRESHOLD).toString()));
-
+			tenant.setQuotaThreshold(Integer.parseInt(values.get(QUOTA_THRESHOLD).toString()));		
+		
 		setQuotaAlertRecipients();
 
 		return !vm.hasErrors();
@@ -206,7 +223,7 @@ public class TenantQuotaPanel extends HLayout {
 			for (int i = 0; i < usernames.length; i++)
 				tenant.addQuotaAlertRecipient(usernames[i]);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
