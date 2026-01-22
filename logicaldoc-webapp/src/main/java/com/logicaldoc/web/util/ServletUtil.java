@@ -231,18 +231,19 @@ public class ServletUtil {
 		initUser(user);
 
 		Document document = getDocument(resource.getDocId(), user);
+		if (document.getId() != resource.getDocId())
+			resource = StoreResource.builder().document(document).fileVersion(resource.getFileVersion())
+					.suffix(resource.getSuffix()).build();
 
 		String filename = getFilename(fileName, resource.getSuffix(), document);
 
 		Store store = Store.get();
 
-		if (!store.exists(resource)) {
+		if (!store.exists(resource))
 			throw new FileNotFoundException(resource.name());
-		}
-
-		if (StringUtils.isNotEmpty(resource.getSuffix())) {
+		
+		if (StringUtils.isNotEmpty(resource.getSuffix()))
 			filename = filename + "." + resource.getSuffix().substring(resource.getSuffix().lastIndexOf('.') + 1);
-		}
 
 		long length = store.size(resource);
 		String contentType = MimeType.getByFilename(filename);
@@ -507,7 +508,7 @@ public class ServletUtil {
 
 	private static Document getDocument(long docId, User user) throws PersistenceException, FileNotFoundException {
 		DocumentDAO dao = DocumentDAO.get();
-		Document doc = dao.findById(docId);
+		Document doc = dao.findDocument(docId);
 		if (doc == null || (user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
 				&& !doc.isPublishing()))
 			throw new FileNotFoundException("Document not published");
