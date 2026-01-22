@@ -65,6 +65,8 @@ public class ModelProperties extends ModelDetailsTab {
 	private static final String NEURAL = "neural";
 
 	private static final String EMBEDDER = "embedder";
+	
+	private static final String ZEROSHOT = "zeroshot";
 
 	private static final String ACTIVATION = "activation";
 

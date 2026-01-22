@@ -50,6 +50,11 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 	}
 
 	private void refresh() {
+		if (!model.isTrainable()) {
+			container.removeMembers(container.getMembers());
+			return;
+		}
+
 		if (Boolean.TRUE.equals(container.contains(form)))
 			container.removeChild(form);
 
@@ -118,6 +123,9 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 	}
 
 	boolean validate() {
+		if (!model.isTrainable())
+	        return true;
+		
 		if (form.validate()) {
 			model.getTraining().setCron(form.getValueAsString("cron"));
 			model.getTraining().setEnabled(Boolean.parseBoolean(form.getValueAsString(ENABLED)));
@@ -147,4 +155,5 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 					: I18N.message("report"));
 		}
 	}
+
 }

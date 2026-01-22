@@ -59,6 +59,8 @@ public class GUIModel implements Serializable {
 	double alpha = 0.025D;
 
 	double minAlpha = 0.0001D;
+	
+	private boolean trainable = true;
 
 	/**
 	 * Words that do not appear this minimum number of times must be discarded
@@ -309,5 +311,13 @@ public class GUIModel implements Serializable {
 
 	public void setMinAlpha(double minAlpha) {
 		this.minAlpha = minAlpha;
+	}
+	
+	public boolean isTrainable() {
+	    return trainable;
+	}
+
+	public void setTrainable(boolean trainable) {
+	    this.trainable = trainable;
 	}
 }
