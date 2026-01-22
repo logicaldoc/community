@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.io.FileUtil;
@@ -26,7 +28,7 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 			String arguments = getParameter("arguments");
 			List<String> commandLine = new ArrayList<>();
 			commandLine.add(getParameter("path"));
-			if (arguments != null)
+			if (StringUtils.isNotBlank(arguments))
 				commandLine.addAll(Arrays.asList(arguments.split(" ")));
 
 			commandLine.add("-dNOPAUSE");
@@ -42,15 +44,21 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 			} else if ("ps".equals(ext)) {
 				device = "ps2write";
 				pages = List.of("-dFirstPage=1", "-dLastPage=1");
-			} else if ("txt".equals(ext))
+			} else if ("txt".equals(ext)) {
 				device = "txtwrite";
-
+			} else {
+				device = "jpeg";
+				pages = List.of("-dFirstPage=1", "-dLastPage=1");
+			}
+			
 			commandLine.add("-sDEVICE=" + device);
 			if (pages != null)
 				commandLine.addAll(pages);
 			commandLine.addAll(List.of("-sOutputFile=" + dest.getPath(), src.getPath()));
 
-			new Exec().exec(commandLine, null, null, getTimeout());
+			System.out.println(commandLine);
+			
+			new Exec().exec(commandLine, null, new File("C:\\LogicalDOC-Devel\\ghostscript\\bin"), getTimeout());
 
 			if (!dest.exists() || dest.length() < 1)
 				throw new IOException("Empty conversion");
