@@ -23,6 +23,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class TenantQuotaPanel extends HLayout {
+	
 	private static final String MONTHLYAPICALLSQUOTA = "monthlyapicallsquota";
 
 	private static final String QUOTA_THRESHOLD = "quotaThreshold";
@@ -89,6 +90,7 @@ public class TenantQuotaPanel extends HLayout {
 		usersQuota.setMin(tenant.getUsers());
 		usersQuota.setStep(1);
 		usersQuota.setWidth(80);
+		usersQuota.setVisible(!tenant.isSystem());
 		if (!readonly)
 			usersQuota.addChangedHandler(changedHandler);
 
@@ -98,6 +100,7 @@ public class TenantQuotaPanel extends HLayout {
 		guestsQuota.setMin(tenant.getGuests());
 		guestsQuota.setStep(1);
 		guestsQuota.setWidth(80);
+		guestsQuota.setVisible(!tenant.isSystem());
 		if (!readonly)
 			guestsQuota.addChangedHandler(changedHandler);
 
@@ -107,6 +110,7 @@ public class TenantQuotaPanel extends HLayout {
 		sessionsQuota.setMin(0);
 		sessionsQuota.setStep(1);
 		sessionsQuota.setWidth(80);
+		sessionsQuota.setVisible(!tenant.isSystem());
 		if (!readonly)
 			sessionsQuota.addChangedHandler(changedHandler);
 
@@ -116,15 +120,17 @@ public class TenantQuotaPanel extends HLayout {
 		monthlyApiCallsQuota.setMin(0);
 		monthlyApiCallsQuota.setStep(10);
 		monthlyApiCallsQuota.setWidth(100);
+		monthlyApiCallsQuota.setVisible(!tenant.isSystem());
 		if (!readonly)
 			monthlyApiCallsQuota.addChangedHandler(changedHandler);
-		
+
 		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, tenant.getMaxRepoDocs());
 		documentsQuota.setDisabled(readonly);
 		documentsQuota.setRequired(false);
 		documentsQuota.setMin(0);
 		documentsQuota.setStep(10000);
 		documentsQuota.setWidth(100);
+		documentsQuota.setVisible(!tenant.isSystem());
 		if (!readonly)
 			documentsQuota.addChangedHandler(changedHandler);
 
@@ -135,6 +141,7 @@ public class TenantQuotaPanel extends HLayout {
 		sizeQuota.setMin(0);
 		sizeQuota.setStep(1024);
 		sizeQuota.setWidth(100);
+		sizeQuota.setVisible(!tenant.isSystem());
 		if (!readonly)
 			sizeQuota.addChangedHandler(changedHandler);
 
@@ -144,6 +151,7 @@ public class TenantQuotaPanel extends HLayout {
 		quotaThreshold.setMax(100);
 		quotaThreshold.setMin(0);
 		quotaThreshold.setHint("%");
+		quotaThreshold.setVisible(!tenant.isSystem());
 		if (!readonly)
 			quotaThreshold.addChangedHandler(changedHandler);
 
@@ -152,21 +160,44 @@ public class TenantQuotaPanel extends HLayout {
 		recipients.setDisabled(readonly);
 		recipients.setValueField("username");
 		recipients.setDisplayField("username");
+		recipients.setVisible(!tenant.isSystem());
 		if (!readonly)
 			recipients.addChangedHandler(changedHandler);
 
 		StaticTextItem size = ItemFactory.newStaticTextItem("ssize", "size", Util.formatSizeW7(tenant.getSize()));
 		size.setWrap(false);
-
 		StaticTextItem documents = ItemFactory.newStaticTextItem("documents", Util.formatLong(tenant.getDocuments()));
 		StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", Util.formatLong(tenant.getSessions()));
-		StaticTextItem apicalls = ItemFactory.newStaticTextItem("monthlyapicalls", Util.formatLong(tenant.getApiCalls()));
+		StaticTextItem apicalls = ItemFactory.newStaticTextItem("monthlyapicalls",
+				Util.formatLong(tenant.getApiCalls()));
 		StaticTextItem users = ItemFactory.newStaticTextItem("users", Util.formatLong(tenant.getUsers()));
 		StaticTextItem guests = ItemFactory.newStaticTextItem("guests", "readonlyusers",
 				Util.formatLong(tenant.getGuests()));
 
-		form.setItems(usersQuota, users, guestsQuota, guests, sessionsQuota, sessions, documentsQuota, documents,
-				sizeQuota, size, monthlyApiCallsQuota, apicalls, quotaThreshold, recipients);
+		// Static items to display whole system quotas
+		StaticTextItem usersSystemQuota = ItemFactory.newStaticTextItem("sys" + USERSQUOTA,
+				USERSQUOTA, Util.formatInt(tenant.getMaxUsers()));
+		usersSystemQuota.setVisible(tenant.isSystem());
+		StaticTextItem guestsSystemQuota = ItemFactory.newStaticTextItem("sys" + GUESTSQUOTA,
+				"readonlyusersquota", Util.formatInt(tenant.getMaxGuests()));
+		guestsSystemQuota.setVisible(tenant.isSystem());
+		
+		StaticTextItem sessionsSystemQuota = ItemFactory.newStaticTextItem("sys" + SESSIONSQUOTA,
+				SESSIONSQUOTA, Util.formatInt(tenant.getMaxSessions()));
+		sessionsSystemQuota.setVisible(tenant.isSystem());
+		StaticTextItem documentsSystemQuota = ItemFactory.newStaticTextItem("sys" + DOCUMENTSQUOTA,
+				DOCUMENTSQUOTA, Util.formatLong(tenant.getMaxRepoDocs()));
+		documentsSystemQuota.setVisible(tenant.isSystem());
+		StaticTextItem sizeSystemQuota = ItemFactory.newStaticTextItem("sys" + SIZEQUOTA, SIZEQUOTA,
+				Util.formatSizeW7(tenant.getMaxRepoSize() * 1024L * 1024L));
+		sizeSystemQuota.setVisible(tenant.isSystem());
+		StaticTextItem monthlyApiCallsSystemQuota = ItemFactory.newStaticTextItem("sys" + MONTHLYAPICALLSQUOTA,
+				MONTHLYAPICALLSQUOTA, Util.formatLong(tenant.getMaxApiCalls()));
+		monthlyApiCallsSystemQuota.setVisible(tenant.isSystem());
+
+		form.setItems(usersQuota, usersSystemQuota, users, guestsQuota, guestsSystemQuota, guests, sessionsQuota, sessionsSystemQuota, sessions, documentsQuota, documentsSystemQuota, documents,
+				sizeQuota, sizeSystemQuota, size, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls,
+				quotaThreshold, recipients);
 		addMember(layout);
 	}
 
@@ -190,7 +221,7 @@ public class TenantQuotaPanel extends HLayout {
 			tenant.setMaxApiCalls(null);
 		else
 			tenant.setMaxApiCalls(Long.parseLong(values.get(MONTHLYAPICALLSQUOTA).toString()));
-		
+
 		if (values.get(USERSQUOTA) == null)
 			tenant.setMaxUsers(null);
 		else
@@ -209,8 +240,8 @@ public class TenantQuotaPanel extends HLayout {
 		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);
 		else
-			tenant.setQuotaThreshold(Integer.parseInt(values.get(QUOTA_THRESHOLD).toString()));		
-		
+			tenant.setQuotaThreshold(Integer.parseInt(values.get(QUOTA_THRESHOLD).toString()));
+
 		setQuotaAlertRecipients();
 
 		return !vm.hasErrors();

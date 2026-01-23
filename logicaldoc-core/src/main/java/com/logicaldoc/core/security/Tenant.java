@@ -136,6 +136,14 @@ public class Tenant extends PersistentObject implements Serializable {
 		setTenantId(source.getTenantId());
 	}
 
+	public boolean isDefault() {
+		return id == DEFAULT_ID;
+	}
+	
+	public boolean isSystem() {
+		return id == SYSTEM_ID;
+	}
+	
 	public String getName() {
 		return name;
 	}

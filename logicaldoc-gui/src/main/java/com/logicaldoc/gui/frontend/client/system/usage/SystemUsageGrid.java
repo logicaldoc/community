@@ -82,7 +82,7 @@ public class SystemUsageGrid extends ListGrid {
 		MenuItem history = new MenuItem();
 		history.setTitle(I18N.message("usagehistory"));
 		history.addClickHandler(
-				event -> new SystemUsageHistoryChart(getSelectedRecord().getAttributeAsString("measure"),
+				click -> new SystemUsageHistoryChart(getSelectedRecord().getAttributeAsString("measure"),
 						getSelectedRecord().getAttributeAsString("label"), tenantId).show());
 
 		Menu contextMenu = new Menu();
@@ -92,6 +92,9 @@ public class SystemUsageGrid extends ListGrid {
 	}
 
 	private String stylize(String value, ListGridRecord rec) {
+		if(value.startsWith("-"))
+			return "";
+		
 		if (rec.getAttributeAsInt("use") > 90) {
 			return "<span class='systemusage-low'>" + value + "</span>";
 		} else {

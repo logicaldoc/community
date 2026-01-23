@@ -244,6 +244,10 @@ public class GUITenant implements Serializable {
 	public boolean isDefault() {
 		return id == Constants.TENANT_DEFAULTID;
 	}
+	
+	public boolean isSystem() {
+		return id == Constants.TENANT_SYSTEMID;
+	}
 
 	public Date getExpire() {
 		return expire;

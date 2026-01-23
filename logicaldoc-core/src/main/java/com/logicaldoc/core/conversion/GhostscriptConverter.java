@@ -33,12 +33,13 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 
 			commandLine.add("-dNOPAUSE");
 			commandLine.add("-dBATCH");
-			
+
 			List<String> pages = null;
 			String device = "jpeg";
-			if ("tif".equals(ext) || "tiff".equals(ext))
+			if ("tif".equals(ext) || "tiff".equals(ext)) {
 				device = "tiff24nc";
-			else if ("png".equals(ext)) {
+				commandLine.add("-sCompression=lzw");
+			} else if ("png".equals(ext)) {
 				device = "png16m";
 				pages = List.of("-dFirstPage=1", "-dLastPage=1");
 			} else if ("ps".equals(ext)) {
@@ -50,14 +51,12 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 				device = "jpeg";
 				pages = List.of("-dFirstPage=1", "-dLastPage=1");
 			}
-			
+
 			commandLine.add("-sDEVICE=" + device);
 			if (pages != null)
 				commandLine.addAll(pages);
 			commandLine.addAll(List.of("-sOutputFile=" + dest.getPath(), src.getPath()));
 
-			System.out.println(commandLine);
-			
 			new Exec().exec(commandLine, null, new File("C:\\LogicalDOC-Devel\\ghostscript\\bin"), getTimeout());
 
 			if (!dest.exists() || dest.length() < 1)

@@ -31,6 +31,8 @@ public final class Constants {
 
 	public static final String WORKSPACE_DEFAULTNAME = "Default";
 
+	public static final long TENANT_SYSTEMID = -1L;
+	
 	public static final long TENANT_DEFAULTID = 1L;
 
 	public static final String TENANT_DEFAULTNAME = "default";

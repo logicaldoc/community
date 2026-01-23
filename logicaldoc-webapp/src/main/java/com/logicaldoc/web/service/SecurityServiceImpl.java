@@ -149,7 +149,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	public static GUITenant getTenant(long tenantId) {
 		Tenant tenant = null;
 		try {
-			tenant = TenantDAO.get().findById(tenantId);
+			if(tenantId == Tenant.SYSTEM_ID) {
+				tenant = new Tenant();
+				tenant.setId(Tenant.SYSTEM_ID);
+				tenant.setName(Tenant.SYSTEM_NAME);
+			} else {
+				tenant = TenantDAO.get().findById(tenantId);
+			}
 			return fromTenant(tenant);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

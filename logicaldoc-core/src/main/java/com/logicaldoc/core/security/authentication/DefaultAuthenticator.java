@@ -1,7 +1,9 @@
 package com.logicaldoc.core.security.authentication;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,11 +161,12 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 	private void validateLegals(User user) throws UnconfirmedLegalsException {
 		if (user.isLegals()) {
 			try {
-				int unconfirmedLegals = userDAO.queryForInt(
-						"select count(*) from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name)",
-						Map.of("username", user.getUsername()));
-				if (unconfirmedLegals > 0) {
-					log.error("User {} did not confirm {} legals", user, unconfirmedLegals);
+				List<String> unconfirmedLegals = userDAO.queryForList(
+						"select ld_name from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name)",
+						Map.of("username", user.getUsername()), String.class, null);			
+				if (!unconfirmedLegals.isEmpty()) {
+					log.error("User {} did not confirm {} legals: {}", user, unconfirmedLegals.size(),
+							unconfirmedLegals.stream().collect(Collectors.joining(",")));
 					throw new UnconfirmedLegalsException();
 				}
 			} catch (PersistenceException e) {

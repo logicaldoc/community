@@ -16,7 +16,6 @@ import com.logicaldoc.gui.frontend.client.settings.protocols.ProtocolsPanel;
 import com.logicaldoc.gui.frontend.client.settings.searchindex.SearchIndexPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -55,7 +54,7 @@ public class SettingsMenu extends VLayout {
 		addAuditing();
 
 		addProxy();
-		
+
 		addParameters();
 	}
 
@@ -120,7 +119,7 @@ public class SettingsMenu extends VLayout {
 		Button keystore = new Button(I18N.message("keystore"));
 		keystore.setWidth100();
 		keystore.setHeight(25);
-		keystore.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new KeystorePanel()));
+		keystore.addClickHandler(click -> AdminScreen.get().setContent(new KeystorePanel()));
 		if (Feature.enabled(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.KEYSTORE))
 			addMember(keystore);
 	}
@@ -129,8 +128,7 @@ public class SettingsMenu extends VLayout {
 		Button quota = new Button(I18N.message("quota"));
 		quota.setWidth100();
 		quota.setHeight(25);
-		quota.addClickHandler(
-				(ClickEvent event) -> AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId())));
+		quota.addClickHandler(click -> AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId())));
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.QUOTA))
 			addMember(quota);
 	}
@@ -139,7 +137,7 @@ public class SettingsMenu extends VLayout {
 		Button smtp = new Button(I18N.message("outgoingemail"));
 		smtp.setWidth100();
 		smtp.setHeight(25);
-		smtp.addClickHandler(event -> SettingService.Instance.get().loadEmailSettings(new DefaultAsyncCallback<>() {
+		smtp.addClickHandler(click -> SettingService.Instance.get().loadEmailSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(GUIEmailSettings settings) {
 				AdminScreen.get().setContent(new OutgoingEmailPanel(settings));

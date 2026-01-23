@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -20,7 +19,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.io.CachedOutputStream;
@@ -99,8 +97,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	@Override
 	public void handleMessage(Message message) throws Fault {
 		if (!config.getBoolean("webservice.enabled", false)) {
-			final ResourceBundle bundle = BundleUtils.getBundle(WebserviceInterceptor.class);
-			throw new Fault(new org.apache.cxf.common.i18n.Message("Webservices not enabled", bundle));
+			throw new Fault(new IOException("Webservices not enabled"));
 		}
 
 		String payload = getPayload(message, 2048L);
@@ -112,7 +109,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 			log.warn(t.getMessage(), t);
 		}
 
-		validateCall(session, payload);
+		validateCall(message, payload, session);
 
 		/**
 		 * Increase the counters
@@ -133,12 +130,13 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	/**
 	 * Put here your own logic that validates the incoming call
 	 * 
+	 * @param message the current message
 	 * @param session current session
 	 * @param payload the call's payload
 	 * 
 	 * @throws Fault raised incase the validation did not pass
 	 */
-	protected void validateCall(Session session, String payload) throws Fault {
+	protected void validateCall(Message message, String payload, Session session) throws Fault {
 		// Nothing to do by default
 	}
 
@@ -270,7 +268,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		for (Map.Entry<Pair<String, Long>, AtomicLong> entry : counters.entrySet()) {
 			AtomicLong counter = entry.getValue();
 			sequenceDAO.next(entry.getKey().getKey(), 0L, entry.getKey().getValue(), counter.get());
-			
+
 			// Reset the counter so it will start counting the new arrivals
 			counter.getAndSet(0L);
 		}
@@ -283,11 +281,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 				// Proceed only in case at least one counter is > 0
 				if (counters.values().stream().anyMatch(v -> v.get() > 0L)) {
 					long timeSinceLastSync = ChronoUnit.SECONDS.between(lastSync, Instant.now());
-					System.out.println("freq " + syncFrequency()+" > since last: " + timeSinceLastSync);
 					if (timeSinceLastSync >= syncFrequency()) {
-						System.out.println("sync 2 " + Instant.now());
-						System.out.println(counters.entrySet().stream().map(ent -> ent.getKey().getKey()+"."+ent.getKey().getValue() + " = " + ent.getValue().get()).toList());
-						
 						syncCounters();
 						lastSync = Instant.now();
 					}
@@ -297,8 +291,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 			}
 		}, syncFrequency(), syncFrequency(), TimeUnit.SECONDS);
 	}
-	
-	
+
 	@PreDestroy
 	public void shutdown() {
 		try {
@@ -378,23 +371,6 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		sb.append(Integer.toString(month));
 		return sb.toString();
 	}
-
-//	/**
-//	 * This runnable takes care of synchronizing the counters into the database
-//	 */
-//	class WebserviceCallCounterSync implements Callable<Void> {
-//
-//		@Override
-//		public Void call() {
-//			try {
-//				syncCounters();
-//				lastSync = Instant.now();
-//			} catch (Exception t) {
-//				log.warn(t.getMessage(), t);
-//			}
-//			return null;
-//		}
-//	}
 
 	/**
 	 * This runnable takes care of writing a call into the database
