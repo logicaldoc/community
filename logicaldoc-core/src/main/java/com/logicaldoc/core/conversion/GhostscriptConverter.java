@@ -55,7 +55,7 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 			commandLine.add("-sDEVICE=" + device);
 			if (pages != null)
 				commandLine.addAll(pages);
-			commandLine.addAll(List.of("-sOutputFile=" + dest.getPath(), src.getPath()));
+			commandLine.addAll(List.of("-sOutputFile=" + dest.getAbsolutePath(), src.getAbsolutePath()));
 
 			new Exec().exec(commandLine, null, new File("C:\\LogicalDOC-Devel\\ghostscript\\bin"), getTimeout());
 

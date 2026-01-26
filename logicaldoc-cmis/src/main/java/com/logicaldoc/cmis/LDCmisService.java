@@ -453,9 +453,9 @@ public class LDCmisService extends AbstractCmisService {
 		try {
 			Session session = SessionManager.get().get(getSid());
 			if (session == null)
-				throw new CmisPermissionDeniedException("Unexisting session " + getSid());
-			if (SessionManager.get().getStatus(getSid()) != Session.STATUS_OPEN)
-				throw new CmisPermissionDeniedException("Invalid or Expired Session " + getSid());
+				throw new CmisPermissionDeniedException("Unexisting session %s".formatted(getSid()));
+			if (!SessionManager.get().isOpen(getSid()))
+				throw new CmisPermissionDeniedException("Invalid or Expired Session %s".formatted(getSid()));
 			SessionManager.get().renew(getSid());
 			return session;
 		} catch (CmisBaseException cbe) {
@@ -485,7 +485,7 @@ public class LDCmisService extends AbstractCmisService {
 
 		if (repo == null)
 			throw new CmisPermissionDeniedException(
-					"Repository " + getCallContext().getRepositoryId() + " not found !");
+					"Repository %s not found !".formatted(getCallContext().getRepositoryId()));
 
 		return repo;
 	}

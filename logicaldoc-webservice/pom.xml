@@ -259,19 +259,6 @@
 			<artifactId>javax.jws</artifactId>
 		</dependency>
 		
-		<!--
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		-->
-		
 		<dependency>
 			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
@@ -351,7 +338,7 @@
 									dir="target/${project.artifactId}-${project.version}-plugin.zip" />
 								<delete>
 									<fileset dir="target/plugin/WEB-INF/lib"
-										includes="*logicaldoc*,*spring*,*commons*,*velocity*,*geronimo*,*aopalliance*,*saaj*,ant*,hibernate*,ehcache*,jetty*,joda*" />
+										includes="*logicaldoc*,*spring*,*commons*,*velocity*,*geronimo*,*aopalliance*,*saaj*,ant*,hibernate*,ehcache*,jetty*,joda*,jaxb*" />
 								</delete>
 								<copy
 									file="target/${project.artifactId}-${project.version}.${project.packaging}"

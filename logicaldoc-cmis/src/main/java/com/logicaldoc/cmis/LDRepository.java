@@ -142,7 +142,6 @@ import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.security.Permission;
-import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.Group;
@@ -2735,7 +2734,7 @@ public class LDRepository {
 	 */
 	private User getSessionUser(CallContext callContext) {
 		if (sid != null) {
-			if (SessionManager.get().getStatus(sid) != Session.STATUS_OPEN)
+			if (!SessionManager.get().isOpen(sid))
 				throw new CmisPermissionDeniedException("Invalid session");
 			try {
 				return userDao.findById(SessionManager.get().get(sid).getUserId());
@@ -2791,7 +2790,7 @@ public class LDRepository {
 
 		try {
 			if (sid != null) {
-				if (SessionManager.get().getStatus(sid) != Session.STATUS_OPEN)
+				if (!SessionManager.get().isOpen(sid))
 					return false;
 				else
 					SessionManager.get().renew(sid);

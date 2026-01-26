@@ -38,7 +38,7 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 		Set<User> users = new HashSet<>();
 		UserDAO userDao = UserDAO.get();
 		for (Session sess : sessions) {
-			if (sess.getStatus() != Session.STATUS_OPEN || !tenant.equals(sess.getTenantName()))
+			if (!sess.isOpen() || !tenant.equals(sess.getTenantName()))
 				continue;
 
 			User user = userDao.findByUsername(sess.getUsername());
@@ -51,10 +51,10 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 		writer.print("<list>");
 		for (User user : users) {
 			writer.print("<user>");
-			writer.print("<id>" + user.getId() + "</id>");
-			writer.print("<username><![CDATA[" + user.getUsername() + "]]></username>");
-			writer.print("<user><![CDATA[" + user.getFullName() + "]]></user>");
-			writer.print("</user>");
+			writer.print(String.format("<id>%d</id>", user.getId()));
+			writer.print(String.format("<username><![CDATA[%s]]></username>",user.getUsername()));
+			writer.print(String.format("<user><![CDATA[%s]]></user>",user.getFullName()));
+			writer.print(String.format("</user>"));
 		}
 		writer.print("</list>");
 	}

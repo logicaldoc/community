@@ -33,6 +33,8 @@ import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -51,12 +53,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = LoggerFactory.getLogger(Session.class);
-
-	public static final int STATUS_OPEN = 0;
-
-	public static final int STATUS_EXPIRED = 1;
-
-	public static final int STATUS_CLOSED = 2;
 
 	private static final String ERROR = "ERROR";
 
@@ -109,7 +105,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	private long tenantId;
 
 	@Column(name = "ld_status", nullable = false)
-	private int status = STATUS_OPEN;
+	@Enumerated(EnumType.ORDINAL)
+	private SessionStatus status = SessionStatus.OPEN;
 
 	@Embedded
 	private Client client = null;
@@ -147,11 +144,11 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	}
 
 	public boolean isOpen() {
-		return status == STATUS_OPEN;
+		return status.equals(SessionStatus.OPEN);
 	}
 
 	protected boolean isTimedOut() {
-		if (status != STATUS_OPEN)
+		if (!status.equals(SessionStatus.OPEN))
 			return true;
 
 		int timeout = getTimeout();
@@ -176,15 +173,12 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		return diffMinutes >= timeout;
 	}
 
-	public int getStatus() {
-		return status;
-	}
 
 	protected void setExpired() {
 		log.warn("Session {} expired", getSid());
 		logWarn("Session expired");
 
-		this.status = STATUS_EXPIRED;
+		this.status = SessionStatus.EXPIRED;
 		this.finished = new Date();
 
 		// Add a user history entry
@@ -195,7 +189,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		log.info("Session {} was closed", getSid());
 		logInfo("Session closed");
 
-		this.status = STATUS_CLOSED;
+		this.status = SessionStatus.CLOSED;
 		this.finished = new Date();
 
 		// Add a user history entry
@@ -508,10 +502,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.sid = sid;
 	}
 
-	protected void setStatus(int status) {
-		this.status = status;
-	}
-
 	public String getKeyLabel() {
 		return keyLabel;
 	}
@@ -519,12 +509,20 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	public void setKeyLabel(String keyLabel) {
 		this.keyLabel = keyLabel;
 	}
+	
+	public SessionStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(SessionStatus status) {
+		this.status = status;
+	}
 
 	@Override
 	public int compareTo(Session other) {
 		if (equals(other))
 			return 0;
-		int compare = Integer.compare(status, other.status);
+		int compare = Integer.compare(status.ordinal(), other.status.ordinal());
 		if (compare == 0)
 			compare = other.getCreation().compareTo(getCreation());
 		return compare;

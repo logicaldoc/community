@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,27 +37,31 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 
 		try {
 			jdbcUpdate(
-					"update ld_session set ld_status=" + Session.STATUS_EXPIRED
-							+ " where ld_node = :node and ld_status = :status",
-					Map.of("node", SystemInfo.get().getInstallationId(), "status", Session.STATUS_OPEN));
+					"update ld_session set ld_status = %d where ld_node = :node and ld_status = :status"
+							.formatted(SessionStatus.EXPIRED.ordinal()),
+					Map.of("node", SystemInfo.get().getInstallationId(), "status", SessionStatus.OPEN.ordinal()));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public int countSessions(Long tenantId, Integer status) {
+	public int countSessions(Long tenantId, SessionStatus status) {
+		Map<String, Object> params = new HashMap<>();
 		StringBuilder query = new StringBuilder(ONE_EQ_ONE);
-		if (tenantId != null)
-			query.append(AND + ENTITY + ".tenantId = " + tenantId);
+		if (tenantId != null) {
+			query.append(AND + ENTITY + ".tenantId = :tenantId");
+			params.put("tenantId", tenantId);
+		}
 		if (status != null) {
-			query.append(AND + ENTITY + ".status = " + status);
-			if (status.intValue() == Session.STATUS_OPEN)
+			params.put("status", status);
+			query.append(AND + ENTITY + ".status = :status");
+			if (SessionStatus.OPEN.equals(status))
 				query.append(AND + ENTITY + ".finished is null ");
 		}
 
 		try {
-			List<Session> sessions = findByWhere(query.toString(), null, null);
+			List<Session> sessions = findByWhere(query.toString(), params, null, null);
 			return sessions.size();
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -65,19 +70,22 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	}
 
 	@Override
-	public int countSessions(String username, Integer status) {
+	public int countSessions(String username, SessionStatus status) {
+		Map<String, Object> params = new HashMap<>();
 		StringBuilder query = new StringBuilder(ONE_EQ_ONE);
-		if (username != null)
+		if (username != null) {
 			query.append(AND + ENTITY + ".username = :username ");
+			params.put("username", StringUtils.defaultString(username));
+		}
 		if (status != null) {
-			query.append(AND + ENTITY + ".status = " + status);
-			if (status.intValue() == Session.STATUS_OPEN)
+			params.put("status", status);
+			query.append(AND + ENTITY + ".status = :status ");
+			if (SessionStatus.OPEN.equals(status))
 				query.append(AND + ENTITY + ".finished is null ");
 		}
 
 		try {
-			List<Session> sessions = findByWhere(query.toString(),
-					username != null ? Map.of("username", StringUtils.defaultString(username)) : null, null, null);
+			List<Session> sessions = findByWhere(query.toString(), params, null, null);
 			return sessions.size();
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

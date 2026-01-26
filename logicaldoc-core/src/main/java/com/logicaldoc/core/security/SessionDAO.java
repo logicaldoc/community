@@ -6,7 +6,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.util.spring.Context;
 
 /**
- * DAO for <code>UserSession</code> handling.
+ * DAO for {@link Session}s handling.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7
@@ -21,7 +21,7 @@ public interface SessionDAO extends PersistentObjectDAO<Session> {
 	public static SessionDAO get() {
 		return Context.get(SessionDAO.class);
 	}
-	
+
 	/**
 	 * Removes all the sessions that refers to the current node
 	 */
@@ -35,7 +35,7 @@ public interface SessionDAO extends PersistentObjectDAO<Session> {
 	 *
 	 * @return the number of sessions
 	 */
-	public int countSessions(Long tenantId, Integer status);
+	public int countSessions(Long tenantId, SessionStatus status);
 
 	/**
 	 * Counts the number of sessions.
@@ -45,7 +45,7 @@ public interface SessionDAO extends PersistentObjectDAO<Session> {
 	 *
 	 * @return the number of sessions
 	 */
-	public int countSessions(String username, Integer status);
+	public int countSessions(String username, SessionStatus status);
 
 	/**
 	 * Retrieves the session of the given SID

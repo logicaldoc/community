@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
@@ -280,8 +280,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		} else {
 			// Perhaps the session was not in memory but just on DB
 			try {
-				sessionDao.jdbcUpdate("update ld_session set ld_status=" + Session.STATUS_CLOSED + " where ld_sid='"
-						+ SqlUtil.doubleQuotes(sid) + "'");
+				sessionDao.jdbcUpdate(
+						"update ld_session set ld_status = " + SessionStatus.CLOSED.ordinal() + " where ld_sid = :sid",
+						Map.of("sid", sid));
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
 			}
@@ -317,11 +318,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		}
 	}
 
-	public int getStatus(String sid) {
+	public SessionStatus getStatus(String sid) {
 		Session session = get(sid);
 		if (session == null)
-			return -1;
-		if (session.getStatus() == Session.STATUS_OPEN && session.isTimedOut()) {
+			return null;
+		if (session.getStatus().equals(SessionStatus.OPEN) && session.isTimedOut()) {
 			session.setExpired();
 			storeSession(session);
 		}
@@ -339,7 +340,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public boolean isOpen(String sid) {
 		if (sid == null)
 			return false;
-		return Session.STATUS_OPEN == getStatus(sid);
+		return SessionStatus.OPEN.equals(getStatus(sid));
 	}
 
 	@Override
@@ -381,7 +382,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return number of opened sessions
 	 */
 	public int countOpened() {
-		return sessionDao.countSessions((Long)null, Session.STATUS_OPEN);
+		return sessionDao.countSessions((Long) null, SessionStatus.OPEN);
 	}
 
 	/**
@@ -392,9 +393,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return number of opened sessions
 	 */
 	public int countOpened(long tenantId) {
-		return sessionDao.countSessions(tenantId, Session.STATUS_OPEN);
+		return sessionDao.countSessions(tenantId, SessionStatus.OPEN);
 	}
-	
+
 	/**
 	 * Counts the total number of opened sessions for a given user
 	 * 
@@ -403,7 +404,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return number of opened sessions
 	 */
 	public int countOpened(String username) {
-		return sessionDao.countSessions(username, Session.STATUS_OPEN);
+		return sessionDao.countSessions(username, SessionStatus.OPEN);
 	}
 
 	/**
@@ -426,7 +427,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		List<String> garbage = new ArrayList<>();
 		int counter = 0;
 		for (Session session : getSessions()) {
-			if (getStatus(session.getSid()) != Session.STATUS_OPEN)
+			if (!SessionStatus.OPEN.equals(getStatus(session.getSid())))
 				counter++;
 			if (counter > MAX_CLOSED_SESSIONS)
 				garbage.add(session.getSid());

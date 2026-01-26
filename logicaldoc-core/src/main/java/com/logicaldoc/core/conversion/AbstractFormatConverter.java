@@ -47,7 +47,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	@Override
 	public final void convert(String sid, Document document, File src, File dest) throws IOException {
 		if (!isEnabled())
-			throw new IOException("Converter " + this.getClass().getSimpleName() + " is disabled");
+			throw new IOException("Converter %s is disabled".formatted(this.getClass().getSimpleName()));
 		else
 			internalConvert(sid, document, src, dest);
 	}

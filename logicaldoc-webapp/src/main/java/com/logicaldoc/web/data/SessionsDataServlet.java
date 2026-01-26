@@ -15,6 +15,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionDAO;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.security.SessionStatus;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
@@ -55,7 +56,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			writer.println("ok");
 		} else {
 			String node = request.getParameter("node");
-			Integer status = request.getParameter("status") != null ? Integer.parseInt(request.getParameter("status"))
+			SessionStatus status = request.getParameter("status") != null
+					? SessionStatus.values()[Integer.parseInt(request.getParameter("status"))]
 					: null;
 
 			// Just listing the sessions
@@ -92,12 +94,12 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		}
 	}
 
-	private void printSessions(Locale locale, Integer status, List<Session> sessions, boolean csvFormat, String tenant,
-			boolean showSid, PrintWriter writer) {
+	private void printSessions(Locale locale, SessionStatus status, List<Session> sessions, boolean csvFormat,
+			String tenant, boolean showSid, PrintWriter writer) {
 
 		for (Session session : sessions) {
 			if ((tenant != null && !tenant.equals(session.getTenantName()))
-					|| (status != null && status != session.getStatus()))
+					|| (status != null && !status.equals(session.getStatus())))
 				continue;
 
 			if (csvFormat) {
@@ -148,16 +150,10 @@ public class SessionsDataServlet extends AbstractDataServlet {
 	}
 
 	private void printSessionStatusCsv(Session session, Locale locale, PrintWriter writer) {
-		int status = SessionManager.get().getStatus(session.getSid());
-		if (status < 0)
+		SessionStatus status = SessionManager.get().getStatus(session.getSid());
+		if (status == null)
 			status = session.getStatus();
-
-		if (status == Session.STATUS_OPEN)
-			writer.print(I18N.message("opened", locale));
-		else if (status == Session.STATUS_CLOSED)
-			writer.print(I18N.message("closed", locale));
-		else if (status == Session.STATUS_EXPIRED)
-			writer.print(I18N.message("expired", locale));
+		writer.print(status.name());
 	}
 
 	private void printSessionXml(PrintWriter writer, Session session, Locale locale, boolean showSid) {
@@ -186,18 +182,14 @@ public class SessionsDataServlet extends AbstractDataServlet {
 	}
 
 	private void printSessionStatusXml(Session session, Locale locale, boolean showSid, PrintWriter writer) {
-		writer.print("<status>" + (showSid ? session.getStatus() : "") + "</status>");
+		writer.print(String.format("<status>%s</status>", showSid ? session.getStatus() : ""));
 		if (showSid) {
-			int status = SessionManager.get().getStatus(session.getSid());
-			if (status < 0)
+			SessionStatus status = SessionManager.get().getStatus(session.getSid());
+			if (status == null)
 				status = session.getStatus();
 
-			if (status == Session.STATUS_OPEN)
-				writer.print(STATUS_LABEL + I18N.message("opened", locale) + CLOSE_STATUS_LABEL);
-			else if (status == Session.STATUS_CLOSED)
-				writer.print(STATUS_LABEL + I18N.message("closed", locale) + CLOSE_STATUS_LABEL);
-			else if (status == Session.STATUS_EXPIRED)
-				writer.print(STATUS_LABEL + I18N.message("expired", locale) + CLOSE_STATUS_LABEL);
+			writer.print(
+					String.format("<statusLabel>%s</statusLabel>", I18N.message(status.name().toLowerCase(), locale)));
 		} else {
 			writer.print("<statusLabel></statusLabel>");
 		}
