@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -41,16 +42,29 @@ public class SessionsPanel extends VLayout {
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
+
+		CheckboxItem currentNode = ItemFactory.newCheckbox("currentnode");
+		currentNode.addChangedHandler(changed -> refresh(Boolean.TRUE.equals(changed.getValue())));
+
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		refresh.addClickHandler(event -> sessionsGrid.refresh(new SessionsDS()));
+		refresh.addClickHandler(click -> refresh(Boolean.TRUE.equals(currentNode.getValueAsBoolean())));
 
 		activeSessions = ItemFactory.newStaticTextItem("activesessions", "");
 
+		
 		toolStrip.addButton(refresh);
+		toolStrip.addFormItem(currentNode);
 		toolStrip.addSeparator();
 		toolStrip.addFormItem(activeSessions);
 		toolStrip.addFill();
 		addMember(toolStrip);
+	}
+
+	private void refresh(boolean currentNode) {
+		if (currentNode)
+			sessionsGrid.refresh(new SessionsDS(Session.get().getInfo().getInstallationId()));
+		else
+			sessionsGrid.refresh(new SessionsDS());
 	}
 
 	@Override
@@ -62,12 +76,13 @@ public class SessionsPanel extends VLayout {
 			event.cancel();
 		});
 
-		sessionsGrid.addDoubleClickHandler(event -> {
-			LD.askForValue(I18N.message("sid"), I18N.message("sid"),
-					sessionsGrid.getSelectedRecord().getAttributeAsString("sid"), value -> {
+		sessionsGrid.addCellDoubleClickHandler(dblClick -> {
+			ListGridField field = sessionsGrid.getField(dblClick.getColNum());
+			LD.askForValue(field.getTitle(), field.getTitle(),
+					dblClick.getRecord().getAttributeAsString(field.getName()), value -> {
 						// Nothing to do
 					});
-			event.cancel();
+			dblClick.cancel();
 		});
 
 		sessionsGrid.addDataArrivedHandler(event -> {
@@ -175,7 +190,7 @@ public class SessionsPanel extends VLayout {
 		contextMenu.setItems(killSession);
 		contextMenu.showContextMenu();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

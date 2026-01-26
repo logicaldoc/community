@@ -364,6 +364,9 @@ create index LD_RCP_MID_NAME on ld_recipient (ld_messageid, ld_name);
 create index LD_DEV_USERID on ld_device (ld_userid);
 create index LD_PHIST_USERID on ld_password_history (ld_userid);
 create index LD_APIKEY_USERID on ld_apikey (ld_userid);
+create index LD_SES_USR_STAT on ld_session (ld_username, ld_status);
+create index LD_SES_TNT_STAT on ld_session (ld_tenantid, ld_status);
+create index LD_SES_STAT on ld_session (ld_status);
 
 insert into ld_tenant(ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion)
 values     (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,'default','Default',0,1,null,1);

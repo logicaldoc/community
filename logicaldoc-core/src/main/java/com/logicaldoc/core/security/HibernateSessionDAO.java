@@ -1,7 +1,6 @@
 package com.logicaldoc.core.security;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +66,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 
 	@Override
 	public int countSessions(String username, Integer status) {
-		StringBuilder query = new StringBuilder(" 1=1 ");
+		StringBuilder query = new StringBuilder(ONE_EQ_ONE);
 		if (username != null)
 			query.append(AND + ENTITY + ".username = :username ");
 		if (status != null) {
@@ -89,9 +88,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	@Override
 	public Session findBySid(String sid) {
 		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("sid", sid);
-			List<Session> sessions = findByWhere(ENTITY + ".sid = :sid", params, null, null);
+			List<Session> sessions = findByWhere(ENTITY + ".sid = :sid", Map.of("sid", sid), null, null);
 			for (Session session : sessions) {
 				if (session.getDeleted() == 0)
 					return session;
@@ -106,12 +103,9 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	public List<Session> findByNode(String node) {
 		try {
 			if (StringUtils.isEmpty(node))
-				return findByWhere(" 1=1 ", (Map<String, Object>) null, ENTITY + ".creation desc", null);
-			else {
-				Map<String, Object> params = new HashMap<>();
-				params.put("node", node);
-				return findByWhere(ENTITY + ".node = :node", params, ENTITY + ".creation desc", null);
-			}
+				return findByWhere(ONE_EQ_ONE, (Map<String, Object>) null, ENTITY + ".creation desc", null);
+			else
+				return findByWhere(ENTITY + ".node = :node", Map.of("node", node), ENTITY + ".creation desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();

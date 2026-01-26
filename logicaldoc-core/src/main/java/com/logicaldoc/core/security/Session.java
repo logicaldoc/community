@@ -210,7 +210,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 * Sets the key and encode it
 	 * 
 	 * @param decodedKey The key in readable format
-	 * @throws NoSuchAlgorithmException Cripting error
+	 * @throws NoSuchAlgorithmException Crypting error
 	 */
 	public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {
 		if (StringUtils.isNotEmpty(decodedKey)) {
@@ -280,7 +280,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 				UserHistoryDAO.get().store(history);
 
 				// Send an email alert to the user in case of new device
-				if (newDevice && Context.get().getConfig().getBoolean(tenantName + ".alertnewdevice", true)) {
+				if (newDevice && Context.get().getConfig().getBoolean(".alertnewdevice".formatted(tenantName), true)) {
 					Map<String, Object> dictionaryMap = new HashMap<>();
 					dictionaryMap.put("user", user);
 					dictionaryMap.put("device", device);
