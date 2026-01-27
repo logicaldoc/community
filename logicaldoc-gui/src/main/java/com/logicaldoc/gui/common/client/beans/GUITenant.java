@@ -61,6 +61,8 @@ public class GUITenant implements Serializable {
 
 	private Long maxApiCalls;
 
+	private Long maxTickets;
+
 	private boolean enabled = true;
 
 	private Date expire;
@@ -77,6 +79,8 @@ public class GUITenant implements Serializable {
 	private long sessions;
 
 	private long apiCalls;
+
+	private long tickets;
 
 	private GUIBranding branding;
 
@@ -244,7 +248,7 @@ public class GUITenant implements Serializable {
 	public boolean isDefault() {
 		return id == Constants.TENANT_DEFAULTID;
 	}
-	
+
 	public boolean isSystem() {
 		return id == Constants.TENANT_SYSTEMID;
 	}
@@ -351,5 +355,21 @@ public class GUITenant implements Serializable {
 
 	public void setApiCalls(long apiCalls) {
 		this.apiCalls = apiCalls;
+	}
+
+	public Long getMaxTickets() {
+		return maxTickets;
+	}
+
+	public void setMaxTickets(Long maxTickets) {
+		this.maxTickets = maxTickets;
+	}
+
+	public long getTickets() {
+		return tickets;
+	}
+
+	public void setTickets(long tickets) {
+		this.tickets = tickets;
 	}
 }

@@ -244,7 +244,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	}
 
 	@Test
-	public void testCreateDownloadTicket() throws ServerException {
+	public void testCreateDownloadTicket() throws ServerException, PersistenceException {
 		List<String> ticket = testSubject.createTicket(5L, 0, null, null, null, null, null, null);
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
@@ -256,7 +256,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	}
 
 	@Test
-	public void testDeleteEnableDisableTicket() throws ServerException {
+	public void testDeleteEnableDisableTicket() throws ServerException, PersistenceException {
 		List<String> ticket = testSubject.createTicket(5, 0, null, null, null, null, null, null);
 
 		// We do not have a HTTP request so expect that the first string is the

@@ -1,8 +1,11 @@
 package com.logicaldoc.core.security.user;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.java.plugin.registry.Extension;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
@@ -32,10 +36,12 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.html.HTMLSanitizer;
+import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordValidator;
 import com.logicaldoc.util.spring.Context;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 
@@ -55,6 +61,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	private static final String USERNAME = "username";
 
+	private static final String POSITION = "position";
+
 	@Resource(name = "genericDAO")
 	private GenericDAO genericDAO;
 
@@ -64,11 +72,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Resource(name = "passwordHistoryDAO")
 	private PasswordHistoryDAO passwordHistoryDAO;
 
-	@Resource(name = "userListenerManager")
-	private UserListenerManager userListenerManager;
-
 	@Resource(name = "config")
 	private ContextProperties config;
+
+	private List<UserListener> listeners = new ArrayList<>();
 
 	private HibernateUserDAO() {
 		super(User.class);
@@ -508,7 +515,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	private void invokeListenersAfter(User user, UserHistory transaction, Map<String, Object> dictionary)
 			throws AuthenticationException {
 		log.debug("Invoke listeners after store");
-		for (UserListener listener : userListenerManager.getListeners())
+		for (UserListener listener : listeners)
 			try {
 				listener.afterStore(user, transaction, dictionary);
 			} catch (AuthenticationException ae) {
@@ -521,7 +528,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	private void invokeListenersBefore(User user, UserHistory transaction, Map<String, Object> dictionary)
 			throws AuthenticationException {
 		log.debug("Invoke listeners before store");
-		for (UserListener listener : userListenerManager.getListeners())
+		for (UserListener listener : listeners)
 			try {
 				listener.beforeStore(user, transaction, dictionary);
 			} catch (AuthenticationException ae) {
@@ -779,14 +786,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		this.userHistoryDAO = userHistoryDAO;
 	}
 
-	public void setUserListenerManager(UserListenerManager userListenerManager) {
-		this.userListenerManager = userListenerManager;
-	}
-
-	public UserListenerManager getUserListenerManager() {
-		return userListenerManager;
-	}
-
 	@Override
 	public void initialize(User user) throws PersistenceException {
 		if (user == null || user.getId() == 0L)
@@ -906,5 +905,50 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	public void setConfig(ContextProperties config) {
 		this.config = config;
+	}
+
+	@PostConstruct
+	public void init() {
+		// Acquire the 'UserListener' extensions of the core plugin
+		PluginRegistry registry = PluginRegistry.getInstance();
+		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "UserListener");
+
+		// Sort the extensions according to ascending position
+		List<Extension> sortedExts = new ArrayList<>();
+		for (Extension extension : exts) {
+			sortedExts.add(extension);
+		}
+		Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
+			int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
+			int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
+			if (position1 < position2)
+				return -1;
+			else if (position1 > position2)
+				return 1;
+			else
+				return 0;
+		});
+
+		for (Extension ext : sortedExts) {
+			String className = ext.getParameter("class").valueAsString();
+
+			try {
+				Class<?> clazz = Class.forName(className);
+				// Try to instantiate the listener
+				Object listener = clazz.getDeclaredConstructor().newInstance();
+				if (listener instanceof UserListener ul) {
+					listeners.add(ul);
+					if (log.isInfoEnabled())
+						log.info("Added new user listener {} position {}", className,
+								ext.getParameter(POSITION).valueAsString());
+				} else {
+					throw new ClassNotFoundException(
+							"The specified listener " + className + " doesn't implement UserListener interface");
+				}
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException e) {
+				log.error(e.getMessage());
+			}
+		}
 	}
 }

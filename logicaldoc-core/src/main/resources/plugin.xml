@@ -120,6 +120,10 @@
     <parameter-def id="class" />
     <parameter-def id="position" />
   </extension-point>
+  <extension-point id="TicketListener">
+    <parameter-def id="class" />
+    <parameter-def id="position" />
+  </extension-point>  
   <extension-point id="Authentication">
     <parameter-def id="authenticatorId" />
     <parameter-def id="position" />

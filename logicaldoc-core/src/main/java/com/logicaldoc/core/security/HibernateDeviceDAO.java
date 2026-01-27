@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -89,9 +90,12 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 		Device device = findByDevice(requestDevice);
 		if (device == null)
 			device = requestDevice;
+		else
+			BeanUtils.copyProperties(requestDevice, device, "id", "recordVersion", "tenantId");
 
 		if (StringUtils.isNotEmpty(requestDevice.getLabel()))
 			device.setLabel(requestDevice.getLabel());
+		device.setTenantId(user.getTenantId());
 		device.setTrusted(true);
 		device.setUserId(user.getId());
 		device.setUsername(user.getFullName());

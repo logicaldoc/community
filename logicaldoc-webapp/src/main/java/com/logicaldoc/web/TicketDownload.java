@@ -75,8 +75,7 @@ public class TicketDownload extends HttpServlet {
 
 			String behavior = request.getParameter("behavior");
 			if (behavior == null)
-				behavior = Context.get().getConfig().getProperty(tenantName + ".downloadticket.behavior",
-						"download");
+				behavior = Context.get().getConfig().getProperty(tenantName + ".downloadticket.behavior", "download");
 			request.setAttribute("open", Boolean.toString("display".equals(behavior)));
 
 			if (!TicketDownload.checkPassword(request, response, ticket))
@@ -92,7 +91,7 @@ public class TicketDownload extends HttpServlet {
 				 * so we must mark the read in the session and count it just the
 				 * first time
 				 */
-				String viewMarker = "ticketviewed-" + ticket.getTicketId();
+				String viewMarker = "ticketviewed-%d".formatted(ticket.getTicketId());
 				if (request.getSession().getAttribute(viewMarker) == null) {
 					ticket.setViews(ticket.getViews() + 1);
 					request.getSession().setAttribute(viewMarker, true);
@@ -108,15 +107,16 @@ public class TicketDownload extends HttpServlet {
 			log.error(e.getMessage(), e);
 
 			try (PrintWriter out = response.getWriter();) {
-				out.println("Ticket " + ticket.getTicketId() + " not authorized"
-						+ (e.getMessage() != null ? ": " + e.getMessage() : ""));
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ticket %d not authorized: %s"
+						.formatted(ticket.getTicketId(), StringUtils.defaultString(e.getMessage())));
 			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
 	}
 
-	public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, PersistenceException {
 		return checkPassword(request, response, getTicket(request));
 	}
 
@@ -204,11 +204,11 @@ public class TicketDownload extends HttpServlet {
 		return doc;
 	}
 
-	private static Ticket getTicket(HttpServletRequest request) throws IOException {
+	private static Ticket getTicket(HttpServletRequest request) throws IOException, PersistenceException {
 		TicketDAO tktDao = TicketDAO.get();
 		Ticket ticket = tktDao.findByTicketId(getTicketId(request));
-		if (ticket == null || ticket.getDocId() == 0)
-			throw new IOException("Unexisting ticket");
+		if (ticket == null || ticket.getDocId() == 0L)
+			throw new PersistenceException("Unexisting ticket");
 		return ticket;
 	}
 
@@ -319,7 +319,7 @@ public class TicketDownload extends HttpServlet {
 				isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED : DocumentEvent.DOWNLOADED);
 		history.setFilename(document.getFileName());
 		history.setFolderId(document.getFolder().getId());
-		history.setComment("Ticket " + ticket);
+		history.setComment("Ticket %s".formatted(ticket));
 
 		DocumentDAO ddao = DocumentDAO.get();
 		try {
