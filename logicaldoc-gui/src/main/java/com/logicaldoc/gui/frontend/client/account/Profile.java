@@ -253,6 +253,9 @@ public class Profile extends Window {
 			rec.setAttribute("label", I18N.message(search));
 			records.add(rec);
 		}
+		
+		
+		
 
 		ListGridField label = new ListGridField("label", I18N.message("searchpreference"));
 		label.setWidth("*");

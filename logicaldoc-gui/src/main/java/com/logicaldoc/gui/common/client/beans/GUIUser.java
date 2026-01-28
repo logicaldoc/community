@@ -599,11 +599,17 @@ public class GUIUser implements Serializable {
 	}
 
 	public List<String> orderedSearches() {
+		List<String> all = Arrays.asList("fulltext", "parameters", "tags", "folders", "semantic");
 		List<String> searches;
 		if (searchPref != null && !searchPref.isEmpty()) {
 			searches = Arrays.asList(searchPref.replace(" ", "").split(","));
-		} else
-			searches = Arrays.asList("fulltext", "parameters", "tags", "folders", "semantic");
+			for (String std : all) {
+				if(!searches.contains(std))
+					searches.add(std);
+			}
+		} else {
+			searches = all;
+		}
 		return searches;
 	}
 
