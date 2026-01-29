@@ -55,5 +55,5 @@ public interface TenantDAO extends PersistentObjectDAO<Tenant> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public int count() throws PersistenceException;
+	public long count() throws PersistenceException;
 }
