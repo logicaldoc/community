@@ -234,7 +234,7 @@ public class StatsCollector extends Task {
 			long histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
 			long userHistories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
 			long votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
-			long tickets = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_ticket");
+			long tickets = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_ticket where ld_id in (0,2)");
 
 			/*
 			 * Save the last update time
@@ -551,7 +551,7 @@ public class StatsCollector extends Task {
 		try {
 			for (Long tenantId : tenantDAO.findAllIds()) {
 				workflows += folderDAO.queryForLong(
-						"select count(distinct(ld_name)) from ld_workflowtemplate where ld_deleted = 0 and ld_deployed = 1 and ld_tenantid = "
+						"select count(distinct(ld_name)) from ld_workflowtemplate where ld_deleted = 0 and ld_tenantid = "
 								+ tenantId);
 			}
 		} catch (Exception t) {

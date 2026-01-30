@@ -40,6 +40,8 @@ public class TenantQuotaPanel extends HLayout {
 
 	private static final String TICKETSQUOTA = "ticketsquota";
 
+	private static final String WORKFLOWSQUOTA = "workflowsquota";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -89,7 +91,7 @@ public class TenantQuotaPanel extends HLayout {
 		SpinnerItem usersQuota = ItemFactory.newSpinnerItem(USERSQUOTA, tenant.getMaxUsers());
 		usersQuota.setDisabled(readonly);
 		usersQuota.setRequired(false);
-		usersQuota.setMin(tenant.getUsers());
+		usersQuota.setMin(1);
 		usersQuota.setStep(1);
 		usersQuota.setWidth(80);
 		usersQuota.setVisible(!tenant.isSystem());
@@ -99,7 +101,7 @@ public class TenantQuotaPanel extends HLayout {
 		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota", tenant.getMaxGuests());
 		guestsQuota.setDisabled(readonly);
 		guestsQuota.setRequired(false);
-		guestsQuota.setMin(tenant.getGuests());
+		guestsQuota.setMin(0);
 		guestsQuota.setStep(1);
 		guestsQuota.setWidth(80);
 		guestsQuota.setVisible(!tenant.isSystem());
@@ -150,12 +152,22 @@ public class TenantQuotaPanel extends HLayout {
 		SpinnerItem ticketsQuota = ItemFactory.newSpinnerItem(TICKETSQUOTA, tenant.getMaxTickets());
 		ticketsQuota.setDisabled(readonly);
 		ticketsQuota.setRequired(false);
-		ticketsQuota.setMin(1);
+		ticketsQuota.setMin(0);
 		ticketsQuota.setStep(10);
 		ticketsQuota.setWidth(100);
 		ticketsQuota.setVisible(!tenant.isSystem());
 		if (!readonly)
 			ticketsQuota.addChangedHandler(changedHandler);
+
+		SpinnerItem workflowsQuota = ItemFactory.newSpinnerItem(WORKFLOWSQUOTA, tenant.getMaxWorkflows());
+		workflowsQuota.setDisabled(readonly);
+		workflowsQuota.setRequired(false);
+		workflowsQuota.setMin(0);
+		workflowsQuota.setStep(1);
+		workflowsQuota.setWidth(100);
+		workflowsQuota.setVisible(!tenant.isSystem());
+		if (!readonly)
+			workflowsQuota.addChangedHandler(changedHandler);
 
 		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(QUOTA_THRESHOLD, "alertthreshold",
 				tenant.getQuotaThreshold());
@@ -186,6 +198,7 @@ public class TenantQuotaPanel extends HLayout {
 		StaticTextItem guests = ItemFactory.newStaticTextItem("guests", "readonlyusers",
 				Util.formatLong(tenant.getGuests()));
 		StaticTextItem tickets = ItemFactory.newStaticTextItem("tickets", Util.formatLong(tenant.getTickets()));
+		StaticTextItem workflows = ItemFactory.newStaticTextItem("workflows", Util.formatLong(tenant.getWorkflows()));
 
 		// Static items to display whole system quotas
 		StaticTextItem usersSystemQuota = ItemFactory.newStaticTextItem("sys" + USERSQUOTA, USERSQUOTA,
@@ -210,11 +223,15 @@ public class TenantQuotaPanel extends HLayout {
 		StaticTextItem ticketsSystemQuota = ItemFactory.newStaticTextItem("sys" + TICKETSQUOTA, TICKETSQUOTA,
 				Util.formatLong(tenant.getMaxTickets()));
 		ticketsSystemQuota.setVisible(tenant.isSystem());
+		StaticTextItem workflowsSystemQuota = ItemFactory.newStaticTextItem("sys" + WORKFLOWSQUOTA, WORKFLOWSQUOTA,
+				Util.formatLong(tenant.getMaxWorkflows()));
+		workflowsSystemQuota.setVisible(tenant.isSystem());
 
 		form.setItems(usersQuota, usersSystemQuota, users, guestsQuota, guestsSystemQuota, guests, sessionsQuota,
 				sessionsSystemQuota, sessions, documentsQuota, documentsSystemQuota, documents, sizeQuota,
 				sizeSystemQuota, size, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls, ticketsQuota,
-				ticketsSystemQuota, tickets, quotaThreshold, recipients);
+				ticketsSystemQuota, tickets, workflowsQuota, workflowsSystemQuota, workflows, quotaThreshold,
+				recipients);
 		addMember(layout);
 	}
 
@@ -258,6 +275,11 @@ public class TenantQuotaPanel extends HLayout {
 			tenant.setMaxTickets(null);
 		else
 			tenant.setMaxTickets(Long.parseLong(values.get(TICKETSQUOTA).toString()));
+
+		if (values.get(WORKFLOWSQUOTA) == null)
+			tenant.setMaxWorkflows(null);
+		else
+			tenant.setMaxWorkflows(Long.parseLong(values.get(WORKFLOWSQUOTA).toString()));
 
 		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);

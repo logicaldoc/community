@@ -63,6 +63,8 @@ public class GUITenant implements Serializable {
 
 	private Long maxTickets;
 
+	private Long maxWorkflows;
+
 	private boolean enabled = true;
 
 	private Date expire;
@@ -81,6 +83,8 @@ public class GUITenant implements Serializable {
 	private long apiCalls;
 
 	private long tickets;
+
+	private long workflows;
 
 	private GUIBranding branding;
 
@@ -235,6 +239,22 @@ public class GUITenant implements Serializable {
 
 	public void setMaxApiCalls(Long maxApiCalls) {
 		this.maxApiCalls = maxApiCalls;
+	}
+
+	public Long getMaxWorkflows() {
+		return maxWorkflows;
+	}
+
+	public void setMaxWorkflows(Long maxWorkflows) {
+		this.maxWorkflows = maxWorkflows;
+	}
+
+	public long getWorkflows() {
+		return workflows;
+	}
+
+	public void setWorkflows(long workflows) {
+		this.workflows = workflows;
 	}
 
 	public boolean isEnabled() {
