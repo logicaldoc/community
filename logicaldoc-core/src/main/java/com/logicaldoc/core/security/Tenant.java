@@ -97,7 +97,7 @@ public class Tenant extends PersistentObject implements Serializable {
 	@Column(name = "ld_maxtickets", nullable = true)
 	private Long maxTickets;
 	
-	@Column(name = "ld_workflows", nullable = true)
+	@Column(name = "ld_maxworkflows", nullable = true)
 	private Long maxWorkflows;
 
 	/**
