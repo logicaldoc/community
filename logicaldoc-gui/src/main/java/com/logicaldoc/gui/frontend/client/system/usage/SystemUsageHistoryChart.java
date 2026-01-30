@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system.usage;
 
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.widgetideas.graphics.client.ImageLoader;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
@@ -54,21 +56,15 @@ public class SystemUsageHistoryChart extends Dialog {
 	}
 
 	private void loadChartImage(String measure, long tenantId, int months) {
-		html.setContents(AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("calculatingstatspleasewait")));
-
 		String chartUrl = Util.contextPath() + "systemusagechart?measure=" + measure + "&locale=" + I18N.getLocale()
 				+ "&height=" + (WindowUtils.getHeight() - 100 + "&months=" + months + "&tenantId=" + tenantId);
-
-		ImageLoader.loadImages(new String[] { chartUrl }, imageElements -> {
-			int width = imageElements[0].getWidth();
-			int height = imageElements[0].getHeight();
-			html.setContents("<img src='" + chartUrl + "' width='" + width + "' height='" + height + "' />");
-			html.setWidth100();
-			html.setHeight100();
-		});
+		html.setContents("<div id='chartwaiting'>" + AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("calculatingstatspleasewait")) + 
+		"</div><img src='" + chartUrl + "' onLoad=\"document.getElementById('chartwaiting').setAttribute ('style', 'display: none');\" />");
+		html.setWidth100();
+		html.setHeight100();
 
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -24,16 +24,17 @@ public class UsagePanel extends VLayout {
 	@Override
 	public void onDraw() {
 		if (Session.get().isDefaultTenant()) {
-			ToolStrip toolStrip = new ToolStrip();
 			SelectItem tenant = ItemFactory.newTenantSelector(true);
 			tenant.setRequired(true);
 			tenant.setValue("-1");
 			tenant.setDefaultValue("-1");
-			toolStrip.addFormItem(tenant);
 			tenant.addChangedHandler(event -> {
 				removeMember(grid);
 				redrawGrid(Long.parseLong(event.getValue().toString()));
 			});
+
+			ToolStrip toolStrip = new ToolStrip();
+			toolStrip.addFormItem(tenant);
 			addMember(toolStrip);
 			redrawGrid(-1L);
 		} else {
@@ -45,7 +46,7 @@ public class UsagePanel extends VLayout {
 		grid = new SystemUsageGrid(true, tenantId);
 		addMember(grid);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
