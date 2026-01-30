@@ -16,6 +16,8 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 9.2
  */
 public class ModelDetailsPanel extends VLayout {
+	private static final String TRAINING = "training";
+
 	private static final String EVALUATION = "evaluation";
 
 	private GUIModel model;
@@ -78,7 +80,8 @@ public class ModelDetailsPanel extends VLayout {
 		trainingTabPanel = new HLayout();
 		trainingTabPanel.setWidth100();
 		trainingTabPanel.setHeight100();
-		Tab trainingTab = new Tab(I18N.message("training"));
+		Tab trainingTab = new Tab(I18N.message(TRAINING));
+		trainingTab.setID(TRAINING);
 		trainingTab.setPane(trainingTabPanel);
 		tabSet.addTab(trainingTab);
 
@@ -156,6 +159,8 @@ public class ModelDetailsPanel extends VLayout {
 		statsTabPanel.addMember(statsPanel);
 
 		toggleEvaluationTab();
+		
+		toggleTrainingTab();
 
 		historyPanel = new ModelHistoryPanel(model.getId());
 		historyTabPanel.addMember(historyPanel);
@@ -167,6 +172,14 @@ public class ModelDetailsPanel extends VLayout {
 		else
 			tabSet.hideTab(EVALUATION);
 	}
+	
+	protected void toggleTrainingTab() {
+		if (model.isZeroShot())
+			tabSet.hideTab(TRAINING);
+		else
+			tabSet.showTab(TRAINING);
+	}
+
 
 	public GUIModel getModel() {
 		return model;
@@ -189,10 +202,14 @@ public class ModelDetailsPanel extends VLayout {
 			return valid;
 		}
 
-		valid = trainingPanel.validate();
-		if (!valid)
-			tabSet.selectTab(1);
-		return valid;
+		if (model.isTrainable()) {
+			valid = trainingPanel.validate();
+			if (!valid) {
+				tabSet.selectTab(1);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void onSave() {

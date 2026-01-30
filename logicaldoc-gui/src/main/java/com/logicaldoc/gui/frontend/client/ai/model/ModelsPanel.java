@@ -221,6 +221,8 @@ public class ModelsPanel extends VLayout {
 		for (ListGridRecord rec : selection)
 			ids.add(rec.getAttributeAsLong(ID));
 
+		String type = selection[0].getAttributeAsString("type");
+
 		Long selectedModelId = selection[0].getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
@@ -316,8 +318,14 @@ public class ModelsPanel extends VLayout {
 		iimport.addClickHandler(
 				click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-		contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(),
-				clone, iimport, export, new MenuItemSeparator(), delete);
+		if (!"zeroshot".equals(type)) {
+			contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(),
+					clone, iimport, export, new MenuItemSeparator(), delete);
+		} else {
+			contextMenu.setItems(query, new MenuItemSeparator(), clone, iimport, export, new MenuItemSeparator(),
+					delete);
+		}
+
 		contextMenu.showContextMenu();
 	}
 

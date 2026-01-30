@@ -65,7 +65,7 @@ public class ModelProperties extends ModelDetailsTab {
 	private static final String NEURAL = "neural";
 
 	private static final String EMBEDDER = "embedder";
-	
+
 	private static final String ZEROSHOT = "zeroshot";
 
 	private static final String ACTIVATION = "activation";
@@ -140,6 +140,9 @@ public class ModelProperties extends ModelDetailsTab {
 		type.addChangedHandler(changedHandler);
 		type.addChangedHandler(changed -> {
 			layersStack.setVisible(NEURAL.equals(type.getValueAsString()));
+			
+			model.setTrainable(!ZEROSHOT.equals(type.getValueAsString()));
+
 			if (EMBEDDER.equals(type.getValueAsString()))
 				windowSize.setValue(10);
 		});

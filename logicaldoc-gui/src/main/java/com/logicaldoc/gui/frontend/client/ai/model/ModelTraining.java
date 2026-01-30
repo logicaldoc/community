@@ -50,11 +50,6 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 	}
 
 	private void refresh() {
-		if (!model.isTrainable()) {
-			container.removeMembers(container.getMembers());
-			return;
-		}
-
 		if (Boolean.TRUE.equals(container.contains(form)))
 			container.removeChild(form);
 
@@ -82,7 +77,7 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 		sampler = new SamplerSelector();
 		if (model.getTraining().getSampler() != null)
 			sampler.setValue(model.getTraining().getSampler().getId());
-		sampler.setRequired(true);
+		sampler.setRequiredWhen(new AdvancedCriteria("trainable", OperatorId.EQUALS, true));
 		sampler.addChangedHandler(changedHandler);
 
 		form = new DynamicForm();
@@ -124,8 +119,8 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 
 	boolean validate() {
 		if (!model.isTrainable())
-	        return true;
-		
+			return true;
+
 		if (form.validate()) {
 			model.getTraining().setCron(form.getValueAsString("cron"));
 			model.getTraining().setEnabled(Boolean.parseBoolean(form.getValueAsString(ENABLED)));

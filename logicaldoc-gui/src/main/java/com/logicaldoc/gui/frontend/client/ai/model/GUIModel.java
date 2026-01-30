@@ -264,6 +264,10 @@ public class GUIModel implements Serializable {
 	public boolean isNeuralNetwork() {
 		return "neural".equals(type);
 	}
+	
+	public boolean isZeroShot() {
+		return "zeroshot".equals(type);
+	}
 
 	public GUIUpdater getUpdater() {
 		return updater;
