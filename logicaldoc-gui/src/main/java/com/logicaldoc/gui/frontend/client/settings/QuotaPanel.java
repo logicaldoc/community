@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
+import com.logicaldoc.gui.frontend.client.system.usage.UsagePanel;
 import com.logicaldoc.gui.frontend.client.tenant.TenantQuotaPanel;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -39,6 +40,11 @@ public class QuotaPanel extends AdminPanel {
 								// Nothing to do
 							}));
 							tabs.addTab(system);
+							
+							Tab usage = new Tab();
+							usage.setTitle(I18N.message("usage"));
+							usage.setPane(new UsagePanel());
+							tabs.addTab(usage);
 						}
 					});
 				}
