@@ -42,6 +42,8 @@ public class TenantQuotaPanel extends HLayout {
 
 	private static final String WORKFLOWSQUOTA = "workflowsquota";
 
+	private static final String FORMSQUOTA = "formsquota";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -169,6 +171,16 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			workflowsQuota.addChangedHandler(changedHandler);
 
+		SpinnerItem formsQuota = ItemFactory.newSpinnerItem(FORMSQUOTA, tenant.getMaxForms());
+		formsQuota.setDisabled(readonly);
+		formsQuota.setRequired(false);
+		formsQuota.setMin(0);
+		formsQuota.setStep(1);
+		formsQuota.setWidth(100);
+		formsQuota.setVisible(!tenant.isSystem());
+		if (!readonly)
+			formsQuota.addChangedHandler(changedHandler);
+
 		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(QUOTA_THRESHOLD, "alertthreshold",
 				tenant.getQuotaThreshold());
 		quotaThreshold.setDisabled(readonly);
@@ -199,6 +211,7 @@ public class TenantQuotaPanel extends HLayout {
 				Util.formatLong(tenant.getGuests()));
 		StaticTextItem tickets = ItemFactory.newStaticTextItem("tickets", Util.formatLong(tenant.getTickets()));
 		StaticTextItem workflows = ItemFactory.newStaticTextItem("workflows", Util.formatLong(tenant.getWorkflows()));
+		StaticTextItem forms = ItemFactory.newStaticTextItem("forms", Util.formatLong(tenant.getForms()));
 
 		// Static items to display whole system quotas
 		StaticTextItem usersSystemQuota = ItemFactory.newStaticTextItem("sys" + USERSQUOTA, USERSQUOTA,
@@ -225,13 +238,16 @@ public class TenantQuotaPanel extends HLayout {
 		ticketsSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem workflowsSystemQuota = ItemFactory.newStaticTextItem("sys" + WORKFLOWSQUOTA, WORKFLOWSQUOTA,
 				Util.formatLong(tenant.getMaxWorkflows()));
-		workflowsSystemQuota.setVisible(tenant.isSystem());
+		workflowsSystemQuota.setVisible(tenant.isSystem());		
+		StaticTextItem formsSystemQuota = ItemFactory.newStaticTextItem("sys" + FORMSQUOTA, FORMSQUOTA,
+				Util.formatLong(tenant.getForms()));
+		formsSystemQuota.setVisible(tenant.isSystem());
 
 		form.setItems(usersQuota, usersSystemQuota, users, guestsQuota, guestsSystemQuota, guests, sessionsQuota,
 				sessionsSystemQuota, sessions, documentsQuota, documentsSystemQuota, documents, sizeQuota,
 				sizeSystemQuota, size, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls, ticketsQuota,
-				ticketsSystemQuota, tickets, workflowsQuota, workflowsSystemQuota, workflows, quotaThreshold,
-				recipients);
+				ticketsSystemQuota, tickets, workflowsQuota, workflowsSystemQuota, workflows, formsSystemQuota,
+				formsQuota, forms, quotaThreshold, recipients);
 		addMember(layout);
 	}
 
@@ -280,6 +296,11 @@ public class TenantQuotaPanel extends HLayout {
 			tenant.setMaxWorkflows(null);
 		else
 			tenant.setMaxWorkflows(Long.parseLong(values.get(WORKFLOWSQUOTA).toString()));
+
+		if (values.get(FORMSQUOTA) == null)
+			tenant.setMaxForms(null);
+		else
+			tenant.setMaxForms(Long.parseLong(values.get(FORMSQUOTA).toString()));
 
 		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);

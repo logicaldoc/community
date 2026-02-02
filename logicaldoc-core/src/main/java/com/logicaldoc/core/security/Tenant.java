@@ -93,12 +93,15 @@ public class Tenant extends PersistentObject implements Serializable {
 	 */
 	@Column(name = "ld_maxapicalls", nullable = true)
 	private Long maxApiCalls;
-	
+
 	@Column(name = "ld_maxtickets", nullable = true)
 	private Long maxTickets;
-	
+
 	@Column(name = "ld_maxworkflows", nullable = true)
 	private Long maxWorkflows;
+
+	@Column(name = "ld_maxforms", nullable = true)
+	private Long maxForms;
 
 	/**
 	 * Maximum repository size expressed in MB
@@ -137,6 +140,7 @@ public class Tenant extends PersistentObject implements Serializable {
 		this.maxApiCalls = source.maxApiCalls;
 		this.maxTickets = source.maxTickets;
 		this.maxWorkflows = source.maxWorkflows;
+		this.maxForms = source.maxForms;
 		this.quotaThreshold = source.quotaThreshold;
 		this.quotaAlertRecipients = source.quotaAlertRecipients;
 
@@ -147,11 +151,11 @@ public class Tenant extends PersistentObject implements Serializable {
 	public boolean isDefault() {
 		return id == DEFAULT_ID;
 	}
-	
+
 	public boolean isSystem() {
 		return id == SYSTEM_ID;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -276,7 +280,7 @@ public class Tenant extends PersistentObject implements Serializable {
 	public void setMaxApiCalls(Long maxApiCalls) {
 		this.maxApiCalls = maxApiCalls;
 	}
-	
+
 	public Long getMaxTickets() {
 		return maxTickets;
 	}
@@ -284,13 +288,21 @@ public class Tenant extends PersistentObject implements Serializable {
 	public void setMaxTickets(Long maxTickets) {
 		this.maxTickets = maxTickets;
 	}
-	
+
 	public Long getMaxWorkflows() {
 		return maxWorkflows;
 	}
 
 	public void setMaxWorkflows(Long maxWorkflows) {
 		this.maxWorkflows = maxWorkflows;
+	}
+
+	public Long getMaxForms() {
+		return maxForms;
+	}
+
+	public void setMaxForms(Long maxForms) {
+		this.maxForms = maxForms;
 	}
 
 	public boolean isEnabled() {

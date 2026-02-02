@@ -209,7 +209,7 @@ create table ld_tenant (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_displayname varchar(4000), ld_enabled int not null, ld_expire timestamp null, 
                         ld_street varchar(255), ld_postalcode varchar(255),
                         ld_city varchar(255), ld_country varchar(255), ld_state varchar(255),
-                        ld_email varchar(255), ld_telephone varchar(255),
+                        ld_email varchar(255), ld_telephone varchar(255), ld_maxforms bigint,
                         ld_maxusers int, ld_maxsessions int, ld_maxrepodocs bigint, ld_maxworkflows bigint, 
                         ld_maxreposize bigint, ld_type int not null, ld_creation timestamp,
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_maxguests int, 

@@ -138,6 +138,10 @@ public class StoreResource {
 
 		private String suffix;
 
+		private Builder() {
+			// Empty
+		}
+
 		public Builder fileVersion(String fileVersion) {
 			this.fileVersion = StringUtils.defaultString(fileVersion, this.fileVersion);
 			return this;
