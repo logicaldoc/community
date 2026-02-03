@@ -54,7 +54,7 @@ public abstract class AbstractTestCase {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractTestCase.class);
 
-	private static final String USER_HOME = "user.home";
+	protected static final String USER_HOME = "user.home";
 
 	protected ApplicationContext context;
 
