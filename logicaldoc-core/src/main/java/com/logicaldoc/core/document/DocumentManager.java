@@ -392,7 +392,7 @@ public class DocumentManager {
 
 			// store the document in the repository (on the file system)
 			try {
-				storeFile(document, file);
+				storeFile(document, file, false);
 			} catch (IOException ioe) {
 				document = documentDAO.findById(document.getId());
 				documentDAO.initialize(document);
@@ -531,8 +531,13 @@ public class DocumentManager {
 		log.debug("locked document {}", document);
 	}
 
-	private void storeFile(Document doc, File file) throws IOException, PersistenceException {
-		store.store(file, StoreResource.builder().document(doc).build());
+	private void storeFile(Document doc, File file, boolean creation) throws IOException, PersistenceException {
+		if (creation) {
+			FolderDAO.get().initialize(doc.getFolder());
+			store.store(file, StoreResource.builder().document(doc).storeId(doc.getFolder().getStore()).build());
+		} else {
+			store.store(file, StoreResource.builder().document(doc).build());
+		}
 	}
 
 	/**
@@ -1065,7 +1070,7 @@ public class DocumentManager {
 
 			/* store the document into filesystem */
 			try {
-				storeFile(docVO, file);
+				storeFile(docVO, file, true);
 			} catch (Exception e) {
 				documentDAO.delete(docVO.getId());
 				throw new PersistenceException(String.format("Unable to store the file of document %d", docVO.getId()),

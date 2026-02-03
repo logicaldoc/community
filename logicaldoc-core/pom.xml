@@ -328,16 +328,7 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>com.mpatric</groupId>
 			<artifactId>mp3agic</artifactId>

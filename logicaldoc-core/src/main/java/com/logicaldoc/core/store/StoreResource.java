@@ -45,10 +45,13 @@ public class StoreResource {
 
 	private String suffix;
 
+	private Integer storeId;
+	
 	StoreResource(Builder builder) {
 		this.fileVersion = builder.fileVersion;
 		this.suffix = builder.suffix;
 		this.docId = builder.docId;
+		this.storeId = builder.storeId;
 	}
 
 	public long getDocId() {
@@ -61,6 +64,10 @@ public class StoreResource {
 
 	public String getSuffix() {
 		return suffix;
+	}
+	
+	public Integer getStoreId() {
+		return storeId;
 	}
 
 	/**
@@ -83,6 +90,7 @@ public class StoreResource {
 		int result = 1;
 		result = prime * result + (int) (docId ^ (docId >>> 32));
 		result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
+		result = prime * result + ((storeId == null) ? 0 : storeId.hashCode());
 		result = prime * result + ((suffix == null) ? 0 : suffix.hashCode());
 		return result;
 	}
@@ -102,6 +110,11 @@ public class StoreResource {
 			if (other.fileVersion != null)
 				return false;
 		} else if (!fileVersion.equals(other.fileVersion))
+			return false;
+		if (storeId == null) {
+			if (other.storeId != null)
+				return false;
+		} else if (!storeId.equals(other.storeId))
 			return false;
 		if (suffix == null) {
 			if (other.suffix != null)
@@ -133,6 +146,8 @@ public class StoreResource {
 	public static class Builder {
 
 		private Long docId;
+		
+		private Integer storeId;
 
 		private String fileVersion;
 
@@ -192,11 +207,17 @@ public class StoreResource {
 			this.docId = docId;
 			return this;
 		}
+		
+		public Builder storeId(Integer storeId) {
+			this.storeId = storeId;
+			return this;
+		}
 
 		public Builder resource(StoreResource res) {
 			this.docId = res.docId;
 			this.fileVersion = res.fileVersion;
 			this.suffix = res.suffix;
+			this.storeId = res.storeId;
 			return this;
 		}
 
