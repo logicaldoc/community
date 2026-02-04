@@ -270,9 +270,6 @@ public class ItemFactory {
 		selectItem.setHintStyle("hint");
 		selectItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		selectItem.setBrowserSpellCheck(false);
-		selectItem.setIconHeight(ITEM_ICON_SIZE);
-		selectItem.setIconWidth(ITEM_ICON_SIZE);
-		selectItem.setIconVAlign(VerticalAlignment.CENTER);
 		SelectItem.setDefaultProperties(selectItem);
 
 		TextItem textItem = new TextItem();
