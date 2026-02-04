@@ -3,4 +3,4 @@
  *
  * @since 9.2.3
  */
-package com.logicaldoc.core.metadata.filling;
+package com.logicaldoc.core.filler;

@@ -163,10 +163,6 @@
     <parameter-def id="class" />
     <parameter-def id="protocols" />
   </extension-point>
-  <extension-point id="Filler">
-    <parameter-def id="class" />
-    <parameter-def id="position" />
-  </extension-point>  
 
   <extension plugin-id="logicaldoc-core" point-id="Authentication" id="DefaultAuthentication">
     <parameter id="authenticatorId" value="DefaultAuthenticator" />

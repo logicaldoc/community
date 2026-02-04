@@ -253,6 +253,12 @@ create table ld_search (ld_id bigint not null, ld_lastmodified timestamp not nul
 create table ld_apikey (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, ld_lastused timestamp, ld_key varchar(255) not null,
                         ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id));
+
+create table ld_filler (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null, 
+						ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_title varchar(255),
+						ld_description varchar(4000), primary key (ld_id));
+create table ld_filler_chain (ld_fillerid bigint not null, ld_chainedid bigint not null, ld_position int not null, primary key (ld_fillerid, ld_chainedid));      
+
                           
 -- Create the sequences for ID generation
 create sequence ld_bookmark_SEQ start with 100 INCREMENT BY 50;
@@ -303,7 +309,6 @@ alter table ld_template_ext add constraint FK6BABB84376C86307 foreign key (ld_te
 alter table ld_template_acl add constraint FK_TEMPLACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
 alter table ld_template_acl add constraint FK_TEMPLACL_TEMPL foreign key (ld_templateid) references ld_template(ld_id) on delete cascade;
 alter table ld_recipient add constraint FK406A04126621DEBE foreign key (ld_messageid) references ld_systemmessage(ld_id);
-
 alter table ld_attributeset_ext add constraint FK_ATT_ATTSET foreign key (ld_attsetid) references ld_attributeset(ld_id);
 alter table ld_ticket add constraint FK_TICKET_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 alter table ld_menu add constraint FK_MENU_PARENT foreign key (ld_parentid) references ld_menu(ld_id);
@@ -320,6 +325,8 @@ alter table ld_folder_store add constraint FK_FOLDER_STORE foreign key (ld_folde
 alter table ld_foldertag add constraint FK_TAG_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 alter table ld_apikey add constraint FK_APIKEY_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
+alter table ld_filler_chain add constraint FK_FILLERCHAIN_FILLER foreign key (ld_fillerid) references ld_filler(ld_id) on delete cascade;
+alter table ld_filler_chain add constraint FK_FILLERCHAIN_CHAINED foreign key (ld_chainedid) references ld_filler(ld_id) on delete cascade;
 
 create unique index AK_DOCUMENT on ld_document (ld_customid, ld_tenantid);
 create unique index AK_USER on ld_user (ld_username);
@@ -341,6 +348,7 @@ create unique index AK_DEVICE on ld_device (ld_deviceid);
 create unique index AK_SEARCH on ld_search (ld_userid, ld_name);
 create unique index AK_APIKEY on ld_apikey (ld_key);
 create unique index AK_APIKEY2 on ld_apikey (ld_name, ld_userid);
+create unique index AK_FILLER on ld_filler (ld_name, ld_tenantid);
 
 
 
