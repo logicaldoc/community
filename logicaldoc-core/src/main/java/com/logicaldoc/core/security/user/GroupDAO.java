@@ -74,14 +74,6 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	public Collection<Group> findByLikeName(String name, long tenantId) throws PersistenceException;
 
 	/**
-	 * Counts the total number of groups
-	 * 
-	 * @return total number of groups
-	 * @throws PersistenceException Error in the database
-	 */
-	public int count() throws PersistenceException;
-
-	/**
 	 * Initializes the group collections
 	 */
 	public void initialize(Group group);

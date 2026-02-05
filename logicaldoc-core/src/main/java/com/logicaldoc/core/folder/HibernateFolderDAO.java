@@ -1923,17 +1923,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public int count(boolean computeDeleted) {
-		try {
-			return queryForInt(
-					"SELECT COUNT(A.ld_id) FROM ld_document A " + (computeDeleted ? "" : "WHERE A.ld_deleted = 0 "));
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
-	}
-
-	@Override
 	public List<Folder> findWorkspaces(long tenantId) throws PersistenceException {
 		Folder root = findRoot(tenantId);
 		if (root == null)

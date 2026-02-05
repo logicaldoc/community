@@ -179,9 +179,10 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		}
 	}
 	
-	public int countFolders(long id) {
+	@Override
+	public long countFolders(long id) {
 		try {
-			return queryForInt("select count(*) from ld_folder where ld_deleted=0 and ld_templateid=" + id);
+			return queryForLong("select count(*) from ld_folder where ld_deleted=0 and ld_templateid=%d".formatted(id));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return 0;
@@ -189,8 +190,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	}
 
 	@Override
-	public int countDocs(long id) throws PersistenceException {
-		return queryForInt("select count(*) from ld_document where ld_deleted=0 and ld_templateid=" + id);
+	public long countDocs(long id) throws PersistenceException {
+		return queryForLong("select count(*) from ld_document where ld_deleted=0 and ld_templateid=%d".formatted(id));
 	}
 
 	@Override

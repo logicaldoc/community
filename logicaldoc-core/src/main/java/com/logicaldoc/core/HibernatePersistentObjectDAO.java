@@ -36,6 +36,7 @@ import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
+import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 
 /**
@@ -88,6 +89,17 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return;
 		entity.setDeleted(code);
 		store(entity);
+	}
+	
+	@Override
+	public long count(Long tenantId, boolean computeDeleted) throws PersistenceException {
+		String table = this.entityClass.getDeclaredAnnotationsByType(Table.class)[0].name();
+		StringBuilder sb=new StringBuilder("select count(*) from %s where 1 = 1".formatted(table));
+		if(!computeDeleted)
+			sb.append(" and ld_deleted = 0 ");
+		if (tenantId == null)
+			sb.append(" ld_tenantid = %d ".formatted(tenantId));
+		return queryForLong(sb.toString());
 	}
 
 	@Override

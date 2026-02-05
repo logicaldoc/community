@@ -154,11 +154,6 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	}
 
 	@Override
-	public int count() throws PersistenceException {
-		return queryForInt("select count(*) from ld_group where ld_deleted=0");
-	}
-
-	@Override
 	public void initialize(Group group) {
 		if (group == null)
 			return;

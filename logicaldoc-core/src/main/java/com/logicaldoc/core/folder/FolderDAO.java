@@ -741,17 +741,6 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
-	 * Counts the number of folders
-	 * 
-	 * @param computeDeleted if the deleted folders have to be taken int account
-	 * 
-	 * @return the number of folders
-	 * 
-	 * @throws PersistenceException error at data layer
-	 */
-	public int count(boolean computeDeleted) throws PersistenceException;
-
-	/**
 	 * Retrieves all the workspaces in the system, that are the first-level
 	 * folders of type {@link Folder#TYPE_WORKSPACE}
 	 * 

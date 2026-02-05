@@ -187,6 +187,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		guiTenant.setMaxTickets(tenant.getMaxTickets());
 		guiTenant.setMaxWorkflows(tenant.getMaxWorkflows());
 		guiTenant.setMaxForms(tenant.getMaxForms());
+		guiTenant.setMaxReports(tenant.getMaxReports());
 		guiTenant.setQuotaThreshold(tenant.getQuotaThreshold());
 		guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
 		guiTenant.setEnabled(tenant.isEnabled());

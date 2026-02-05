@@ -15,7 +15,7 @@ import com.logicaldoc.util.spring.Context;
  * @version 1.0
  */
 public interface TemplateDAO extends PersistentObjectDAO<Template> {
-	
+
 	/**
 	 * Gets the object available in the application context
 	 * 
@@ -24,7 +24,7 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	public static TemplateDAO get() {
 		return Context.get(TemplateDAO.class);
 	}
-	
+
 	/**
 	 * This method finds a template by name
 	 * 
@@ -57,7 +57,17 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * 
 	 * @throws PersistenceException Error in the data layer
 	 */
-	public int countDocs(long id) throws PersistenceException;
+	public long countDocs(long id) throws PersistenceException;
+
+	/**
+	 * Counts the total number of folders using this template
+	 * 
+	 * @param id The template ID
+	 * @return the folders count
+	 * 
+	 * @throws PersistenceException Error in the data layer
+	 */
+	public long countFolders(long id) throws PersistenceException;
 
 	/**
 	 * This method finds a template by type

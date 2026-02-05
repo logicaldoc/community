@@ -146,9 +146,9 @@ public class StatsCollector extends Task {
 			/*
 			 * Collect users statistics
 			 */
-			int users = userDao.count(null);
-			int guests = userDao.countGuests(null);
-			int groups = groupDAO.count();
+			long users = userDao.countRegulars(null);
+			long guests = userDao.countGuests(null);
+			long groups = groupDAO.count();
 			log.debug("Collected users data");
 
 			long userdir = calculateUserDirSize();
@@ -275,9 +275,9 @@ public class StatsCollector extends Task {
 			statistics.add(new BasicNameValuePair("user_country", StringUtils.defaultString(usercountry)));
 
 			// Sizing
-			statistics.add(new BasicNameValuePair("users", Integer.toString(users)));
-			statistics.add(new BasicNameValuePair("guests", Integer.toString(guests)));
-			statistics.add(new BasicNameValuePair("groups", Integer.toString(groups)));
+			statistics.add(new BasicNameValuePair("users", Long.toString(users)));
+			statistics.add(new BasicNameValuePair("guests", Long.toString(guests)));
+			statistics.add(new BasicNameValuePair("groups", Long.toString(groups)));
 			statistics.add(new BasicNameValuePair("docs", Long.toString(totaldocs)));
 			statistics.add(new BasicNameValuePair("pages", Long.toString(totalpages)));
 

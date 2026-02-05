@@ -33,7 +33,7 @@ public class WSTemplate implements Serializable {
 	private String lastModified;
 
 	@WSDoc(description = "the last modified date (format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd')", required = false)
-	private int docsCount;
+	private long docsCount;
 
 	@WSDoc(required = false)
 	private String initialization;
@@ -76,11 +76,11 @@ public class WSTemplate implements Serializable {
 		this.lastModified = lastModified;
 	}
 
-	public int getDocsCount() {
+	public long getDocsCount() {
 		return docsCount;
 	}
 
-	public void setDocsCount(int docsCount) {
+	public void setDocsCount(long docsCount) {
 		this.docsCount = docsCount;
 	}
 

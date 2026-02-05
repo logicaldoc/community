@@ -47,13 +47,4 @@ public interface TenantDAO extends PersistentObjectDAO<Tenant> {
 	 * @throws PersistenceException Error in the database
 	 */
 	public Set<String> findAllNames() throws PersistenceException;
-
-	/**
-	 * Counts the total number of tenants
-	 * 
-	 * @return number of tenants
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public long count() throws PersistenceException;
 }

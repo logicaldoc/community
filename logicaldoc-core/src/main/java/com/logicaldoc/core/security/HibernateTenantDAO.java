@@ -80,18 +80,6 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	}
 
 	@Override
-	public long count() {
-		String query = "select count(*) from ld_tenant where ld_deleted=0";
-
-		try {
-			return queryForLong(query);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
-	}
-
-	@Override
 	public Set<String> findAllNames() throws PersistenceException {
 		Set<String> names = new HashSet<>();
 		List<Tenant> tenants = findAll();

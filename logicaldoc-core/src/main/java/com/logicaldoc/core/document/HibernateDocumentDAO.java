@@ -347,7 +347,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			doc.setModified(false);
 
 			log.debug("Invoke listeners after store");
-			for (DocumentListener listener : listenerManager.getListeners())
+			for (DocumentListener listener : listenerManager.getListeners()) 
 				listener.afterStore(doc, transaction, dictionary);
 
 			if (StringUtils.isEmpty(doc.getCustomId())) {

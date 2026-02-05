@@ -245,7 +245,43 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 		for (T entity : entities)
 			initialize(entity);
 	}
+	
+	/**
+	 * Counts the total number of not-deleted entities
+	 * 
+	 * @return The total count
+	 * 
+	 * @throws PersistenceException Error in the database 
+	 */
+	public default long count()  throws PersistenceException {
+		return count(null);
+	}
 
+	/**
+	 * Counts the total number of not-deleted entities
+	 * 
+	 * @param tenantId Optional specification of the tenant
+	 * 
+	 * @return The total count
+	 * 
+	 * @throws PersistenceException Error in the database 
+	 */
+	public default long count(Long tenantId)  throws PersistenceException {
+		return count(tenantId, false);
+	}
+	
+	/**
+	 * Counts the total number of entities
+	 * 
+	 * @param tenantId Optional specification of the tenant
+	 * @param computeDeleted If deleted records must be computed as well
+	 * 
+	 * @return The total count
+	 * 
+	 * @throws PersistenceException Error in the database 
+	 */
+	public long count(Long tenantId, boolean computeDeleted)  throws PersistenceException;
+	
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
 	 * arguments to bind to the query, mapping each row to a Java object via a

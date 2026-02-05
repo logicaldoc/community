@@ -475,7 +475,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		params.put("userId", user.getId());
 		jdbcUpdate("delete from ld_usergroup where ld_userid = :userId", params);
 		for (UserGroup ug : user.getUserGroups()) {
-			int exists = queryForInt("select count(*) from ld_group where ld_id=" + ug.getGroupId());
+			long exists = queryForLong("select count(*) from ld_group where ld_id=" + ug.getGroupId());
 			if (exists > 0) {
 				jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (" + user.getId() + ", "
 						+ ug.getGroupId() + ")");
@@ -720,17 +720,24 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public int count(Long tenantId) throws PersistenceException {
+	public long count(Long tenantId) throws PersistenceException {
 		String query = "select count(*) from ld_user where ld_type=" + UserType.DEFAULT.ordinal() + " and ld_deleted=0 "
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-		return queryForInt(query);
+		return queryForLong(query);
+	}
+	
+	@Override
+	public long countRegulars(Long tenantId) throws PersistenceException {
+		String query = "select count(*) from ld_user where ld_type=" + UserType.DEFAULT.ordinal() + " and ld_deleted=0 "
+				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
+		return queryForLong(query);
 	}
 
 	@Override
-	public int countGuests(Long tenantId) throws PersistenceException {
+	public long countGuests(Long tenantId) throws PersistenceException {
 		String query = "select count(*) from ld_user where ld_type=" + UserType.READONLY.ordinal()
 				+ " and ld_deleted=0 " + (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-		return queryForInt(query);
+		return queryForLong(query);
 	}
 
 	@Override

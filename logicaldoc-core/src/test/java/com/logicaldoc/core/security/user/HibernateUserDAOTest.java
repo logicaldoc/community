@@ -298,8 +298,8 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCount() throws PersistenceException {
-		assertEquals(5, testSubject.count(null));
+	public void testCountRegulars() throws PersistenceException {
+		assertEquals(5, testSubject.countRegulars(null));
 	}
 
 	public void isPasswordExpired() throws PersistenceException {
