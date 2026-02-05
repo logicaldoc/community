@@ -1455,7 +1455,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		// If the user is an administrator bypass all controls
 		if (user.isAdmin())
 			return Permission.all();
-		
+
 		StringBuilder query = new StringBuilder("""
 						select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE,
 						ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,

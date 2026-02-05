@@ -1062,7 +1062,7 @@ public class DocumentManager {
 			// Create the record
 			transaction.setEvent(DocumentEvent.STORED);
 			documentDAO.store(docVO, transaction);
-
+			
 			/* store the document into filesystem */
 			try {
 				storeFile(docVO, file, true);
@@ -1071,12 +1071,12 @@ public class DocumentManager {
 				throw new PersistenceException(String.format("Unable to store the file of document %d", docVO.getId()),
 						e);
 			}
-
+			
 			// The document record has been written, now store the initial
 			// version (default 1.0)
 			Version version = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
 					DocumentEvent.STORED, true);
-
+			
 			return new DocumentFuture(docVO, storeVersionAsync(version, docVO));
 		}
 	}
