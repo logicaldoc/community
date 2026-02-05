@@ -531,13 +531,8 @@ public class DocumentManager {
 		log.debug("locked document {}", document);
 	}
 
-	private void storeFile(Document doc, File file, boolean creation) throws IOException, PersistenceException {
-		if (creation) {
-			FolderDAO.get().initialize(doc.getFolder());
-			store.store(file, StoreResource.builder().document(doc).storeId(doc.getFolder().getStore()).build());
-		} else {
-			store.store(file, StoreResource.builder().document(doc).build());
-		}
+	private void storeFile(Document doc, File file, boolean newDocument) throws IOException, PersistenceException {
+		store.store(file, StoreResource.builder().document(doc).newEntry(newDocument).build());
 	}
 
 	/**

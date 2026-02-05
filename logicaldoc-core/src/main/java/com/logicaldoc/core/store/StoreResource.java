@@ -17,23 +17,23 @@ import com.logicaldoc.core.document.Version;
  */
 public class StoreResource {
 
-	/*
+	/**
 	 * The suffix for the document's resource that represents the PDF conversion
 	 */
 	public static final String SUFFIX_PDF_CONVERSION = "conversion.pdf";
 
-	/*
+	/**
 	 * The suffix for the document's resource that represents the tile image
 	 */
 	public static final String SUFFIX_TILE = "tile.png";
 
-	/*
+	/**
 	 * The suffix for the document's resource that represents the thumbnail
 	 * image
 	 */
 	public static final String SUFFIX_THUMBNAIL = "thumb.png";
 
-	/*
+	/**
 	 * The suffix for the document's resource that represents the mobile
 	 * thumbnail image
 	 */
@@ -44,14 +44,17 @@ public class StoreResource {
 	private String fileVersion;
 
 	private String suffix;
-
-	private Integer storeId;
 	
+	/**
+	 * Indicates this is a resource added for the very first time
+	 */
+	private boolean newEntry = false;
+
 	StoreResource(Builder builder) {
 		this.fileVersion = builder.fileVersion;
 		this.suffix = builder.suffix;
 		this.docId = builder.docId;
-		this.storeId = builder.storeId;
+		this.newEntry = builder.newEntry;
 	}
 
 	public long getDocId() {
@@ -65,9 +68,9 @@ public class StoreResource {
 	public String getSuffix() {
 		return suffix;
 	}
-	
-	public Integer getStoreId() {
-		return storeId;
+
+	public boolean isNewEntry() {
+		return newEntry;
 	}
 
 	/**
@@ -90,7 +93,6 @@ public class StoreResource {
 		int result = 1;
 		result = prime * result + (int) (docId ^ (docId >>> 32));
 		result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
-		result = prime * result + ((storeId == null) ? 0 : storeId.hashCode());
 		result = prime * result + ((suffix == null) ? 0 : suffix.hashCode());
 		return result;
 	}
@@ -110,11 +112,6 @@ public class StoreResource {
 			if (other.fileVersion != null)
 				return false;
 		} else if (!fileVersion.equals(other.fileVersion))
-			return false;
-		if (storeId == null) {
-			if (other.storeId != null)
-				return false;
-		} else if (!storeId.equals(other.storeId))
 			return false;
 		if (suffix == null) {
 			if (other.suffix != null)
@@ -146,12 +143,12 @@ public class StoreResource {
 	public static class Builder {
 
 		private Long docId;
-		
-		private Integer storeId;
 
 		private String fileVersion;
 
 		private String suffix;
+
+		private boolean newEntry;
 
 		private Builder() {
 			// Empty
@@ -207,9 +204,9 @@ public class StoreResource {
 			this.docId = docId;
 			return this;
 		}
-		
-		public Builder storeId(Integer storeId) {
-			this.storeId = storeId;
+
+		public Builder newEntry(boolean newEntry) {
+			this.newEntry = newEntry;
 			return this;
 		}
 
@@ -217,7 +214,7 @@ public class StoreResource {
 			this.docId = res.docId;
 			this.fileVersion = res.fileVersion;
 			this.suffix = res.suffix;
-			this.storeId = res.storeId;
+			this.newEntry = res.newEntry;
 			return this;
 		}
 

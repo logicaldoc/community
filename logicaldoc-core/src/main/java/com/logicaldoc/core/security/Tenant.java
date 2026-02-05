@@ -103,6 +103,9 @@ public class Tenant extends PersistentObject implements Serializable {
 	@Column(name = "ld_maxforms", nullable = true)
 	private Long maxForms;
 
+	@Column(name = "ld_maxreports", nullable = true)
+	private Long maxReports;
+
 	/**
 	 * Maximum repository size expressed in MB
 	 */
@@ -141,6 +144,7 @@ public class Tenant extends PersistentObject implements Serializable {
 		this.maxTickets = source.maxTickets;
 		this.maxWorkflows = source.maxWorkflows;
 		this.maxForms = source.maxForms;
+		this.maxReports = source.maxReports;
 		this.quotaThreshold = source.quotaThreshold;
 		this.quotaAlertRecipients = source.quotaAlertRecipients;
 
@@ -303,6 +307,14 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	public void setMaxForms(Long maxForms) {
 		this.maxForms = maxForms;
+	}
+
+	public Long getMaxReports() {
+		return maxReports;
+	}
+
+	public void setMaxReports(Long maxReports) {
+		this.maxReports = maxReports;
 	}
 
 	public boolean isEnabled() {
