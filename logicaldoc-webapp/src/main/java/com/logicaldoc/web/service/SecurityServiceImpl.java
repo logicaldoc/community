@@ -178,7 +178,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		guiTenant.setState(tenant.getState());
 		guiTenant.setStreet(tenant.getStreet());
 		guiTenant.setTelephone(tenant.getTelephone());
-		guiTenant.setMaxRepoDocs(tenant.getMaxRepoDocs());
+		guiTenant.setMaxRepoDocs(tenant.getMaxDocuments());
 		guiTenant.setMaxRepoSize(tenant.getMaxRepoSize());
 		guiTenant.setMaxSessions(tenant.getMaxSessions());
 		guiTenant.setMaxApiCalls(tenant.getMaxApiCalls());

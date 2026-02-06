@@ -69,7 +69,7 @@ public abstract class Filler extends PersistentObject {
 	 * @param content the content of the object, if not specified it will be
 	 *        taken from the transaction's file.
 	 * @param transaction the current transaction
-	 * @dictionary Dictionary of the execution pipeline
+	 * @param dictionary Dictionary of the execution pipeline
 	 */
 	public abstract void fill(ExtensibleObject object, String content, History transaction,
 			Map<String, Object> dictionary);

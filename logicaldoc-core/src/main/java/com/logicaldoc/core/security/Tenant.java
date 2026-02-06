@@ -85,8 +85,8 @@ public class Tenant extends PersistentObject implements Serializable {
 	@Column(name = "ld_maxsessions", nullable = true)
 	private Integer maxSessions;
 
-	@Column(name = "ld_maxrepodocs", nullable = true)
-	private Long maxRepoDocs;
+	@Column(name = "ld_maxdocuments", nullable = true)
+	private Long maxDocuments;
 	
 	/**
 	 * Maximum repository size expressed in MB
@@ -140,7 +140,7 @@ public class Tenant extends PersistentObject implements Serializable {
 		this.maxUsers = source.maxUsers;
 		this.maxGuests = source.maxGuests;
 		this.maxSessions = source.maxSessions;
-		this.maxRepoDocs = source.maxRepoDocs;
+		this.maxDocuments = source.maxDocuments;
 		this.enabled = source.enabled;
 		this.expire = source.expire;
 		this.maxRepoSize = source.maxRepoSize;
@@ -266,12 +266,12 @@ public class Tenant extends PersistentObject implements Serializable {
 		this.maxSessions = maxSessions;
 	}
 
-	public Long getMaxRepoDocs() {
-		return maxRepoDocs;
+	public Long getMaxDocuments() {
+		return maxDocuments;
 	}
 
-	public void setMaxRepoDocs(Long maxRepoDocs) {
-		this.maxRepoDocs = maxRepoDocs;
+	public void setMaxDocuments(Long maxDocuments) {
+		this.maxDocuments = maxDocuments;
 	}
 
 	public Long getMaxRepoSize() {
