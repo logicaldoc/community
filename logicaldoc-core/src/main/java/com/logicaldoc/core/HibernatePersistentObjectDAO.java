@@ -92,13 +92,13 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 	
 	@Override
-	public long count(Long tenantId, boolean computeDeleted) throws PersistenceException {
+	public long count(Long tenantId, boolean includeDeleted) throws PersistenceException {
 		String table = this.entityClass.getDeclaredAnnotationsByType(Table.class)[0].name();
 		StringBuilder sb=new StringBuilder("select count(*) from %s where 1 = 1".formatted(table));
-		if(!computeDeleted)
+		if(!includeDeleted)
 			sb.append(" and ld_deleted = 0 ");
-		if (tenantId == null)
-			sb.append(" ld_tenantid = %d ".formatted(tenantId));
+		if (tenantId != null)
+			sb.append(" and ld_tenantid = %d ".formatted(tenantId));
 		return queryForLong(sb.toString());
 	}
 

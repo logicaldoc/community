@@ -211,9 +211,9 @@ create table ld_tenant (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_city varchar(255), ld_country varchar(255), ld_state varchar(255),
                         ld_email varchar(255), ld_telephone varchar(255), ld_maxforms bigint,
                         ld_maxusers int, ld_maxsessions int, ld_maxrepodocs bigint, ld_maxworkflows bigint, 
-                        ld_maxreposize bigint, ld_type int not null, ld_creation timestamp,
+                        ld_maxreposize bigint, ld_type int not null, ld_creation timestamp, 
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_maxguests int, ld_maxreports bigint, 
-                        ld_maxapicalls bigint, ld_maxtickets bigint, primary key (ld_id));   
+                        ld_maxapicalls bigint, ld_maxtickets bigint, ld_maxstamps bigint, primary key (ld_id));   
 create table ld_sequence (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null,
                           ld_objectid bigint not null, ld_lastreset timestamp null, ld_value bigint not null,

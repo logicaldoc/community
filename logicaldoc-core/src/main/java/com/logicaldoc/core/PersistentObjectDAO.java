@@ -274,13 +274,13 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * Counts the total number of entities
 	 * 
 	 * @param tenantId Optional specification of the tenant
-	 * @param computeDeleted If deleted records must be computed as well
+	 * @param includeDeleted If deleted records must be computed as well
 	 * 
 	 * @return The total count
 	 * 
 	 * @throws PersistenceException Error in the database 
 	 */
-	public long count(Long tenantId, boolean computeDeleted)  throws PersistenceException;
+	public long count(Long tenantId, boolean includeDeleted)  throws PersistenceException;
 	
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of

@@ -69,6 +69,8 @@ public class GUITenant implements Serializable {
 	
 	private Long maxReports;
 	
+	private Long maxStamps;
+	
 	private boolean enabled = true;
 
 	private Date expire;
@@ -93,6 +95,8 @@ public class GUITenant implements Serializable {
 	private long forms;
 	
 	private long reports;
+	
+	private long stamps;
 
 	private GUIBranding branding;
 
@@ -357,6 +361,22 @@ public class GUITenant implements Serializable {
 
 	public void setMaxReports(Long maxReports) {
 		this.maxReports = maxReports;
+	}
+	
+	public Long getMaxStamps() {
+		return maxStamps;
+	}
+
+	public void setMaxStamps(Long maxStamps) {
+		this.maxStamps = maxStamps;
+	}
+
+	public long getStamps() {
+		return stamps;
+	}
+
+	public void setStamps(long stamps) {
+		this.stamps = stamps;
 	}
 
 	public GUIBranding getBranding() {
