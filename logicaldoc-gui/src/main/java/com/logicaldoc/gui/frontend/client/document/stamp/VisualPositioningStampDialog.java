@@ -88,13 +88,6 @@ public class VisualPositioningStampDialog extends Window {
 					firstSelectedDoc = documents.get(0);
 
 					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new DefaultAsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							super.onFailure(caught);
-							LD.clearPrompt();
-						}
-
 						@Override
 						public void handleSuccess(GUIDocument doc) {
 							firstSelectedDoc = doc;
@@ -144,12 +137,6 @@ public class VisualPositioningStampDialog extends Window {
 
 		StampService.Instance.get().applyStamp(documents.stream().map(d -> d.getId()).collect(Collectors.toList()),
 				stamp, new DefaultAsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						super.onFailure(caught);
-					}
 
 					@Override
 					public void handleSuccess(Void result) {

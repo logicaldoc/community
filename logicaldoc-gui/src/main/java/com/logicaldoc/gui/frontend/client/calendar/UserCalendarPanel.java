@@ -149,7 +149,6 @@ public class UserCalendarPanel extends VLayout {
 	private final class RefreshCallback extends GoogleAsyncCallback<Void> {
 		@Override
 		public void onSuccess(Void arg0) {
-			LD.clearPrompt();
 			refresh();
 		}
 	}

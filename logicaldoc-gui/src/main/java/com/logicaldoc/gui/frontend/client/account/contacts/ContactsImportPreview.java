@@ -58,31 +58,20 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		toolStrip.addButton(importButton);
 		importButton.addClickHandler((ClickEvent event) -> {
 			LD.contactingServer();
-			try {
-				ContactService.Instance.get().parseContacts(false, settings.getParseContactsParameters(),
-						new DefaultAsyncCallback<>() {
+			ContactService.Instance.get().parseContacts(false, settings.getParseContactsParameters(),
+					new DefaultAsyncCallback<>() {
+						@Override
+						public void handleSuccess(List<GUIContact> contacts) {
+							settings.destroy();
+							destroy();
 
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								super.onFailure(caught);
+							try {
+								Contacts.get().refresh();
+							} catch (Exception t) {
+								// Nothing to do
 							}
-
-							@Override
-							public void handleSuccess(List<GUIContact> contacts) {
-								settings.destroy();
-								destroy();
-
-								try {
-									Contacts.get().refresh();
-								} catch (Exception t) {
-									// Nothing to do
-								}
-							}
-						});
-			} catch (Exception t) {
-				LD.clearPrompt();
-			}
+						}
+					});
 		});
 
 		ToolStripButton cancel = new ToolStripButton();

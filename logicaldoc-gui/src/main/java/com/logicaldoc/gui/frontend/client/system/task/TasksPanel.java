@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITask;
@@ -324,9 +325,15 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	private void loadTasks() {
-		SystemService.Instance.get().loadTasks(I18N.getLocale(), new DefaultAsyncCallback<>() {
+		SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<List<GUITask>>() {
+
 			@Override
-			public void handleSuccess(List<GUITask> tasks) {
+			public void onFailure(Throwable caught) {
+				// empty
+			}
+
+			@Override
+			public void onSuccess(List<GUITask> tasks) {
 				for (GUITask guiTask : tasks) {
 					Progressbar p = progresses.get(guiTask.getName());
 					if (p == null)

@@ -67,7 +67,6 @@ public class DriveEditor extends Window {
 						new GoogleAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
-								LD.clearPrompt();
 								destroy();
 							}
 						});

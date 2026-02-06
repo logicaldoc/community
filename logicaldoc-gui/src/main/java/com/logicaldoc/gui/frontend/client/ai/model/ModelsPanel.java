@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
@@ -248,7 +249,7 @@ public class ModelsPanel extends VLayout {
 				AIService.Instance.get().trainModel(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
-						LD.clearPrompt();
+						// empty
 					}
 				});
 			}
@@ -274,7 +275,7 @@ public class ModelsPanel extends VLayout {
 				AIService.Instance.get().evaluateModel(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
-						LD.clearPrompt();
+						// empty
 					}
 				});
 			}
@@ -400,9 +401,14 @@ public class ModelsPanel extends VLayout {
 	}
 
 	private void loadModels() {
-		AIService.Instance.get().getModels(new DefaultAsyncCallback<>() {
+		AIService.Instance.get().getModels(new AsyncCallback<List<GUIModel>>() {
 			@Override
-			public void handleSuccess(List<GUIModel> models) {
+			public void onFailure(Throwable caught) {
+				// empty
+			}
+
+			@Override
+			public void onSuccess(List<GUIModel> models) {
 				for (GUIModel guiModel : models) {
 					updateRecord(guiModel);
 				}

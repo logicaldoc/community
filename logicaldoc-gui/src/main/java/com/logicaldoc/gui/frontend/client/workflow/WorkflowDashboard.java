@@ -111,7 +111,6 @@ public class WorkflowDashboard extends VLayout {
 			@Override
 			public void handleSuccess(Void result) {
 				refreshGridsAfterWorkflowsKilled(instanceIds);
-				LD.clearPrompt();
 			}
 		});
 	}

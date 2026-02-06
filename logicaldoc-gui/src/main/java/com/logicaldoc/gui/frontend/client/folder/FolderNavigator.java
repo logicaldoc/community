@@ -403,7 +403,6 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 			@Override
 			public void handleSuccess(Void ret) {
-				LD.clearPrompt();
 				TreeNode target = getTree().find(FOLDER_ID, Long.toString(targetFolderId));
 				if (target != null)
 					getTree().reloadChildren(target);

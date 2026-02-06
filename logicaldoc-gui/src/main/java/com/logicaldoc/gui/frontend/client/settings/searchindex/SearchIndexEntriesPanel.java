@@ -124,7 +124,6 @@ public class SearchIndexEntriesPanel extends VLayout {
 						format.format((double) Search.get().getTime() / (double) 1000)));
 
 				entriesGrid.setDocuments(result.getHits());
-				LD.clearPrompt();
 			}
 		});
 	}

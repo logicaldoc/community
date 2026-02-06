@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.AutoFitWidthApproach;
@@ -104,9 +105,9 @@ public class QueryDialog extends Window {
 		ListGridField name = new ListGridField(NAME, I18N.message(NAME));
 		name.setAutoFitWidth(true);
 		name.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
-		
+
 		ListGridField score = new ListGridField(SCORE, I18N.message(SCORE));
-		
+
 		ListGridField value = new ListGridField(VALUE, I18N.message(VALUE));
 		value.setAutoFitWidth(true);
 		value.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
@@ -116,6 +117,7 @@ public class QueryDialog extends Window {
 
 	private void onQuery() {
 		query.setDisabled(true);
+		LD.contactingServer();
 		AIService.Instance.get().query(model.getId(),
 				model.getFeaturesList().stream().map(f -> form.getValueAsString(f)).collect(Collectors.toList()),
 				new DefaultAsyncCallback<>() {
@@ -128,7 +130,6 @@ public class QueryDialog extends Window {
 
 					@Override
 					public void handleSuccess(List<GUIQueryResult> answers) {
-						query.setDisabled(false);
 						resultGrid.setData(new RecordList(answers.stream().map(answer -> {
 							ListGridRecord rec = new ListGridRecord();
 							rec.setAttribute(NAME, answer.getName());
@@ -136,6 +137,8 @@ public class QueryDialog extends Window {
 							rec.setAttribute(VALUE, answer.getValue());
 							return rec;
 						}).collect(Collectors.toList())));
+
+						query.setDisabled(false);
 					}
 
 				});

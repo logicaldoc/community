@@ -169,27 +169,24 @@ public class ContactsImportSettings extends Window {
 	private void onImport() {
 		if (form.validate()) {
 			LD.contactingServer();
-			try {
-				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new DefaultAsyncCallback<>() {
+			ContactService.Instance.get().parseContacts(true, getParseContactsParameters(),
+					new DefaultAsyncCallback<>() {
 
-					@Override
-					public void handleSuccess(List<GUIContact> contacts) {
-						ContactsImportPreview preview = new ContactsImportPreview(ContactsImportSettings.this);
-						preview.show();
-						preview.setContacts(contacts);
-					}
-				});
-			} catch (Exception t) {
-				LD.clearPrompt();
-			}
+						@Override
+						public void handleSuccess(List<GUIContact> contacts) {
+							ContactsImportPreview preview = new ContactsImportPreview(ContactsImportSettings.this);
+							preview.show();
+							preview.setContacts(contacts);
+						}
+					});
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

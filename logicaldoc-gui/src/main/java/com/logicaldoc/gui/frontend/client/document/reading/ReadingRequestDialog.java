@@ -76,7 +76,6 @@ public class ReadingRequestDialog extends StickyWindow {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
 								sendButton.enable();
 								super.onFailure(caught);
 							}

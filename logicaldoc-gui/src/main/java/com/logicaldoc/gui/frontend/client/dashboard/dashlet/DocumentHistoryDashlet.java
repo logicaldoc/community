@@ -45,12 +45,6 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 			DocumentService.Instance.get().markHistoryAsRead(event, new DefaultAsyncCallback<>() {
 
 				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
-
-				@Override
 				public void handleSuccess(Void ret) {
 					RecordList l = list.getRecordList();
 					for (int i = 0; i < list.getTotalRows(); i++) {

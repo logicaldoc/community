@@ -92,13 +92,6 @@ public class ConversionDialog extends Window {
 		if ("save".equals(form.getValueAsString(ACTION))) {
 			DocumentService.Instance.get().convert(document.getId(), document.getFileVersion(), format,
 					new DefaultAsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							super.onFailure(caught);
-						}
-
 						@Override
 						public void handleSuccess(GUIDocument doc) {
 							if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)

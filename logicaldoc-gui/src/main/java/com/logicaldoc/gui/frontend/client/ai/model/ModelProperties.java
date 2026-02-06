@@ -281,7 +281,7 @@ public class ModelProperties extends ModelDetailsTab {
 		workers.setMin(1);
 		workers.setStep(1);
 		workers.addChangedHandler(changedHandler);
-		setEmbedderVisibility(windowSize);
+		setEmbedderVisibility(workers);
 
 		FloatRangeValidator rangevalidator = new FloatRangeValidator();
 		rangevalidator.setMin(0);

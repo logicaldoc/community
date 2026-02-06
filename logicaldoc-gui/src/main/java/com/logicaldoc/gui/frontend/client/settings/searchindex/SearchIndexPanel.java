@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -537,12 +538,7 @@ public class SearchIndexPanel extends AdminPanel {
 		purge.addClickHandler(purgeClick -> SC.ask(I18N.message("purgeconfirmation"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
 				LD.contactingServer();
-				SearchEngineService.Instance.get().purge(new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void ret) {
-						LD.clearPrompt();
-					}
-				});
+				SearchEngineService.Instance.get().purge(new EmptyAsyncCallback<>());
 			}
 		}));
 		return purge;
@@ -583,7 +579,6 @@ public class SearchIndexPanel extends AdminPanel {
 							public void handleSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsreindex"), null);
 								dropIndex.setDisabled(false);
-								LD.clearPrompt();
 								AdminScreen.get().setContent(new SearchIndexPanel());
 							}
 						});
@@ -612,7 +607,6 @@ public class SearchIndexPanel extends AdminPanel {
 							public void handleSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsreindex"), null);
 								rescheduleAll.setDisabled(false);
-								LD.clearPrompt();
 								AdminScreen.get().setContent(new SearchIndexPanel());
 							}
 						});

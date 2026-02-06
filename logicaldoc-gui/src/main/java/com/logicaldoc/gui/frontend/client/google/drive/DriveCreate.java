@@ -85,7 +85,6 @@ public class DriveCreate extends Window {
 		GoogleService.Instance.get().create(filename, new GoogleAsyncCallback<>() {
 			@Override
 			public void onSuccess(String resId) {
-				LD.clearPrompt();
 				GUIDocument document = new GUIDocument();
 				document.setFileName(fn);
 				document.setType(type);

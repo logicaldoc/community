@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
@@ -231,12 +232,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
 							DocumentService.Instance.get().enforceFilesIntoFolderStore(folder.getId(),
-									new DefaultAsyncCallback<>() {
-										@Override
-										public void handleSuccess(Void v) {
-											LD.clearPrompt();
-										}
-									});
+									new EmptyAsyncCallback<>());
 						}
 					});
 
@@ -251,12 +247,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyStoreToSubfolders.setSrc("[SKIN]/icons/clone.png");
 		applyStoreToSubfolders.addFormItemClickHandler(applyStoreToSubfoldersClick -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyStore(folder.getId(), new DefaultAsyncCallback<>() {
-				@Override
-				public void handleSuccess(Void v) {
-					LD.clearPrompt();
-				}
-			});
+			FolderService.Instance.get().applyStore(folder.getId(), new EmptyAsyncCallback<>());
 			applyStoreToSubfoldersClick.cancel();
 		});
 		return applyStoreToSubfolders;
@@ -409,12 +400,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyTags.setDisabled(!folder.isWrite());
 		applyTags.addClickHandler(event -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyTags(folder.getId(), new DefaultAsyncCallback<>() {
-				@Override
-				public void handleSuccess(Void v) {
-					LD.clearPrompt();
-				}
-			});
+			FolderService.Instance.get().applyTags(folder.getId(), new EmptyAsyncCallback<>());
 		});
 		items.add(applyTags);
 	}

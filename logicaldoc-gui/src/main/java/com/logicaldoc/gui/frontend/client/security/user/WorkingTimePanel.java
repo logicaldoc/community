@@ -85,12 +85,7 @@ public class WorkingTimePanel extends VLayout {
 						public void execute(Map<String, Object> values) {
 							LD.contactingServer();
 							SecurityService.Instance.get().cloneWorkTimes(user.getId(), usersSelector.getUserIds(),
-									groupsSelector.getGroupIds(), new EmptyAsyncCallback<>() {
-										@Override
-										public void onSuccess(Void arg0) {
-											LD.clearPrompt();
-										}
-									});
+									groupsSelector.getGroupIds(), new EmptyAsyncCallback<>());
 						}
 					});
 		});

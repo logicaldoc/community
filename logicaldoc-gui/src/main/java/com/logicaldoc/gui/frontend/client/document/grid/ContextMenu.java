@@ -500,12 +500,6 @@ public class ContextMenu extends Menu {
 							new DefaultAsyncCallback<>() {
 
 								@Override
-								public void onFailure(Throwable caught) {
-									super.onFailure(caught);
-									LD.clearPrompt();
-								}
-
-								@Override
 								public void handleSuccess(GUIDocument mergedDoc) {
 									DocumentController.get().stored(mergedDoc);
 								}
@@ -600,14 +594,7 @@ public class ContextMenu extends Menu {
 
 			DocumentService.Instance.get().indexDocuments(getSelectionIds(selection), new DefaultAsyncCallback<>() {
 				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
-
-				@Override
 				public void handleSuccess(Void result) {
-					LD.clearPrompt();
 					for (GUIDocument doc : selection) {
 						doc.setIndexed(Constants.INDEX_INDEXED);
 						if (DocumentController.get().getCurrentDocument() != null

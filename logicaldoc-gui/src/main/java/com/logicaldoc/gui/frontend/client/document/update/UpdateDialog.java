@@ -171,16 +171,9 @@ public class UpdateDialog extends StickyWindow {
 				bulkPanel.getDocument().setComment(saveForm.getValueAsString(VERSIONCOMMENT));
 				LD.contactingServer();
 				DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
-						Boolean.valueOf(saveForm.getValueAsString(IGNOREEMPTYFIELDS)), new AsyncCallback<>() {
+						Boolean.valueOf(saveForm.getValueAsString(IGNOREEMPTYFIELDS)), new DefaultAsyncCallback<>() {
 							@Override
-							public void onFailure(Throwable error) {
-								LD.clearPrompt();
-								GuiLog.serverError(error);
-							}
-
-							@Override
-							public void onSuccess(List<GUIDocument> updatedDocs) {
-								LD.clearPrompt();
+							protected void handleSuccess(List<GUIDocument> updatedDocs) {
 								GuiLog.info(I18N.message("bulkapplied"), null);
 								for (GUIDocument updatedDoc : updatedDocs)
 									DocumentController.get().modified(updatedDoc);
@@ -193,17 +186,10 @@ public class UpdateDialog extends StickyWindow {
 
 	private void doCheckin() {
 		LD.contactingServer();
-		DocumentService.Instance.get().checkin(metadata, majorVersion, new AsyncCallback<>() {
+		DocumentService.Instance.get().checkin(metadata, majorVersion, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onFailure(Throwable error) {
-				LD.clearPrompt();
-				GuiLog.serverError(error);
-			}
-
-			@Override
-			public void onSuccess(GUIDocument doc) {
-				LD.clearPrompt();
+			protected void handleSuccess(GUIDocument doc) {
 				DocUtil.markCheckedIn(doc);
 				destroy();
 			}

@@ -81,12 +81,6 @@ public class StampDialog extends StickyWindow {
 		StampService.Instance.get().getStamp(stampId, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				super.onFailure(caught);
-			}
-
-			@Override
 			public void handleSuccess(GUIStamp stamp) {
 				Boolean visualPositioningFlag = visualPositioning.getValueAsBoolean();
 				if (stamp.getTemplateId() != null) {
@@ -110,12 +104,6 @@ public class StampDialog extends StickyWindow {
 
 			StampService.Instance.get().applyStamp(documents.stream().map(d -> d.getId()).collect(Collectors.toList()),
 					stamp, new DefaultAsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							super.onFailure(caught);
-						}
 
 						@Override
 						public void handleSuccess(Void result) {

@@ -100,12 +100,6 @@ public class FolderInterfacePanel extends FolderDetailTab {
 			LD.contactingServer();
 			FolderService.Instance.get().applyGridLayout(folder.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
-
-				@Override
 				public void handleSuccess(Void arg0) {
 					GuiLog.info(I18N.message("appliedgridonsubfolders"));
 				}

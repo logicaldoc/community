@@ -110,12 +110,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 				LD.contactingServer();
 				SignService.Instance.get().signDocuments(Arrays.asList(document.getId()), form.getValueAsString(REASON),
 						1, null, null, null, new DefaultAsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								super.onFailure(caught);
-							}
-
+							
 							@Override
 							public void handleSuccess(Void ret) {
 								refresh(document);

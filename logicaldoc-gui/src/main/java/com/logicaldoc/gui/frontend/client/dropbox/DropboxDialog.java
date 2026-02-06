@@ -96,7 +96,6 @@ public class DropboxDialog extends Dialog {
 								new DefaultAsyncCallback<>() {
 									@Override
 									public void handleSuccess(Boolean result) {
-										LD.clearPrompt();
 										if (result.booleanValue()) {
 											SC.say(I18N.message("dboxexportok"));
 											DropboxDialog.this.destroy();

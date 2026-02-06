@@ -391,7 +391,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		importFrom.addClickHandler(event -> ShareFileService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(Boolean authorized) {
-				LD.clearPrompt();
 				if (Boolean.TRUE.equals(authorized)) {
 					ShareFileDialog dialog = new ShareFileDialog(false);
 					dialog.show();
@@ -431,7 +430,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			DocuSignService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 				@Override
 				public void handleSuccess(Boolean authorized) {
-					LD.clearPrompt();
 					if (Boolean.TRUE.equals(authorized)) {
 						new EnvelopeDetails().show();
 					} else {
@@ -450,7 +448,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			DocuSignService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 				@Override
 				public void handleSuccess(Boolean authorized) {
-					LD.clearPrompt();
 					if (Boolean.TRUE.equals(authorized)) {
 						new Envelopes().show();
 					} else {

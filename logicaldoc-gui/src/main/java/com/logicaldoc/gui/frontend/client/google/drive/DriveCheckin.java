@@ -71,7 +71,6 @@ public class DriveCheckin extends Window {
 				Boolean.valueOf(vm.getValueAsString(MAJORVERSION)), new GoogleAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIDocument result) {
-						LD.clearPrompt();
 						destroy();
 						parentDialog.destroy();
 						DocumentController.get().modified(result);

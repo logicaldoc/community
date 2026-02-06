@@ -82,12 +82,7 @@ public class SplitDialog extends Window {
 						Integer.parseInt(form.getValueAsString("splittingpolicy")),
 						Integer.parseInt(form.getValueAsString("separatorhandling")),
 						form.getValueAsString("expression"), new DefaultAsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								super.onFailure(caught);
-							}
-
+							
 							@Override
 							public void handleSuccess(Void ret) {
 								destroy();

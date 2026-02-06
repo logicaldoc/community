@@ -74,12 +74,6 @@ public class FillForm extends Window {
 		DocumentService.Instance.get().createWithContent((GUIDocument) propertiesPanel.getObject(), null, false,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						super.onFailure(caught);
-					}
-
-					@Override
 					public void handleSuccess(GUIDocument doc) {
 						FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 						destroy();

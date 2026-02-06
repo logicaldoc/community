@@ -92,11 +92,6 @@ public class UserSearchDialog extends Window {
 
 	protected void search(String username, String groupId) {
 		SecurityService.Instance.get().searchUsers(username, groupId, new DefaultAsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				super.onFailure(caught);
-			}
 
 			@Override
 			public void handleSuccess(List<GUIUser> result) {

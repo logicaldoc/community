@@ -433,7 +433,6 @@ public class WorkflowToolStrip extends ToolStrip {
 		WorkflowService.Instance.get().save(currentWorkflow, new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(GUIWorkflow result) {
-				LD.clearPrompt();
 				if (result == null) {
 					SC.warn(I18N.message("workflowalreadyexist"));
 				} else {
