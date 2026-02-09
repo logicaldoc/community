@@ -48,6 +48,8 @@ public class TenantQuotaPanel extends HLayout {
 
 	private static final String STAMPSQUOTA = "stampsquota";
 
+	private static final String IMPORTFOLDERSQUOTA = "importfoldersquota";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -205,6 +207,16 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			stampsQuota.addChangedHandler(changedHandler);
 
+		SpinnerItem importFoldersQuota = ItemFactory.newSpinnerItem(IMPORTFOLDERSQUOTA, tenant.getMaxImportFolders());
+		importFoldersQuota.setDisabled(readonly);
+		importFoldersQuota.setRequired(false);
+		importFoldersQuota.setMin(-1);
+		importFoldersQuota.setStep(1);
+		importFoldersQuota.setWidth(100);
+		importFoldersQuota.setVisible(!tenant.isSystem());
+		if (!readonly)
+			importFoldersQuota.addChangedHandler(changedHandler);
+
 		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(QUOTA_THRESHOLD, "alertthreshold",
 				tenant.getQuotaThreshold());
 		quotaThreshold.setDisabled(readonly);
@@ -238,6 +250,8 @@ public class TenantQuotaPanel extends HLayout {
 		StaticTextItem forms = ItemFactory.newStaticTextItem("forms", Util.formatLong(tenant.getForms()));
 		StaticTextItem reports = ItemFactory.newStaticTextItem("reports", Util.formatLong(tenant.getReports()));
 		StaticTextItem stamps = ItemFactory.newStaticTextItem("stamps", Util.formatLong(tenant.getStamps()));
+		StaticTextItem importFolders = ItemFactory.newStaticTextItem("importfolders",
+				Util.formatLong(tenant.getImportFolders()));
 
 		// Static items to display whole system quotas
 		StaticTextItem usersSystemQuota = ItemFactory.newStaticTextItem("sys" + USERSQUOTA, USERSQUOTA,
@@ -272,15 +286,18 @@ public class TenantQuotaPanel extends HLayout {
 				Util.formatLong(tenant.getMaxReports()));
 		reportsSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem stampsSystemQuota = ItemFactory.newStaticTextItem("sys" + STAMPSQUOTA, STAMPSQUOTA,
-				Util.formatLong(tenant.getMaxReports()));
+				Util.formatLong(tenant.getMaxStamps()));
 		stampsSystemQuota.setVisible(tenant.isSystem());
+		StaticTextItem importFoldersSystemQuota = ItemFactory.newStaticTextItem("sys" + IMPORTFOLDERSQUOTA,
+				IMPORTFOLDERSQUOTA, Util.formatLong(tenant.getMaxImportFolders()));
+		importFoldersSystemQuota.setVisible(tenant.isSystem());
 
 		form.setItems(usersQuota, usersSystemQuota, users, guestsQuota, guestsSystemQuota, guests, sessionsQuota,
 				sessionsSystemQuota, sessions, documentsQuota, documentsSystemQuota, documents, sizeQuota,
 				sizeSystemQuota, size, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls, ticketsQuota,
 				ticketsSystemQuota, tickets, workflowsQuota, workflowsSystemQuota, workflows, formsSystemQuota,
 				formsQuota, forms, reportsSystemQuota, reportsQuota, reports, stampsSystemQuota, stampsQuota, stamps,
-				quotaThreshold, recipients);
+				importFoldersSystemQuota, importFoldersQuota, importFolders, quotaThreshold, recipients);
 		addMember(layout);
 	}
 
@@ -343,8 +360,13 @@ public class TenantQuotaPanel extends HLayout {
 		if (values.get(STAMPSQUOTA) == null)
 			tenant.setMaxStamps(null);
 		else
-			tenant.setMaxStamps(Long.parseLong(values.get(STAMPSQUOTA).toString()));		
-		
+			tenant.setMaxStamps(Long.parseLong(values.get(STAMPSQUOTA).toString()));
+
+		if (values.get(IMPORTFOLDERSQUOTA) == null)
+			tenant.setMaxImportFolders(null);
+		else
+			tenant.setMaxImportFolders(Long.parseLong(values.get(IMPORTFOLDERSQUOTA).toString()));
+
 		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);
 		else

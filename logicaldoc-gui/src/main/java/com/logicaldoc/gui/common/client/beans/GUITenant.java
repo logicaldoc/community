@@ -66,11 +66,13 @@ public class GUITenant implements Serializable {
 	private Long maxWorkflows;
 
 	private Long maxForms;
-	
+
 	private Long maxReports;
-	
+
 	private Long maxStamps;
-	
+
+	private Long maxImportFolders;
+
 	private boolean enabled = true;
 
 	private Date expire;
@@ -93,10 +95,12 @@ public class GUITenant implements Serializable {
 	private long workflows;
 
 	private long forms;
-	
+
 	private long reports;
-	
+
 	private long stamps;
+
+	private long importFolders;
 
 	private GUIBranding branding;
 
@@ -346,7 +350,7 @@ public class GUITenant implements Serializable {
 	public void setForms(long forms) {
 		this.forms = forms;
 	}
-	
+
 	public long getReports() {
 		return reports;
 	}
@@ -362,7 +366,7 @@ public class GUITenant implements Serializable {
 	public void setMaxReports(Long maxReports) {
 		this.maxReports = maxReports;
 	}
-	
+
 	public Long getMaxStamps() {
 		return maxStamps;
 	}
@@ -377,6 +381,14 @@ public class GUITenant implements Serializable {
 
 	public void setStamps(long stamps) {
 		this.stamps = stamps;
+	}
+
+	public long getImportFolders() {
+		return importFolders;
+	}
+
+	public void setImportFolders(long importFolders) {
+		this.importFolders = importFolders;
 	}
 
 	public GUIBranding getBranding() {
@@ -451,5 +463,13 @@ public class GUITenant implements Serializable {
 
 	public void setTickets(long tickets) {
 		this.tickets = tickets;
+	}
+
+	public Long getMaxImportFolders() {
+		return maxImportFolders;
+	}
+
+	public void setMaxImportFolders(Long maxImportFolders) {
+		this.maxImportFolders = maxImportFolders;
 	}
 }
