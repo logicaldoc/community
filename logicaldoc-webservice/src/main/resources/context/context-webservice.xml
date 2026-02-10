@@ -192,8 +192,16 @@
     <bean id="cxfJsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
       <property name="dropRootElement" value="${webservice.json.droproot}" /> 
       <property name="supportUnwrapped" value="true" /> 
+      
+      <!-- THIS is what forces collections called "attributes" to always be an array -->
+	  <property name="arrayKeys">
+		<list>
+			<value>attributes</value>
+		</list>
+	  </property>		
     </bean>
     <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+    
     
     <jaxrs:server id="commentservice" address="/mobile/comments">
         <jaxrs:inInterceptors>
