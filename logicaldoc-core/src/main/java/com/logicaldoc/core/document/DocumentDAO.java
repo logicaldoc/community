@@ -157,12 +157,12 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	public Map<String, Long> findTags(String firstLetter, Long tenantId) throws PersistenceException;
 
 	/**
-	 * Searches for all tags,
+	 * Searches for all unique tags.
 	 * 
 	 * @param firstLetter Optional first letter hint
 	 * @param tenantId ID of the tenant to search in
 	 * 
-	 * @return The list of all tags in the system
+	 * @return The list of all unique tags in the system
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */

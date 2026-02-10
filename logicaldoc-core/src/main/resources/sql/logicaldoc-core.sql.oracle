@@ -216,7 +216,7 @@ create table ld_tenant (ld_id number(19,0) not null, ld_lastmodified timestamp n
                         ld_maxreposize number(19,0), ld_type int not null, ld_creation timestamp,
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_maxguests int, ld_maxreports bigint,
                         ld_maxapicalls number(19,0), ld_maxtickets number(19,0), ld_maxstamps number(19,0), ld_maximportfolders number(19,0), 
-                        ld_maxemailaccounts number(19,0), primary key (ld_id));   
+                        ld_maxemailaccounts number(19,0), primary key (ld_id));     
 create table ld_sequence (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion number(19,0) not null,
                           ld_deleted int not null, ld_tenantid number(19,0) not null, ld_name varchar(255) not null,
                           ld_objectid number(19,0) not null, ld_lastreset timestamp null, ld_value number(19,0) not null,
@@ -256,6 +256,14 @@ create table ld_search (ld_id number(19,0) not null, ld_lastmodified timestamp n
 create table ld_apikey (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion number(19,0) not null,
                         ld_deleted int not null, ld_tenantid number(19,0) not null, ld_userid number(19,0) not null, ld_lastused timestamp, ld_key varchar(255) not null,
                         ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id));
+       
+create table ld_filler (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion number(19,0) not null, 
+						ld_deleted int not null, ld_tenantid number(19,0) not null, ld_name varchar(255) not null, ld_title varchar(255), ld_label varchar(255),
+						ld_description varchar(4000), ld_type varchar(50) not null, ld_modelid number(19,0), ld_threshold double, primary key (ld_id));
+create table ld_filler_chain (ld_fillerid number(19,0) not null, ld_chainedid number(19,0) not null, ld_position int not null, primary key (ld_fillerid, ld_chainedid));      
+
+           
+       
                     
 -- Create the sequences for ID generation
 create sequence ld_bookmark_SEQ increment by 50 start with 100;
@@ -286,7 +294,9 @@ create sequence ld_dashlet_SEQ increment by 50 start with 100;
 create sequence ld_device_SEQ increment by 50 start with 100;
 create sequence ld_password_history_SEQ increment by 50 start with 100;                   
 create sequence ld_search_SEQ increment by 50 start with 100;
-create sequence ld_apikey_SEQ increment by 50 start with 100;                 
+create sequence ld_apikey_SEQ increment by 50 start with 100;    
+create sequence ld_filler_SEQ increment by 50 start with 100;
+             
                     
 alter table ld_document add constraint FK75ED9C0276C86307 foreign key (ld_templateid) references ld_template(ld_id);
 alter table ld_document add constraint FK75ED9C027C565C60 foreign key (ld_folderid) references ld_folder(ld_id);
@@ -321,6 +331,10 @@ alter table ld_folder_acl add constraint FK_FOLDACL_GROUP foreign key (ld_groupi
 alter table ld_folder_store add constraint FK_FOLDER_STORE foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
 alter table ld_foldertag add constraint FK_TAG_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
+alter table ld_apikey add constraint FK_APIKEY_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
+alter table ld_filler_chain add constraint FK_FILLERCHAIN_FILLER foreign key (ld_fillerid) references ld_filler(ld_id) on delete cascade;
+alter table ld_filler_chain add constraint FK_FILLERCHAIN_CHAINED foreign key (ld_chainedid) references ld_filler(ld_id) on delete cascade;
+
 
 create unique index AK_DOCUMENT on ld_document (ld_customid, ld_tenantid);
 create unique index AK_USER on ld_user (ld_username);
@@ -342,6 +356,7 @@ create unique index AK_DEVICE on ld_device (ld_deviceid);
 create unique index AK_SEARCH on ld_search (ld_userid, ld_name);
 create unique index AK_APIKEY on ld_apikey (ld_key);
 create unique index AK_APIKEY2 on ld_apikey (ld_name, ld_userid);
+create unique index AK_FILLER on ld_filler (ld_name, ld_tenantid);
 
 
 --Prepare some indexes

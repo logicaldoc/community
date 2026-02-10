@@ -1,5 +1,7 @@
 package com.logicaldoc.core.document;
 
+import com.logicaldoc.core.history.History;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,6 +28,10 @@ public class DocumentHistory extends AbstractDocumentHistory {
 
 	public DocumentHistory() {
 		super();
+	}
+
+	public DocumentHistory(History source) {
+		copyAttributesFrom(source);
 	}
 
 	public DocumentHistory(DocumentHistory source) {

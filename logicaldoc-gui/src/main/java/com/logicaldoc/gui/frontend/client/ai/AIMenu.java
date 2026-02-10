@@ -33,7 +33,7 @@ public class AIMenu extends VLayout {
 			models.addClickHandler(click -> AdminScreen.get().setContent(new ModelsAndSamplersPanel()));
 			addMember(models);
 		}
-		
+
 		if (Menu.enabled(Menu.EMBEDDIGNS)) {
 			Button models = new Button(I18N.message("embeddings"));
 			models.setWidth100();
@@ -48,6 +48,14 @@ public class AIMenu extends VLayout {
 			robots.setHeight(25);
 			robots.addClickHandler(click -> AdminScreen.get().setContent(new RobotsPanel()));
 			addMember(robots);
+		}
+
+		if (Menu.enabled(Menu.FILLERS)) {
+			Button fillers = new Button(I18N.message("fillers"));
+			fillers.setWidth100();
+			fillers.setHeight(25);
+//			fillers.addClickHandler(click -> AdminScreen.get().setContent(new FillersPanel()));
+			addMember(fillers);
 		}
 	}
 }

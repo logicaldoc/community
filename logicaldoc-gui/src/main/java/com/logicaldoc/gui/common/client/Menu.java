@@ -230,6 +230,8 @@ public class Menu {
 	public static final long ADMIN_ROBOTS = 3010;
 
 	public static final long ROBOTS = 3020;
+	
+	public static final long FILLERS = 3021;
 
 	private static Set<Long> menus = new HashSet<>();
 

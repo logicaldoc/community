@@ -1,5 +1,6 @@
 package com.logicaldoc.core.filler;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +9,11 @@ import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.FeatureDisabledException;
 import com.logicaldoc.core.runtime.RunLevel;
 
 import jakarta.persistence.Cacheable;
@@ -50,7 +53,8 @@ public class ChainFiller extends Filler {
 	}
 
 	@Override
-	public void fill(ExtensibleObject object, String content, History transaction, Map<String, Object> dictionary) {
+	public void fill(ExtensibleObject object, String content, History transaction, Map<String, Object> dictionary)
+			throws PersistenceException, IOException, FeatureDisabledException {
 		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
 			return;
 

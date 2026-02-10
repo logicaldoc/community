@@ -214,7 +214,7 @@ create table ld_tenant (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_maxreposize bigint, ld_type int not null, ld_creation timestamp, 
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_maxguests int, ld_maxreports bigint, 
                         ld_maxapicalls bigint, ld_maxtickets bigint, ld_maxstamps bigint, ld_maximportfolders bigint,
-                        ld_maxemailaccounts bigint, primary key (ld_id));   
+                        ld_maxemailaccounts bigint, primary key (ld_id));    
 create table ld_sequence (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null,
                           ld_objectid bigint not null, ld_lastreset timestamp null, ld_value bigint not null,
@@ -255,9 +255,9 @@ create table ld_apikey (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, ld_lastused timestamp, ld_key varchar(255) not null,
                         ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id));
 
-create table ld_filler (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null, 
-						ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_title varchar(255),
-						ld_description varchar(4000), primary key (ld_id));
+create table ld_filler (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 
+						ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_title varchar(255), ld_label varchar(255),
+						ld_description varchar(4000), ld_type varchar(50) not null, ld_modelid bigint, ld_threshold double, primary key (ld_id));
 create table ld_filler_chain (ld_fillerid bigint not null, ld_chainedid bigint not null, ld_position int not null, primary key (ld_fillerid, ld_chainedid));      
 
                           
@@ -291,6 +291,7 @@ create sequence ld_device_SEQ start with 100 INCREMENT BY 50;
 create sequence ld_password_history_SEQ start with 100 INCREMENT BY 50;                   
 create sequence ld_search_SEQ start with 100 INCREMENT BY 50;
 create sequence ld_apikey_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_filler_SEQ start with 100 INCREMENT BY 50;
 
 
 alter table ld_document add constraint FK75ED9C0276C86307 foreign key (ld_templateid) references ld_template(ld_id);
@@ -328,6 +329,8 @@ alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid
 alter table ld_apikey add constraint FK_APIKEY_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 alter table ld_filler_chain add constraint FK_FILLERCHAIN_FILLER foreign key (ld_fillerid) references ld_filler(ld_id) on delete cascade;
 alter table ld_filler_chain add constraint FK_FILLERCHAIN_CHAINED foreign key (ld_chainedid) references ld_filler(ld_id) on delete cascade;
+
+
 
 create unique index AK_DOCUMENT on ld_document (ld_customid, ld_tenantid);
 create unique index AK_USER on ld_user (ld_username);

@@ -1,10 +1,13 @@
 package com.logicaldoc.core.filler;
 
+import java.io.IOException;
 import java.util.Map;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.runtime.FeatureDisabledException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -70,9 +73,13 @@ public abstract class Filler extends PersistentObject {
 	 *        taken from the transaction's file.
 	 * @param transaction the current transaction
 	 * @param dictionary Dictionary of the execution pipeline
+	 * 
+	 * @throws PersistenceException Error in the data layer 
+	 * @throws IOException I/O error
+	 * @throws FeatureDisabledException An involved feature is disabled
 	 */
 	public abstract void fill(ExtensibleObject object, String content, History transaction,
-			Map<String, Object> dictionary);
+			Map<String, Object> dictionary) throws PersistenceException, IOException, FeatureDisabledException;
 
 	@Override
 	public int hashCode() {
