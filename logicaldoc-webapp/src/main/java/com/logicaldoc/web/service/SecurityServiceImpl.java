@@ -149,7 +149,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	public static GUITenant getTenant(long tenantId) {
 		Tenant tenant = null;
 		try {
-			if(tenantId == Tenant.SYSTEM_ID) {
+			if (tenantId == Tenant.SYSTEM_ID) {
 				tenant = new Tenant();
 				tenant.setId(Tenant.SYSTEM_ID);
 				tenant.setName(Tenant.SYSTEM_NAME);
@@ -190,6 +190,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		guiTenant.setMaxReports(tenant.getMaxReports());
 		guiTenant.setMaxStamps(tenant.getMaxStamps());
 		guiTenant.setMaxImportFolders(tenant.getMaxImportFolders());
+		guiTenant.setMaxEmailAccounts(tenant.getMaxEmailAccounts());
 		guiTenant.setQuotaThreshold(tenant.getQuotaThreshold());
 		guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
 		guiTenant.setEnabled(tenant.isEnabled());

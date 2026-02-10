@@ -72,6 +72,8 @@ public class GUITenant implements Serializable {
 	private Long maxStamps;
 
 	private Long maxImportFolders;
+	
+	private Long maxEmailAccounts;
 
 	private boolean enabled = true;
 
@@ -102,6 +104,8 @@ public class GUITenant implements Serializable {
 
 	private long importFolders;
 
+	private long emailAccounts;
+	
 	private GUIBranding branding;
 
 	private Integer quotaThreshold = null;
@@ -471,5 +475,21 @@ public class GUITenant implements Serializable {
 
 	public void setMaxImportFolders(Long maxImportFolders) {
 		this.maxImportFolders = maxImportFolders;
+	}
+
+	public Long getMaxEmailAccounts() {
+		return maxEmailAccounts;
+	}
+
+	public void setMaxEmailAccounts(Long maxEmailAccounts) {
+		this.maxEmailAccounts = maxEmailAccounts;
+	}
+
+	public long getEmailAccounts() {
+		return emailAccounts;
+	}
+
+	public void setEmailAccounts(long emailAccounts) {
+		this.emailAccounts = emailAccounts;
 	}
 }

@@ -118,6 +118,9 @@ public class Tenant extends PersistentObject implements Serializable {
 	@Column(name = "ld_maximportfolders", nullable = true)
 	private Long maxImportFolders;
 	
+	@Column(name = "ld_maxemailaccounts", nullable = true)
+	private Long maxEmailAccounts;
+	
 	@Column(name = "ld_qthreshold")
 	private Integer quotaThreshold = null;
 
@@ -153,6 +156,7 @@ public class Tenant extends PersistentObject implements Serializable {
 		this.maxReports = source.maxReports;
 		this.maxStamps = source.maxStamps;
 		this.maxImportFolders = source.maxImportFolders;		
+		this.maxEmailAccounts = source.maxEmailAccounts;
 		this.quotaThreshold = source.quotaThreshold;
 		this.quotaAlertRecipients = source.quotaAlertRecipients;
 
@@ -339,6 +343,14 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	public void setMaxImportFolders(Long maxImportFolders) {
 		this.maxImportFolders = maxImportFolders;
+	}
+	
+	public Long getMaxEmailAccounts() {
+		return maxEmailAccounts;
+	}
+
+	public void setMaxEmailAccounts(Long maxEmailAccounts) {
+		this.maxEmailAccounts = maxEmailAccounts;
 	}
 
 	public boolean isEnabled() {

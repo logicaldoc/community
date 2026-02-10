@@ -50,6 +50,8 @@ public class TenantQuotaPanel extends HLayout {
 
 	private static final String IMPORTFOLDERSQUOTA = "importfoldersquota";
 
+	private static final String EMAILACCOUNTSQUOTA = "emailaccountsquota";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -217,6 +219,16 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			importFoldersQuota.addChangedHandler(changedHandler);
 
+		SpinnerItem emailAccountsQuota = ItemFactory.newSpinnerItem(EMAILACCOUNTSQUOTA, tenant.getMaxEmailAccounts());
+		emailAccountsQuota.setDisabled(readonly);
+		emailAccountsQuota.setRequired(false);
+		emailAccountsQuota.setMin(-1);
+		emailAccountsQuota.setStep(1);
+		emailAccountsQuota.setWidth(100);
+		emailAccountsQuota.setVisible(!tenant.isSystem());
+		if (!readonly)
+			emailAccountsQuota.addChangedHandler(changedHandler);
+
 		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(QUOTA_THRESHOLD, "alertthreshold",
 				tenant.getQuotaThreshold());
 		quotaThreshold.setDisabled(readonly);
@@ -252,6 +264,8 @@ public class TenantQuotaPanel extends HLayout {
 		StaticTextItem stamps = ItemFactory.newStaticTextItem("stamps", Util.formatLong(tenant.getStamps()));
 		StaticTextItem importFolders = ItemFactory.newStaticTextItem("importfolders",
 				Util.formatLong(tenant.getImportFolders()));
+		StaticTextItem emailAccounts = ItemFactory.newStaticTextItem("emailaccounts",
+				Util.formatLong(tenant.getEmailAccounts()));
 
 		// Static items to display whole system quotas
 		StaticTextItem usersSystemQuota = ItemFactory.newStaticTextItem("sys" + USERSQUOTA, USERSQUOTA,
@@ -291,13 +305,17 @@ public class TenantQuotaPanel extends HLayout {
 		StaticTextItem importFoldersSystemQuota = ItemFactory.newStaticTextItem("sys" + IMPORTFOLDERSQUOTA,
 				IMPORTFOLDERSQUOTA, Util.formatLong(tenant.getMaxImportFolders()));
 		importFoldersSystemQuota.setVisible(tenant.isSystem());
+		StaticTextItem emailAccountsSystemQuota = ItemFactory.newStaticTextItem("sys" + EMAILACCOUNTSQUOTA,
+				EMAILACCOUNTSQUOTA, Util.formatLong(tenant.getMaxEmailAccounts()));
+		emailAccountsSystemQuota.setVisible(tenant.isSystem());
 
 		form.setItems(usersQuota, usersSystemQuota, users, guestsQuota, guestsSystemQuota, guests, sessionsQuota,
 				sessionsSystemQuota, sessions, documentsQuota, documentsSystemQuota, documents, sizeQuota,
 				sizeSystemQuota, size, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls, ticketsQuota,
 				ticketsSystemQuota, tickets, workflowsQuota, workflowsSystemQuota, workflows, formsSystemQuota,
 				formsQuota, forms, reportsSystemQuota, reportsQuota, reports, stampsSystemQuota, stampsQuota, stamps,
-				importFoldersSystemQuota, importFoldersQuota, importFolders, quotaThreshold, recipients);
+				importFoldersSystemQuota, importFoldersQuota, importFolders, emailAccountsSystemQuota,
+				emailAccountsQuota, emailAccounts, quotaThreshold, recipients);
 		addMember(layout);
 	}
 
@@ -366,6 +384,11 @@ public class TenantQuotaPanel extends HLayout {
 			tenant.setMaxImportFolders(null);
 		else
 			tenant.setMaxImportFolders(Long.parseLong(values.get(IMPORTFOLDERSQUOTA).toString()));
+
+		if (values.get(EMAILACCOUNTSQUOTA) == null)
+			tenant.setMaxEmailAccounts(null);
+		else
+			tenant.setMaxEmailAccounts(Long.parseLong(values.get(EMAILACCOUNTSQUOTA).toString()));
 
 		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);
