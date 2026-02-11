@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingsAndVectorStorePanel;
+import com.logicaldoc.gui.frontend.client.ai.filler.FillersPanel;
 import com.logicaldoc.gui.frontend.client.ai.robot.RobotsPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
@@ -54,7 +55,7 @@ public class AIMenu extends VLayout {
 			Button fillers = new Button(I18N.message("fillers"));
 			fillers.setWidth100();
 			fillers.setHeight(25);
-//			fillers.addClickHandler(click -> AdminScreen.get().setContent(new FillersPanel()));
+			fillers.addClickHandler(click -> AdminScreen.get().setContent(new FillersPanel()));
 			addMember(fillers);
 		}
 	}

@@ -32,7 +32,7 @@ public interface RobotService extends RemoteService {
 	 * 
 	 * @param robot the robot to save
 	 * 
-	 * @return the saved sampler
+	 * @return the saved robot
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
@@ -43,7 +43,7 @@ public interface RobotService extends RemoteService {
 	 * 
 	 * @param robotId identifier of the robot
 	 * 
-	 * @return the sampler
+	 * @return the robot
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
