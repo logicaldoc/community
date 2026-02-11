@@ -27,6 +27,7 @@ public class GUIFiller implements Serializable {
 	private Double threshold = 0.7d;
 
 	public GUIFiller() {
+		// Empty constructor
 	}
 
 	public GUIFiller(long id, String name) {

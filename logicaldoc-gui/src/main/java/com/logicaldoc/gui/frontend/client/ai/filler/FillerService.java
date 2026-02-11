@@ -8,17 +8,17 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.frontend.client.ai.robot.RobotServiceAsync;
 
 /**
- * The client side stub for the Robot Service. This service gives all needed
- * methods to handle robots.
+ * The client side stub for the {@link FillerService}. This service gives all needed
+ * methods to handle fillers.
  * 
  * @author Matteo Desiato - LogicalDOC
  * @since 9.2.3
  */
 @RemoteServiceRelativePath("filler")
 public interface FillerService extends RemoteService {
+	
 	/**
 	 * Deletes some fillers
 	 * 
@@ -31,18 +31,18 @@ public interface FillerService extends RemoteService {
 	/**
 	 * Creates or updates a filler
 	 * 
-	 * @param robot the robot to save
+	 * @param filler the filler to save
 	 * 
 	 * @return the saved filler
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIFiller save(GUIFiller robot) throws ServerException;
+	public GUIFiller save(GUIFiller filler) throws ServerException;
 
 	/**
-	 * Retrieves a robot from the data layer
+	 * Retrieves a filler from the data layer
 	 * 
-	 * @param fillerId identifier of the robot
+	 * @param fillerId identifier of the filler
 	 * 
 	 * @return the filler
 	 * 
