@@ -1,7 +1,14 @@
 package com.logicaldoc.core.filler;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
@@ -12,6 +19,7 @@ import com.logicaldoc.core.runtime.FeatureDisabledException;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -32,6 +40,8 @@ public abstract class Filler extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final Logger log = LoggerFactory.getLogger(Filler.class);
+	
 	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
 
@@ -65,6 +75,34 @@ public abstract class Filler extends PersistentObject {
 		this.description = description;
 	}
 
+	/**
+	 * Factory method for instantiating a new filler
+	 * 
+	 * @param type Type of filler, matches the discriminator value
+	 * 
+	 * @return The new filler
+	 * 
+	 * @throws IllegalArgumentException No implementation found for the given
+	 *         type
+	 */
+	public static Filler newFiller(String type) {
+		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+		scanner.addIncludeFilter(new AnnotationTypeFilter(DiscriminatorValue.class));
+		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
+			try {
+				Class<?> beanClass = Class.forName(bd.getBeanClassName());
+				if (Filler.class.isAssignableFrom(beanClass)
+						&& type.equals(beanClass.getAnnotation(DiscriminatorValue.class).value()))
+					return (Filler) beanClass.getDeclaredConstructor().newInstance();
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				log.warn(e.getMessage(), e);
+			}
+		}
+
+		throw new IllegalArgumentException("Cannot find any filler of type %s".formatted(type));
+	}
+	
 	/**
 	 * Fills an object instance
 	 * 
