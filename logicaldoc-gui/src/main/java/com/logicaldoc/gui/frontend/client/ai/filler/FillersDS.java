@@ -5,6 +5,10 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 
 public class FillersDS extends DataSource {
 
+	public FillersDS() {
+		this(null);
+	}
+	
 	public FillersDS(String type) {
 		setRecordXPath("/list/filler");
 
@@ -21,7 +25,7 @@ public class FillersDS extends DataSource {
 		setFields(id, name, label, description, typeField);
 		setClientOnly(true);
 
-		String url = "data/ai.xml?object=sampler";
+		String url = "data/fillers.xml";
 		if (type != null)
 			url += "&type=" + type;
 

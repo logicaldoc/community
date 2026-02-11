@@ -5,10 +5,8 @@ import java.util.List;
 
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
-import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -97,13 +95,7 @@ public class FillersPanel extends VLayout {
 
 		ListGridField fillerType = new ListGridField("type", I18N.message("type"));
 		fillerType.setAutoFit(AutoFitWidthApproach.BOTH);
-		fillerType.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("aifillertype." + value));
-
-		ListGridField training = new RunningListGridField(TRAINING);
-		training.setTitle(I18N.message(TRAINING));
-		training.setAutoFitWidth(true);
-		training.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
-		DateListGridField trained = new DateListGridField(TRAINED, I18N.message("lasttrained"));
+		fillerType.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("fillertype." + value));
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -111,13 +103,13 @@ public class FillersPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, fillerType, training, trained, description);
+		list.setFields(id, name, label, fillerType, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new FillersDS(null));
+		list.setDataSource(new FillersDS());
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -136,18 +128,6 @@ public class FillersPanel extends VLayout {
 		add.setTitle(I18N.message("addfiller"));
 		toolStrip.addButton(add);
 		add.addClickHandler(event -> onAddFiller());
-
-		toolStrip.addSeparator();
-
-		ToolStripButton settings = new ToolStripButton();
-		settings.setTitle(I18N.message("settings"));
-		toolStrip.addButton(settings);
-		settings.addClickHandler(event -> new EmbeddingSettings().show());
-
-		ToolStripButton stats = new ToolStripButton();
-		stats.setTitle(I18N.message("stats"));
-		toolStrip.addButton(stats);
-		stats.addClickHandler(event -> new AIStats().show());
 
 		toolStrip.addFill();
 
@@ -177,7 +157,7 @@ public class FillersPanel extends VLayout {
 	}
 
 	private void refresh() {
-		list.refresh(new FillersDS(null));
+		list.refresh(new FillersDS());
 		detailsContainer.removeMembers(detailsContainer.getMembers());
 		details = SELECT_FILLER;
 		detailsContainer.setMembers(details);

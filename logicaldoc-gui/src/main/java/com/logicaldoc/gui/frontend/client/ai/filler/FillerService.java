@@ -51,12 +51,12 @@ public interface FillerService extends RemoteService {
 	public GUIFiller get(long fillerId) throws ServerException;
 
 	public static class Instance {
-		private static RobotServiceAsync inst;
+		private static FillerServiceAsync inst;
 
 		private Instance() {
 		}
 
-		public static RobotServiceAsync get() {
+		public static FillerServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(FillerService.class);
 				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
