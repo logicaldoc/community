@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.ai.filler;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
@@ -11,8 +10,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingSettings;
-import com.logicaldoc.gui.frontend.client.ai.model.AIStats;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -40,11 +37,7 @@ public class FillersPanel extends VLayout {
 
 	private static final String QUESTION = "question";
 
-	private static final String TRAINED = "trained";
-
 	private static final String ID = "id";
-
-	private static final String TRAINING = "training";
 
 	static final Canvas SELECT_FILLER = new HTMLPanel("&nbsp;" + I18N.message("selectafiller"));
 
@@ -57,8 +50,6 @@ public class FillersPanel extends VLayout {
 	protected RefreshableListGrid list;
 
 	protected Canvas details = SELECT_FILLER;
-
-	private Timer timer;
 
 	public FillersPanel() {
 		setWidth100();
@@ -231,12 +222,6 @@ public class FillersPanel extends VLayout {
 	protected void onAddFiller() {
 		list.deselectAllRecords();
 		showFillerDetails(new GUIFiller());
-	}
-
-	@Override
-	public void destroy() {
-		super.destroy();
-		this.timer.cancel();
 	}
 
 	@Override
