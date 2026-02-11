@@ -21,6 +21,10 @@ public class GUIFiller implements Serializable {
 	private String description;
 
 	private String type;
+	
+	private Long modelId;
+	
+	private Double threshold = 0.7d;
 
 	public GUIFiller() {
 	}
@@ -71,4 +75,19 @@ public class GUIFiller implements Serializable {
 		this.type = type;
 	}
 
+	public Long getModelId() {
+		return modelId;
+	}
+
+	public void setModelId(Long modelId) {
+		this.modelId = modelId;
+	}
+
+	public Double getThreshold() {
+		return threshold;
+	}
+
+	public void setThreshold(Double threshold) {
+		this.threshold = threshold;
+	}
 }
