@@ -10,15 +10,15 @@ import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 
 /**
- * The client side stub for the {@link FillerService}. This service gives all needed
- * methods to handle fillers.
+ * The client side stub for the {@link FillerService}. This service gives all
+ * needed methods to handle fillers.
  * 
  * @author Matteo Desiato - LogicalDOC
  * @since 9.2.3
  */
 @RemoteServiceRelativePath("filler")
 public interface FillerService extends RemoteService {
-	
+
 	/**
 	 * Deletes some fillers
 	 * 

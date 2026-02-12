@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.ai.model;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
@@ -14,10 +17,14 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 public class ModelsDS extends DataSource {
 
 	public ModelsDS() {
-		this(null);
+		this((List<String>) null);
 	}
 
 	public ModelsDS(String type) {
+		this(List.of(type));
+	}
+
+	public ModelsDS(List<String> types) {
 		setRecordXPath("/list/model");
 
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -37,6 +44,8 @@ public class ModelsDS extends DataSource {
 		setFields(id, name, label, training, trained, description, typeField, evaluated, evaluation);
 		setClientOnly(true);
 
-		setDataURL("data/ai.xml?object=model" + (type != null ? "&type=" + type : ""));
+		setDataURL("data/ai.xml?object=model"
+				+ (types != null && !types.isEmpty() ? "&type=" + types.stream().collect(Collectors.joining(","))
+						: ""));
 	}
 }

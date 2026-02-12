@@ -2,6 +2,8 @@ package com.logicaldoc.gui.frontend.client.ai.filler;
 
 import java.util.LinkedHashMap;
 
+import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -9,7 +11,6 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DoubleItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -19,7 +20,7 @@ import com.smartgwt.client.widgets.form.validator.FloatRangeValidator;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
- * Shows robot's standard properties and read-only data
+ * Shows filler's standard properties and read-only data
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2.3
@@ -36,7 +37,7 @@ public class FillerProperties extends FillerDetailsTab {
 
 	private static final String TYPE = "type";
 
-	private static final String MODEL = "modelId";
+	private static final String MODEL_ID = "modelId";
 
 	private static final String THRESHOLD = "threshold";
 
@@ -55,16 +56,16 @@ public class FillerProperties extends FillerDetailsTab {
 	}
 
 	private void refresh() {
-
 		form.clearValues();
 		form.clearErrors(false);
 		form.destroy();
-		form = new DynamicForm();
-		form.setNumCols(4);
-		form.setTitleOrientation(TitleOrientation.TOP);
 
 		if (Boolean.TRUE.equals(container.contains(form)))
 			container.removeChild(form);
+
+		form = new DynamicForm();
+		form.setNumCols(4);
+		form.setTitleOrientation(TitleOrientation.TOP);
 
 		// ID
 		StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(filler.getId()));
@@ -81,44 +82,75 @@ public class FillerProperties extends FillerDetailsTab {
 
 		// Description
 		TextAreaItem description = ItemFactory.newTextAreaItem(DESCRIPTION, filler.getDescription());
-		description.setColSpan(4);
-		description.setWidth("*");
 		description.addChangedHandler(changedHandler);
+		description.setColSpan(4);
+		description.setWidth(400);
 
+//		SelectItem modelSelector = new SelectItem(MODEL);
+//		modelSelector.setTitle("Model");
+//		modelSelector.setValueField("id");
+//		modelSelector.setDisplayField("name");
+//		modelSelector.setRequired(true);
+//		modelSelector.addChangedHandler(changedHandler);
+//
+//		GuiLog.info("C");
+//		if (filler.getType() != null) {
+//			GuiLog.info("Type used for ModelsDS: " + filler.getType());
+//			GuiLog.info("D");
+//			ModelsDS ds = new ModelsDS(modelTypesSuitableForFiller(filler.getType()));
+//			modelSelector.setOptionDataSource(ds);
+//			// Fetch first
+//			GuiLog.info("E");
+//			modelSelector.fetchData((response, rawData, request) -> {
+//				if (filler.getModelId() != null) {
+//					modelSelector.setValue(filler.getModelId());
+//				}
+//			});
+//		}
+//
+//		// Type selector
+//		SelectItem type = ItemFactory.newSelectItem(TYPE);
+//		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+//		map.put("tag", I18N.message("fillertype.tag"));
+//		map.put("language", I18N.message("fillertype.language"));
+//		type.setValueMap(map);
+//		type.setRequired(true);
+//		type.setValue(filler.getType());
+//		type.addChangedHandler(changedHandler);
+//		type.addChangedHandler(event -> {
+//			String selectedType = event.getValue().toString();
+//			ModelsDS ds = new ModelsDS(modelTypesSuitableForFiller(selectedType));
+//
+//			modelSelector.setOptionDataSource(ds);
+//			// Clear previous value
+//			modelSelector.clearValue();
+//			// Load new models
+//			modelSelector.fetchData();
+//		});
+
+		// Model selector
+		SelectItem modelSelector = ItemFactory.newSelectItem(MODEL_ID, "model");
+		modelSelector.setValueField("id");
+		modelSelector.setDisplayField("name");
+		modelSelector.setRequired(true);
+		modelSelector.addChangedHandler(changedHandler);
+				
+		
 		// Type selector
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-		map.put("tag", "Tag Filler");
-		map.put("language", "Language Filler");
+		map.put("tag", I18N.message("fillertype.tag"));
+		map.put("language", I18N.message("fillertype.language"));
 		type.setValueMap(map);
 		type.setRequired(true);
 		type.setValue(filler.getType());
 		type.addChangedHandler(changedHandler);
-
-		// Model selector
-		boolean editing = filler.getId() != 0L;
-
-		FormItem modelItem;
-
-		if (!editing) {
-
-			SelectItem modelSelector = new SelectItem(MODEL);
-			modelSelector.setTitle("Model");
-			modelSelector.setOptionDataSource(new ModelsDS());
-			modelSelector.setValueField("id");
-			modelSelector.setDisplayField("name");
-			modelSelector.setRequired(true);
-			modelSelector.setValue(filler.getModelId());
-			modelSelector.addChangedHandler(changedHandler);
-
-			modelItem = modelSelector;
-
-		} else {
-
-			StaticTextItem modelName = ItemFactory.newStaticTextItem("modelName", "Model", filler.getModel());
-
-			modelItem = modelName;
-		}
+		type.addChangedHandler(event -> {
+			String selectedType = event.getValue().toString();
+			modelSelector.clearValue();
+			modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(selectedType)));
+			modelSelector.fetchData();
+		});
 
 		// Threshold (only for tag)
 		FloatRangeValidator validator = new FloatRangeValidator();
@@ -134,13 +166,20 @@ public class FillerProperties extends FillerDetailsTab {
 		threshold.setVisibleWhen(tagCriteria);
 		threshold.setRequiredWhen(tagCriteria);
 
-		form.setItems(id, type, name, label, modelItem, threshold, description);
+		form.setItems(id, type, name, label, modelSelector, threshold, description);
 
 		container.addMember(form);
 	}
 
-	public boolean validate() {
+	private String modelTypesSuitableForFiller(String fillerType) {
+		return switch (fillerType) {
+			case "tag" -> "zeroshot,classifier";
+			case "language" -> "language";
+			default -> null;
+		};
+	}
 
+	public boolean validate() {
 		if (!form.validate())
 			return false;
 
@@ -149,7 +188,9 @@ public class FillerProperties extends FillerDetailsTab {
 		filler.setDescription(form.getValueAsString(DESCRIPTION));
 		filler.setType(form.getValueAsString(TYPE));
 
-		String modelId = form.getValueAsString(MODEL);
+		String modelId = form.getValueAsString(MODEL_ID);
+		GuiLog.info("modelId: " + modelId);
+		
 		filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
 
 		String threshold = form.getValueAsString(THRESHOLD);
