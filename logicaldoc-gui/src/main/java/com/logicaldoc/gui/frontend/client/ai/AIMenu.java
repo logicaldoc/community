@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.ai;
 
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
@@ -51,7 +52,7 @@ public class AIMenu extends VLayout {
 			addMember(robots);
 		}
 
-		if (Menu.enabled(Menu.FILLERS)) {
+		if (Menu.enabled(Menu.FILLERS) && Feature.enabled(Feature.AUTOFILL)) {
 			Button fillers = new Button(I18N.message("fillers"));
 			fillers.setWidth100();
 			fillers.setHeight(25);
