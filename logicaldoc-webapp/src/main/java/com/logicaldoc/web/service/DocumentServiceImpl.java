@@ -766,10 +766,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		try {
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			return docDao.queryForInt(
-					"select count(ld_id) from ld_document where ld_deleted=0 and not ld_password = null and ld_id="
-							+ docId) > 0;
+			return Context.get(DocumentDAO.class).queryForInt(
+					"select count(ld_id) from ld_document where ld_deleted = 0 and ld_password is not null and ld_id = %d"
+							.formatted(docId)) > 0;
 		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
 		}
