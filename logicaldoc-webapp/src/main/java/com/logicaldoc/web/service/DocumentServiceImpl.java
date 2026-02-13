@@ -768,8 +768,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		try {
 			return DocumentDAO.get().queryForInt(
-					"select count(ld_id) from ld_document where ld_deleted=0 and not ld_password = null and ld_id="
-							+ docId) > 0;
+					"select count(ld_id) from ld_document where ld_deleted = 0 and ld_password is not null and ld_id = %d"
+							.formatted(docId)) > 0;
 		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
 		}
@@ -2442,9 +2442,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			List<String> result = new ArrayList<>();
 			result.add(ticket.getTicketId());
 			result.add(ticket.getUrl());
-			result.add(
-					new URI(ticket.getUrl().replace(urlPrefix, Context.get().getConfig().getProperty("server.url")))
-							.normalize().toString());
+			result.add(new URI(ticket.getUrl().replace(urlPrefix, Context.get().getConfig().getProperty("server.url")))
+					.normalize().toString());
 			return result;
 		} catch (PasswordWeakException pwe) {
 			List<String> messages = pwe.getMessages();
