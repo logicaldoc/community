@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.ai.filler;
 import java.util.LinkedHashMap;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -86,56 +85,13 @@ public class FillerProperties extends FillerDetailsTab {
 		description.setColSpan(4);
 		description.setWidth(400);
 
-//		SelectItem modelSelector = new SelectItem(MODEL);
-//		modelSelector.setTitle("Model");
-//		modelSelector.setValueField("id");
-//		modelSelector.setDisplayField("name");
-//		modelSelector.setRequired(true);
-//		modelSelector.addChangedHandler(changedHandler);
-//
-//		GuiLog.info("C");
-//		if (filler.getType() != null) {
-//			GuiLog.info("Type used for ModelsDS: " + filler.getType());
-//			GuiLog.info("D");
-//			ModelsDS ds = new ModelsDS(modelTypesSuitableForFiller(filler.getType()));
-//			modelSelector.setOptionDataSource(ds);
-//			// Fetch first
-//			GuiLog.info("E");
-//			modelSelector.fetchData((response, rawData, request) -> {
-//				if (filler.getModelId() != null) {
-//					modelSelector.setValue(filler.getModelId());
-//				}
-//			});
-//		}
-//
-//		// Type selector
-//		SelectItem type = ItemFactory.newSelectItem(TYPE);
-//		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-//		map.put("tag", I18N.message("fillertype.tag"));
-//		map.put("language", I18N.message("fillertype.language"));
-//		type.setValueMap(map);
-//		type.setRequired(true);
-//		type.setValue(filler.getType());
-//		type.addChangedHandler(changedHandler);
-//		type.addChangedHandler(event -> {
-//			String selectedType = event.getValue().toString();
-//			ModelsDS ds = new ModelsDS(modelTypesSuitableForFiller(selectedType));
-//
-//			modelSelector.setOptionDataSource(ds);
-//			// Clear previous value
-//			modelSelector.clearValue();
-//			// Load new models
-//			modelSelector.fetchData();
-//		});
-
 		// Model selector
 		SelectItem modelSelector = ItemFactory.newSelectItem(MODEL_ID, "model");
 		modelSelector.setValueField("id");
 		modelSelector.setDisplayField("name");
 		modelSelector.setRequired(true);
 		modelSelector.addChangedHandler(changedHandler);
-				
-		
+
 		// Type selector
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -151,6 +107,14 @@ public class FillerProperties extends FillerDetailsTab {
 			modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(selectedType)));
 			modelSelector.fetchData();
 		});
+
+		if (filler.getType() != null) {
+			modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(filler.getType())));
+
+			if (filler.getModelId() != null) {
+				modelSelector.setValue(filler.getModelId());
+			}
+		}
 
 		// Threshold (only for tag)
 		FloatRangeValidator validator = new FloatRangeValidator();
@@ -189,8 +153,7 @@ public class FillerProperties extends FillerDetailsTab {
 		filler.setType(form.getValueAsString(TYPE));
 
 		String modelId = form.getValueAsString(MODEL_ID);
-		GuiLog.info("modelId: " + modelId);
-		
+
 		filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
 
 		String threshold = form.getValueAsString(THRESHOLD);
