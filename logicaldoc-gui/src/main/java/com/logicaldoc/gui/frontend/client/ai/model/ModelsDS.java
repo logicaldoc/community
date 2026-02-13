@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.ai.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
@@ -21,7 +21,13 @@ public class ModelsDS extends DataSource {
 	}
 
 	public ModelsDS(String type) {
-		this(List.of(type));
+		this(type != null ? createList(type) : null);
+	}
+
+	private static List<String> createList(String type) {
+		List<String> list = new ArrayList<>();
+		list.add(type);
+		return list;
 	}
 
 	public ModelsDS(List<String> types) {
@@ -44,8 +50,18 @@ public class ModelsDS extends DataSource {
 		setFields(id, name, label, training, trained, description, typeField, evaluated, evaluation);
 		setClientOnly(true);
 
-		setDataURL("data/ai.xml?object=model"
-				+ (types != null && !types.isEmpty() ? "&type=" + types.stream().collect(Collectors.joining(","))
-						: ""));
+		String url = "data/ai.xml?object=model";
+
+		if (types != null && !types.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < types.size(); i++) {
+				if (i > 0)
+					sb.append(",");
+				sb.append(types.get(i));
+			}
+			url += "&type=" + sb.toString();
+		}
+
+		setDataURL(url);
 	}
 }
