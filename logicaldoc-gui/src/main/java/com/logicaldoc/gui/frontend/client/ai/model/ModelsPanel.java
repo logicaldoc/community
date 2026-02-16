@@ -122,6 +122,7 @@ public class ModelsPanel extends VLayout {
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
+		list.setDataSource(new ModelsDS());
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
@@ -131,7 +132,6 @@ public class ModelsPanel extends VLayout {
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new ModelsDS());
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -306,9 +306,6 @@ public class ModelsPanel extends VLayout {
 						refresh();
 					}
 				})));
-
-		query.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING)
-				&& !selection[0].getAttributeAsBoolean(EVALUATING) && selection[0].getAttribute(TRAINED) != null);
 
 		MenuItem export = new MenuItem();
 		export.setTitle(I18N.message("export"));
