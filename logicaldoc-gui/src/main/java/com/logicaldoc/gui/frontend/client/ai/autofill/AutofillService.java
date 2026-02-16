@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.filler;
+package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import java.util.List;
 
@@ -10,14 +10,14 @@ import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 
 /**
- * The client side stub for the {@link FillerService}. This service gives all
+ * The client side stub for the {@link AutofillService}. This service gives all
  * needed methods to handle fillers.
  * 
  * @author Matteo Desiato - LogicalDOC
  * @since 9.2.3
  */
-@RemoteServiceRelativePath("filler")
-public interface FillerService extends RemoteService {
+@RemoteServiceRelativePath("autofill")
+public interface AutofillService extends RemoteService {
 
 	/**
 	 * Deletes some fillers
@@ -26,7 +26,7 @@ public interface FillerService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void delete(List<Long> fillerId) throws ServerException;
+	public void deleteFillers(List<Long> fillerId) throws ServerException;
 
 	/**
 	 * Creates or updates a filler
@@ -37,7 +37,7 @@ public interface FillerService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIFiller save(GUIFiller filler) throws ServerException;
+	public GUIFiller saveFiller(GUIFiller filler) throws ServerException;
 
 	/**
 	 * Retrieves a filler from the data layer
@@ -48,17 +48,17 @@ public interface FillerService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIFiller get(long fillerId) throws ServerException;
+	public GUIFiller getFiller(long fillerId) throws ServerException;
 
 	public static class Instance {
-		private static FillerServiceAsync inst;
+		private static AutofillServiceAsync inst;
 
 		private Instance() {
 		}
 
-		public static FillerServiceAsync get() {
+		public static AutofillServiceAsync get() {
 			if (inst == null) {
-				inst = GWT.create(FillerService.class);
+				inst = GWT.create(AutofillService.class);
 				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return inst;

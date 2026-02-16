@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.filler;
+package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;

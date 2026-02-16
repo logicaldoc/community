@@ -81,8 +81,7 @@ public class LogDownload extends HttpServlet {
 
 				response.setContentType("application/zip");
 				response.setHeader("Content-Disposition",
-						"attachment; filename=\"" + ("ldoc-log-" + df.format(new Date()) + ".zip") + "\"");
-
+						"attachment; filename=\"ldoc-log-%s.zip\"".formatted(df.format(new Date())));
 				file = prepareAllSupportResources();
 			} else if (appender != null) {
 				response.setContentType("text/html");
@@ -154,7 +153,7 @@ public class LogDownload extends HttpServlet {
 				// store just the latest logs
 				if (file.length() > 0 && counter.get(baseName) < 10
 						&& !file.getName().toLowerCase().contains(".html")) {
-					writeEntry(out, "logicaldoc/logs/" + file.getName(), file);
+					writeEntry(out, "logicaldoc/logs/%s".formatted(file.getName()), file);
 					counter.computeIfPresent(baseName, (k, v) -> v + 1);
 				}
 			}
@@ -178,7 +177,7 @@ public class LogDownload extends HttpServlet {
 			File buf = FileUtil.createTempFile("environment", ".txt");
 			FileUtil.writeFile(env, buf.getPath());
 
-			writeEntry(out, "logicaldoc/conf/environment.txt", buf);
+			writeEntry(out, "environment.txt", buf);
 			FileUtil.delete(buf);
 
 			/*
@@ -236,7 +235,7 @@ public class LogDownload extends HttpServlet {
 	}
 
 	private void writeTomcatLogs(ZipOutputStream out, File webappDir) throws IOException {
-		File logsDir = new File(webappDir.getPath() + "/logs");
+		File logsDir = new File("%s/logs".formatted(webappDir.getPath()));
 		File[] files = logsDir.listFiles();
 
 		// Sort by descending modified date
@@ -250,14 +249,14 @@ public class LogDownload extends HttpServlet {
 
 			// store just the latest logs
 			if (file.length() > 0 && counter.get(baseName) < 10) {
-				writeEntry(out, "tomcat/logs/" + file.getName(), file);
+				writeEntry(out, "tomcat/logs/%s".formatted(file.getName()), file);
 				counter.computeIfPresent(file.getName(), (k, v) -> v + 1);
 			}
 		}
 	}
 
 	private void writeTomcatConfigFiles(ZipOutputStream out, File webappDir) throws IOException {
-		File confDir = new File(webappDir.getPath() + "/conf");
+		File confDir = new File("%s/conf".formatted(webappDir.getPath()));
 		File[] files = confDir.listFiles();
 		for (File file : files) {
 			if (file.isDirectory())
@@ -266,12 +265,12 @@ public class LogDownload extends HttpServlet {
 			// store just the logs of today
 			if (file.getName().toLowerCase().endsWith(".xml") || file.getName().toLowerCase().endsWith(DOT_PROPERTIES)
 					|| file.getName().toLowerCase().endsWith(".policy"))
-				writeEntry(out, "tomcat/conf/" + file.getName(), file);
+				writeEntry(out, "tomcat/conf/%s".formatted(file.getName()), file);
 		}
 	}
 
 	private void writeConfigFiles(ZipOutputStream out) throws IOException {
-		File confDir = new File(Context.get().getConfig().getProperty("LDOCHOME") + "/conf");
+		File confDir = new File("%s/conf".formatted(Context.get().getConfig().getProperty("LDOCHOME")));
 		File[] files = confDir.listFiles();
 		for (File file : files) {
 			if (file.isDirectory())
@@ -279,7 +278,7 @@ public class LogDownload extends HttpServlet {
 
 			if (file.getName().toLowerCase().contains(DOT_PROPERTIES) || file.getName().toLowerCase().endsWith(".xml")
 					|| file.getName().toLowerCase().endsWith(".txt"))
-				writeEntry(out, "logicaldoc/conf/" + file.getName(), file);
+				writeEntry(out, "logicaldoc/conf/%s".formatted(file.getName()), file);
 		}
 	}
 
@@ -294,7 +293,7 @@ public class LogDownload extends HttpServlet {
 		if (files != null)
 			for (File file : files) {
 				if (file.getName().toLowerCase().endsWith(".log"))
-					writeEntry(out, "logicaldoc/updates/" + file.getName(), file);
+					writeEntry(out, "logicaldoc/updates/%s".formatted(file.getName()), file);
 			}
 
 		/*
@@ -386,7 +385,7 @@ public class LogDownload extends HttpServlet {
 		if (files != null)
 			for (File file : files) {
 				if (file.getName().toLowerCase().endsWith(".log"))
-					writeEntry(out, "logicaldoc/patches/" + file.getName(), file);
+					writeEntry(out, "logicaldoc/patches/%s".formatted(file.getName()), file);
 			}
 
 		/*
@@ -421,7 +420,7 @@ public class LogDownload extends HttpServlet {
 	private Properties loadBuildProperties() throws IOException {
 		Properties buildProperties = new Properties();
 		try (InputStream is = new FileInputStream(
-				new File(Context.get().getConfig().getProperty("LDOCHOME") + "/conf/build.properties"))) {
+				new File("%s/conf/build.properties".formatted(Context.get().getConfig().getProperty("LDOCHOME"))))) {
 			buildProperties.load(is);
 		}
 		return buildProperties;

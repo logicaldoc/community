@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.filler;
+package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import java.util.LinkedHashMap;
 

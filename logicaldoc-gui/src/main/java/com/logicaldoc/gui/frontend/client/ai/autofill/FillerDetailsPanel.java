@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.filler;
+package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -36,7 +36,7 @@ public class FillerDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (filler.getId() != 0) {
-				FillerService.Instance.get().get(filler.getId(), new DefaultAsyncCallback<>() {
+				AutofillService.Instance.get().getFiller(filler.getId(), new DefaultAsyncCallback<>() {
 
 					@Override
 					public void handleSuccess(GUIFiller filler) {
@@ -99,7 +99,7 @@ public class FillerDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			FillerService.Instance.get().save(filler, new DefaultAsyncCallback<>() {
+			AutofillService.Instance.get().saveFiller(filler, new DefaultAsyncCallback<>() {
 				@Override
 				public void handleSuccess(GUIFiller filler) {
 					tabSet.hideSave();

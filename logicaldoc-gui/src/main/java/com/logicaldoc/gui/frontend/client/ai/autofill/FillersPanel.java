@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.filler;
+package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +130,7 @@ public class FillersPanel extends VLayout {
 		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				FillerService.Instance.get().get(rec.getAttributeAsLong(ID), new DefaultAsyncCallback<>() {
+				AutofillService.Instance.get().getFiller(rec.getAttributeAsLong(ID), new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(GUIFiller filler) {
 						showFillerDetails(filler);
@@ -166,7 +166,7 @@ public class FillersPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				FillerService.Instance.get().delete(ids, new DefaultAsyncCallback<>() {
+				AutofillService.Instance.get().deleteFillers(ids, new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
 						list.removeSelectedData();
