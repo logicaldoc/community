@@ -13,7 +13,7 @@ import com.logicaldoc.gui.common.client.ServerException;
  * The client side stub for the {@link AutofillService}. This service gives all
  * needed methods to handle fillers.
  * 
- * @author Matteo Desiato - LogicalDOC
+ * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2.3
  */
 @RemoteServiceRelativePath("autofill")
