@@ -299,9 +299,8 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		language.setValue(document.getLanguage());
 		items.add(language);
 
-		if (Feature.enabled(Feature.TAGS)) {
+		if (Feature.enabled(Feature.TAGS))
 			addTags(items);
-		}
 
 		form2.setItems(items.toArray(new FormItem[0]));
 		columns.addMember(form2);
@@ -326,12 +325,12 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 				@Override
 				protected void handleSuccess(GUIDocument result) {
 					LD.clearPrompt();
-					document.setIndexed(result.getIndexed());
 					tagItem.setValue(result.getTags());
+					changedHandler.onChanged(null);
 				}
 			});
 		});
-		if (Feature.enabled(Feature.AUTOFILL))
+		if (Feature.enabled(Feature.AUTOFILL) && changedHandler != null)
 			tagItem.setIcons(fillTags);
 
 		final TextItem newTagItem = prepareNewTagItem(ds);
