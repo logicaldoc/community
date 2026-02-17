@@ -2,11 +2,11 @@ package com.logicaldoc.core.document;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.exception.GenericJDBCException;
 import org.slf4j.Logger;
@@ -96,9 +96,9 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 
 		if (source.getIndexed() != IndexingStatus.INDEXED)
 			setIndexingStatus(source.getIndexed());
-		
+
 		setEmbeddingStatus(source.getEmbeddingStatus());
-		
+
 		try {
 			if (source instanceof Document doc)
 				for (DocumentAccessControlEntry ace : doc.getAccessControlList())
@@ -204,35 +204,18 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	}
 
 	public Set<String> getTagsAsWords() {
-		Set<String> words = new HashSet<>();
-		if (tags != null)
-			for (Tag tag : tags) {
-				words.add(tag.getTag());
-			}
-		return words;
+		if (tags == null)
+			return Set.of();
+		else
+			return tags.stream().map(t -> t.getTag()).collect(Collectors.toSet());
 	}
 
 	public String getTagsString() {
-		StringBuilder sb = new StringBuilder(",");
-		if (tags == null)
+		if (CollectionUtils.isEmpty(tags))
 			return "";
 
-		Iterator<Tag> iter = tags.iterator();
-		boolean start = true;
-
-		while (iter.hasNext()) {
-			String words = iter.next().toString();
-			words = words.replace(",", "\\,");
-
-			if (!start) {
-				sb.append(",");
-			} else {
-				start = false;
-			}
-
-			sb.append(words);
-		}
-
+		StringBuilder sb = new StringBuilder(",");
+		sb.append(tags.stream().map(t -> t.getTag().replace(",", "\\,")).collect(Collectors.joining(",")));
 		sb.append(",");
 
 		return sb.toString();
@@ -348,7 +331,7 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	public void removeAccessControlEntries(long groupId) {
 		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
