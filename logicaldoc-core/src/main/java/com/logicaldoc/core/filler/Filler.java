@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -12,9 +13,16 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.runtime.FeatureDisabledException;
+import com.logicaldoc.core.searchengine.Hit;
+import com.logicaldoc.core.searchengine.SearchEngine;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -41,7 +49,7 @@ public abstract class Filler extends PersistentObject {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = LoggerFactory.getLogger(Filler.class);
-	
+
 	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
 
@@ -50,7 +58,7 @@ public abstract class Filler extends PersistentObject {
 
 	@Column(name = "ld_description", nullable = true)
 	private String description;
-	
+
 	public String getName() {
 		return name;
 	}
@@ -102,7 +110,7 @@ public abstract class Filler extends PersistentObject {
 
 		throw new IllegalArgumentException("Cannot find any filler of type %s".formatted(type));
 	}
-	
+
 	/**
 	 * Fills an object instance
 	 * 
@@ -112,12 +120,40 @@ public abstract class Filler extends PersistentObject {
 	 * @param transaction the current transaction
 	 * @param dictionary Dictionary of the execution pipeline
 	 * 
-	 * @throws PersistenceException Error in the data layer 
+	 * @throws PersistenceException Error in the data layer
 	 * @throws IOException I/O error
 	 * @throws FeatureDisabledException An involved feature is disabled
 	 */
 	public abstract void fill(ExtensibleObject object, String content, History transaction,
 			Map<String, Object> dictionary) throws PersistenceException, IOException, FeatureDisabledException;
+
+	/**
+	 * Fills a document using the body text as input
+	 * 
+	 * @param document the document to fill
+	 * @param transaction the current transaction
+	 * @param dictionary Dictionary of the execution pipeline
+	 * 
+	 * @throws PersistenceException Error in the data layer
+	 * @throws IOException I/O error
+	 * @throws ParsingException The document cannot be parsed and no texts were
+	 *         extracted
+	 * @throws FeatureDisabledException An involved feature is disabled
+	 */
+	public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
+			throws PersistenceException, IOException, FeatureDisabledException, ParsingException {
+
+		// Check if the document must be indexed first
+		if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
+			DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
+
+		Hit hit = SearchEngine.get().getHit(document.getId());
+		String extractedContent = hit != null ? hit.getContent() : "";
+		if (StringUtils.isBlank(extractedContent))
+			throw new ParsingException("Cannot extract any content from document %s".formatted(document));
+
+		fill(document, SearchEngine.get().getHit(document.getId()).getContent(), transaction, dictionary);
+	}
 
 	@Override
 	public int hashCode() {
