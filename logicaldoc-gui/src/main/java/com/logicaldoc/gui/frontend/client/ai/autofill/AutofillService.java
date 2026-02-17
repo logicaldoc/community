@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
 /**
  * The client side stub for the {@link AutofillService}. This service gives all
@@ -49,6 +50,17 @@ public interface AutofillService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIFiller getFiller(long fillerId) throws ServerException;
+
+	/**
+	 * Fills the tags
+	 * 
+	 * @param document The document to process
+	 * 
+	 * @return the same document with proposed tags
+	 * 
+	 * @throws ServerException Error in server application
+	 */
+	public GUIDocument fillTags(GUIDocument document) throws ServerException;
 
 	public static class Instance {
 		private static AutofillServiceAsync inst;

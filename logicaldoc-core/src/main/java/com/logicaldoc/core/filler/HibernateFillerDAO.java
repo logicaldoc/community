@@ -52,7 +52,7 @@ public class HibernateFillerDAO extends HibernatePersistentObjectDAO<Filler> imp
 			saveOrUpdate(sampler);
 
 			// Removes references to this deleted sampler
-			jdbcUpdate("delete from ld_filler_chain where ld_chainedid=" + id);
+			jdbcUpdate("delete from ld_filler_chain where ld_chainedid = %d".formatted(id));
 		}
 	}
 

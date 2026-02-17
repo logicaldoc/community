@@ -813,7 +813,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return guiDocument;
 	}
 
-	public GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser) throws PersistenceException {
+	public static GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser) throws PersistenceException {
 		boolean isFolder = doc.getType() != null && doc.getType().startsWith("folder");
 		DocumentDAO docDao = DocumentDAO.get();
 		if (doc.getId() != 0L && !isFolder)
@@ -913,7 +913,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return guiDocument;
 	}
 
-	private void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) throws PersistenceException {
+	private static void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) throws PersistenceException {
 		if (sessionUser != null && !isFolder) {
 			BookmarkDAO bDao = BookmarkDAO.get();
 			document.setBookmarked(bDao.isDocBookmarkedByUser(document.getId(), sessionUser.getId()));

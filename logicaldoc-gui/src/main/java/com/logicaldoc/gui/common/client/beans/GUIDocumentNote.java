@@ -81,12 +81,16 @@ public class GUIDocumentNote implements Serializable {
 	 */
 	private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
 
-	public GUIDocumentNote(long id, GUIDocument doc) {
+	public GUIDocumentNote(GUIDocument doc) {
 		super();
-		this.id = id;
 		this.docId = doc.getId();
 		this.fileVersion = doc.getFileVersion();
-		this.fileName = doc.getFileName();
+		this.fileName = doc.getFileName();		
+	}
+	
+	public GUIDocumentNote(long id, GUIDocument doc) {
+		this(doc);
+		this.id = id;
 	}
 
 	public GUIDocumentNote(long id, String fileVersion) {
