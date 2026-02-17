@@ -118,7 +118,7 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 	}
 
 	boolean validate() {
-		if (!model.isTrainable())
+		if (!model.getTraining().isTrainable())
 			return true;
 
 		if (form.validate()) {

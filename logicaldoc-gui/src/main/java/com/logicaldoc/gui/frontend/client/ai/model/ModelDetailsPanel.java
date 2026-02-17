@@ -202,7 +202,7 @@ public class ModelDetailsPanel extends VLayout {
 			return valid;
 		}
 
-		if (model.isTrainable()) {
+		if (model.getTraining().isTrainable()) {
 			valid = trainingPanel.validate();
 			if (!valid) {
 				tabSet.selectTab(1);

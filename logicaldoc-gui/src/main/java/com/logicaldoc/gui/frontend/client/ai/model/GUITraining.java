@@ -35,8 +35,18 @@ public class GUITraining implements Serializable {
 	 */
 	private boolean saveSamples = true;
 
+	private boolean trainable = true;
+	
 	private GUISampler sampler;
 	
+	public boolean isTrainable() {
+		return trainable;
+	}
+
+	public void setTrainable(boolean trainable) {
+		this.trainable = trainable;
+	}
+
 	public Date getLastTrained() {
 		return lastTrained;
 	}

@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.ai.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,6 +16,8 @@ import java.util.stream.Stream;
 public class GUIModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private static List<String> NOT_TRAINABLE_TYPES = Arrays.asList("zeroshot", "language");
 
 	private long id = 0;
 
@@ -59,8 +62,6 @@ public class GUIModel implements Serializable {
 	double alpha = 0.025D;
 
 	double minAlpha = 0.0001D;
-	
-	private boolean trainable = true;
 
 	/**
 	 * Words that do not appear this minimum number of times must be discarded
@@ -155,6 +156,7 @@ public class GUIModel implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+		getTraining().setTrainable(!NOT_TRAINABLE_TYPES.contains(type));
 	}
 
 	public String getFeatures() {
@@ -264,7 +266,7 @@ public class GUIModel implements Serializable {
 	public boolean isNeuralNetwork() {
 		return "neural".equals(type);
 	}
-	
+
 	public boolean isZeroShot() {
 		return "zeroshot".equals(type);
 	}
@@ -315,13 +317,5 @@ public class GUIModel implements Serializable {
 
 	public void setMinAlpha(double minAlpha) {
 		this.minAlpha = minAlpha;
-	}
-	
-	public boolean isTrainable() {
-	    return trainable;
-	}
-
-	public void setTrainable(boolean trainable) {
-	    this.trainable = trainable;
 	}
 }

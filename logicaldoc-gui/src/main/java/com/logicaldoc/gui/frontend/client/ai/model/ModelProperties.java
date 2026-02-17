@@ -140,9 +140,6 @@ public class ModelProperties extends ModelDetailsTab {
 		type.addChangedHandler(changedHandler);
 		type.addChangedHandler(changed -> {
 			layersStack.setVisible(NEURAL.equals(type.getValueAsString()));
-			
-			model.setTrainable(!ZEROSHOT.equals(type.getValueAsString()));
-
 			if (EMBEDDER.equals(type.getValueAsString()))
 				windowSize.setValue(10);
 		});
