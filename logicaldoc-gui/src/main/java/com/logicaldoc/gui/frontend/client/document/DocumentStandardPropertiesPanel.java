@@ -19,7 +19,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.QRFormItemIcon;
-import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.logicaldoc.gui.frontend.client.ai.autofill.AutofillService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
@@ -316,10 +315,10 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		tagItem.setEndRow(true);
 		tagItem.setDisabled(!updateEnabled);
 		tagItem.addChangedHandler(changedHandler);
-		
+
 		FormItemIcon fillTags = new FormItemIcon();
 		fillTags.setPrompt(I18N.message("autofill"));
-		fillTags.setSrc("[SKIN]/icons/pen-to-square.png");
+		fillTags.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
 		fillTags.addFormItemClickHandler(event -> {
 			LD.contactingServer();
 			AutofillService.Instance.get().fillTags(document, new DefaultAsyncCallback<GUIDocument>() {
@@ -332,7 +331,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 				}
 			});
 		});
-		if(Feature.enabled(Feature.AUTOFILL))
+		if (Feature.enabled(Feature.AUTOFILL))
 			tagItem.setIcons(fillTags);
 
 		final TextItem newTagItem = prepareNewTagItem(ds);
