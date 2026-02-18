@@ -293,6 +293,7 @@ public class ModelsPanel extends VLayout {
 				new QueryDialog(mdl).show();
 			}
 		}));
+		
 		query.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING)
 				&& !selection[0].getAttributeAsBoolean(EVALUATING) && selection[0].getAttribute(TRAINED) != null);
 
@@ -316,7 +317,7 @@ public class ModelsPanel extends VLayout {
 		iimport.addClickHandler(
 				click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-		if (!"zeroshot".equals(type)) {
+		if (!"zeroshot".equals(type) && !"language".equals(type)) {
 			contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(),
 					clone, iimport, export, new MenuItemSeparator(), delete);
 		} else {
@@ -362,6 +363,7 @@ public class ModelsPanel extends VLayout {
 				model.getLabel() != null && !model.getLabel().trim().isEmpty() ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
 		rec.setAttribute(TRAINING, model.getTraining().isTraining());
+		rec.setAttribute(TRAINED, model.getTraining().getLastTrained());
 		if (model.isNeuralNetwork())
 			rec.setAttribute(EVALUATING, model.getEvaluation().isEvaluating());
 		list.refreshRow(list.getRecordIndex(rec));

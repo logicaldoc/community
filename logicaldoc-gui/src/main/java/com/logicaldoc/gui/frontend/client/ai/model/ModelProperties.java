@@ -366,22 +366,20 @@ public class ModelProperties extends ModelDetailsTab {
 	}
 
 	private void setNeuralNetworkVisibility(FormItem item) {
-		item.setVisibleWhen(NEURAL_CRITERIA);
-		item.setRequiredWhen(NEURAL_CRITERIA);
+		applyTrainableVisibility(item, NEURAL_CRITERIA);
 	}
 
 	private void setEmbedderVisibility(FormItem item) {
-		item.setVisibleWhen(EMBEDDER_CRITERIA);
-		item.setRequiredWhen(EMBEDDER_CRITERIA);
+		applyTrainableVisibility(item, EMBEDDER_CRITERIA);
 	}
 
 	private void setNLPVisibility(FormItem item) {
+
 		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
 				new Criterion[] { new AdvancedCriteria(TYPE, OperatorId.EQUALS, "classifier"),
 						new AdvancedCriteria(TYPE, OperatorId.EQUALS, TOKENS) });
 
-		item.setVisibleWhen(criteria);
-		item.setRequiredWhen(criteria);
+		applyTrainableVisibility(item, criteria);
 	}
 
 	private SelectItem updaterSelector() {
@@ -573,6 +571,21 @@ public class ModelProperties extends ModelDetailsTab {
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
+	}
+
+	private boolean isTrainable() {
+		return model.getTraining() != null && model.getTraining().isTrainable();
+	}
+
+	private void applyTrainableVisibility(FormItem item, AdvancedCriteria criteria) {
+		if (!isTrainable()) {
+			item.setVisible(false);
+			item.setRequired(false);
+			return;
+		}
+
+		item.setVisibleWhen(criteria);
+		item.setRequiredWhen(criteria);
 	}
 
 	@Override

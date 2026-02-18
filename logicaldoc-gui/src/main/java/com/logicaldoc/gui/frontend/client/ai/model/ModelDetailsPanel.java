@@ -174,10 +174,10 @@ public class ModelDetailsPanel extends VLayout {
 	}
 	
 	protected void toggleTrainingTab() {
-		if (model.isZeroShot())
-			tabSet.hideTab(TRAINING);
-		else
-			tabSet.showTab(TRAINING);
+	    if (model.getTraining() != null && model.getTraining().isTrainable())
+	        tabSet.showTab(TRAINING);
+	    else
+	        tabSet.hideTab(TRAINING);
 	}
 
 
