@@ -314,10 +314,10 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 				}
 			});
 		});
-		
+
 		if (Feature.enabled(Feature.AUTOFILL) && updateEnabled)
 			language.setIcons(fillLanguage);
-		
+
 		if (Feature.enabled(Feature.TAGS))
 			addTags(items);
 
