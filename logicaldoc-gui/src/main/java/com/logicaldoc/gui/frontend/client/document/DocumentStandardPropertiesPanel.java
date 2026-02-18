@@ -372,24 +372,8 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			form2.redraw();
 		});
 
-		FormItemIcon fillTags2 = new FormItemIcon();
-		fillTags2.setPrompt(I18N.message("autofill"));
-		fillTags2.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
-		fillTags2.addFormItemClickHandler(click -> {
-			LD.contactingServer();
-			AutofillService.Instance.get().fillTags(document, new DefaultAsyncCallback<GUIDocument>() {
-
-				@Override
-				protected void handleSuccess(GUIDocument result) {
-					LD.clearPrompt();
-					tagsString.setValue(Util.getTagsHTML(result.getTags()));
-					changedHandler.onChanged(null);
-				}
-			});
-		});
-
 		if (updateEnabled)
-			tagsString.setIcons(editTags, fillTags2);
+			tagsString.setIcons(editTags);
 
 		items.add(tagsString);
 		items.add(tagItem);
