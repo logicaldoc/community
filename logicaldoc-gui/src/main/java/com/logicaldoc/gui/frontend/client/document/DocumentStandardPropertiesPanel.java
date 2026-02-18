@@ -304,7 +304,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		fillLanguage.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
 		fillLanguage.addFormItemClickHandler(click -> {
 			LD.contactingServer();
-			AutofillService.Instance.get().fillTags(document, new DefaultAsyncCallback<GUIDocument>() {
+			AutofillService.Instance.get().fillLanguage(document, new DefaultAsyncCallback<GUIDocument>() {
 
 				@Override
 				protected void handleSuccess(GUIDocument result) {
