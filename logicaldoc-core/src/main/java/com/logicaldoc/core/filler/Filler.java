@@ -20,7 +20,9 @@ import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.parser.ParsingException;
+import com.logicaldoc.core.runtime.Aspect;
 import com.logicaldoc.core.runtime.FeatureDisabledException;
+import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.SearchEngine;
 
@@ -143,6 +145,9 @@ public abstract class Filler extends PersistentObject {
 	public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, ParsingException {
 
+		if(RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+			
+		
 		// Check if the document must be indexed first
 		if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
 			DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
