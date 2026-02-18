@@ -299,6 +299,25 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		language.setValue(document.getLanguage());
 		items.add(language);
 
+		FormItemIcon fillLanguage = new FormItemIcon();
+		fillLanguage.setPrompt(I18N.message("autofill"));
+		fillLanguage.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
+		fillLanguage.addFormItemClickHandler(click -> {
+			LD.contactingServer();
+			AutofillService.Instance.get().fillTags(document, new DefaultAsyncCallback<GUIDocument>() {
+
+				@Override
+				protected void handleSuccess(GUIDocument result) {
+					LD.clearPrompt();
+					language.setValue(result.getLanguage());
+					changedHandler.onChanged(null);
+				}
+			});
+		});
+		
+		if (Feature.enabled(Feature.AUTOFILL) && updateEnabled)
+			language.setIcons(fillLanguage);
+		
 		if (Feature.enabled(Feature.TAGS))
 			addTags(items);
 
@@ -318,7 +337,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		FormItemIcon fillTags = new FormItemIcon();
 		fillTags.setPrompt(I18N.message("autofill"));
 		fillTags.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
-		fillTags.addFormItemClickHandler(event -> {
+		fillTags.addFormItemClickHandler(click -> {
 			LD.contactingServer();
 			AutofillService.Instance.get().fillTags(document, new DefaultAsyncCallback<GUIDocument>() {
 
@@ -330,7 +349,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 				}
 			});
 		});
-		if (Feature.enabled(Feature.AUTOFILL) && changedHandler != null)
+		if (Feature.enabled(Feature.AUTOFILL))
 			tagItem.setIcons(fillTags);
 
 		final TextItem newTagItem = prepareNewTagItem(ds);
@@ -342,7 +361,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		FormItemIcon editTags = new FormItemIcon();
 		editTags.setPrompt(I18N.message("edittags"));
 		editTags.setSrc("[SKIN]/icons/pen-to-square.png");
-		editTags.addFormItemClickHandler(event -> {
+		editTags.addFormItemClickHandler(click -> {
 			tagsString.setVisible(false);
 			tagItem.setVisible(true);
 			tagItem.setEndRow(true);
@@ -353,8 +372,24 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			form2.redraw();
 		});
 
+		FormItemIcon fillTags2 = new FormItemIcon();
+		fillTags2.setPrompt(I18N.message("autofill"));
+		fillTags2.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
+		fillTags2.addFormItemClickHandler(click -> {
+			LD.contactingServer();
+			AutofillService.Instance.get().fillTags(document, new DefaultAsyncCallback<GUIDocument>() {
+
+				@Override
+				protected void handleSuccess(GUIDocument result) {
+					LD.clearPrompt();
+					tagsString.setValue(Util.getTagsHTML(result.getTags()));
+					changedHandler.onChanged(null);
+				}
+			});
+		});
+
 		if (updateEnabled)
-			tagsString.setIcons(editTags);
+			tagsString.setIcons(editTags, fillTags2);
 
 		items.add(tagsString);
 		items.add(tagItem);

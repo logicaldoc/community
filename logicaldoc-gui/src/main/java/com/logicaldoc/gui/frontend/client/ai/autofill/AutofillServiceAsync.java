@@ -14,4 +14,6 @@ public interface AutofillServiceAsync {
 	void getFiller(long fillerId, AsyncCallback<GUIFiller> callback);
 
 	void fillTags(GUIDocument document, AsyncCallback<GUIDocument> callback);
+	
+	void fillLanguage(GUIDocument document, AsyncCallback<GUIDocument> callback);
 }

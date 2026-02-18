@@ -62,6 +62,18 @@ public interface AutofillService extends RemoteService {
 	 */
 	public GUIDocument fillTags(GUIDocument document) throws ServerException;
 
+	/**
+	 * Fills the language
+	 * 
+	 * @param document The document to process
+	 * 
+	 * @return the same document with proposed language
+	 * 
+	 * @throws ServerException Error in server application
+	 */
+	public GUIDocument fillLanguage(GUIDocument document) throws ServerException;
+	
+	
 	public static class Instance {
 		private static AutofillServiceAsync inst;
 
