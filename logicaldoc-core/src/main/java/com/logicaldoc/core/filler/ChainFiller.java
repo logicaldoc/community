@@ -15,6 +15,7 @@ import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.runtime.Aspect;
 import com.logicaldoc.core.runtime.FeatureDisabledException;
 import com.logicaldoc.core.runtime.RunLevel;
+import com.logicaldoc.core.searchengine.SearchException;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
@@ -54,7 +55,7 @@ public class ChainFiller extends Filler {
 
 	@Override
 	public void fill(ExtensibleObject object, String content, History transaction, Map<String, Object> dictionary)
-			throws PersistenceException, IOException, FeatureDisabledException {
+			throws PersistenceException, IOException, FeatureDisabledException, SearchException {
 		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
 			return;
 

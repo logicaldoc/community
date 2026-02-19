@@ -25,6 +25,7 @@ import com.logicaldoc.core.runtime.FeatureDisabledException;
 import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.searchengine.SearchException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -125,9 +126,11 @@ public abstract class Filler extends PersistentObject {
 	 * @throws PersistenceException Error in the data layer
 	 * @throws IOException I/O error
 	 * @throws FeatureDisabledException An involved feature is disabled
+	 * @throws SearchException Error in case of search
 	 */
 	public abstract void fill(ExtensibleObject object, String content, History transaction,
-			Map<String, Object> dictionary) throws PersistenceException, IOException, FeatureDisabledException;
+			Map<String, Object> dictionary)
+			throws PersistenceException, IOException, FeatureDisabledException, SearchException;
 
 	/**
 	 * Fills a document using the body text as input
@@ -141,16 +144,16 @@ public abstract class Filler extends PersistentObject {
 	 * @throws ParsingException The document cannot be parsed and no texts were
 	 *         extracted
 	 * @throws FeatureDisabledException An involved feature is disabled
+	 * @throws SearchException Error in case of search
 	 */
 	public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-			throws PersistenceException, IOException, FeatureDisabledException, ParsingException {
+			throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException {
 
-		if(RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
-			
-		
-		// Check if the document must be indexed first
-		if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
-			DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
+		if (RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+
+			// Check if the document must be indexed first
+			if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
+				DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
 
 		Hit hit = SearchEngine.get().getHit(document.getId());
 		String extractedContent = hit != null ? hit.getContent() : "";
