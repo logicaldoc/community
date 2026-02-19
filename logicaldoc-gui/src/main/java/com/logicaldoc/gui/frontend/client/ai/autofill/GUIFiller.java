@@ -25,6 +25,8 @@ public class GUIFiller implements Serializable {
 	private String model;
 
 	private Long modelId;
+	
+	private Long embeddingSchemeId;
 
 	private Double threshold = 0.7d;
 
@@ -100,5 +102,13 @@ public class GUIFiller implements Serializable {
 
 	public void setThreshold(Double threshold) {
 		this.threshold = threshold;
+	}
+
+	public Long getEmbeddingSchemeId() {
+		return embeddingSchemeId;
+	}
+
+	public void setEmbeddingSchemeId(Long embeddingSchemeId) {
+		this.embeddingSchemeId = embeddingSchemeId;
 	}
 }
