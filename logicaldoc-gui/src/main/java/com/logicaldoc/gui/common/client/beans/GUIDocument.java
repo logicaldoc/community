@@ -142,6 +142,11 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	 * Identifier of the barcode template to use to process this document
 	 */
 	private Long barcodeTemplateId = null;
+	
+	/**
+	 * Identifier of the Filler to be used by the autofill
+	 */
+	private Long fillerId = null;
 
 	/**
 	 * Indicates if the document has been processed by the barcodes processorsS
@@ -695,6 +700,14 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
 		this.accessControlList = accessControlList;
+	}
+	
+	public Long getFillerId() {
+		return fillerId;
+	}
+
+	public void setFillerId(Long fillerId) {
+		this.fillerId = fillerId;
 	}
 
 	@Override

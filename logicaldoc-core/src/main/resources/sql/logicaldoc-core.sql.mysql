@@ -18,7 +18,7 @@ create table ld_document (ld_id bigint not null, ld_lastmodified datetime not nu
                           ld_published int not null, ld_startpublishing datetime, ld_stoppublishing datetime null, ld_transactionid varchar(255), 
                           ld_extresid varchar(255), ld_tgs varchar(1000), ld_pages int not null, ld_previewpages int not null, ld_nature int not null,
                           ld_formid bigint, ld_links int not null, ld_docattrs int not null, ld_ocrtemplateid bigint, ld_ocrd int not null, 
-                          ld_barcodetemplateid bigint, ld_color varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                         
+                          ld_barcodetemplateid bigint, ld_color varchar(255), ld_fillerid bigint, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                         
 create table ld_document_ext (ld_docid bigint not null, ld_mandatory int not null, ld_type int not null, 
                               ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                               ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, 
@@ -143,7 +143,7 @@ create table ld_version (ld_id bigint not null, ld_lastmodified datetime not nul
                          ld_startpublishing datetime, ld_stoppublishing datetime null, 
                          ld_transactionid varchar(255), ld_extresid varchar(255), ld_pages int not null, ld_previewpages int not null, ld_nature int not null,
                          ld_formid bigint, ld_links int not null, ld_docattrs int not null, ld_ocrtemplateid bigint, ld_ocrd int not null, 
-                         ld_barcodetemplateid bigint, ld_color varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+                         ld_barcodetemplateid bigint, ld_color varchar(255), ld_fillerid bigint, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_version_ext (ld_versionid bigint not null, ld_mandatory int not null, ld_type int not null, ld_editor int not null, 
                              ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), ld_intvalue bigint, ld_doublevalue double, 
                              ld_datevalue datetime null, ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
@@ -157,7 +157,7 @@ create table ld_folder (ld_id bigint not null, ld_lastmodified datetime not null
                         ld_quotadocs bigint, ld_quotasize bigint, ld_hidden int not null, ld_foldref bigint, 
                         ld_level int, ld_maxversions int, ld_color varchar(255), ld_tgs varchar(1000), 
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_path varchar(255), ld_grid varchar(4000), 
-                        ld_ocrtemplateid bigint, ld_barcodetemplateid bigint, ld_tile mediumtext, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+                        ld_ocrtemplateid bigint, ld_barcodetemplateid bigint, ld_tile mediumtext, ld_fillerid bigint, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_folder_ext (ld_folderid bigint not null, ld_mandatory int not null, ld_type int not null, ld_editor int not null,
                             ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                             ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, ld_name varchar(255) not null, 

@@ -81,6 +81,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		folderVO.setFoldRef(wsFolder.getFoldRef());
 		folderVO.setOcrTemplateId(wsFolder.getOcrTemplateId());
 		folderVO.setBarcodeTemplateId(wsFolder.getBarcodeTemplateId());
+		folderVO.setFillerId(wsFolder.getFillerId());
 		folderVO.setColor(wsFolder.getColor());
 		folderVO.setTile(wsFolder.getTile());
 
@@ -495,6 +496,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folder.setFoldRef(wsFolder.getFoldRef());
 			folder.setOcrTemplateId(wsFolder.getOcrTemplateId());
 			folder.setBarcodeTemplateId(wsFolder.getBarcodeTemplateId());
+			folder.setFillerId(wsFolder.getFillerId());
 			folder.setStore(wsFolder.getStore());
 			folder.setMaxVersions(wsFolder.getMaxVersions());
 			folder.setTagsFromWords(new HashSet<>(wsFolder.getTags()));

@@ -14,8 +14,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.Tag;
+import com.logicaldoc.core.filler.Fillable;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.Secure;
 import com.logicaldoc.util.spring.Context;
@@ -49,7 +49,7 @@ import jakarta.persistence.Transient;
 @Entity
 @Table(name = "ld_folder")
 @Cacheable
-public class Folder extends ExtensibleObject implements Secure<FolderAccessControlEntry>, Comparable<Folder> {
+public class Folder extends Fillable implements Secure<FolderAccessControlEntry>, Comparable<Folder> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -230,6 +230,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 		this.ocrTemplateId = source.ocrTemplateId;
 		this.barcodeTemplateId = source.barcodeTemplateId;
 		this.tile = source.tile;
+		this.fillerId = source.fillerId;
 
 		setTemplate(source.getTemplate());
 		setTemplateId(source.getTemplateId());
@@ -282,7 +283,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 	public void setAccessControlList(Set<FolderAccessControlEntry> accessControlList) {
 		this.accessControlList = accessControlList;
 	}
-	
+
 	@Override
 	public void removeAccessControlEntries(long groupId) {
 		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);

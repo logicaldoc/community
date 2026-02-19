@@ -3,7 +3,6 @@ package com.logicaldoc.core.filler;
 import java.util.Map;
 
 import com.logicaldoc.core.history.History;
-import com.logicaldoc.core.metadata.ExtensibleObject;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.DiscriminatorValue;
@@ -24,7 +23,7 @@ public class MockFiller extends Filler {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void fill(ExtensibleObject object, String content, History transaction, Map<String, Object> dictionary) {
+	public void fill(Fillable filler, String content, History transaction, Map<String, Object> dictionary) {
 		// Do nothing
 	}
 }

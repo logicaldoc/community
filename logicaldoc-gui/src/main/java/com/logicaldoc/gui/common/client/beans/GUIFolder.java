@@ -102,6 +102,11 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	private Long barcodeTemplateId = null;
 
 	private String tile;
+	
+	/**
+	 * Identifier of the Filler to be used by the autofill
+	 */
+	private Long fillerId = null;
 
 	public GUIFolder() {
 
@@ -197,6 +202,14 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	public List<GUIFolder> getPath() {
 		return path;
+	}
+	
+	public Long getFillerId() {
+		return fillerId;
+	}
+
+	public void setFillerId(Long fillerId) {
+		this.fillerId = fillerId;
 	}
 
 	public void setPath(List<GUIFolder> path) {

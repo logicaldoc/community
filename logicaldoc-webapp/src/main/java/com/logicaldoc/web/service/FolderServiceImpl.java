@@ -184,6 +184,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		guiFolder.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList());
 		guiFolder.setOcrTemplateId(folder.getOcrTemplateId());
 		guiFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
+		guiFolder.setFillerId(folder.getFillerId());
 		if (computePath)
 			guiFolder.setPathExtended(dao.computePathExtended(folder.getId()));
 
@@ -646,6 +647,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			folder.setGrid(guiFolder.getGrid());
 			folder.setOcrTemplateId(guiFolder.getOcrTemplateId());
 			folder.setBarcodeTemplateId(guiFolder.getBarcodeTemplateId());
+			folder.setFillerId(guiFolder.getFillerId());
 
 			updateExtendedAttributes(folder, guiFolder);
 

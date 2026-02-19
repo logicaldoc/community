@@ -94,6 +94,7 @@ public class WSUtil {
 			wsDoc.setOcrd(document.isOcrd() ? 1 : 0);
 			wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
 			wsDoc.setBarcoded(document.isBarcoded() ? 1 : 0);
+			wsDoc.setFillerId(document.getFillerId());
 
 			if (document instanceof Document doc) {
 				wsDoc.setDocRef(doc.getDocRef());
@@ -242,6 +243,7 @@ public class WSUtil {
 
 		doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
 		doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
+		doc.setFillerId(wsDoc.getFillerId());
 
 		doc.setSigned(wsDoc.getSigned() == 1);
 		doc.setBarcoded(wsDoc.getBarcoded() == 1);

@@ -224,6 +224,9 @@ public class WSDocument implements Serializable {
 
 	@WSDoc(required = false, description = "indicates if the document has been processed by the barcode processor: <b>0</b> = to process, <b>1</b> = processed")
 	private int barcoded = 0;
+	
+	@WSDoc(required = false, description = "identifier of the filler to use when autofilling")
+	private Long fillerId;
 
 	public Collection<String> listAttributeNames() {
 		List<String> names = new ArrayList<>();
@@ -699,5 +702,13 @@ public class WSDocument implements Serializable {
 
 	public void setEmbedded(int embedded) {
 		this.embedded = embedded;
+	}
+
+	public Long getFillerId() {
+		return fillerId;
+	}
+
+	public void setFillerId(Long fillerId) {
+		this.fillerId = fillerId;
 	}
 }

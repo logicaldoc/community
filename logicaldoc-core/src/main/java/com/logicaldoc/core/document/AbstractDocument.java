@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.TransactionalObject;
+import com.logicaldoc.core.filler.Fillable;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -55,7 +55,7 @@ import jakarta.persistence.Transient;
  * @since 4.5
  */
 @MappedSuperclass
-public abstract class AbstractDocument extends ExtensibleObject implements TransactionalObject {
+public abstract class AbstractDocument extends Fillable implements TransactionalObject {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractDocument.class);
 
@@ -300,7 +300,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public IndexingStatus getIndexingStatus() {
 		return indexingStatus;
 	}
-	
+
 	public IndexingStatus getIndexed() {
 		return getIndexingStatus();
 	}
@@ -312,7 +312,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setIndexingStatus(int indexingStatus) {
 		this.indexingStatus = IndexingStatus.values()[indexingStatus];
 	}
-	
+
 	public EmbeddingStatus getEmbeddingStatus() {
 		return embeddingStatus;
 	}
@@ -928,6 +928,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setColor(docVO.getColor());
 		setTemplateId(docVO.getTemplateId());
 		setTemplateName(docVO.getTemplateName());
+		setFillerId(docVO.getFillerId());
 
 		setAttributes(new HashMap<>());
 		try {

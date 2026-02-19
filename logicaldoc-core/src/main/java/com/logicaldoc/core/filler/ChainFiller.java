@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.History;
-import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.runtime.Aspect;
 import com.logicaldoc.core.runtime.FeatureDisabledException;
 import com.logicaldoc.core.runtime.RunLevel;
@@ -54,14 +53,14 @@ public class ChainFiller extends Filler {
 	}
 
 	@Override
-	public void fill(ExtensibleObject object, String content, History transaction, Map<String, Object> dictionary)
+	public void fill(Fillable fillable, String content, History transaction, Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, SearchException {
 		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
 			return;
 
 		if (!transaction.isFill()) {
 			if (log.isDebugEnabled())
-				log.debug("Skiping fill of object {}", object);
+				log.debug("Skiping fill of object {}", fillable);
 			return;
 		}
 
@@ -71,7 +70,7 @@ public class ChainFiller extends Filler {
 
 		for (Filler filler : chain) {
 			log.debug("invoking filler {}", filler);
-			filler.fill(object, content, transaction, pipelineDict);
+			filler.fill(fillable, content, transaction, pipelineDict);
 		}
 	}
 }

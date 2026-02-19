@@ -99,6 +99,9 @@ public class WSFolder implements Serializable {
 
 	@WSDoc(required = false, description = "optional tile image(Base64 encoded) of the folder")
 	private String tile;
+	
+	@WSDoc(required = false, description = "identifier of the filler to use when autofilling the documents inside this folder")
+	private Long fillerId;
 
 	public void addAttribute(WSAttribute att) {
 		if (attributes == null)
@@ -152,8 +155,10 @@ public class WSFolder implements Serializable {
 		wsFolder.setSecurityRef(folder.getSecurityRef());
 		wsFolder.setOcrTemplateId(folder.getOcrTemplateId());
 		wsFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
+		wsFolder.setFillerId(folder.getFillerId());
 		wsFolder.setColor(folder.getColor());
 		wsFolder.setTile(folder.getTile());
+		
 
 		if (withCollections && folder.getTags() != null)
 			wsFolder.setTags(new ArrayList<>(folder.getTagsAsWords()));
@@ -408,5 +413,13 @@ public class WSFolder implements Serializable {
 
 	public void setTile(String tile) {
 		this.tile = tile;
+	}
+
+	public Long getFillerId() {
+		return fillerId;
+	}
+
+	public void setFillerId(Long fillerId) {
+		this.fillerId = fillerId;
 	}
 }

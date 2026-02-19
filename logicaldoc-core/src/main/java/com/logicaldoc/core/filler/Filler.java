@@ -117,7 +117,7 @@ public abstract class Filler extends PersistentObject {
 	/**
 	 * Fills an object instance
 	 * 
-	 * @param object the instance to fill
+	 * @param fillable the instance to fill
 	 * @param content the content of the object, if not specified it will be
 	 *        taken from the transaction's file.
 	 * @param transaction the current transaction
@@ -128,7 +128,7 @@ public abstract class Filler extends PersistentObject {
 	 * @throws FeatureDisabledException An involved feature is disabled
 	 * @throws SearchException Error in case of search
 	 */
-	public abstract void fill(ExtensibleObject object, String content, History transaction,
+	public abstract void fill(Fillable fillable, String content, History transaction,
 			Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, SearchException;
 

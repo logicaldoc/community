@@ -347,7 +347,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			doc.setModified(false);
 
 			log.debug("Invoke listeners after store");
-			for (DocumentListener listener : listenerManager.getListeners()) 
+			for (DocumentListener listener : listenerManager.getListeners())
 				listener.afterStore(doc, transaction, dictionary);
 
 			if (StringUtils.isEmpty(doc.getCustomId())) {
@@ -433,6 +433,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	private void copyFolderMetadata(Document doc) {
 		if (doc.getFolder().getTemplate() != null)
 			copyFolderExtendedAttributes(doc);
+
+		/*
+		 * Check for Filler at folder level
+		 */
+		if (doc.getFillerId() == null && doc.getFolder().getFillerId() != null)
+			doc.setFillerId(doc.getFolder().getFillerId());
+
 		/*
 		 * Check for OCR template at folder level
 		 */
