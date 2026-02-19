@@ -259,7 +259,7 @@ create table ld_apikey (ld_id number(19,0) not null, ld_lastmodified timestamp n
        
 create table ld_filler (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion number(19,0) not null, 
 						ld_deleted int not null, ld_tenantid number(19,0) not null, ld_name varchar(255) not null, ld_title varchar(255), ld_label varchar(255),
-						ld_description varchar(4000), ld_type varchar(50) not null, ld_modelid number(19,0), ld_threshold double, primary key (ld_id));
+						ld_description varchar(4000), ld_type varchar(50) not null, ld_modelid number(19,0), ld_embeddingschemeid (19,0), ld_threshold double, primary key (ld_id));
 create table ld_filler_chain (ld_fillerid number(19,0) not null, ld_chainedid number(19,0) not null, ld_position int not null, primary key (ld_fillerid, ld_chainedid));      
 
            
