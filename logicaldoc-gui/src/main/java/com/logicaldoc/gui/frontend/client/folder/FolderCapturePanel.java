@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.frontend.client.ai.autofill.FillerSelector;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -81,7 +82,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		barcodeTemplate.addChangedHandler(changedHandler);
 		barcodeTemplate.addChangedHandler(changed -> applySubFolders.setDisabled(true));
 
-		SelectItem filler = ItemFactory.newFillerSelector(true, folder.getFillerId());
+		FillerSelector filler = new FillerSelector(true, folder.getFillerId());
 		filler.setWrapTitle(false);
 		filler.setDisabled(!Feature.enabled(Feature.AUTOFILL));
 		filler.addChangedHandler(changedHandler);
@@ -108,7 +109,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 			else {
 				folder.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
 			}
-			
+
 			if (values.get(FILLER) == null || values.get(FILLER).toString().isEmpty())
 				folder.setFillerId(null);
 			else {
