@@ -56,7 +56,7 @@ public interface FolderServiceAsync {
 
 	void applyGridLayout(long folderId, AsyncCallback<Void> callback);
 
-	void applyOCR(long parentId, AsyncCallback<Void> callback);
+	void applyCapture(long parentId, AsyncCallback<Void> callback);
 
 	void applyStore(long parentId, AsyncCallback<Void> callback);
 

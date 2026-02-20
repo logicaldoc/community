@@ -1855,7 +1855,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testApplyOCRToTree() throws PersistenceException {
+	public void testApplyCaptureToTree() throws PersistenceException {
 		Folder folder = testSubject.findById(1200);
 		testSubject.initialize(folder);
 		assertNull(folder.getOcrTemplateId());
@@ -1881,7 +1881,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(userDao.findById(User.USERID_ADMIN));
 		transaction.setNotified(false);
-		testSubject.applyOCRToTree(1200, transaction);
+		testSubject.applyCaptureToTree(1200, transaction);
 
 		folder = testSubject.findById(1201);
 		assertEquals(Long.valueOf(1), folder.getOcrTemplateId());

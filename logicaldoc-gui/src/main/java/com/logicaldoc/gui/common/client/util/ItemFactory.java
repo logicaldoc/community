@@ -69,6 +69,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
 import com.logicaldoc.gui.common.client.widgets.QRFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
+import com.logicaldoc.gui.frontend.client.ai.autofill.FillersDS;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
@@ -2149,6 +2150,30 @@ public class ItemFactory {
 		if (selectedTemplateId != null)
 			templateItem.setValue(selectedTemplateId.toString());
 		return templateItem;
+	}
+	
+	/**
+	 * Creates a select list with the fillers
+	 * 
+	 * @param includeEmpty id an empty row must be shown
+	 * @param fillerId identifier of the filler to be selected by
+	 *        default
+	 * 
+	 * @return the item
+	 */
+	public static SelectItem newFillerSelector(boolean includeEmpty, Long fillerId) {
+		SelectItem selectItem = new SelectItem("filler", I18N.message("filler"));
+		selectItem.setDisplayField("label");
+		selectItem.setValueField("id");
+		selectItem.setWidth(150);
+		selectItem.setMultiple(false);
+		selectItem.setWrapTitle(false);
+		selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
+		selectItem.setOptionDataSource(new FillersDS(includeEmpty));
+
+		if (fillerId != null)
+			selectItem.setValue(fillerId);
+		return selectItem;
 	}
 
 	/**

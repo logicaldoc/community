@@ -3,13 +3,23 @@ package com.logicaldoc.gui.frontend.client.ai.autofill;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
+/**
+ * A datasource to retrieve the fillers
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 9.2.3
+ */
 public class FillersDS extends DataSource {
 
 	public FillersDS() {
-		this(null);
+		this(false, null);
 	}
-	
-	public FillersDS(String type) {
+
+	public FillersDS(boolean includeEmpty) {
+		this(includeEmpty, null);
+	}
+
+	public FillersDS(boolean includeEmpty, String type) {
 		setRecordXPath("/list/filler");
 
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -25,7 +35,7 @@ public class FillersDS extends DataSource {
 		setFields(id, name, label, description, typeField);
 		setClientOnly(true);
 
-		String url = "data/fillers.xml";
+		String url = "data/fillers.xml?withempty=" + includeEmpty;
 		if (type != null)
 			url += "&type=" + type;
 

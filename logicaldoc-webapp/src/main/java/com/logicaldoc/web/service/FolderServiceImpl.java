@@ -1134,15 +1134,15 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void applyOCR(long parentId) throws ServerException {
+	public void applyCapture(long parentId) throws ServerException {
 		Session session = validateSession();
 
-		executeLongRunningOperation("Apply OCR", () -> {
+		executeLongRunningOperation("Apply Capture", () -> {
 			FolderDAO fdao = FolderDAO.get();
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
 			try {
-				fdao.applyOCRToTree(parentId, transaction);
+				fdao.applyCaptureToTree(parentId, transaction);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}

@@ -14,9 +14,7 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 
 /**
  * Shows folder's OCR options.
@@ -25,6 +23,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
  * @since 8.4.2
  */
 public class FolderCapturePanel extends FolderDetailTab {
+	private static final String FILLER = "filler";
+
 	private static final String BARCODETEMPLATE = "barcodetemplate";
 
 	private static final String OCRTEMPLATE = "ocrtemplate";
@@ -53,6 +53,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setNumCols(3);
 		form.setWrapItemTitles(false);
 
 		ButtonItem applySubFolders = new ButtonItem(I18N.message("applytosubfolders"));
@@ -60,9 +61,9 @@ public class FolderCapturePanel extends FolderDetailTab {
 		applySubFolders.setEndRow(true);
 		applySubFolders.setDisabled(!folder.isWrite());
 		applySubFolders.setColSpan(1);
-		applySubFolders.addClickHandler((ClickEvent event) -> {
+		applySubFolders.addClickHandler(click -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyOCR(folder.getId(), new EmptyAsyncCallback<>());
+			FolderService.Instance.get().applyCapture(folder.getId(), new EmptyAsyncCallback<>());
 		});
 
 		SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
@@ -70,7 +71,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		ocrTemplate.setWrapTitle(false);
 		ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) && folder.getTemplateId() == null);
 		ocrTemplate.addChangedHandler(changedHandler);
-		ocrTemplate.addChangedHandler((ChangedEvent event) -> applySubFolders.setDisabled(true));
+		ocrTemplate.addChangedHandler(changed -> applySubFolders.setDisabled(true));
 		ocrTemplate.setDisabled(documentTemplateId == null);
 
 		SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
@@ -78,9 +79,15 @@ public class FolderCapturePanel extends FolderDetailTab {
 		barcodeTemplate.setWrapTitle(false);
 		barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
 		barcodeTemplate.addChangedHandler(changedHandler);
-		barcodeTemplate.addChangedHandler((ChangedEvent event) -> applySubFolders.setDisabled(true));
+		barcodeTemplate.addChangedHandler(changed -> applySubFolders.setDisabled(true));
 
-		form.setItems(ocrTemplate, barcodeTemplate, applySubFolders);
+		SelectItem filler = ItemFactory.newFillerSelector(true, folder.getFillerId());
+		filler.setWrapTitle(false);
+		filler.setDisabled(!Feature.enabled(Feature.AUTOFILL));
+		filler.addChangedHandler(changedHandler);
+		filler.addChangedHandler(changed -> applySubFolders.setDisabled(true));
+
+		form.setItems(ocrTemplate, barcodeTemplate, filler, applySubFolders);
 		addMember(form);
 	}
 
@@ -100,6 +107,12 @@ public class FolderCapturePanel extends FolderDetailTab {
 				folder.setBarcodeTemplateId(null);
 			else {
 				folder.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
+			}
+			
+			if (values.get(FILLER) == null || values.get(FILLER).toString().isEmpty())
+				folder.setFillerId(null);
+			else {
+				folder.setFillerId(Long.parseLong(values.get(FILLER).toString()));
 			}
 		}
 		return !vm.hasErrors();

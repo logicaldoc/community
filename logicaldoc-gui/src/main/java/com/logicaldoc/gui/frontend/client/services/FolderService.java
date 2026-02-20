@@ -125,7 +125,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void applyOCR(long parentId) throws ServerException;
+	public void applyCapture(long parentId) throws ServerException;
 
 	/**
 	 * Gets the Folder initializing the permissions.

@@ -2242,7 +2242,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
+	public void applyCaptureToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
 
 		transaction.setEvent(FolderEvent.CHANGED);
@@ -2255,6 +2255,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			initialize(folder);
 			folder.setOcrTemplateId(parent.getOcrTemplateId());
 			folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
+			folder.setFillerId(parent.getFillerId());
 
 			FolderHistory tr = new FolderHistory(transaction);
 			tr.setFolderId(folder.getId());
@@ -2262,7 +2263,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			store(folder, tr);
 			flush();
 
-			applyOCRToTree(folder.getId(), transaction);
+			applyCaptureToTree(folder.getId(), transaction);
 		}
 	}
 

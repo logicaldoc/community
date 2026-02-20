@@ -180,7 +180,7 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 		folder.setTemplate("test");
 		testSubject.save(folder);
 
-		testSubject.applyOCR(1200L);
+		testSubject.applyCapture(1200L);
 
 		folder = testSubject.getFolder(1201L, true, true, true);
 		assertEquals(Long.valueOf(1L), folder.getOcrTemplateId());

@@ -731,14 +731,14 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	public void applyStoreToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
-	 * Propagates the OCR settings to the whole subree
+	 * Propagates the automated capture settings to the whole subree
 	 * 
 	 * @param id identifier of the folder
 	 * @param transaction session informations
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException;
+	public void applyCaptureToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Retrieves all the workspaces in the system, that are the first-level
