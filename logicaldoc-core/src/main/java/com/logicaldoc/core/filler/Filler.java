@@ -62,6 +62,18 @@ public abstract class Filler extends PersistentObject {
 	@Column(name = "ld_description", nullable = true)
 	private String description;
 
+	/**
+	 * Specifies if the document must be re-filled at checkin
+	 */
+	@Column(name = "ld_checkin", nullable = false)
+	protected boolean checkin = false;
+
+	/**
+	 * Specifies if already filled properties must be overwrite
+	 */
+	@Column(name = "ld_overwrite", nullable = false)
+	protected boolean overwrite = false;
+
 	public String getName() {
 		return name;
 	}
@@ -84,6 +96,22 @@ public abstract class Filler extends PersistentObject {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public boolean isCheckin() {
+		return checkin;
+	}
+
+	public void setCheckin(boolean checkin) {
+		this.checkin = checkin;
+	}
+
+	public boolean isOverwrite() {
+		return overwrite;
+	}
+
+	public void setOverwrite(boolean overwrite) {
+		this.overwrite = overwrite;
 	}
 
 	/**
@@ -128,8 +156,7 @@ public abstract class Filler extends PersistentObject {
 	 * @throws FeatureDisabledException An involved feature is disabled
 	 * @throws SearchException Error in case of search
 	 */
-	public abstract void fill(Fillable fillable, String content, History transaction,
-			Map<String, Object> dictionary)
+	public abstract void fill(Fillable fillable, String content, History transaction, Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, SearchException;
 
 	/**
