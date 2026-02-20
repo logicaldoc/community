@@ -70,7 +70,7 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-			// documentStuff(sid);
+			 documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
@@ -581,6 +581,13 @@ public class SoapWorkbench {
 			System.out.println(attr.getName() + " s:" + attr.getStringValue() + " i:" + attr.getIntValue() + " d:"
 					+ attr.getDoubleValue());
 		}
+		
+		
+		doc = new WSDocument();
+		doc.setFolderId(4L);
+		doc.setFileName("pippo.xml");
+		doc =  documentClient.create(sid, doc, new File("pom.xml"));
+		System.out.println("Created document "+doc.getId());
 
 //
 //		doc.setId(0);
