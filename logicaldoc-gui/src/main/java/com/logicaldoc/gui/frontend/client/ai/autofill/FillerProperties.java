@@ -4,8 +4,10 @@ import java.util.LinkedHashMap;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingSchemesDS;
 import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.data.Criterion;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -39,6 +41,10 @@ public class FillerProperties extends FillerDetailsTab {
 	private static final String MODEL_ID = "modelId";
 
 	private static final String THRESHOLD = "threshold";
+
+	private static final String STRATEGY = "strategy";
+
+	private static final String EMBEDDING = "embeddingscheme";
 
 	private DynamicForm form = new DynamicForm();
 
@@ -110,10 +116,8 @@ public class FillerProperties extends FillerDetailsTab {
 
 		if (filler.getType() != null) {
 			modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(filler.getType())));
-
-			if (filler.getModelId() != null) {
+			if (filler.getModelId() != null)
 				modelSelector.setValue(filler.getModelId());
-			}
 		}
 
 		// Threshold (only for tag)
@@ -121,16 +125,64 @@ public class FillerProperties extends FillerDetailsTab {
 		validator.setMin(0);
 		validator.setMax(1);
 
+		// Strategy selector
+		SelectItem strategy = ItemFactory.newSelectItem(STRATEGY);
+		LinkedHashMap<String, String> strategyMap = new LinkedHashMap<>();
+		strategyMap.put("model", I18N.message("strategy.model"));
+		strategyMap.put("retrieval", I18N.message("strategy.retrieval"));
+		strategy.setValueMap(strategyMap);
+		strategy.setRequired(true);
+
+		if ("tag".equals(filler.getType())) {
+			if (filler.getModelId() == null) {
+				strategy.setValue("retrieval");
+			} else {
+				strategy.setValue("model");
+			}
+		}
+
+		// EmbeddingScheme selector
+		SelectItem embeddingSelector = ItemFactory.newSelectItem(EMBEDDING, I18N.message("embeddingscheme"));
+
+		embeddingSelector.setValueField("id");
+		embeddingSelector.setDisplayField("name");
+		embeddingSelector.setOptionDataSource(new EmbeddingSchemesDS());
+		embeddingSelector.addChangedHandler(changedHandler);
+		if (filler.getEmbeddingSchemeId() != null)
+			embeddingSelector.setValue(filler.getEmbeddingSchemeId());
+
 		DoubleItem threshold = ItemFactory.newDoubleItem(THRESHOLD, filler.getThreshold());
 		threshold.setValidators(validator);
 		threshold.addChangedHandler(changedHandler);
 
+		// Criteria
 		AdvancedCriteria tagCriteria = new AdvancedCriteria(TYPE, OperatorId.EQUALS, "tag");
 
 		threshold.setVisibleWhen(tagCriteria);
 		threshold.setRequiredWhen(tagCriteria);
 
-		form.setItems(id, type, name, label, modelSelector, threshold, description);
+		AdvancedCriteria modelVisible = new AdvancedCriteria(OperatorId.OR,
+				new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, "language"),
+						new AdvancedCriteria(OperatorId.AND,
+								new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, "tag"),
+										new Criterion(STRATEGY, OperatorId.EQUALS, "model") }) });
+
+		modelSelector.setVisibleWhen(modelVisible);
+		modelSelector.setRequiredWhen(modelVisible);
+
+		AdvancedCriteria strategyVisible = new AdvancedCriteria(TYPE, OperatorId.EQUALS, "tag");
+
+		strategy.setVisibleWhen(strategyVisible);
+		strategy.setRequiredWhen(strategyVisible);
+
+		AdvancedCriteria embeddingVisible = new AdvancedCriteria(OperatorId.AND,
+				new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, "tag"),
+						new Criterion(STRATEGY, OperatorId.EQUALS, "retrieval") });
+
+		embeddingSelector.setVisibleWhen(embeddingVisible);
+		embeddingSelector.setRequiredWhen(embeddingVisible);
+
+		form.setItems(id, type, strategy, name, label, modelSelector, embeddingSelector, threshold, description);
 
 		container.addMember(form);
 	}
@@ -146,16 +198,25 @@ public class FillerProperties extends FillerDetailsTab {
 	public boolean validate() {
 		if (!form.validate())
 			return false;
-
 		filler.setName(form.getValueAsString(NAME));
 		filler.setLabel(form.getValueAsString(LABEL));
 		filler.setDescription(form.getValueAsString(DESCRIPTION));
 		filler.setType(form.getValueAsString(TYPE));
 
+		String strategyValue = form.getValueAsString(STRATEGY);
 		String modelId = form.getValueAsString(MODEL_ID);
+		String embeddingId = form.getValueAsString(EMBEDDING);
 
-		filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
+		if ("retrieval".equals(strategyValue)) {
+			// Retrieval strategy
+			filler.setModelId(null);
+			filler.setEmbeddingSchemeId(embeddingId != null ? Long.parseLong(embeddingId) : null);
 
+		} else {
+			// Model strategy
+			filler.setEmbeddingSchemeId(null);
+			filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
+		}
 		String threshold = form.getValueAsString(THRESHOLD);
 		filler.setThreshold(threshold != null ? Double.parseDouble(threshold) : null);
 
