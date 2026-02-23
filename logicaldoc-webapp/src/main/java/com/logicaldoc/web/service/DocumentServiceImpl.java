@@ -879,6 +879,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setOcrTemplateId(realDoc.getOcrTemplateId());
 		guiDocument.setBarcoded(realDoc.isBarcoded());
 		guiDocument.setBarcodeTemplateId(realDoc.getBarcodeTemplateId());
+		guiDocument.setFillerId(realDoc.getFillerId());
 
 		if (realDoc.getRating() != null)
 			guiDocument.setRating(realDoc.getRating());
@@ -1317,6 +1318,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		docVO.setFormId(guiDocument.getFormId());
 		docVO.setOcrTemplateId(guiDocument.getOcrTemplateId());
 		docVO.setBarcodeTemplateId(guiDocument.getBarcodeTemplateId());
+		docVO.setFillerId(guiDocument.getFillerId());
 
 		if (guiDocument.getTemplateId() != null) {
 			docVO.setTemplateId(guiDocument.getTemplateId());
