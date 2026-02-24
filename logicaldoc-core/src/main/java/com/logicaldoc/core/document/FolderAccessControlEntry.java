@@ -41,10 +41,10 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 	public FolderAccessControlEntry(FolderAccessControlEntry source) {
 		super(source);
 		ace = new ExtendedAccessControlEntry(source.getAce());
-		this.add = source.add;
-		this.iimport = source.iimport;
-		this.export = source.export;
-		this.store = source.store;
+		setAdd(source.isAdd());
+		setImport(source.isImport());
+		setExport(source.isExport());
+		setStore(source.isStore());
 	}
 
 	public FolderAccessControlEntry(long groupId) {
@@ -85,42 +85,52 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 		store = permissions.contains(Permission.STORE);
 	}
 
+	@Override
 	public void setGroupId(long groupId) {
 		ace.setGroupId(groupId);
 	}
 
+	@Override
 	public long getGroupId() {
 		return ace.getGroupId();
 	}
 
+	@Override
 	public boolean isRead() {
 		return ace.isRead();
 	}
 
+	@Override
 	public void setRead(boolean read) {
 		ace.setRead(read);
 	}
 
+	@Override
 	public boolean isWrite() {
 		return ace.isWrite();
 	}
 
+	@Override
 	public void setWrite(boolean write) {
 		ace.setWrite(write);
 	}
 
+	@Override
 	public boolean isPreview() {
 		return ace.isPreview();
 	}
 
+	@Override
 	public void setPreview(boolean preview) {
 		ace.setPreview(preview);
 	}
 
+	@Override
 	public boolean isDownload() {
 		return ace.isDownload();
 	}
 
+	@Override
 	public void setDownload(boolean download) {
 		ace.setDownload(download);
 	}
@@ -129,30 +139,37 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 		return ace.isSecurity();
 	}
 
+	@Override
 	public void setSecurity(boolean security) {
 		ace.setSecurity(security);
 	}
 
+	@Override
 	public boolean isDelete() {
 		return ace.isDelete();
 	}
 
+	@Override
 	public void setDelete(boolean delete) {
 		ace.setDelete(delete);
 	}
 
+	@Override
 	public boolean isRename() {
 		return ace.isRename();
 	}
 
+	@Override
 	public void setRename(boolean rename) {
 		ace.setRename(rename);
 	}
 
+	@Override
 	public boolean isImmutable() {
 		return ace.isImmutable();
 	}
 
+	@Override
 	public void setImmutable(boolean immutable) {
 		ace.setImmutable(immutable);
 	}
@@ -276,7 +293,7 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 	public void setImport(boolean imprt) {
 		this.iimport = imprt;
 	}
-	
+
 	public boolean isIimport() {
 		return iimport;
 	}

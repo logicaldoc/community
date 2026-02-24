@@ -3,6 +3,7 @@ package com.logicaldoc.core.document;
 import java.util.Set;
 
 import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.ExtendedAccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 
 import jakarta.persistence.Column;
@@ -32,11 +33,29 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 	public NoteAccessControlEntry() {
 	}
 
+	public NoteAccessControlEntry(AccessControlEntry source) {
+		this.ace = new AccessControlEntry(source);
+		setGroupId(source.getGroupId());
+		setRead(source.isRead());
+		setWrite(source.isWrite());
+	}
+
 	public NoteAccessControlEntry(NoteAccessControlEntry source) {
-		super(source);
 		this.ace = new AccessControlEntry(source.getAce());
-		this.delete = source.delete;
-		this.security = source.security;
+		setGroupId(source.getGroupId());
+		setRead(source.isRead());
+		setWrite(source.isWrite());
+		setDelete(source.isDelete());
+		setSecurity(source.isSecurity());
+	}
+
+	public NoteAccessControlEntry(ExtendedAccessControlEntry source) {
+		this.ace = new AccessControlEntry(source.getAce());
+		setGroupId(source.getGroupId());
+		setRead(source.isRead());
+		setWrite(source.isWrite());
+		setDelete(source.isDelete());
+		setSecurity(source.isSecurity());
 	}
 
 	public NoteAccessControlEntry(long groupId) {
@@ -81,6 +100,7 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 		return ace.getGroupId();
 	}
 
+	@Override
 	public void setGroupId(long groupId) {
 		ace.setGroupId(groupId);
 	}

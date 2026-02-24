@@ -2,6 +2,7 @@ package com.logicaldoc.core.document;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -193,17 +194,21 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 		note.setDocId(1L);
 		testSubject.store(note);
+		assertNotEquals(0L, note.getId());
 		note = testSubject.findById(note.getId());
+		assertNotNull(note);
 		testSubject.initialize(note);
 
+		assertEquals(3, note.getAccessControlList().size());
+		
 		NoteAccessControlEntry ace = new NoteAccessControlEntry();
-		ace.setGroupId(2L);
+		ace.setGroupId(-4L);
 		note.addAccessControlEntry(ace);
 		testSubject.store(note);
 
 		note = testSubject.findById(note.getId());
 		testSubject.initialize(note);
-		assertEquals(1, note.getAccessControlList().size());
+		assertEquals(4, note.getAccessControlList().size());
 
 		// fileVersion() == null
 		Folder folder = folderDao.findById(6);

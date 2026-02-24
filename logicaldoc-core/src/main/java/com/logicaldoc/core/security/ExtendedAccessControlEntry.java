@@ -87,25 +87,27 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 	public ExtendedAccessControlEntry(ExtendedAccessControlEntry source) {
 		super(source);
 		this.ace = new AccessControlEntry(source.getAce());
-		this.archive = source.archive;
-		this.automation = source.automation;
-		this.calendar = source.calendar;
-		this.delete = source.delete;
-		this.download = source.download;
-		this.email = source.email;
-		this.immutable = source.immutable;
-		this.move = source.move;
-		this.password = source.password;
-		this.preview = source.preview;
-		this.print = source.print;
-		this.rename = source.rename;
-		this.security = source.security;
-		this.sign = source.sign;
-		this.subscription = source.subscription;
-		this.workflow = source.workflow;
-		this.readingreq = source.readingreq;
-		this.customid = source.customid;
-		this.revision = source.revision;
+		setArchive(source.isArchive());
+		setAutomation(source.isAutomation());
+		setCalendar(source.isCalendar());
+		setDelete(source.isDelete());
+		setDownload(source.isDownload());
+		setEmail(source.isEmail());
+		setImmutable(source.isImmutable());
+		setMove(source.isMove());
+		setMove(source.isMove());
+		setPassword(source.isPassword());
+		setPreview(source.isPreview());
+		setPrint(source.isPrint());
+		setPrint(source.isPrint());
+		setRename(source.isRename());
+		setSecurity(source.isSecurity());
+		setSign(source.isSign());
+		setSubscription(source.isSubscription());
+		setWorkflow(source.isWorkflow());
+		setReadingreq(source.isReadingreq());
+		setCustomid(source.isCustomid());
+		setRevision(source.isRevision());
 	}
 
 	public ExtendedAccessControlEntry(long groupId) {

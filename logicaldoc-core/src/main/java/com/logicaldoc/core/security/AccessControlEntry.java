@@ -31,9 +31,9 @@ public class AccessControlEntry implements Serializable {
 	}
 
 	public AccessControlEntry(AccessControlEntry source) {
-		this.groupId = source.groupId;
-		this.read = source.read;
-		this.write = source.write;
+		setGroupId(source.getGroupId());
+		setRead(source.isRead());
+		setWrite(source.isWrite());
 	}
 
 	public AccessControlEntry(long groupId) {
