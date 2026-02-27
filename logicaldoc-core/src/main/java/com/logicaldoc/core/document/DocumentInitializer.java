@@ -52,4 +52,10 @@ public class DocumentInitializer extends Initializer implements DocumentListener
 			throws PersistenceException {
 		// Nothing to do
 	}
+
+	@Override
+	public void afterFileStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
+			throws PersistenceException {
+		// Nothing to do
+	}
 }

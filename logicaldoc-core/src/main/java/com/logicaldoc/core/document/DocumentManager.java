@@ -392,7 +392,7 @@ public class DocumentManager {
 
 			// store the document in the repository (on the file system)
 			try {
-				storeFile(document, file, false);
+				storeFile(document, file, transaction, false);
 			} catch (IOException ioe) {
 				document = documentDAO.findById(document.getId());
 				documentDAO.initialize(document);
@@ -531,8 +531,15 @@ public class DocumentManager {
 		log.debug("locked document {}", document);
 	}
 
-	private void storeFile(Document doc, File file, boolean newDocument) throws IOException, PersistenceException {
+	private void storeFile(Document doc, File file, DocumentHistory transaction, boolean newDocument)
+			throws IOException, PersistenceException {
 		store.store(file, StoreResource.builder().document(doc).newEntry(newDocument).build());
+
+		Map<String, Object> dictionary = new HashMap<String, Object>();
+		dictionary.put("newdoc", newDocument);
+		transaction.setFile(file);
+		for (DocumentListener listener : DocumentListenerManager.get().getListeners())
+			listener.afterFileStore(doc, transaction, dictionary);
 	}
 
 	/**
@@ -836,6 +843,8 @@ public class DocumentManager {
 
 			setBarcodeTemplate(document, docVO);
 
+			document.setFillerId(docVO.getFillerId());
+
 			// create a new version
 			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 					DocumentEvent.CHANGED, false);
@@ -1025,7 +1034,7 @@ public class DocumentManager {
 	 * 
 	 * @param file The document's file
 	 * @param docVO The value object containing the document's metadata
-	 * @param transaction The trandaction metadata (remember to set the user and
+	 * @param transaction The transaction metadata (remember to set the user and
 	 *        the comment)
 	 * 
 	 * @return A {@link Pair} where the key is the newly created document and
@@ -1062,21 +1071,21 @@ public class DocumentManager {
 			// Create the record
 			transaction.setEvent(DocumentEvent.STORED);
 			documentDAO.store(docVO, transaction);
-			
+
 			/* store the document into filesystem */
 			try {
-				storeFile(docVO, file, true);
+				storeFile(docVO, file, transaction, true);
 			} catch (Exception e) {
 				documentDAO.delete(docVO.getId());
 				throw new PersistenceException(String.format("Unable to store the file of document %d", docVO.getId()),
 						e);
 			}
-			
+
 			// The document record has been written, now store the initial
 			// version (default 1.0)
 			Version version = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
 					DocumentEvent.STORED, true);
-			
+
 			return new DocumentFuture(docVO, storeVersionAsync(version, docVO));
 		}
 	}

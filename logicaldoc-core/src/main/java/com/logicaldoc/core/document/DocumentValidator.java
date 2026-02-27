@@ -53,6 +53,12 @@ public class DocumentValidator extends Validator implements DocumentListener {
 		// Nothing to do
 	}
 
+	@Override
+	public void afterFileStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
+			throws PersistenceException {
+		// Nothing to do
+	}
+
 	private void onValidate(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws ValidationException {
 		try {

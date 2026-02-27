@@ -40,6 +40,18 @@ public interface DocumentListener {
 			throws PersistenceException;
 
 	/**
+	 * Called after a document's file gets stored after a creation or checkin.
+	 * 
+	 * @param document The document to be stored
+	 * @param transaction Transaction informations
+	 * @param dictionary Dictionary of the execution pipeline
+	 * 
+	 * @throws PersistenceException raised if something went wrong
+	 */
+	public void afterFileStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
+			throws PersistenceException;
+
+	/**
 	 * Called before a document is checked in
 	 * 
 	 * @param document The document to be checked in

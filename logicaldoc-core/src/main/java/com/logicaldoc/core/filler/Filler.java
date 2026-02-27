@@ -176,18 +176,18 @@ public abstract class Filler extends PersistentObject {
 	public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException {
 
-		if (RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+			return;
 
-			// Check if the document must be indexed first
-			if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
-				DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
+		if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
+			DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
 
 		Hit hit = SearchEngine.get().getHit(document.getId());
 		String extractedContent = hit != null ? hit.getContent() : "";
 		if (StringUtils.isBlank(extractedContent))
 			throw new ParsingException("Cannot extract any content from document %s".formatted(document));
 
-		fill(document, SearchEngine.get().getHit(document.getId()).getContent(), transaction, dictionary);
+		fill(document, extractedContent, transaction, dictionary);
 	}
 
 	@Override

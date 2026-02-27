@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.PostConstruct;
 
@@ -29,6 +30,15 @@ public class DocumentListenerManager {
 
 	private List<DocumentListener> listeners = new ArrayList<>();
 
+	/**
+	 * Gets the object available in the application context
+	 * 
+	 * @return the instance of this object in the application context
+	 */
+	public static DocumentListenerManager get() {
+		return Context.get(DocumentListenerManager.class);
+	}
+	
 	@PostConstruct
 	public synchronized void init() {
 		if (!listeners.isEmpty())
