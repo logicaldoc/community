@@ -11,7 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
-import com.logicaldoc.gui.frontend.client.account.AllowedImpersonifiers;
+import com.logicaldoc.gui.frontend.client.account.AllowedImpersonators;
 import com.logicaldoc.gui.frontend.client.account.ApiKeys;
 import com.logicaldoc.gui.frontend.client.account.ChangePassword;
 import com.logicaldoc.gui.frontend.client.account.LastLogins;
@@ -127,10 +127,10 @@ public class AccountMenu extends Menu {
 		lastLogins.addClickHandler(event -> new LastLogins().show());
 		items.add(lastLogins);
 
-		MenuItem allowedImpersonifiers = new MenuItem(I18N.message("allowedimpersonifiers"));
-		allowedImpersonifiers.addClickHandler(click -> new AllowedImpersonifiers().show());
-		allowedImpersonifiers.setEnabled(!Session.get().isDemo());
-		items.add(allowedImpersonifiers);
+		MenuItem allowedImpersonators = new MenuItem(I18N.message("allowedimpersonators"));
+		allowedImpersonators.addClickHandler(click -> new AllowedImpersonators().show());
+		allowedImpersonators.setEnabled(!Session.get().isDemo());
+		items.add(allowedImpersonators);
 		
 		MenuItem twofactorsauth = new MenuItem(I18N.message("twofactorsauth"));
 		twofactorsauth

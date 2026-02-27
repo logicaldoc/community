@@ -28,12 +28,12 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
 /**
- * This panel shows the list of the users that can impersonify the current user
+ * This panel shows the list of the users that can impersonate the current user
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2.3
  */
-public class AllowedImpersonifiers extends com.smartgwt.client.widgets.Window {
+public class AllowedImpersonators extends com.smartgwt.client.widgets.Window {
 
 	private static final String GROUPS = "groups";
 
@@ -43,11 +43,11 @@ public class AllowedImpersonifiers extends com.smartgwt.client.widgets.Window {
 
 	private RefreshableListGrid list;
 
-	public AllowedImpersonifiers() {
+	public AllowedImpersonators() {
 		super();
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("allowedimpersonifiers"));
+		setTitle(I18N.message("allowedimpersonators"));
 		setWidth(600);
 		setHeight(300);
 		setIsModal(true);
@@ -56,7 +56,7 @@ public class AllowedImpersonifiers extends com.smartgwt.client.widgets.Window {
 		setAutoSize(true);
 		centerInPage();
 
-		Label alert=new Label(I18N.message("impersonifiersalert"));
+		Label alert=new Label(I18N.message("impersonatorsalert"));
 		alert.setWidth100();
 		alert.setHeight(50);
 		addItem(alert);
@@ -133,7 +133,7 @@ public class AllowedImpersonifiers extends com.smartgwt.client.widgets.Window {
 				SecurityService.Instance.get().deleteImpersonifiers(usernames, new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(Void result) {
-						Session.get().getUser().getImpersonifiers().removeAll(usernames);
+						Session.get().getUser().getImpersonators().removeAll(usernames);
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}

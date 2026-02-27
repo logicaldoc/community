@@ -118,10 +118,16 @@ public class User extends PersistentObject implements Serializable {
 	private Set<Group> groups = new HashSet<>();
 
 	/**
-	 * Other usernames allowed to impersonify this user
+	 * Other usernames allowed to impersonate this user
 	 */
 	@Transient
-	private Set<String> impersonifiers = new HashSet<>();
+	private Set<String> impersonators = new HashSet<>();
+
+	/**
+	 * A user currently impersonating this one
+	 */
+	@Transient
+	private String impersonator = null;
 
 	@Column(name = "ld_enabled", nullable = false)
 	private boolean enabled = true;
@@ -533,12 +539,20 @@ public class User extends PersistentObject implements Serializable {
 		this.groups = groups;
 	}
 
-	public Set<String> getImpersonifiers() {
-		return impersonifiers;
+	public Set<String> getImpersonators() {
+		return impersonators;
 	}
 
-	public void setImpersonifiers(Set<String> impersonifiers) {
-		this.impersonifiers = impersonifiers;
+	public void setImpersonators(Set<String> impersonators) {
+		this.impersonators = impersonators;
+	}
+
+	public String getImpersonator() {
+		return impersonator;
+	}
+
+	public void setImpersonator(String impersonator) {
+		this.impersonator = impersonator;
 	}
 
 	/**

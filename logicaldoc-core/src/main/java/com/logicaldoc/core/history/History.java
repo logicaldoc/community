@@ -83,6 +83,9 @@ public abstract class History extends PersistentObject implements Comparable<His
 	@Column(name = "ld_device", length = 255)
 	private String device;
 
+	@Column(name = "ld_impersonator", length = 255)
+	private String impersonator;
+
 	/**
 	 * Note persistent, used as convenience to store the name of the tenant
 	 */
@@ -103,7 +106,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	 */
 	@Transient
 	private File file = null;
-	
+
 	/**
 	 * Marks if the object related to this event must be auto-filled
 	 */
@@ -193,13 +196,21 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public void setFile(File file) {
 		this.file = file;
 	}
-	
+
 	public boolean isFill() {
 		return fill;
 	}
 
 	public void setFill(boolean fill) {
 		this.fill = fill;
+	}
+
+	public String getImpersonator() {
+		return impersonator;
+	}
+
+	public void setImpersonator(String impersonator) {
+		this.impersonator = impersonator;
 	}
 
 	public User getUser() {
@@ -228,6 +239,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 			setKeyLabel(session.getKeyLabel());
 			setTenantId(session.getTenantId());
 			setTenant(session.getTenantName());
+			setImpersonator(session.getImpersonator());
 			if (session.getClient() != null)
 				setClient(session.getClient());
 		}
@@ -246,6 +258,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 			setUserLogin(user.getUsername());
 			setUsername(user.getFullName());
 			setTenantId(user.getTenantId());
+			setImpersonator(user.getImpersonator());
 		}
 	}
 
@@ -351,11 +364,12 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setGeolocation(source.getGeolocation());
 		setKeyLabel(source.getKeyLabel());
 		setFile(source.getFile());
+		setImpersonator(source.getImpersonator());
 	}
 
 	@Override
 	public String toString() {
-		return getId() + " - " + event;
+		return "%d - %s".formatted(getId(), event);
 	}
 
 	@Override

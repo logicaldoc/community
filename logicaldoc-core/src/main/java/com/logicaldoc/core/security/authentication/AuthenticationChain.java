@@ -33,6 +33,8 @@ import com.logicaldoc.util.spring.Context;
 @Component("authenticationChain")
 public class AuthenticationChain extends AbstractAuthenticator {
 
+	private static final String IMPERSONATION_SEPARATOR = ">";
+	
 	private static final Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
 
 	private List<Authenticator> authenticators = new ArrayList<>();
@@ -46,13 +48,13 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	public final User authenticate(String username, String password, String key, Client client)
 			throws AuthenticationException {
 
-		String impersonifiedUsername = null;
-		if (username.contains(">")) {
-			impersonifiedUsername = username.split(">")[1].trim();
-			username = username.split(">")[0].trim();
-		} else if(StringUtils.defaultString(key).contains(">")) {
-			impersonifiedUsername = key.split(">")[1].trim();
-			key = key.split(">")[0].trim();
+		String impersonatedUsername = null;
+		if (username.contains(IMPERSONATION_SEPARATOR)) {
+			impersonatedUsername = username.split(IMPERSONATION_SEPARATOR)[1].trim();
+			username = username.split(IMPERSONATION_SEPARATOR)[0].trim();
+		} else if (StringUtils.defaultString(key).contains(IMPERSONATION_SEPARATOR)) {
+			impersonatedUsername = key.split(IMPERSONATION_SEPARATOR)[1].trim();
+			key = key.split(IMPERSONATION_SEPARATOR)[0].trim();
 		}
 
 		init();
@@ -81,9 +83,19 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 		log.debug("Collected authentication errors: {}", errors);
 
-		if (StringUtils.isNotEmpty(impersonifiedUsername))
+		if (StringUtils.isNotEmpty(impersonatedUsername))
 			try {
-				user = UserDAO.get().findByUsername(impersonifiedUsername);
+				User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername);
+				UserDAO.get().initialize(impersonatedUser);
+				if (!impersonatedUser.getImpersonators().contains(username)) {
+					log.error("User {} not allowed to impersonate {}", user, impersonatedUser);
+					errors.add(new ForbiddenImpersonationException(username, impersonatedUsername));
+					user = null;
+				} else {
+					log.error("User {} impersonates {}", user, impersonatedUser);
+					impersonatedUser.setImpersonator(username);
+					user = impersonatedUser;
+				}
 			} catch (PersistenceException pe) {
 				log.error(pe.getMessage(), pe);
 				errors.clear();

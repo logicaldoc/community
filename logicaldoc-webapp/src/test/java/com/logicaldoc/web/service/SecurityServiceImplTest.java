@@ -533,7 +533,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 		UserDAO dao = UserDAO.get();
 		User sessionUser = dao.findById(session.getUser().getId());
 		dao.initialize(sessionUser);
-		assertTrue(sessionUser.getImpersonifiers().isEmpty());
+		assertTrue(sessionUser.getImpersonators().isEmpty());
 
 		testSubject.addImpersonifier("author");
 		testSubject.addImpersonifier("boss");
@@ -542,11 +542,11 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 		
 		sessionUser = dao.findById(session.getUser().getId());
 		dao.initialize(sessionUser);
-		assertEquals(3, sessionUser.getImpersonifiers().size());
+		assertEquals(3, sessionUser.getImpersonators().size());
 		
 		testSubject.deleteImpersonifiers(List.of("author","boss"));
 		sessionUser = dao.findById(session.getUser().getId());
 		dao.initialize(sessionUser);
-		assertEquals(1, sessionUser.getImpersonifiers().size());
+		assertEquals(1, sessionUser.getImpersonators().size());
 	}
 }

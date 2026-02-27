@@ -37,10 +37,6 @@ public class SessionsDataServlet extends AbstractDataServlet {
 
 	private static final Logger log = LoggerFactory.getLogger(SessionsDataServlet.class);
 
-	private static final String CLOSE_STATUS_LABEL = "</statusLabel>";
-
-	private static final String STATUS_LABEL = "<statusLabel>";
-
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -165,6 +161,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		printSessionStatusXml(session, locale, showSid, writer);
 
 		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
+		writer.print(
+				String.format("<impersonator><![CDATA[%s]]></impersonator>", showSid ? session.getImpersonator() : ""));
 		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
 
 		final Serializable client = session.getClient() != null ? session.getClient() : "";

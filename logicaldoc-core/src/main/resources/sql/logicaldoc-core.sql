@@ -130,7 +130,7 @@ create table ld_user_history (ld_id bigint not null, ld_lastmodified timestamp n
                               ld_author varchar(255), ld_geolocation varchar(255), ld_device varchar(255), 
                               ld_filesize bigint, ld_folderid bigint, ld_docid bigint, ld_path varchar(4000), primary key (ld_id));                         
 create table ld_usergroup (ld_groupid bigint not null, ld_userid bigint not null, primary key (ld_groupid, ld_userid));
-create table ld_impersonifier (ld_userid bigint not null, ld_username varchar(255) not null, primary key (ld_userid, ld_username));
+create table ld_impersonator (ld_userid bigint not null, ld_username varchar(255) not null, primary key (ld_userid, ld_username));
 create table ld_version (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                          ld_deleted int not null, ld_tenantid bigint not null, ld_immutable int not null, ld_customid varchar(200),
                          ld_version varchar(10), ld_fileversion varchar(10), ld_revision varchar(255), ld_date timestamp, ld_creation timestamp, ld_publisher varchar(255),
@@ -235,7 +235,8 @@ create table ld_session(ld_id bigint not null, ld_lastmodified timestamp not nul
                           ld_deleted int not null, ld_tenantid bigint not null, ld_sid varchar(255) not null,
                           ld_username varchar(255), ld_key varchar(255), ld_node varchar(255), ld_tenantname varchar(255),
                           ld_creation timestamp null, ld_finished timestamp null, ld_lastrenew timestamp null, ld_status int not null,
-                          ld_clientid varchar(255), ld_clientaddr varchar(255), ld_clienthost varchar(255), ld_keylabel varchar(255), primary key (ld_id));
+                          ld_clientid varchar(255), ld_clientaddr varchar(255), ld_clienthost varchar(255), ld_keylabel varchar(255), 
+                          ld_impersonator varchar(255), primary key (ld_id));
 create table ld_dashlet(ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255), ld_title varchar(255), 
                         ld_type varchar(255), ld_query varchar(4000), ld_content varchar(4000), ld_max int, ld_columns varchar(1000),
@@ -331,7 +332,7 @@ alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid
 alter table ld_apikey add constraint FK_APIKEY_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 alter table ld_filler_chain add constraint FK_FILLERCHAIN_FILLER foreign key (ld_fillerid) references ld_filler(ld_id) on delete cascade;
 alter table ld_filler_chain add constraint FK_FILLERCHAIN_CHAINED foreign key (ld_chainedid) references ld_filler(ld_id) on delete cascade;
-alter table ld_impersonifier add constraint FK_IMPERS_USERID foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
+alter table ld_impersonator add constraint FK_IMPERS_USERID foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 
 
 create unique index AK_DOCUMENT on ld_document (ld_customid, ld_tenantid);

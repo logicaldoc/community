@@ -496,12 +496,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private void updateImpersonifiers(User user) throws PersistenceException {
-		jdbcUpdate("delete from ld_impersonifier where ld_userid = :userId", Map.of("userId", user.getId()));
-		for (String username : user.getImpersonifiers()) {
+		jdbcUpdate("delete from ld_impersonator where ld_userid = :userId", Map.of("userId", user.getId()));
+		for (String username : user.getImpersonators()) {
 			long exists = queryForLong("select count(*) from ld_user where ld_username = :username",
 					Map.of("username", username));
 			if (exists > 0) {
-				jdbcUpdate("insert into ld_impersonifier(ld_userid, ld_username) values (%d, '%s')"
+				jdbcUpdate("insert into ld_impersonator(ld_userid, ld_username) values (%d, '%s')"
 						.formatted(user.getId(), username));
 			} else
 				log.warn("It seems that the username {} does not exist anymore", username);
@@ -786,7 +786,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		jdbcUpdate("delete from ld_usergroup where ld_userid = %d".formatted(userId));
 		jdbcUpdate("delete from ld_apikey where ld_userid = %d".formatted(userId));
-		jdbcUpdate("delete from ld_impersonifier where ld_userid = %d".formatted(userId));
+		jdbcUpdate("delete from ld_impersonator where ld_userid = %d".formatted(userId));
 
 		saveUserHistory(user, transaction);
 	}
@@ -847,14 +847,14 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			}
 		}
 
-		// Initialize the impersonifiers
+		// Initialize the impersonators
 		try {
-			user.getImpersonifiers().clear();
+			user.getImpersonators().clear();
 			List<String> usernames = queryForList(
-					"select distinct ld_username from ld_impersonifier where ld_userid = %d".formatted(user.getId()),
+					"select distinct ld_username from ld_impersonator where ld_userid = %d".formatted(user.getId()),
 					String.class);
 			for (String usr : usernames)
-				user.getImpersonifiers().add(usr);
+				user.getImpersonators().add(usr);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

@@ -544,7 +544,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				}
 				guiUser.setGroups(grps);
 
-				guiUser.getImpersonifiers().addAll(user.getImpersonifiers());
+				guiUser.getImpersonators().addAll(user.getImpersonators());
 
 				guiUser.setQuota(user.getQuota());
 				guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
@@ -762,8 +762,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user = userDao.findById(user.getId());
 			userDao.initialize(user);
 
-			user.getImpersonifiers().clear();
-			user.getImpersonifiers().addAll(guiUser.getImpersonifiers());
+			user.getImpersonators().clear();
+			user.getImpersonators().addAll(guiUser.getImpersonators());
 
 			setGroups(user, guiUser, transaction);
 
@@ -1803,7 +1803,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			UserDAO dao = UserDAO.get();
 			User user = dao.findById(session.getUserId());
 			dao.initialize(user);
-			user.getImpersonifiers().removeAll(usernames);
+			user.getImpersonators().removeAll(usernames);
 
 			UserHistory transaction = new UserHistory(session);
 			transaction.setEvent(UserEvent.IMPERSONIFIERS_CHANGED);
@@ -1821,7 +1821,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			UserDAO dao = UserDAO.get();
 			User user = dao.findById(session.getUserId());
 			dao.initialize(user);
-			user.getImpersonifiers().add(username);
+			user.getImpersonators().add(username);
 			
 			UserHistory transaction = new UserHistory(session);
 			transaction.setEvent(UserEvent.IMPERSONIFIERS_CHANGED);

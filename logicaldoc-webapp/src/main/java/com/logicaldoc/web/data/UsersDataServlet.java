@@ -117,7 +117,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 	}
 
 	private List<User> findImpersonifiers(long userId) throws PersistenceException {
-		List<String> usernames = UserDAO.get().queryForList("select ld_username from ld_impersonifier where ld_userid = %d".formatted(userId),
+		List<String> usernames = UserDAO.get().queryForList("select ld_username from ld_impersonator where ld_userid = %d".formatted(userId),
 				String.class);
 
 		if (CollectionUtils.isEmpty(usernames)) {

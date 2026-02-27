@@ -221,7 +221,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	private synchronized Session createSession(User user, String key, Client client) {
 		Session session = new Session(user, key, client);
 		put(session.getSid(), session);
-		log.warn("Created new session {} for user {}", session.getSid(), user.getUsername());
+		if(StringUtils.isEmpty(user.getImpersonator()))
+			log.warn("Created new session {} for user {}", session.getSid(), user.getUsername());
+		else
+			log.warn("Created new session {} for user {} impersonated by {}", session.getSid(), user.getUsername(), user.getImpersonator());
 		cleanClosedSessions();
 		storeSession(session);
 		for (SessionListener listener : listeners)

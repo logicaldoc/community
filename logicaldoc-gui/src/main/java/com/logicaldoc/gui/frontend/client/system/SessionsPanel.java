@@ -106,6 +106,10 @@ public class SessionsPanel extends VLayout {
 		ListGridField username = new ListGridField("username", I18N.message("username"), 80);
 		username.setCanFilter(true);
 
+		ListGridField impersonator = new ListGridField("impersonator", I18N.message("impersonator"), 80);
+		impersonator.setCanFilter(true);
+		impersonator.setHidden(true);
+		
 		ListGridField key = new ListGridField("key", I18N.message("key"), 80);
 		key.setCanFilter(true);
 
@@ -156,7 +160,7 @@ public class SessionsPanel extends VLayout {
 		sessionsGrid.setDataSource(new SessionsDS());
 
 		sessionsGrid.setFields(sid, statusLabel, username, key, tenant, created, renew, finished, duration, node,
-				client);
+				client, impersonator);
 	}
 
 	private void showContextMenu() {

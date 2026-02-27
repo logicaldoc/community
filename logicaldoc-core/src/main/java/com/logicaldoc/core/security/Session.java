@@ -23,6 +23,7 @@ import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
@@ -111,6 +112,9 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	@Embedded
 	private Client client = null;
 
+	@Column(name = "ld_impersonator", length = 255)
+	private String impersonator;
+
 	@Transient
 	private User user = null;
 
@@ -173,7 +177,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		return diffMinutes >= timeout;
 	}
 
-
 	protected void setExpired() {
 		log.warn("Session {} expired", getSid());
 		logWarn("Session expired");
@@ -231,6 +234,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.tenantId = user.getTenantId();
 		this.user = user;
 		this.username = user.getUsername();
+		this.impersonator = user.getImpersonator();
 		try {
 			setDecodedKey(key);
 		} catch (NoSuchAlgorithmException e) {
@@ -316,9 +320,24 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.setCreation(other.getCreation());
 		this.setLastRenew(other.lastRenew);
 		this.setClient(other.client);
+		this.impersonator = other.impersonator;
 	}
 
 	private UserHistory saveLoginEvent(User user, Client client) {
+		UserHistoryDAO userHistoryDAO = UserHistoryDAO.get();
+
+		/*
+		 * record the impersonation event
+		 */
+		if (StringUtils.isNotEmpty(user.getImpersonator())) {
+			try {
+				UserHistoryDAO.get().createUserHistory(UserDAO.get().findByUsername(user.getImpersonator()),
+						UserEvent.IMPERSONATION, "impersonating %s".formatted(user.getUsername()), sid, client);
+			} catch (PersistenceException e) {
+				log.warn("Impersonation of user {} not saved", user.getImpersonator());
+			}
+		}
+
 		/*
 		 * The history comment the remote host and IP
 		 */
@@ -333,8 +352,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		}
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = UserHistoryDAO.get();
-		UserHistory history = UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN, historyComment, sid, client);
+		UserHistory history = UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN, historyComment, sid,
+				client);
 
 		// Update the last login into the DB
 		try {
@@ -465,6 +484,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.username = username;
 	}
 
+	public String getImpersonator() {
+		return impersonator;
+	}
+
 	@Override
 	public void setTenantId(long tenantId) {
 		this.tenantId = tenantId;
@@ -509,7 +532,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	public void setKeyLabel(String keyLabel) {
 		this.keyLabel = keyLabel;
 	}
-	
+
 	public SessionStatus getStatus() {
 		return status;
 	}

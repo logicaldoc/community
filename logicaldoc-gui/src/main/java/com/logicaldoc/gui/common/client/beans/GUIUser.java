@@ -172,7 +172,7 @@ public class GUIUser implements Serializable {
 
 	private Date lastLogin;
 
-	private List<String> impersonifiers = new ArrayList<>();
+	private List<String> impersonators = new ArrayList<>();
 
 	private List<GUIGroup> groups = new ArrayList<>();
 
@@ -812,11 +812,11 @@ public class GUIUser implements Serializable {
 		this.sessionsQuotaCount = count;
 	}
 
-	public List<String> getImpersonifiers() {
-		return impersonifiers;
+	public List<String> getImpersonators() {
+		return impersonators;
 	}
 
-	public void setImpersonifiers(List<String> impersonifiers) {
-		this.impersonifiers = impersonifiers;
+	public void setImpersonators(List<String> impersonators) {
+		this.impersonators = impersonators;
 	}
 }
