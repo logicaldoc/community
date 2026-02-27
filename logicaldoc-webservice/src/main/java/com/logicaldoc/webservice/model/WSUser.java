@@ -133,6 +133,9 @@ public class WSUser {
 	@WSDoc(description = "ids of the groups this user belongs to")
 	private List<Long> groupIds = new ArrayList<>();
 
+	@WSDoc(description = "usernames allowed to impersonify this user")
+	private List<String> impersonifiers = new ArrayList<>();
+
 	@WSDoc(required = true, description = "if the user is enabled")
 	private boolean enabled = true;
 
@@ -459,6 +462,14 @@ public class WSUser {
 		this.building = building;
 	}
 
+	public List<String> getImpersonifiers() {
+		return impersonifiers;
+	}
+
+	public void setImpersonifiers(List<String> impersonifiers) {
+		this.impersonifiers = impersonifiers;
+	}
+
 	public User toUser() {
 		User user = new User();
 
@@ -516,6 +527,11 @@ public class WSUser {
 				if (CollectionUtils.isNotEmpty(groups))
 					user.setGroups(groups);
 			}
+
+			user.getImpersonifiers().clear();
+
+			if (CollectionUtils.isNotEmpty(impersonifiers))
+				user.getImpersonifiers().addAll(impersonifiers);
 
 			if (CollectionUtils.isNotEmpty(workingTimes))
 				for (WSWorkingTime wswt : workingTimes) {
@@ -580,7 +596,9 @@ public class WSUser {
 			wsUser.setSecondFactor(user.getSecondFactor());
 			wsUser.setLegals(user.isLegals() ? 1 : 0);
 			wsUser.setGroupIds(user.getGroups().stream().map(g -> g.getId()).collect(Collectors.toList()));
-
+			wsUser.getImpersonifiers().clear();
+			wsUser.getImpersonifiers().addAll(user.getImpersonifiers());
+			
 			List<WSWorkingTime> tmp = user.getWorkingTimes().stream().map(wt -> {
 				WSWorkingTime wswt = new WSWorkingTime();
 				try {

@@ -544,6 +544,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				}
 				guiUser.setGroups(grps);
 
+				guiUser.getImpersonifiers().addAll(user.getImpersonifiers());
+
 				guiUser.setQuota(user.getQuota());
 				guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
 				guiUser.setSessionsQuota(user.getSessionsQuota());
@@ -759,6 +761,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			user = userDao.findById(user.getId());
 			userDao.initialize(user);
+
+			user.getImpersonifiers().clear();
+			user.getImpersonifiers().addAll(guiUser.getImpersonifiers());
+
 			setGroups(user, guiUser, transaction);
 
 			// Notify the user by email
@@ -1784,6 +1790,42 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			ApiKey apiKey = dao.findById(keyId);
 			apiKey.setName(newName);
 			dao.store(apiKey);
+		} catch (PersistenceException e) {
+			throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void deleteImpersonifiers(List<String> usernames) throws ServerException {
+		Session session = validateSession();
+		
+		try {
+			UserDAO dao = UserDAO.get();
+			User user = dao.findById(session.getUserId());
+			dao.initialize(user);
+			user.getImpersonifiers().removeAll(usernames);
+
+			UserHistory transaction = new UserHistory(session);
+			transaction.setEvent(UserEvent.IMPERSONIFIERS_CHANGED);
+			dao.store(user, transaction);
+		} catch (PersistenceException e) {
+			throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void addImpersonifier(String username) throws ServerException {
+		Session session = validateSession();
+		
+		try {
+			UserDAO dao = UserDAO.get();
+			User user = dao.findById(session.getUserId());
+			dao.initialize(user);
+			user.getImpersonifiers().add(username);
+			
+			UserHistory transaction = new UserHistory(session);
+			transaction.setEvent(UserEvent.IMPERSONIFIERS_CHANGED);
+			dao.store(user, transaction);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}

@@ -39,8 +39,32 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 	}
 
 	public FolderAccessControlEntry(FolderAccessControlEntry source) {
-		super(source);
-		ace = new ExtendedAccessControlEntry(source.getAce());
+		setGroupId(source.getGroupId());
+		setRead(source.isRead());
+		setWrite(source.isWrite());
+
+		setArchive(source.isArchive());
+		setAutomation(source.isAutomation());
+		setCalendar(source.isCalendar());
+		setDelete(source.isDelete());
+		setDownload(source.isDownload());
+		setEmail(source.isEmail());
+		setImmutable(source.isImmutable());
+		setMove(source.isMove());
+		setMove(source.isMove());
+		setPassword(source.isPassword());
+		setPreview(source.isPreview());
+		setPrint(source.isPrint());
+		setPrint(source.isPrint());
+		setRename(source.isRename());
+		setSecurity(source.isSecurity());
+		setSign(source.isSign());
+		setSubscription(source.isSubscription());
+		setWorkflow(source.isWorkflow());
+		setReadingreq(source.isReadingreq());
+		setCustomid(source.isCustomid());
+		setRevision(source.isRevision());
+
 		setAdd(source.isAdd());
 		setImport(source.isImport());
 		setExport(source.isExport());

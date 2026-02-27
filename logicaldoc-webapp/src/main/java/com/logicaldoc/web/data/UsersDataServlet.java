@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -42,7 +43,11 @@ public class UsersDataServlet extends AbstractDataServlet {
 		boolean required = "true".equals(request.getParameter("required"));
 		boolean skipdisabled = "true".equals(request.getParameter("skipdisabled"));
 
-		List<User> users = findUsers(session, groupIdOrName);
+		List<User> users = new ArrayList<>();
+		if (StringUtils.isNotEmpty(request.getParameter("impersonifiers")))
+			users = findImpersonifiers(Long.parseLong(request.getParameter("impersonifiers")));
+		else
+			users = findUsers(session, groupIdOrName);
 
 		printUsers(users, required, skipdisabled, response);
 	}
@@ -109,6 +114,22 @@ public class UsersDataServlet extends AbstractDataServlet {
 		if (user.getTimeZone() != null)
 			writer.print("<timeZone><![CDATA[" + user.getTimeZone() + "]]></timeZone>");
 		writer.print("</user>");
+	}
+
+	private List<User> findImpersonifiers(long userId) throws PersistenceException {
+		List<String> usernames = UserDAO.get().queryForList("select ld_username from ld_impersonifier where ld_userid = %d".formatted(userId),
+				String.class);
+
+		if (CollectionUtils.isEmpty(usernames)) {
+			return List.of();
+		} else {
+			List<User> users = UserDAO.get().findByWhere(
+					"_entity.username in ('%s')".formatted(usernames.stream().collect(Collectors.joining("','"))), null,
+					null);
+			for (User user : users)
+				UserDAO.get().initialize(user);
+			return users;
+		}
 	}
 
 	private List<User> findUsers(Session session, String groupIdOrName) throws PersistenceException {

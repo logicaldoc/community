@@ -563,7 +563,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Folder folder = new Folder();
 		folder.setName("text");
 		folder.setParentId(5);
-		folder.setAccessControlList(new HashSet<>(Arrays.asList(new FolderAccessControlEntry(1L), new FolderAccessControlEntry(2L))));
+		folder.setAccessControlList(
+				new HashSet<>(Arrays.asList(new FolderAccessControlEntry(1L), new FolderAccessControlEntry(2L))));
 
 		folder.addTag("A");
 
@@ -730,7 +731,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		try {
 			testSubject.store(workspaceFolder);
 		} catch (Exception e) {
-			fail("store() should not have thrown an exception, but it threw: " + e.getMessage());
+			fail("store() should not have thrown an exception, but it threw: %s".formatted(e.getMessage()));
 		}
 
 		// Store workspace when root is null
@@ -744,7 +745,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 			testSubject.store(folder);
 			assertEquals("Workspace", folder.getName());
 		} catch (Exception e) {
-			fail("store() should not throw exception when root is null, but threw: " + e.getMessage());
+			fail("store() should not throw exception when root is null, but threw: %s".formatted(e.getMessage()));
 		}
 
 		// Store a default workspace with the same name
@@ -760,7 +761,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 			assertNotNull(defaultWorkspace);
 			assertEquals(Folder.DEFAULTWORKSPACENAME, defaultWorkspace.getName());
 		} catch (Exception e) {
-			fail("store() should not have thrown an exception, but it threw: " + e.getMessage());
+			e.printStackTrace();
+			fail("store() should not have thrown an exception, but it threw: %s".formatted(e.getMessage()));
 		}
 	}
 

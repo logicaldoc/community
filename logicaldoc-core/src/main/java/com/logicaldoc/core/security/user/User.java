@@ -111,9 +111,17 @@ public class User extends PersistentObject implements Serializable {
 	@Column(name = "ld_telephone2", length = 255)
 	private String telephone2 = "";
 
-	// Not persisted
+	/**
+	 * Groups this user belongs to
+	 */
 	@Transient
 	private Set<Group> groups = new HashSet<>();
+
+	/**
+	 * Other usernames allowed to impersonify this user
+	 */
+	@Transient
+	private Set<String> impersonifiers = new HashSet<>();
 
 	@Column(name = "ld_enabled", nullable = false)
 	private boolean enabled = true;
@@ -523,6 +531,14 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setGroups(Set<Group> groups) {
 		this.groups = groups;
+	}
+
+	public Set<String> getImpersonifiers() {
+		return impersonifiers;
+	}
+
+	public void setImpersonifiers(Set<String> impersonifiers) {
+		this.impersonifiers = impersonifiers;
 	}
 
 	/**

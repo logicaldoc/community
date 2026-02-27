@@ -374,7 +374,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		Button inheritFromParent = new Button(I18N.message("inheritfromparent"));
 		inheritFromParent.setAutoFit(true);
 		buttons.addMember(inheritFromParent);
-		inheritFromParent.addClickHandler((ClickEvent event) -> FolderService.Instance.get()
+		inheritFromParent.addClickHandler(click -> FolderService.Instance.get()
 				.getFolder(folder.getParentId(), false, false, false, new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(GUIFolder parent) {
@@ -412,7 +412,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
-		user.addChangedHandler((ChangedEvent userChangedEvent) -> {
+		user.addChangedHandler(changed -> {
 			ListGridRecord selectedRecord = user.getSelectedRecord();
 			if (selectedRecord == null)
 				return;

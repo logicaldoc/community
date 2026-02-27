@@ -571,23 +571,22 @@ public class SoapWorkbench {
 
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
-//		List<WSDocument> documents = documentClient.list(sid, 103L, null, "fileName desc", 1, 3);
-//		for (WSDocument doc : documents) {
-//			System.out.println(doc.getFileName() + "\t" + doc.getDate());
-//		}
-
-		WSDocument doc = documentClient.getDocument(sid, 723651853L);
-		for (WSAttribute attr : doc.getAttributes()) {
-			System.out.println(attr.getName() + " s:" + attr.getStringValue() + " i:" + attr.getIntValue() + " d:"
-					+ attr.getDoubleValue());
+		List<WSDocument> documents = documentClient.list(sid, 103L, null, "fileName desc", 1, 3);
+		for (WSDocument doc : documents) {
+			System.out.println(doc.getFileName() + "\t" + doc.getDate());
 		}
+
+//		WSDocument doc = documentClient.getDocument(sid, 723651853L);
+//		for (WSAttribute attr : doc.getAttributes()) {
+//			System.out.println(attr.getName() + " s:" + attr.getStringValue() + " i:" + attr.getIntValue() + " d:"
+//					+ attr.getDoubleValue());
+//		}
 		
-		
-		doc = new WSDocument();
-		doc.setFolderId(4L);
-		doc.setFileName("pippo.xml");
-		doc =  documentClient.create(sid, doc, new File("pom.xml"));
-		System.out.println("Created document "+doc.getId());
+//		doc = new WSDocument();
+//		doc.setFolderId(4L);
+//		doc.setFileName("pippo.xml");
+//		doc =  documentClient.create(sid, doc, new File("pom.xml"));
+//		System.out.println("Created document "+doc.getId());
 
 //
 //		doc.setId(0);

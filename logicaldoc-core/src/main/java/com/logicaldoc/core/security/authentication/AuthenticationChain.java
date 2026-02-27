@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +45,22 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	@Override
 	public final User authenticate(String username, String password, String key, Client client)
 			throws AuthenticationException {
+
+		String impersonifiedUsername = null;
+		if (username.contains(">")) {
+			impersonifiedUsername = username.split(">")[1].trim();
+			username = username.split(">")[0].trim();
+		} else if(StringUtils.defaultString(key).contains(">")) {
+			impersonifiedUsername = key.split(">")[1].trim();
+			key = key.split(">")[0].trim();
+		}
+
 		init();
 
 		User user = validateAnonymousUser(username, key, client);
 
 		List<AuthenticationException> errors = new ArrayList<>();
+
 		if (user == null)
 			user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
 
@@ -68,6 +80,15 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		}
 
 		log.debug("Collected authentication errors: {}", errors);
+
+		if (StringUtils.isNotEmpty(impersonifiedUsername))
+			try {
+				user = UserDAO.get().findByUsername(impersonifiedUsername);
+			} catch (PersistenceException pe) {
+				log.error(pe.getMessage(), pe);
+				errors.clear();
+				user = null;
+			}
 
 		if (user != null) {
 			initializeUser(user);

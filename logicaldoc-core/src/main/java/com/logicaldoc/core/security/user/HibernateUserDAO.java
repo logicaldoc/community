@@ -214,6 +214,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		boolean passwordChanged = false;
 		boolean enabledStatusChanged = false;
 
+		if (user.getUsername().contains(">"))
+			throw new PersistenceException("Cannot set username containing char >");
+
 		passwordChanged = processPasswordChanged(user);
 
 		validateUsernameUniquenes(user, newUser);
@@ -265,6 +268,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		 * Update the user-group assignments
 		 */
 		updateUserGroupAssignments(user);
+
+		// Update the allowed impersonifiers
+		updateImpersonifiers(user);
 
 		// Save the password history to track the password change
 		recordPasswordChange(user, transaction, passwordChanged);
@@ -471,16 +477,34 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private void updateUserGroupAssignments(User user) throws PersistenceException {
-		Map<String, Object> params = new HashMap<>();
-		params.put("userId", user.getId());
-		jdbcUpdate("delete from ld_usergroup where ld_userid = :userId", params);
+		jdbcUpdate("delete from ld_usergroup where ld_userid = :userId", Map.of("userId", user.getId()));
 		for (UserGroup ug : user.getUserGroups()) {
-			long exists = queryForLong("select count(*) from ld_group where ld_id=" + ug.getGroupId());
+			long exists = queryForLong("select count(*) from ld_group where ld_id = %d".formatted(ug.getGroupId()));
 			if (exists > 0) {
-				jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (" + user.getId() + ", "
-						+ ug.getGroupId() + ")");
+				jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (%d, %d)".formatted(user.getId(),
+						+ug.getGroupId()));
 			} else
 				log.warn("It seems that the usergroup {} does not exist anymore", ug.getGroupId());
+		}
+	}
+
+	/**
+	 * Update the allowed impersonifiers
+	 * 
+	 * @param user the current user
+	 * 
+	 * @throws PersistenceException Error in the database
+	 */
+	private void updateImpersonifiers(User user) throws PersistenceException {
+		jdbcUpdate("delete from ld_impersonifier where ld_userid = :userId", Map.of("userId", user.getId()));
+		for (String username : user.getImpersonifiers()) {
+			long exists = queryForLong("select count(*) from ld_user where ld_username = :username",
+					Map.of("username", username));
+			if (exists > 0) {
+				jdbcUpdate("insert into ld_impersonifier(ld_userid, ld_username) values (%d, '%s')"
+						.formatted(user.getId(), username));
+			} else
+				log.warn("It seems that the username {} does not exist anymore", username);
 		}
 	}
 
@@ -661,8 +685,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (!user.isEnabled())
 			return true;
 
-		String tenantName = (Context.get(TenantDAO.class)).getTenantName(user.getTenantId());
-		int maxInactiveDays = config.getInt(tenantName + ".security.user.maxinactivity", -1);
+		int maxInactiveDays = config.getInt("%s.security.user.maxinactivity".formatted(TenantDAO.get().getTenantName(user.getTenantId())), -1);
 		if (user.getMaxInactivity() != null)
 			maxInactiveDays = user.getMaxInactivity();
 		if (maxInactiveDays <= 0)
@@ -725,7 +748,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
 		return queryForLong(query);
 	}
-	
+
 	@Override
 	public long countRegulars(Long tenantId) throws PersistenceException {
 		String query = "select count(*) from ld_user where ld_type=" + UserType.DEFAULT.ordinal() + " and ld_deleted=0 "
@@ -754,18 +777,16 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		Group userGroup = user.getUserGroup();
 
 		user.setDeleted(PersistentObject.DELETED_CODE_DEFAULT);
-		user.setUsername(user.getUsername() + "." + user.getId());
+		user.setUsername("%s.%d".formatted(user.getUsername(), user.getId()));
 		saveOrUpdate(user);
 
 		// Delete the user's group
-		if (userGroup != null) {
-			GroupDAO groupDAO = Context.get(GroupDAO.class);
-			groupDAO.delete(userGroup.getId());
-		}
+		if (userGroup != null)
+			GroupDAO.get().delete(userGroup.getId());
 
-		jdbcUpdate("delete from ld_usergroup where ld_userid=" + userId);
-
-		jdbcUpdate("delete from ld_apikey where ld_userid=" + userId);
+		jdbcUpdate("delete from ld_usergroup where ld_userid = %d".formatted(userId));
+		jdbcUpdate("delete from ld_apikey where ld_userid = %d".formatted(userId));
+		jdbcUpdate("delete from ld_impersonifier where ld_userid = %d".formatted(userId));
 
 		saveUserHistory(user, transaction);
 	}
@@ -780,9 +801,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private int getPasswordEnforce(User user) throws PersistenceException {
-		TenantDAO tenantDAO = Context.get(TenantDAO.class);
-		String tenant = tenantDAO.getTenantName(user.getTenantId());
-		return config.getInt(tenant + ".password.enforcehistory", 10);
+		return config.getInt("%s.password.enforcehistory".formatted(TenantDAO.get().getTenantName(user.getTenantId())), 10);
 	}
 
 	public UserHistoryDAO getUserHistoryDAO() {
@@ -802,7 +821,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		List<Long> groupIds = new ArrayList<>();
 		try {
-			groupIds = queryForList("select distinct ld_groupid from ld_usergroup where ld_userid=" + user.getId(),
+			groupIds = queryForList(
+					"select distinct ld_groupid from ld_usergroup where ld_userid = %d".formatted(user.getId()),
 					Long.class);
 			for (Long groupId : groupIds)
 				user.getUserGroups().add(new UserGroup(groupId));
@@ -827,12 +847,24 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			}
 		}
 
+		// Initialize the impersonifiers
+		try {
+			user.getImpersonifiers().clear();
+			List<String> usernames = queryForList(
+					"select distinct ld_username from ld_impersonifier where ld_userid = %d".formatted(user.getId()),
+					String.class);
+			for (String usr : usernames)
+				user.getImpersonifiers().add(usr);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
 		// Manually initialize the collegtion of working times
 		user.getWorkingTimes().clear();
 
 		queryForResultSet(
-				"select ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description from ld_workingtime where ld_userid="
-						+ user.getId(),
+				"select ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description from ld_workingtime where ld_userid = %d"
+						.formatted(user.getId()),
 				null, null, rows -> {
 					while (rows.next()) {
 						WorkingTime wt = new WorkingTime(rows.getInt(1), rows.getInt(2), rows.getInt(3));
@@ -871,7 +903,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	public Set<User> findByGroup(long groupId) throws PersistenceException {
 		List<Long> docIds = new ArrayList<>();
 		try {
-			docIds = queryForList("select ld_userid from ld_usergroup where ld_groupid=" + groupId, Long.class);
+			docIds = queryForList("select ld_userid from ld_usergroup where ld_groupid = %d".formatted(groupId),
+					Long.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -950,7 +983,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 								ext.getParameter(POSITION).valueAsString());
 				} else {
 					throw new ClassNotFoundException(
-							"The specified listener " + className + " doesn't implement UserListener interface");
+							"The specified listener %s doesn't implement UserListener interface".formatted(className ));
 				}
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException e) {

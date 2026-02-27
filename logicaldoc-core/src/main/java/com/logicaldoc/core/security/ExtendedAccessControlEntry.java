@@ -85,8 +85,10 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 	}
 
 	public ExtendedAccessControlEntry(ExtendedAccessControlEntry source) {
-		super(source);
-		this.ace = new AccessControlEntry(source.getAce());
+		ace.setGroupId(source.getGroupId());
+		ace.setRead(source.isRead());
+		ace.setWrite(source.isWrite());
+		
 		setArchive(source.isArchive());
 		setAutomation(source.isAutomation());
 		setCalendar(source.isCalendar());

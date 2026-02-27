@@ -528,4 +528,25 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 		assertNotNull(key);
 	}
 
+	@Test
+	public void testChangeImpersonifiers() throws ServerException, PersistenceException, NoSuchAlgorithmException {
+		UserDAO dao = UserDAO.get();
+		User sessionUser = dao.findById(session.getUser().getId());
+		dao.initialize(sessionUser);
+		assertTrue(sessionUser.getImpersonifiers().isEmpty());
+
+		testSubject.addImpersonifier("author");
+		testSubject.addImpersonifier("boss");
+		testSubject.addImpersonifier("sebastian");
+		testSubject.addImpersonifier("unexisting");
+		
+		sessionUser = dao.findById(session.getUser().getId());
+		dao.initialize(sessionUser);
+		assertEquals(3, sessionUser.getImpersonifiers().size());
+		
+		testSubject.deleteImpersonifiers(List.of("author","boss"));
+		sessionUser = dao.findById(session.getUser().getId());
+		dao.initialize(sessionUser);
+		assertEquals(1, sessionUser.getImpersonifiers().size());
+	}
 }

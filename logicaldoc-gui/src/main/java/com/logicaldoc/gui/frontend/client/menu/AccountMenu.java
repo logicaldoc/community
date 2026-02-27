@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.gui.frontend.client.account.AllowedImpersonifiers;
 import com.logicaldoc.gui.frontend.client.account.ApiKeys;
 import com.logicaldoc.gui.frontend.client.account.ChangePassword;
 import com.logicaldoc.gui.frontend.client.account.LastLogins;
@@ -126,6 +127,11 @@ public class AccountMenu extends Menu {
 		lastLogins.addClickHandler(event -> new LastLogins().show());
 		items.add(lastLogins);
 
+		MenuItem allowedImpersonifiers = new MenuItem(I18N.message("allowedimpersonifiers"));
+		allowedImpersonifiers.addClickHandler(click -> new AllowedImpersonifiers().show());
+		allowedImpersonifiers.setEnabled(!Session.get().isDemo());
+		items.add(allowedImpersonifiers);
+		
 		MenuItem twofactorsauth = new MenuItem(I18N.message("twofactorsauth"));
 		twofactorsauth
 				.addClickHandler(event -> new TwoFactorsAuthenticationDialog(Session.get().getUser(), false).show());
@@ -134,7 +140,7 @@ public class AccountMenu extends Menu {
 		MenuItem trustedDevices = new MenuItem(I18N.message("trusteddevices"));
 		trustedDevices.addClickHandler(event -> new TrustedDevices().show());
 		trustedDevices.setEnabled(!Session.get().isDemo());
-
+		
 		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) && Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED)
 				&& com.logicaldoc.gui.common.client.Menu
 						.enabled(com.logicaldoc.gui.common.client.Menu.PROFILE_TWO_FACTORS_AUTHENTICATION)) {

@@ -77,7 +77,7 @@ public interface SecurityServiceAsync {
 	void syncGeolocationDB(String key, AsyncCallback<String> callback);
 
 	void saveAvatar(long userId, AsyncCallback<Void> callback);
-	
+
 	void resetAvatar(long userId, AsyncCallback<Void> callback);
 
 	void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);
@@ -97,6 +97,10 @@ public interface SecurityServiceAsync {
 	void createApiKey(String name, AsyncCallback<String> callback);
 
 	void updateApiKey(long keyId, String name, AsyncCallback<Void> callback);
-	
+
 	void deleteApiKey(long keyId, AsyncCallback<Void> callback);
+
+	void deleteImpersonifiers(List<String> usernames, AsyncCallback<Void> callback);
+
+	void addImpersonifier(String username, AsyncCallback<Void> callback);
 }

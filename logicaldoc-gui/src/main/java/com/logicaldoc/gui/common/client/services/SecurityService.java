@@ -393,7 +393,25 @@ public interface SecurityService extends RemoteService {
 	 * @throws ServerException error generated in the server application
 	 */
 	public void deleteTrustedDevices(List<Long> deviceIds) throws ServerException;
+	
+	/**
+	 * Deletes the impersonifiers allowed by the current user
+	 * 
+	 * @param usernames usernames of the impersonifiers to remove
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void deleteImpersonifiers(List<String> usernames) throws ServerException;
 
+	/**
+	 * Adds another impersonifier allowed by the current user
+	 * 
+	 * @param username username of the new impersonifier
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void addImpersonifier(String username) throws ServerException;
+	
 	/**
 	 * Downloads the most recent version of the Geolocation database
 	 * 

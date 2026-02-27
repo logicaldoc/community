@@ -172,6 +172,8 @@ public class GUIUser implements Serializable {
 
 	private Date lastLogin;
 
+	private List<String> impersonifiers = new ArrayList<>();
+
 	private List<GUIGroup> groups = new ArrayList<>();
 
 	private List<GUIDashlet> dashlets = new ArrayList<>();
@@ -604,7 +606,7 @@ public class GUIUser implements Serializable {
 		if (searchPref != null && !searchPref.isEmpty()) {
 			searches = Arrays.asList(searchPref.replace(" ", "").split(","));
 			for (String std : all) {
-				if(!searches.contains(std))
+				if (!searches.contains(std))
 					searches.add(std);
 			}
 		} else {
@@ -808,5 +810,13 @@ public class GUIUser implements Serializable {
 
 	public void setSessionsQuotaCount(long count) {
 		this.sessionsQuotaCount = count;
+	}
+
+	public List<String> getImpersonifiers() {
+		return impersonifiers;
+	}
+
+	public void setImpersonifiers(List<String> impersonifiers) {
+		this.impersonifiers = impersonifiers;
 	}
 }

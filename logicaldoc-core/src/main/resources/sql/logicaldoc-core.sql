@@ -128,8 +128,9 @@ create table ld_user_history (ld_id bigint not null, ld_lastmodified timestamp n
                               ld_comment varchar(4000), ld_notified int not null, ld_sessionid varchar(255), 
                               ld_filename varchar(255), ld_userlogin varchar(255), ld_ip varchar(255),
                               ld_author varchar(255), ld_geolocation varchar(255), ld_device varchar(255), 
-                              ld_filesize bigint, ld_folderid bigint, ld_docid bigint, ld_path varchar(4000), primary key (ld_id));
+                              ld_filesize bigint, ld_folderid bigint, ld_docid bigint, ld_path varchar(4000), primary key (ld_id));                         
 create table ld_usergroup (ld_groupid bigint not null, ld_userid bigint not null, primary key (ld_groupid, ld_userid));
+create table ld_impersonifier (ld_userid bigint not null, ld_username varchar(255) not null, primary key (ld_userid, ld_username));
 create table ld_version (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                          ld_deleted int not null, ld_tenantid bigint not null, ld_immutable int not null, ld_customid varchar(200),
                          ld_version varchar(10), ld_fileversion varchar(10), ld_revision varchar(255), ld_date timestamp, ld_creation timestamp, ld_publisher varchar(255),
@@ -330,7 +331,7 @@ alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid
 alter table ld_apikey add constraint FK_APIKEY_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 alter table ld_filler_chain add constraint FK_FILLERCHAIN_FILLER foreign key (ld_fillerid) references ld_filler(ld_id) on delete cascade;
 alter table ld_filler_chain add constraint FK_FILLERCHAIN_CHAINED foreign key (ld_chainedid) references ld_filler(ld_id) on delete cascade;
-
+alter table ld_impersonifier add constraint FK_IMPERS_USERID foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 
 
 create unique index AK_DOCUMENT on ld_document (ld_customid, ld_tenantid);
