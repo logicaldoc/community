@@ -161,8 +161,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		printSessionStatusXml(session, locale, showSid, writer);
 
 		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
-		writer.print(
-				String.format("<impersonator><![CDATA[%s]]></impersonator>", showSid ? session.getImpersonator() : ""));
+		writer.print(String.format("<impersonator><![CDATA[%s]]></impersonator>",
+				showSid ? StringUtils.defaultString(session.getImpersonator()) : ""));
 		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
 
 		final Serializable client = session.getClient() != null ? session.getClient() : "";

@@ -180,12 +180,12 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testSearch() throws ServerException {
-		List<GUIHistory> hits = testSubject.search(null, null, null, 100, null, new ArrayList<>(), null);
+		List<GUIHistory> hits = testSubject.search(null, null, null,null, 100, null, new ArrayList<>(), null);
 		assertEquals(9, hits.size());
-		hits = testSubject.search(null, null, null, 100, null, new ArrayList<>(), 5L);
+		hits = testSubject.search(null, null, null, null, 100, null, new ArrayList<>(), 5L);
 		assertEquals(5, hits.size());
 
-		hits = testSubject.search(1L, new Date(), new Date(), 100, "unxisting",
+		hits = testSubject.search(1L, null, new Date(), new Date(), 100, "unxisting",
 				List.of(DocumentEvent.STORED.toString()), 5L);
 		assertEquals(0, hits.size());
 	}

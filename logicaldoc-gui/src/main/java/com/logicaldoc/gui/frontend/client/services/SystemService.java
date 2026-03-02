@@ -200,7 +200,7 @@ public interface SystemService extends RemoteService {
 	 */
 	public void removeLogger(String name) throws ServerException;
 
-	public List<GUIHistory> search(Long userId, Date from, Date till, int maxResult, String historySid,
+	public List<GUIHistory> search(Long userId, Long impersonatorId, Date from, Date till, int maxResult, String historySid,
 			List<String> event, Long rootFolderId) throws ServerException;
 
 	public List<GUIHistory> searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol,

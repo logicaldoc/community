@@ -614,8 +614,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	@Override
-	public List<GUIHistory> search(Long userId, Date from, Date till, int maxResult, String historySid,
-			List<String> events, Long rootFolderId) throws ServerException {
+	public List<GUIHistory> search(Long userId, Long impersonatorId, Date from, Date till, int maxResult,
+			String historySid, List<String> events, Long rootFolderId) throws ServerException {
 		Session session = validateSession();
 
 		int i = 0;
@@ -636,7 +636,18 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			query.append(" from TABLE A where A.ld_tenantid = ".replace("TABLE", table).replace("A", tableAlias));
 			query.append(Long.toString(session.getTenantId()));
 
-			appendUserCondition(tableAlias, userId, query);
+			String impersonator = null;
+			if (impersonatorId != null) {
+				try {
+					User impers = UserDAO.get().findById(impersonatorId);
+					if (impers != null)
+						impersonator = impers.getUsername();
+				} catch (PersistenceException e) {
+					return throwServerException(session, log, e);
+				}
+			}
+
+			appendUserCondition(tableAlias, userId, impersonator, query);
 			appendSessionCondition(tableAlias, historySid, query);
 			appendDatesCondition(tableAlias, from, till, query);
 			appendFolderCondition(tableAlias, rootFolderId, query);
@@ -720,12 +731,14 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	private void appendSessionCondition(String tableAlias, String historySid, StringBuilder query) {
 		if (historySid != null && StringUtils.isNotEmpty(historySid))
-			query.append(AND + tableAlias + ".ld_sessionid='" + historySid + "' ");
+			query.append(AND + tableAlias + ".ld_sessionid='%s' ".formatted(historySid));
 	}
 
-	private void appendUserCondition(String tableAlias, Long userId, StringBuilder query) {
+	private void appendUserCondition(String tableAlias, Long userId, String impersonator, StringBuilder query) {
 		if (userId != null)
-			query.append(AND + tableAlias + ".ld_userid = " + userId);
+			query.append(AND + tableAlias + ".ld_userid = %d ".formatted(userId));
+		if (impersonator != null)
+			query.append(AND + tableAlias + ".ld_impersonator = '%s' ".formatted(impersonator));
 	}
 
 	private List<GUIHistory> executeQuery(String query, int maxResult, Session session) throws PersistenceException {

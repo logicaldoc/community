@@ -35,7 +35,7 @@ public interface SystemServiceAsync {
 
 	void restart(AsyncCallback<Void> callback);
 
-	void search(Long userId, Date from, Date till, int maxResult, String historySid, List<String> event,
+	void search(Long userId, Long impersonatorId, Date from, Date till, int maxResult, String historySid, List<String> event,
 			Long rootFolderId, AsyncCallback<List<GUIHistory>> callback);
 
 	void searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri, int maxResult,
