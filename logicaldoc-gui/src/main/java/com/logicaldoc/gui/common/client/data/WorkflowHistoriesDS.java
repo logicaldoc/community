@@ -40,13 +40,15 @@ public class WorkflowHistoriesDS extends DataSource {
 		DataSourceTextField transition = new DataSourceTextField("transition");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
-
+		DataSourceTextField impersonator = new DataSourceTextField("impersonator");
+		impersonator.setHidden(true);
+		
 		DataSourceIntegerField templateVersion = new DataSourceIntegerField("templateVersion");
 		DataSourceIntegerField templateId = new DataSourceIntegerField("templateId");
 
 		setFields(id, taskId, name, tag, startDate, endDate, documents, initiator, initiatorId, event, date, user,
 				userId, comment, icon, filename, transition, documentId, sessionId, key, templateId, templateVersion,
-				display, wfDisplay);
+				display, wfDisplay, impersonator);
 		setDataURL("data/workflowhistories.xml?locale=" + I18N.getLocale()
 				+ (instanceId != null ? "&instanceId=" + instanceId : "")
 				+ (workflowTemplateId != null ? "&workflowTemplateId=" + workflowTemplateId : "")

@@ -83,6 +83,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 			writer.print("<geolocation><![CDATA[" + columns[9] + "]]></geolocation>");
 		if (columns[10] != null)
 			writer.write("<key><![CDATA[" + columns[10] + "]]></key>");
+		writer.write(String.format("<impersonator>%s</impersonator>", StringUtils.defaultString((String)columns[11])));
 		writer.print("</history>");
 	}
 
@@ -91,7 +92,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		Map<String, Object> params = new HashMap<>();
 
 		StringBuilder query = new StringBuilder(
-				"select A.id, A.username, A.event, A.date, A.comment, A.sessionId, A.userId, A.ip, A.device, A.geolocation, A.keyLabel from UserHistory A where A.deleted = 0 ");
+				"select A.id, A.username, A.event, A.date, A.comment, A.sessionId, A.userId, A.ip, A.device, A.geolocation, A.keyLabel, A.impersonator from UserHistory A where A.deleted = 0 ");
 		if (StringUtils.isNotEmpty(event)) {
 			query.append(" and A.event = :event ");
 			params.put("event", event);

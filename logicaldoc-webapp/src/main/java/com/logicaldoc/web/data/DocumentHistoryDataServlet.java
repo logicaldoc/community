@@ -55,7 +55,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel, A.revision from DocumentHistory A where A.deleted = 0 ");
+				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel, A.revision, A.impersonator from DocumentHistory A where A.deleted = 0 ");
 		Map<String, Object> params = prepareQueryParams(request, query);
 		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), params,
 				max != null ? max : 100);
@@ -124,6 +124,8 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		if (historyRecord[19] != null)
 			writer.write("<key><![CDATA[" + historyRecord[19] + "]]></key>");
 		writer.write("<revision><![CDATA[" + StringUtils.defaultString((String) historyRecord[20]) + "]]></revision>");
+		
+		writer.write(String.format("<impersonator>%s</impersonator>",StringUtils.defaultString((String) historyRecord[21])));
 		writer.print("</history>");
 	}
 

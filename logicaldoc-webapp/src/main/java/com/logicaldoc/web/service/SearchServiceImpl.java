@@ -79,11 +79,10 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 			DocumentDAO docDao = DocumentDAO.get();
 			List<GUIDocument> guiResults = new ArrayList<>();
-			DocumentServiceImpl documentServiceImpl = new DocumentServiceImpl();
 			for (Hit hit : hits) {
 				GUIDocument guiHit = null;
 				if (hit.getType().startsWith("folder")) {
-					guiHit = documentServiceImpl.fromDocument(hit, null, null);
+					guiHit = DocumentServiceImpl.fromDocument(hit, null, null);
 					guiHit.setIcon(hit.getType());
 				} else {
 					Document doc = docDao.findById(hit.getId());
@@ -94,7 +93,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 						 * search hits may have not been fully compiled so the
 						 * DocumentServiceImpl.fromDocument doesn't do the job
 						 */
-						guiHit = documentServiceImpl.fromDocument(doc, null, null);
+						guiHit = DocumentServiceImpl.fromDocument(doc, null, null);
 					} else {
 						log.debug("Unexisting document {}", hit.getId());
 						continue;

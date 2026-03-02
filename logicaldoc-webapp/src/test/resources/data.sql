@@ -375,7 +375,7 @@ create table ld_webservicecall (ld_id bigint not null, ld_lastmodified timestamp
                                 ld_userid bigint, ld_date timestamp, ld_username varchar(255), ld_event varchar(255), 
                                 ld_comment varchar(4000), ld_path varchar(4000), ld_sessionid varchar(255),
                                 ld_userlogin varchar(255), ld_ip varchar(255), ld_geolocation varchar(255), 
-                                ld_device varchar(255), ld_protocol varchar(255), primary key (ld_id));
+                                ld_device varchar(255), ld_protocol varchar(255), ld_impersonator varchar(255), primary key (ld_id));
                                 
 INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
 VALUES (28591,'2024-04-10 16:51:54',0,0,1,1,'2024-04-10 16:51:49','Peter McKenna','event.webservice.call',null,'http://localhost:9080/services/Auth','8d7b32e8-fe82-45c4-b0e1-f69083e90133','admin','127.0.0.1',null,'Unknown on Unknown (UNKNOWN)','soap','2024-04-10 16:51:49');

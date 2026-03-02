@@ -225,6 +225,7 @@ public class LastChangesReport extends AdminPanel {
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"), 250);
 		sid.setCanFilter(true);
 		sid.setAlign(Alignment.CENTER);
+	
 
 		ListGridField key = new ListGridField("key", I18N.message("key"), 90);
 		key.setCanFilter(true);
@@ -255,6 +256,10 @@ public class LastChangesReport extends AdminPanel {
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		username.setCanFilter(true);
 		username.setHidden(true);
+		
+		ListGridField impersonator = new ListGridField("impersonator", I18N.message("impersonator"), 100);
+		impersonator.setCanFilter(true);
+		impersonator.setAlign(Alignment.CENTER);
 
 		ListGridField comment = new ListGridField(COMMENT, I18N.message(COMMENT), 200);
 		comment.setCanFilter(true);
@@ -269,7 +274,7 @@ public class LastChangesReport extends AdminPanel {
 		histories.setWidth100();
 		histories.setHeight100();
 		histories.setFields(eventField, date, userField, name, folderField, sid, key, docId, folderId, userId, username,
-				ip, device, geolocation, comment, reason);
+				ip, device, geolocation, comment, reason, impersonator);
 		histories.setSelectionType(SelectionStyle.SINGLE);
 		histories.setShowRecordComponents(true);
 		histories.setShowRecordComponentsByCell(true);
@@ -393,6 +398,7 @@ public class LastChangesReport extends AdminPanel {
 							rec.setAttribute(USERNAME, hist.getUserLogin());
 							rec.setAttribute(COMMENT, hist.getComment());
 							rec.setAttribute(REASON, hist.getReason());
+							rec.setAttribute("impersonator", hist.getImpersonator());
 							rec.setAttribute("icon", hist.getIcon());
 							records.add(rec);
 						}

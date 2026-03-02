@@ -1806,7 +1806,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.getImpersonators().removeAll(usernames);
 
 			UserHistory transaction = new UserHistory(session);
-			transaction.setEvent(UserEvent.IMPERSONIFIERS_CHANGED);
+			transaction.setEvent(UserEvent.IMPERSONATORS_CHANGED);
 			dao.store(user, transaction);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -1824,7 +1824,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.getImpersonators().add(username);
 			
 			UserHistory transaction = new UserHistory(session);
-			transaction.setEvent(UserEvent.IMPERSONIFIERS_CHANGED);
+			transaction.setEvent(UserEvent.IMPERSONATORS_CHANGED);
 			dao.store(user, transaction);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);

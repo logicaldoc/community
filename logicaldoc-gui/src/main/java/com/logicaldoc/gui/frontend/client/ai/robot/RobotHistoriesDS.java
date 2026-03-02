@@ -38,8 +38,10 @@ public class RobotHistoriesDS extends DataSource {
 		DataSourceTextField ip = new DataSourceTextField("id");
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
+		DataSourceTextField impersonator = new DataSourceTextField("impersonator");
+		impersonator.setHidden(true);
 
-		setFields(user, date, evnt, ip, device, geolocation, comment, sid, key);
+		setFields(user, date, evnt, ip, device, geolocation, comment, sid, key, impersonator);
 		setClientOnly(true);
 
 		String url = "data/robots.xml?object=history&locale=" + I18N.getLocale();

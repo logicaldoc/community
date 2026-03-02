@@ -35,6 +35,8 @@ public class RobotHistoryPanel extends VLayout {
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"), 200);
 		ListGridField ip = new ListGridField("ip", I18N.message("ip"), 100);
+		ListGridField impersonator = new ListGridField("impersonator", I18N.message("impersonator"), 100);
+		impersonator.setHidden(true);
 		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"), 200);
 		ListGridField device = new ListGridField("device", I18N.message("device"), 200);
 
@@ -43,7 +45,7 @@ public class RobotHistoryPanel extends VLayout {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setDataSource(new RobotHistoriesDS(modelId));
-		list.setFields(event, date, ip, geolocation, device, sid, comment);
+		list.setFields(event, date, ip, geolocation, device, sid, comment, impersonator);
 		list.addCellDoubleClickHandler(new CopyCellClickHandler());
 
 		ToolStrip buttons = new ToolStrip();

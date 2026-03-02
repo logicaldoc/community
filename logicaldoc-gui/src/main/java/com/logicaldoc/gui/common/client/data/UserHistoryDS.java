@@ -49,8 +49,10 @@ public class UserHistoryDS extends DataSource {
 		DataSourceTextField ip = new DataSourceTextField("id");
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
+		DataSourceTextField impersonator = new DataSourceTextField("impersonator");
+		impersonator.setHidden(true);
 
-		setFields(user, date, evnt, ip, device, geolocation, comment, reason, sid, key, folderId);
+		setFields(user, date, evnt, ip, device, geolocation, comment, reason, sid, key, folderId, impersonator);
 		setClientOnly(true);
 
 		String url = "data/userhistory.xml?&locale=" + I18N.getLocale();

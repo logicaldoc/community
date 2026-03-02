@@ -37,7 +37,7 @@ public class GUIHistory implements Serializable {
 	private int notified = 0;
 
 	private String sessionId = "";
-	
+
 	private String keyLabel = "";
 
 	private String ip = null;
@@ -51,10 +51,12 @@ public class GUIHistory implements Serializable {
 	private String icon = null;
 
 	private String protocol = null;
-	
+
 	private String tenant = null;
-	
+
 	private Long tenantId = null;
+
+	private String impersonator = null;
 
 	public long getDocId() {
 		return docId;
@@ -230,5 +232,13 @@ public class GUIHistory implements Serializable {
 
 	public void setKeyLabel(String keyLabel) {
 		this.keyLabel = keyLabel;
+	}
+
+	public String getImpersonator() {
+		return impersonator;
+	}
+
+	public void setImpersonator(String impersonator) {
+		this.impersonator = impersonator;
 	}
 }

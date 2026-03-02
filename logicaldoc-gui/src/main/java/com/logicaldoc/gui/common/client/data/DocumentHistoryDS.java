@@ -75,9 +75,11 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField ip = new DataSourceTextField("ip");
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
+		DataSourceTextField impersonator = new DataSourceTextField("impersonator");
+		impersonator.setHidden(true);
 
 		setFields(user, filename, date, event, comment, reason, version, fileVersion, revision, fileSize, icon,
-				newField, documentId, folderId, userId, path, sid, key, ip, device, geolocation);
+				newField, documentId, folderId, userId, path, sid, key, ip, device, geolocation, impersonator);
 		setClientOnly(true);
 
 		setDataURL(url);

@@ -6,10 +6,11 @@
 
 
 create table ld_webservicecall (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
-                                ld_deleted int not null, ld_tenantid bigint not null, ld_keylabel varchar(255),
-                                ld_userid bigint, ld_date datetime2(3), ld_username varchar(255), ld_event varchar(255), 
-                                ld_comment varchar(4000), ld_path varchar(4000), ld_sessionid varchar(255),
-                                ld_userlogin varchar(255), ld_ip varchar(255), ld_geolocation varchar(255), 
-                                ld_device varchar(255), ld_protocol varchar(255), ld_notified int not null, primary key (ld_id));
+                                ld_deleted int not null, ld_tenantid bigint not null, ld_keylabel nvarchar(255),
+                                ld_userid bigint, ld_date datetime2(3), ld_username nvarchar(255), ld_event nvarchar(255), 
+                                ld_comment nvarchar(4000), ld_path nvarchar(4000), ld_sessionid nvarchar(255),
+                                ld_userlogin nvarchar(255), ld_ip nvarchar(255), ld_geolocation nvarchar(255), 
+                                ld_device nvarchar(255), ld_protocol nvarchar(255), ld_notified int not null, ld_impersonator nvarchar(255),
+                                primary key (ld_id));
                                 
 create sequence ld_webservicecall_SEQ as bigint start with 100 increment by 50;                        

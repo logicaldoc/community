@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Session;
@@ -35,12 +37,13 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color, A.keyLabel from FolderHistory A where A.deleted = 0 ");
+				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color, A.keyLabel, A.impersonator from FolderHistory A where A.deleted = 0 ");
 		if (request.getParameter("id") != null)
 			query.append(" and A.folderId=" + request.getParameter("id"));
 		query.append(" order by A.date desc ");
 
-		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null, max != null ? max : 100);
+		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null,
+				max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -82,6 +85,8 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 			writer.print("<color>" + cols[13] + "</color>");
 		if (cols[14] != null)
 			writer.print("<key><![CDATA[" + cols[14] + "]]></key>");
+
+		writer.print(String.format("<impersonator>%s</impersonator>", StringUtils.defaultString((String) cols[15])));
 		writer.print("</history>");
 	}
 

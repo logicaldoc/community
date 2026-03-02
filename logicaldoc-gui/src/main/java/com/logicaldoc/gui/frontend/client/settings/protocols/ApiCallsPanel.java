@@ -199,6 +199,10 @@ public class ApiCallsPanel extends VLayout {
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		username.setCanFilter(true);
 		username.setHidden(true);
+		
+		ListGridField impersonator = new ListGridField("impersonator", I18N.message("impersonator"), 100);
+		impersonator.setCanFilter(true);
+		impersonator.setHidden(true);
 
 		ListGridField payload = new ListGridField(PAYLOAD, I18N.message(PAYLOAD));
 		payload.setCanFilter(true);
@@ -211,7 +215,7 @@ public class ApiCallsPanel extends VLayout {
 		calls.setWidth100();
 		calls.setHeight100();
 		calls.setFields(date, protocol, ip, userField, uri, tenant, sid, key, userId, username, device, geolocation,
-				payload);
+				payload, impersonator);
 		calls.setSelectionType(SelectionStyle.SINGLE);
 		calls.setShowRecordComponents(true);
 		calls.setShowRecordComponentsByCell(true);

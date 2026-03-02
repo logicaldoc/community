@@ -45,7 +45,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 
 		List<User> users = new ArrayList<>();
 		if (StringUtils.isNotEmpty(request.getParameter("impersonifiers")))
-			users = findImpersonifiers(Long.parseLong(request.getParameter("impersonifiers")));
+			users = findImpersonators(Long.parseLong(request.getParameter("impersonifiers")));
 		else
 			users = findUsers(session, groupIdOrName);
 
@@ -116,7 +116,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		writer.print("</user>");
 	}
 
-	private List<User> findImpersonifiers(long userId) throws PersistenceException {
+	private List<User> findImpersonators(long userId) throws PersistenceException {
 		List<String> usernames = UserDAO.get().queryForList("select ld_username from ld_impersonator where ld_userid = %d".formatted(userId),
 				String.class);
 

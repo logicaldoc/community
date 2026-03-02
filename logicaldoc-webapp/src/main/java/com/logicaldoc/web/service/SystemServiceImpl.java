@@ -420,7 +420,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			guiTask.setSize(task.getSize());
 			guiTask.setIndeterminate(task.isIndeterminate());
 			guiTask.setCompletionPercentage(task.getCompletionPercentage());
-			
+
 			GUIScheduling guiScheduling = new GUIScheduling(task.getName());
 			guiScheduling.setEnabled(task.getScheduling().isEnabled());
 			guiScheduling.setMode(task.getScheduling().getMode());
@@ -428,8 +428,9 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				guiScheduling.setSimple(true);
 				guiScheduling.setDelay(task.getScheduling().getDelay());
 				guiScheduling.setInterval(task.getScheduling().getIntervalSeconds());
-				guiTask.setSchedulingLabel(I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds()
-						+ " " + I18N.message(SECONDS, locale).toLowerCase());
+				guiTask.setSchedulingLabel(
+						I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds() + " "
+								+ I18N.message(SECONDS, locale).toLowerCase());
 			} else if (task.getScheduling().getMode().equals(TaskTrigger.MODE_CRON)) {
 				guiScheduling.setSimple(false);
 				guiScheduling.setCronExpression(task.getScheduling().getCronExpression());
@@ -440,7 +441,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			guiScheduling.setPreviousFireTime(task.getScheduling().getPreviousFireTime());
 			guiScheduling.setNextFireTime(task.getScheduling().getNextFireTime());
 			guiScheduling.setLastDuration(TimeDiff.printDuration(task.getScheduling().getLastDuration()));
-			
+
 			guiTask.setScheduling(guiScheduling);
 
 			guiTask.setSendActivityReport(task.isSendActivityReport());
@@ -682,7 +683,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		else
 			query.append(", A.ld_reason".replace("A", tableAlias));
 
-		query.append(", A.ld_device, A.ld_geolocation, A.ld_keylabel ".replace("A", tableAlias));
+		query.append(", A.ld_device, A.ld_geolocation, A.ld_keylabel, A.ld_impersonator".replace("A", tableAlias));
 	}
 
 	protected void appendUnion(StringBuilder query) {
@@ -751,6 +752,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				history.setDevice(rs.getString(14));
 				history.setGeolocation(rs.getString(15));
 				history.setKeyLabel(rs.getString(16));
+				history.setImpersonator(rs.getString(17));
 
 				if (history.getFileName() != null && history.getDocId() != 0L)
 					history.setIcon(IconSelector.selectIcon(history.getFileName()));
@@ -800,23 +802,23 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			// Search in the document/folder history
 			StringBuilder query = new StringBuilder(
-					"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId, ld_keylabel from ld_webservicecall where 1 = 1 ");
+					"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId, ld_keylabel, ld_impersonator from ld_webservicecall where 1 = 1 ");
 			if (userId != null)
-				query.append(" and ld_userid = " + userId);
+				query.append(" and ld_userid = %d".formatted(userId));
 			if (callSid != null && StringUtils.isNotEmpty(callSid))
-				query.append(" and ld_sessionid='" + callSid + "' ");
+				query.append(" and ld_sessionid='%s' ".formatted(callSid));
 			if (from != null) {
-				query.append(" and ld_date > '" + new Timestamp(from.getTime()) + "' ");
+				query.append(" and ld_date > '%s' ".formatted(new Timestamp(from.getTime())));
 			}
 			if (till != null) {
-				query.append(" and ld_date < '" + new Timestamp(till.getTime()) + "' ");
+				query.append(" and ld_date < '%s' ".formatted(new Timestamp(till.getTime())));
 			}
 			if (protocol != null) {
-				query.append(" and ld_protocol = '" + protocol + "' ");
+				query.append(" and ld_protocol = '%s' ".formatted(protocol));
 			}
 
 			if (session.getTenantId() != Tenant.DEFAULT_ID)
-				query.append(" and ld_tenantid = " + session.getTenantId());
+				query.append(" and ld_tenantid = %d".formatted(session.getTenantId()));
 
 			query.append(" order by ld_date desc ");
 
@@ -839,7 +841,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 					history.setTenantId(rs.getLong(12));
 					history.setTenant(tenants.get(history.getTenantId()));
 					history.setKeyLabel(rs.getString(13));
-
+					history.setImpersonator(rs.getString(14));
 					return history;
 				}
 
