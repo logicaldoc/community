@@ -81,7 +81,6 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 			assertNull(wsUser.getEmail2());
 
 			assertTrue(wsUser.getPassword() == null || wsUser.getPassword().isEmpty());
-			assertNull(wsUser.getPasswordmd4());
 		}
 
 		securityServiceImpl.setValidateSession(false);
@@ -267,8 +266,8 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testChangePassword() throws Exception {
-		String pswd=PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
-		
+		String pswd = PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
+
 		WSUser newUser = new WSUser();
 		newUser.setName("user test");
 		newUser.setUsername("user");

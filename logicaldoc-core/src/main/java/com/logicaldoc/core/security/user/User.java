@@ -62,9 +62,6 @@ public class User extends PersistentObject implements Serializable {
 	@Column(name = "ld_password", length = 255)
 	private String password = "";
 
-	@Column(name = "ld_passwordmd4", length = 255)
-	private String passwordmd4 = "";
-
 	@Column(name = "ld_name", length = 255)
 	private String name = "";
 
@@ -695,14 +692,6 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setIpBlackList(String ipBlackList) {
 		this.ipBlackList = ipBlackList;
-	}
-
-	public String getPasswordmd4() {
-		return passwordmd4;
-	}
-
-	public void setPasswordmd4(String passwordmd4) {
-		this.passwordmd4 = passwordmd4;
 	}
 
 	public String getDecodedPassword() {

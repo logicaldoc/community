@@ -109,7 +109,7 @@ create table ld_ticket (ld_id number(19,0) not null, ld_lastmodified timestamp n
                         primary key (ld_id));
 create table ld_user (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion number(19,0) not null,
                       ld_deleted int not null, ld_tenantid number(19,0) not null, ld_enabled int not null, 
-                      ld_username varchar(255) not null, ld_password varchar(255), ld_passwordmd4 varchar(255), ld_name varchar(255), ld_firstname varchar(255), 
+                      ld_username varchar(255) not null, ld_password varchar(255), ld_name varchar(255), ld_firstname varchar(255), 
                       ld_street varchar(255), ld_postalcode varchar(255), ld_city varchar(255), ld_country varchar(255), 
                       ld_state varchar(255), ld_language varchar(10), ld_email varchar(255), ld_emailsignature varchar(1000), ld_telephone varchar(255), 
                       ld_telephone2 varchar(255), ld_type int not null, ld_passwordchanged timestamp, ld_passwordexpires int not null,
@@ -642,8 +642,8 @@ insert into ld_group
 values     (-10000,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,'publisher','Group of publishers',0,1,'local');
 
 insert into ld_user
-           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_passwordmd4,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_telephone2,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_welcomescreen,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_maxinactivity,ld_evalform,ld_legals,ld_sessionsquota)
-values     (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,'admin','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','U8FeEPvxYRhKNCBsLa0K+1rD1tTtR6yctJIwxje2QMwEOlEQx9HuiA==','Admin','Admin','','','','','en','admin@admin.net','','',0,null,0,0,-1,1520,0,1,1,0,-1,1,1,-1);
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_telephone2,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_welcomescreen,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_maxinactivity,ld_evalform,ld_legals,ld_sessionsquota)
+values     (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,'admin','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','Admin','Admin','','','','','en','admin@admin.net','','',0,null,0,0,-1,1520,0,1,1,0,-1,1,1,-1);
 insert into ld_group
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion,ld_source)
 values     (-1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,'_user_1',1,1,'local');

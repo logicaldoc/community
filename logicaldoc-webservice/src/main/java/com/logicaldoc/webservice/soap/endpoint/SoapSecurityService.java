@@ -56,7 +56,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					usr.setEmail(null);
 					usr.setEmail2(null);
 					usr.setPassword(null);
-					usr.setPasswordmd4(null);
 					usr.setPostalcode(null);
 					usr.setStreet(null);
 					usr.setTelephone(null);

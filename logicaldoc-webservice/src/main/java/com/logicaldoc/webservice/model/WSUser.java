@@ -71,9 +71,6 @@ public class WSUser {
 	private String decodedPassword = "";
 
 	@WSDoc(required = false)
-	private String passwordmd4 = "";
-
-	@WSDoc(required = false)
 	private String name = "";
 
 	@WSDoc(required = false)
@@ -577,7 +574,6 @@ public class WSUser {
 			wsUser.setType(user.getType().ordinal());
 			wsUser.setSource(user.getSource().ordinal());
 			wsUser.setPassword(user.getPassword());
-			wsUser.setPasswordmd4(user.getPasswordmd4());
 			wsUser.setPasswordChanged(DateUtil.format(user.getPasswordChanged()));
 			wsUser.setLastModified(DateUtil.format(user.getLastModified()));
 			wsUser.setLastLogin(DateUtil.format(user.getLastLogin()));
@@ -598,7 +594,7 @@ public class WSUser {
 			wsUser.setGroupIds(user.getGroups().stream().map(g -> g.getId()).collect(Collectors.toList()));
 			wsUser.getImpersonators().clear();
 			wsUser.getImpersonators().addAll(user.getImpersonators());
-			
+
 			List<WSWorkingTime> tmp = user.getWorkingTimes().stream().map(wt -> {
 				WSWorkingTime wswt = new WSWorkingTime();
 				try {
@@ -618,14 +614,6 @@ public class WSUser {
 		}
 
 		return wsUser;
-	}
-
-	public String getPasswordmd4() {
-		return passwordmd4;
-	}
-
-	public void setPasswordmd4(String passwordmd4) {
-		this.passwordmd4 = passwordmd4;
 	}
 
 	public String getEmailSignature() {
