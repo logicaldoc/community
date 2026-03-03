@@ -103,8 +103,7 @@ public class AllowedImpersonators extends com.smartgwt.client.widgets.Window {
 		list.setAutoFetchData(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setFilterOnKeypress(true);
-		list.setCanEdit(true);
-		list.setEditByCell(true);
+		list.setCanEdit(false);
 		list.setDataSource(new ImpersonifiersDS());
 		list.setFields(id, enabled, avatar, username, firstName, name, groups, guest);
 		list.sort(USERNAME, SortDirection.ASCENDING);

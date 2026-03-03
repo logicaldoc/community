@@ -87,13 +87,13 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			try {
 				User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername);
 				UserDAO.get().initialize(impersonatedUser);
-				if (!impersonatedUser.getImpersonators().contains(username)) {
+				if (!impersonatedUser.getImpersonators().contains(user.getUsername())) {
 					log.error("User {} not allowed to impersonate {}", user, impersonatedUser);
-					errors.add(new ForbiddenImpersonationException(username, impersonatedUsername));
+					errors.add(new ForbiddenImpersonationException(user.getUsername(), impersonatedUsername));
 					user = null;
 				} else {
 					log.error("User {} impersonates {}", user, impersonatedUser);
-					impersonatedUser.setImpersonator(username);
+					impersonatedUser.setImpersonator(user.getUsername());
 					user = impersonatedUser;
 				}
 			} catch (PersistenceException pe) {

@@ -53,7 +53,7 @@ public class SoapWorkbench {
 		develProps.load(new FileInputStream(new File(System.getProperty("user.home") + "/logicaldoc-dev.properties")));
 
 		// Open a session
-		String sid = auth.loginApiKey(develProps.getProperty("apikey.Development"));
+		String sid = auth.loginApiKey(develProps.getProperty("apikey.Development")+">marco");
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
 		System.out.println("Sid: " + sid);
 
