@@ -1105,11 +1105,12 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		Session session = validateSession();
 
 		if (pageSize != null && startRecord != null) {
-			session.getDictionary().put(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + folderId, pageSize);
-			session.getDictionary().put(FoldersDataServlet.FOLDER_START_RECORD + ":" + folderId, startRecord);
+			session.getDictionary().put("%s:%d".formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, folderId), pageSize);
+			session.getDictionary().put("%s:%d".formatted(FoldersDataServlet.FOLDER_START_RECORD, folderId),
+					startRecord);
 		} else {
-			session.getDictionary().remove(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + folderId);
-			session.getDictionary().remove(FoldersDataServlet.FOLDER_START_RECORD + ":" + folderId);
+			session.getDictionary().remove("%s:%d".formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, folderId));
+			session.getDictionary().remove("%s:%d".formatted(FoldersDataServlet.FOLDER_START_RECORD, folderId));
 		}
 	}
 

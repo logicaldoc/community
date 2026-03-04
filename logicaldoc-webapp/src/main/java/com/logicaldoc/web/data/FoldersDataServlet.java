@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -190,20 +191,19 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			boolean published = (rs.getInt(4) == 1) && (rs.getDate(5) == null || now.after(rs.getDate(5)))
 					&& (rs.getDate(6) == null || now.before(rs.getDate(6)));
 			writer.print(FOLDER);
-			writer.print("<id>d-" + rs.getLong(1) + "</id>");
-			writer.print("<folderId>d-" + rs.getLong(1) + "</folderId>");
-			writer.print("<parentId>" + parentId + "</parentId>");
-			writer.print("<parent>" + parent + "</parent>");
-			writer.print("<name><![CDATA[" + rs.getString(2) + "]]></name>");
+			writer.print(String.format("<id>d-%d</id>", rs.getLong(1)));
+			writer.print(String.format("<folderId>d-%d</folderId>", rs.getLong(1)));
+			writer.print(String.format("<parentId>%d</parentId>", parentId));
+			writer.print(String.format("<parent>%s</parent>", parent));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", rs.getString(2)));
 			writer.print("<type>file</type>");
-			writer.print("<customIcon>"
-					+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
-					+ "</customIcon>");
-			writer.print("<size>" + rs.getInt(3) + "</size>");
-			writer.print("<status>" + rs.getInt(7) + "</status>");
-			writer.print("<publishedStatus>" + (published ? "yes" : "no") + "</publishedStatus>");
+			writer.print(String.format("<customIcon>%s</customIcon>",
+					FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))));
+			writer.print(String.format("<size>%d</size>", rs.getInt(3)));
+			writer.print(String.format("<status>%d</status>", rs.getInt(7)));
+			writer.print(String.format("<publishedStatus>%s</publishedStatus>", published ? "yes" : "no"));
 			if (StringUtils.isNotEmpty(rs.getString(8)))
-				writer.print("<color><![CDATA[" + rs.getString(8) + "]]></color>");
+				writer.print(String.format("<color><![CDATA[%s]]></color>", rs.getString(8)));
 			writer.print("<position>0</position>");
 			writer.print(FOLDER_CLOSED);
 		}
@@ -213,11 +213,11 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			throws PersistenceException {
 		StringBuilder query = new StringBuilder(
 				"select ld_id, ld_parentid, ld_name, ld_type, ld_foldref, ld_color, ld_position from ld_folder where ld_deleted=0 and ld_hidden=0 and not ld_id=ld_parentid and ld_parentid = :parentId and ld_tenantid = :tenantId ");
-		if (!user.isMemberOf(Group.GROUP_ADMIN) && parentFolder != null) {
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && parentFolder != null)
 			addReadConditions(query, session, parentFolder);
-		}
+
 		query.append(" order by ld_position asc, ");
-		if ("name".equals(Context.get().getConfig().getProperty(tenantName + ".gui.folder.sorting")))
+		if ("name".equals(Context.get().getConfig().getProperty("%s.gui.folder.sorting".formatted(tenantName))))
 			query.append(" ld_name asc ");
 		else
 			query.append(" ld_creation desc ");
@@ -248,8 +248,8 @@ public class FoldersDataServlet extends AbstractDataServlet {
 				int chunkStart = chunk * chunkSize;
 				List<Long> sublist = folderIds.subList(chunkStart,
 						chunkStart + chunkSize < length ? chunkStart + chunkSize : length);
-				String idsStr = sublist.toString().replace('[', '(').replace(']', ')');
-				query.append(" ld_id in " + idsStr);
+				query.append(" ld_id in (%s) "
+						.formatted(sublist.stream().map(id -> id.toString()).collect(Collectors.joining(","))));
 			}
 
 			query.append(" ) ");
@@ -273,12 +273,14 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 			// Go with the default page size
 			if (endRecord == null)
-				endRecord = Context.get().getConfig().getLong(session.getTenantName() + ".gui.folder.maxchildren",
-						2000L);
+				endRecord = Context.get().getConfig()
+						.getLong("%s.gui.folder.maxchildren".formatted(session.getTenantName()), 2000L);
 
 			Integer[] pagination = new Integer[] {
-					(Integer) session.getDictionary().get(FOLDER_START_RECORD + ":" + parentFolderId),
-					(Integer) session.getDictionary().get(FOLDER_PAGE_SIZE + ":" + parentFolderId) };
+					(Integer) session.getDictionary()
+							.get("%s:%d".formatted(FoldersDataServlet.FOLDER_START_RECORD, parentFolderId)),
+					(Integer) session.getDictionary()
+							.get("%s:%d".formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, parentFolderId)) };
 			if (pagination[0] != null && pagination[1] != null) {
 				log.debug("Found pagination for folder {} -> max: {}  page: {}", parentFolder, pagination[0],
 						pagination[1]);
@@ -326,7 +328,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		if ("/".equals(parent)) {
 			Folder root = folderDao.findRoot(tenantId);
 			if (root == null)
-				throw new IOException("Unable to locate the root folder for tenant " + tenantId);
+				throw new IOException("Unable to locate the root folder for tenant %d".formatted(tenantId));
 			parent = "" + root.getId();
 		}
 		return parent;

@@ -70,7 +70,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			String name = rs.getString(2);
 			int type = rs.getInt(3);
 
-			String key = docId + "-" + name;
+			String key = "%d-%s".formatted(docId, name);
 
 			if (type == Attribute.TYPE_STRING) {
 				if (StringUtils.isNotEmpty(rs.getString(8)))
@@ -162,74 +162,75 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			List<String> extendedAttributes, final Map<String, Object> extendedAttributesValues, String tenant) {
 
 		writer.print("<document>");
-		writer.print("<id>" + document.getId() + "</id>");
+		writer.print(String.format("<id>%d</id>", document.getId()));
 
 		printFolderAndDocRef(writer, document);
 		printCustomIdAndRevision(writer, document);
 
-		writer.print("<icon>" + FileUtil.getBaseName(document.getIcon()) + "</icon>");
-		writer.print("<version>" + document.getVersion() + "</version>");
+		writer.print(String.format("<icon>%s</icon>", FileUtil.getBaseName(document.getIcon())));
+		writer.print(String.format("<version>%s</version>", document.getVersion()));
 
 		printDates(writer, document);
 
-		writer.print("<creator><![CDATA[" + document.getCreator() + "]]></creator>");
+		writer.print(String.format("<creator><![CDATA[%s]]></creator>", document.getCreator()));
 
-		writer.print("<size>" + document.getFileSize() + "</size>");
-		writer.print("<pages>" + document.getPages() + "</pages>");
+		writer.print(String.format("<size>%d</size>", document.getFileSize()));
+		writer.print(String.format("<pages>%d</pages>", document.getPages()));
 
-		writer.print("<status>" + document.getStatus().ordinal() + "</status>");
-		writer.print("<immutable>" + document.isImmutable() + "</immutable>");
-		writer.print("<indexed>" + document.getIndexed().ordinal() + "</indexed>");
+		writer.print(String.format("<status>%d</status>", document.getStatus().ordinal()));
+		writer.print(String.format("<immutable>%b</immutable>", document.isImmutable()));
+		writer.print(String.format("<indexed>%d</indexed>", document.getIndexed().ordinal()));
 		writer.print(String.format("<embedded>%d</embedded>", document.getEmbeddingStatus().ordinal()));
-		writer.print("<password>" + StringUtils.isNotEmpty(document.getPassword()) + "</password>");
-		writer.print("<signed>" + document.isSigned() + "</signed>");
-		writer.print("<stamped>" + document.isStamped() + "</stamped>");
-		writer.print("<bookmarked>" + (bookmarks.contains(document.getId()) || bookmarks.contains(document.getDocRef()))
-				+ "</bookmarked>");
-		writer.print("<language>" + document.getLanguage() + "</language>");
-		writer.print("<links>" + (document.getLinks()
-				+ (Context.get().getConfig().getBoolean(tenant + ".gui.showdocattrsaslinks", false)
-						? document.getDocAttrs()
-						: 0))
-				+ "</links>");
-		writer.print("<publisherId>" + document.getPublisherId() + "</publisherId>");
-		writer.print("<creatorId>" + document.getCreatorId() + "</creatorId>");
-		writer.print("<tenantId>" + document.getTenantId() + "</tenantId>");
+		writer.print(String.format("<password>%b</password>", StringUtils.isNotEmpty(document.getPassword())));
+		writer.print(String.format("<signed>%b</signed>", document.isSigned()));
+		writer.print(String.format("<stamped>%b</stamped>", document.isStamped()));
+		writer.print(String.format("<bookmarked>%b</bookmarked>",
+				(bookmarks.contains(document.getId()) || bookmarks.contains(document.getDocRef()))));
+		writer.print(String.format("<language>%s</language>", document.getLanguage()));
+		writer.print(String.format("<links>%d</links>",
+				document.getLinks()
+						+ (Context.get().getConfig().getBoolean("%s.gui.showdocattrsaslinks".formatted(tenant), false)
+								? document.getDocAttrs()
+								: 0)));
+		writer.print(String.format("<publisherId>%d</publisherId>", document.getPublisherId()));
+		writer.print(String.format("<creatorId>%d</creatorId>", document.getCreatorId()));
+		writer.print(String.format("<tenantId>%d</tenantId>", document.getTenantId()));
 
 		printLockUser(writer, document);
 
-		writer.print("<filename><![CDATA[" + document.getFileName() + "]]></filename>");
-		writer.print("<type><![CDATA[" + document.getType() + "]]></type>");
+		writer.print(String.format("<filename><![CDATA[%s]]></filename>", document.getFileName()));
+		writer.print(String.format("<type><![CDATA[%s]]></type>", document.getType()));
 
-		writer.print("<rating>" + (document.getRating() != null ? document.getRating() : "0") + "</rating>");
-		writer.print("<fileVersion><![CDATA[" + document.getFileVersion() + "]]></fileVersion>");
+		writer.print(String.format("<rating>%d</rating>", document.getRating() != null ? document.getRating() : 0));
+		writer.print(String.format("<fileVersion><![CDATA[%s]]></fileVersion>", document.getFileVersion()));
 
 		if (StringUtils.isNotEmpty(document.getComment()))
-			writer.print("<comment><![CDATA[" + document.getComment() + "]]></comment>");
+			writer.print(String.format("<comment><![CDATA[%s]]></comment>", document.getComment()));
 
 		if (StringUtils.isNotEmpty(document.getLastNote()))
-			writer.print("<lastNote><![CDATA[" + document.getLastNote() + "]]></lastNote>");
+			writer.print(String.format("<lastNote><![CDATA[%s]]></lastNote>", document.getLastNote()));
 
 		if (StringUtils.isNotEmpty(document.getWorkflowStatus()))
-			writer.print("<workflowStatus><![CDATA[" + document.getWorkflowStatus() + "]]></workflowStatus>");
+			writer.print(
+					String.format("<workflowStatus><![CDATA[%s]]></workflowStatus>", document.getWorkflowStatus()));
 		if (StringUtils.isNotEmpty(document.getWorkflowStatusDisplay()))
-			writer.print("<workflowStatusDisplay><![CDATA[" + document.getWorkflowStatusDisplay()
-					+ "]]></workflowStatusDisplay>");
+			writer.print(String.format("<workflowStatusDisplay><![CDATA[%s]]></workflowStatusDisplay>",
+					document.getWorkflowStatusDisplay()));
 
 		if (StringUtils.isNotEmpty(document.getColor()))
-			writer.print("<color><![CDATA[" + document.getColor() + "]]></color>");
+			writer.print(String.format("<color><![CDATA[%s]]></color>", document.getColor()));
 
-		writer.print("<publishedStatus>" + (document.isPublishing() ? "yes" : "no") + "</publishedStatus>");
+		writer.print(String.format("<publishedStatus>%s</publishedStatus>", document.isPublishing() ? "yes" : "no"));
 
 		if (document.getExtResId() != null)
-			writer.print("<extResId><![CDATA[" + document.getExtResId() + "]]></extResId>");
+			writer.print(String.format("<extResId><![CDATA[%s]]></extResId>", document.getExtResId()));
 
 		if (document.getTemplateName() != null)
-			writer.print("<template><![CDATA[" + document.getTemplateName() + "]]></template>");
+			writer.print(String.format("<template><![CDATA[%s]]></template>", document.getTemplateName()));
 
 		if (StringUtils.isNotEmpty(document.getTgs()))
-			writer.print(
-					"<tags><![CDATA[" + document.getTgs().substring(1, document.getTgs().length() - 1) + "]]></tags>");
+			writer.print(String.format("<tags><![CDATA[%s]]></tags>",
+					document.getTgs().substring(1, document.getTgs().length() - 1)));
 
 		printExtendedAttributes(writer, document, extendedAttributes, extendedAttributesValues);
 
@@ -246,64 +247,58 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			for (String name : extendedAttributes) {
 				Object val = document.getValue(name);
 				if (val != null) {
-					writer.print("<ext_" + name + ">");
+					writer.print("<ext_%s>".formatted(name));
 
 					switch (val) {
 						case Date date -> writer.print(df.format(date));
 						case Integer intVal -> writer.print(Integer.toString(intVal));
 						case Long longVal -> writer.print(Long.toString(longVal));
 						case Double doubleVal -> writer.print(Double.toString(doubleVal));
-						default -> writer.print("<![CDATA[" + val + "]]>");
+						default -> writer.print("<![CDATA[%s]]>".formatted(val));
 					}
 
-					writer.print("</ext_" + name + ">");
+					writer.print("</ext_%s>".formatted(name));
 				}
 			}
 	}
 
 	private void printDates(PrintWriter writer, Document document) {
 		DateFormat df = getDateFormat();
-		writer.print(
-				"<lastModified>" + (document.getLastModified() != null ? df.format(document.getLastModified()) : "")
-						+ "</lastModified>");
-		writer.print(
-				"<published>" + (document.getDate() != null ? df.format(document.getDate()) : "") + "</published>");
-		writer.print("<publisher><![CDATA[" + document.getPublisher() + "]]></publisher>");
-		writer.print(
-				"<created>" + (document.getCreation() != null ? df.format(document.getCreation()) : "") + "</created>");
-		if (document.getStartPublishing() != null)
-			writer.print("<startPublishing>" + df.format(document.getStartPublishing()) + "</startPublishing>");
-		else
-			writer.print("<startPublishing></startPublishing>");
-
-		if (document.getStopPublishing() != null)
-			writer.print("<stopPublishing>" + df.format(document.getStopPublishing()) + "</stopPublishing>");
-		else
-			writer.print("<stopPublishing></stopPublishing>");
+		writer.print(String.format("<lastModified>%s</lastModified>",
+				document.getLastModified() != null ? df.format(document.getLastModified()) : ""));
+		writer.print(String.format("<published>%s</published>",
+				document.getDate() != null ? df.format(document.getDate()) : ""));
+		writer.print(String.format("<publisher><![CDATA[%s]]></publisher>", document.getPublisher()));
+		writer.print(String.format("<created>%s</created>",
+				document.getCreation() != null ? df.format(document.getCreation()) : ""));
+		writer.print(String.format("<startPublishing>%s</startPublishing>",
+				document.getStartPublishing() != null ? df.format(document.getStartPublishing()) : ""));
+		writer.print(String.format("<stopPublishing>%s</stopPublishing>",
+				document.getStopPublishing() != null ? df.format(document.getStopPublishing()) : ""));
 	}
 
 	private void printLockUser(PrintWriter writer, Document document) {
 		if (document.getLockUserId() != null)
-			writer.print("<lockUserId>" + document.getLockUserId() + "</lockUserId>");
+			writer.print(String.format("<lockUserId>%d</lockUserId>", document.getLockUserId()));
 		if (document.getLockUser() != null)
-			writer.print("<lockUser><![CDATA[" + document.getLockUser() + "]]></lockUser>");
+			writer.print(String.format("<lockUser><![CDATA[%s]]></lockUser>", document.getLockUser()));
 	}
 
 	private void printFolderAndDocRef(PrintWriter writer, Document document) {
 		if (document.getFolder() != null)
-			writer.print("<folderId>" + document.getFolder().getId() + "</folderId>");
+			writer.print(String.format("<folderId>%d</folderId>", document.getFolder().getId()));
 		if (document.getDocRef() != null) {
-			writer.print("<docref>" + document.getDocRef() + "</docref>");
+			writer.print(String.format("<docref>%d</docref>", document.getDocRef()));
 			if (document.getDocRefType() != null)
-				writer.print("<docrefType>" + document.getDocRefType() + "</docrefType>");
+				writer.print(String.format("<docrefType>%s</docrefType>", document.getDocRefType()));
 		}
 	}
 
 	private void printCustomIdAndRevision(PrintWriter writer, Document document) {
-		writer.print("<customId><![CDATA[" + (document.getCustomId() != null ? document.getCustomId() : "")
-				+ "]]></customId>");
-		writer.print("<revision><![CDATA[" + (document.getRevision() != null ? document.getRevision() : "")
-				+ "]]></revision>");
+		writer.print(String.format("<customId><![CDATA[%s]]></customId>",
+				document.getCustomId() != null ? document.getCustomId() : ""));
+		writer.print(String.format("<revision><![CDATA[%s]]></revision>",
+				document.getRevision() != null ? document.getRevision() : ""));
 	}
 
 	private void findDocumentsByIds(HttpServletRequest request, Session session, List<Document> documentsInCurrentPage)
@@ -398,25 +393,25 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
 		query.append(DocumentStatus.ARCHIVED.ordinal());
 
 		if (folderId != null) {
-			query.append(" and A.folder.id=" + folderId);
+			query.append(" and A.folder.id = %d".formatted(folderId));
 
 			List<Long> forbiddenDocIds = getForbiddenDocumentIds(user, folderId);
 			if (!forbiddenDocIds.isEmpty()) {
-				query.append(" and A.id not in(");
+				query.append(" and A.id not in (");
 				query.append(forbiddenDocIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
 				query.append(") ");
 			}
 		}
 
 		if (formId != null)
-			query.append(" and A.formId=" + Long.toString(formId));
+			query.append(" and A.formId = %d".formatted(formId));
 		if (StringUtils.isNotEmpty(request.getParameter(INDEXED)))
-			query.append(" and A.indexingStatus=" + request.getParameter(INDEXED));
+			query.append(" and A.indexingStatus = %s".formatted(request.getParameter(INDEXED)));
 
 		Map<String, Object> params = new HashMap<>();
 		if (filename != null) {
 			query.append(" and lower(A.fileName) like :fileName ");
-			params.put("fileName", "%" + filename.toLowerCase() + "%");
+			params.put("fileName", "%%%s%%".formatted(filename.toLowerCase()));
 		}
 
 		List<?> records = new ArrayList<>();
@@ -480,7 +475,7 @@ select ld_docid
 			doc.setTenantId((Long) cols[40]);
 			doc.setIndexingStatus((IndexingStatus) cols[12]);
 			doc.setEmbeddingStatus((EmbeddingStatus) cols[43]);
-			
+
 			Folder f = new Folder();
 			f.setId((Long) cols[39]);
 			doc.setFolder(f);
@@ -658,12 +653,11 @@ select ld_docid
 		query.append(" from ld_document_ext where ld_docid in (");
 		query.append("select D.ld_id from ld_document D where D.ld_deleted=0 ");
 		if (folderId != null)
-			query.append(" and D.ld_folderid=" + Long.toString(folderId));
+			query.append(" and D.ld_folderid = %d".formatted(folderId));
 		if (formId != null)
-			query.append(" and D.ld_formid=" + Long.toString(formId));
-		query.append(") and ld_name in ");
-		query.append(extendedAttributes.toString().replace("[", "('").replace("]", "')").replace(",", "','")
-				.replace(" ", ""));
+			query.append(" and D.ld_formid = %d".formatted(formId));
+		query.append(
+				") and ld_name in ('%s')".formatted(extendedAttributes.stream().collect(Collectors.joining("','"))));
 
 		dao.query(query.toString(), new ExtendedAttributeRowMapper(extAttributesValues, locale), null);
 	}
@@ -704,8 +698,7 @@ select ld_docid
 
 	private String prepareExtendedAttributes(HttpServletRequest request, Session session,
 			List<String> extendedAttributes) {
-		String extAttributeNames = Context.get().getConfig()
-				.getProperty(session.getTenantName() + ".search.extattr");
+		String extAttributeNames = Context.get().getConfig().getProperty(session.getTenantName() + ".search.extattr");
 		if (request.getParameter("extattr") != null)
 			extAttributeNames = request.getParameter("extattr");
 		if (StringUtils.isNotEmpty(extAttributeNames)) {
