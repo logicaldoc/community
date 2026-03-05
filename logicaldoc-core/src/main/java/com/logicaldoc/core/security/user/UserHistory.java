@@ -45,13 +45,15 @@ public class UserHistory extends History {
 		setSession(session);
 	}
 
-	public UserHistory(UserHistory source) {
+	public UserHistory(History source) {
 		copyAttributesFrom(source);
-		this.author = source.author;
-		this.filename = source.filename;
-		this.fileSize = source.fileSize;
-		this.folderId = source.folderId;
-		this.docId = source.docId;
+		if (source instanceof UserHistory uh) {
+			this.author = uh.author;
+			this.filename = uh.filename;
+			this.fileSize = uh.fileSize;
+			this.folderId = uh.folderId;
+			this.docId = uh.docId;
+		}
 	}
 
 	public void setEvent(UserEvent event) {
