@@ -2839,7 +2839,7 @@ public class ItemFactory {
 				htmlItem.setShowTitle(false);
 				if (handler != null)
 					htmlItem.addChangedHandler(handler);
-				LD.askForValue(EDITHTML, null, item.getValueAsString(), htmlItem, (String val) -> {
+				LD.askForValue(EDITHTML, null, item.getValueAsString(), htmlItem, val -> {
 					item.setValue(val);
 					if (handler != null)
 						handler.onChanged(null);

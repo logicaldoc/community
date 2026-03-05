@@ -7,7 +7,6 @@ import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.NoteChangedListener;
 import com.smartgwt.client.widgets.drawing.DrawItem;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -109,7 +108,7 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 	protected void prepareAdditionalActions(ToolStrip toolStrip) {
 		if (editEnabled) {
 			ToolStripButton addLabel = AwesomeFactory.newToolStripButton("font", LABEL);
-			addLabel.addClickHandler((ClickEvent event) -> addNewNote(LABEL));
+			addLabel.addClickHandler(click -> addNewNote(LABEL));
 
 			toolStrip.addMenuButton(getPolygonMenuButton());
 			toolStrip.addMenuButton(getLineMenuButton());
@@ -119,7 +118,7 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 			ToolStripButton save = new ToolStripButton();
 			save.setTitle(I18N.message("save"));
-			save.addClickHandler((ClickEvent event) -> onSave());
+			save.addClickHandler(click -> onSave());
 			toolStrip.addButton(save);
 
 		}

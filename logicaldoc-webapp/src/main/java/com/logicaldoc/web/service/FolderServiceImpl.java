@@ -59,6 +59,8 @@ import com.logicaldoc.web.data.FoldersDataServlet;
  */
 public class FolderServiceImpl extends AbstractRemoteService implements FolderService {
 
+	private static final String KEY = "%s:%d";
+
 	private static final String FOLDER = "Folder ";
 
 	private static final long serialVersionUID = 1L;
@@ -1105,12 +1107,12 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		Session session = validateSession();
 
 		if (pageSize != null && startRecord != null) {
-			session.getDictionary().put("%s:%d".formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, folderId), pageSize);
-			session.getDictionary().put("%s:%d".formatted(FoldersDataServlet.FOLDER_START_RECORD, folderId),
+			session.getDictionary().put(KEY.formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, folderId), pageSize);
+			session.getDictionary().put(KEY.formatted(FoldersDataServlet.FOLDER_START_RECORD, folderId),
 					startRecord);
 		} else {
-			session.getDictionary().remove("%s:%d".formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, folderId));
-			session.getDictionary().remove("%s:%d".formatted(FoldersDataServlet.FOLDER_START_RECORD, folderId));
+			session.getDictionary().remove(KEY.formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, folderId));
+			session.getDictionary().remove(KEY.formatted(FoldersDataServlet.FOLDER_START_RECORD, folderId));
 		}
 	}
 

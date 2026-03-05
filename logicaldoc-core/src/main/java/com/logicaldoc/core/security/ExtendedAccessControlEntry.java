@@ -125,18 +125,22 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		this.ace = ace;
 	}
 
+	@Override
 	public boolean isRead() {
 		return ace.isRead();
 	}
 
+	@Override
 	public void setRead(boolean read) {
 		ace.setRead(read);
 	}
 
+	@Override
 	public boolean isWrite() {
 		return ace.isWrite();
 	}
 
+	@Override
 	public void setWrite(boolean write) {
 		ace.setWrite(write);
 	}

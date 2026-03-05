@@ -163,10 +163,11 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			try {
 				List<String> unconfirmedLegals = userDAO.queryForList(
 						"select ld_name from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name)",
-						Map.of("username", user.getUsername()), String.class, null);			
+						Map.of("username", user.getUsername()), String.class, null);
 				if (!unconfirmedLegals.isEmpty()) {
-					log.error("User {} did not confirm {} legals: {}", user, unconfirmedLegals.size(),
-							unconfirmedLegals.stream().collect(Collectors.joining(",")));
+					if (log.isErrorEnabled())
+						log.error("User {} did not confirm {} legals: {}", user, unconfirmedLegals.size(),
+								unconfirmedLegals.stream().collect(Collectors.joining(",")));
 					throw new UnconfirmedLegalsException();
 				}
 			} catch (PersistenceException e) {

@@ -70,7 +70,7 @@ public class BruteForcePanel extends AdminPanel {
 
 	private DynamicForm form = new DynamicForm();
 
-	private MultiComboBoxItem recipients;
+	private MultiComboBoxItem recipientsItem;
 	
 	public BruteForcePanel() {
 		super("bruteforceprevention");
@@ -153,16 +153,16 @@ public class BruteForcePanel extends AdminPanel {
 		apikeyWait.setWrapTitle(false);
 		apikeyWait.setHint(I18N.message(MINUTES));
 
-		recipients = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
+		recipientsItem = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
 				new UsersDS(null, false, false),
 				params.get(THROTTLE_ALERT_RECIPIENTS) != null && !params.get(THROTTLE_ALERT_RECIPIENTS).trim().isEmpty()
 						? params.get(THROTTLE_ALERT_RECIPIENTS).trim().split(",")
 						: null);
-		recipients.setValueField("username");
-		recipients.setDisplayField("username");
+		recipientsItem.setValueField("username");
+		recipientsItem.setDisplayField("username");
 
 		form.setItems(enabled, usernameMax, usernameDisableUser, usernameWait, ipMax, ipWait, apikeyMax, apikeyWait,
-				recipients);
+				recipientsItem);
 
 		body.addMember(form);
 
@@ -255,7 +255,7 @@ public class BruteForcePanel extends AdminPanel {
 		params.add(new GUIParameter(THROTTLE_APIKEY_WAIT, form.getValueAsString("apikeywait")));
 		params.add(new GUIParameter(THROTTLE_USERNAME_DISABLEUSER, form.getValueAsString("usernamedisableuser")));
 
-		String[] usernames = recipients.getValues();
+		String[] usernames = recipientsItem.getValues();
 		if (usernames != null && usernames.length > 0) {
 			params.add(new GUIParameter(THROTTLE_ALERT_RECIPIENTS,
 					Arrays.asList(usernames).stream().collect(Collectors.joining(","))));

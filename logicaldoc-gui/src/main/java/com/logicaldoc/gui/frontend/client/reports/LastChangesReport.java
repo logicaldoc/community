@@ -56,6 +56,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class LastChangesReport extends AdminPanel {
 
+	private static final String IMPERSONATOR = "impersonator";
+
 	private static final String NAME = "name";
 
 	private static final String DISPLAYMAX = "displaymax";
@@ -118,7 +120,7 @@ public class LastChangesReport extends AdminPanel {
 		user.setEndRow(true);
 
 		// Impersonator
-		SelectItem impersonatorSelector = ItemFactory.newUserSelector("impersonator", "impersonator", null, false,
+		SelectItem impersonatorSelector = ItemFactory.newUserSelector(IMPERSONATOR, IMPERSONATOR, null, false,
 				false);
 		impersonatorSelector.setEndRow(true);
 
@@ -261,7 +263,7 @@ public class LastChangesReport extends AdminPanel {
 		username.setCanFilter(true);
 		username.setHidden(true);
 
-		ListGridField impersonator = new ListGridField("impersonator", I18N.message("impersonator"), 100);
+		ListGridField impersonator = new ListGridField(IMPERSONATOR, I18N.message(IMPERSONATOR), 100);
 		impersonator.setCanFilter(true);
 		impersonator.setHidden(true);
 
@@ -325,7 +327,7 @@ public class LastChangesReport extends AdminPanel {
 		List<String> eventValues = getEvents();
 
 		Long userId = getUserId("user");
-		Long impersonatorId = getUserId("impersonator");
+		Long impersonatorId = getUserId(IMPERSONATOR);
 
 		Date fromValue = null;
 		if (vm.getValue(FROM_DATE) != null)
@@ -403,7 +405,7 @@ public class LastChangesReport extends AdminPanel {
 							rec.setAttribute(USERNAME, hist.getUserLogin());
 							rec.setAttribute(COMMENT, hist.getComment());
 							rec.setAttribute(REASON, hist.getReason());
-							rec.setAttribute("impersonator", hist.getImpersonator());
+							rec.setAttribute(IMPERSONATOR, hist.getImpersonator());
 							rec.setAttribute("icon", hist.getIcon());
 							records.add(rec);
 						}

@@ -34,7 +34,7 @@ import com.logicaldoc.util.spring.Context;
 public class AuthenticationChain extends AbstractAuthenticator {
 
 	private static final String IMPERSONATION_SEPARATOR = ">";
-	
+
 	private static final Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
 
 	private List<Authenticator> authenticators = new ArrayList<>();
@@ -83,7 +83,25 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 		log.debug("Collected authentication errors: {}", errors);
 
-		if (StringUtils.isNotEmpty(impersonatedUsername))
+		user = handleImpersonation(user, impersonatedUsername, errors);
+
+		if (user != null) {
+			initializeUser(user);
+		} else {
+			// In case of multiple errors, we consider the first one that is
+			// not a UserNotFound exception because it is normal that some
+			// authenticator does not find this user because not in it's domain
+			for (AuthenticationException err : errors)
+				if (!(err instanceof AccountNotFoundException))
+					throw err;
+			throw errors.get(0);
+		}
+
+		return user;
+	}
+
+	private User handleImpersonation(User user, String impersonatedUsername, List<AuthenticationException> errors) {
+		if (StringUtils.isNotEmpty(impersonatedUsername) && user != null)
 			try {
 				User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername);
 				UserDAO.get().initialize(impersonatedUser);
@@ -101,19 +119,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
 				errors.clear();
 				user = null;
 			}
-
-		if (user != null) {
-			initializeUser(user);
-		} else {
-			// In case of multiple errors, we consider the first one that is
-			// not a UserNotFound exception because it is normal that some
-			// authenticator does not find this user because not in it's domain
-			for (AuthenticationException err : errors)
-				if (!(err instanceof AccountNotFoundException))
-					throw err;
-			throw errors.get(0);
-		}
-
 		return user;
 	}
 

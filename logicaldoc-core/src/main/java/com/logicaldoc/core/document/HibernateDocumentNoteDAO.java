@@ -70,16 +70,16 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			FolderDAO.get().initialize(doc.getFolder());
 
 			if (CollectionUtils.isNotEmpty(doc.getAccessControlList())) {
-				note.getAccessControlList().addAll(doc.getAccessControlList().stream()
-						.map(dace -> new NoteAccessControlEntry(dace)).collect(Collectors.toSet()));
+				note.getAccessControlList().addAll(doc.getAccessControlList().stream().map(NoteAccessControlEntry::new)
+						.collect(Collectors.toSet()));
 			} else if (CollectionUtils.isNotEmpty(doc.getFolder().getAccessControlList())) {
 				note.getAccessControlList().addAll(doc.getFolder().getAccessControlList().stream()
-						.map(face -> new NoteAccessControlEntry(face)).collect(Collectors.toSet()));
-			} else if (doc.getFolder().getSecurityRef()!=null) {
-				Folder securityFolder=FolderDAO.get().findFolder(doc.getFolder().getSecurityRef());
+						.map(NoteAccessControlEntry::new).collect(Collectors.toSet()));
+			} else if (doc.getFolder().getSecurityRef() != null) {
+				Folder securityFolder = FolderDAO.get().findFolder(doc.getFolder().getSecurityRef());
 				FolderDAO.get().initialize(securityFolder);
 				note.getAccessControlList().addAll(securityFolder.getAccessControlList().stream()
-						.map(face -> new NoteAccessControlEntry(face)).collect(Collectors.toSet()));
+						.map(NoteAccessControlEntry::new).collect(Collectors.toSet()));
 			}
 		}
 

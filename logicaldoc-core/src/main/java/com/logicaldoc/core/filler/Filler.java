@@ -213,11 +213,10 @@ public abstract class Filler extends PersistentObject {
 				return false;
 		} else if (!label.equals(other.label))
 			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		}
-		return name.equals(other.name);
+		if (name == null)
+			return other.name == null;
+		else
+			return name.equals(other.name);
 	}
 
 	@Override

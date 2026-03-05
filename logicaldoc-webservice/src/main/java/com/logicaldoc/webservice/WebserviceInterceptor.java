@@ -264,7 +264,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		return freq;
 	}
 
-	protected void syncCounters() throws PersistenceException, IOException {
+	protected void syncCounters() throws PersistenceException {
 		for (Map.Entry<Pair<String, Long>, AtomicLong> entry : counters.entrySet()) {
 			AtomicLong counter = entry.getValue();
 			sequenceDAO.next(entry.getKey().getKey(), 0L, entry.getKey().getValue(), counter.get());

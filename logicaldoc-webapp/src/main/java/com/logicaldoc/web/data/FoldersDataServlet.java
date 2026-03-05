@@ -39,9 +39,15 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class FoldersDataServlet extends AbstractDataServlet {
 
-	private static final String FOLDER_CLOSED = "</folder>";
+	private static final String NAME_ELEMENT = "<name><![CDATA[%s]]></name>";
 
-	private static final String FOLDER = "<folder>";
+	private static final String PARENT_ELEMENT = "<parent>%s</parent>";
+
+	private static final String PARENT_ID_ELEMENT = "<parentId>%d</parentId>";
+
+	private static final String FOLDER_ELEMENT_CLOSED = "</folder>";
+
+	private static final String FOLDER_ELEMENT = "<folder>";
 
 	private static final long serialVersionUID = 1L;
 
@@ -93,16 +99,16 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		if ("/".equals(request.getParameter(PARENT)) && withroot) {
-			writer.print(FOLDER);
+			writer.print(FOLDER_ELEMENT);
 			writer.print("<id>%d</id>".formatted(parentFolder.getId()));
 			writer.print("<folderId>%d</folderId>".formatted(parentFolder.getId()));
-			writer.print("<parentId>%d</parentId>".formatted(parentFolder.getId()));
-			writer.print("<parent>%s</parent>".formatted(parent));
-			writer.print("<name><![CDATA[%s]]></name>".formatted(parentFolder.getName()));
+			writer.print(PARENT_ID_ELEMENT.formatted(parentFolder.getId()));
+			writer.print(PARENT_ELEMENT.formatted(parent));
+			writer.print(NAME_ELEMENT.formatted(parentFolder.getName()));
 			writer.print("<type>%d</type>".formatted(parentFolder.getType()));
 			writer.print("<status>0</status>");
 			writer.print("<publishedStatus>yes</publishedStatus>");
-			writer.print(FOLDER_CLOSED);
+			writer.print(FOLDER_ELEMENT_CLOSED);
 		} else {
 			printFolders(writer, session, tenantId, tenantName, parent, parentFolder, user, root ? null : startRecord,
 					root ? null : endRecord);
@@ -128,12 +134,12 @@ public class FoldersDataServlet extends AbstractDataServlet {
 							continue;
 						}
 
-						writer.print(FOLDER);
+						writer.print(FOLDER_ELEMENT);
 						writer.print("<id>%s-%d</id>".formatted(parent, rows.getLong(1)));
 						writer.print("<folderId>%d</folderId>".formatted(rows.getLong(1)));
-						writer.print("<parentId>%d</parentId>".formatted(rows.getLong(2)));
-						writer.print("<parent>%s</parent>".formatted(parent));
-						writer.print("<name><![CDATA[%s]]></name>".formatted(rows.getString(3)));
+						writer.print(PARENT_ID_ELEMENT.formatted(rows.getLong(2)));
+						writer.print(PARENT_ELEMENT.formatted(parent));
+						writer.print(NAME_ELEMENT.formatted(rows.getString(3)));
 						writer.print("<type>%d</type>".formatted(rows.getInt(4)));
 						printFoldRef(writer, rows);
 						printCustomIcon(writer, rows);
@@ -141,7 +147,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 						writer.print("<publishedStatus>yes</publishedStatus>");
 						printColor(writer, rows);
 						writer.print("<position>%d</position>".formatted(rows.getInt(7)));
-						writer.print(FOLDER_CLOSED);
+						writer.print(FOLDER_ELEMENT_CLOSED);
 
 						i++;
 					}
@@ -190,12 +196,12 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			Date now = new Date();
 			boolean published = (rs.getInt(4) == 1) && (rs.getDate(5) == null || now.after(rs.getDate(5)))
 					&& (rs.getDate(6) == null || now.before(rs.getDate(6)));
-			writer.print(FOLDER);
+			writer.print(FOLDER_ELEMENT);
 			writer.print(String.format("<id>d-%d</id>", rs.getLong(1)));
 			writer.print(String.format("<folderId>d-%d</folderId>", rs.getLong(1)));
-			writer.print(String.format("<parentId>%d</parentId>", parentId));
-			writer.print(String.format("<parent>%s</parent>", parent));
-			writer.print(String.format("<name><![CDATA[%s]]></name>", rs.getString(2)));
+			writer.print(String.format(PARENT_ID_ELEMENT, parentId));
+			writer.print(String.format(PARENT_ELEMENT, parent));
+			writer.print(String.format(NAME_ELEMENT, rs.getString(2)));
 			writer.print("<type>file</type>");
 			writer.print(String.format("<customIcon>%s</customIcon>",
 					FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))));
@@ -205,7 +211,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			if (StringUtils.isNotEmpty(rs.getString(8)))
 				writer.print(String.format("<color><![CDATA[%s]]></color>", rs.getString(8)));
 			writer.print("<position>0</position>");
-			writer.print(FOLDER_CLOSED);
+			writer.print(FOLDER_ELEMENT_CLOSED);
 		}
 	}
 
@@ -249,7 +255,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 				List<Long> sublist = folderIds.subList(chunkStart,
 						chunkStart + chunkSize < length ? chunkStart + chunkSize : length);
 				query.append(" ld_id in (%s) "
-						.formatted(sublist.stream().map(id -> id.toString()).collect(Collectors.joining(","))));
+						.formatted(sublist.stream().map(Object::toString).collect(Collectors.joining(","))));
 			}
 
 			query.append(" ) ");

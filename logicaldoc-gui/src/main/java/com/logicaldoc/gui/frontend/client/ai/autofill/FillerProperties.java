@@ -28,6 +28,12 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class FillerProperties extends FillerDetailsTab {
 
+	private static final String RETRIEVAL = "retrieval";
+
+	private static final String LANGUAGE = "language";
+
+	private static final String MODEL = "model";
+
 	private static final String ID = "id";
 
 	private static final String NAME = "name";
@@ -44,7 +50,7 @@ public class FillerProperties extends FillerDetailsTab {
 
 	private static final String STRATEGY = "strategy";
 
-	private static final String EMBEDDING = "embeddingscheme";
+	private static final String EMBEDDING_SCHEME = "embeddingscheme";
 
 	private DynamicForm form = new DynamicForm();
 
@@ -92,7 +98,7 @@ public class FillerProperties extends FillerDetailsTab {
 		description.setWidth(400);
 
 		// Model selector
-		SelectItem modelSelector = ItemFactory.newSelectItem(MODEL_ID, "model");
+		SelectItem modelSelector = ItemFactory.newSelectItem(MODEL_ID, MODEL);
 		modelSelector.setValueField("id");
 		modelSelector.setDisplayField("name");
 		modelSelector.setRequired(true);
@@ -102,7 +108,7 @@ public class FillerProperties extends FillerDetailsTab {
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("tag", I18N.message("fillertype.tag"));
-		map.put("language", I18N.message("fillertype.language"));
+		map.put(LANGUAGE, I18N.message("fillertype.language"));
 		type.setValueMap(map);
 		type.setRequired(true);
 		type.setValue(filler.getType());
@@ -128,21 +134,21 @@ public class FillerProperties extends FillerDetailsTab {
 		// Strategy selector
 		SelectItem strategy = ItemFactory.newSelectItem(STRATEGY);
 		LinkedHashMap<String, String> strategyMap = new LinkedHashMap<>();
-		strategyMap.put("model", I18N.message("strategy.model"));
-		strategyMap.put("retrieval", I18N.message("strategy.retrieval"));
+		strategyMap.put(MODEL, I18N.message("strategy.model"));
+		strategyMap.put(RETRIEVAL, I18N.message("strategy.retrieval"));
 		strategy.setValueMap(strategyMap);
 		strategy.setRequired(true);
 
 		if ("tag".equals(filler.getType())) {
 			if (filler.getModelId() == null) {
-				strategy.setValue("retrieval");
+				strategy.setValue(RETRIEVAL);
 			} else {
-				strategy.setValue("model");
+				strategy.setValue(MODEL);
 			}
 		}
 
 		// EmbeddingScheme selector
-		SelectItem embeddingSelector = ItemFactory.newSelectItem(EMBEDDING, I18N.message("embeddingscheme"));
+		SelectItem embeddingSelector = ItemFactory.newSelectItem(EMBEDDING_SCHEME);
 
 		embeddingSelector.setValueField("id");
 		embeddingSelector.setDisplayField("name");
@@ -162,10 +168,10 @@ public class FillerProperties extends FillerDetailsTab {
 		threshold.setRequiredWhen(tagCriteria);
 
 		AdvancedCriteria modelVisible = new AdvancedCriteria(OperatorId.OR,
-				new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, "language"),
+				new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, LANGUAGE),
 						new AdvancedCriteria(OperatorId.AND,
 								new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, "tag"),
-										new Criterion(STRATEGY, OperatorId.EQUALS, "model") }) });
+										new Criterion(STRATEGY, OperatorId.EQUALS, MODEL) }) });
 
 		modelSelector.setVisibleWhen(modelVisible);
 		modelSelector.setRequiredWhen(modelVisible);
@@ -175,9 +181,8 @@ public class FillerProperties extends FillerDetailsTab {
 		strategy.setVisibleWhen(strategyVisible);
 		strategy.setRequiredWhen(strategyVisible);
 
-		AdvancedCriteria embeddingVisible = new AdvancedCriteria(OperatorId.AND,
-				new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, "tag"),
-						new Criterion(STRATEGY, OperatorId.EQUALS, "retrieval") });
+		AdvancedCriteria embeddingVisible = new AdvancedCriteria(OperatorId.AND, new Criterion[] {
+				new Criterion(TYPE, OperatorId.EQUALS, "tag"), new Criterion(STRATEGY, OperatorId.EQUALS, RETRIEVAL) });
 
 		embeddingSelector.setVisibleWhen(embeddingVisible);
 		embeddingSelector.setRequiredWhen(embeddingVisible);
@@ -190,7 +195,7 @@ public class FillerProperties extends FillerDetailsTab {
 	private String modelTypesSuitableForFiller(String fillerType) {
 		return switch (fillerType) {
 			case "tag" -> "zeroshot,classifier";
-			case "language" -> "language";
+			case LANGUAGE -> LANGUAGE;
 			default -> null;
 		};
 	}
@@ -205,9 +210,9 @@ public class FillerProperties extends FillerDetailsTab {
 
 		String strategyValue = form.getValueAsString(STRATEGY);
 		String modelId = form.getValueAsString(MODEL_ID);
-		String embeddingId = form.getValueAsString(EMBEDDING);
+		String embeddingId = form.getValueAsString(EMBEDDING_SCHEME);
 
-		if ("retrieval".equals(strategyValue)) {
+		if (RETRIEVAL.equals(strategyValue)) {
 			// Retrieval strategy
 			filler.setModelId(null);
 			filler.setEmbeddingSchemeId(embeddingId != null ? Long.parseLong(embeddingId) : null);

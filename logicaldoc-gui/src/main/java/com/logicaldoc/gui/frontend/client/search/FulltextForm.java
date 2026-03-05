@@ -39,6 +39,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class FulltextForm extends VLayout implements SearchObserver {
+	private static final String SEARCHIN = "searchin";
+
 	private static final String START = "start";
 
 	private static final String SIZE_OPERATOR = "sizeOperator";
@@ -323,7 +325,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		fieldsForm.setValuesManager(vm);
 		addMember(fieldsForm);
 
-		searchinItem = ItemFactory.newMultiComboBoxItem("searchin", "searchin", null, null);
+		searchinItem = ItemFactory.newMultiComboBoxItem(SEARCHIN, SEARCHIN, null, null);
 		searchinItem.setWidth(300);
 
 		final LinkedHashMap<String, String> fieldsMap = new LinkedHashMap<>();
@@ -374,7 +376,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		vm.setValue(SUBFOLDERS, options.isSearchInSubPath());
 		vm.setValue(ALIASES, options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
-		vm.getItem("searchin").setValue(options.getFields());
+		vm.getItem(SEARCHIN).setValue(options.getFields());
 
 		if (options.getSizeMax() != null) {
 			vm.setValue("size", options.getSizeMax() / 1024D);

@@ -29,6 +29,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  * @since 8.4.2
  */
 public class DocumentCapturePanel extends DocumentDetailTab {
+	private static final String PROCESS = "process";
+
 	private static final String FILLER = "filler";
 
 	private static final String BARCODETEMPLATE = "barcodetemplate";
@@ -65,7 +67,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setWrapItemTitles(false);
 
-		ButtonItem processOcr = new ButtonItem("processOcr", I18N.message("process"));
+		ButtonItem processOcr = new ButtonItem("processOcr", I18N.message(PROCESS));
 		processOcr.setAutoFit(true);
 		processOcr.setEndRow(true);
 		processOcr.setDisabled(!updateEnabled || document.getOcrTemplateId() == null);
@@ -88,7 +90,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		ocrTemplate.addChangedHandler(changedHandler);
 		ocrTemplate.addChangedHandler(event -> processOcr.setDisabled(true));
 
-		ButtonItem processBarcode = new ButtonItem("processBarcode", I18N.message("process"));
+		ButtonItem processBarcode = new ButtonItem("processBarcode", I18N.message(PROCESS));
 		processBarcode.setAutoFit(true);
 		processBarcode.setEndRow(true);
 		processBarcode.setDisabled(!updateEnabled || document.getBarcodeTemplateId() == null);
@@ -119,7 +121,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 				document.isBarcoded() ? I18N.message("yes") : I18N.message("no"));
 		barcodeProcessed.setWrapTitle(false);
 
-		ButtonItem fill = new ButtonItem("fill", I18N.message("process"));
+		ButtonItem fill = new ButtonItem("fill", I18N.message(PROCESS));
 		fill.setAutoFit(true);
 		fill.setEndRow(true);
 		fill.setColSpan(1);
@@ -129,7 +131,10 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		filler.setWrapTitle(false);
 		filler.setDisabled(!updateEnabled || !Feature.enabled(Feature.AUTOFILL));
 		filler.addChangedHandler(changedHandler);
-		filler.addChangedHandler(changed -> { GuiLog.info("-"+changed.getValue()+"-"); fill.setDisabled(changed.getValue() == null);});
+		filler.addChangedHandler(changed -> {
+			GuiLog.info("-" + changed.getValue() + "-");
+			fill.setDisabled(changed.getValue() == null);
+		});
 
 		fill.addClickHandler(event -> {
 			LD.contactingServer();

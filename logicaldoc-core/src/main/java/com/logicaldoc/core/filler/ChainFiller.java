@@ -73,4 +73,29 @@ public class ChainFiller extends Filler {
 			filler.fill(fillable, content, transaction, pipelineDict);
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((chain == null) ? 0 : chain.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ChainFiller other = (ChainFiller) obj;
+		if (chain == null) {
+			if (other.chain != null)
+				return false;
+		} else if (!chain.equals(other.chain))
+			return false;
+		return true;
+	}
 }

@@ -79,7 +79,6 @@ public class TenantQuotaPanel extends HLayout {
 	}
 
 	public void refresh() {
-		boolean readonly = (changedHandler == null);
 		vm.clearValues();
 		vm.clearErrors(true);
 		vm = new ValuesManager();
@@ -98,154 +97,49 @@ public class TenantQuotaPanel extends HLayout {
 
 		layout.addMember(form, 1);
 
-		SpinnerItem usersQuota = ItemFactory.newSpinnerItem(USERSQUOTA, tenant.getMaxUsers());
-		usersQuota.setDisabled(readonly);
-		usersQuota.setRequired(false);
-		usersQuota.setMin(1);
-		usersQuota.setStep(1);
-		usersQuota.setWidth(80);
-		usersQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			usersQuota.addChangedHandler(changedHandler);
+		SpinnerItem usersQuota = prepareUsersQuotaItem();
 
-		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota", tenant.getMaxGuests());
-		guestsQuota.setDisabled(readonly);
-		guestsQuota.setRequired(false);
-		guestsQuota.setMin(-1);
-		guestsQuota.setStep(1);
-		guestsQuota.setWidth(80);
-		guestsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			guestsQuota.addChangedHandler(changedHandler);
+		SpinnerItem guestsQuota = prepareGuestsQuotaItem();
 
-		SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, tenant.getMaxSessions());
-		sessionsQuota.setDisabled(readonly);
-		sessionsQuota.setRequired(false);
-		sessionsQuota.setMin(-1);
-		sessionsQuota.setStep(1);
-		sessionsQuota.setWidth(80);
-		sessionsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			sessionsQuota.addChangedHandler(changedHandler);
+		SpinnerItem sessionsQuota = prepareSessionsQuotaItem();
 
-		SpinnerItem monthlyApiCallsQuota = ItemFactory.newSpinnerItem(MONTHLYAPICALLSQUOTA, tenant.getMaxApiCalls());
-		monthlyApiCallsQuota.setDisabled(readonly);
-		monthlyApiCallsQuota.setRequired(false);
-		monthlyApiCallsQuota.setMin(-1);
-		monthlyApiCallsQuota.setStep(10);
-		monthlyApiCallsQuota.setWidth(100);
-		monthlyApiCallsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			monthlyApiCallsQuota.addChangedHandler(changedHandler);
+		SpinnerItem monthlyApiCallsQuota = prepareMonthlyApiCallsQuotaItem();
 
-		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, tenant.getMaxRepoDocs());
-		documentsQuota.setDisabled(readonly);
-		documentsQuota.setRequired(false);
-		documentsQuota.setMin(-1);
-		documentsQuota.setStep(10000);
-		documentsQuota.setWidth(100);
-		documentsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			documentsQuota.addChangedHandler(changedHandler);
+		SpinnerItem documentsQuota = prepareDocumentsQuotaItem();
 
-		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(SIZEQUOTA, tenant.getMaxRepoSize());
-		sizeQuota.setHint("MB");
-		sizeQuota.setDisabled(readonly);
-		sizeQuota.setRequired(false);
-		sizeQuota.setMin(-1);
-		sizeQuota.setStep(1024);
-		sizeQuota.setWidth(100);
-		sizeQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			sizeQuota.addChangedHandler(changedHandler);
+		SpinnerItem sizeQuota = prepareSizeQuotaItem();
 
-		SpinnerItem ticketsQuota = ItemFactory.newSpinnerItem(TICKETSQUOTA, tenant.getMaxTickets());
-		ticketsQuota.setDisabled(readonly);
-		ticketsQuota.setRequired(false);
-		ticketsQuota.setMin(-1);
-		ticketsQuota.setStep(10);
-		ticketsQuota.setWidth(100);
-		ticketsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			ticketsQuota.addChangedHandler(changedHandler);
+		SpinnerItem ticketsQuota = prepareTicketsQuoteItem();
 
-		SpinnerItem workflowsQuota = ItemFactory.newSpinnerItem(WORKFLOWSQUOTA, tenant.getMaxWorkflows());
-		workflowsQuota.setDisabled(readonly);
-		workflowsQuota.setRequired(false);
-		workflowsQuota.setMin(-1);
-		workflowsQuota.setStep(1);
-		workflowsQuota.setWidth(100);
-		workflowsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			workflowsQuota.addChangedHandler(changedHandler);
+		SpinnerItem workflowsQuota = prepareWorkflowQuotaItem();
 
-		SpinnerItem formsQuota = ItemFactory.newSpinnerItem(FORMSQUOTA, tenant.getMaxForms());
-		formsQuota.setDisabled(readonly);
-		formsQuota.setRequired(false);
-		formsQuota.setMin(-1);
-		formsQuota.setStep(1);
-		formsQuota.setWidth(100);
-		formsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			formsQuota.addChangedHandler(changedHandler);
+		SpinnerItem formsQuota = prepareFormsQuotaItem();
 
-		SpinnerItem reportsQuota = ItemFactory.newSpinnerItem(REPORTSQUOTA, tenant.getMaxReports());
-		reportsQuota.setDisabled(readonly);
-		reportsQuota.setRequired(false);
-		reportsQuota.setMin(-1);
-		reportsQuota.setStep(1);
-		reportsQuota.setWidth(100);
-		reportsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			reportsQuota.addChangedHandler(changedHandler);
+		SpinnerItem reportsQuota = prepareReportsQuotaItem();
 
-		SpinnerItem stampsQuota = ItemFactory.newSpinnerItem(STAMPSQUOTA, tenant.getMaxStamps());
-		stampsQuota.setDisabled(readonly);
-		stampsQuota.setRequired(false);
-		stampsQuota.setMin(-1);
-		stampsQuota.setStep(1);
-		stampsQuota.setWidth(100);
-		stampsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			stampsQuota.addChangedHandler(changedHandler);
+		SpinnerItem stampsQuota = prepareStampsQuotaItem();
 
-		SpinnerItem importFoldersQuota = ItemFactory.newSpinnerItem(IMPORTFOLDERSQUOTA, tenant.getMaxImportFolders());
-		importFoldersQuota.setDisabled(readonly);
-		importFoldersQuota.setRequired(false);
-		importFoldersQuota.setMin(-1);
-		importFoldersQuota.setStep(1);
-		importFoldersQuota.setWidth(100);
-		importFoldersQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			importFoldersQuota.addChangedHandler(changedHandler);
+		SpinnerItem importFoldersQuota = prepareImportFoldersQuotaItem();
 
-		SpinnerItem emailAccountsQuota = ItemFactory.newSpinnerItem(EMAILACCOUNTSQUOTA, tenant.getMaxEmailAccounts());
-		emailAccountsQuota.setDisabled(readonly);
-		emailAccountsQuota.setRequired(false);
-		emailAccountsQuota.setMin(-1);
-		emailAccountsQuota.setStep(1);
-		emailAccountsQuota.setWidth(100);
-		emailAccountsQuota.setVisible(!tenant.isSystem());
-		if (!readonly)
-			emailAccountsQuota.addChangedHandler(changedHandler);
+		SpinnerItem emailAccountsQuota = prepareEmailAccountsQuotaItem();
 
 		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(QUOTA_THRESHOLD, "alertthreshold",
 				tenant.getQuotaThreshold());
-		quotaThreshold.setDisabled(readonly);
+		quotaThreshold.setDisabled(changedHandler == null);
 		quotaThreshold.setMax(100);
 		quotaThreshold.setMin(-1);
 		quotaThreshold.setHint("%");
 		quotaThreshold.setVisible(!tenant.isSystem());
-		if (!readonly)
+		if (changedHandler != null)
 			quotaThreshold.addChangedHandler(changedHandler);
 
 		recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false, false),
 				tenant.getQuotaAlertRecipients().toArray(new String[0]));
-		recipients.setDisabled(readonly);
+		recipients.setDisabled(changedHandler == null);
 		recipients.setValueField("username");
 		recipients.setDisplayField("username");
 		recipients.setVisible(!tenant.isSystem());
-		if (!readonly)
+		if (changedHandler != null)
 			recipients.addChangedHandler(changedHandler);
 
 		StaticTextItem size = ItemFactory.newStaticTextItem("ssize", "size", Util.formatSizeW7(tenant.getSize()));
@@ -282,7 +176,7 @@ public class TenantQuotaPanel extends HLayout {
 				Util.formatLong(tenant.getMaxRepoDocs()));
 		documentsSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem sizeSystemQuota = ItemFactory.newStaticTextItem("sys" + SIZEQUOTA, SIZEQUOTA,
-				Util.formatSizeW7(tenant.getMaxRepoSize() * 1024L * 1024L));
+				Util.formatSizeW7((double)tenant.getMaxRepoSize() * 1024D * 1024D));
 		sizeSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem monthlyApiCallsSystemQuota = ItemFactory.newStaticTextItem("sys" + MONTHLYAPICALLSQUOTA,
 				MONTHLYAPICALLSQUOTA, Util.formatLong(tenant.getMaxApiCalls()));
@@ -319,76 +213,205 @@ public class TenantQuotaPanel extends HLayout {
 		addMember(layout);
 	}
 
+	private SpinnerItem prepareEmailAccountsQuotaItem() {
+		SpinnerItem emailAccountsQuota = ItemFactory.newSpinnerItem(EMAILACCOUNTSQUOTA, tenant.getMaxEmailAccounts());
+		emailAccountsQuota.setDisabled(changedHandler == null);
+		emailAccountsQuota.setRequired(false);
+		emailAccountsQuota.setMin(-1);
+		emailAccountsQuota.setStep(1);
+		emailAccountsQuota.setWidth(100);
+		emailAccountsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			emailAccountsQuota.addChangedHandler(changedHandler);
+		return emailAccountsQuota;
+	}
+
+	private SpinnerItem prepareImportFoldersQuotaItem() {
+		SpinnerItem importFoldersQuota = ItemFactory.newSpinnerItem(IMPORTFOLDERSQUOTA, tenant.getMaxImportFolders());
+		importFoldersQuota.setDisabled(changedHandler == null);
+		importFoldersQuota.setRequired(false);
+		importFoldersQuota.setMin(-1);
+		importFoldersQuota.setStep(1);
+		importFoldersQuota.setWidth(100);
+		importFoldersQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			importFoldersQuota.addChangedHandler(changedHandler);
+		return importFoldersQuota;
+	}
+
+	private SpinnerItem prepareStampsQuotaItem() {
+		SpinnerItem stampsQuota = ItemFactory.newSpinnerItem(STAMPSQUOTA, tenant.getMaxStamps());
+		stampsQuota.setDisabled(changedHandler == null);
+		stampsQuota.setRequired(false);
+		stampsQuota.setMin(-1);
+		stampsQuota.setStep(1);
+		stampsQuota.setWidth(100);
+		stampsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			stampsQuota.addChangedHandler(changedHandler);
+		return stampsQuota;
+	}
+
+	private SpinnerItem prepareReportsQuotaItem() {
+		SpinnerItem reportsQuota = ItemFactory.newSpinnerItem(REPORTSQUOTA, tenant.getMaxReports());
+		reportsQuota.setDisabled(changedHandler == null);
+		reportsQuota.setRequired(false);
+		reportsQuota.setMin(-1);
+		reportsQuota.setStep(1);
+		reportsQuota.setWidth(100);
+		reportsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			reportsQuota.addChangedHandler(changedHandler);
+		return reportsQuota;
+	}
+
+	private SpinnerItem prepareFormsQuotaItem() {
+		SpinnerItem formsQuota = ItemFactory.newSpinnerItem(FORMSQUOTA, tenant.getMaxForms());
+		formsQuota.setDisabled(changedHandler == null);
+		formsQuota.setRequired(false);
+		formsQuota.setMin(-1);
+		formsQuota.setStep(1);
+		formsQuota.setWidth(100);
+		formsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			formsQuota.addChangedHandler(changedHandler);
+		return formsQuota;
+	}
+
+	private SpinnerItem prepareWorkflowQuotaItem() {
+		SpinnerItem workflowsQuota = ItemFactory.newSpinnerItem(WORKFLOWSQUOTA, tenant.getMaxWorkflows());
+		workflowsQuota.setDisabled(changedHandler == null);
+		workflowsQuota.setRequired(false);
+		workflowsQuota.setMin(-1);
+		workflowsQuota.setStep(1);
+		workflowsQuota.setWidth(100);
+		workflowsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			workflowsQuota.addChangedHandler(changedHandler);
+		return workflowsQuota;
+	}
+
+	private SpinnerItem prepareTicketsQuoteItem() {
+		SpinnerItem ticketsQuota = ItemFactory.newSpinnerItem(TICKETSQUOTA, tenant.getMaxTickets());
+		ticketsQuota.setDisabled(changedHandler == null);
+		ticketsQuota.setRequired(false);
+		ticketsQuota.setMin(-1);
+		ticketsQuota.setStep(10);
+		ticketsQuota.setWidth(100);
+		ticketsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			ticketsQuota.addChangedHandler(changedHandler);
+		return ticketsQuota;
+	}
+
+	private SpinnerItem prepareSizeQuotaItem() {
+		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(SIZEQUOTA, tenant.getMaxRepoSize());
+		sizeQuota.setHint("MB");
+		sizeQuota.setDisabled(changedHandler == null);
+		sizeQuota.setRequired(false);
+		sizeQuota.setMin(-1);
+		sizeQuota.setStep(1024);
+		sizeQuota.setWidth(100);
+		sizeQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			sizeQuota.addChangedHandler(changedHandler);
+		return sizeQuota;
+	}
+
+	private SpinnerItem prepareDocumentsQuotaItem() {
+		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, tenant.getMaxRepoDocs());
+		documentsQuota.setDisabled(changedHandler == null);
+		documentsQuota.setRequired(false);
+		documentsQuota.setMin(-1);
+		documentsQuota.setStep(10000);
+		documentsQuota.setWidth(100);
+		documentsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			documentsQuota.addChangedHandler(changedHandler);
+		return documentsQuota;
+	}
+
+	private SpinnerItem prepareMonthlyApiCallsQuotaItem() {
+		SpinnerItem monthlyApiCallsQuota = ItemFactory.newSpinnerItem(MONTHLYAPICALLSQUOTA, tenant.getMaxApiCalls());
+		monthlyApiCallsQuota.setDisabled(changedHandler == null);
+		monthlyApiCallsQuota.setRequired(false);
+		monthlyApiCallsQuota.setMin(-1);
+		monthlyApiCallsQuota.setStep(10);
+		monthlyApiCallsQuota.setWidth(100);
+		monthlyApiCallsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			monthlyApiCallsQuota.addChangedHandler(changedHandler);
+		return monthlyApiCallsQuota;
+	}
+
+	private SpinnerItem prepareSessionsQuotaItem() {
+		SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, tenant.getMaxSessions());
+		sessionsQuota.setDisabled(changedHandler == null);
+		sessionsQuota.setRequired(false);
+		sessionsQuota.setMin(-1);
+		sessionsQuota.setStep(1);
+		sessionsQuota.setWidth(80);
+		sessionsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			sessionsQuota.addChangedHandler(changedHandler);
+		return sessionsQuota;
+	}
+
+	private SpinnerItem prepareGuestsQuotaItem() {
+		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota", tenant.getMaxGuests());
+		guestsQuota.setDisabled(changedHandler == null);
+		guestsQuota.setRequired(false);
+		guestsQuota.setMin(-1);
+		guestsQuota.setStep(1);
+		guestsQuota.setWidth(80);
+		guestsQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			guestsQuota.addChangedHandler(changedHandler);
+		return guestsQuota;
+	}
+
+	private SpinnerItem prepareUsersQuotaItem() {
+		SpinnerItem usersQuota = ItemFactory.newSpinnerItem(USERSQUOTA, tenant.getMaxUsers());
+		usersQuota.setDisabled(changedHandler == null);
+		usersQuota.setRequired(false);
+		usersQuota.setMin(1);
+		usersQuota.setStep(1);
+		usersQuota.setWidth(80);
+		usersQuota.setVisible(!tenant.isSystem());
+		if (changedHandler != null)
+			usersQuota.addChangedHandler(changedHandler);
+		return usersQuota;
+	}
+
 	@SuppressWarnings("unchecked")
 	public boolean validate() {
 		Map<String, Object> values = vm.getValues();
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		if (values.get(DOCUMENTSQUOTA) == null)
-			tenant.setMaxRepoDocs(null);
-		else
-			tenant.setMaxRepoDocs(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
+		validateDocumentsQuota(values);
 
-		if (values.get(SIZEQUOTA) == null)
-			tenant.setMaxRepoSize(null);
-		else
-			tenant.setMaxRepoSize(Long.parseLong(values.get(SIZEQUOTA).toString()));
+		validateSizeQuota(values);
 
-		if (values.get(MONTHLYAPICALLSQUOTA) == null)
-			tenant.setMaxApiCalls(null);
-		else
-			tenant.setMaxApiCalls(Long.parseLong(values.get(MONTHLYAPICALLSQUOTA).toString()));
+		validateApiCallsQuota(values);
 
-		if (values.get(USERSQUOTA) == null)
-			tenant.setMaxUsers(null);
-		else
-			tenant.setMaxUsers(Integer.parseInt(values.get(USERSQUOTA).toString()));
+		validateUsersQuota(values);
 
-		if (values.get(GUESTSQUOTA) == null)
-			tenant.setMaxGuests(null);
-		else
-			tenant.setMaxGuests(Integer.parseInt(values.get(GUESTSQUOTA).toString()));
+		validateSessionsQuota(values);
 
-		if (values.get(SESSIONSQUOTA) == null)
-			tenant.setMaxSessions(null);
-		else
-			tenant.setMaxSessions(Integer.parseInt(values.get(SESSIONSQUOTA).toString()));
+		validateTicketsQuota(values);
 
-		if (values.get(TICKETSQUOTA) == null)
-			tenant.setMaxTickets(null);
-		else
-			tenant.setMaxTickets(Long.parseLong(values.get(TICKETSQUOTA).toString()));
+		validateWorkflowsQuota(values);
 
-		if (values.get(WORKFLOWSQUOTA) == null)
-			tenant.setMaxWorkflows(null);
-		else
-			tenant.setMaxWorkflows(Long.parseLong(values.get(WORKFLOWSQUOTA).toString()));
+		validateFormsQuota(values);
 
-		if (values.get(FORMSQUOTA) == null)
-			tenant.setMaxForms(null);
-		else
-			tenant.setMaxForms(Long.parseLong(values.get(FORMSQUOTA).toString()));
+		validatereportsQuota(values);
 
-		if (values.get(REPORTSQUOTA) == null)
-			tenant.setMaxReports(null);
-		else
-			tenant.setMaxReports(Long.parseLong(values.get(REPORTSQUOTA).toString()));
+		validateStampsQuota(values);
 
-		if (values.get(STAMPSQUOTA) == null)
-			tenant.setMaxStamps(null);
-		else
-			tenant.setMaxStamps(Long.parseLong(values.get(STAMPSQUOTA).toString()));
+		validateImportFoldersQuota(values);
 
-		if (values.get(IMPORTFOLDERSQUOTA) == null)
-			tenant.setMaxImportFolders(null);
-		else
-			tenant.setMaxImportFolders(Long.parseLong(values.get(IMPORTFOLDERSQUOTA).toString()));
-
-		if (values.get(EMAILACCOUNTSQUOTA) == null)
-			tenant.setMaxEmailAccounts(null);
-		else
-			tenant.setMaxEmailAccounts(Long.parseLong(values.get(EMAILACCOUNTSQUOTA).toString()));
+		validateEmailAccountsQuota(values);
 
 		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);
@@ -398,6 +421,95 @@ public class TenantQuotaPanel extends HLayout {
 		setQuotaAlertRecipients();
 
 		return !vm.hasErrors();
+	}
+
+	private void validateEmailAccountsQuota(Map<String, Object> values) {
+		if (values.get(EMAILACCOUNTSQUOTA) == null)
+			tenant.setMaxEmailAccounts(null);
+		else
+			tenant.setMaxEmailAccounts(Long.parseLong(values.get(EMAILACCOUNTSQUOTA).toString()));
+	}
+
+	private void validateImportFoldersQuota(Map<String, Object> values) {
+		if (values.get(IMPORTFOLDERSQUOTA) == null)
+			tenant.setMaxImportFolders(null);
+		else
+			tenant.setMaxImportFolders(Long.parseLong(values.get(IMPORTFOLDERSQUOTA).toString()));
+	}
+
+	private void validateStampsQuota(Map<String, Object> values) {
+		if (values.get(STAMPSQUOTA) == null)
+			tenant.setMaxStamps(null);
+		else
+			tenant.setMaxStamps(Long.parseLong(values.get(STAMPSQUOTA).toString()));
+	}
+
+	private void validatereportsQuota(Map<String, Object> values) {
+		if (values.get(REPORTSQUOTA) == null)
+			tenant.setMaxReports(null);
+		else
+			tenant.setMaxReports(Long.parseLong(values.get(REPORTSQUOTA).toString()));
+	}
+
+	private void validateFormsQuota(Map<String, Object> values) {
+		if (values.get(FORMSQUOTA) == null)
+			tenant.setMaxForms(null);
+		else
+			tenant.setMaxForms(Long.parseLong(values.get(FORMSQUOTA).toString()));
+	}
+
+	private void validateWorkflowsQuota(Map<String, Object> values) {
+		if (values.get(WORKFLOWSQUOTA) == null)
+			tenant.setMaxWorkflows(null);
+		else
+			tenant.setMaxWorkflows(Long.parseLong(values.get(WORKFLOWSQUOTA).toString()));
+	}
+
+	private void validateTicketsQuota(Map<String, Object> values) {
+		if (values.get(TICKETSQUOTA) == null)
+			tenant.setMaxTickets(null);
+		else
+			tenant.setMaxTickets(Long.parseLong(values.get(TICKETSQUOTA).toString()));
+	}
+
+	private void validateSessionsQuota(Map<String, Object> values) {
+		if (values.get(SESSIONSQUOTA) == null)
+			tenant.setMaxSessions(null);
+		else
+			tenant.setMaxSessions(Integer.parseInt(values.get(SESSIONSQUOTA).toString()));
+	}
+
+	private void validateUsersQuota(Map<String, Object> values) {
+		if (values.get(USERSQUOTA) == null)
+			tenant.setMaxUsers(null);
+		else
+			tenant.setMaxUsers(Integer.parseInt(values.get(USERSQUOTA).toString()));
+
+		if (values.get(GUESTSQUOTA) == null)
+			tenant.setMaxGuests(null);
+		else
+			tenant.setMaxGuests(Integer.parseInt(values.get(GUESTSQUOTA).toString()));
+	}
+
+	private void validateApiCallsQuota(Map<String, Object> values) {
+		if (values.get(MONTHLYAPICALLSQUOTA) == null)
+			tenant.setMaxApiCalls(null);
+		else
+			tenant.setMaxApiCalls(Long.parseLong(values.get(MONTHLYAPICALLSQUOTA).toString()));
+	}
+
+	private void validateSizeQuota(Map<String, Object> values) {
+		if (values.get(SIZEQUOTA) == null)
+			tenant.setMaxRepoSize(null);
+		else
+			tenant.setMaxRepoSize(Long.parseLong(values.get(SIZEQUOTA).toString()));
+	}
+
+	private void validateDocumentsQuota(Map<String, Object> values) {
+		if (values.get(DOCUMENTSQUOTA) == null)
+			tenant.setMaxRepoDocs(null);
+		else
+			tenant.setMaxRepoDocs(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
 	}
 
 	private void setQuotaAlertRecipients() {

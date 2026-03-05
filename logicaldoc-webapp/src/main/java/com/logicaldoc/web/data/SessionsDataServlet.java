@@ -99,7 +99,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 				continue;
 
 			if (csvFormat) {
-				printSessionCsv(writer, session, locale, showSid);
+				printSessionCsv(writer, session, showSid);
 			} else {
 				printSessionXml(writer, session, locale, showSid);
 			}
@@ -109,14 +109,14 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			writer.print("</list>");
 	}
 
-	private void printSessionCsv(PrintWriter writer, Session session, Locale locale, boolean showSid) {
+	private void printSessionCsv(PrintWriter writer, Session session, boolean showSid) {
 		DateFormat df = getDateFormat();
 
 		writer.print(showSid ? session.getSid() : "--");
 		writer.print(",");
 
 		if (showSid)
-			printSessionStatusCsv(session, locale, writer);
+			printSessionStatusCsv(session, writer);
 
 		writer.print(",");
 		if (showSid)
@@ -145,7 +145,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print("\n");
 	}
 
-	private void printSessionStatusCsv(Session session, Locale locale, PrintWriter writer) {
+	private void printSessionStatusCsv(Session session, PrintWriter writer) {
 		SessionStatus status = SessionManager.get().getStatus(session.getSid());
 		if (status == null)
 			status = session.getStatus();

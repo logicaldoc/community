@@ -207,7 +207,7 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 		if (tags == null)
 			return Set.of();
 		else
-			return tags.stream().map(t -> t.getTag()).collect(Collectors.toSet());
+			return tags.stream().map(Tag::getTag).collect(Collectors.toSet());
 	}
 
 	public String getTagsString() {

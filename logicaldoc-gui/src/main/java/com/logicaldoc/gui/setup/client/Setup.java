@@ -230,7 +230,7 @@ public class Setup implements EntryPoint {
 						"org.hibernate.dialect.Oracle10gDialect", "SELECT 1 FROM DUAL" });
 		engines.put(SQLSERVER, new String[] { "SQL Server", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
 				"jdbc:sqlserver://<server>[:<1433>];encrypt=false;trustServerCertificate=true;databaseName=<database>;instanceName=<instance>",
-				"org.hibernate.dialect.SQLServer2008Dialect", SELECT_1 });
+				"org.hibernate.dialect.SQLServer2012Dialect", SELECT_1 });
 
 		Tab databaseTab = new Tab();
 		databaseTab.setTitle(I18N.message("database"));

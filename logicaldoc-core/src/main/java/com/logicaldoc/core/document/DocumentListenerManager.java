@@ -47,8 +47,8 @@ public class DocumentListenerManager {
 		// Acquire the 'DocumentListener' extensions of the core plugin sorted
 		// by position
 		for (Extension ext : PluginRegistry.getInstance().getExtensions("logicaldoc-core", "DocumentListener").stream()
-				.sorted((e1, e2) -> Integer.valueOf(e1.getParameter("position").valueAsString())
-						.compareTo(Integer.valueOf(e2.getParameter("position").valueAsString())))
+				.sorted((e1, e2) -> Integer.valueOf(e1.getParameter(POSITION).valueAsString())
+						.compareTo(Integer.valueOf(e2.getParameter(POSITION).valueAsString())))
 				.toList()) {
 			String className = ext.getParameter("class").valueAsString();
 

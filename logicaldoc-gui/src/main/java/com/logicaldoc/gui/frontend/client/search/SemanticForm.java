@@ -54,7 +54,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 
 	private FolderSelector folder;
 
-	private TextAreaItem expression;
+	private TextAreaItem expressionArea;
 
 	private GUISearchOptions defaultOptions;
 
@@ -97,24 +97,24 @@ public class SemanticForm extends VLayout implements SearchObserver {
 			TextAreaItem area = ItemFactory.newTextAreaItem("expressionEditor", null);
 			area.setHeight(500);
 			area.setWidth("100%");
-			area.setValue(expression.getValue());
+			area.setValue(expressionArea.getValue());
 
-			LD.askForValue(I18N.message("freetextarea"), null, (String) expression.getValue(), area, 550,
-					newValue -> expression.setValue(newValue));
+			LD.askForValue(I18N.message("freetextarea"), null, (String) expressionArea.getValue(), area, 550,
+					newValue -> expressionArea.setValue(newValue));
 
 			event.cancel();
 		});
 
-		expression = ItemFactory.newTextAreaItem(EXPRESSION, "");
-		expression.setHint(I18N.message(SEARCH) + "...");
-		expression.setShowHintInField(true);
-		expression.setWidth("*");
-		expression.setHeight(50);
-		expression.setColSpan(2);
-		expression.setRequired(true);
-		expression.setIcons(search, clear, expandIcon);
+		expressionArea = ItemFactory.newTextAreaItem(EXPRESSION, "");
+		expressionArea.setHint(I18N.message(SEARCH) + "...");
+		expressionArea.setShowHintInField(true);
+		expressionArea.setWidth("*");
+		expressionArea.setHeight(50);
+		expressionArea.setColSpan(2);
+		expressionArea.setRequired(true);
+		expressionArea.setIcons(search, clear, expandIcon);
 
-		expression.addKeyPressHandler(event -> {
+		expressionArea.addKeyPressHandler(event -> {
 			if (event.getKeyName() == null)
 				return;
 			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName()))
@@ -154,7 +154,7 @@ public class SemanticForm extends VLayout implements SearchObserver {
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
-		form.setItems(expression, language, embeddingScheme, folder, threshold, subfolders, searchinhits, aliases);
+		form.setItems(expressionArea, language, embeddingScheme, folder, threshold, subfolders, searchinhits, aliases);
 
 		addMember(form);
 

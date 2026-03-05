@@ -91,7 +91,7 @@ public class TicketDownload extends HttpServlet {
 				 * so we must mark the read in the session and count it just the
 				 * first time
 				 */
-				String viewMarker = "ticketviewed-%d".formatted(ticket.getTicketId());
+				String viewMarker = "ticketviewed-%s".formatted(ticket.getTicketId());
 				if (request.getSession().getAttribute(viewMarker) == null) {
 					ticket.setViews(ticket.getViews() + 1);
 					request.getSession().setAttribute(viewMarker, true);
@@ -107,7 +107,7 @@ public class TicketDownload extends HttpServlet {
 			log.error(e.getMessage(), e);
 
 			try (PrintWriter out = response.getWriter();) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ticket %d not authorized: %s"
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ticket %s not authorized: %s"
 						.formatted(ticket.getTicketId(), StringUtils.defaultString(e.getMessage())));
 			} catch (Exception t) {
 				// Nothing to do
@@ -204,7 +204,7 @@ public class TicketDownload extends HttpServlet {
 		return doc;
 	}
 
-	private static Ticket getTicket(HttpServletRequest request) throws IOException, PersistenceException {
+	private static Ticket getTicket(HttpServletRequest request) throws PersistenceException {
 		TicketDAO tktDao = TicketDAO.get();
 		Ticket ticket = tktDao.findByTicketId(getTicketId(request));
 		if (ticket == null || ticket.getDocId() == 0L)

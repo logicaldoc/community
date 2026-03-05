@@ -55,6 +55,8 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> implements UserDAO {
 
+	private static final String USER_ID = "userId";
+
 	private static final String ADMIN = "admin";
 
 	private static final String LOWER = "lower(";
@@ -319,7 +321,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.getWorkingTimes() != null)
 			for (WorkingTime wt : user.getWorkingTimes()) {
 				Map<String, Object> params = new HashMap<>();
-				params.put("userId", user.getId());
+				params.put(USER_ID, user.getId());
 				params.put("dayOfWeek", wt.getDayOfWeek());
 				params.put("hourStart", wt.getHourStart());
 				params.put("minuteStart", wt.getMinuteStart());
@@ -477,7 +479,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private void updateUserGroupAssignments(User user) throws PersistenceException {
-		jdbcUpdate("delete from ld_usergroup where ld_userid = :userId", Map.of("userId", user.getId()));
+		jdbcUpdate("delete from ld_usergroup where ld_userid = :userId", Map.of(USER_ID, user.getId()));
 		for (UserGroup ug : user.getUserGroups()) {
 			long exists = queryForLong("select count(*) from ld_group where ld_id = %d".formatted(ug.getGroupId()));
 			if (exists > 0) {
@@ -496,10 +498,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private void updateImpersonifiers(User user) throws PersistenceException {
-		jdbcUpdate("delete from ld_impersonator where ld_userid = :userId", Map.of("userId", user.getId()));
+		jdbcUpdate("delete from ld_impersonator where ld_userid = :userId", Map.of(USER_ID, user.getId()));
 		for (String username : user.getImpersonators()) {
 			long exists = queryForLong("select count(*) from ld_user where ld_username = :username",
-					Map.of("username", username));
+					Map.of(USERNAME, username));
 			if (exists > 0) {
 				jdbcUpdate("insert into ld_impersonator(ld_userid, ld_username) values (%d, '%s')"
 						.formatted(user.getId(), username));
@@ -685,7 +687,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (!user.isEnabled())
 			return true;
 
-		int maxInactiveDays = config.getInt("%s.security.user.maxinactivity".formatted(TenantDAO.get().getTenantName(user.getTenantId())), -1);
+		int maxInactiveDays = config.getInt(
+				"%s.security.user.maxinactivity".formatted(TenantDAO.get().getTenantName(user.getTenantId())), -1);
 		if (user.getMaxInactivity() != null)
 			maxInactiveDays = user.getMaxInactivity();
 		if (maxInactiveDays <= 0)
@@ -743,24 +746,15 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public long count(Long tenantId) throws PersistenceException {
-		String query = "select count(*) from ld_user where ld_type=" + UserType.DEFAULT.ordinal() + " and ld_deleted=0 "
-				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-		return queryForLong(query);
-	}
-
-	@Override
 	public long countRegulars(Long tenantId) throws PersistenceException {
-		String query = "select count(*) from ld_user where ld_type=" + UserType.DEFAULT.ordinal() + " and ld_deleted=0 "
-				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-		return queryForLong(query);
+		return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted=0 %s".formatted(
+				UserType.DEFAULT.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
 	}
 
 	@Override
 	public long countGuests(Long tenantId) throws PersistenceException {
-		String query = "select count(*) from ld_user where ld_type=" + UserType.READONLY.ordinal()
-				+ " and ld_deleted=0 " + (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-		return queryForLong(query);
+		return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted=0 %s".formatted(
+				UserType.READONLY.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
 	}
 
 	@Override
@@ -801,7 +795,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private int getPasswordEnforce(User user) throws PersistenceException {
-		return config.getInt("%s.password.enforcehistory".formatted(TenantDAO.get().getTenantName(user.getTenantId())), 10);
+		return config.getInt("%s.password.enforcehistory".formatted(TenantDAO.get().getTenantName(user.getTenantId())),
+				10);
 	}
 
 	public UserHistoryDAO getUserHistoryDAO() {
@@ -983,7 +978,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 								ext.getParameter(POSITION).valueAsString());
 				} else {
 					throw new ClassNotFoundException(
-							"The specified listener %s doesn't implement UserListener interface".formatted(className ));
+							"The specified listener %s doesn't implement UserListener interface".formatted(className));
 				}
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException e) {

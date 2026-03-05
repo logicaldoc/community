@@ -31,4 +31,29 @@ public abstract class Fillable extends ExtensibleObject {
 	public void setFillerId(Long fillerId) {
 		this.fillerId = fillerId;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((fillerId == null) ? 0 : fillerId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Fillable other = (Fillable) obj;
+		if (fillerId == null) {
+			if (other.fillerId != null)
+				return false;
+		} else if (!fillerId.equals(other.fillerId))
+			return false;
+		return true;
+	}
 }

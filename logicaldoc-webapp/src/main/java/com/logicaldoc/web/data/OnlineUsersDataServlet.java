@@ -54,7 +54,7 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 			writer.print(String.format("<id>%d</id>", user.getId()));
 			writer.print(String.format("<username><![CDATA[%s]]></username>",user.getUsername()));
 			writer.print(String.format("<user><![CDATA[%s]]></user>",user.getFullName()));
-			writer.print(String.format("</user>"));
+			writer.print("</user>");
 		}
 		writer.print("</list>");
 	}

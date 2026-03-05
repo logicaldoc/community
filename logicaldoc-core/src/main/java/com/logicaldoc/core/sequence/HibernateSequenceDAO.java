@@ -25,6 +25,8 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence> implements SequenceDAO {
 
+	private static final String OBJECT_ID = "objectId";
+
 	private static final String TENANTID = "tenantId";
 
 	private static final String AND = " and ";
@@ -59,8 +61,8 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 				reset(sequence, objectId, tenantId, increment);
 				return increment;
 			} else {
-				seq.setValue(seq.getValue()+increment);
-				store(seq);				
+				seq.setValue(seq.getValue() + increment);
+				store(seq);
 				evict(seq.getId());
 				return seq.getValue();
 			}
@@ -74,7 +76,9 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 
 	@Override
 	public long getCurrentValue(String sequence, long objectId, long tenantId) throws PersistenceException {
-		return queryForLong("select ld_value from ld_sequence where ld_deleted = 0 and ld_name = :name and ld_objectid = :objectId and ld_tenantid = :tenantId", Map.of(TENANTID, tenantId, "name", sequence, "objectId", objectId));
+		return queryForLong(
+				"select ld_value from ld_sequence where ld_deleted = 0 and ld_name = :name and ld_objectid = :objectId and ld_tenantid = :tenantId",
+				Map.of(TENANTID, tenantId, "name", sequence, OBJECT_ID, objectId));
 	}
 
 	@Override
@@ -115,7 +119,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			throws PersistenceException {
 		String query = "select ld_id from ld_sequence where ld_name = :name and ld_objectid = :objectId and ld_tenantid = :tenantId";
 
-		long sequenceId = queryForLong(query, Map.of(TENANTID, tenantId, "objectId", objectId, "name", sequenceName));
+		long sequenceId = queryForLong(query, Map.of(TENANTID, tenantId, OBJECT_ID, objectId, "name", sequenceName));
 		if (sequenceId != 0L) {
 			sequence = findById(sequenceId);
 			refresh(sequence);
@@ -129,7 +133,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		query += AND + ENTITY + ".objectId = :objectId ";
 		query += AND + ENTITY + ".name = :name ";
 
-		return findByWhere(query, Map.of(TENANTID, tenantId, "objectId", objectId, "name", sequenceName), null, null);
+		return findByWhere(query, Map.of(TENANTID, tenantId, OBJECT_ID, objectId, "name", sequenceName), null, null);
 	}
 
 	@Override

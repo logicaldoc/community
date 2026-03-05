@@ -43,7 +43,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		boolean required = "true".equals(request.getParameter("required"));
 		boolean skipdisabled = "true".equals(request.getParameter("skipdisabled"));
 
-		List<User> users = new ArrayList<>();
+		List<User> users;
 		if (StringUtils.isNotEmpty(request.getParameter("impersonifiers")))
 			users = findImpersonators(Long.parseLong(request.getParameter("impersonifiers")));
 		else

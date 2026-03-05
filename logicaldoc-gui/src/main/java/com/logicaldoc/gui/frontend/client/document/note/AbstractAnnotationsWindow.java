@@ -176,12 +176,13 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 */
 	protected void onSave() {
 		captureNotesPosition();
-		DocumentService.Instance.get().saveNotes(document.getId(), fileVersion, notes, types, new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(Void arg) {
-				onNotesSaved();
-			}
-		});
+		DocumentService.Instance.get().saveNotes(document.getId(), fileVersion, notes, types,
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(Void arg) {
+						onNotesSaved();
+					}
+				});
 	}
 
 	protected void initGUI() {
@@ -272,12 +273,12 @@ public abstract class AbstractAnnotationsWindow extends Window {
 					}
 				});
 
-			showAnnotations(page);
-
 			// Calculate the zoom to see the complete page without scroll
 			double zoom = (double) bottom.getHeight() / (double) pageDrawingPane.getImageHeight();
 			zoomItem.setValue(zoom);
 			pageDrawingPane.zoom(zoom);
+
+			showAnnotations(page);
 		});
 		bottom.addMember(pageDrawingPane);
 	}
@@ -381,13 +382,11 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		drawItem.setLineOpacity(note.getLineOpacity() / 100.0f);
 		drawItem.setShowResizeOutline(false);
 		drawItem.setKeepInParentRect(true);
+		drawItem.setTitle(Util.strip(note.getMessage()));
 		drawItem.setTitleAutoFit(true);
 		drawItem.setTitleRotationMode(TitleRotationMode.NEVER_ROTATE);
 		drawItem.setPrompt(note.getMessage());
 		drawItem.setRotation(note.getRotation());
-
-		if (!(drawItem instanceof DrawLabel))
-			drawItem.setTitle(Util.strip(note.getMessage()));
 
 		if (note.isShowKnobs())
 			showKnowbs(drawItem);
@@ -424,13 +423,12 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		drawItem.setCanDrag(false);
 		drawItem.hideAllKnobs();
 	}
-	
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

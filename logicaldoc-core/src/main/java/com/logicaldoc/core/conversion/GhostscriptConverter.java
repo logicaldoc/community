@@ -20,6 +20,9 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class GhostscriptConverter extends AbstractFormatConverter {
 
+	private static final String FIRST_PAGE_1 = "-dFirstPage=1";
+	private static final String LAST_PAGE_1 = "-dLastPage=1";
+
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		String ext = FileUtil.getExtension(dest.getName()).toLowerCase();
@@ -41,23 +44,22 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 				commandLine.add("-sCompression=lzw");
 			} else if ("png".equals(ext)) {
 				device = "png16m";
-				pages = List.of("-dFirstPage=1", "-dLastPage=1");
+				pages = List.of(FIRST_PAGE_1, LAST_PAGE_1);
 			} else if ("ps".equals(ext)) {
 				device = "ps2write";
-				pages = List.of("-dFirstPage=1", "-dLastPage=1");
+				pages = List.of(FIRST_PAGE_1, LAST_PAGE_1);
 			} else if ("txt".equals(ext)) {
 				device = "txtwrite";
 			} else {
-				device = "jpeg";
-				pages = List.of("-dFirstPage=1", "-dLastPage=1");
+				pages = List.of(FIRST_PAGE_1, LAST_PAGE_1);
 			}
 
-			commandLine.add("-sDEVICE=" + device);
+			commandLine.add("-sDEVICE=%s".formatted(device));
 			if (pages != null)
 				commandLine.addAll(pages);
-			commandLine.addAll(List.of("-sOutputFile=" + dest.getAbsolutePath(), src.getAbsolutePath()));
+			commandLine.addAll(List.of("-sOutputFile=%s".formatted(dest.getAbsolutePath()), src.getAbsolutePath()));
 
-			new Exec().exec(commandLine, null, new File("C:\\LogicalDOC-Devel\\ghostscript\\bin"), getTimeout());
+			new Exec().exec(commandLine, null, null, getTimeout());
 
 			if (!dest.exists() || dest.length() < 1)
 				throw new IOException("Empty conversion");

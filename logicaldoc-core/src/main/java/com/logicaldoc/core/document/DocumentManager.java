@@ -535,7 +535,7 @@ public class DocumentManager {
 			throws IOException, PersistenceException {
 		store.store(file, StoreResource.builder().document(doc).newEntry(newDocument).build());
 
-		Map<String, Object> dictionary = new HashMap<String, Object>();
+		Map<String, Object> dictionary = new HashMap<>();
 		dictionary.put("newdoc", newDocument);
 		transaction.setFile(file);
 		for (DocumentListener listener : DocumentListenerManager.get().getListeners())

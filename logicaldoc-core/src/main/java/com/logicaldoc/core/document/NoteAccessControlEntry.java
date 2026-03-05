@@ -105,10 +105,12 @@ public class NoteAccessControlEntry extends AccessControlEntry {
 		ace.setGroupId(groupId);
 	}
 
+	@Override
 	public boolean isRead() {
 		return ace.isRead();
 	}
 
+	@Override
 	public boolean isWrite() {
 		return ace.isWrite();
 	}

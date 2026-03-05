@@ -278,7 +278,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 				UserHistoryDAO.get().store(history);
 
 				// Send an email alert to the user in case of new device
-				if (newDevice && Context.get().getConfig().getBoolean(".alertnewdevice".formatted(tenantName), true)) {
+				if (newDevice && Context.get().getConfig().getBoolean("%s.alertnewdevice".formatted(tenantName), true)) {
 					Map<String, Object> dictionaryMap = new HashMap<>();
 					dictionaryMap.put("user", user);
 					dictionaryMap.put("device", device);

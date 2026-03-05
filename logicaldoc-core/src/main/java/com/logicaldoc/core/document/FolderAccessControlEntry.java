@@ -159,6 +159,7 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 		ace.setDownload(download);
 	}
 
+	@Override
 	public boolean isSecurity() {
 		return ace.isSecurity();
 	}
@@ -198,106 +199,132 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 		ace.setImmutable(immutable);
 	}
 
+	@Override
 	public boolean isSign() {
 		return ace.isSign();
 	}
 
+	@Override
 	public void setSign(boolean sign) {
 		ace.setSign(sign);
 	}
 
+	@Override
 	public boolean isArchive() {
 		return ace.isArchive();
 	}
 
+	@Override
 	public void setArchive(boolean archive) {
 		ace.setArchive(archive);
 	}
 
+	@Override
 	public boolean isWorkflow() {
 		return ace.isWorkflow();
 	}
 
+	@Override
 	public void setWorkflow(boolean workflow) {
 		ace.setWorkflow(workflow);
 	}
 
+	@Override
 	public boolean isCalendar() {
 		return ace.isCalendar();
 	}
 
+	@Override
 	public void setCalendar(boolean calendar) {
 		ace.setCalendar(calendar);
 	}
 
+	@Override
 	public boolean isSubscription() {
 		return ace.isSubscription();
 	}
 
+	@Override
 	public void setSubscription(boolean subscription) {
 		ace.setSubscription(subscription);
 	}
 
+	@Override
 	public boolean isPassword() {
 		return ace.isPassword();
 	}
 
+	@Override
 	public void setPassword(boolean password) {
 		ace.setPassword(password);
 	}
 
+	@Override
 	public boolean isPrint() {
 		return ace.isPrint();
 	}
 
+	@Override
 	public void setPrint(boolean print) {
 		ace.setPrint(print);
 	}
 
+	@Override
 	public boolean isMove() {
 		return ace.isMove();
 	}
 
+	@Override
 	public void setMove(boolean move) {
 		ace.setMove(move);
 	}
 
+	@Override
 	public boolean isEmail() {
 		return ace.isEmail();
 	}
 
+	@Override
 	public void setEmail(boolean email) {
 		ace.setEmail(email);
 	}
 
+	@Override
 	public boolean isAutomation() {
 		return ace.isAutomation();
 	}
 
+	@Override
 	public void setAutomation(boolean automation) {
 		ace.setAutomation(automation);
 	}
 
+	@Override
 	public boolean isReadingreq() {
 		return ace.isReadingreq();
 	}
 
+	@Override
 	public void setReadingreq(boolean readingreq) {
 		ace.setReadingreq(readingreq);
 	}
-
+	
+	@Override
 	public boolean isCustomid() {
 		return ace.isCustomid();
 	}
 
+	@Override
 	public void setCustomid(boolean customid) {
 		ace.setCustomid(customid);
 	}
 
+	@Override
 	public boolean isRevision() {
 		return ace.isRevision();
 	}
 
+	@Override
 	public void setRevision(boolean revision) {
 		ace.setRevision(revision);
 	}
@@ -319,11 +346,11 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 	}
 
 	public boolean isIimport() {
-		return iimport;
+		return isIimport();
 	}
 
 	public void setIimport(boolean iimport) {
-		this.iimport = iimport;
+		setImport(iimport);
 	}
 
 	public boolean isExport() {

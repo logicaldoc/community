@@ -18,6 +18,8 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> implements SessionDAO {
 
+	private static final String STATUS = "status";
+
 	private static final String ONE_EQ_ONE = " 1 = 1 ";
 
 	private static final String AND = " and ";
@@ -39,7 +41,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 			jdbcUpdate(
 					"update ld_session set ld_status = %d where ld_node = :node and ld_status = :status"
 							.formatted(SessionStatus.EXPIRED.ordinal()),
-					Map.of("node", SystemInfo.get().getInstallationId(), "status", SessionStatus.OPEN.ordinal()));
+					Map.of("node", SystemInfo.get().getInstallationId(), STATUS, SessionStatus.OPEN.ordinal()));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -54,7 +56,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 			params.put("tenantId", tenantId);
 		}
 		if (status != null) {
-			params.put("status", status);
+			params.put(STATUS, status);
 			query.append(AND + ENTITY + ".status = :status");
 			if (SessionStatus.OPEN.equals(status))
 				query.append(AND + ENTITY + ".finished is null ");
@@ -78,7 +80,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 			params.put("username", StringUtils.defaultString(username));
 		}
 		if (status != null) {
-			params.put("status", status);
+			params.put(STATUS, status);
 			query.append(AND + ENTITY + ".status = :status ");
 			if (SessionStatus.OPEN.equals(status))
 				query.append(AND + ENTITY + ".finished is null ");

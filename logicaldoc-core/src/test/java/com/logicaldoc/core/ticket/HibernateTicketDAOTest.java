@@ -112,7 +112,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCount() throws PersistenceException, NoSuchAlgorithmException {
+	public void testCount() throws PersistenceException {
 		assertEquals(3L, testSubject.countViewOrDownloadTickets(null));
 		assertEquals(3L, testSubject.countViewOrDownloadTickets(Tenant.SYSTEM_ID));
 
