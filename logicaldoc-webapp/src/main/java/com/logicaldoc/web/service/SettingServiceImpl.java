@@ -449,7 +449,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		try {
 			Store store = Store.get().newStore(id);
 			log.info("Testing store {}", store);
-			return Store.get().test();
+			return store.test();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;

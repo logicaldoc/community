@@ -176,7 +176,7 @@ public abstract class Filler extends PersistentObject {
 	public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException {
 
-		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
 			return;
 
 		if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
