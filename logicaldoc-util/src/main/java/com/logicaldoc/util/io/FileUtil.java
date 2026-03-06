@@ -339,11 +339,42 @@ public class FileUtil {
 	 * @return the size as human readable text
 	 */
 	public static String getDisplaySize(long size, String language) {
-		String displaySize = "";
 		Locale locale = LocaleUtils.toLocale("en");
 		if (StringUtils.isNotEmpty(language))
 			locale = LocaleUtils.toLocale(language);
-		NumberFormat nf = new DecimalFormat("###,###,###.0", new DecimalFormatSymbols(locale));
+		return getDisplaySize(size, locale);
+	}
+
+	/**
+	 * Renders a file size in a more readable behaviour using en locale.
+	 * Depending on the size, the result will be presented in the following
+	 * measure units: GB, MB, KB or Bytes
+	 * 
+	 * @param size Size to be rendered
+	 * @param locale The locale for the format symbols
+	 * 
+	 * @return the size as human readable text
+	 */
+	public static String getDisplaySize(long size) {
+		return getDisplaySize(size, (Locale) null);
+	}
+
+	/**
+	 * Renders a file size in a more readable behaviour taking into account the
+	 * user locale. Depending on the size, the result will be presented in the
+	 * following measure units: GB, MB, KB or Bytes
+	 * 
+	 * @param size Size to be rendered
+	 * @param locale The locale for the format symbols
+	 * 
+	 * @return the size as human readable text
+	 */
+	public static String getDisplaySize(long size, Locale locale) {
+		String displaySize = "";
+		Locale lcl = LocaleUtils.toLocale("en");
+		if (locale != null)
+			lcl = locale;
+		NumberFormat nf = new DecimalFormat("###,###,###.0", new DecimalFormatSymbols(lcl));
 		if (size > 1000000000) {
 			displaySize = nf.format((double) size / 1024 / 1024 / 1024) + " GB";
 		} else if (size > 1000000) {
@@ -753,9 +784,10 @@ public class FileUtil {
 		Path path = Files.createTempDirectory(prefix);
 		return path.toFile();
 	}
-	
+
 	/**
-	 * Gets the temporary folder for the current JVM, normally it is specified in the property called java.io.tmpdir
+	 * Gets the temporary folder for the current JVM, normally it is specified
+	 * in the property called java.io.tmpdir
 	 * 
 	 * @return The default java temporary directory
 	 */

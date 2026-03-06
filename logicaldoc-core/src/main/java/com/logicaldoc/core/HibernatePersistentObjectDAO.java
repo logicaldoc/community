@@ -596,14 +596,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return "hsqldb".equals(getDbms());
 	}
 
-	protected boolean isPostgreSQL() {
-		return "postgresql".equals(getDbms());
-	}
-
-	protected boolean isSqlServer() {
-		return "mssql".equals(getDbms());
-	}
-
 	/**
 	 * A generic method to logically delete old records of a table, useful for
 	 * some DAO implementations. This method uses JDBC directly. The processed

@@ -287,7 +287,7 @@ public class FileUtilTest {
 		assertEquals("12 Bytes", FileUtil.getDisplaySize(12L, "en"));
 		assertEquals("2.5 KB", FileUtil.getDisplaySize(2598L, "en"));
 		assertEquals("5.4 MB", FileUtil.getDisplaySize(5682598L, "en"));
-		assertEquals("5,292,332.6 GB", FileUtil.getDisplaySize(5682598909897798L, null));
+		assertEquals("5,292,332.6 GB", FileUtil.getDisplaySize(5682598909897798L));
 		assertEquals("5,549.4 KB", FileUtil.getDisplaySizeKB(5682598L, null));
 		assertEquals(FileUtil.getDisplaySizeKB(5682598L, null), FileUtil.getDisplaySizeKB(5682598L, "en"));
 	}

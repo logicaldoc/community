@@ -686,6 +686,14 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 		return "maria".equals(getDbms());
 	}
 
+	public default boolean isPostgreSQL() {
+		return "postgresql".equals(getDbms());
+	}
+	
+	public default boolean isSQLServer() {
+		return "mssql".equals(getDbms());
+	}
+	
 	/**
 	 * Retrieves the metadata from the database
 	 * 
