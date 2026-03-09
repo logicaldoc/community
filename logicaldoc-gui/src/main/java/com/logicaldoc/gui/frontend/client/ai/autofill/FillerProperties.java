@@ -106,10 +106,9 @@ public class FillerProperties extends FillerDetailsTab {
 
 		// Type selector
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
-		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-		map.put("tag", I18N.message("fillertype.tag"));
-		map.put(LANGUAGE, I18N.message("fillertype.language"));
-		type.setValueMap(map);
+		type.setOptionDataSource(new FillerTypesDS());
+		type.setValueField("id");
+		type.setDisplayField("label");	
 		type.setRequired(true);
 		type.setValue(filler.getType());
 		type.addChangedHandler(changedHandler);
