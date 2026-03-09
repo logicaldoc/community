@@ -1,6 +1,7 @@
 package com.logicaldoc.core.filler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
 
 /**
  * A filler that fills using a list of other fillers
@@ -42,7 +44,8 @@ public class ChainFiller extends Filler {
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@JoinTable(name = "ld_filler_chain", joinColumns = @JoinColumn(name = "ld_fillerid"), inverseJoinColumns = @JoinColumn(name = "ld_chainedid"))
-	private List<Filler> chain;
+	@OrderColumn(name = "ld_position")
+	private List<Filler> chain = new ArrayList<>();
 
 	public List<Filler> getChain() {
 		return chain;

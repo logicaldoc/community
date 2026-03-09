@@ -2,13 +2,17 @@ package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import java.util.LinkedHashMap;
 
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingSchemesDS;
 import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Criterion;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DoubleItem;
@@ -18,7 +22,14 @@ import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.validator.FloatRangeValidator;
+import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.SectionStackSection;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 
 /**
  * Shows filler's standard properties and read-only data
@@ -52,9 +63,15 @@ public class FillerProperties extends FillerDetailsTab {
 
 	private static final String EMBEDDING_SCHEME = "embeddingscheme";
 
+	private static final String CHAIN = "chain";
+
 	private DynamicForm form = new DynamicForm();
 
 	private HLayout container = new HLayout();
+
+	private ListGrid chainGrid;
+
+	private SectionStack chainStack = new SectionStack();
 
 	public FillerProperties(GUIFiller filler, ChangedHandler changedHandler) {
 		super(filler, changedHandler);
@@ -108,7 +125,7 @@ public class FillerProperties extends FillerDetailsTab {
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new FillerTypesDS());
 		type.setValueField("id");
-		type.setDisplayField("label");	
+		type.setDisplayField("label");
 		type.setRequired(true);
 		type.setValue(filler.getType());
 		type.addChangedHandler(changedHandler);
@@ -117,6 +134,8 @@ public class FillerProperties extends FillerDetailsTab {
 			modelSelector.clearValue();
 			modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(selectedType)));
 			modelSelector.fetchData();
+
+			chainStack.setVisible(CHAIN.equals(selectedType));
 		});
 
 		if (filler.getType() != null) {
@@ -189,6 +208,8 @@ public class FillerProperties extends FillerDetailsTab {
 		form.setItems(id, type, strategy, name, label, modelSelector, embeddingSelector, threshold, description);
 
 		container.addMember(form);
+
+		prepareChain();
 	}
 
 	private String modelTypesSuitableForFiller(String fillerType) {
@@ -200,31 +221,167 @@ public class FillerProperties extends FillerDetailsTab {
 	}
 
 	public boolean validate() {
-		if (!form.validate())
-			return false;
-		filler.setName(form.getValueAsString(NAME));
-		filler.setLabel(form.getValueAsString(LABEL));
-		filler.setDescription(form.getValueAsString(DESCRIPTION));
-		filler.setType(form.getValueAsString(TYPE));
+		if (form.validate()) {
+			filler.setName(form.getValueAsString(NAME));
+			filler.setLabel(form.getValueAsString(LABEL));
+			filler.setDescription(form.getValueAsString(DESCRIPTION));
+			filler.setType(form.getValueAsString(TYPE));
 
-		String strategyValue = form.getValueAsString(STRATEGY);
-		String modelId = form.getValueAsString(MODEL_ID);
-		String embeddingId = form.getValueAsString(EMBEDDING_SCHEME);
+			String strategyValue = form.getValueAsString(STRATEGY);
+			String modelId = form.getValueAsString(MODEL_ID);
+			String embeddingId = form.getValueAsString(EMBEDDING_SCHEME);
 
-		if (RETRIEVAL.equals(strategyValue)) {
-			// Retrieval strategy
-			filler.setModelId(null);
-			filler.setEmbeddingSchemeId(embeddingId != null ? Long.parseLong(embeddingId) : null);
+			if (RETRIEVAL.equals(strategyValue)) {
+				// Retrieval strategy
+				filler.setModelId(null);
+				filler.setEmbeddingSchemeId(embeddingId != null ? Long.parseLong(embeddingId) : null);
 
-		} else {
-			// Model strategy
-			filler.setEmbeddingSchemeId(null);
-			filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
+			} else {
+				// Model strategy
+				filler.setEmbeddingSchemeId(null);
+				filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
+			}
+
+			String threshold = form.getValueAsString(THRESHOLD);
+			filler.setThreshold(threshold != null ? Double.parseDouble(threshold) : null);
+
+			// Chain handling
+			if (CHAIN.equals(filler.getType())) {
+				if (chainGrid == null || chainGrid.getRecordList().isEmpty()) {
+					GuiLog.error("fillerchainempty");
+					return false;
+				}
+
+				filler.getChain().clear();
+
+				com.smartgwt.client.data.Record[] chainRecords = chainGrid.getRecordList().toArray();
+				for (com.smartgwt.client.data.Record chainRecord : chainRecords) {
+					Long id = chainRecord.getAttributeAsLong(ID);
+					String name = chainRecord.getAttribute(NAME);
+					filler.getChain().add(new GUIFiller(id, name));
+				}
+			}
 		}
-		String threshold = form.getValueAsString(THRESHOLD);
-		filler.setThreshold(threshold != null ? Double.parseDouble(threshold) : null);
 
 		return !form.hasErrors();
+	}
+
+	private void prepareChain() {
+		chainGrid = new ListGrid();
+		chainGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		chainGrid.setWidth100();
+		chainGrid.setHeight100();
+		chainGrid.setEmptyMessage(I18N.message("norecords"));
+		chainGrid.setCanSort(false);
+		chainGrid.setCanFreezeFields(false);
+		chainGrid.setCanGroupBy(false);
+		chainGrid.setLeaveScrollbarGap(false);
+		chainGrid.setShowHeader(true);
+		chainGrid.setSelectionType(SelectionStyle.MULTIPLE);
+		chainGrid.setCanEdit(false);
+		chainGrid.setShowRowNumbers(true);
+		chainGrid.setCanReorderRecords(true);
+		chainGrid.setAutoFetchData(true);
+		chainGrid.setShowRecordComponents(true);
+		chainGrid.setShowRecordComponentsByCell(true);
+		chainGrid.addDropCompleteHandler(dropCompleted -> changedHandler.onChanged(null));
+		chainGrid.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
+		});
+
+		ListGridField id = new IdListGridField();
+
+		ListGridField name = new ListGridField(NAME, I18N.message(NAME));
+		name.setCanEdit(false);
+		name.setCanSort(false);
+		name.setAutoFitWidth(true);
+		name.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+
+		ListGridField type = new ListGridField(TYPE, I18N.message(TYPE));
+		type.setCanEdit(false);
+		type.setCanSort(false);
+		type.setAutoFitWidth(true);
+		type.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
+		description.setCanEdit(false);
+		description.setCanSort(false);
+		description.setAutoFitWidth(true);
+		description.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+
+		chainGrid.setFields(id, name, type, description);
+
+		SelectItem addFiller = prepareFillerSelector();
+
+		// Initialize the chain grid with existing fillers
+		for (GUIFiller chainedFiller : filler.getChain()) {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(ID, chainedFiller.getId());
+			rec.setAttribute(NAME, chainedFiller.getName());
+			rec.setAttribute(TYPE, chainedFiller.getType());
+			rec.setAttribute(DESCRIPTION, chainedFiller.getDescription());
+			chainGrid.addData(rec);
+		}
+
+		// Form that contains the selector
+		DynamicForm buttonsForm = new DynamicForm();
+		buttonsForm.setItems(addFiller);
+
+		// Configure the chain stack
+		chainStack.setHeight100();
+		chainStack.setVisible(CHAIN.equals(filler.getType()));
+
+		// Section that holds the grid + selector
+		SectionStackSection section = new SectionStackSection("<b>" + I18N.message(CHAIN) + "</b>");
+
+		section.setCanCollapse(false);
+		section.setExpanded(true);
+		section.setItems(chainGrid, buttonsForm);
+
+		// Attach section to stack
+		chainStack.setSections(section);
+		chainStack.draw();
+
+		// Attach chain UI to main container
+		container.addMember(chainStack);
+	}
+
+	private SelectItem prepareFillerSelector() {
+		SelectItem addFiller = new FillerSelector(true, null);
+		addFiller.addChangedHandler(changed -> {
+			ListGridRecord selection = addFiller.getSelectedRecord();
+
+			boolean alreadyInChain = chainGrid
+					.find(new AdvancedCriteria(ID, OperatorId.EQUALS, selection.getAttributeAsString(ID))) != null;
+
+			if (!alreadyInChain && selection.getAttributeAsLong(ID) != filler.getId()) {
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute(ID, selection.getAttributeAsLong(ID));
+				rec.setAttribute(NAME, selection.getAttribute(NAME));
+				rec.setAttribute(TYPE, selection.getAttribute(TYPE));
+				rec.setAttribute(DESCRIPTION, selection.getAttribute(DESCRIPTION));
+				chainGrid.getRecordList().add(rec);
+			}
+		});
+		addFiller.addChangedHandler(changedHandler);
+
+		return addFiller;
+	}
+
+	private void showContextMenu() {
+		Menu contextMenu = new Menu();
+
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+
+		delete.addClickHandler(click -> {
+			chainGrid.removeSelectedData();
+			changedHandler.onChanged(null);
+		});
+
+		contextMenu.setItems(delete);
+		contextMenu.showContextMenu();
 	}
 
 	@Override

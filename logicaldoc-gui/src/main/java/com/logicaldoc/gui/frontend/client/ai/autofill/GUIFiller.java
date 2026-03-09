@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A GUI bean representing an AI filler
@@ -25,10 +27,12 @@ public class GUIFiller implements Serializable {
 	private String model;
 
 	private Long modelId;
-	
+
 	private Long embeddingSchemeId;
 
 	private Double threshold = 0.7d;
+
+	private List<GUIFiller> chain = new ArrayList<>();
 
 	public GUIFiller() {
 		// Empty constructor
@@ -102,6 +106,14 @@ public class GUIFiller implements Serializable {
 
 	public void setThreshold(Double threshold) {
 		this.threshold = threshold;
+	}
+
+	public List<GUIFiller> getChain() {
+		return chain;
+	}
+
+	public void setChain(List<GUIFiller> chain) {
+		this.chain = chain;
 	}
 
 	public Long getEmbeddingSchemeId() {
