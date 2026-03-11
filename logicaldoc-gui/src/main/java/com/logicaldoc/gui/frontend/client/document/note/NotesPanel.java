@@ -91,8 +91,7 @@ public class NotesPanel extends DocumentDetailTab {
 		toolStrip.setWidth100();
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
-		addNote.addClickHandler(
-				click -> new NoteUpdateDialog(new GUIDocumentNote(document), nt -> refresh()).show());
+		addNote.addClickHandler(click -> new NoteUpdateDialog(new GUIDocumentNote(document), nt -> refresh()).show());
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
 		annotations.addClickHandler(
