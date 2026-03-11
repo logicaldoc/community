@@ -33,6 +33,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class RunLevelPanel extends VLayout {
 
+	private static final String DEMO = "demo";
+
 	private static final String DEVEL = "devel";
 
 	private static final String SLAVE = "slave";
@@ -61,7 +63,7 @@ public class RunLevelPanel extends VLayout {
 		ToolStrip toolbar = new ToolStrip();
 		toolbar.setWidth100();
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
-		save.setDisabled("demo".equals(Session.get().getConfig(RUNLEVEL)));
+		save.setDisabled(DEMO.equals(Session.get().getConfig(RUNLEVEL)));
 		save.addClickHandler(event -> onSave());
 		currentRunlevel = ItemFactory.newRunlevelSelector();
 
@@ -90,16 +92,16 @@ public class RunLevelPanel extends VLayout {
 		settings.add(new GUIParameter(RUNLEVEL, currentRunlevel.getValueAsString()));
 		settings.add(new GUIParameter("runlevel.back", currentRunlevel.getValueAsString()));
 		for (ListGridRecord rec : aspects.getRecords()) {
-			settings.add(new GUIParameter(ASPECT + rec.getAttributeAsString("id") + ".default",
+			settings.add(new GUIParameter((ASPECT + rec.getAttributeAsString("id") + "." + DEFAULT).toLowerCase(),
 					rec.getAttributeAsString(DEFAULT)));
-			settings.add(new GUIParameter(ASPECT + rec.getAttributeAsString("id") + ".bulkload",
+			settings.add(new GUIParameter((ASPECT + rec.getAttributeAsString("id") + "." + BULKLOAD).toLowerCase(),
 					rec.getAttributeAsString(BULKLOAD)));
-			settings.add(new GUIParameter(ASPECT + rec.getAttributeAsString("id") + ".slave",
+			settings.add(new GUIParameter((ASPECT + rec.getAttributeAsString("id") + "." + SLAVE).toLowerCase(),
 					rec.getAttributeAsString(SLAVE)));
-			settings.add(new GUIParameter(ASPECT + rec.getAttributeAsString("id") + ".devel",
+			settings.add(new GUIParameter((ASPECT + rec.getAttributeAsString("id") + "." + DEVEL).toLowerCase(),
 					rec.getAttributeAsString(DEVEL)));
-			settings.add(new GUIParameter(ASPECT + rec.getAttributeAsString("id") + ".demo",
-					rec.getAttributeAsString("demo")));
+			settings.add(new GUIParameter((ASPECT + rec.getAttributeAsString("id") + "." + DEMO).toLowerCase(),
+					rec.getAttributeAsString(DEMO)));
 		}
 
 		SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
@@ -144,7 +146,7 @@ public class RunLevelPanel extends VLayout {
 		devel.setAutoFitWidth(true);
 		devel.setCanSort(false);
 
-		ListGridField demo = new ListGridField("demo", I18N.message("demo"), 60);
+		ListGridField demo = new ListGridField(DEMO, I18N.message(DEMO), 60);
 		demo.setType(ListGridFieldType.BOOLEAN);
 		demo.setCanEdit(true);
 		demo.setAutoFitWidth(true);
@@ -158,11 +160,11 @@ public class RunLevelPanel extends VLayout {
 		aspects.setFields(id, defaultField, bulkload, slave, devel, demo);
 		aspects.setHeaderHeight(44);
 		aspects.setHeaderSpans(
-				new HeaderSpan(I18N.message("runlevels"), new String[] { DEFAULT, BULKLOAD, SLAVE, DEVEL, "demo" }));
+				new HeaderSpan(I18N.message("runlevels"), new String[] { DEFAULT, BULKLOAD, SLAVE, DEVEL, DEMO }));
 
 		return aspects;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

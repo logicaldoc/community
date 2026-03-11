@@ -20,9 +20,10 @@ public class AspectsDS extends DataSource {
 		DataSourceBooleanField ddefault = new DataSourceBooleanField("default");
 		DataSourceBooleanField bulkload = new DataSourceBooleanField("bulkload");
 		DataSourceBooleanField devel = new DataSourceBooleanField("devel");
+		DataSourceBooleanField slave = new DataSourceBooleanField("slave");
 		DataSourceBooleanField demo = new DataSourceBooleanField("demo");
 
-		setFields(id, ddefault, bulkload, devel, demo);
+		setFields(id, ddefault, bulkload, slave, devel, demo);
 		setClientOnly(true);
 		setDataURL("data/aspects.xml");
 	}

@@ -59,13 +59,14 @@ public class AttributeSetsDataServlet extends AbstractDataServlet {
 		 */
 		for (AttributeSet set : sets) {
 			writer.print("<attributeset>");
-			writer.print("<id>" + set.getId() + "</id>");
-			writer.print("<name><![CDATA[" + set.getName() + "]]></name>");
-			writer.print(
-					"<label><![CDATA[" + StringUtils.defaultIfEmpty(set.getLabel(), set.getName()) + "]]></label>");
-			writer.print("<description><![CDATA[" + set.getDescription() + "]]></description>");
-			writer.print("<readonly>" + Boolean.toString(set.isReadonly()) + "</readonly>");
-			writer.print("<type>" + set.getType() + "</type>");
+			writer.print(String.format("<id>%d</id>", set.getId()));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", set.getName()));
+			writer.print(String.format("<label><![CDATA[%s]]></label>",
+					StringUtils.defaultIfEmpty(set.getLabel(), set.getName())));
+			writer.print(String.format("<description><![CDATA[%s]]></description>",
+					StringUtils.defaultString(set.getDescription())));
+			writer.print(String.format("<readonly>%b</readonly>", set.isReadonly()));
+			writer.print(String.format("<type>%d</type>", set.getType()));
 			writer.print("</attributeset>");
 		}
 

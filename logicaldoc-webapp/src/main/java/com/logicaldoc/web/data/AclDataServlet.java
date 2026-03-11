@@ -35,41 +35,23 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class AclDataServlet extends AbstractDataServlet {
 
+	private static final String TYPE = "<type>%d</type>";
+
+	private static final String AVATAR = "<avatar>%d</avatar>";
+
+	private static final String ENTITY = "<entity><![CDATA[%s]]></entity>";
+
+	private static final String ENTITY_ID = "<entityId>%d</entityId>";
+
 	private static final String AVATAR_GROUP_AVATAR = "<avatar>group</avatar>";
-
-	private static final String TYPE_CLOSED = "</type>";
-
-	private static final String TYPE = "<type>";
-
-	private static final String READ_CLOSED = "</read>";
-
-	private static final String READ = "<read>";
-
-	private static final String WRITE = "<write>";
-
-	private static final String WRITE_CLOSED = "</write>";
-
-	private static final String AVATAR_CLOSED = "</avatar>";
-
-	private static final String AVATAR = "<avatar>";
 
 	private static final String LIST_CLOSED = "</list>";
 
 	private static final String ACE_CLOSED = "</ace>";
 
-	private static final String ENTITYID_CLOSED = "</entityId>";
-
-	private static final String ENTITYID = "<entityId>";
-
 	private static final String ACE = "<ace>";
 
-	private static final String AND_B_LD_TENANTID = " and B.ld_tenantid = ";
-
 	private static final String LIST = "<list>";
-
-	private static final String ENTITY = "<entity><![CDATA[";
-
-	private static final String ENTITY_CLOSED = "]]></entity>";
 
 	private static final long serialVersionUID = 1L;
 
@@ -110,7 +92,7 @@ public class AclDataServlet extends AbstractDataServlet {
 				null, null, rows -> {
 					while (rows.next())
 						users.put(rows.getLong(1),
-								rows.getString(3) + " " + rows.getString(4) + " (" + rows.getString(2) + ")");
+								String.format("%s %s (%s)", rows.getString(3), rows.getString(4), rows.getString(2)));
 
 				});
 		return users;
@@ -129,9 +111,9 @@ public class AclDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the folder group in join with groups
 		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_read from ld_template_acl A, ld_group B where A.ld_templateid = ");
-		query.append("" + template.getId());
-		query.append(AND_B_LD_TENANTID + template.getTenantId());
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write from ld_template_acl A, ld_group B where A.ld_templateid = %d"
+						.formatted(template.getId()));
+		query.append(" and B.ld_tenantid = %d".formatted(template.getTenantId()));
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_name asc");
 
 		tDao.queryForResultSet(query.toString(), null, null, rows -> {
@@ -147,18 +129,20 @@ public class AclDataServlet extends AbstractDataServlet {
 					userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
 				writer.print(ACE);
-				writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
+				writer.print(String.format(ENTITY_ID, groupId));
 
 				if (groupType == GroupType.DEFAULT.ordinal()) {
-					writer.print(ENTITY + groupName + ENTITY_CLOSED);
+					writer.print(String.format(ENTITY, groupName));
 					writer.print(AVATAR_GROUP_AVATAR);
 				} else {
-					writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
-					writer.print(AVATAR + userId + AVATAR_CLOSED);
+					writer.print(String.format(ENTITY, users.get(userId)));
+					writer.print(String.format(AVATAR, userId));
 				}
-				writer.print(WRITE + (rows.getInt(4) == 1) + WRITE_CLOSED);
-				writer.print(READ + (rows.getInt(5) == 1) + READ_CLOSED);
-				writer.print(TYPE + groupType + TYPE_CLOSED);
+
+				printPermission("read", writer, intToBoolean(rows.getInt(4)));
+				printPermission("write", writer, intToBoolean(rows.getInt(5)));
+
+				writer.print(String.format(TYPE, groupType));
 				writer.print(ACE_CLOSED);
 
 			}
@@ -185,10 +169,8 @@ public class AclDataServlet extends AbstractDataServlet {
 						        A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
 						        0, A.ld_readingreq, A.ld_read, A.ld_preview, A.ld_customid, A.ld_revision
 						   from ld_document_acl A, ld_group B 
-						  where A.ld_docid =
-						""");
-		query.append(Long.toString(documentId));
-		query.append(AND_B_LD_TENANTID + document.getTenantId());
+						  where A.ld_docid = %d and B.ld_tenantid = %d
+						""".formatted(documentId, document.getTenantId()));
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
 
 		docDao.queryForResultSet(query.toString(), null, null, rows -> {
@@ -226,10 +208,8 @@ public class AclDataServlet extends AbstractDataServlet {
 						       A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
 						       A.ld_store, A.ld_readingreq, A.ld_read, A.ld_preview, A.ld_customid, A.ld_revision
 						  from ld_folder_acl A, ld_group B 
-						 where A.ld_folderid =
-						""");
-		query.append(Long.toString(ref.getId()));
-		query.append(AND_B_LD_TENANTID + ref.getTenantId());
+						 where A.ld_folderid = %d and B.ld_tenantid = %d
+						""".formatted(ref.getId(), ref.getTenantId()));
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
 
 		folderDao.queryForResultSet(query.toString(), null, null, rows -> {
@@ -257,9 +237,9 @@ public class AclDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the menu ACL in join with groups
 		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read from ld_menu_acl A, ld_group B where A.ld_menuid = ");
-		query.append("" + menu.getId());
-		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + tenantId);
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read from ld_menu_acl A, ld_group B where A.ld_menuid = %d"
+						.formatted(menu.getId()));
+		query.append(String.format(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = %d", tenantId));
 		query.append(" order by B.ld_type asc, B.ld_name asc");
 
 		menuDao.queryForResultSet(query.toString(), null, null, rows -> {
@@ -275,18 +255,19 @@ public class AclDataServlet extends AbstractDataServlet {
 					userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
 				writer.print(ACE);
-				writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
+				writer.print(String.format(ENTITY_ID, groupId));
 
 				if (groupType == GroupType.DEFAULT.ordinal()) {
-					writer.print(ENTITY + groupName + ENTITY_CLOSED);
+					writer.print(String.format(ENTITY, groupName));
 					writer.print(AVATAR_GROUP_AVATAR);
 				} else {
-					writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
-					writer.print(AVATAR + userId + AVATAR_CLOSED);
+					writer.print(String.format(ENTITY, users.get(userId)));
+					writer.print(String.format(AVATAR, userId));
 				}
 
-				writer.print(READ + intToBoolean(rows.getInt(4)) + READ_CLOSED);
-				writer.print(TYPE + groupType + TYPE_CLOSED);
+				printPermission("read", writer, intToBoolean(rows.getInt(4)));
+
+				writer.print(String.format(TYPE, groupType));
 				writer.print(ACE_CLOSED);
 			}
 		});
@@ -306,11 +287,12 @@ public class AclDataServlet extends AbstractDataServlet {
 		writer.write(LIST);
 
 		// Prepare the query on the menu ACL in join with groups
-		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write, A.ld_delete, A.ld_security from ld_note_acl A, ld_group B where A.ld_noteid = ");
-		query.append("" + note.getId());
-		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + note.getTenantId());
-		query.append(" order by B.ld_type asc, B.ld_name asc");
+		StringBuilder query = new StringBuilder("""
+				select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write, A.ld_delete, A.ld_security 
+	              from ld_note_acl A, ld_group B where A.ld_noteid = %d
+	               and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = %d
+	             order by B.ld_type asc, B.ld_name asc	
+             """.formatted(note.getId(), note.getTenantId()));
 
 		noteDao.queryForResultSet(query.toString(), null, null, rows -> {
 			/*
@@ -325,21 +307,22 @@ public class AclDataServlet extends AbstractDataServlet {
 					userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
 				writer.print(ACE);
-				writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
+				writer.print(String.format(ENTITY_ID, groupId));
 
 				if (groupType == GroupType.DEFAULT.ordinal()) {
-					writer.print(ENTITY + groupName + ENTITY_CLOSED);
+					writer.print(String.format(ENTITY, groupName));
 					writer.print(AVATAR_GROUP_AVATAR);
 				} else {
-					writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
-					writer.print(AVATAR + userId + AVATAR_CLOSED);
+					writer.print(String.format(ENTITY, users.get(userId)));
+					writer.print(String.format(AVATAR, userId));
 				}
 
-				writer.print(READ + intToBoolean(rows.getInt(4)) + READ_CLOSED);
-				writer.print(WRITE + intToBoolean(rows.getInt(5)) + WRITE_CLOSED);
-				writer.print("<delete>" + intToBoolean(rows.getInt(6)) + "</delete>");
-				writer.print("<security>" + intToBoolean(rows.getInt(6)) + "</security>");
-				writer.print(TYPE + groupType + TYPE_CLOSED);
+				printPermission("read", writer, intToBoolean(rows.getInt(4)));
+				printPermission("write", writer, intToBoolean(rows.getInt(5)));
+				printPermission("delete", writer, intToBoolean(rows.getInt(6)));
+				printPermission("security", writer, intToBoolean(rows.getInt(7)));
+
+				writer.print(String.format(TYPE, groupType));
 
 				writer.print(ACE_CLOSED);
 			}
@@ -357,14 +340,15 @@ public class AclDataServlet extends AbstractDataServlet {
 			userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
 		writer.print(ACE);
-		writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
+
+		writer.print(String.format(ENTITY_ID, groupId));
 
 		if (groupType == GroupType.DEFAULT.ordinal()) {
-			writer.print(ENTITY + groupName + ENTITY_CLOSED);
+			writer.print(String.format(ENTITY, groupName));
 			writer.print(AVATAR_GROUP_AVATAR);
 		} else {
-			writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
-			writer.print(AVATAR + userId + AVATAR_CLOSED);
+			writer.print(String.format(ENTITY, users.get(userId)));
+			writer.print(String.format(AVATAR, userId));
 		}
 
 		printPermission("write", writer, intToBoolean(set.getInt(4)));
@@ -393,7 +377,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		printPermission("customid", writer, intToBoolean(set.getInt(27)));
 		printPermission("revision", writer, intToBoolean(set.getInt(28)));
 
-		writer.print(TYPE + groupType + TYPE_CLOSED);
+		writer.print(String.format(TYPE, groupType));
 		writer.print(ACE_CLOSED);
 	}
 

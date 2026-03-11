@@ -31,12 +31,12 @@ public class AspectsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 		for (String aspect : aspects) {
 			writer.print("<aspect>");
-			writer.print("<id>" + aspect + "</id>");
-			writer.print("<default>" + RunLevel.DEFAULT.aspectEnabled(aspect) + "</default>");
-			writer.print("<bulkload>" + RunLevel.BULKLOAD.aspectEnabled(aspect) + "</bulkload>");
-			writer.print("<devel>" + RunLevel.DEVEL.aspectEnabled(aspect) + "</devel>");
-			writer.print("<devel>" + RunLevel.SLAVE.aspectEnabled(aspect) + "</devel>");
-			writer.print("<demo>" + RunLevel.DEMO.aspectEnabled(aspect) + "</demo>");
+			writer.print(String.format("<id>%s</id>",aspect));
+			writer.print(String.format("<default>%b</default>", RunLevel.DEFAULT.aspectEnabled(aspect)));
+			writer.print(String.format("<bulkload>%b</bulkload>", RunLevel.BULKLOAD.aspectEnabled(aspect)));
+			writer.print(String.format("<devel>%b</devel>", RunLevel.DEVEL.aspectEnabled(aspect)));
+			writer.print(String.format("<slave>%b</slave>", RunLevel.SLAVE.aspectEnabled(aspect)));
+			writer.print(String.format("<demo>%b</demo>", RunLevel.DEMO.aspectEnabled(aspect)));
 			writer.print("</aspect>");
 		}
 		writer.write("</list>");

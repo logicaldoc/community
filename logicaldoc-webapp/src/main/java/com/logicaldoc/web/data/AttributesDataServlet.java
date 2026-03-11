@@ -121,9 +121,9 @@ public class AttributesDataServlet extends AbstractDataServlet {
 
 	private void printAttibute(String name, String label, int type, PrintWriter writer) {
 		writer.print("<attribute>");
-		writer.print("<name>" + name + "</name>");
-		writer.print("<label><![CDATA[" + label + "]]></label>");
-		writer.print("<type>" + type + "</type>");
+		writer.print(String.format("<name>%s</name>", name));
+		writer.print(String.format("<label><![CDATA[%s]]></label>", label));
+		writer.print(String.format("<type>%d</type>", type));
 		writer.print("</attribute>");
 	}
 }

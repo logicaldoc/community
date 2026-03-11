@@ -39,12 +39,12 @@ public class ApiKeysDataServlet extends AbstractDataServlet {
 		 */
 		for (ApiKey apiKey : apiKeys) {
 			writer.print("<apikey>");
-			writer.print("<id>" + apiKey.getId() + "</id>");
-			writer.print("<name><![CDATA[" + apiKey.getName() + "]]></name>");
-			writer.print("<key><![CDATA[" + apiKey.getLabel() + "]]></key>");
-			writer.print("<creation>" + getDateFormat().format(apiKey.getCreation()) + "</creation>");
-			if(apiKey.getLastUsed()!=null)
-				writer.print("<lastUsed>" + getDateFormat().format(apiKey.getLastUsed()) + "</lastUsed>");
+			writer.print(String.format("<id>%d</id>", apiKey.getId()));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", apiKey.getName()));
+			writer.print(String.format("<key><![CDATA[%s]]></key>", apiKey.getLabel()));
+			writer.print(String.format("<creation>%s</creation>", getDateFormat().format(apiKey.getCreation())));
+			if (apiKey.getLastUsed() != null)
+				writer.print(String.format("<lastUsed>%s</lastUsed>", getDateFormat().format(apiKey.getLastUsed())));
 			writer.print("</apikey>");
 		}
 

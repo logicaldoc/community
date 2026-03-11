@@ -47,32 +47,28 @@ public enum RunLevel {
 	}
 
 	private String getAspectProperty(String aspect) {
-		return "aspect." + aspect.toLowerCase() + "." + toString();
+		return "aspect.%s.%s".formatted(aspect.toLowerCase(), toString());
 	}
 
 	public boolean aspectEnabled(Aspect aspect) {
 		return aspectEnabled(aspect.name());
 	}
-	
+
 	public boolean aspectEnabled(String aspect) {
-		ContextProperties config = getConfig();
-		return config != null && config.getBoolean(getAspectProperty(aspect), false);
+		return getConfig().getBoolean(getAspectProperty(aspect), false);
 	}
 
 	public void checkAspect(Aspect aspect) throws AspectDisabledException {
 		checkAspect(aspect.name());
 	}
-	
+
 	public void checkAspect(String aspect) throws AspectDisabledException {
-		if(!aspectEnabled(aspect))
+		if (!aspectEnabled(aspect))
 			throw new AspectDisabledException(aspect);
 	}
 
-	
 	public void setAspect(String aspect, boolean enabled) {
-		ContextProperties config = getConfig();
-		if (config != null)
-			config.setProperty(getAspectProperty(aspect), "" + enabled);
+		getConfig().setProperty(getAspectProperty(aspect), Boolean.toString(enabled));
 	}
 
 	private static ContextProperties getConfig() {

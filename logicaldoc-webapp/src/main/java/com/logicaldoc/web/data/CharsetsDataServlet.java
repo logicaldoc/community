@@ -35,8 +35,8 @@ public class CharsetsDataServlet extends AbstractDataServlet {
 		Map<String, Charset> charsets = Charset.availableCharsets();
 		for (Map.Entry<String, Charset> entry : charsets.entrySet()) {
 			writer.print("<charset>");
-			writer.print("<code><![CDATA[" + entry.getKey() + "]]></code>");
-			writer.print("<name><![CDATA[" + entry.getValue().displayName(locale) + "]]></name>");
+			writer.print(String.format("<code><![CDATA[%s]]></code>", entry.getKey()));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", entry.getValue().displayName(locale)));
 			writer.print("</charset>");
 		}
 

@@ -44,15 +44,19 @@ public class ContactsDataServlet extends AbstractDataServlet {
 				continue;
 
 			writer.print("<contact>");
-			writer.print("<id>" + contact.getId() + "</id>");
-			writer.print("<email><![CDATA[" + contact.getEmail() + "]]></email>");
+			writer.print(String.format("<id>%d</id>", contact.getId()));
+			writer.print(String.format("<email><![CDATA[%s]]></email>", contact.getEmail()));
+			writer.print(String.format("<firstName><![CDATA[%s]]></firstName>",
+					StringUtils.defaultString(contact.getFirstName())));
+			writer.print(String.format("<lastName><![CDATA[%s]]></lastName>",
+					StringUtils.defaultString(contact.getLastName())));
+			writer.print(String.format("<company><![CDATA[%s]]></company>",
+					StringUtils.defaultString(contact.getCompany())));
 			writer.print(
-					"<firstName><![CDATA[" + StringUtils.defaultString(contact.getFirstName()) + "]]></firstName>");
-			writer.print("<lastName><![CDATA[" + StringUtils.defaultString(contact.getLastName()) + "]]></lastName>");
-			writer.print("<company><![CDATA[" + StringUtils.defaultString(contact.getCompany()) + "]]></company>");
-			writer.print("<mobile><![CDATA[" + StringUtils.defaultString(contact.getMobile()) + "]]></mobile>");
-			writer.print("<phone><![CDATA[" + StringUtils.defaultString(contact.getPhone()) + "]]></phone>");
-			writer.print("<address><![CDATA[" + StringUtils.defaultString(contact.getAddress()) + "]]></address>");
+					String.format("<mobile><![CDATA[%s]]></mobile>", StringUtils.defaultString(contact.getMobile())));
+			writer.print(String.format("<phone><![CDATA[%s]]></phone>", StringUtils.defaultString(contact.getPhone())));
+			writer.print(String.format("<address><![CDATA[%s]]></address>",
+					StringUtils.defaultString(contact.getAddress())));
 			writer.print("</contact>");
 		}
 

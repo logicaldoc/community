@@ -50,22 +50,22 @@ public class AttributeOptionsDataServlet extends AbstractDataServlet {
 				category = "";
 
 			writer.print("<option>");
-			writer.print("<id>-" + category.hashCode() + "</id>");
+			writer.print(String.format("<id>-%d</id>", category.hashCode()));
 			writer.print("<attribute></attribute>");
 			writer.print("<value></value>");
 			writer.print("<position></position>");
-			writer.print("<category><![CDATA[" + (StringUtils.isEmpty(category) ? "" : category) + "]]></category>");
+			writer.print(String.format("<category><![CDATA[%s]]></category>", StringUtils.defaultString(category)));
 			writer.print("</option>");
 		}
 
 		for (AttributeOption option : options) {
 			writer.print("<option>");
-			writer.print("<id>" + option.getId() + "</id>");
-			writer.print("<attribute><![CDATA[" + option.getAttribute() + "]]></attribute>");
-			writer.print("<value><![CDATA[" + option.getValue() + "]]></value>");
+			writer.print(String.format("<id>%d</id>", option.getId()));
+			writer.print(String.format("<attribute><![CDATA[%s]]></attribute>", option.getAttribute()));
+			writer.print(String.format("<value><![CDATA[%s]]></value>", option.getValue()));
 			if (StringUtils.isNotEmpty(option.getCategory()))
-				writer.print("<category><![CDATA[" + option.getCategory() + "]]></category>");
-			writer.print("<position><![CDATA[" + option.getPosition() + "]]></position>");
+				writer.print(String.format("<category><![CDATA[%s]]></category>", option.getCategory()));
+			writer.print(String.format("<position><![CDATA[%d]]></position>", option.getPosition()));
 			writer.print("</option>");
 		}
 

@@ -307,7 +307,7 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	public boolean getBoolean(String property, boolean defaultValue) {
-		String v = getProperty(property, "" + defaultValue).trim();
+		String v = getProperty(property, Boolean.toString(defaultValue)).trim();
 		return "true".equals(v) || "yes".equals(v) || "1".equals(v);
 	}
 

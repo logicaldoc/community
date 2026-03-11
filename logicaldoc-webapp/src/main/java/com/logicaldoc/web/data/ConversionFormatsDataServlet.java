@@ -33,11 +33,8 @@ public class ConversionFormatsDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (String format : FormatConversionManager.get().getEnabledOutputFormats(fileName)) {
-			writer.print("<format>");
-			writer.print("<extension><![CDATA[" + format + "]]></extension>");
-			writer.print("</format>");
-		}
+		for (String format : FormatConversionManager.get().getEnabledOutputFormats(fileName))
+			writer.print(String.format("<format><extension><![CDATA[%s]]></extension></format>", format));
 
 		writer.write("</list>");
 	}
