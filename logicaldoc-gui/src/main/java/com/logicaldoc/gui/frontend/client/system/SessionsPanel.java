@@ -87,9 +87,9 @@ public class SessionsPanel extends VLayout {
 
 		sessionsGrid.addDataArrivedHandler(event -> {
 			// Search the records with status=0 that are the active sessions
-			Record[] records = sessionsGrid.getRecordList().findAll(STATUS, "0");
+			Record[] records = sessionsGrid.getRecordList().findAll(STATUS, "CLOSED");
 			if (records == null || records.length < 1)
-				activeSessions.setValue("0");
+				activeSessions.setValue("OPEN");
 			else
 				activeSessions.setValue(Integer.toString(records.length));
 		});
@@ -141,7 +141,7 @@ public class SessionsPanel extends VLayout {
 						return super.getCellCSSText(rec, rowNum, colNum);
 					}
 				} else if (getFieldName(colNum).equals(STATUS_LABEL)) {
-					if (!"0".equals(rec.getAttribute(STATUS))) {
+					if (!"OPEN".equals(rec.getAttribute(STATUS))) {
 						return "color: red;";
 					} else {
 						return super.getCellCSSText(rec, rowNum, colNum);
@@ -175,14 +175,14 @@ public class SessionsPanel extends VLayout {
 					@Override
 					public void handleSuccess(Void result) {
 						sessionsGrid.getSelectedRecord().setAttribute(STATUS_LABEL, "Closed");
-						sessionsGrid.getSelectedRecord().setAttribute(STATUS, "1");
+						sessionsGrid.getSelectedRecord().setAttribute(STATUS, "OPEN");
 						sessionsGrid.refreshRow(sessionsGrid.getRecordIndex(sessionsGrid.getSelectedRecord()));
 					}
 				});
 			}
 		}));
 
-		if (!"0".equals(sessionsGrid.getSelectedRecord().getAttributeAsString(STATUS))
+		if (!"OPEN".equals(sessionsGrid.getSelectedRecord().getAttributeAsString(STATUS))
 				|| (Session.get().getSid() != null
 						&& Session.get().getSid().equals(sessionsGrid.getSelectedRecord().getAttributeAsString("sid"))))
 			killSession.setEnabled(false);

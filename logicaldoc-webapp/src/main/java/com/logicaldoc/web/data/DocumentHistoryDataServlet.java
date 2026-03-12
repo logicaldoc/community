@@ -37,6 +37,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
+	private static final String USER_ID = "userId";
+
 	private static final String TENANT_ID = "tenantId";
 
 	private static final String EVENT = "event";
@@ -54,11 +56,15 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel, A.revision, A.impersonator from DocumentHistory A where A.deleted = 0 ");
+		StringBuilder query = new StringBuilder("""
+ 												select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, 
+ 												       A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, 
+ 												       A.fileSize, A.keyLabel, A.revision, A.impersonator 
+ 												  from DocumentHistory A 
+ 												 where A.deleted = 0
+                                                """);
 		Map<String, Object> params = prepareQueryParams(request, query);
-		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), params,
-				max != null ? max : 100);
+		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), params, max != null ? max : 100);
 
 		// Used only to cache the already encountered documents when the
 		// history
@@ -70,7 +76,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		 */
 		for (Object gridRecord : records) {
 			Object[] cols = (Object[]) gridRecord;
-			if (request.getParameter("userId") != null) {
+			if (request.getParameter(USER_ID) != null) {
 				/*
 				 * If the request contains the user specification, we report
 				 * just the latest event per each document
@@ -88,44 +94,52 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
 	private void printHistory(PrintWriter writer, Object[] historyRecord, Locale locale, boolean showSid) {
 		writer.print("<history>");
-		writer.print("<user><![CDATA[" + historyRecord[0] + "]]></user>");
-		writer.print("<event><![CDATA[" + I18N.message((String) historyRecord[1], locale) + "]]></event>");
-		writer.print("<version>" + historyRecord[2] + "</version>");
+		writer.print(String.format("<user><![CDATA[%s]]></user>", historyRecord[0]));
+		writer.print(String.format("<event><![CDATA[%s]]></event>", I18N.message((String) historyRecord[1], locale)));
+		writer.print(String.format("<version>%s</version>", historyRecord[2]));
 
 		DateFormat df = getDateFormat();
-		writer.print("<date>" + df.format((Date) historyRecord[3]) + "</date>");
+		writer.print(String.format("<date>%s</date>", df.format((Date) historyRecord[3])));
 
-		writer.print("<comment><![CDATA[" + (historyRecord[4] == null ? "" : historyRecord[4]) + "]]></comment>");
-		writer.print("<filename><![CDATA[" + (historyRecord[5] == null ? "" : historyRecord[5]) + "]]></filename>");
-		writer.print("<icon>"
-				+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) historyRecord[5])))
-				+ "</icon>");
-		writer.print("<new>" + historyRecord[6] + "</new>");
-		writer.print("<folderId>" + historyRecord[7] + "</folderId>");
-		writer.print("<docId>" + historyRecord[8] + "</docId>");
-		writer.print("<path><![CDATA[" + (historyRecord[9] == null ? "" : historyRecord[9]) + "]]></path>");
+		writer.print(String.format("<comment><![CDATA[%s]]></comment>",
+				StringUtils.defaultString((String) historyRecord[4])));
+		writer.print(String.format(String.format("<filename><![CDATA[%s]]></filename>",
+				StringUtils.defaultString((String) historyRecord[5]))));
+		writer.print(String.format("<icon>%s</icon>",
+				FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) historyRecord[5])))));
+		writer.print(String.format("<new>%b</new>", historyRecord[6]));
+		writer.print(String.format("<folderId>%d</folderId>", historyRecord[7]));
+		writer.print(String.format("<docId>%d</docId>", historyRecord[8]));
+		writer.print(
+				String.format("<path><![CDATA[%s]]></path>", StringUtils.defaultString((String) historyRecord[9])));
 		if (showSid)
-			writer.print("<sid><![CDATA[" + (historyRecord[10] == null ? "" : historyRecord[10]) + "]]></sid>");
-		writer.print("<userId>" + historyRecord[11] + "</userId>");
+			writer.print(
+					String.format("<sid><![CDATA[%s]]></sid>", StringUtils.defaultString((String) historyRecord[10])));
+		writer.print(String.format("<userId>%d</userId>", historyRecord[11]));
 
 		if (historyRecord[12] != null)
-			writer.print("<reason><![CDATA[" + historyRecord[12] + "]]></reason>");
+			writer.print(String.format("<reason><![CDATA[%s]]></reason>", historyRecord[12]));
 
-		writer.print("<ip><![CDATA[" + (historyRecord[13] == null ? "" : historyRecord[13]) + "]]></ip>");
-		writer.print("<device><![CDATA[" + (historyRecord[14] == null ? "" : historyRecord[14]) + "]]></device>");
-		writer.print(
-				"<geolocation><![CDATA[" + (historyRecord[15] == null ? "" : historyRecord[15]) + "]]></geolocation>");
+		writer.print(String.format("<ip><![CDATA[%s]]></ip>", StringUtils.defaultString((String) historyRecord[13])));
+		writer.print(String.format("<device><![CDATA[%s]]></device>",
+				StringUtils.defaultString((String) historyRecord[14])));
+		writer.print(String.format("<geolocation><![CDATA[%s]]></geolocation>",
+				StringUtils.defaultString((String) historyRecord[15])));
 
 		if (historyRecord[16] != null)
-			writer.write("<color><![CDATA[" + historyRecord[16] + "]]></color>");
+			writer.write(String.format("<color><![CDATA[%s]]></color>", (String) historyRecord[16]));
 
-		writer.print("<fileVersion>" + (historyRecord[17] == null ? "" : historyRecord[17]) + "</fileVersion>");
-		writer.print("<fileSize>" + (historyRecord[18] == null ? "" : historyRecord[18]) + "</fileSize>");
+		writer.print(
+				String.format("<fileVersion>%s</fileVersion>", StringUtils.defaultString((String) historyRecord[17])));
+		writer.print(String.format("<fileSize>%d</fileSize>", historyRecord[18]));
+
 		if (historyRecord[19] != null)
-			writer.write("<key><![CDATA[" + historyRecord[19] + "]]></key>");
-		writer.write("<revision><![CDATA[" + StringUtils.defaultString((String) historyRecord[20]) + "]]></revision>");
-		
-		writer.write(String.format("<impersonator>%s</impersonator>",StringUtils.defaultString((String) historyRecord[21])));
+			writer.write(String.format("<key><![CDATA[%s]]></key>", historyRecord[19]));
+
+		writer.write(String.format("<revision><![CDATA[%s]]></revision>",
+				StringUtils.defaultString((String) historyRecord[20])));
+		writer.write(String.format("<impersonator>%s</impersonator>",
+				StringUtils.defaultString((String) historyRecord[21])));
 		writer.print("</history>");
 	}
 
@@ -143,8 +157,9 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			params.put(DOC_ID, docId);
 		}
 
-		if (request.getParameter("userId") != null) {
+		if (request.getParameter(USER_ID) != null) {
 			query.append(" and A.userId = :userId");
+			params.put(USER_ID, Long.parseLong(request.getParameter(USER_ID)));
 		}
 
 		if (request.getParameter(TENANT_ID) != null) {
@@ -158,7 +173,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			event = event.replaceAll("[^a-zA-Z0-9.,]", "");
 			if (event.contains(",")) {
 				query.append(" and A.event in (");
-				query.append(Arrays.asList(event.split("\\,")).stream().map(ev -> "'" + ev + "'")
+				query.append(Arrays.asList(event.split("\\,")).stream().map(ev -> "'%s'".formatted(ev))
 						.collect(Collectors.joining(",")));
 				query.append(")");
 			} else {

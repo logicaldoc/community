@@ -47,23 +47,19 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuilder query = new StringBuilder(
-				"select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser, ld_color ");
-		query.append(" from ld_folder ");
-		query.append(" where ld_tenantid = ");
-		query.append(Long.toString(session.getTenantId()));
-		query.append(" and ld_foldref is null ");
-		query.append(" and ld_deleted > 0 ");
+		StringBuilder query = new StringBuilder("""
+				                                select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser, ld_color 
+                                                  from ld_folder
+                                                 where ld_tenantid = %d
+                                                   and ld_foldref is null
+                                                   and ld_deleted > 0                                                                             				                                
+                                                """.formatted(session.getTenantId()));
 
-		if (deleteUserId != null) {
-			query.append(" and ld_deleteuserId=");
-			query.append(Long.toString(deleteUserId));
-		}
+		if (deleteUserId != null)
+			query.append(" and ld_deleteuserId = %d".formatted(deleteUserId));
 
-		if (parentId != null) {
-			query.append(" and ld_parentId=");
-			query.append(Long.toString(parentId));
-		}
+		if (parentId != null)
+			query.append(" and ld_parentId = %d".formatted(parentId));
 
 		query.append(" order by ld_creation desc ");
 
@@ -88,18 +84,19 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 		 */
 		for (Folder fld : records) {
 			writer.print("<folder>");
-			writer.print("<id>" + fld.getId() + "</id>");
-			writer.print("<name><![CDATA[" + fld.getName() + "]]></name>");
-			writer.print("<lastModified>" + df.format(fld.getLastModified()) + "</lastModified>");
-			writer.print("<deleteUserId>" + fld.getDeleteUserId() + "</deleteUserId>");
-			writer.print("<deleteUser><![CDATA[" + (fld.getDeleteUser() != null ? fld.getDeleteUser() : "")
-					+ "]]></deleteUser>");
-			writer.print("<parentId>" + fld.getParentId() + "</parentId>");
-			writer.print("<type>" + fld.getType() + "</type>");
+			writer.print(String.format("<id>%d</id>", fld.getId()));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", fld.getName()));
+			writer.print(String.format("<lastModified>%s</lastModified>", df.format(fld.getLastModified())));
+			writer.print(String.format("<deleteUserId>%d</deleteUserId>", fld.getDeleteUserId()));
+			writer.print(String.format("<deleteUser><![CDATA[%s]]></deleteUser>",
+					StringUtils.defaultString(fld.getDeleteUser())));
+			writer.print(String.format("<parentId>%d</parentId>", fld.getParentId()));
+			writer.print(String.format("<type>%d</type>", fld.getType()));
 			if (fld.getColor() != null)
-				writer.print("<color><![CDATA[" + fld.getColor() + "]]></color>");
+				writer.print(String.format("<color><![CDATA[%s]]></color>", fld.getColor()));
 			writer.print("</folder>");
 		}
+		
 		writer.write("</list>");
 	}
 }

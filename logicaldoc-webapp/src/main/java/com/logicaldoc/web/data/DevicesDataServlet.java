@@ -42,12 +42,11 @@ public class DevicesDataServlet extends AbstractDataServlet {
 				continue;
 
 			writer.print("<device>");
-
-			writer.print("<id>" + device.getId() + "</id>");
+			writer.print(String.format("<id>%d</id>", device.getId()));
 
 			printLabel(device, writer);
 
-			writer.print("<deviceId>" + device.getDeviceId() + "</deviceId>");
+			writer.print(String.format("<deviceId>%s</deviceId>", device.getDeviceId()));
 
 			printBrowser(device, writer);
 
@@ -65,23 +64,23 @@ public class DevicesDataServlet extends AbstractDataServlet {
 
 	private void printType(Device device, PrintWriter writer) {
 		if (device.getType() != null)
-			writer.print("<type>" + device.getType() + "</type>");
+			writer.print(String.format("<type>%s</type>", device.getType()));
 	}
 
 	private void printLabel(Device device, PrintWriter writer) {
 		if (device.getLabel() != null)
-			writer.print("<label><![CDATA[" + device.getLabel() + "]]></label>");
+			writer.print(String.format("<label><![CDATA[%s]]></label>", device.getLabel()));
 	}
 
 	private void printOperativeSystem(Device device, PrintWriter writer) {
 		if (device.getOperativeSystem() != null)
-			writer.print("<os><![CDATA[" + device.getOperativeSystem() + "]]></os>");
+			writer.print(String.format("<os><![CDATA[%s]]></os>", device.getOperativeSystem()));
 	}
 
 	private void printBrowser(Device device, PrintWriter writer) {
 		if (device.getBrowser() != null)
-			writer.print(
-					"<browser><![CDATA[" + device.getBrowser() + " v" + device.getBrowserVersion() + "]]></browser>");
+			writer.print(String.format("<browser><![CDATA[%s v%s]]></browser>", device.getBrowser(),
+					device.getBrowserVersion()));
 	}
 
 	private List<Device> getDevices(Session session, boolean trustedOnly) {
@@ -96,8 +95,8 @@ public class DevicesDataServlet extends AbstractDataServlet {
 	private void printDates(Device device, PrintWriter writer) {
 		DateFormat df = getDateFormat();
 		if (device.getCreation() != null)
-			writer.print("<creation>" + df.format(device.getCreation()) + "</creation>");
+			writer.print(String.format("<creation>%s</creation>", df.format(device.getCreation())));
 		if (device.getLastLogin() != null)
-			writer.print("<lastlogin>" + df.format(device.getLastLogin()) + "</lastlogin>");
+			writer.print(String.format("<lastlogin>%s</lastlogin>", df.format(device.getLastLogin())));
 	}
 }

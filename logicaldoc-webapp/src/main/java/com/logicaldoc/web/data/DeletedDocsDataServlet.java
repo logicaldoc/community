@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class DeletedDocsDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final Logger log = LoggerFactory.getLogger(DeletedDocsDataServlet.class);
 
 	@Override
@@ -55,26 +55,19 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuilder query = new StringBuilder(
-				"select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_fileversion, A.ld_lastmodified, ");
-		query.append(
-				" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_folderid, B.ld_name, A.ld_creation, A.ld_deleteuserid, A.ld_deleteuser ");
-		query.append(" from ld_document A ");
-		query.append(" left outer join ld_folder B on A.ld_folderid=B.ld_id ");
-		query.append(" where A.ld_tenantid=");
-		query.append(Long.toString(session.getTenantId()));
-		query.append(" and A.ld_docref is null ");
-		query.append(" and A.ld_deleted > 0 ");
+		StringBuilder query = new StringBuilder("""
+                                                select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_fileversion, A.ld_lastmodified, 
+				                                       A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_folderid, B.ld_name, A.ld_creation, A.ld_deleteuserid, A.ld_deleteuser
+				                                  from ld_document A left outer join ld_folder B on A.ld_folderid = B.ld_id
+				                                 where A.ld_tenantid = %d
+				                                   and A.ld_docref is null
+				                                   and A.ld_deleted > 0
+				                                """.formatted(session.getTenantId()));
+		if (deleteUserId != null)
+			query.append(" and A.ld_deleteuserId = %d".formatted(deleteUserId));
 
-		if (deleteUserId != null) {
-			query.append(" and A.ld_deleteuserId=");
-			query.append(Long.toString(deleteUserId));
-		}
-
-		if (folderId != null) {
-			query.append(" and A.ld_folderId=");
-			query.append(Long.toString(folderId));
-		}
+		if (folderId != null)
+			query.append(" and A.ld_folderId = %d".formatted(folderId));
 
 		query.append(" order by A.ld_creation desc ");
 
@@ -113,26 +106,24 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 		 */
 		for (Document doc : records) {
 			writer.print("<document>");
-			writer.print("<id>" + doc.getId() + "</id>");
-			if (doc.getCustomId() != null)
-				writer.print("<customId><![CDATA[" + doc.getCustomId() + "]]></customId>");
-			else
-				writer.print("<customId> </customId>");
-			writer.print("<icon>" + doc.getIcon() + "</icon>");
-			writer.print("<version>" + doc.getVersion() + "</version>");
-			writer.print("<fileVersion>" + doc.getFileVersion() + "</fileVersion>");
-			writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
-			writer.print("<created>" + df.format(doc.getCreation()) + "</created>");
-			writer.print("<size>" + doc.getFileSize() + "</size>");
-			writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-			writer.print("<immutable>" + doc.isImmutable() + "</immutable>");
-			writer.print("<deleteUserId>" + doc.getDeleteUserId() + "</deleteUserId>");
-			writer.print("<avatar>" + doc.getDeleteUserId() + "</avatar>");
-			writer.print("<deleteUser><![CDATA[" + (doc.getDeleteUser() != null ? doc.getDeleteUser() : "")
-					+ "]]></deleteUser>");
-			writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");
-			writer.print("<folder><![CDATA[" + doc.getFolder().getName() + "]]></folder>");
-			writer.print("<type>" + doc.getType() + "</type>");
+			writer.print(String.format("<id>%d</id>", doc.getId()));
+			writer.print(
+					String.format("<customId><![CDATA[%s]]></customId>", StringUtils.defaultString(doc.getCustomId())));
+			writer.print(String.format("<icon>%s</icon>", doc.getIcon()));
+			writer.print(String.format("<version>%s</version>", doc.getVersion()));
+			writer.print(String.format("<fileVersion>%s</fileVersion>", doc.getFileVersion()));
+			writer.print(String.format("<lastModified>%s</lastModified>", df.format(doc.getLastModified())));
+			writer.print(String.format("<created>%s</created>", df.format(doc.getCreation())));
+			writer.print(String.format("<size>%d</size>", doc.getFileSize()));
+			writer.print(String.format("<filename><![CDATA[%s]]></filename>", doc.getFileName()));
+			writer.print(String.format("<immutable>%b</immutable>", doc.isImmutable()));
+			writer.print(String.format("<deleteUserId>%d</deleteUserId>", doc.getDeleteUserId()));
+			writer.print(String.format("<avatar>%d</avatar>", doc.getDeleteUserId()));
+			writer.print(String.format("<deleteUser><![CDATA[%s]]></deleteUser>",
+					StringUtils.defaultString(doc.getDeleteUser())));
+			writer.print(String.format("<folderId>%d</folderId>", doc.getFolder().getId()));
+			writer.print(String.format("<folder><![CDATA[%s]]></folder>", doc.getFolder().getName()));
+			writer.print(String.format("<type>%s</type>", doc.getType()));
 			writer.print("</document>");
 		}
 		writer.write("</list>");

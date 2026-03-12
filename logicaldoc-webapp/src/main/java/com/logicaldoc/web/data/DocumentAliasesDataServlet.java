@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -40,7 +41,7 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 		Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
 		StringBuilder query = new StringBuilder(
-				"select id, fileName, folder.id from Document where deleted = 0 and docRef = " + docId);
+				"select id, fileName, folder.id from Document where deleted = 0 and docRef = %d".formatted(docId));
 
 		User user = session.getUser();
 
@@ -52,20 +53,11 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 				 * if the sets contain two or more items: (x, 0) IN ((1,0),
 				 * (2,0), (3,0), ...):
 				 */
-				query.append(" and (folder.id,0) in ( ");
-				boolean firstItem = true;
-				for (Long folderId : accessibleFolderIds) {
-					if (!firstItem)
-						query.append(",");
-					query.append("(");
-					query.append(folderId);
-					query.append(",0)");
-					firstItem = false;
-				}
-				query.append(" )");
+				query.append(" and (folder.id,0) in (%s)".formatted(accessibleFolderIds.stream()
+						.map(id -> "(%d,0)".formatted(id)).collect(Collectors.joining(","))));
 			} else {
-				query.append(" and folder.id in ");
-				query.append(accessibleFolderIds.toString().replace('[', '(').replace(']', ')'));
+				query.append(" and folder.id in (%s)".formatted(
+						accessibleFolderIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))));
 			}
 		}
 
@@ -77,14 +69,13 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 		for (Object gridRecord : records) {
 			Object[] cols = (Object[]) gridRecord;
 			writer.print("<alias>");
-			writer.print("<id>" + cols[0] + "</id>");
-			writer.print("<filename><![CDATA[" + cols[1] + "]]></filename>");
-			writer.print("<folderId>" + cols[2] + "</folderId>");
-			writer.print(
-					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[1])))
-							+ "</icon>");
-			writer.print(
-					"<path><![CDATA[" + folderDAO.computePathExtended((Long) cols[2]) + "/" + cols[1] + "]]></path>");
+			writer.print(String.format("<id>%d</id>", cols[0]));
+			writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[1]));
+			writer.print(String.format("<folderId>%d</folderId>", cols[2]));
+			writer.print(String.format("<icon>%s</icon>",
+					FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[1])))));
+			writer.print(String.format("<path><![CDATA[%s]]></path>",
+					"%d/%s".formatted(folderDAO.computePathExtended((Long) cols[2]), cols[1])));
 			writer.print("</alias>");
 		}
 		writer.write("</list>");
