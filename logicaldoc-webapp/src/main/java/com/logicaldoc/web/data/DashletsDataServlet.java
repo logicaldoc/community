@@ -42,7 +42,7 @@ public class DashletsDataServlet extends AbstractDataServlet {
 		 */
 		String query = "select A.id, A.name, A.title, A.type, A.query, A.content from Dashlet A where A.deleted = 0 and A.tenantId = %d order by A.id asc"
 				.formatted(session.getTenantId());
-		records.addAll(BookmarkDAO.get().findByQuery(query.toString(), (Map<String, Object>) null, null));
+		records.addAll(BookmarkDAO.get().findByQuery(query, (Map<String, Object>) null, null));
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -51,7 +51,7 @@ public class DashletsDataServlet extends AbstractDataServlet {
 			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<dashlet>");
-			writer.print(String.format("<id>%d</id>", cols[0]));
+			writer.print(String.format("<id>%d</id>", (Long) cols[0]));
 			writer.print(String.format("<name><![CDATA[%s]]></name>", cols[1] == null ? "" : cols[1]));
 			writer.print(String.format("<title><![CDATA[%s]]></title>",
 					cols[2] == null ? "" : I18N.message(cols[2].toString(), locale)));

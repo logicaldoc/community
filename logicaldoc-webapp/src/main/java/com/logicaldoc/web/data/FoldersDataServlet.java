@@ -156,23 +156,25 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	private void printColor(PrintWriter writer, ResultSet rs) throws SQLException {
 		if (StringUtils.isNotEmpty(rs.getString(6)))
-			writer.print("<color><![CDATA[" + rs.getString(6) + "]]></color>");
+			writer.print(String.format("<color><![CDATA[%s]]></color>", rs.getString(6)));
 	}
 
 	private void printCustomIcon(PrintWriter writer, ResultSet rs) throws SQLException {
-		writer.print(
-				"<customIcon>" + (rs.getInt(4) == Folder.TYPE_ALIAS ? "folder_alias" : "folder") + "</customIcon>");
+		writer.print(String.format("<customIcon>%s</customIcon>", rs.getInt(4) == Folder.TYPE_ALIAS ? "folder_alias" : "folder"));
 	}
 
 	private void printFoldRef(PrintWriter writer, ResultSet rs) throws SQLException {
 		if (rs.getObject(5) != null)
-			writer.print("<foldRef>" + rs.getLong(5) + "</foldRef>");
+			writer.print(String.format("<foldRef>%d</foldRef>", rs.getLong(5)));
 	}
 
 	private void printFoldersWithDocs(PrintWriter writer, String parent, Folder parentFolder, User user)
 			throws PersistenceException {
-		StringBuilder query = new StringBuilder(
-				"select ld_id, ld_filename, ld_filesize, ld_published, ld_startpublishing, ld_stoppublishing, ld_status, ld_color from ld_document where ld_deleted=0 and ld_folderid=:parentId ");
+		StringBuilder query = new StringBuilder("""
+                                                select ld_id, ld_filename, ld_filesize, ld_published, ld_startpublishing, ld_stoppublishing, ld_status, ld_color 
+                                                  from ld_document 
+                                                 where ld_deleted = 0 and ld_folderid = :parentId 
+                                                """);
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")) {
 			query.append(" and ld_published=1");
 			query.append(" and (ld_startpublishing is null or CURRENT_TIMESTAMP > ld_startpublishing) ");
@@ -217,8 +219,14 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	private StringBuilder prepareQuery(Session session, String tenantName, Folder parentFolder, User user)
 			throws PersistenceException {
-		StringBuilder query = new StringBuilder(
-				"select ld_id, ld_parentid, ld_name, ld_type, ld_foldref, ld_color, ld_position from ld_folder where ld_deleted=0 and ld_hidden=0 and not ld_id=ld_parentid and ld_parentid = :parentId and ld_tenantid = :tenantId ");
+		StringBuilder query = new StringBuilder("""
+                                                select ld_id, ld_parentid, ld_name, ld_type, ld_foldref, ld_color, ld_position 
+                                                  from ld_folder 
+                                                 where ld_deleted = 0 and ld_hidden = 0 
+                                                   and not ld_id = ld_parentid 
+                                                   and ld_parentid = :parentId 
+                                                   and ld_tenantid = :tenantId 
+                                                """);
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && parentFolder != null)
 			addReadConditions(query, session, parentFolder);
 
@@ -305,7 +313,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		Folder parentFolder = fDao.findFolder(parentFolderId);
 		if (parentFolder == null) {
 			throw new PersistenceException(
-					String.format("No folder found with ID=%d parent %s", parentFolderId, parent));
+					String.format("No folder found with ID = %d parent %s", parentFolderId, parent));
 		} else {
 			return parentFolder;
 		}

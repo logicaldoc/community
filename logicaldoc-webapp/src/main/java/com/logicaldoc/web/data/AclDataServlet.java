@@ -35,6 +35,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class AclDataServlet extends AbstractDataServlet {
 
+	private static final String WRITE = "write";
+
 	private static final String TYPE = "<type>%d</type>";
 
 	private static final String AVATAR = "<avatar>%d</avatar>";
@@ -140,7 +142,7 @@ public class AclDataServlet extends AbstractDataServlet {
 				}
 
 				printPermission("read", writer, intToBoolean(rows.getInt(4)));
-				printPermission("write", writer, intToBoolean(rows.getInt(5)));
+				printPermission(WRITE, writer, intToBoolean(rows.getInt(5)));
 
 				writer.print(String.format(TYPE, groupType));
 				writer.print(ACE_CLOSED);
@@ -288,10 +290,10 @@ public class AclDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the menu ACL in join with groups
 		StringBuilder query = new StringBuilder("""
-				select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write, A.ld_delete, A.ld_security 
-	              from ld_note_acl A, ld_group B where A.ld_noteid = %d
-	               and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = %d
-	             order by B.ld_type asc, B.ld_name asc	
+                select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write, A.ld_delete, A.ld_security 
+                  from ld_note_acl A, ld_group B where A.ld_noteid = %d
+                   and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = %d
+                 order by B.ld_type asc, B.ld_name asc	
              """.formatted(note.getId(), note.getTenantId()));
 
 		noteDao.queryForResultSet(query.toString(), null, null, rows -> {
@@ -318,7 +320,7 @@ public class AclDataServlet extends AbstractDataServlet {
 				}
 
 				printPermission("read", writer, intToBoolean(rows.getInt(4)));
-				printPermission("write", writer, intToBoolean(rows.getInt(5)));
+				printPermission(WRITE, writer, intToBoolean(rows.getInt(5)));
 				printPermission("delete", writer, intToBoolean(rows.getInt(6)));
 				printPermission("security", writer, intToBoolean(rows.getInt(7)));
 
@@ -351,7 +353,7 @@ public class AclDataServlet extends AbstractDataServlet {
 			writer.print(String.format(AVATAR, userId));
 		}
 
-		printPermission("write", writer, intToBoolean(set.getInt(4)));
+		printPermission(WRITE, writer, intToBoolean(set.getInt(4)));
 		printPermission("add", writer, intToBoolean(set.getInt(5)));
 		printPermission("security", writer, intToBoolean(set.getInt(6)));
 		printPermission("immutable", writer, intToBoolean(set.getInt(7)));

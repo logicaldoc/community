@@ -57,11 +57,11 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder("""
- 												select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, 
- 												       A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, 
- 												       A.fileSize, A.keyLabel, A.revision, A.impersonator 
- 												  from DocumentHistory A 
- 												 where A.deleted = 0
+                                                 select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, 
+                                                        A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, 
+                                                        A.fileSize, A.keyLabel, A.revision, A.impersonator 
+                                                   from DocumentHistory A 
+                                                  where A.deleted = 0
                                                 """);
 		Map<String, Object> params = prepareQueryParams(request, query);
 		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), params, max != null ? max : 100);
@@ -107,15 +107,15 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 				StringUtils.defaultString((String) historyRecord[5]))));
 		writer.print(String.format("<icon>%s</icon>",
 				FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) historyRecord[5])))));
-		writer.print(String.format("<new>%b</new>", historyRecord[6]));
-		writer.print(String.format("<folderId>%d</folderId>", historyRecord[7]));
-		writer.print(String.format("<docId>%d</docId>", historyRecord[8]));
+		writer.print(String.format("<new>%b</new>", (Boolean) historyRecord[6]));
+		writer.print(String.format("<folderId>%d</folderId>", (Long) historyRecord[7]));
+		writer.print(String.format("<docId>%d</docId>", (Long) historyRecord[8]));
 		writer.print(
 				String.format("<path><![CDATA[%s]]></path>", StringUtils.defaultString((String) historyRecord[9])));
 		if (showSid)
 			writer.print(
 					String.format("<sid><![CDATA[%s]]></sid>", StringUtils.defaultString((String) historyRecord[10])));
-		writer.print(String.format("<userId>%d</userId>", historyRecord[11]));
+		writer.print(String.format("<userId>%d</userId>", (Long) historyRecord[11]));
 
 		if (historyRecord[12] != null)
 			writer.print(String.format("<reason><![CDATA[%s]]></reason>", historyRecord[12]));
@@ -131,7 +131,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
 		writer.print(
 				String.format("<fileVersion>%s</fileVersion>", StringUtils.defaultString((String) historyRecord[17])));
-		writer.print(String.format("<fileSize>%d</fileSize>", historyRecord[18]));
+		writer.print(String.format("<fileSize>%d</fileSize>", (Long) historyRecord[18]));
 
 		if (historyRecord[19] != null)
 			writer.write(String.format("<key><![CDATA[%s]]></key>", historyRecord[19]));
@@ -173,7 +173,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			event = event.replaceAll("[^a-zA-Z0-9.,]", "");
 			if (event.contains(",")) {
 				query.append(" and A.event in (");
-				query.append(Arrays.asList(event.split("\\,")).stream().map(ev -> "'%s'".formatted(ev))
+				query.append(Arrays.asList(event.split("\\,")).stream().map("'%s'"::formatted)
 						.collect(Collectors.joining(",")));
 				query.append(")");
 			} else {

@@ -21,13 +21,11 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class EnvironmentDataServlet extends AbstractDataServlet {
 
-	private static final String CDATA_VALUE = "]]></value>";
+	private static final String VALUE = "<value><![CDATA[%s]]></value>";
 
-	private static final String VALUE_CDATA = "<value><![CDATA[";
+	private static final String NAME = "<name><![CDATA[%s]]></name>";
 
 	private static final String ENTRY_CLOSE = "</entry>";
-
-	private static final String ENTRY_SCOPE_DATABASE_SCOPE = "<entry><scope>database</scope>";
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,25 +39,25 @@ public class EnvironmentDataServlet extends AbstractDataServlet {
 		Map<String, String> env = System.getenv();
 		for (Map.Entry<String, String> entry : env.entrySet()) {
 			writer.print("<entry><scope>system</scope>");
-			writer.print("<name><![CDATA[" + entry.getKey() + "]]></name>");
-			writer.print(VALUE_CDATA + entry.getValue() + CDATA_VALUE);
+			writer.print(String.format(NAME, entry.getKey()));
+			writer.print(String.format(VALUE, entry.getValue()));
 			writer.print(ENTRY_CLOSE);
 		}
 
 		Properties props = System.getProperties();
 		for (Map.Entry<Object, Object> entry : props.entrySet()) {
 			writer.print("<entry><scope>java</scope>");
-			writer.print("<name><![CDATA[" + entry.getKey() + "]]></name>");
-			writer.print(VALUE_CDATA + entry.getValue() + CDATA_VALUE);
+			writer.print(String.format(NAME, entry.getKey()));
+			writer.print(String.format(VALUE, entry.getValue()));
 			writer.print(ENTRY_CLOSE);
 		}
 
 		DocumentDAO dao = DocumentDAO.get();
 		Map<String, String> meta = dao.getDatabaseMetadata();
 		for (Map.Entry<String, String> entry : meta.entrySet()) {
-			writer.print(ENTRY_SCOPE_DATABASE_SCOPE);
-			writer.print("<name>" + entry.getKey() + "</name>");
-			writer.print(VALUE_CDATA + entry.getValue() + CDATA_VALUE);
+			writer.print("<entry><scope>database</scope>");
+			writer.print(String.format(NAME, entry.getKey()));
+			writer.print(String.format(VALUE, entry.getValue()));
 			writer.print(ENTRY_CLOSE);
 		}
 

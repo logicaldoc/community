@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class IndexingQueueDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final Logger log = LoggerFactory.getLogger(IndexingQueueDataServlet.class);
 
 	@Override
@@ -47,12 +47,13 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		User user = dao.findById(session.getUserId());
 		dao.initialize(user);
 
-		String where = prepareWhere(request, session);
-
-		StringBuilder query = new StringBuilder(
-				"select ld_id, ld_customid, ld_docref, ld_type, ld_version, ld_lastModified, ld_date, ld_publisher,"
-						+ " ld_creation, ld_creator, ld_filesize, ld_immutable, ld_indexed, ld_lockuserid, ld_filename, ld_status,"
-						+ " ld_signed, ld_type, ld_fileversion, ld_color from ld_document where " + where);
+		String query = """
+                       select ld_id, ld_customid, ld_docref, ld_type, ld_version, ld_lastModified, ld_date, ld_publisher,
+                              ld_creation, ld_creator, ld_filesize, ld_immutable, ld_indexed, ld_lockuserid, ld_filename, ld_status,
+                              ld_signed, ld_type, ld_fileversion, ld_color 
+                         from ld_document 
+                        where %s
+                        """.formatted(prepareWhere(request, session));
 
 		if (log.isDebugEnabled())
 			log.debug("Running filter query {}", query);
@@ -60,7 +61,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		/*
 		 * Execute the Query.
 		 */
-		List<Object[]> records = dao.query(query.toString(), new RowMapper<Object[]>() {
+		List<Object[]> records = dao.query(query, new RowMapper<Object[]>() {
 
 			@Override
 			public Object[] mapRow(ResultSet rs, int row) throws SQLException {
@@ -113,8 +114,8 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		ContextProperties config = Context.get().getConfig();
 		for (Object[] cols : records) {
 			if (!FileUtil.matches(cols[14].toString(),
-					config.getProperty(session.getTenantName() + ".barcode.includes"),
-					config.getProperty(session.getTenantName() + ".barcode.excludes")))
+					config.getProperty("%s.barcode.includes".formatted(session.getTenantName())),
+					config.getProperty("%s.barcode.excludes".formatted(session.getTenantName()))))
 				continue;
 
 			printDocument(writer, cols);
@@ -126,27 +127,26 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		DateFormat df = getDateFormat();
 
 		writer.print("<document>");
-		writer.print("<id>" + cols[0] + "</id>");
-		if (cols[1] != null)
-			writer.print("<customId><![CDATA[" + cols[1] + "]]></customId>");
-		else
-			writer.print("<customId> </customId>");
-		writer.print("<docref>" + (cols[2] != null ? cols[2] : "") + "</docref>");
-		writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[3])) + "</icon>");
+		writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+		writer.print(String.format("<customId><![CDATA[%s]]></customId>", StringUtils.defaultString((String) cols[1])));
 
-		writer.print("<version>" + cols[4] + "</version>");
-		writer.print("<lastModified>" + df.format(cols[5]) + "</lastModified>");
-		writer.print("<published>" + df.format(cols[6]) + "</published>");
-		writer.print("<publisher><![CDATA[" + cols[7] + "]]></publisher>");
-		writer.print("<created>" + df.format(cols[8]) + "</created>");
-		writer.print("<creator><![CDATA[" + cols[9] + "]]></creator>");
-		writer.print("<size>" + cols[10] + "</size>");
+		writer.print(String.format("<docref>%s</docref>", StringUtils.defaultString((String) cols[2])));
+		writer.print(String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[3]))));
+
+		writer.print(String.format("<version>%s</version>", cols[4]));
+		writer.print(String.format("<lastModified>%s</lastModified>", df.format(cols[5])));
+		writer.print(String.format("<published>%s</published>", df.format(cols[6])));
+		writer.print(String.format("<publisher><![CDATA[%s]]></publisher>", cols[7]));
+		writer.print(String.format("<created>%s</created>", df.format(cols[8])));
+		writer.print(String.format("<creator><![CDATA[%s]]></creator>", cols[9]));
+		writer.print(String.format("<size>%d</size>", (Long) cols[10]));
+
 		if (Integer.parseInt(cols[11].toString()) == 0)
 			writer.print("<immutable>blank</immutable>");
 		else if (Integer.parseInt(cols[11].toString()) == 1)
 			writer.print("<immutable>stop</immutable>");
 
-		writer.print("<indexed>" + cols[12] + "</indexed>");
+		writer.print(String.format("<indexed>%d</indexed>", (Integer) cols[12]));
 
 		if (Integer.parseInt(cols[15].toString()) == Constants.DOC_LOCKED)
 			writer.print("<locked>lock</locked>");
@@ -154,22 +154,23 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 			writer.print("<locked>page_edit</locked>");
 		else
 			writer.print("<locked>blank</locked>");
+
 		if (cols[14] != null)
-			writer.print("<lockUserId>" + cols[13] + "</lockUserId>");
-		writer.print("<filename><![CDATA[" + cols[14] + "]]></filename>");
-		writer.print("<status>" + cols[15] + "</status>");
+			writer.print(String.format("<lockUserId>%d</lockUserId>", (Long) cols[13]));
+		writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[14]));
+		writer.print(String.format("<status>%d</status>", (Integer) cols[15]));
 
 		if (Integer.parseInt(cols[16].toString()) == 0)
 			writer.print("<signed>blank</signed>");
 		else if (Integer.parseInt(cols[16].toString()) == 1)
 			writer.print("<signed>rosette</signed>");
 
-		writer.print("<type>" + cols[17] + "</type>");
+		writer.print(String.format("<type>%s</type>", cols[17]));
 
-		writer.print("<fileVersion><![CDATA[" + cols[18] + "]]></fileVersion>");
+		writer.print(String.format("<fileVersion><![CDATA[%s]]></fileVersion>", cols[18]));
 
 		if (cols[19] != null)
-			writer.print("<color><![CDATA[" + cols[19] + "]]></color>");
+			writer.print(String.format("<color><![CDATA[%s]]></color>", cols[19]));
 
 		writer.print("</document>");
 	}
@@ -191,9 +192,9 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 
 		StringBuilder where = new StringBuilder(queryFragments[0].replace("_entity.", "ld_"));
 
-		where.append(
-				(StringUtils.isNotEmpty(queryFragments[1]) ? " order by " + queryFragments[1].replace("_entity.", "ld_")
-						: ""));
+		where.append((StringUtils.isNotEmpty(queryFragments[1])
+				? " order by %s".formatted(queryFragments[1].replace("_entity.", "ld_"))
+				: ""));
 
 		return where.toString().replace("ld_indexingStatus", "ld_indexed");
 	}

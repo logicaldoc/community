@@ -50,11 +50,11 @@ public class MenusDataServlet extends AbstractDataServlet {
 		 */
 		for (Menu menu : menus) {
 			writer.print("<menu>");
-			writer.print("<id>" + menu.getId() + "</id>");
-			writer.print("<name><![CDATA[" + menu.getName() + "]]></name>");
-			writer.print("<position><![CDATA[" + menu.getPosition() + "]]></position>");
-			writer.print("<parent>" + menu.getParentId() + "</parent>");
-			writer.print("<eenabled>" + Boolean.toString(menu.isEnabled()) + "</eenabled>");
+			writer.print(String.format("<id>%d</id>", menu.getId()));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", menu.getName()));
+			writer.print(String.format("<position><![CDATA[%s]]></position>", menu.getPosition()));
+			writer.print(String.format("<parent>%s</parent>", menu.getParentId()));
+			writer.print(String.format("<eenabled>%b</eenabled>", menu.isEnabled()));
 			writer.print("</menu>");
 		}
 

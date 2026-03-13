@@ -57,12 +57,12 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 
 		StringBuilder query = new StringBuilder("""
                                                 select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_fileversion, A.ld_lastmodified, 
-				                                       A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_folderid, B.ld_name, A.ld_creation, A.ld_deleteuserid, A.ld_deleteuser
-				                                  from ld_document A left outer join ld_folder B on A.ld_folderid = B.ld_id
-				                                 where A.ld_tenantid = %d
-				                                   and A.ld_docref is null
-				                                   and A.ld_deleted > 0
-				                                """.formatted(session.getTenantId()));
+                                                       A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_folderid, B.ld_name, A.ld_creation, A.ld_deleteuserid, A.ld_deleteuser
+                                                  from ld_document A left outer join ld_folder B on A.ld_folderid = B.ld_id
+                                                 where A.ld_tenantid = %d
+                                                   and A.ld_docref is null
+                                                   and A.ld_deleted > 0
+                                                """.formatted(session.getTenantId()));
 		if (deleteUserId != null)
 			query.append(" and A.ld_deleteuserId = %d".formatted(deleteUserId));
 

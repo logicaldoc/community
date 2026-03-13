@@ -115,9 +115,10 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		String sql = "select ld_docid from ld_bookmark where ld_type=" + Bookmark.TYPE_DOCUMENT
-				+ " and ld_deleted = 0 and ld_userid = " + session.getUserId();
-		List<Long> bookmarks = dao.queryForList(sql, Long.class);
+		List<Long> bookmarks = dao.queryForList(
+				"select ld_docid from ld_bookmark where ld_type = %d and ld_deleted = 0 and ld_userid = %d"
+						.formatted(Bookmark.TYPE_DOCUMENT, session.getUserId()),
+				Long.class);
 
 		// The list of documents to be returned
 		List<Document> documentsInCurrentPage = new ArrayList<>();
@@ -389,8 +390,7 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
   from Document as A
   left outer join A.template as B
  where A.deleted = 0
-   and not A.status=""");
-		query.append(DocumentStatus.ARCHIVED.ordinal());
+   and not A.status = %d""".formatted(DocumentStatus.ARCHIVED.ordinal()));
 
 		if (folderId != null) {
 			query.append(" and A.folder.id = %d".formatted(folderId));
@@ -648,10 +648,13 @@ select ld_docid
 
 		log.debug("Search for extended attributes {}", extendedAttributesSpec);
 
-		StringBuilder query = new StringBuilder(
-				"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
-		query.append(" from ld_document_ext where ld_docid in (");
-		query.append("select D.ld_id from ld_document D where D.ld_deleted=0 ");
+		StringBuilder query = new StringBuilder("""
+                                                select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, 
+                                                       ld_doublevalue, ld_datevalue, ld_stringvalues
+                                                       from ld_document_ext where ld_docid in (select D.ld_id 
+                                                                                                 from ld_document D 
+                                                                                                where D.ld_deleted = 0
+                                                """);
 		if (folderId != null)
 			query.append(" and D.ld_folderid = %d".formatted(folderId));
 		if (formId != null)

@@ -41,22 +41,22 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 		 * Search for documents first.
 		 */
 		String query = """ 
-			           select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, B.folder.id, B.color 
+                       select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, B.folder.id, B.color 
                          from Bookmark A, Document B 
                         where A.type = %d and A.deleted = 0 and B.deleted = 0 
                           and A.targetId = B.id and A.userId = %d
                        """.formatted(Bookmark.TYPE_DOCUMENT, session.getUserId());
-		records.addAll(dao.findByQuery(query.toString(), (Map<String, Object>) null, null));
+		records.addAll(dao.findByQuery(query, (Map<String, Object>) null, null));
 
 		/*
 		 * Than for folders
 		 */
 		query = """
-				select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, A.targetId, B.color
-				  from Bookmark A, Folder B where A.targetId = B.id and A.type = %d and A.deleted = 0 
-				   and A.userId = %d
-				""".formatted(Bookmark.TYPE_FOLDER, session.getUserId());
-		records.addAll(dao.findByQuery(query.toString(), (Map<String, Object>) null, null));
+                select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, A.targetId, B.color
+                  from Bookmark A, Folder B where A.targetId = B.id and A.type = %d and A.deleted = 0 
+                   and A.userId = %d
+                """.formatted(Bookmark.TYPE_FOLDER, session.getUserId());
+		records.addAll(dao.findByQuery(query, (Map<String, Object>) null, null));
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -71,20 +71,21 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 		Object[] cols = (Object[]) bookmarkRecord;
 
 		writer.print("<bookmark>");
-		writer.print(String.format("<id>%d</id>", cols[0]));
+		writer.print(String.format("<id>%d</id>", (Long) cols[0]));
 		if (cols[7].toString().equals("0"))
-			writer.print(String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[1]))));
+			writer.print(
+					String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[1]))));
 		else
 			writer.print("<icon>folder</icon>");
 		writer.print(String.format("<name><![CDATA[%s]]></name>", printValue(cols[2])));
-		writer.print(String.format("<description><![CDATA[%s]]></description>",printValue(cols[3])));
+		writer.print(String.format("<description><![CDATA[%s]]></description>", printValue(cols[3])));
 		writer.print(String.format("<position>%s</position>", printValue(cols[4])));
 		writer.print(String.format("<userId>%s</userId>", printValue(cols[5])));
 		writer.print(String.format("<targetId>%s</targetId>", printValue(cols[6])));
-		writer.print(String.format("<type>%s</type>",printValue(cols[7])));
-		writer.print(String.format("<folderId>%s</folderId>",printValue(cols[8])));
+		writer.print(String.format("<type>%s</type>", printValue(cols[7])));
+		writer.print(String.format("<folderId>%s</folderId>", printValue(cols[8])));
 		if (cols[9] != null)
-			writer.print(String.format("<color><![CDATA[%s]]></color>",printValue(cols[9])));
+			writer.print(String.format("<color><![CDATA[%s]]></color>", printValue(cols[9])));
 		writer.print("</bookmark>");
 	}
 

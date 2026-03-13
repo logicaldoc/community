@@ -12,10 +12,10 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 public class FillerTypesDS extends DataSource {
 
 	public FillerTypesDS() {
-		this(false, null);
+		this(null);
 	}
 
-	public FillerTypesDS(boolean includeEmpty, String type) {
+	public FillerTypesDS(String type) {
 		setRecordXPath("/list/type");
 
 		DataSourceTextField id = new DataSourceTextField("id");

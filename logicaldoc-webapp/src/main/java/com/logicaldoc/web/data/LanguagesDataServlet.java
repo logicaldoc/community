@@ -46,11 +46,9 @@ public class LanguagesDataServlet extends AbstractDataServlet {
 				Locale lc = LocaleUtil.toLocale(loc);
 
 				writer.print("<lang>");
-				writer.print("<code><![CDATA[" + loc + "]]></code>");
-				writer.print("<name><![CDATA[" + StringUtils.capitalize(lc.getDisplayName(locale)) + "]]></name>");
-				writer.print("<eenabled>"
-						+ "enabled".equals(pbean.getProperty(session.getTenantName() + ".lang." + loc + ".gui"))
-						+ "</eenabled>");
+				writer.print(String.format("<code><![CDATA[%s]]></code>", loc));
+				writer.print(String.format("<name><![CDATA[%s]]></name>", StringUtils.capitalize(lc.getDisplayName(locale))));
+				writer.print(String.format("<eenabled>%b</eenabled>", "enabled".equals(pbean.getProperty("%s.lang.%s.gui".formatted(session.getTenantName(), loc)))));
 				writer.print("</lang>");
 			}
 		} else {
@@ -60,10 +58,9 @@ public class LanguagesDataServlet extends AbstractDataServlet {
 
 			for (Language language : languages) {
 				writer.print("<lang>");
-				writer.print("<code><![CDATA[" + language.toString() + "]]></code>");
-				writer.print("<name><![CDATA[" + StringUtils.capitalize(language.getLocale().getDisplayName(locale))
-						+ "]]></name>");
-				writer.print("<eenabled>" + activeLanguages.contains(language) + "</eenabled>");
+				writer.print(String.format("<code><![CDATA[%s]]></code>",language.toString()));
+				writer.print(String.format("<name><![CDATA[%s]]></name>", StringUtils.capitalize(language.getLocale().getDisplayName(locale))));
+				writer.print(String.format("<eenabled>%b</eenabled>", activeLanguages.contains(language)));
 				writer.print("</lang>");
 			}
 		}

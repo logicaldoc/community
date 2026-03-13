@@ -30,174 +30,188 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class LinksDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		Long docId = getDocId(request);
+        Long docId = getDocId(request);
 
-		String parent = getParent(request);
+        String parent = getParent(request);
 
-		Long parentDocId = getParentDocId(docId, parent);
+        Long parentDocId = getParentDocId(docId, parent);
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+        PrintWriter writer = response.getWriter();
+        writer.write("<list>");
 
-		DocumentDAO dao = DocumentDAO.get();
-		StringBuilder query = new StringBuilder(
-				"select A.id, 0, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
-		query.append(
-				" A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color from DocumentLink A where A.deleted = 0");
-		query.append(" and ((A.document1.id = " + parentDocId + ")");
-		query.append(" or  (A.document2.id = " + parentDocId + ")");
-		query.append(") ");
-		if (!docId.equals(parentDocId)) {
-			query.append(" and not A.document1.id = " + docId);
-			query.append(" and not A.document2.id = " + docId);
-		}
+        DocumentDAO dao = DocumentDAO.get();
+        StringBuilder query = new StringBuilder("""
+                                                select A.id, 0, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, 
+                                                       A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color
+                                                  from DocumentLink A 
+                                                 where A.deleted = 0
+                                                """);
+        query.append(" and ((A.document1.id = %d)".formatted(parentDocId));
+        query.append(" or  (A.document2.id = %d)".formatted(parentDocId));
+        query.append(") ");
+        if (!docId.equals(parentDocId)) {
+            query.append(" and not A.document1.id = %d".formatted(docId));
+            query.append(" and not A.document2.id = %d".formatted(docId));
+        }
 
-		List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
+        List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		for (Object gridRecord : records) {
-			Object[] cols = (Object[]) gridRecord;
-			printLink(writer, cols, parent, parentDocId, null);
-		}
+        /*
+         * Iterate over records composing the response XML document
+         */
+        for (Object gridRecord : records) {
+            Object[] cols = (Object[]) gridRecord;
+            printLink(writer, cols, parent, parentDocId, null);
+        }
 
-		/*
-		 * Now retrieve the documents linked as extended attributes
-		 */
-		printAttributesOfTypeDocument(docId, parent, parentDocId, session.getTenantName(), writer);
+        /*
+         * Now retrieve the documents linked as extended attributes
+         */
+        printAttributesOfTypeDocument(docId, parent, parentDocId, session.getTenantName(), writer);
 
-		writer.write("</list>");
-	}
+        writer.write("</list>");
+    }
 
-	private void printAttributesOfTypeDocument(Long docId, String parent, Long parentDocId, String tenant,
-			PrintWriter writer) throws PersistenceException {
-		if (!Context.get().getConfig().getBoolean(tenant + ".gui.showdocattrsaslinks", false))
-			return;
+    private void printAttributesOfTypeDocument(Long docId, String parent, Long parentDocId, String tenant,
+            PrintWriter writer) throws PersistenceException {
+        if (!Context.get().getConfig().getBoolean(tenant + ".gui.showdocattrsaslinks", false))
+            return;
 
-		// Use the stringValue of the attribute to print the filename of the
-		// referenced document
-		StringBuilder query = new StringBuilder("select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, E.ld_stringvalue, DOC2.ld_color, E.ld_label ");
-		query.append(" from ld_document_ext E, ld_document DOC1, ld_document DOC2 where E.ld_type="+ Attribute.TYPE_DOCUMENT);
-		query.append(" and DOC1.ld_deleted=0 and DOC2.ld_deleted=0 and E.ld_intvalue is not null ");
-		query.append(" and DOC1.ld_id = E.ld_docid ");
-		query.append(" and DOC2.ld_id = E.ld_intvalue ");
-		query.append(" and E.ld_docid = ");
-		query.append(parentDocId);
-		if (!docId.equals(parentDocId)) {
-			query.append(" and not DOC1.ld_id = " + docId);
-			query.append(" and not DOC2.ld_id = " + docId);
-		}
-		
-		// Get backward references to current document from referenced ones
-		query.append(" UNION ");
-		query.append("select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, DOC2.ld_filename, DOC2.ld_color, E.ld_label ");
-		query.append(" from ld_document_ext E, ld_document DOC1, ld_document DOC2 where E.ld_type="+ Attribute.TYPE_DOCUMENT);
-		query.append(" and DOC1.ld_deleted=0 and DOC2.ld_deleted=0 and E.ld_intvalue is not null ");
-		query.append(" and DOC1.ld_id = E.ld_docid ");
-		query.append(" and DOC2.ld_id = E.ld_intvalue ");
-		query.append(" and E.ld_intvalue = ");
-		query.append(parentDocId);
-		if (!docId.equals(parentDocId)) {
-			query.append(" and not DOC1.ld_id = " + docId);
-			query.append(" and not DOC2.ld_id = " + docId);
-		}
+        // Use the stringValue of the attribute to print the filename of the
+        // referenced document
+        StringBuilder query = new StringBuilder("""
+                                                select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, E.ld_stringvalue, DOC2.ld_color, E.ld_label
+                                                  from ld_document_ext E, ld_document DOC1, ld_document DOC2 
+                                                 where E.ld_type = %d
+                                                   and DOC1.ld_deleted = 0 
+                                                   and DOC2.ld_deleted = 0 
+                                                   and E.ld_intvalue is not null
+                                                   and DOC1.ld_id = E.ld_docid
+                                                   and DOC2.ld_id = E.ld_intvalue
+                                                   and E.ld_docid = %d
+                                                """.formatted(Attribute.TYPE_DOCUMENT, parentDocId));
 
-		DocumentDAO dao = DocumentDAO.get();
-		dao.queryForResultSet(query.toString(), null, null, rows -> {
-			while (rows.next()) {
-				List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
-				final long docId1 = rows.getLong(1);
-				final long docId2 = rows.getLong(6);
-				final String attributeName = rows.getString(5);
+        if (!docId.equals(parentDocId)) {
+            query.append(" and not DOC1.ld_id = %d".formatted(docId));
+            query.append(" and not DOC2.ld_id = %d".formatted(docId));
+        }
 
-				cols.set(0, -docId1);
-				cols.set(1, rows.getLong(2));
-				cols.set(2, StringUtils.defaultString(rows.getString(10), attributeName));
-				cols.set(3, docId1);
-				cols.set(9, rows.getLong(2));
-				cols.set(10, rows.getLong(7));
+        // Get backward references to current document from referenced ones
+        query.append(""" 
+                     UNION 
+                     select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, DOC2.ld_filename, DOC2.ld_color, E.ld_label
+                       from ld_document_ext E, ld_document DOC1, ld_document DOC2 
+                       where E.ld_type = %d
+                         and DOC1.ld_deleted = 0 
+                         and DOC2.ld_deleted = 0 
+                         and E.ld_intvalue is not null
+                         and DOC1.ld_id = E.ld_docid
+                         and DOC2.ld_id = E.ld_intvalue
+                         and E.ld_intvalue = %d
+                      """.formatted(Attribute.TYPE_DOCUMENT, parentDocId));
+        query.append(parentDocId);
+        if (!docId.equals(parentDocId)) {
+            query.append(" and not DOC1.ld_id = %d".formatted(docId));
+            query.append(" and not DOC2.ld_id = %d".formatted(docId));
+        }
 
-				if (parentDocId.longValue() == docId1) {
-					cols.set(6, docId2);
-					cols.set(7, rows.getString(8));
-					cols.set(8, rows.getString(8));
-					cols.set(12, rows.getString(9));
-				} else {
-					cols.set(3, docId1);
-					cols.set(4, rows.getString(3));
-					cols.set(5, rows.getString(3));
-					cols.set(11, rows.getString(4));
-				}
+        DocumentDAO dao = DocumentDAO.get();
+        dao.queryForResultSet(query.toString(), null, null, rows -> {
+            while (rows.next()) {
+                List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
+                final long docId1 = rows.getLong(1);
+                final long docId2 = rows.getLong(6);
+                final String attributeName = rows.getString(5);
 
-				printLink(writer, cols.toArray(new Object[0]), parent, parentDocId, attributeName);
-			}
-		});
-	}
+                cols.set(0, -docId1);
+                cols.set(1, rows.getLong(2));
+                cols.set(2, StringUtils.defaultString(rows.getString(10), attributeName));
+                cols.set(3, docId1);
+                cols.set(9, rows.getLong(2));
+                cols.set(10, rows.getLong(7));
 
-	private void printLink(PrintWriter writer, Object[] cols, String parent, Long parentDocId, String attribute) {
-		writer.print("<link>");
-		writer.print("<linkId>" + cols[0] + "</linkId>");
-		writer.print("<folderId>" + cols[1] + "</folderId>");
-		writer.print("<type>" + cols[2] + "</type>");
-		writer.print("<parent>" + parent + "</parent>");
-		writer.print("<folderId1>" + cols[9] + "</folderId1>");
-		writer.print("<folderId2>" + cols[10] + "</folderId2>");
-		if (StringUtils.isNotEmpty(attribute))
-			writer.print("<attribute>" + attribute + "</attribute>");
-		if (parentDocId.longValue() == (Long) cols[3]) {
-			writer.print("<documentId>" + parent + "-" + cols[6] + "</documentId>");
-			writer.print("<filename><![CDATA[" + (String) cols[7] + "]]></filename>");
-			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[8])) + "</icon>");
-			writer.print("<direction>out</direction>");
-			if (cols[12] != null)
-				writer.print("<color><![CDATA[" + cols[12] + "]]></color>");
-		} else {
-			writer.print("<documentId>" + parent + "-" + cols[3] + "</documentId>");
-			writer.print("<filename><![CDATA[" + (String) cols[4] + "]]></filename>");
-			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[5])) + "</icon>");
-			if (cols[11] != null)
-				writer.print("<color><![CDATA[" + cols[11] + "]]></color>");
-			writer.print("<direction>in</direction>");
-		}
+                if (parentDocId.longValue() == docId1) {
+                    cols.set(6, docId2);
+                    cols.set(7, rows.getString(8));
+                    cols.set(8, rows.getString(8));
+                    cols.set(12, rows.getString(9));
+                } else {
+                    cols.set(3, docId1);
+                    cols.set(4, rows.getString(3));
+                    cols.set(5, rows.getString(3));
+                    cols.set(11, rows.getString(4));
+                }
 
-		writer.print("</link>");
-	}
+                printLink(writer, cols.toArray(new Object[0]), parent, parentDocId, attributeName);
+            }
+        });
+    }
 
-	private Long getParentDocId(Long docId, String parent) {
-		Long parentDocId = docId;
-		if (parent.contains("-"))
-			parentDocId = Long.parseLong(parent.substring(parent.lastIndexOf('-') + 1));
-		else if (!"/".equals(parent))
-			parentDocId = Long.parseLong(parent);
-		return parentDocId;
-	}
+    private void printLink(PrintWriter writer, Object[] cols, String parent, Long parentDocId, String attribute) {
+        writer.print("<link>");
+        writer.print(String.format("<linkId>%d</linkId>", (Long) cols[0]));
+        writer.print(String.format("<folderId>%d</folderId>", (Long) cols[1]));
+        writer.print(String.format("<type>%s</type>", cols[2]));
+        writer.print(String.format("<parent>%s</parent>", parent));
+        writer.print(String.format("<folderId1>%d</folderId1>", (Long) cols[9]));
+        writer.print(String.format("<folderId2>%d</folderId2>", (Long) cols[10]));
+        if (StringUtils.isNotEmpty(attribute))
+            writer.print(String.format("<attribute>%s</attribute>", attribute));
+        if (parentDocId.longValue() == (Long) cols[3]) {
+            writer.print(String.format("<documentId>%s-%d</documentId>", parent, (Long) cols[6]));
+            writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[7]));
+            writer.print(
+                    String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[8]))));
+            writer.print("<direction>out</direction>");
+            if (cols[12] != null)
+                writer.print(String.format("<color><![CDATA[%s]]></color>", cols[12]));
+        } else {
+            writer.print(String.format("<documentId>%s-%d</documentId>", parent, (Long) cols[3]));
+            writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[4]));
+            writer.print(
+                    String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[5]))));
+            if (cols[11] != null)
+                writer.print(String.format("<color><![CDATA[%s]]></color>", cols[11]));
+            writer.print("<direction>in</direction>");
+        }
 
-	private String getParent(HttpServletRequest request) {
-		String parent = request.getParameter("parent");
-		if (StringUtils.isEmpty(parent))
-			parent = "/";
-		return parent;
-	}
+        writer.print("</link>");
+    }
 
-	private Long getDocId(HttpServletRequest request) throws PersistenceException, IOException {
-		Long docId = null;
-		if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
-			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = DocumentDAO.get();
-			Document doc = ddao.findDocument(docId);
-			if (doc != null)
-				docId = doc.getId();
-		}
+    private Long getParentDocId(Long docId, String parent) {
+        Long parentDocId = docId;
+        if (parent.contains("-"))
+            parentDocId = Long.parseLong(parent.substring(parent.lastIndexOf('-') + 1));
+        else if (!"/".equals(parent))
+            parentDocId = Long.parseLong(parent);
+        return parentDocId;
+    }
 
-		if (docId == null)
-			throw new IOException("No document ID");
-		return docId;
-	}
+    private String getParent(HttpServletRequest request) {
+        String parent = request.getParameter("parent");
+        if (StringUtils.isEmpty(parent))
+            parent = "/";
+        return parent;
+    }
+
+    private Long getDocId(HttpServletRequest request) throws PersistenceException, IOException {
+        Long docId = null;
+        if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
+            docId = Long.parseLong(request.getParameter("docId"));
+            DocumentDAO ddao = DocumentDAO.get();
+            Document doc = ddao.findDocument(docId);
+            if (doc != null)
+                docId = doc.getId();
+        }
+
+        if (docId == null)
+            throw new IOException("No document ID");
+        return docId;
+    }
 }

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.GroupDAO;
@@ -32,11 +34,15 @@ public class GroupsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuilder query = new StringBuilder("select A.id, A.name, A.description, A.source "
-				+ "from com.logicaldoc.core.security.user.Group A where A.deleted = 0 and A.type = "
-				+ GroupType.DEFAULT.ordinal() + " and A.tenantId=" + session.getTenantId());
+		String query = """
+                       select A.id, A.name, A.description, A.source "
+                         from com.logicaldoc.core.security.user.Group A 
+                        where A.deleted = 0 
+                          and A.type = %d
+                          and A.tenantId = %d
+                       """.formatted(GroupType.DEFAULT.ordinal(), session.getTenantId());
 
-		List<?> records = GroupDAO.get().findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<?> records = GroupDAO.get().findByQuery(query, (Map<String, Object>) null, null);
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -45,11 +51,12 @@ public class GroupsDataServlet extends AbstractDataServlet {
 			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<group>");
-			writer.print("<id>" + cols[0] + "</id>");
-			writer.print("<name><![CDATA[" + cols[1] + "]]></name>");
-			writer.print("<description><![CDATA[" + (cols[2] == null ? "" : cols[2]) + "]]></description>");
-			writer.print("<label><![CDATA[" + I18N.message("group", locale) + ": " + (String) cols[1] + "]]></label>");
-			writer.print("<source><![CDATA[" + (cols[3] == null ? "" : cols[3]) + "]]></source>");
+			writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", cols[1]));
+			writer.print(String.format("<description><![CDATA[%s]]></description>",
+					StringUtils.defaultString((String) cols[2])));
+			writer.print(String.format("<label><![CDATA[%s: %s]]></label>", I18N.message("group", locale), cols[1]));
+			writer.print(String.format("<source><![CDATA[%s]]></source>", StringUtils.defaultString((String) cols[3])));
 			writer.print("</group>");
 		}
 

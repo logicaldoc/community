@@ -43,7 +43,7 @@ public class ExtensionAliasesDataServlet extends AbstractDataServlet {
 		// Get all the possible associations of a specific converter
 		for (String targetExt : FormatConversionManager.get().getAvailableInputFormats()) {
 			writer.print("<alias>");
-			writer.print("<extension><![CDATA[" + targetExt + "]]></extension>");
+			writer.print(String.format("<extension><![CDATA[%s]]></extension>", targetExt));
 
 			// Get all the keys that correspond to the same target
 			// extension
@@ -55,7 +55,7 @@ public class ExtensionAliasesDataServlet extends AbstractDataServlet {
 			String aliasExts = keys.stream().map(key -> key.substring(key.lastIndexOf('.') + 1))
 					.collect(Collectors.joining(","));
 
-			writer.print("<aliases><![CDATA[" + aliasExts + "]]></aliases>");
+			writer.print(String.format("<aliases><![CDATA[%s]]></aliases>", aliasExts));
 			writer.print("</alias>");
 		}
 

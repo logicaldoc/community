@@ -56,11 +56,8 @@ public class JobsDataServlet extends AbstractDataServlet {
 		if (groupsonly) {
 			try {
 				JobManager jobManager = Context.get(JobManager.class);
-				for (String name : jobManager.getGroups()) {
-					writer.print("<job>");
-					writer.print("<group><![CDATA[" + name + "]]></group>");
-					writer.print("</job>");
-				}
+				for (String name : jobManager.getGroups())
+					writer.print(String.format("<job><group><![CDATA[%s]]></group></job>", name));
 			} catch (SchedulerException e) {
 				logger.warn(e.getMessage(), e);
 			}
@@ -89,28 +86,27 @@ public class JobsDataServlet extends AbstractDataServlet {
 				break;
 
 			writer.print("<job>");
-			writer.print("<name><![CDATA[" + trigger.getJobKey().getName() + "]]></name>");
-			writer.print("<group><![CDATA[" + trigger.getJobKey().getGroup() + "]]></group>");
-			writer.print("<trigger><![CDATA[" + trigger.getKey().getName() + "]]></trigger>");
+			writer.print(String.format("<name><![CDATA[%s]]></name>", trigger.getJobKey().getName()));
+			writer.print(String.format("<group><![CDATA[%s]]></group>", trigger.getJobKey().getGroup()));
+			writer.print(String.format("<trigger><![CDATA[%s]]></trigger>", trigger.getKey().getName()));
 			if (trigger.getJobDataMap() != null && trigger.getJobDataMap().containsKey(JobManager.TENANT_ID)) {
-				writer.print("<tenantId>" + trigger.getJobDataMap().getLong(JobManager.TENANT_ID) + "</tenantId>");
-				writer.print("<tenant><![CDATA[" + tenants.get(trigger.getJobDataMap().getLong(JobManager.TENANT_ID))
-						+ "]]></tenant>");
+				writer.print(String.format("<tenantId>%d</tenantId>", trigger.getJobDataMap().getLong(JobManager.TENANT_ID)));
+				writer.print(String.format("<tenant><![CDATA[%s]]></tenant>", tenants.get(trigger.getJobDataMap().getLong(JobManager.TENANT_ID))));
 			}
 
 			JobDetail job = jobManager.getJob(trigger.getJobKey().getName(), trigger.getJobKey().getGroup());
 			if (job.getDescription() != null)
-				writer.print("<description><![CDATA[" + job.getDescription() + "]]></description>");
+				writer.print(String.format("<description><![CDATA[%s]]></description>", job.getDescription()));
 
 			final Date previousFireTime = trigger.getPreviousFireTime();
 			Date nextFireTime = trigger.getNextFireTime();
 			if (previousFireTime != null) {
-				writer.print("<previousFire>" + df.format(previousFireTime) + "</previousFire>");
+				writer.print(String.format("<previousFire>%s</previousFire>", df.format(previousFireTime)));
 				nextFireTime=trigger.getFireTimeAfter(previousFireTime);
 			}
 			
 			if (nextFireTime != null )
-				writer.print("<nextFire>" + df.format(nextFireTime) + "</nextFire>");
+				writer.print(String.format("<nextFire>%s</nextFire>", df.format(nextFireTime)));
 			writer.print("</job>");
 		}
 	}

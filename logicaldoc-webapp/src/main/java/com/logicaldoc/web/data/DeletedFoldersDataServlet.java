@@ -48,11 +48,11 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder("""
-				                                select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser, ld_color 
+                                                select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser, ld_color 
                                                   from ld_folder
                                                  where ld_tenantid = %d
                                                    and ld_foldref is null
-                                                   and ld_deleted > 0                                                                             				                                
+                                                   and ld_deleted > 0				                                
                                                 """.formatted(session.getTenantId()));
 
 		if (deleteUserId != null)

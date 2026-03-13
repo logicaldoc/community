@@ -53,11 +53,11 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 				 * if the sets contain two or more items: (x, 0) IN ((1,0),
 				 * (2,0), (3,0), ...):
 				 */
-				query.append(" and (folder.id,0) in (%s)".formatted(accessibleFolderIds.stream()
-						.map(id -> "(%d,0)".formatted(id)).collect(Collectors.joining(","))));
+				query.append(" and (folder.id,0) in (%s)".formatted(
+						accessibleFolderIds.stream().map("(%d,0)"::formatted).collect(Collectors.joining(","))));
 			} else {
 				query.append(" and folder.id in (%s)".formatted(
-						accessibleFolderIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))));
+						accessibleFolderIds.stream().map(Object::toString).collect(Collectors.joining(","))));
 			}
 		}
 
@@ -69,15 +69,16 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 		for (Object gridRecord : records) {
 			Object[] cols = (Object[]) gridRecord;
 			writer.print("<alias>");
-			writer.print(String.format("<id>%d</id>", cols[0]));
+			writer.print(String.format("<id>%d</id>", (Long) cols[0]));
 			writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[1]));
-			writer.print(String.format("<folderId>%d</folderId>", cols[2]));
+			writer.print(String.format("<folderId>%d</folderId>", (Long) cols[2]));
 			writer.print(String.format("<icon>%s</icon>",
 					FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[1])))));
-			writer.print(String.format("<path><![CDATA[%s]]></path>",
-					"%d/%s".formatted(folderDAO.computePathExtended((Long) cols[2]), cols[1])));
+			writer.print(String.format("<path><![CDATA[%s/%s]]></path>", folderDAO.computePathExtended((Long) cols[2]),
+					cols[1]));
 			writer.print("</alias>");
 		}
+
 		writer.write("</list>");
 	}
 }

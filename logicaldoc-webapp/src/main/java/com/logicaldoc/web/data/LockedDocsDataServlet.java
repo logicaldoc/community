@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
@@ -43,19 +44,19 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuilder query = new StringBuilder(
-				"select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_lastmodified, ");
-		query.append(
-				" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_immutable, A.ld_folderid, A.ld_status, A.ld_lockuserid, ");
-		query.append(" B.ld_firstname, B.ld_name, A.ld_fileversion, A.ld_color, A.ld_fileversion ");
-		query.append(" from ld_document A ");
-		query.append(" left outer join ld_user B on A.ld_lockuserid=B.ld_id ");
-		query.append(" where A.ld_deleted = 0 and not A.ld_status=" + DocumentStatus.ARCHIVED.ordinal());
-		query.append(" and A.ld_tenantid=");
-		query.append(Long.toString(session.getTenantId()));
-		query.append(" and A.ld_docref is null ");
-		query.append(" and (not A.ld_status=0 or not A.ld_immutable=0) ");
-
+		StringBuilder query = new StringBuilder("""
+                                                select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_lastmodified, 
+                                                       A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_immutable, A.ld_folderid, A.ld_status, A.ld_lockuserid
+                                                       B.ld_firstname, B.ld_name, A.ld_fileversion, A.ld_color, A.ld_fileversion
+                                                  from ld_document A 
+                                                  left outer join ld_user B on A.ld_lockuserid = B.ld_id
+                                                 where A.ld_deleted = 0 
+                                                   and not A.ld_status = %d
+                                                   and A.ld_tenantid = %d
+                                                   and A.ld_docref is null
+                                                   and (not A.ld_status = 0 or not A.ld_immutable = 0)
+                                                """.formatted(DocumentStatus.ARCHIVED.ordinal(),
+				session.getTenantId()));
 		if (userId != null) {
 			query.append(" and A.ld_lockuserid=");
 			query.append(Long.toString(userId));
@@ -98,27 +99,25 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 		 */
 		for (Document doc : records) {
 			writer.print("<document>");
-			writer.print("<id>" + doc.getId() + "</id>");
-			if (doc.getCustomId() != null)
-				writer.print("<customId><![CDATA[" + doc.getCustomId() + "]]></customId>");
-			else
-				writer.print("<customId> </customId>");
-			writer.print("<icon>" + doc.getIcon() + "</icon>");
-			writer.print("<version>" + doc.getVersion() + "</version>");
-			writer.print("<fileVersion>" + doc.getFileVersion() + "</fileVersion>");
-			writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
-			writer.print("<size>" + doc.getFileSize() + "</size>");
-			writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-			writer.print("<immutable>" + doc.isImmutable() + "</immutable>");
-			writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");
-			writer.print("<type>" + doc.getType() + "</type>");
-			writer.print("<status>" + doc.getStatus() + "</status>");
-			writer.print("<userId>" + doc.getLockUserId() + "</userId>");
-			writer.print("<avatar>" + doc.getLockUserId() + "</avatar>");
+			writer.print(String.format("<id>%d</id>", doc.getId()));
+			writer.print(
+					String.format("<customId><![CDATA[%s]]></customId>", StringUtils.defaultString(doc.getCustomId())));
+			writer.print(String.format("<icon>%s</icon>", doc.getIcon()));
+			writer.print(String.format("<version>%s</version>", doc.getVersion()));
+			writer.print(String.format("<fileVersion>%s</fileVersion>", doc.getFileVersion()));
+			writer.print(String.format("<lastModified>%s</lastModified>", df.format(doc.getLastModified())));
+			writer.print(String.format("<size>%d</size>", doc.getFileSize()));
+			writer.print(String.format("<filename><![CDATA[%s]]></filename>", doc.getFileName()));
+			writer.print(String.format("<immutable>%b</immutable>", doc.isImmutable()));
+			writer.print(String.format("<folderId>%d</folderId>", doc.getFolder().getId()));
+			writer.print(String.format("<type>%s</type>", doc.getType()));
+			writer.print(String.format("<status>%s</status>", doc.getStatus()));
+			writer.print(String.format("<userId>%d</userId>", doc.getLockUserId()));
+			writer.print(String.format("<avatar>%d</avatar>", doc.getLockUserId()));
 			if (doc.getComment() != null)
-				writer.print("<username>" + doc.getComment() + "</username>");
+				writer.print(String.format("<username>%s</username>", doc.getComment()));
 			if (doc.getColor() != null)
-				writer.print("<color><![CDATA[" + doc.getColor() + "]]></color>");
+				writer.print(String.format("<color><![CDATA[%s]]></color>", doc.getColor()));
 			writer.print("</document>");
 		}
 		writer.write("</list>");

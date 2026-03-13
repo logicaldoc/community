@@ -24,49 +24,51 @@ import jakarta.servlet.http.HttpServletResponse;
  * @since 6.0
  */
 public class GarbageDataServlet extends AbstractDataServlet {
-
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
-			throws PersistenceException, IOException {
+	private static final String ICON = "<icon>%s</icon>";
 
-		DocumentDAO documentDAO = DocumentDAO.get();
-		FolderDAO folderDAO = FolderDAO.get();
+	private static final String COLOR = "<color><![CDATA[%s]]></color>";
+
+	private static final String LAST_MODIFIED = "<lastModified>%s</lastModified>";
+
+	private static final String FILENAME = "<filename><![CDATA[%s]]></filename>";
+
+	private static final String ID = "<id>%d</id>";
+
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+			Locale locale) throws PersistenceException, IOException {
 
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
-		for (Document doc : documentDAO.findDeleted(session.getUserId(), 100)) {
+		for (Document doc : DocumentDAO.get().findDeleted(session.getUserId(), 100)) {
 			writer.print("<entry>");
-			writer.print("<id>" + doc.getId() + "</id>");
-			writer.print(
-					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(doc.getFileExtension())) + "</icon>");
-			writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-			writer.print("<customId><![CDATA[" + doc.getCustomId() + "]]></customId>");
-			writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
-			writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");
+			writer.print(String.format(ID, doc.getId()));
+			writer.print(String.format(ICON, FileUtil.getBaseName(IconSelector.selectIcon(doc.getFileExtension()))));
+			writer.print(String.format(FILENAME, doc.getFileName()));
+			writer.print(String.format("<customId><![CDATA[%s]]></customId>", doc.getCustomId()));
+			writer.print(String.format(LAST_MODIFIED, df.format(doc.getLastModified())));
+			writer.print(String.format("<folderId>%d</folderId>", doc.getFolder().getId()));
 			writer.print("<type>document</type>");
 			if (doc.getColor() != null)
-				writer.print("<color><![CDATA[" + doc.getColor() + "]]></color>");
+				writer.print(String.format(COLOR, doc.getColor()));
 			writer.print("</entry>");
 		}
 
-		for (Folder fld : folderDAO.findDeleted(session.getUserId(), 100)) {
+		for (Folder fld : FolderDAO.get().findDeleted(session.getUserId(), 100)) {
 			writer.print("<entry>");
-			writer.print("<id>" + fld.getId() + "</id>");
-			writer.print("<filename><![CDATA[" + fld.getName() + "]]></filename>");
-			writer.print("<lastModified>" + df.format(fld.getLastModified()) + "</lastModified>");
-			writer.print("<folderId>" + fld.getParentId() + "</folderId>");
+			writer.print(String.format(ID, fld.getId()));
+			writer.print(String.format(FILENAME, fld.getName()));
+			writer.print(String.format(LAST_MODIFIED, df.format(fld.getLastModified())));
+			writer.print(String.format("<folderId>%s</folderId>", fld.getParentId()));
 			writer.print("<type>folder</type>");
 			if (fld.getColor() != null)
-				writer.print("<color><![CDATA[" + fld.getColor() + "]]></color>");
-			writer.print("<folderType>" + fld.getType() + "</folderType>");
-			if (fld.getType() == Folder.TYPE_WORKSPACE)
-				writer.print("<icon>workspace</icon>");
-			else
-				writer.print("<icon>folder</icon>");
+				writer.print(String.format(COLOR, fld.getColor()));
+			writer.print(String.format("<folderType>%d</folderType>", fld.getType()));
+			writer.print(String.format(ICON, fld.getType() == Folder.TYPE_WORKSPACE ? "workspace" : "folder"));
 			writer.print("</entry>");
 		}
 		writer.write("</list>");

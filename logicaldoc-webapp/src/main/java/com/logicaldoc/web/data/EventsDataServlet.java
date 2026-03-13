@@ -22,15 +22,13 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class EventsDataServlet extends AbstractDataServlet {
 
-	private static final String LABEL_CDATA = "<label><![CDATA[";
+	private static final String TYPE = "<type>%s</type>";
+
+	private static final String CODE = "<code>%s</code>";
+
+	private static final String LABEL = "<label><![CDATA[%s]]></label>";
 
 	private static final String CLOSE_EVENT = "</event>";
-
-	private static final String CLOSE_LABEL = "]]></label>";
-
-	private static final String CLOSE_CODE = "</code>";
-
-	private static final String CODE = "<code>";
 
 	private static final String EVENT = "<event>";
 
@@ -57,8 +55,8 @@ public class EventsDataServlet extends AbstractDataServlet {
 
 		if (all) {
 			writer.print(EVENT);
-			writer.print(CODE + "all" + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message("allevents", locale) + CLOSE_LABEL);
+			writer.print("<code>all</code>");
+			writer.print(String.format(LABEL, I18N.message("allevents", locale)));
 			writer.print("<type></type>");
 			writer.print(CLOSE_EVENT);
 		}
@@ -86,49 +84,29 @@ public class EventsDataServlet extends AbstractDataServlet {
 		if (ai)
 			writeAiEvents(writer, locale);
 
-		if (webservice) {
-			writer.print(EVENT);
-			writer.print(CODE + "event.webservice.call" + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message("event.webservice.call", locale) + CLOSE_LABEL);
-			writer.print("<type>webservice</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		if (webservice)
+			printEvent("event.webservice.call", "webservice", writer, locale);
 
 		writer.write("</list>");
 	}
 
 	private void writeAiEvents(PrintWriter writer, Locale locale) {
 		String[] events = new String[] { "event.ai.query", "event.ai.trained" };
-		for (String event : events) {
-			writer.print(EVENT);
-			writer.print(CODE + event + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
-			writer.print("<type>ai</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		for (String event : events)
+			printEvent(event, "ai", writer, locale);
 	}
 
 	private void writeOcrEvents(PrintWriter writer, Locale locale) {
 		String[] events = new String[] { "event.ocr.success", "event.ocr.failure" };
-		for (String event : events) {
-			writer.print(EVENT);
-			writer.print(CODE + event + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
-			writer.print("<type>ocr</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		for (String event : events)
+			printEvent(event, "ocr", writer, locale);
 	}
 
 	private void writeImportFolderEvents(PrintWriter writer, Locale locale) {
 		String[] events = new String[] { "event.importfolder.imported", "event.importfolder.updated",
 				"event.importfolder.error" };
-		for (String event : events) {
-			writer.print(EVENT);
-			writer.print(CODE + event + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
-			writer.print("<type>workflow</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		for (String event : events)
+			printEvent(event, "importfolder", writer, locale);
 	}
 
 	private void writeWorkflowEvents(PrintWriter writer, Locale locale) {
@@ -136,42 +114,30 @@ public class EventsDataServlet extends AbstractDataServlet {
 				"event.workflow.task.start", "event.workflow.task.end", "event.workflow.task.assigned",
 				"event.workflow.task.reassigned", "event.workflow.task.overdue", "event.workflow.task.note",
 				"event.workflow.task.invalid", "event.workflow.docappended" };
-		for (String event : events) {
-			writer.print(EVENT);
-			writer.print(CODE + event + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
-			writer.print("<type>workflow</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		for (String event : events)
+			printEvent(event, "workflow", writer, locale);
 	}
 
 	private void writeUserEvents(PrintWriter writer, Locale locale) {
-		for (UserEvent event : UserEvent.values()) {
-			writer.print(EVENT);
-			writer.print(CODE + event.toString() + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
-			writer.print("<type>user</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		for (UserEvent event : UserEvent.values())
+			printEvent(event.toKey(), "user", writer, locale);
 	}
 
 	private void writeFolderEvents(PrintWriter writer, Locale locale) {
-		for (FolderEvent event : FolderEvent.values()) {
-			writer.print(EVENT);
-			writer.print(CODE + event.toString() + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
-			writer.print("<type>folder</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		for (FolderEvent event : FolderEvent.values())
+			printEvent(event.toKey(), "folder", writer, locale);
 	}
 
 	private void writeDocumentEvents(PrintWriter writer, Locale locale) {
-		for (DocumentEvent event : DocumentEvent.values()) {
-			writer.print(EVENT);
-			writer.print(CODE + event.toString() + CLOSE_CODE);
-			writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
-			writer.print("<type>document</type>");
-			writer.print(CLOSE_EVENT);
-		}
+		for (DocumentEvent event : DocumentEvent.values())
+			printEvent(event.toKey(), "document", writer, locale);
+	}
+	
+	private void printEvent(String event, String type, PrintWriter writer, Locale locale) {
+		writer.print(EVENT);
+		writer.print(String.format(CODE, event));
+		writer.print(String.format(LABEL, I18N.message(event, locale)));
+		writer.print(String.format(TYPE, type));
+		writer.print(CLOSE_EVENT);
 	}
 }

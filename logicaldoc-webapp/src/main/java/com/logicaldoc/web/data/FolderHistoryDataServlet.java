@@ -36,10 +36,14 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color, A.keyLabel, A.impersonator from FolderHistory A where A.deleted = 0 ");
+		StringBuilder query = new StringBuilder("""
+                                                select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, 
+                                                       A.geolocation, A.userId, A.color, A.keyLabel, A.impersonator 
+                                                  from FolderHistory A 
+                                                 where A.deleted = 0
+                                                """);
 		if (request.getParameter("id") != null)
-			query.append(" and A.folderId=" + request.getParameter("id"));
+			query.append(" and A.folderId = %s".formatted(request.getParameter("id")));
 		query.append(" order by A.date desc ");
 
 		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null,
@@ -61,51 +65,37 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		DateFormat df = getDateFormat();
 
 		writer.print("<history>");
-		writer.print("<id>" + cols[7] + "</id>");
-		writer.print("<user><![CDATA[" + (cols[0] == null ? "" : cols[0]) + "]]></user>");
-		writer.print("<event><![CDATA[" + I18N.message((String) cols[1], locale) + "]]></event>");
-		writer.print("<date>" + df.format((Date) cols[2]) + "</date>");
-		writer.print("<comment><![CDATA[" + (cols[3] == null ? "" : cols[3]) + "]]></comment>");
-		writer.print("<filename><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></filename>");
+		writer.print(String.format("<id>%d</id>", (Long) cols[7]));
+		writer.print(String.format("<user><![CDATA[%s]]></user>", StringUtils.defaultString((String) cols[0])));
+		writer.print(String.format("<event><![CDATA[%s]]></event>", I18N.message((String) cols[1], locale)));
+		writer.print(String.format("<date>%s</date>", df.format((Date) cols[2])));
+		writer.print(String.format("<comment><![CDATA[%s]]></comment>", StringUtils.defaultString((String) cols[3])));
+		writer.print(String.format("<filename><![CDATA[%s]]></filename>", StringUtils.defaultString((String) cols[4])));
 
-		printIcon(writer, cols);
+		if (cols[4] != null && !FileUtil.getExtension(cols[4].toString()).isEmpty())
+			writer.print(String.format("<icon>%s</icon>",
+					FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[4])))));
+		else
+			writer.print("<icon>folder</icon>");
 
-		writer.print("<path><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></path>");
+		writer.print(String.format("<path><![CDATA[%s]]></path>", StringUtils.defaultString((String) cols[5])));
 
-		printSid(writer, cols, showSid);
+		if (showSid)
+			writer.print(String.format("<sid><![CDATA[%s]]></sid>", cols[6]));
 
-		writer.print("<reason><![CDATA[" + (cols[8] == null ? "" : cols[8]) + "]]></reason>");
-		writer.print("<ip><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></ip>");
-		writer.print("<device><![CDATA[" + (cols[10] == null ? "" : cols[10]) + "]]></device>");
-		writer.print("<userId>" + cols[12] + "</userId>");
+		writer.print(String.format("<reason><![CDATA[%s]]></reason>", StringUtils.defaultString((String) cols[8])));
+		writer.print(String.format("<ip><![CDATA[%s]]></ip>", StringUtils.defaultString((String) cols[9])));
+		writer.print(String.format("<device><![CDATA[%s]]></device>", StringUtils.defaultString((String) cols[10])));
+		writer.print(String.format("<userId>%d</userId>", (Long) cols[12]));
 
-		printGeolocation(writer, cols);
-
+		if (cols[11] != null)
+			writer.print(String.format("<geolocation><![CDATA[%s]]></geolocation>", cols[11]));
 		if (cols[13] != null)
-			writer.print("<color>" + cols[13] + "</color>");
+			writer.print(String.format("<color>%s</color>", cols[13]));
 		if (cols[14] != null)
-			writer.print("<key><![CDATA[" + cols[14] + "]]></key>");
+			writer.print(String.format("<key><![CDATA[%s]]></key>", cols[14]));
 
 		writer.print(String.format("<impersonator>%s</impersonator>", StringUtils.defaultString((String) cols[15])));
 		writer.print("</history>");
-	}
-
-	private void printGeolocation(PrintWriter writer, Object[] cols) {
-		if (cols[11] != null)
-			writer.print("<geolocation><![CDATA[" + cols[11] + "]]></geolocation>");
-	}
-
-	private void printSid(PrintWriter writer, Object[] cols, boolean showSid) {
-		if (showSid)
-			writer.print("<sid><![CDATA[" + (cols[6] == null ? "" : cols[6]) + "]]></sid>");
-	}
-
-	private void printIcon(PrintWriter writer, Object[] cols) {
-		if (cols[4] != null && !FileUtil.getExtension(cols[4].toString()).isEmpty())
-			writer.print(
-					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[4])))
-							+ "</icon>");
-		else
-			writer.print("<icon>folder</icon>");
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -39,7 +40,7 @@ public class FolderAliasesDataServlet extends AbstractDataServlet {
 		Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
 		StringBuilder query = new StringBuilder(
-				"select id, name from Folder where deleted = 0 and foldRef = " + folderId);
+				"select id, name from Folder where deleted = 0 and foldRef = %d".formatted(folderId));
 
 		User user = session.getUser();
 		if (!user.isMemberOf(Group.GROUP_ADMIN)) {
@@ -50,20 +51,11 @@ public class FolderAliasesDataServlet extends AbstractDataServlet {
 				 * if the sets contain two or more items: (x, 0) IN ((1,0),
 				 * (2,0), (3,0), ...):
 				 */
-				query.append(" and (id,0) in ( ");
-				boolean firstItem = true;
-				for (Long fid : accessibleFolderIds) {
-					if (!firstItem)
-						query.append(",");
-					query.append("(");
-					query.append(fid);
-					query.append(",0)");
-					firstItem = false;
-				}
-				query.append(" )");
+				query.append(" and (id,0) in (%s)".formatted(
+						accessibleFolderIds.stream().map("(%d,0)"::formatted).collect(Collectors.joining(","))));
 			} else {
-				query.append(" and id in ");
-				query.append(accessibleFolderIds.toString().replace('[', '(').replace(']', ')'));
+				query.append(" and id in (%s)".formatted(
+						accessibleFolderIds.stream().map(Object::toString).collect(Collectors.joining(","))));
 			}
 		}
 
@@ -76,10 +68,10 @@ public class FolderAliasesDataServlet extends AbstractDataServlet {
 			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<alias>");
-			writer.print("<id>" + cols[0] + "</id>");
-			writer.print("<name><![CDATA[" + cols[1] + "]]></name>");
+			writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+			writer.print(String.format("<name><![CDATA[%s]]></name>", cols[1]));
 			writer.print("<icon>folder_alias_closed</icon>");
-			writer.print("<path><![CDATA[" + folderDAO.computePathExtended((Long) cols[0]) + "]]></path>");
+			writer.print(String.format("<path><![CDATA[%s]]></path>", folderDAO.computePathExtended((Long) cols[0])));
 			writer.print("</alias>");
 		}
 		writer.write("</list>");

@@ -125,7 +125,7 @@ public class FillerProperties extends FillerDetailsTab {
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new FillerTypesDS());
 		type.setValueField("id");
-		type.setDisplayField("label");
+		type.setDisplayField(LABEL);
 		type.setRequired(true);
 		type.setValue(filler.getType());
 		type.addChangedHandler(changedHandler);
@@ -227,20 +227,7 @@ public class FillerProperties extends FillerDetailsTab {
 			filler.setDescription(form.getValueAsString(DESCRIPTION));
 			filler.setType(form.getValueAsString(TYPE));
 
-			String strategyValue = form.getValueAsString(STRATEGY);
-			String modelId = form.getValueAsString(MODEL_ID);
-			String embeddingId = form.getValueAsString(EMBEDDING_SCHEME);
-
-			if (RETRIEVAL.equals(strategyValue)) {
-				// Retrieval strategy
-				filler.setModelId(null);
-				filler.setEmbeddingSchemeId(embeddingId != null ? Long.parseLong(embeddingId) : null);
-
-			} else {
-				// Model strategy
-				filler.setEmbeddingSchemeId(null);
-				filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
-			}
+			validateStrategy();
 
 			String threshold = form.getValueAsString(THRESHOLD);
 			filler.setThreshold(threshold != null ? Double.parseDouble(threshold) : null);
@@ -264,6 +251,23 @@ public class FillerProperties extends FillerDetailsTab {
 		}
 
 		return !form.hasErrors();
+	}
+
+	private void validateStrategy() {
+		String strategyValue = form.getValueAsString(STRATEGY);
+		String modelId = form.getValueAsString(MODEL_ID);
+		String embeddingId = form.getValueAsString(EMBEDDING_SCHEME);
+
+		if (RETRIEVAL.equals(strategyValue)) {
+			// Retrieval strategy
+			filler.setModelId(null);
+			filler.setEmbeddingSchemeId(embeddingId != null ? Long.parseLong(embeddingId) : null);
+
+		} else {
+			// Model strategy
+			filler.setEmbeddingSchemeId(null);
+			filler.setModelId(modelId != null ? Long.parseLong(modelId) : null);
+		}
 	}
 
 	private void prepareChain() {

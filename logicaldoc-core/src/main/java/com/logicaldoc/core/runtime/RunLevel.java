@@ -55,7 +55,8 @@ public enum RunLevel {
 	}
 
 	public boolean aspectEnabled(String aspect) {
-		return getConfig().getBoolean(getAspectProperty(aspect), false);
+		ContextProperties cfg = getConfig();
+		return cfg != null && cfg.getBoolean(getAspectProperty(aspect), false);
 	}
 
 	public void checkAspect(Aspect aspect) throws AspectDisabledException {
@@ -68,7 +69,9 @@ public enum RunLevel {
 	}
 
 	public void setAspect(String aspect, boolean enabled) {
-		getConfig().setProperty(getAspectProperty(aspect), Boolean.toString(enabled));
+		ContextProperties cfg = getConfig();
+		if (cfg != null)
+			cfg.setProperty(getAspectProperty(aspect), Boolean.toString(enabled));
 	}
 
 	private static ContextProperties getConfig() {
