@@ -39,272 +39,271 @@ import jakarta.servlet.http.HttpSessionListener;
  */
 public class ApplicationListener implements ServletContextListener, HttpSessionListener {
 
-	private static final String CONSOLE = "console";
+    private static final String CONSOLE = "console";
 
-	private static final String JDBC_URL = "jdbc.url";
+    private static final String JDBC_URL = "jdbc.url";
 
-	private static final Logger log = LoggerFactory.getLogger(ApplicationListener.class);
+    private static final Logger log = LoggerFactory.getLogger(ApplicationListener.class);
 
-	private boolean pidCreated = false;
+    private boolean pidCreated = false;
 
-	private static boolean restartRequired = false;
+    private static boolean restartRequired = false;
 
-	public static boolean isRestartRequired() {
-		return restartRequired;
-	}
+    public static boolean isRestartRequired() {
+        return restartRequired;
+    }
 
-	public static void restartRequired() {
-		ApplicationListener.restartRequired = true;
-	}
+    public static void restartRequired() {
+        ApplicationListener.restartRequired = true;
+    }
 
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		try {
-			onShutdown();
-		} finally {
-			if (pidCreated)
-				FileUtil.delete(getPidFile());
-		}
-	}
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        try {
+            onShutdown();
+        } finally {
+            if (pidCreated)
+                FileUtil.delete(getPidFile());
+        }
+    }
 
-	public static void onShutdown() {
-		log.warn("Shutting down the application");
+    public static void onShutdown() {
+        log.warn("Shutting down the application");
 
-		/*
-		 * Try to shutdown the DB connection
-		 */
-		try {
-			ContextProperties config = new ContextProperties();
-			if (config.getProperty(JDBC_URL).contains("jdbc:hsqldb")) {
-				DBInit dbInit = new DBInit();
-				dbInit.setDriver(config.getProperty("jdbc.driver"));
-				dbInit.setUrl(config.getProperty(JDBC_URL));
-				dbInit.setUsername(config.getProperty("jdbc.username"));
-				dbInit.setPassword(config.getProperty("jdbc.password"));
+        /*
+         * Try to shutdown the DB connection
+         */
+        try {
+            ContextProperties config = new ContextProperties();
+            if (config.getProperty(JDBC_URL).contains("jdbc:hsqldb")) {
+                DBInit dbInit = new DBInit();
+                dbInit.setDriver(config.getProperty("jdbc.driver"));
+                dbInit.setUrl(config.getProperty(JDBC_URL));
+                dbInit.setUsername(config.getProperty("jdbc.username"));
+                dbInit.setPassword(config.getProperty("jdbc.password"));
 
-				dbInit.executeSql("shutdown compact");
-				log.warn("Embedded database stopped");
-			} else if (config.getProperty(JDBC_URL).contains("jdbc:mysql")) {
-				com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.uncheckedShutdown();
-			}
-		} catch (Exception e) {
-			log.warn(e.getMessage());
-		}
+                dbInit.executeSql("shutdown compact");
+                log.warn("Embedded database stopped");
+            } else if (config.getProperty(JDBC_URL).contains("jdbc:mysql")) {
+                com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.uncheckedShutdown();
+            }
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+        }
 
-		/*
-		 * De-register the database drivers
-		 */
-		try {
-			Enumeration<Driver> drivers = DriverManager.getDrivers();
-			Driver d = null;
-			while (drivers.hasMoreElements()) {
-				d = drivers.nextElement();
-				registerDriver(d);
-			}
-		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
-		}
+        /*
+         * De-register the database drivers
+         */
+        try {
+            Enumeration<Driver> drivers = DriverManager.getDrivers();
+            Driver d = null;
+            while (drivers.hasMoreElements()) {
+                d = drivers.nextElement();
+                registerDriver(d);
+            }
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
 
-		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 
-		for (Thread t : threadArray) {
-			synchronized (t) {
-				if ((t.getName().toLowerCase().contains("abandoned connection") || t.getName().startsWith("Scheduler_"))
-						&& !Thread.currentThread().equals(t) && !t.isInterrupted())
-					interruptThread(t);
-			}
-		}
+        for (Thread t : threadArray) {
+            synchronized (t) {
+                if ((t.getName().toLowerCase().contains("abandoned connection") || t.getName().startsWith("Scheduler_"))
+                        && !Thread.currentThread().equals(t) && !t.isInterrupted())
+                    interruptThread(t);
+            }
+        }
 
-		log.warn("Application stopped");
-	}
+        log.warn("Application stopped");
+    }
 
-	private static void interruptThread(Thread thread) {
-		try {
-			thread.interrupt();
-			log.warn("Killed thread {}", thread.getName());
-		} catch (Exception e) {
-			log.warn("Error killing {}", thread.getName());
-		}
-	}
+    private static void interruptThread(Thread thread) {
+        try {
+            thread.interrupt();
+            log.warn("Killed thread {}", thread.getName());
+        } catch (Exception e) {
+            log.warn("Error killing {}", thread.getName());
+        }
+    }
 
-	private static void registerDriver(Driver driver) {
-		try {
-			DriverManager.deregisterDriver(driver);
-			if (log.isWarnEnabled())
-				log.warn(String.format("Driver %s unregistered", driver.getClass().getName()));
-		} catch (SQLException ex) {
-			log.warn(String.format("Error unregistering driver %s", driver), ex);
-		}
-	}
+    private static void registerDriver(Driver driver) {
+        try {
+            DriverManager.deregisterDriver(driver);
+            if (log.isWarnEnabled())
+                log.warn(String.format("Driver %s unregistered", driver.getClass().getName()));
+        } catch (SQLException ex) {
+            log.warn(String.format("Error unregistering driver %s", driver), ex);
+        }
+    }
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
-		try {
-			ServletContext context = sce.getServletContext();
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        try {
+            ServletContext context = sce.getServletContext();
 
-			// Initialize logging
-			new LogConfigurator().initializeLogging();
+            // Initialize logging
+            new LogConfigurator().initializeLogging();
 
-			// Update the web descriptor with the correct transport guarantee
-			try {
-				ContextProperties conf = new ContextProperties();
-				String policy = "true".equals(conf.getProperty("ssl.required")) ? "CONFIDENTIAL" : "NONE";
-				WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
-				if (configurator.setTransportGuarantee(policy)) {
-					PluginRegistry.getInstance().setRestartRequired();
-				}
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
+            // Update the web descriptor with the correct transport guarantee
+            try {
+                ContextProperties conf = new ContextProperties();
+                String policy = "true".equals(conf.getProperty("ssl.required")) ? "CONFIDENTIAL" : "NONE";
+                WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
+                if (configurator.setTransportGuarantee(policy)) {
+                    PluginRegistry.getInstance().setRestartRequired();
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
 
-			// Update the cookies processor with the correct sameSite
-			try {
-				ContextProperties conf = new ContextProperties();
-				WebContextConfigurator configurator = new WebContextConfigurator(
-						context.getRealPath("/META-INF/context.xml"));
-				if (configurator.setSameSiteCookies(conf.getProperty("cookies.samesite", "lax"))) {
-					PluginRegistry.getInstance().setRestartRequired();
-				}
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
+            // Update the cookies processor with the correct sameSite
+            try {
+                ContextProperties conf = new ContextProperties();
+                WebContextConfigurator configurator = new WebContextConfigurator(
+                        context.getRealPath("/META-INF/context.xml"));
+                if (configurator.setSameSiteCookies(conf.getProperty("cookies.samesite", "lax"))) {
+                    PluginRegistry.getInstance().setRestartRequired();
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
 
-			// Prepare the plugins dir
-			String pluginsDir = context.getRealPath("/WEB-INF/lib");
+            // Prepare the plugins dir
+            String pluginsDir = context.getRealPath("/WEB-INF/lib");
 
-			// Initialize plugins
-			try {
-				PluginRegistry.getInstance().init(pluginsDir);
-			} catch (PluginException e) {
-				log.error(e.getMessage(), e);
-				return;
-			}
+            // Initialize plugins
+            try {
+                PluginRegistry.getInstance().init(pluginsDir);
+            } catch (PluginException e) {
+                log.error(e.getMessage(), e);
+                return;
+            }
 
-			// Clean some temporary folders
-			cleanTemporaryFolders(context);
+            // Clean some temporary folders
+            cleanTemporaryFolders(context);
 
-			// Initialize the Automation
-			Automation.initialize();
+            // Initialize the Automation
+            Automation.initialize();
 
-			// Try to unpack new plugins
-			try {
-				unpackPlugins(context);
-			} catch (IOException e) {
-				log.warn(e.getMessage());
-			}
+            // Try to unpack new plugins
+            try {
+                unpackPlugins(context);
+            } catch (IOException e) {
+                log.warn(e.getMessage());
+            }
 
-			if (PluginRegistry.getInstance().isRestartRequired()) {
-				restartRequired();
-				log.warn("The application has to be restarted");
+            if (PluginRegistry.getInstance().isRestartRequired()) {
+                restartRequired();
+                log.warn("The application has to be restarted");
 
-				Logger console = LoggerFactory.getLogger(CONSOLE);
-				console.warn("The application has to be restarted");
-			} else {
-				log.info("Application started and ready");
-				Logger console = LoggerFactory.getLogger(CONSOLE);
-				console.info("Application started and ready");
-			}
-		} finally {
-			writePidFile();
-		}
-	}
+                Logger console = LoggerFactory.getLogger(CONSOLE);
+                console.warn("The application has to be restarted");
+            } else {
+                log.info("Application started and ready");
+                Logger console = LoggerFactory.getLogger(CONSOLE);
+                console.info("Application started and ready");
+            }
+        } finally {
+            writePidFile();
+        }
+    }
 
-	private void cleanTemporaryFolders(ServletContext context) {
-		File tempDirToDelete = new File(context.getRealPath("upload"));
-		try {
-			if (tempDirToDelete.exists())
-				FileUtils.forceDelete(tempDirToDelete);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+    private void cleanTemporaryFolders(ServletContext context) {
+        File tempDirToDelete = new File(context.getRealPath("upload"));
+        try {
+            if (tempDirToDelete.exists())
+                FileUtils.forceDelete(tempDirToDelete);
+        } catch (IOException e) {
+            log.warn(e.getMessage());
+        }
 
-		tempDirToDelete = new File(FileUtil.tempDir(), "upload");
-		try {
-			if (tempDirToDelete.exists())
-				FileUtils.forceDelete(tempDirToDelete);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+        tempDirToDelete = new File(FileUtil.tempDir(), "upload");
+        try {
+            if (tempDirToDelete.exists())
+                FileUtils.forceDelete(tempDirToDelete);
+        } catch (IOException e) {
+            log.warn(e.getMessage());
+        }
 
-		tempDirToDelete = new File(FileUtil.tempDir(), "convertjpg");
-		try {
-			if (tempDirToDelete.exists())
-				FileUtils.forceDelete(tempDirToDelete);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
-	}
+        tempDirToDelete = new File(FileUtil.tempDir(), "convertjpg");
+        try {
+            if (tempDirToDelete.exists())
+                FileUtils.forceDelete(tempDirToDelete);
+        } catch (IOException e) {
+            log.warn(e.getMessage());
+        }
+    }
 
-	/**
-	 * Unpacks the plugin that are newly installed and positioned in the plugins
-	 * folder
-	 * 
-	 * @throws IOException
-	 */
-	private void unpackPlugins(ServletContext context) throws IOException {
-		File pluginsDir = PluginRegistry.getPluginsDir();
-		File[] archives = pluginsDir.listFiles((dir, fileName) -> fileName.toLowerCase().contains("plugin")
-				&& fileName.toLowerCase().endsWith(".zip"));
-		File webappDir = new File(context.getRealPath("/"));
-		if (archives != null)
-			for (File archive : archives) {
-				log.info("Unpack plugin {}", archive.getName());
-				try (ZipUtil zipUtil = new ZipUtil()) {
-					zipUtil.unzip(archive, webappDir);
-				}
+    /**
+     * Unpacks the plugin that are newly installed and positioned in the plugins
+     * folder
+     * 
+     * @throws IOException
+     */
+    private void unpackPlugins(ServletContext context) throws IOException {
+        File pluginsDir = PluginRegistry.getPluginsDir();
+        File[] archives = pluginsDir.listFiles((dir, fileName) -> fileName.toLowerCase().contains("plugin")
+                && fileName.toLowerCase().endsWith(".zip"));
+        File webappDir = new File(context.getRealPath("/"));
+        if (archives != null)
+            for (File archive : archives) {
+                log.info("Unpack plugin {}", archive.getName());
+                try (ZipUtil zipUtil = new ZipUtil()) {
+                    zipUtil.unzip(archive, webappDir);
+                }
 
-				// Delete the plugin.xml file
-				FileUtils.deleteQuietly(new File(webappDir, "plugin.xml"));
+                // Delete the plugin.xml file
+                FileUtils.deleteQuietly(new File(webappDir, "plugin.xml"));
 
-				FileUtils.moveFile(archive, new File(archive.getParentFile(), archive.getName() + ".installed"));
+                FileUtils.moveFile(archive, new File(archive.getParentFile(), archive.getName() + ".installed"));
 
-				String pluginName = archive.getName().replace("-plugin.zip", "");
-				pluginName = pluginName.substring(0, pluginName.lastIndexOf('-'));
-				log.info("Remove installation marker of plugin {}", pluginName);
-				File pluginDir = new File(pluginsDir, pluginName);
-				File[] installationMarkers = pluginDir
-						.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith("install-"));
-				for (File file : installationMarkers)
-					FileUtils.deleteQuietly(file);
+                String pluginName = archive.getName().replace("-plugin.zip", "");
+                pluginName = pluginName.substring(0, pluginName.lastIndexOf('-'));
+                log.info("Remove installation marker of plugin {}", pluginName);
+                File pluginDir = new File(pluginsDir, pluginName);
+                File[] installationMarkers = pluginDir
+                        .listFiles((dir, fileName) -> fileName.toLowerCase().startsWith("install-"));
+                for (File file : installationMarkers)
+                    FileUtils.deleteQuietly(file);
 
-				restartRequired();
-			}
-	}
+                restartRequired();
+            }
+    }
 
-	@Override
-	public void sessionCreated(HttpSessionEvent event) {
-		// Nothing to do
-	}
+    @Override
+    public void sessionCreated(HttpSessionEvent event) {
+        // Nothing to do
+    }
 
-	@Override
-	public void sessionDestroyed(HttpSessionEvent event) {
-		UploadServlet.cleanUploads((String) event.getSession().getAttribute("sid"));
-	}
+    @Override
+    public void sessionDestroyed(HttpSessionEvent event) {
+        UploadServlet.cleanUploads((String) event.getSession().getAttribute("sid"));
+    }
 
-	private void writePidFile() {
-		File pidFile = getPidFile();
-		if (pidFile.exists())
-			return;
-		long pid = ProcessHandle.current().pid();
-		try {
-			FileUtils.touch(pidFile);
-			FileUtil.writeFile("" + pid, pidFile.getPath());
-			pidCreated = true;
-		} catch (IOException e) {
-			log.warn(e.getMessage());
+    private void writePidFile() {
+        File pidFile = getPidFile();
+        if (pidFile.exists())
+            return;
+        long pid = ProcessHandle.current().pid();
+        try {
+            FileUtils.touch(pidFile);
+            FileUtil.writeFile(Long.toString(pid), pidFile.getPath());
+            pidCreated = true;
+        } catch (IOException e) {
+            log.warn(e.getMessage());
 
-			Logger console = LoggerFactory.getLogger(CONSOLE);
-			console.warn("Cannot create pid file {}", pidFile.getAbsolutePath());
-		}
-	}
+            Logger console = LoggerFactory.getLogger(CONSOLE);
+            console.warn("Cannot create pid file {}", pidFile.getAbsolutePath());
+        }
+    }
 
-	private File getPidFile() {
-		try {
-			ContextProperties config = new ContextProperties();
-			return new File(config.getProperty("LDOCHOME") + "/bin/pid");
-		} catch (Exception t) {
-			return new File("pid");
-		}
-	}
+    private File getPidFile() {
+        try {
+            return new File("%s/bin/pid".formatted(new ContextProperties().getProperty("LDOCHOME")));
+        } catch (Exception t) {
+            return new File("pid");
+        }
+    }
 }

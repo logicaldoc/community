@@ -107,7 +107,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 			if (attribute.isHidden() || (!sections && attribute.isSection()))
 				continue;
 
-			printAttibute("ext_" + entry.getKey(),
+			printAttibute("ext_%s".formatted(entry.getKey()),
 					(StringUtils.isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : ""), attribute.getType(),
 					writer);
 		}

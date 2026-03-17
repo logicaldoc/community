@@ -17,6 +17,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.util.CollectionUtil;
 import com.logicaldoc.util.io.FileUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,8 +57,7 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 				query.append(" and (folder.id,0) in (%s)".formatted(
 						accessibleFolderIds.stream().map("(%d,0)"::formatted).collect(Collectors.joining(","))));
 			} else {
-				query.append(" and folder.id in (%s)".formatted(
-						accessibleFolderIds.stream().map(Object::toString).collect(Collectors.joining(","))));
+				query.append(" and folder.id in (%s)".formatted(CollectionUtil.join(accessibleFolderIds)));
 			}
 		}
 

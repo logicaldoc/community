@@ -52,6 +52,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserGroup;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.store.StoreResource;
+import com.logicaldoc.util.CollectionUtil;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
@@ -996,11 +997,10 @@ select distinct(A.ld_folderid)
              * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
              * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
              */
-            query2.append("(B.ld_id,0) in (%s)".formatted(
-                    masterIds.stream().map(id -> (ORACLE_DUPLE.formatted(id))).collect(Collectors.joining(","))));
+            query2.append(
+                    "(B.ld_id,0) in (%s)".formatted(CollectionUtil.join(masterIds, id -> ORACLE_DUPLE.formatted(id))));
         } else {
-            query2.append(" B.ld_id in (%s)"
-                    .formatted(masterIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
+            query2.append(" B.ld_id in (%s)".formatted(CollectionUtil.join(masterIds)));
         }
 
         query2.append(" or ");
@@ -1010,11 +1010,10 @@ select distinct(A.ld_folderid)
              * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
              * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
              */
-            query2.append(" (B.ld_securityref,0) in (%s)".formatted(
-                    masterIds.stream().map(id -> (ORACLE_DUPLE.formatted(id))).collect(Collectors.joining(","))));
+            query2.append(" (B.ld_securityref,0) in (%s)"
+                    .formatted(CollectionUtil.join(masterIds, id -> ORACLE_DUPLE.formatted(id))));
         } else {
-            query2.append(" B.ld_securityref in (%s)"
-                    .formatted(masterIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
+            query2.append(" B.ld_securityref in (%s)".formatted(CollectionUtil.join(masterIds)));
         }
         query2.append(" ) and ");
 
@@ -1025,11 +1024,10 @@ select distinct(A.ld_folderid)
              * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
              * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
              */
-            query2.append("( (B.ld_id,0) in (%s) ) ".formatted(
-                    folderIds.stream().map(id -> (ORACLE_DUPLE.formatted(id))).collect(Collectors.joining(","))));
+            query2.append("( (B.ld_id,0) in (%s) ) "
+                    .formatted(CollectionUtil.join(folderIds, id -> ORACLE_DUPLE.formatted(id))));
         } else {
-            query2.append("  B.ld_id in (%s)"
-                    .formatted(folderIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
+            query2.append("  B.ld_id in (%s)".formatted(CollectionUtil.join(folderIds)));
         }
 
         ids.addAll(queryForList(query2.toString(), Long.class));
@@ -1104,8 +1102,8 @@ select distinct(A.ld_folderid)
                      * limit if the sets contain two or more items: (x, 0) IN
                      * ((1,0), (2,0), (3,0), ...):
                      */
-                    query.append("( (B.ld_id,0) in (%s) )".formatted(
-                            folderIds.stream().map(id -> (ORACLE_DUPLE.formatted(id))).collect(Collectors.joining(","))));
+                    query.append("( (B.ld_id,0) in (%s) )"
+                            .formatted(CollectionUtil.join(folderIds, id -> ORACLE_DUPLE.formatted(id))));
                 } else {
                     query.append("  B.ld_id in (%s) ".formatted(
                             folderIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
@@ -1799,10 +1797,10 @@ select distinct(A.ld_folderid)
                  * if the sets contain two or more items: (x, 0) IN ((1,0),
                  * (2,0), (3,0), ...):
                  */
-                String str = ids.stream().map(id -> (ORACLE_DUPLE.formatted(id))).collect(Collectors.joining(","));
+                String str = CollectionUtil.join(ids, id -> ORACLE_DUPLE.formatted(id));
                 idsExpression = " ( (ld_id,0) not in (%s) and (ld_parentid,0) in (%s) ) ".formatted(str, str);
             } else {
-                String str = ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
+                String str = CollectionUtil.join(ids);
                 idsExpression = "(  ld_id not in (%s) and ld_parentid in (%s) ) ".formatted(str, str);
             }
             lastIds.clear();
@@ -2273,8 +2271,8 @@ SELECT COUNT(*) from ld_document D, ld_folder F
                  * if the sets contain two or more items: (x, 0) IN ((1,0),
                  * (2,0), (3,0), ...):
                  */
-                query.append(" and (C.ld_id,0) in (%s) ".formatted(
-                        accessibleIds.stream().map(id -> (ORACLE_DUPLE.formatted(id))).collect(Collectors.joining(","))));
+                query.append(" and (C.ld_id,0) in (%s) "
+                        .formatted(CollectionUtil.join(accessibleIds, id -> ORACLE_DUPLE.formatted(id))));
             } else {
                 query.append(" and C.ld_id in (%s) ".formatted(
                         accessibleIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
@@ -2297,12 +2295,9 @@ SELECT COUNT(*) from ld_document D, ld_folder F
         if (ids.isEmpty())
             return coll;
 
-        StringBuilder query = new StringBuilder("select A from Folder A where A.id in (");
-        query.append(ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
-        query.append(")");
-
         try {
-            coll = findByObjectQuery(query.toString(), (Map<String, Object>) null, max);
+            coll = findByObjectQuery("select A from Folder A where A.id in (%s)".formatted(CollectionUtil.join(ids)),
+                    (Map<String, Object>) null, max);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
         }
