@@ -35,7 +35,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		String query = """
-                       select A.id, A.name, A.description, A.source "
+                       select A.id, A.name, A.description, A.source
                          from com.logicaldoc.core.security.user.Group A 
                         where A.deleted = 0 
                           and A.type = %d
