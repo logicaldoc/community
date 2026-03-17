@@ -26,34 +26,33 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class ParsersDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
-		int i = 0;
-		Set<String> keys = ParserFactory.getParsers().keySet();
-		List<String> sort = new ArrayList<>();
-		for (String ext : keys) {
-			sort.add(ext);
-		}
-		Collections.sort(sort);
+        PrintWriter writer = response.getWriter();
+        writer.write("<list>");
+        int i = 0;
+        Set<String> keys = ParserFactory.getParsers().keySet();
+        List<String> sort = new ArrayList<>();
+        for (String ext : keys)
+            sort.add(ext);
+        Collections.sort(sort);
 
-		for (String ext : sort) {
-			writer.print("<parser>");
-			writer.print("<id>" + i + "</id>");
-			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(ext.toLowerCase())) + "</icon>");
-			writer.print("<extension>" + ext.toLowerCase() + "</extension>");
-			writer.print(
-					"<name><![CDATA[" + ParserFactory.getParsers().get(ext).getClass().getSimpleName() + "]]></name>");
-
-			String aliasProp = Context.get().getConfig().getProperty("parser.alias." + ext.toLowerCase());
-			writer.print("<aliases><![CDATA[" + (aliasProp != null ? aliasProp : "") + "]]></aliases>");
-			writer.print("</parser>");
-		}
-		writer.write("</list>");
-	}
+        for (String ext : sort) {
+            writer.print("<parser>");
+            writer.print(String.format("<id>%d</id>", i));
+            writer.print(
+                    String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon(ext.toLowerCase()))));
+            writer.print(String.format("<extension>%s</extension>", ext.toLowerCase()));
+            writer.print(String.format("<name><![CDATA[%s]]></name>",
+                    ParserFactory.getParsers().get(ext).getClass().getSimpleName()));
+            writer.print(String.format("<aliases><![CDATA[%s]]></aliases>",
+                    Context.get().getConfig().getProperty("parser.alias.%s".formatted(ext.toLowerCase()), "")));
+            writer.print("</parser>");
+        }
+        writer.write("</list>");
+    }
 }

@@ -30,9 +30,9 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class LockedDocsDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
+    @Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
@@ -84,7 +84,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 				doc.setLockUserId(rs.getLong(12));
 
 				// Use the comment to store the locker
-				doc.setComment(rs.getString(13) + " " + rs.getString(14));
+				doc.setComment("%s %s".formatted(rs.getString(13), rs.getString(14)));
 
 				doc.setFileVersion(rs.getString(15));
 				doc.setColor(rs.getString(16));

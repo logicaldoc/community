@@ -24,39 +24,39 @@ import jakarta.servlet.http.HttpServletResponse;
  * @since 9.2.2
  */
 public class UpdateHistoryDataServlet extends AbstractDataServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
-		PrintWriter writer = response.getWriter();
-		writer.print("<list>");
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
+        PrintWriter writer = response.getWriter();
+        writer.print("<list>");
 
-		DateFormat df = getDateFormat();
+        DateFormat df = getDateFormat();
 
-		UserDAO userDao = UserDAO.get();
-		userDao.queryForResultSet("""
+        UserDAO userDao = UserDAO.get();
+        userDao.queryForResultSet("""
 select lower(ld_update), ld_date, ld_version, 0, 'update' from ld_update
  UNION
 select lower(ld_patch), ld_date, ld_version, ld_rating, 'patch' from ld_patch 
 """, null, null, new ResultSetWalker() {
 
-			@Override
-			public void walk(ResultSet rows) throws SQLException {
-				while (rows.next()) {
-					writer.print("<update>");
+            @Override
+            public void walk(ResultSet rows) throws SQLException {
+                while (rows.next()) {
+                    writer.print("<update>");
 
-					String name = StringUtils.defaultString(rows.getString(1)).replace(".zip", "");
-					writer.print("<name>" + name + "</name>");
-					writer.print("<date>" + df.format(rows.getTimestamp(2)) + "</date>");
-					writer.print("<version>" + rows.getString(3) + "</version>");
-					writer.print("<rating>" + rows.getInt(4) + "</rating>");
-					writer.print("<type>" + rows.getString(5) + "</type>");
-					writer.print("</update>");
-				}
-			}
-		});
+                    String name = StringUtils.defaultString(rows.getString(1)).replace(".zip", "");
+                    writer.print(String.format("<name>%s</name>", name));
+                    writer.print(String.format("<date>%s</date>", df.format(rows.getTimestamp(2))));
+                    writer.print(String.format("<version>%s</version>", rows.getString(3)));
+                    writer.print(String.format("<rating>%d</rating>", rows.getInt(4)));
+                    writer.print(String.format("<type>%s</type>", rows.getString(5)));
+                    writer.print("</update>");
+                }
+            }
+        });
 
-		writer.print("</list>");
-	}
+        writer.print("</list>");
+    }
 }

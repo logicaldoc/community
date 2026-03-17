@@ -32,58 +32,63 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class NotesDataServlet extends AbstractDataServlet {
 
-	private static final String FILE_VERSION = "fileVersion";
+    private static final String FILE_VERSION = "fileVersion";
 
-	private static final Logger logger = LoggerFactory.getLogger(NotesDataServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotesDataServlet.class);
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		Long userId = getUserId(request);
+        Long userId = getUserId(request);
 
-		Long docId = getDocId(request);
+        Long docId = getDocId(request);
 
-		String fileVersion = getFileVersion(request);
+        String fileVersion = getFileVersion(request);
 
-		Long page = getPage(request);
+        Long page = getPage(request);
 
-		StringBuilder query = new StringBuilder(
-				"select A.ld_id,A.ld_message,A.ld_username,A.ld_date,A.ld_docid,B.ld_filename,A.ld_userid,A.ld_page,A.ld_color,A.ld_fileversion from ld_note A, ld_document B where A.ld_deleted=0 and B.ld_deleted=0 and A.ld_docid=B.ld_id ");
-		if (userId != null)
-			query.append(" and A.ld_userid =" + userId);
-		if (docId != null)
-			query.append(" and A.ld_docid =" + docId);
-		if (page != null)
-			query.append(" and A.ld_page =" + page);
+        StringBuilder query = new StringBuilder("""
+                                                select A.ld_id,A.ld_message,A.ld_username,A.ld_date,A.ld_docid,B.ld_filename,A.ld_userid,A.ld_page,A.ld_color,A.ld_fileversion 
+                                                from ld_note A, ld_document B 
+                                                where A.ld_deleted = 0 
+                                                and B.ld_deleted = 0 
+                                                and A.ld_docid = B.ld_id 
+                                                """);
+        if (userId != null)
+            query.append(" and A.ld_userid = %d".formatted(userId));
+        if (docId != null)
+            query.append(" and A.ld_docid = %d".formatted(docId));
+        if (page != null)
+            query.append(" and A.ld_page = %d".formatted(page));
 
-		if (docId != null && fileVersion == null) {
-			DocumentDAO ddao = DocumentDAO.get();
-			Document doc = ddao.findDocument(docId);
-			fileVersion = doc.getFileVersion();
-		}
+        if (docId != null && fileVersion == null) {
+            DocumentDAO ddao = DocumentDAO.get();
+            Document doc = ddao.findDocument(docId);
+            fileVersion = doc.getFileVersion();
+        }
 
-		Map<String, Object> params = null;
-		if (docId != null && StringUtils.isNotEmpty(fileVersion)) {
-			query.append(" and A.ld_fileversion = :fileVersion ");
-			params = Map.of(FILE_VERSION, fileVersion);
-		}
-		query.append(" order by A.ld_date desc, A.ld_page asc ");
+        Map<String, Object> params = null;
+        if (docId != null && StringUtils.isNotEmpty(fileVersion)) {
+            query.append(" and A.ld_fileversion = :fileVersion ");
+            params = Map.of(FILE_VERSION, fileVersion);
+        }
+        query.append(" order by A.ld_date desc, A.ld_page asc ");
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+        PrintWriter writer = response.getWriter();
+        writer.write("<list>");
 
-		DocumentNoteDAO.get().queryForResultSet(query.toString(), params, 200, rows -> {
-			while (rows.next())
-				printPost(writer, rows, userId != null ? userId : session.getUserId());
-		});
+        DocumentNoteDAO.get().queryForResultSet(query.toString(), params, 200, rows -> {
+            while (rows.next())
+                printPost(writer, rows, userId != null ? userId : session.getUserId());
+        });
 
-		writer.write("</list>");
-	}
+        writer.write("</list>");
+    }
 
-	private void printPost(PrintWriter writer, ResultSet set, long userId) throws SQLException {
+    private void printPost(PrintWriter writer, ResultSet set, long userId) throws SQLException {
 		DateFormat df = getDateFormat();
 
 		long noteId = set.getLong(1);
@@ -91,12 +96,12 @@ public class NotesDataServlet extends AbstractDataServlet {
 			return;
 
 		writer.print("<post>");
-		writer.print("<id>" + noteId + "</id>");
-		writer.print("<title><![CDATA[" + StringUtils.abbreviate(set.getString(2), 100) + "]]></title>");
+		writer.print(String.format("<id>%d</id>", noteId));
+		writer.print(String.format("<title><![CDATA[%s]]></title>", StringUtils.abbreviate(set.getString(2), 100)));
 		if (set.getString(9) != null)
-			writer.print("<noteColor><![CDATA[" + set.getString(9) + "]]></noteColor>");
-		writer.print("<page>" + set.getInt(8) + "</page>");
-		writer.print("<user><![CDATA[" + set.getString(3) + "]]></user>");
+			writer.print(String.format("<noteColor><![CDATA[%s]]></noteColor>", set.getString(9)));
+		writer.print(String.format("<page>%d</page>", set.getInt(8)));
+		writer.print(String.format("<user><![CDATA[%s]]></user>",set.getString(3)));
 
 		Date date = null;
 		Object obj = set.getObject(4);
@@ -110,47 +115,48 @@ public class NotesDataServlet extends AbstractDataServlet {
 			date = set.getTimestamp(4);
 		}
 
-		writer.print("<date>" + (date != null ? df.format(date) : "") + "</date>");
-		writer.print("<message><![CDATA[" + set.getString(2) + "]]></message>");
-		writer.print("<docId>" + set.getLong(5) + "</docId>");
-		writer.print("<filename><![CDATA[" + set.getString(6) + "]]></filename>");
-		writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(set.getString(6))))
-				+ "</icon>");
-		writer.print("<userId>" + set.getString(7) + "</userId>");
-		writer.print("<fileVersion><![CDATA[" + set.getString(10) + "]]></fileVersion>");
+		if(date!=null)
+		    writer.print(String.format("<date>%s</date>", df.format(date)));
+		
+		writer.print(String.format("<message><![CDATA[%s]]></message>", set.getString(2)));
+		writer.print(String.format("<docId>%d</docId>", set.getLong(5)));
+		writer.print(String.format("<filename><![CDATA[%s]]></filename>", set.getString(6)));
+		writer.print(String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(set.getString(6))))));
+		writer.print(String.format("<userId>%s</userId>", set.getString(7)));
+		writer.print(String.format("<fileVersion><![CDATA[%s]]></fileVersion>", set.getString(10)));
 		writer.print("</post>");
 	}
 
-	private Long getPage(HttpServletRequest request) {
-		Long page = null;
-		if (request.getParameter("page") != null)
-			page = Long.parseLong(request.getParameter("page"));
-		return page;
-	}
+    private Long getPage(HttpServletRequest request) {
+        Long page = null;
+        if (request.getParameter("page") != null)
+            page = Long.parseLong(request.getParameter("page"));
+        return page;
+    }
 
-	private String getFileVersion(HttpServletRequest request) {
-		String fileVersion = null;
-		if (request.getParameter(FILE_VERSION) != null)
-			fileVersion = request.getParameter(FILE_VERSION);
-		return fileVersion;
-	}
+    private String getFileVersion(HttpServletRequest request) {
+        String fileVersion = null;
+        if (request.getParameter(FILE_VERSION) != null)
+            fileVersion = request.getParameter(FILE_VERSION);
+        return fileVersion;
+    }
 
-	private Long getDocId(HttpServletRequest request) throws PersistenceException {
-		Long docId = null;
-		if (request.getParameter("docId") != null) {
-			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = DocumentDAO.get();
-			Document doc = ddao.findDocument(docId);
-			if (doc != null)
-				docId = doc.getId();
-		}
-		return docId;
-	}
+    private Long getDocId(HttpServletRequest request) throws PersistenceException {
+        Long docId = null;
+        if (request.getParameter("docId") != null) {
+            docId = Long.parseLong(request.getParameter("docId"));
+            DocumentDAO ddao = DocumentDAO.get();
+            Document doc = ddao.findDocument(docId);
+            if (doc != null)
+                docId = doc.getId();
+        }
+        return docId;
+    }
 
-	private Long getUserId(HttpServletRequest request) {
-		Long userId = null;
-		if (request.getParameter("userId") != null)
-			userId = Long.parseLong(request.getParameter("userId"));
-		return userId;
-	}
+    private Long getUserId(HttpServletRequest request) {
+        Long userId = null;
+        if (request.getParameter("userId") != null)
+            userId = Long.parseLong(request.getParameter("userId"));
+        return userId;
+    }
 }

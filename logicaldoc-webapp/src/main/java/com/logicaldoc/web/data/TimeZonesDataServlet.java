@@ -19,22 +19,19 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class TimeZonesDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
-		response.setContentType("text/xml");
-		response.setCharacterEncoding("UTF-8");
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
+        response.setContentType("text/xml");
+        response.setCharacterEncoding("UTF-8");
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
-		String[] timezones = TimeZone.getAvailableIDs();
-		for (String timezone : timezones) {
-			writer.print("<timezone>");
-			writer.print("<id>" + timezone + "</id>");
-			writer.print("</timezone>");
-		}
-		writer.write("</list>");
-	}
+        PrintWriter writer = response.getWriter();
+        writer.write("<list>");
+        String[] timezones = TimeZone.getAvailableIDs();
+        for (String timezone : timezones)
+            writer.print(String.format("<timezone><id>%s</id></timezone>", timezone));
+        writer.write("</list>");
+    }
 }

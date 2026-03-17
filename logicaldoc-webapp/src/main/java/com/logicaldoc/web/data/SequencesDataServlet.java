@@ -23,26 +23,26 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class SequencesDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		List<Sequence> sequences = SequenceDAO.get()
-				.findByName(StringUtils.defaultString(request.getParameter("prefix")), session.getTenantId());
-		sequences.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
+        List<Sequence> sequences = SequenceDAO.get()
+                .findByName(StringUtils.defaultString(request.getParameter("prefix")), session.getTenantId());
+        sequences.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
-		for (Sequence sequence : sequences) {
-			writer.print("<sequence>");
-			writer.print("<id>" + sequence.getId() + "</id>");
-			writer.print("<name><![CDATA[" + sequence.getName() + "]]></name>");
-			writer.print("<value>" + sequence.getValue() + "</value>");
-			writer.print("</sequence>");
-		}
-		writer.write("</list>");
+        PrintWriter writer = response.getWriter();
+        writer.write("<list>");
+        for (Sequence sequence : sequences) {
+            writer.print("<sequence>");
+            writer.print(String.format("<id>%d</id>", sequence.getId()));
+            writer.print(String.format("<name><![CDATA[%s]]></name>", sequence.getName()));
+            writer.print(String.format("<value>%d</value>", sequence.getValue()));
+            writer.print("</sequence>");
+        }
+        writer.write("</list>");
 
-	}
+    }
 }

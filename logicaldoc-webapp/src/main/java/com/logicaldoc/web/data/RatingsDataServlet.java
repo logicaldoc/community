@@ -21,31 +21,30 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class RatingsDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
-		
-		String docId = request.getParameter("docId");
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		DateFormat df = getDateFormat();
+        String docId = request.getParameter("docId");
 
-		PrintWriter writer = response.getWriter();
-		
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		writer.print("<list>");
-		for (Rating rating : RatingDAO.get().findByDocId(Long.parseLong(docId))) {
-			writer.print("<rating>");
-			writer.print("<id>" + rating.getId() + "</id>");
-			writer.print("<user><![CDATA[" + rating.getUsername() + "]]></user>");
-			writer.print("<vote>" + rating.getVote() + "</vote>");
-			writer.print("<date>" + df.format(rating.getLastModified()) + "</date>");
-			writer.print("</rating>");
-		}
+        DateFormat df = getDateFormat();
 
-		writer.print("</list>");
-	}
+        PrintWriter writer = response.getWriter();
+
+        /*
+         * Iterate over records composing the response XML document
+         */
+        writer.print("<list>");
+        for (Rating rating : RatingDAO.get().findByDocId(Long.parseLong(docId))) {
+            writer.print("<rating>");
+            writer.print(String.format("<id>%d</id>", rating.getId()));
+            writer.print(String.format("<user><![CDATA[%s]]></user>", rating.getUsername()));
+            writer.print(String.format("<vote>%d</vote>", rating.getVote()));
+            writer.print(String.format("<date>%s</date>", df.format(rating.getLastModified())));
+            writer.print("</rating>");
+        }
+        writer.print("</list>");
+    }
 }

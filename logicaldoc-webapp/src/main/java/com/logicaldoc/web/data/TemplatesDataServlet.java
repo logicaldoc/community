@@ -23,57 +23,57 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class TemplatesDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		Long templateId = StringUtils.isNotEmpty(request.getParameter("templateId"))
-				? Long.parseLong(request.getParameter("templateId"))
-				: null;
-		Integer type = request.getParameter("type") != null ? Integer.parseInt(request.getParameter("type")) : null;
+        Long templateId = StringUtils.isNotEmpty(request.getParameter("templateId"))
+                ? Long.parseLong(request.getParameter("templateId"))
+                : null;
+        Integer type = request.getParameter("type") != null ? Integer.parseInt(request.getParameter("type")) : null;
 
-		TemplateDAO templateDao = TemplateDAO.get();
-		Template template = templateId != null ? templateDao.findById(templateId) : null;
+        TemplateDAO templateDao = TemplateDAO.get();
+        Template template = templateId != null ? templateDao.findById(templateId) : null;
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+        PrintWriter writer = response.getWriter();
+        writer.write("<list>");
 
-		if ("true".equals(request.getParameter("withempty"))) {
-			writer.print("<template>");
-			writer.print("<id></id>");
-			writer.print("<name> </name>");
-			writer.print("<documents>0</documents>");
-			writer.print("<readonly>false</readonly>");
-			writer.print("</template>");
-		}
+        if ("true".equals(request.getParameter("withempty"))) {
+            writer.print("<template>");
+            writer.print("<id></id>");
+            writer.print("<name> </name>");
+            writer.print("<documents>0</documents>");
+            writer.print("<readonly>false</readonly>");
+            writer.print("</template>");
+        }
 
-		List<Template> templates = null;
-		if (type != null)
-			templates = templateDao.findByType(type, session.getTenantId());
-		else
-			templates = templateDao.findAll(session.getTenantId());
+        List<Template> templates = null;
+        if (type != null)
+            templates = templateDao.findByType(type, session.getTenantId());
+        else
+            templates = templateDao.findAll(session.getTenantId());
 
-		/*
-		 * Iterate over the collection of templates
-		 */
-		for (Template templ : templates) {
-			if (templateDao.isReadEnable(templ.getId(), session.getUserId())
-					|| (template != null && template.equals(templ))) {
+        /*
+         * Iterate over the collection of templates
+         */
+        for (Template templ : templates) {
+            if (templateDao.isReadEnable(templ.getId(), session.getUserId())
+                    || (template != null && template.equals(templ))) {
 
-				writer.print("<template>");
-				writer.print("<id>" + templ.getId() + "</id>");
-				writer.print("<name><![CDATA[" + templ.getName() + "]]></name>");
-				writer.print("<label><![CDATA[" + StringUtils.defaultIfEmpty(templ.getLabel(), templ.getName())
-						+ "]]></label>");
-				writer.print("<description><![CDATA[" + templ.getDescription() + "]]></description>");
-				writer.print("<readonly>" + templ.isReadonly() + "</readonly>");
-				writer.print("<type>" + templ.getType() + "</type>");
-				writer.print("</template>");
-			}
-		}
+                writer.print("<template>");
+                writer.print(String.format("<id>%d</id>", templ.getId()));
+                writer.print(String.format("<name><![CDATA[%s]]></name>", templ.getName()));
+                writer.print(String.format("<label><![CDATA[%s]]></label>",
+                        StringUtils.defaultIfEmpty(templ.getLabel(), templ.getName())));
+                writer.print(String.format("<description><![CDATA[%s]]></description>", templ.getDescription()));
+                writer.print(String.format("<readonly>%b</readonly>", templ.isReadonly()));
+                writer.print(String.format("<type>%d</type>", templ.getType()));
+                writer.print("</template>");
+            }
+        }
 
-		writer.write("</list>");
-	}
+        writer.write("</list>");
+    }
 }

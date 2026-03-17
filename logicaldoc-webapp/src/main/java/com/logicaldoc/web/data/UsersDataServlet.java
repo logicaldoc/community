@@ -33,129 +33,132 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class UsersDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		String groupIdOrName = request.getParameter("groupId");
-		boolean required = "true".equals(request.getParameter("required"));
-		boolean skipdisabled = "true".equals(request.getParameter("skipdisabled"));
+        String groupIdOrName = request.getParameter("groupId");
+        boolean required = "true".equals(request.getParameter("required"));
+        boolean skipdisabled = "true".equals(request.getParameter("skipdisabled"));
 
-		List<User> users;
-		if (StringUtils.isNotEmpty(request.getParameter("impersonifiers")))
-			users = findImpersonators(Long.parseLong(request.getParameter("impersonifiers")));
-		else
-			users = findUsers(session, groupIdOrName);
+        List<User> users;
+        if (StringUtils.isNotEmpty(request.getParameter("impersonifiers")))
+            users = findImpersonators(Long.parseLong(request.getParameter("impersonifiers")));
+        else
+            users = findUsers(session, groupIdOrName);
 
-		printUsers(users, required, skipdisabled, response);
-	}
+        printUsers(users, required, skipdisabled, response);
+    }
 
-	private void printUsers(List<User> users, boolean required, boolean skipdisabled, HttpServletResponse response)
-			throws IOException, PersistenceException {
-		PrintWriter writer = response.getWriter();
-		writer.print("<list>");
-		if (!required)
-			writer.print("<user><id></id><username></username><name></name></user>");
+    private void printUsers(List<User> users, boolean required, boolean skipdisabled, HttpServletResponse response)
+            throws IOException, PersistenceException {
+        PrintWriter writer = response.getWriter();
+        writer.print("<list>");
+        if (!required)
+            writer.print("<user><id></id><username></username><name></name></user>");
 
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		UserDAO userDao = UserDAO.get();
-		for (User user : users) {
-			if (user.getType() == UserType.SYSTEM || (skipdisabled && !user.isEnabled()))
-				continue;
+        /*
+         * Iterate over records composing the response XML document
+         */
+        UserDAO userDao = UserDAO.get();
+        for (User user : users) {
+            if (user.getType() == UserType.SYSTEM || (skipdisabled && !user.isEnabled()))
+                continue;
 
-			userDao.initialize(user);
+            userDao.initialize(user);
 
-			printUser(writer, user);
-		}
+            printUser(writer, user);
+        }
 
-		writer.print("</list>");
-	}
+        writer.print("</list>");
+    }
 
-	private void printUser(PrintWriter writer, User user) throws PersistenceException {
-		DateFormat df = getDateFormat();
+    private void printUser(PrintWriter writer, User user) throws PersistenceException {
+        DateFormat df = getDateFormat();
 
-		writer.print("<user>");
-		writer.print(String.format("<id>%d</id>", user.getId()));
-		writer.print(String.format("<username><![CDATA[%s]]></username>", user.getUsername()));
-		writer.print(String.format("<eenabled>%b</eenabled>", user.isEnabled()));
-		writer.print(String.format("<guest>%b</guest>", user.isReadonly()));
-		writer.print("<name><![CDATA[" + StringUtils.defaultString(user.getName()) + "]]></name>");
-		writer.print("<firstName><![CDATA[" + StringUtils.defaultString(user.getFirstName()) + "]]></firstName>");
-		writer.print("<label><![CDATA[" + StringUtils.defaultString(user.getFullName()) + "]]></label>");
-		writer.print("<email><![CDATA[" + StringUtils.defaultString(user.getEmail()) + "]]></email>");
-		writer.print("<phone><![CDATA[" + StringUtils.defaultString(user.getTelephone()) + "]]></phone>");
-		writer.print("<cell><![CDATA[" + StringUtils.defaultString(user.getTelephone2()) + "]]></cell>");
-		writer.print("<city><![CDATA[" + StringUtils.defaultString(user.getCity()) + "]]></city>");
-		writer.print("<department><![CDATA[" + StringUtils.defaultString(user.getDepartment()) + "]]></department>");
-		writer.print("<building><![CDATA[" + StringUtils.defaultString(user.getBuilding()) + "]]></building>");
-		writer.print("<organizationalUnit><![CDATA[" + StringUtils.defaultString(user.getOrganizationalUnit())
-				+ "]]></organizationalUnit>");
-		writer.print("<company><![CDATA[" + StringUtils.defaultString(user.getCompany()) + "]]></company>");
+        writer.print("<user>");
+        writer.print(String.format("<id>%d</id>", user.getId()));
+        writer.print(String.format("<username><![CDATA[%s]]></username>", user.getUsername()));
+        writer.print(String.format("<eenabled>%b</eenabled>", user.isEnabled()));
+        writer.print(String.format("<guest>%b</guest>", user.isReadonly()));
+        writer.print(String.format("<name><![CDATA[%s]]></name>", StringUtils.defaultString(user.getName())));
+        writer.print(
+                String.format("<firstName><![CDATA[%s]]></firstName>", StringUtils.defaultString(user.getFirstName())));
+        writer.print(String.format("<label><![CDATA[%s]]></label>", StringUtils.defaultString(user.getFullName())));
+        writer.print(String.format("<email><![CDATA[%s]]></email>", StringUtils.defaultString(user.getEmail())));
+        writer.print(String.format("<phone><![CDATA[%s]]></phone>", StringUtils.defaultString(user.getTelephone())));
+        writer.print(String.format("<cell><![CDATA[%s]]></cell>", StringUtils.defaultString(user.getTelephone2())));
+        writer.print(String.format("<city><![CDATA[%s]]></city>", StringUtils.defaultString(user.getCity())));
+        writer.print(String.format("<department><![CDATA[%s]]></department>",
+                StringUtils.defaultString(user.getDepartment())));
+        writer.print(
+                String.format("<building><![CDATA[%s]]></building>", StringUtils.defaultString(user.getBuilding())));
+        writer.print(String.format("<organizationalUnit><![CDATA[%s]]></organizationalUnit>",
+                StringUtils.defaultString(user.getOrganizationalUnit())));
+        writer.print(String.format("<company><![CDATA[%s]]></company>", StringUtils.defaultString(user.getCompany())));
 
-		writer.print("<source>" + user.getSource().name() + "</source>");
-		if (user.getExpire() != null)
-			writer.print("<expire>" + df.format(user.getExpire()) + "</expire>");
-		if (user.getLastLogin() != null)
-			writer.print("<lastLogin>" + df.format(user.getLastLogin()) + "</lastLogin>");
-		if (user.getCreation() != null)
-			writer.print("<creation>" + df.format(user.getCreation()) + "</creation>");
-		if (user.getUserGroup() != null)
-			writer.print("<usergroup><![CDATA[" + user.getUserGroup().getId() + "]]></usergroup>");
+        writer.print(String.format("<source>%s</source>", user.getSource().name()));
+        if (user.getExpire() != null)
+            writer.print(String.format("<expire>%s</expire>", df.format(user.getExpire())));
+        if (user.getLastLogin() != null)
+            writer.print(String.format("<lastLogin>%s</lastLogin>", df.format(user.getLastLogin())));
+        if (user.getCreation() != null)
+            writer.print(String.format("<creation>%s</creation>", df.format(user.getCreation())));
+        if (user.getUserGroup() != null)
+            writer.print(String.format("<usergroup><![CDATA[%s]]></usergroup>", user.getUserGroup().getId()));
 
-		writer.print("<groups><![CDATA[" + user.getGroups().stream().filter(g -> g.getType() == GroupType.DEFAULT)
-				.map(Group::getName).collect(Collectors.joining(", ")) + "]]></groups>");
-		writer.print("<avatar>" + user.getId() + "</avatar>");
-		writer.print("<sfa>" + StringUtils.defaultString(user.getSecondFactor()) + "</sfa>");
+        writer.print(String.format("<groups><![CDATA[%s]]></groups>", user.getGroups().stream()
+                .filter(g -> g.getType() == GroupType.DEFAULT).map(Group::getName).collect(Collectors.joining(", "))));
+        writer.print(String.format("<avatar>%d</avatar>", user.getId()));
+        writer.print(String.format("<sfa>%s</sfa>", StringUtils.defaultString(user.getSecondFactor())));
 
-		if (user.getTimeZone() != null)
-			writer.print("<timeZone><![CDATA[" + user.getTimeZone() + "]]></timeZone>");
-		writer.print("</user>");
-	}
+        if (user.getTimeZone() != null)
+            writer.print(String.format("<timeZone><![CDATA[%s]]></timeZone>", user.getTimeZone()));
+        writer.print("</user>");
+    }
 
-	private List<User> findImpersonators(long userId) throws PersistenceException {
-		List<String> usernames = UserDAO.get().queryForList("select ld_username from ld_impersonator where ld_userid = %d".formatted(userId),
-				String.class);
+    private List<User> findImpersonators(long userId) throws PersistenceException {
+        List<String> usernames = UserDAO.get().queryForList(
+                "select ld_username from ld_impersonator where ld_userid = %d".formatted(userId), String.class);
 
-		if (CollectionUtils.isEmpty(usernames)) {
-			return List.of();
-		} else {
-			List<User> users = UserDAO.get().findByWhere(
-					"_entity.username in ('%s')".formatted(usernames.stream().collect(Collectors.joining("','"))), null,
-					null);
-			for (User user : users)
-				UserDAO.get().initialize(user);
-			return users;
-		}
-	}
+        if (CollectionUtils.isEmpty(usernames)) {
+            return List.of();
+        } else {
+            List<User> users = UserDAO.get().findByWhere(
+                    "_entity.username in ('%s')".formatted(usernames.stream().collect(Collectors.joining("','"))), null,
+                    null);
+            for (User user : users)
+                UserDAO.get().initialize(user);
+            return users;
+        }
+    }
 
-	private List<User> findUsers(Session session, String groupIdOrName) throws PersistenceException {
-		List<User> users = new ArrayList<>();
+    private List<User> findUsers(Session session, String groupIdOrName) throws PersistenceException {
+        List<User> users = new ArrayList<>();
 
-		UserDAO userDao = UserDAO.get();
-		GroupDAO groupDao = GroupDAO.get();
+        UserDAO userDao = UserDAO.get();
+        GroupDAO groupDao = GroupDAO.get();
 
-		if (StringUtils.isNotEmpty(groupIdOrName)) {
-			Group group = null;
-			try {
-				group = groupDao.findById(Long.parseLong(groupIdOrName));
-			} catch (Exception t) {
-				// Nothing to do
-			}
-			if (group == null)
-				group = groupDao.findByName(groupIdOrName, session.getTenantId());
-			groupDao.initialize(group);
+        if (StringUtils.isNotEmpty(groupIdOrName)) {
+            Group group = null;
+            try {
+                group = groupDao.findById(Long.parseLong(groupIdOrName));
+            } catch (Exception t) {
+                // Nothing to do
+            }
+            if (group == null)
+                group = groupDao.findByName(groupIdOrName, session.getTenantId());
+            groupDao.initialize(group);
 
-			users.addAll(group.getUsers());
-		} else {
-			Map<String, Object> params = new HashMap<>();
-			params.put("tenantId", session.getTenantId());
+            users.addAll(group.getUsers());
+        } else {
+            Map<String, Object> params = new HashMap<>();
+            params.put("tenantId", session.getTenantId());
 
-			users = userDao.findByWhere("_entity.tenantId = :tenantId", params, null, null);
-		}
-		return users;
-	}
+            users = userDao.findByWhere("_entity.tenantId = :tenantId", params, null, null);
+        }
+        return users;
+    }
 }

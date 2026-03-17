@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -29,83 +31,84 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class VersionsDataServlet extends AbstractDataServlet {
 
-	private static final String DOC_ID = "docId";
+    private static final String DOC_ID = "docId";
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		List<?> records = executeQuery(request, max);
+        List<?> records = executeQuery(request, max);
 
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		DateFormat df = getDateFormat();
+        /*
+         * Iterate over records composing the response XML document
+         */
+        DateFormat df = getDateFormat();
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+        PrintWriter writer = response.getWriter();
+        writer.write("<list>");
 
-		for (Object gridRecord : records) {
-			Object[] cols = (Object[]) gridRecord;
+        for (Object gridRecord : records) {
+            Object[] cols = (Object[]) gridRecord;
 
-			writer.print("<version>");
-			writer.print("<id>" + cols[0] + "</id>");
-			writer.print("<user><![CDATA[" + (cols[1] == null ? "" : cols[1]) + "]]></user>");
-			writer.print("<event><![CDATA[" + I18N.message((String) cols[2], locale) + "]]></event>");
-			writer.print("<version>" + cols[3] + "</version>");
-			writer.print("<fileVersion>" + cols[4] + "</fileVersion>");
-			writer.print("<revision>" + cols[17] + "</revision>");
-			writer.print("<date>" + df.format((Date) cols[5]) + "</date>");
-			writer.print("<comment><![CDATA[" + (cols[6] == null ? "" : cols[6]) + "]]></comment>");
-			writer.print("<docid>" + cols[7] + "</docid>");
-			writer.print("<filename><![CDATA[" + (String) cols[8] + "]]></filename>");
-			writer.print("<customid><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></customid>");
-			writer.print("<size>" + cols[10] + "</size>");
-			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[11])) + "</icon>");
-			writer.print("<type>" + (String) cols[11] + "</type>");
+            writer.print("<version>");
+            writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+            writer.print(String.format("<user><![CDATA[%s]]></user>", StringUtils.defaultString((String) cols[1])));
+            writer.print(String.format("<event><![CDATA[%s]]></event>", I18N.message((String) cols[2], locale)));
+            writer.print(String.format("<version>%s</version>",cols[3]));
+            writer.print(String.format("<fileVersion>%s</fileVersion>", cols[4]));
+            writer.print(String.format("<revision>%s</revision>", cols[17]));
+            writer.print(String.format("<date>%s</date>", df.format((Date) cols[5])));
+            writer.print(String.format("<comment><![CDATA[%s]]></comment>", StringUtils.defaultString((String)cols[6])));
+            writer.print(String.format("<docid>%d</docid>", (Long) cols[7]));
+            writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[8]));
+            writer.print(String.format("<customid><![CDATA[%s]]></customid>", StringUtils.defaultString((String)cols[9])));
+            writer.print(String.format("<size>%d</size>", (Long) cols[10]));
+            writer.print(String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[11]))));
+            writer.print(String.format("<type>%s</type>", cols[11]));
 
-			if (cols[12] != null)
-				writer.print("<template><![CDATA[" + cols[12] + "]]></template>");
-			if (cols[13] != null)
-				writer.print("<workflowStatus><![CDATA[" + cols[13] + "]]></workflowStatus>");
-			if (cols[14] != null)
-				writer.print("<workflowStatusDisplay><![CDATA[" + cols[14] + "]]></workflowStatusDisplay>");
-			writer.print("<userId>" + cols[15] + "</userId>");
-			if (cols[16] != null)
-				writer.print("<color><![CDATA[" + cols[16] + "]]></color>");
+            if (cols[12] != null)
+                writer.print(String.format("<template><![CDATA[%s]]></template>", cols[12]));
+            if (cols[13] != null)
+                writer.print(String.format("<workflowStatus><![CDATA[%s]]></workflowStatus>", cols[13]));
+            if (cols[14] != null)
+                writer.print(String.format("<workflowStatusDisplay><![CDATA[%s]]></workflowStatusDisplay>", cols[14]));
+            writer.print(String.format("<userId>%d</userId>", (Long) cols[15]));
+            if (cols[16] != null)
+                writer.print(String.format("<color><![CDATA[%s]]></color>", cols[16]));
 
-			writer.print("</version>");
-		}
+            writer.print("</version>");
+        }
 
-		writer.write("</list>");
-	}
+        writer.write("</list>");
+    }
 
-	private List<?> executeQuery(HttpServletRequest request, Integer max) throws PersistenceException {
-		VersionDAO dao = VersionDAO.get();
+    private List<?> executeQuery(HttpServletRequest request, Integer max) throws PersistenceException {
+        VersionDAO dao = VersionDAO.get();
 
-		Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
 
-		StringBuilder query = new StringBuilder(
-				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
-						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color, A.revision ");
-		if (request.getParameter(DOC_ID) != null) {
-			long docId = Long.parseLong(request.getParameter(DOC_ID));
-			DocumentDAO ddao = DocumentDAO.get();
-			Document doc = ddao.findDocument(docId);
-			if (doc != null)
-				docId = doc.getId();
+        StringBuilder query = new StringBuilder("""
+select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName, A.customId, 
+       A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color, A.revision 
+""");
+        if (request.getParameter(DOC_ID) != null) {
+            long docId = Long.parseLong(request.getParameter(DOC_ID));
+            DocumentDAO ddao = DocumentDAO.get();
+            Document doc = ddao.findDocument(docId);
+            if (doc != null)
+                docId = doc.getId();
 
-			query.append(" from Version A where A.deleted = 0 and A.docId = :docId ");
-			params.put(DOC_ID, docId);
-		} else {
-			query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
-			query.append(" and B.id = :archiveId");
-			params.put("archiveId", Long.parseLong(request.getParameter("archiveId")));
-		}
-		query.append(" order by A.versionDate desc ");
+            query.append(" from Version A where A.deleted = 0 and A.docId = :docId ");
+            params.put(DOC_ID, docId);
+        } else {
+            query.append(
+                    " from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) and B.id = :archiveId ");
+            params.put("archiveId", Long.parseLong(request.getParameter("archiveId")));
+        }
+        query.append(" order by A.versionDate desc ");
 
-		return dao.findByQuery(query.toString(), params, max != null ? max : 100);
-	}
+        return dao.findByQuery(query.toString(), params, max != null ? max : 100);
+    }
 }

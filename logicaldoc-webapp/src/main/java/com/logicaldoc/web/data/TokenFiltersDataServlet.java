@@ -25,43 +25,43 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class TokenFiltersDataServlet extends AbstractDataServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+            Locale locale) throws PersistenceException, IOException {
 
-		String filter = request.getParameter("filter");
+        String filter = request.getParameter("filter");
 
-		ContextProperties config = Context.get().getConfig();
+        ContextProperties config = Context.get().getConfig();
 
-		PrintWriter writer = response.getWriter();
-		writer.print("<list>");
+        PrintWriter writer = response.getWriter();
+        writer.print("<list>");
 
-		if (StringUtils.isNotEmpty(filter)) {
-			// We have to iterate over the configs of a specific filter
-			String prefix = "index.tokenfilter." + filter + ".";
-			Map<String, String> settings = config.getProperties(prefix);
-			for (Map.Entry<String, String> entry : settings.entrySet()) {
-				if (entry.getKey().equals("position"))
-					continue;
-				writer.print("<filter>");
-				writer.print("<name><![CDATA[" + entry.getKey() + "]]></name>");
-				writer.print("<value><![CDATA[" + entry.getValue() + "]]></value>");
-				writer.print("</filter>");
-			}
-		} else {
-			// We have to iterate over the filters
-			List<String> filters = FilteredAnalyzer.getTokenFilterNames(false);
-			for (String filterName : filters) {
-				writer.print("<filter>");
-				writer.print("<name><![CDATA[" + filterName + "]]></name>");
-				writer.print("<eenabled>" + "enabled".equals(config.getProperty("index.tokenfilter." + filterName))
-						+ "</eenabled>");
-				writer.print("</filter>");
-			}
-		}
+        if (StringUtils.isNotEmpty(filter)) {
+            // We have to iterate over the configs of a specific filter
+            String prefix = "index.tokenfilter.%s.".formatted(filter);
+            Map<String, String> settings = config.getProperties(prefix);
+            for (Map.Entry<String, String> entry : settings.entrySet()) {
+                if (entry.getKey().equals("position"))
+                    continue;
+                writer.print("<filter>");
+                writer.print(String.format("<name><![CDATA[%s]]></name>", entry.getKey()));
+                writer.print(String.format("<value><![CDATA[%s]]></value>", entry.getValue()));
+                writer.print("</filter>");
+            }
+        } else {
+            // We have to iterate over the filters
+            List<String> filters = FilteredAnalyzer.getTokenFilterNames(false);
+            for (String filterName : filters) {
+                writer.print("<filter>");
+                writer.print(String.format("<name><![CDATA[%s]]></name>", filterName));
+                writer.print(String.format("<eenabled>%b</eenabled>",
+                        "enabled".equals(config.getProperty("index.tokenfilter.%s".formatted(filterName)))));
+                writer.print("</filter>");
+            }
+        }
 
-		writer.print("</list>");
-	}
+        writer.print("</list>");
+    }
 }
