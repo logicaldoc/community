@@ -58,21 +58,28 @@ public class ChainFiller extends Filler {
 	@Override
 	public void fill(Fillable fillable, String content, History transaction, Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, SearchException {
+
 		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
 			return;
 
-		if (!transaction.isFill()) {
-			if (log.isDebugEnabled())
-				log.debug("Skiping fill of object {}", fillable);
+		if (transaction == null) {
+			log.warn("Skipping filler chain: transaction is null");
 			return;
 		}
 
-		Map<String, Object> pipelineDict = new HashMap<>();
-		if (MapUtils.isNotEmpty(dictionary))
-			pipelineDict.putAll(dictionary);
+		if (chain == null || chain.isEmpty())
+			return;
+
+		Map<String, Object> pipelineDict = MapUtils.isNotEmpty(dictionary) ? new HashMap<>(dictionary)
+				: new HashMap<>();
 
 		for (Filler filler : chain) {
-			log.debug("invoking filler {}", filler);
+			if (filler == null)
+				continue;
+
+			if (log.isDebugEnabled())
+				log.debug("Invoking filler {}", filler.getClass().getSimpleName());
+
 			filler.fill(fillable, content, transaction, pipelineDict);
 		}
 	}

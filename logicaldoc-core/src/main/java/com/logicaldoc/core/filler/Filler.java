@@ -187,6 +187,7 @@ public abstract class Filler extends PersistentObject {
 		if (StringUtils.isBlank(extractedContent))
 			throw new ParsingException("Cannot extract any content from document %s".formatted(document));
 
+		log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
 		fill(document, extractedContent, transaction, dictionary);
 	}
 

@@ -7,7 +7,6 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.ai.autofill.AutofillService;
@@ -132,7 +131,6 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		filler.setDisabled(!updateEnabled || !Feature.enabled(Feature.AUTOFILL));
 		filler.addChangedHandler(changedHandler);
 		filler.addChangedHandler(changed -> {
-			GuiLog.info("-" + changed.getValue() + "-");
 			fill.setDisabled(changed.getValue() == null);
 		});
 
