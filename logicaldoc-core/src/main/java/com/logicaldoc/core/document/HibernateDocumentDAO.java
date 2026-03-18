@@ -73,12 +73,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
 
-    private static final String AND = " and ";
-
-    private static final String AND_LD_TENANTID = " and ld_tenantid=";
-
-    private static final String STATUS = ".status=";
-
     @Resource(name = "documentHistoryDAO")
     private DocumentHistoryDAO documentHistoryDAO;
 
@@ -247,11 +241,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     @Override
     public List<Long> findDocIdByTag(String tag) throws PersistenceException {
-        StringBuilder query = new StringBuilder(
-                "select distinct(A.ld_docid) from ld_tag A, ld_document B where A.ld_docid=B.ld_id and not B.ld_status="
-                        + DocumentStatus.ARCHIVED.ordinal());
-        query.append(" and lower(ld_tag)='" + SqlUtil.doubleQuotesAndBackslashes(tag).toLowerCase() + "'");
-        return queryForList(query.toString(), Long.class);
+        return queryForList("""
+                            select distinct(A.ld_docid) 
+                              from ld_tag A, ld_document B 
+                             where A.ld_docid=B.ld_id 
+                               and not B.ld_status = %d
+                               and lower(ld_tag) = '%s'
+                            """.formatted(DocumentStatus.ARCHIVED.ordinal(),
+                SqlUtil.doubleQuotesAndBackslashes(tag).toLowerCase()), Long.class);
     }
 
     @Override
@@ -572,18 +569,20 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         // Execute the query to populate the sets
         queryForResultSet("""
-              select ld_filename 
-                from ld_document 
-               where ld_deleted = 0 and ld_folderid = %d
-                 and ld_filename like '%s%%' 
-                 and not ld_id = %d
-              """.formatted(doc.getFolder().getId(), SqlUtil.doubleQuotes(baseName), doc.getId()), null, null, rs -> {
-            while (rs.next()) {
-                String file = rs.getString(1);
-                if (file != null && !fileNames.contains(file))
-                    fileNames.add(file.toLowerCase());
-            }
-        });
+                          select ld_filename 
+                            from ld_document 
+                           where ld_deleted = 0 
+                             and ld_folderid = %d
+                             and ld_filename like '%s%%' 
+                             and not ld_id = %d
+                          """.formatted(doc.getFolder().getId(), SqlUtil.doubleQuotes(baseName), doc.getId()), null,
+                null, rs -> {
+                    while (rs.next()) {
+                        String file = rs.getString(1);
+                        if (file != null && !fileNames.contains(file))
+                            fileNames.add(file.toLowerCase());
+                    }
+                });
 
         int counter = 1;
         while (fileNames.contains(doc.getFileName().toLowerCase()))
@@ -721,14 +720,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
              * Search in all accessible folders
              */
             String query = """
-                    select distinct(C.ld_id) 
-                    from ld_document C, ld_tag D
-                   where C.ld_id = D.ld_docid 
-                     and C.ld_deleted = 0 
-                     and not C.ld_status = %d
-                     and C.ld_folderid in (%s)
-                     and lower(D.ld_tag) = '%s'
-                   """.formatted(DocumentStatus.ARCHIVED.ordinal(),
+                            select distinct(C.ld_id) 
+                            from ld_document C, ld_tag D
+                           where C.ld_id = D.ld_docid 
+                             and C.ld_deleted = 0 
+                             and not C.ld_status = %d
+                             and C.ld_folderid in (%s)
+                             and lower(D.ld_tag) = '%s'
+                           """.formatted(DocumentStatus.ARCHIVED.ordinal(),
                     CollectionUtil.join(folderDAO.findFolderIdByUserId(userId, null, true)),
                     SqlUtil.doubleQuotes(tag.toLowerCase()));
 
@@ -790,7 +789,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     @Override
     public List<Document> findByFolder(long folderId, Integer max) throws PersistenceException {
-        return findByWhere("_entity.folder.id = :folderId ", Map.of("folderId", Long.valueOf(folderId)), null, max);
+        return findByWhere("_entity.folder.id = :folderId", Map.of("folderId", Long.valueOf(folderId)), null, max);
     }
 
     @Override
@@ -843,18 +842,21 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public List<Document> findByFileNameAndParentFolderId(Long folderId, String fileName, Long excludeId, Long tenantId,
             Integer max) throws PersistenceException {
-        String query = "lower(" + ENTITY + ".fileName) like '%" + SqlUtil.doubleQuotes(fileName.toLowerCase()) + "%'";
-        if (tenantId != null) {
-            query += AND + ENTITY + ".tenantId = " + tenantId;
-        }
-        if (folderId != null) {
-            query += AND + ENTITY + ".folder.id = " + folderId;
-        }
-        if (excludeId != null)
-            query += " and not(" + ENTITY + ".id = " + excludeId + ")";
-        query += " and not " + ENTITY + STATUS + DocumentStatus.ARCHIVED.ordinal();
+        StringBuilder query = new StringBuilder(
+                "lower(_entity.fileName) like '%%%s%%'".formatted(SqlUtil.doubleQuotes(fileName.toLowerCase())));
 
-        return findByWhere(query, null, max);
+        if (tenantId != null)
+            query.append(" and _entity.tenantId = %d".formatted(tenantId));
+
+        if (folderId != null)
+            query.append(" and _entity.folder.id = %d".formatted(folderId));
+
+        if (excludeId != null)
+            query.append(" and not(_entity.id = %d)".formatted(excludeId));
+
+        query.append(" and not _entity.status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+
+        return findByWhere(query.toString(), null, max);
     }
 
     @Override
@@ -876,14 +878,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     @Override
     public List<Long> findDeletedDocIds() throws PersistenceException {
-        String query = "select ld_id from ld_document where ld_deleted=1 order by ld_lastmodified desc";
+        String query = "select ld_id from ld_document where ld_deleted = 1 order by ld_lastmodified desc";
         return queryForList(query, Long.class);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Document> findDeletedDocs() throws PersistenceException {
-        String query = "select ld_id, ld_customid, ld_lastModified, ld_filename from ld_document where ld_deleted=1 order by ld_lastmodified desc";
+        String query = "select ld_id, ld_customid, ld_lastModified, ld_filename from ld_document where ld_deleted = 1 order by ld_lastmodified desc";
 
         @SuppressWarnings("rawtypes")
         RowMapper docMapper = new BeanPropertyRowMapper() {
@@ -904,23 +906,35 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public long computeTotalSize(Long tenantId, Long userId, boolean computeDeleted) throws PersistenceException {
         // Count all the versions of the documents related to file change
-        final String query = "select sum(ld_filesize) from ld_version where ld_version = ld_fileversion"
-                + (computeDeleted ? "" : " and ld_deleted=0 ") + (userId != null ? " and ld_publisherid=" + userId : "")
-                + (tenantId != null ? AND_LD_TENANTID + tenantId : "");
-        return queryForLong(query);
+        StringBuilder query = new StringBuilder(
+                "select sum(ld_filesize) from ld_version where ld_version = ld_fileversion ");
+
+        if (!computeDeleted)
+            query.append(" and ld_deleted = 0 ");
+
+        if (userId != null)
+            query.append(" and ld_publisherid = %d".formatted(userId));
+
+        if (tenantId != null)
+            query.append(" and ld_tenantid = %d".formatted(tenantId));
+
+        return queryForLong(query.toString());
     }
 
     @Override
     public long count(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException {
-        String query = "select count(*) from ld_document where 1=1 ";
-        if (!computeDeleted)
-            query += " and ld_deleted = 0 ";
-        if (!computeArchived)
-            query += " and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal());
-        if (tenantId != null)
-            query += " and ld_tenantid = %d".formatted(tenantId);
+        StringBuilder query = new StringBuilder("select count(*) from ld_document where 1=1 ");
 
-        return queryForLong(query);
+        if (!computeDeleted)
+            query.append(" and ld_deleted = 0 ");
+
+        if (!computeArchived)
+            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+
+        if (tenantId != null)
+            query.append(" and ld_tenantid = %d".formatted(tenantId));
+
+        return queryForLong(query.toString());
     }
 
     @Override
@@ -1043,7 +1057,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     @Override
     public List<Long> findAliasIds(long docId) throws PersistenceException {
-        return findIdsByWhere(ENTITY + ".docRef = " + Long.toString(docId), null, null);
+        return findIdsByWhere("_entity.docRef = %d".formatted(docId), null, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -1070,12 +1084,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         };
 
         return query("""
-                select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid, ld_color 
-                from ld_document 
-               where ld_deleted = 1 
-                 and ld_deleteuserid = %d 
-               order by ld_lastmodified desc
-              """.formatted(userId), docMapper, maxHits);
+                        select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid, ld_color 
+                          from ld_document 
+                         where ld_deleted = 1 
+                           and ld_deleteuserid = %d 
+                         order by ld_lastmodified desc
+                     """.formatted(userId), docMapper, maxHits);
     }
 
     @Override
@@ -1114,14 +1128,16 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public Collection<Long> findPublishedIds(Collection<Long> folderIds) throws PersistenceException {
         StringBuilder query = new StringBuilder(
-                "select ld_id from ld_document where ld_deleted=0 and not ld_status = %d"
+                "select ld_id from ld_document where ld_deleted = 0 and not ld_status = %d"
                         .formatted(DocumentStatus.ARCHIVED.ordinal()));
         if (CollectionUtils.isNotEmpty(folderIds))
             query.append(" and ld_folderid in (%s) ".formatted(CollectionUtil.join(folderIds)));
 
-        query.append(" and ld_published = 1 ");
-        query.append(" and ld_startpublishing <= :now ");
-        query.append(" and ( ld_stoppublishing is null or ld_stoppublishing > :now )");
+        query.append(""" 
+                     and ld_published = 1 
+                     and ld_startpublishing <= :now 
+                     and ( ld_stoppublishing is null or ld_stoppublishing > :now )
+                     """);
 
         Collection<Long> buf = queryForList(query.toString(), Map.of("now", new Date()), Long.class, null);
         Set<Long> ids = new HashSet<>();
@@ -1223,7 +1239,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         }
     }
 
-    
     @Override
     public void insertNewUniqueTags() throws PersistenceException {
         jdbcUpdate("""
