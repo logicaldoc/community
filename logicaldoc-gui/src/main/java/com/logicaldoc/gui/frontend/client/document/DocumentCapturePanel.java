@@ -125,13 +125,17 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		fill.setEndRow(true);
 		fill.setColSpan(1);
 		fill.setDisabled(document.getFillerId() == null);
+		ChangedHandler disableFillHandler = event -> fill.setDisabled(true);
 
 		FillerSelector filler = new FillerSelector(true, document.getFillerId());
 		filler.setWrapTitle(false);
 		filler.setDisabled(!updateEnabled || !Feature.enabled(Feature.AUTOFILL));
 		filler.addChangedHandler(changedHandler);
+		filler.addChangedHandler(disableFillHandler);
 		filler.addChangedHandler(changed -> {
-			fill.setDisabled(changed.getValue() == null);
+			if (changed.getValue() == null) {
+				fill.setDisabled(true);
+			}
 		});
 
 		fill.addClickHandler(event -> {
