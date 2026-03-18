@@ -652,7 +652,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     public Map<String, Long> findTags(String firstLetter, Long tenantId) throws PersistenceException {
         final Map<String, Long> map = new HashMap<>();
 
-        StringBuilder query = new StringBuilder("SELECT ld_count, ld_tag from ld_uniquetag where 1=1 ");
+        StringBuilder query = new StringBuilder("SELECT ld_count, ld_tag from ld_uniquetag where 1 = 1 ");
         if (StringUtils.isNotEmpty(firstLetter))
             query.append(" and lower(ld_tag) like '%s%%' ".formatted(firstLetter.toLowerCase()));
         if (tenantId != null)
@@ -1223,12 +1223,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         }
     }
 
+    
     @Override
     public void insertNewUniqueTags() throws PersistenceException {
         jdbcUpdate("""
                     insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) 
                     select distinct(B.ld_tag), B.ld_tenantid, 0 
-                      from ld_tag B, ld_document D ");
+                      from ld_tag B, ld_document D
                      where B.ld_docid = D.ld_id 
                        and D.ld_deleted = 0 
                        and B.ld_tag not in (select A.ld_tag 

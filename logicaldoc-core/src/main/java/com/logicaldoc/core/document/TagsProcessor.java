@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
 
@@ -25,6 +26,15 @@ public class TagsProcessor extends Task {
 	private DocumentDAO documentDao;
 
 
+	/**
+     * Gets the object available in the application context
+     * 
+     * @return the instance of this object in the application context
+     */
+    public static TagsProcessor get() {
+        return Context.get(TagsProcessor.class);
+    }
+	
 	public TagsProcessor() {
 		super(NAME);
 		log = LoggerFactory.getLogger(TagsProcessor.class);

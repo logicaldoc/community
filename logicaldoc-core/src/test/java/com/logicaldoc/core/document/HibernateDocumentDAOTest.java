@@ -578,8 +578,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindTags() throws PersistenceException {
-		TagsProcessor processor = (TagsProcessor) context.getBean("tagsProcessor");
-		processor.run();
+		TagsProcessor.get().run();
 
 		Collection<String> tags = testSubject.findTags("a", 1L).keySet();
 		assertNotNull(tags);
