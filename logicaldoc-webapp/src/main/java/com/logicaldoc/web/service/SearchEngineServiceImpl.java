@@ -305,7 +305,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
                          * (x, 0) IN ((1,0), (2,0), (3,0), ...):
                          */
                         hitsIdsCondition.append(" (ld_id,0) in (%s) ".formatted(
-                                entryIds.stream().map(id -> "(%d,0)".formatted(id)).collect(Collectors.joining(","))));
+                                entryIds.stream().map("(%d,0)"::formatted).collect(Collectors.joining(","))));
                     } else {
                         hitsIdsCondition.append(" ld_id in (%s) ".formatted(CollectionUtil.join(entryIds)));
                     }
@@ -467,7 +467,7 @@ select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmo
                  * (2,0), (3,0), ...):
                  */
                 hitsIdsCondition.append(
-                        " (A.ld_id,0) in (%s)".formatted(CollectionUtil.join(hitsIds, id -> "(%d,0)".formatted(id))));
+                        " (A.ld_id,0) in (%s)".formatted(CollectionUtil.join(hitsIds, "(%d,0)"::formatted)));
             } else {
                 hitsIdsCondition.append(" A.ld_id in (%s)".formatted(CollectionUtil.join(hitsIds)));
             }

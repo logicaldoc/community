@@ -140,6 +140,8 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class DocumentServiceImpl extends AbstractRemoteService implements DocumentService {
 
+    private static final String DOCUMENT_D = "Document %d";
+
     private static final String ERROR = "error";
 
     private static final String UNEXISTING_DOCUMENT = "Unexisting document";
@@ -599,7 +601,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
             FolderDAO fDao = FolderDAO.get();
             if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
-                throw new PermissionException(session.getUsername(), "Document %d".formatted(docId), Permission.WRITE);
+                throw new PermissionException(session.getUsername(), DOCUMENT_D.formatted(docId), Permission.WRITE);
 
             if (doc.getStatus() != DocumentStatus.UNLOCKED)
                 throw new PermissionException("The document %d is locked".formatted(docId));
@@ -1969,7 +1971,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         try {
             document = retrieveDocument(docId);
             if (document == null)
-                throw new UnexistingResourceException("Document %d".formatted(docId));
+                throw new UnexistingResourceException(DOCUMENT_D.formatted(docId));
 
             /*
              * Check for deletions
@@ -2681,7 +2683,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
             FolderDAO fDao = FolderDAO.get();
             if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
-                throw new PermissionException(session.getUsername(), "Document %d".formatted(doc.getId()),
+                throw new PermissionException(session.getUsername(), DOCUMENT_D.formatted(doc.getId()),
                         Permission.WRITE);
             DocumentHistory transaction = new DocumentHistory();
             transaction.setSession(session);

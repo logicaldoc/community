@@ -997,8 +997,7 @@ select distinct(A.ld_folderid)
              * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
              * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
              */
-            query2.append(
-                    "(B.ld_id,0) in (%s)".formatted(CollectionUtil.join(masterIds, id -> ORACLE_DUPLE.formatted(id))));
+            query2.append("(B.ld_id,0) in (%s)".formatted(CollectionUtil.join(masterIds, ORACLE_DUPLE::formatted)));
         } else {
             query2.append(" B.ld_id in (%s)".formatted(CollectionUtil.join(masterIds)));
         }
@@ -1010,8 +1009,8 @@ select distinct(A.ld_folderid)
              * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
              * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
              */
-            query2.append(" (B.ld_securityref,0) in (%s)"
-                    .formatted(CollectionUtil.join(masterIds, id -> ORACLE_DUPLE.formatted(id))));
+            query2.append(
+                    " (B.ld_securityref,0) in (%s)".formatted(CollectionUtil.join(masterIds, ORACLE_DUPLE::formatted)));
         } else {
             query2.append(" B.ld_securityref in (%s)".formatted(CollectionUtil.join(masterIds)));
         }
@@ -1024,8 +1023,8 @@ select distinct(A.ld_folderid)
              * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
              * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
              */
-            query2.append("( (B.ld_id,0) in (%s) ) "
-                    .formatted(CollectionUtil.join(folderIds, id -> ORACLE_DUPLE.formatted(id))));
+            query2.append(
+                    "( (B.ld_id,0) in (%s) ) ".formatted(CollectionUtil.join(folderIds, ORACLE_DUPLE::formatted)));
         } else {
             query2.append("  B.ld_id in (%s)".formatted(CollectionUtil.join(folderIds)));
         }
@@ -1103,7 +1102,7 @@ select distinct(A.ld_folderid)
                      * ((1,0), (2,0), (3,0), ...):
                      */
                     query.append("( (B.ld_id,0) in (%s) )"
-                            .formatted(CollectionUtil.join(folderIds, id -> ORACLE_DUPLE.formatted(id))));
+                            .formatted(CollectionUtil.join(folderIds, ORACLE_DUPLE::formatted)));
                 } else {
                     query.append("  B.ld_id in (%s) ".formatted(
                             folderIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));

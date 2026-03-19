@@ -69,7 +69,7 @@ public class CollectionUtil {
      * 
      * @return Comma separated String of elements
      */
-    public static <T> String join(Collection<T> list, Function<? super T, ? extends String> mapper) {
+    public static <T> String join(Collection<T> list, Function<? super T, String> mapper) {
         return join(list, mapper, ",");
     }
 
@@ -84,7 +84,7 @@ public class CollectionUtil {
      * 
      * @return String of delimited elements
      */
-    public static <T> String join(Collection<T> list, Function<? super T, ? extends String> mapper, String delimiter) {
+    public static <T> String join(Collection<T> list, Function<? super T, String> mapper, String delimiter) {
         return list.stream().map(mapper).collect(Collectors.joining(delimiter));
     }
 }

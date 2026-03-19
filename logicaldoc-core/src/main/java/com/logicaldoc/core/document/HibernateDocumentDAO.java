@@ -69,6 +69,8 @@ import jakarta.transaction.Transactional;
 @Repository("documentDAO")
 @Transactional
 public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document> implements DocumentDAO {
+    private static final String AND_LD_TENANTID_D = " and ld_tenantid = %d";
+
     private static final String DOC_ID = "docId";
 
     private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
@@ -655,7 +657,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         if (StringUtils.isNotEmpty(firstLetter))
             query.append(" and lower(ld_tag) like '%s%%' ".formatted(firstLetter.toLowerCase()));
         if (tenantId != null)
-            query.append(" and ld_tenantid = %d".formatted(tenantId));
+            query.append(AND_LD_TENANTID_D.formatted(tenantId));
 
         query(query.toString(), new RowMapper<Object>() {
 
@@ -676,7 +678,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     public List<String> findAllTags(String firstLetter, Long tenantId) throws PersistenceException {
         StringBuilder sb = new StringBuilder("select ld_tag from ld_uniquetag where 1=1 ");
         if (tenantId != null)
-            sb.append(" and ld_tenantid = %d".formatted(tenantId));
+            sb.append(AND_LD_TENANTID_D.formatted(tenantId));
 
         Map<String, Object> params = new HashMap<>();
         if (firstLetter != null) {
@@ -732,7 +734,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
                     SqlUtil.doubleQuotes(tag.toLowerCase()));
 
             log.debug("Find by tag: {}", query);
-            ids.addAll(queryForList(query.toString(), Long.class));
+            ids.addAll(queryForList(query, Long.class));
         }
 
         return ids;
@@ -802,35 +804,35 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction)
             throws PersistenceException {
-        String query = "";
-        if (direction == null)
-            query = """
-                    select distinct(ld_docid2) 
-                      from ld_link 
-                     where ld_deleted = 0 
-                       and ld_docid1 = :docId 
-                     UNION 
-                    select distinct(ld_docid1) 
-                      from ld_link 
-                     where ld_deleted = 0 
-                       and ld_docid2 = :docId
-                    """;
-        else if (direction.intValue() == 1)
-            query = """
-                    select distinct(ld_docid2) 
-                      from ld_link 
-                     where ld_deleted = 0 
-                       and ld_docid1 = :docId
-                    """;
-        else if (direction.intValue() == 2)
-            query = """
-                    select distinct(ld_docid1) 
-                      from ld_link 
-                     where ld_deleted = 0 
-                       and ld_docid2 = :docId
-                    """;
 
-        List<Long> ids = queryForList(query.toString(), Map.of(DOC_ID, docId), Long.class, null);
+        String query = switch (direction) {
+            case null -> """
+                select distinct(ld_docid2) 
+                from ld_link 
+               where ld_deleted = 0 
+                 and ld_docid1 = :docId 
+               UNION 
+              select distinct(ld_docid1) 
+                from ld_link 
+               where ld_deleted = 0 
+                 and ld_docid2 = :docId
+              """;
+            case 1 -> """
+              select distinct(ld_docid2) 
+                from ld_link 
+               where ld_deleted = 0 
+                 and ld_docid1 = :docId
+              """;
+            case 2 -> """
+              select distinct(ld_docid1) 
+                from ld_link 
+               where ld_deleted = 0 
+                 and ld_docid2 = :docId
+              """;
+            default -> "";
+        };
+
+        List<Long> ids = queryForList(query, Map.of(DOC_ID, docId), Long.class, null);
 
         if (ids.isEmpty())
             return new ArrayList<>();
@@ -916,7 +918,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             query.append(" and ld_publisherid = %d".formatted(userId));
 
         if (tenantId != null)
-            query.append(" and ld_tenantid = %d".formatted(tenantId));
+            query.append(AND_LD_TENANTID_D.formatted(tenantId));
 
         return queryForLong(query.toString());
     }
@@ -932,7 +934,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
 
         if (tenantId != null)
-            query.append(" and ld_tenantid = %d".formatted(tenantId));
+            query.append(AND_LD_TENANTID_D.formatted(tenantId));
 
         return queryForLong(query.toString());
     }
@@ -1432,7 +1434,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         // First of all, find all duplicates digests.
         StringBuilder digestQuery = new StringBuilder("select ld_digest from ld_document where ld_deleted = 0 ");
         if (tenantId != null)
-            digestQuery.append(" and ld_tenantid = %d".formatted(tenantId));
+            digestQuery.append(AND_LD_TENANTID_D.formatted(tenantId));
 
         if (folderId != null) {
             List<Long> tree = folderDAO.findIdsByParentId(folderId);

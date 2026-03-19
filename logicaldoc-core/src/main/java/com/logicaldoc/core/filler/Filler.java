@@ -49,179 +49,180 @@ import jakarta.persistence.Table;
 @DiscriminatorColumn(name = "ld_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Filler extends PersistentObject {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(Filler.class);
+    private static final Logger log = LoggerFactory.getLogger(Filler.class);
 
-	@Column(name = "ld_name", length = 255, nullable = false)
-	private String name;
+    @Column(name = "ld_name", length = 255, nullable = false)
+    private String name;
 
-	@Column(name = "ld_label", length = 255, nullable = true)
-	private String label;
+    @Column(name = "ld_label", length = 255, nullable = true)
+    private String label;
 
-	@Column(name = "ld_description", nullable = true)
-	private String description;
+    @Column(name = "ld_description", nullable = true)
+    private String description;
 
-	/**
-	 * Specifies if the document must be re-filled at checkin
-	 */
-	@Column(name = "ld_checkin", nullable = false)
-	protected boolean checkin = false;
+    /**
+     * Specifies if the document must be re-filled at checkin
+     */
+    @Column(name = "ld_checkin", nullable = false)
+    protected boolean checkin = false;
 
-	/**
-	 * Specifies if already filled properties must be overwrite
-	 */
-	@Column(name = "ld_overwrite", nullable = false)
-	protected boolean overwrite = false;
+    /**
+     * Specifies if already filled properties must be overwrite
+     */
+    @Column(name = "ld_overwrite", nullable = false)
+    protected boolean overwrite = false;
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public boolean isCheckin() {
-		return checkin;
-	}
+    public boolean isCheckin() {
+        return checkin;
+    }
 
-	public void setCheckin(boolean checkin) {
-		this.checkin = checkin;
-	}
+    public void setCheckin(boolean checkin) {
+        this.checkin = checkin;
+    }
 
-	public boolean isOverwrite() {
-		return overwrite;
-	}
+    public boolean isOverwrite() {
+        return overwrite;
+    }
 
-	public void setOverwrite(boolean overwrite) {
-		this.overwrite = overwrite;
-	}
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
+    }
 
-	/**
-	 * Factory method for instantiating a new filler
-	 * 
-	 * @param type Type of filler, matches the discriminator value
-	 * 
-	 * @return The new filler
-	 * 
-	 * @throws IllegalArgumentException No implementation found for the given
-	 *         type
-	 */
-	public static Filler newFiller(String type) {
-		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-		scanner.addIncludeFilter(new AnnotationTypeFilter(DiscriminatorValue.class));
-		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
-			try {
-				Class<?> beanClass = Class.forName(bd.getBeanClassName());
-				if (Filler.class.isAssignableFrom(beanClass)
-						&& type.equals(beanClass.getAnnotation(DiscriminatorValue.class).value()))
-					return (Filler) beanClass.getDeclaredConstructor().newInstance();
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				log.warn(e.getMessage(), e);
-			}
-		}
+    /**
+     * Factory method for instantiating a new filler
+     * 
+     * @param type Type of filler, matches the discriminator value
+     * 
+     * @return The new filler
+     * 
+     * @throws IllegalArgumentException No implementation found for the given
+     *         type
+     */
+    public static Filler newFiller(String type) {
+        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(DiscriminatorValue.class));
+        for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
+            try {
+                Class<?> beanClass = Class.forName(bd.getBeanClassName());
+                if (Filler.class.isAssignableFrom(beanClass)
+                        && type.equals(beanClass.getAnnotation(DiscriminatorValue.class).value()))
+                    return (Filler) beanClass.getDeclaredConstructor().newInstance();
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                log.warn(e.getMessage(), e);
+            }
+        }
 
-		throw new IllegalArgumentException("Cannot find any filler of type %s".formatted(type));
-	}
+        throw new IllegalArgumentException("Cannot find any filler of type %s".formatted(type));
+    }
 
-	/**
-	 * Fills an object instance
-	 * 
-	 * @param fillable the instance to fill
-	 * @param content the content of the object, if not specified it will be
-	 *        taken from the transaction's file.
-	 * @param transaction the current transaction
-	 * @param dictionary Dictionary of the execution pipeline
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 * @throws IOException I/O error
-	 * @throws FeatureDisabledException An involved feature is disabled
-	 * @throws SearchException Error in case of search
-	 */
-	public abstract void fill(Fillable fillable, String content, History transaction, Map<String, Object> dictionary)
-			throws PersistenceException, IOException, FeatureDisabledException, SearchException;
+    /**
+     * Fills an object instance
+     * 
+     * @param fillable the instance to fill
+     * @param content the content of the object, if not specified it will be
+     *        taken from the transaction's file.
+     * @param transaction the current transaction
+     * @param dictionary Dictionary of the execution pipeline
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws IOException I/O error
+     * @throws FeatureDisabledException An involved feature is disabled
+     * @throws SearchException Error in case of search
+     */
+    public abstract void fill(Fillable fillable, String content, History transaction, Map<String, Object> dictionary)
+            throws PersistenceException, IOException, FeatureDisabledException, SearchException;
 
-	/**
-	 * Fills a document using the body text as input
-	 * 
-	 * @param document the document to fill
-	 * @param transaction the current transaction
-	 * @param dictionary Dictionary of the execution pipeline
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 * @throws IOException I/O error
-	 * @throws ParsingException The document cannot be parsed and no texts were
-	 *         extracted
-	 * @throws FeatureDisabledException An involved feature is disabled
-	 * @throws SearchException Error in case of search
-	 */
-	public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-			throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException {
+    /**
+     * Fills a document using the body text as input
+     * 
+     * @param document the document to fill
+     * @param transaction the current transaction
+     * @param dictionary Dictionary of the execution pipeline
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws IOException I/O error
+     * @throws ParsingException The document cannot be parsed and no texts were
+     *         extracted
+     * @throws FeatureDisabledException An involved feature is disabled
+     * @throws SearchException Error in case of search
+     */
+    public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
+            throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException {
 
-		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
-			return;
+        if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
+            return;
 
-		if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
-			DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
+        if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
+            DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
 
-		Hit hit = SearchEngine.get().getHit(document.getId());
-		String extractedContent = hit != null ? hit.getContent() : "";
-		if (StringUtils.isBlank(extractedContent))
-			throw new ParsingException("Cannot extract any content from document %s".formatted(document));
+        Hit hit = SearchEngine.get().getHit(document.getId());
+        String extractedContent = hit != null ? hit.getContent() : "";
+        if (StringUtils.isBlank(extractedContent))
+            throw new ParsingException("Cannot extract any content from document %s".formatted(document));
 
-		log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
-		fill(document, extractedContent, transaction, dictionary);
-	}
+        if (log.isDebugEnabled())
+            log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
+        fill(document, extractedContent, transaction, dictionary);
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((label == null) ? 0 : label.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Filler other = (Filler) obj;
-		if (label == null) {
-			if (other.label != null)
-				return false;
-		} else if (!label.equals(other.label))
-			return false;
-		if (name == null)
-			return other.name == null;
-		else
-			return name.equals(other.name);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Filler other = (Filler) obj;
+        if (label == null) {
+            if (other.label != null)
+                return false;
+        } else if (!label.equals(other.label))
+            return false;
+        if (name == null)
+            return other.name == null;
+        else
+            return name.equals(other.name);
+    }
 
-	@Override
-	public String toString() {
-		return "%s(%d)".formatted(name, id);
-	}
+    @Override
+    public String toString() {
+        return "%s(%d)".formatted(name, id);
+    }
 }

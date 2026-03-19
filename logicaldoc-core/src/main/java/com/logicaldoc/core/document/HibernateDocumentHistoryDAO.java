@@ -28,6 +28,8 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHistory> implements DocumentHistoryDAO {
 
+    private static final String ENTITY_DATE_ASC = "_entity.date asc";
+
     private HibernateDocumentHistoryDAO() {
         super(DocumentHistory.class);
         super.log = LoggerFactory.getLogger(HibernateDocumentHistoryDAO.class);
@@ -55,12 +57,12 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 
     @Override
     public List<DocumentHistory> findByFolderId(long folderId) throws PersistenceException {
-        return findByWhere("_entity.folderId = %d".formatted(folderId), "_entity.date asc", null);
+        return findByWhere("_entity.folderId = %d".formatted(folderId), ENTITY_DATE_ASC, null);
     }
 
     @Override
     public List<DocumentHistory> findNotNotified(Integer max) throws PersistenceException {
-        return findByWhere("_entity.notified = false", "_entity.date asc", max);
+        return findByWhere("_entity.notified = false", ENTITY_DATE_ASC, max);
     }
 
     @Override
@@ -77,7 +79,7 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
         if (StringUtils.isNotEmpty(sessionId))
             query.append(" and _entity.sessionId = '%s'".formatted(sessionId));
 
-        return findByWhere(query.toString(), "_entity.date asc", null);
+        return findByWhere(query.toString(), ENTITY_DATE_ASC, null);
     }
 
     @Override

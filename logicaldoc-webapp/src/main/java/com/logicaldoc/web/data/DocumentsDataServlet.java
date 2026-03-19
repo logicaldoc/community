@@ -55,6 +55,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
     private static final Logger log = LoggerFactory.getLogger(DocumentsDataServlet.class);
 
     private final class ExtendedAttributeRowMapper implements RowMapper<Long> {
+        private static final String D_S = "%d-%s";
+
         private final Map<String, Object> extAttributesValues;
 
         private final Locale locale;
@@ -70,7 +72,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             String name = rs.getString(2);
             int type = rs.getInt(3);
 
-            String key = "%d-%s".formatted(docId, name);
+            String key = D_S.formatted(docId, name);
 
             if (type == Attribute.TYPE_STRING) {
                 if (StringUtils.isNotEmpty(rs.getString(8)))
