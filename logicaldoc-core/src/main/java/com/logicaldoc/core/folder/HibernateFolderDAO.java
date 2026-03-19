@@ -1796,7 +1796,7 @@ select distinct(A.ld_folderid)
                  * if the sets contain two or more items: (x, 0) IN ((1,0),
                  * (2,0), (3,0), ...):
                  */
-                String str = CollectionUtil.join(ids, id -> ORACLE_DUPLE.formatted(id));
+                String str = CollectionUtil.join(ids, ORACLE_DUPLE::formatted);
                 idsExpression = " ( (ld_id,0) not in (%s) and (ld_parentid,0) in (%s) ) ".formatted(str, str);
             } else {
                 String str = CollectionUtil.join(ids);
@@ -2271,7 +2271,7 @@ SELECT COUNT(*) from ld_document D, ld_folder F
                  * (2,0), (3,0), ...):
                  */
                 query.append(" and (C.ld_id,0) in (%s) "
-                        .formatted(CollectionUtil.join(accessibleIds, id -> ORACLE_DUPLE.formatted(id))));
+                        .formatted(CollectionUtil.join(accessibleIds, ORACLE_DUPLE::formatted)));
             } else {
                 query.append(" and C.ld_id in (%s) ".formatted(
                         accessibleIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));

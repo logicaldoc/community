@@ -52,11 +52,12 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
     private static final String INDEXED = "indexed";
 
+    private static final String D_S = "%d-%s";
+    
     private static final Logger log = LoggerFactory.getLogger(DocumentsDataServlet.class);
 
     private final class ExtendedAttributeRowMapper implements RowMapper<Long> {
-        private static final String D_S = "%d-%s";
-
+        
         private final Map<String, Object> extAttributesValues;
 
         private final Locale locale;
@@ -558,7 +559,7 @@ select ld_docid
             doc.setPublisherId((Long) cols[37]);
 
             for (String name : extendedAttributes) {
-                Object val = extendedAttributesValues.get("%d-%s".formatted(doc.getId(), name));
+                Object val = extendedAttributesValues.get(D_S.formatted(doc.getId(), name));
                 if (val != null) {
                     doc.setValue(name, val);
                 }
