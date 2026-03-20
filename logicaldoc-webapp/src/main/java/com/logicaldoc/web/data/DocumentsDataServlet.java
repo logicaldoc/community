@@ -573,7 +573,7 @@ select ld_docid
             doc.setTemplateName(doc.getTemplate().getName());
 
         for (String name : extendedAttributes) {
-            String key = "%d-%s".formatted(aliasId, name);
+            String key = D_S.formatted(aliasId, name);
             if (!extendedAttributesValues.containsKey(key) && doc.getValue(name) != null) {
                 Attribute att = doc.getAttribute(name);
                 if (att != null && (att.getType() == Attribute.TYPE_FOLDER || att.getType() == Attribute.TYPE_USER
