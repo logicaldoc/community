@@ -155,7 +155,7 @@ public class RegexTester extends Applet implements ActionListener, TextListener 
             }
         }
         catch (IllegalStateException e) {
-            resultField.setText("IllegalStateException: " + e.getMessage());
+            resultField.setText("IllegalStateException: %s".formatted(e.getMessage()));
         }
     }
     
@@ -166,7 +166,7 @@ public class RegexTester extends Applet implements ActionListener, TextListener 
     public void textValueChanged(TextEvent e) {
         TextField inputField = (TextField)e.getSource();
         if (inputField == patternField) {
-            javaField.setText("\"" + javaVersion(patternField.getText()) + "\"");
+            javaField.setText("\"%s\"".formatted(javaVersion(patternField.getText())));
         }
         resetMatcher();
     }
@@ -175,17 +175,18 @@ public class RegexTester extends Applet implements ActionListener, TextListener 
      * Displays the result of the most recent match.
      */
     void showResult() {
-        String result = "";
-        if (targetText == null) result = "String to be searched is null.";
+        StringBuilder result = new StringBuilder();
+        if (targetText == null) 
+            result.append("String to be searched is null.");
         else {
-            result = "start() = " + matcher.start() + 
-                     ", end() = " + matcher.end() + "\n";
+            result.append("start() = %d, end() = %d%n".formatted(matcher.start(), matcher.end());
             for (int i = 0; i <= matcher.groupCount(); i++) {
-                if (i > 0) result += "\n";
-                result += "group(" + i + ") = \"" + matcher.group(i) + "\"";
+                if (i > 0) 
+                    result.append("\n");
+                result.append("group(%d) = \"%s\"".formatted(i, matcher.group(i));
             }
         }
-        resultField.setText(result);
+        resultField.setText(result.toString());
     }
     
     /**

@@ -623,7 +623,7 @@ public class TypeManager {
 	public TypeDefinition getTypeDefinition(CallContext context, String typeId) {
 		TypeDefinitionContainer tc = types.get(typeId);
 		if (tc == null) {
-			throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
+			throw new CmisObjectNotFoundException("Type '%s' is unknown!".formatted(typeId));
 		}
 
 		return copyTypeDefintion(tc.getTypeDefinition());

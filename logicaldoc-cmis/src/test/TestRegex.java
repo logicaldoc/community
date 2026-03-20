@@ -6,44 +6,47 @@ import java.util.regex.Pattern;
 public class TestRegex {
 	
 	public static void main(String[] args) {
-		//accountCoder();
 		accountCoder03();
 	}
 	
 	private static void accountCoder03() {
 		String patternText = "%.*%";
-		String targetText = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document  WHERE cmis:name LIKE '%flexspaces%'";
+		String targetText = """
+                            SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,
+                                   cmis:versionSeriesId,cmis:contentStreamMimeType 
+                              FROM cmis:document
+                             WHERE cmis:name LIKE '%flexspaces%'
+                            """;
 		
 		boolean success = false;
 		
 		Pattern pattern = Pattern.compile(patternText);
 		Matcher matcher = pattern.matcher(targetText);
-		//success = matcher.matches();
 		
 		success = matcher.find();
-		System.out.println("success: " + success);
+		System.out.println("success: %b".formatted(success));
 		String xxx = matcher.group();
-		System.out.println("xxx: " + xxx);
-		
-		//System.out.println("success: " + success);
+		System.out.println("xxx: %s".formatted(xxx));
 	}		
 	
 	private static void accountCoder02() {
 		String patternText = "\\*.*\\*";
-		String targetText = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document  WHERE CONTAINS('~cmis:name:\'*wiki*\'')";
+		String targetText = """
+                            SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,
+                                   cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType 
+                              FROM cmis:document 
+                             WHERE CONTAINS('~cmis:name:\'*wiki*\'')
+                            """;
 		
 		boolean success = false;
 		
 		Pattern pattern = Pattern.compile(patternText);
 		Matcher matcher = pattern.matcher(targetText);
-		//success = matcher.matches();
 		
 		success = matcher.find();
-		System.out.println("success: " + success);
+		System.out.println("success: %b".formatted(success));
 		String xxx = matcher.group();
-		System.out.println("xxx: " + xxx);
-		
-		//System.out.println("success: " + success);
+		System.out.println("xxx: %s".formatted(xxx));
 	}	
 
 	private static void accountCoder() {
@@ -56,6 +59,6 @@ public class TestRegex {
 		Matcher matcher = pattern.matcher(targetText);
 		success = matcher.matches();
 		
-		System.out.println("success: " + success);
+		System.out.println("success: %b".formatted(success));
 	}
 }

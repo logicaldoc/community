@@ -128,7 +128,7 @@ public class LDCmisService extends AbstractCmisService {
 			}
 		}
 
-		throw new CmisObjectNotFoundException("Unknown repository '" + repositoryId + "'!");
+		throw new CmisObjectNotFoundException("Unknown repository '%s'!".formatted(repositoryId));
 	}
 
 	@Override
