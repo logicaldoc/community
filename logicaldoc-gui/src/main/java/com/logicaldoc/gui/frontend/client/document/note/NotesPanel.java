@@ -104,9 +104,8 @@ public class NotesPanel extends DocumentDetailTab {
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		print.addClickHandler(click -> GridUtil.print(notesGrid));
 
-		if (document.getFolder().isWrite()) {
+		if (document.isWrite())
 			toolStrip.addButton(addNote);
-		}
 
 		if (Feature.visible(Feature.ANNOTATIONS)) {
 			toolStrip.addButton(annotations);
