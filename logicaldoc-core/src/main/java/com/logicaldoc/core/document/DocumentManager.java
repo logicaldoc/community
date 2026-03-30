@@ -540,6 +540,9 @@ public class DocumentManager {
         transaction.setFile(file);
         for (DocumentListener listener : DocumentListenerManager.get().getListeners())
             listener.afterFileStore(doc, transaction, dictionary);
+
+        if(doc.isModified())
+            documentDAO.store(doc);
     }
 
     /**
