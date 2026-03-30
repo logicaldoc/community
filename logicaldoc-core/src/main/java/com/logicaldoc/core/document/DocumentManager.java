@@ -75,7 +75,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
 import jakarta.annotation.Resource;
 
 /**
- * Basic Implementation of <code>DocumentManager</code>
+ * Basic Implementation of {@link DocumentManager}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5
