@@ -17,6 +17,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.CollectionUtil;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -68,10 +69,10 @@ public class FolderAliasesDataServlet extends AbstractDataServlet {
             Object[] cols = (Object[]) gridRecord;
 
             writer.print("<alias>");
-            writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+            writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(cols[0])));
             writer.print(String.format("<name><![CDATA[%s]]></name>", cols[1]));
             writer.print("<icon>folder_alias_closed</icon>");
-            writer.print(String.format("<path><![CDATA[%s]]></path>", folderDAO.computePathExtended((Long) cols[0])));
+            writer.print(String.format("<path><![CDATA[%s]]></path>", folderDAO.computePathExtended(SqlUtil.getColumnLongValue(cols[0]))));
             writer.print("</alias>");
         }
         writer.write("</list>");

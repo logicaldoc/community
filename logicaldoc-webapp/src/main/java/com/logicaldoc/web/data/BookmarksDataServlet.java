@@ -13,6 +13,7 @@ import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -71,7 +72,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 		Object[] cols = (Object[]) bookmarkRecord;
 
 		writer.print("<bookmark>");
-		writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+		writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(cols[0])));
 		if (cols[7].toString().equals("0"))
 			writer.print(
 					String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[1]))));

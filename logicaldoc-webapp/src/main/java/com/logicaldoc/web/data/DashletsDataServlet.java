@@ -11,6 +11,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,7 +52,7 @@ public class DashletsDataServlet extends AbstractDataServlet {
 			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<dashlet>");
-			writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+			writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(cols[0])));
 			writer.print(String.format("<name><![CDATA[%s]]></name>", cols[1] == null ? "" : cols[1]));
 			writer.print(String.format("<title><![CDATA[%s]]></title>",
 					cols[2] == null ? "" : I18N.message(cols[2].toString(), locale)));

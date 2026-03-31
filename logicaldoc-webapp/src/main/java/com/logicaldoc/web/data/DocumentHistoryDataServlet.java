@@ -25,6 +25,7 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -84,7 +85,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 				if (docIds.contains(cols[8]))
 					continue;
 				else
-					docIds.add((Long) cols[8]);
+					docIds.add(SqlUtil.getColumnLongValue(cols[8]));
 			}
 
 			printHistory(writer, cols, locale, showSid);

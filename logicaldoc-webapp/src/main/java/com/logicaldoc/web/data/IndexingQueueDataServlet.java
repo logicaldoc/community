@@ -23,6 +23,7 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -127,7 +128,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		DateFormat df = getDateFormat();
 
 		writer.print("<document>");
-		writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+		writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(cols[0])));
 		writer.print(String.format("<customId><![CDATA[%s]]></customId>", StringUtils.defaultString((String) cols[1])));
 
 		writer.print(String.format("<docref>%s</docref>", StringUtils.defaultString((String) cols[2])));
@@ -139,7 +140,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		writer.print(String.format("<publisher><![CDATA[%s]]></publisher>", cols[7]));
 		writer.print(String.format("<created>%s</created>", df.format(cols[8])));
 		writer.print(String.format("<creator><![CDATA[%s]]></creator>", cols[9]));
-		writer.print(String.format("<size>%d</size>", (Long) cols[10]));
+		writer.print(String.format("<size>%d</size>", SqlUtil.getColumnLongValue(cols[10])));
 
 		if (Integer.parseInt(cols[11].toString()) == 0)
 			writer.print("<immutable>blank</immutable>");
@@ -156,7 +157,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 			writer.print("<locked>blank</locked>");
 
 		if (cols[14] != null)
-			writer.print(String.format("<lockUserId>%d</lockUserId>", (Long) cols[13]));
+			writer.print(String.format("<lockUserId>%d</lockUserId>", SqlUtil.getColumnLongValue(cols[13])));
 		writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[14]));
 		writer.print(String.format("<status>%d</status>", (Integer) cols[15]));
 

@@ -18,6 +18,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -115,14 +116,12 @@ public class LinksDataServlet extends AbstractDataServlet {
                          and DOC2.ld_id = E.ld_intvalue
                          and E.ld_intvalue = %d
                       """.formatted(Attribute.TYPE_DOCUMENT, parentDocId));
-        query.append(parentDocId);
         if (!docId.equals(parentDocId)) {
             query.append(" and not DOC1.ld_id = %d".formatted(docId));
             query.append(" and not DOC2.ld_id = %d".formatted(docId));
         }
-
-        DocumentDAO dao = DocumentDAO.get();
-        dao.queryForResultSet(query.toString(), null, null, rows -> {
+        
+        DocumentDAO.get().queryForResultSet(query.toString(), null, null, rows -> {
             while (rows.next()) {
                 List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
                 final long docId1 = rows.getLong(1);
@@ -155,16 +154,16 @@ public class LinksDataServlet extends AbstractDataServlet {
 
     private void printLink(PrintWriter writer, Object[] cols, String parent, Long parentDocId, String attribute) {
         writer.print("<link>");
-        writer.print(String.format("<linkId>%d</linkId>", (Long) cols[0]));
-        writer.print(String.format("<folderId>%d</folderId>", (Long) cols[1]));
+        writer.print(String.format("<linkId>%d</linkId>", SqlUtil.getColumnLongValue(cols[0])));
+        writer.print(String.format("<folderId>%d</folderId>", SqlUtil.getColumnLongValue(cols[1])));
         writer.print(String.format("<type>%s</type>", cols[2]));
         writer.print(String.format("<parent>%s</parent>", parent));
-        writer.print(String.format("<folderId1>%d</folderId1>", (Long) cols[9]));
-        writer.print(String.format("<folderId2>%d</folderId2>", (Long) cols[10]));
+        writer.print(String.format("<folderId1>%d</folderId1>", SqlUtil.getColumnLongValue(cols[9])));
+        writer.print(String.format("<folderId2>%d</folderId2>", SqlUtil.getColumnLongValue(cols[10])));
         if (StringUtils.isNotEmpty(attribute))
             writer.print(String.format("<attribute>%s</attribute>", attribute));
-        if (parentDocId.longValue() == (Long) cols[3]) {
-            writer.print(String.format("<documentId>%s-%d</documentId>", parent, (Long) cols[6]));
+        if (parentDocId.longValue() == SqlUtil.getColumnLongValue(cols[3])) {
+            writer.print(String.format("<documentId>%s-%d</documentId>", parent, SqlUtil.getColumnLongValue(cols[6])));
             writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[7]));
             writer.print(
                     String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[8]))));
@@ -172,7 +171,7 @@ public class LinksDataServlet extends AbstractDataServlet {
             if (cols[12] != null)
                 writer.print(String.format("<color><![CDATA[%s]]></color>", cols[12]));
         } else {
-            writer.print(String.format("<documentId>%s-%d</documentId>", parent, (Long) cols[3]));
+            writer.print(String.format("<documentId>%s-%d</documentId>", parent, SqlUtil.getColumnLongValue(cols[3])));
             writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[4]));
             writer.print(
                     String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[5]))));

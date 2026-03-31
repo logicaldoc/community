@@ -3,7 +3,6 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,6 +16,7 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -66,15 +66,15 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 
     private void printHistory(PrintWriter writer, Object[] columns, Locale locale, boolean showSid, DateFormat df) {
         writer.print("<history>");
-        writer.print(String.format("<id>%d</id>", (Long) columns[0]));
+        writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(columns[0])));
         writer.print(String.format("<user><![CDATA[%s]]></user>", columns[1]));
         writer.print(String.format("<event><![CDATA[%s]]></event>", I18N.message((String) columns[2], locale)));
-        writer.print(String.format("<date>%s</date>", df.format((Date) columns[3])));
+        writer.print(String.format("<date>%s</date>", df.format(SqlUtil.getColumnDateValue(columns[3]))));
         if (columns[4] != null)
             writer.print(String.format("<comment><![CDATA[%s]]></comment>", columns[4]));
         if (columns[5] != null && showSid)
             writer.print(String.format("<sid><![CDATA[%s]]></sid>", columns[5]));
-        writer.print(String.format("<userId>%d</userId>", (Long) columns[6]));
+        writer.print(String.format("<userId>%d</userId>", SqlUtil.getColumnLongValue(columns[6])));
         if (columns[7] != null)
             writer.print(String.format("<ip><![CDATA[%s]]></ip>", columns[7]));
         if (columns[8] != null)

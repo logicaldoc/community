@@ -38,6 +38,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,11 +54,11 @@ public class DocumentsDataServlet extends AbstractDataServlet {
     private static final String INDEXED = "indexed";
 
     private static final String D_S = "%d-%s";
-    
+
     private static final Logger log = LoggerFactory.getLogger(DocumentsDataServlet.class);
 
     private final class ExtendedAttributeRowMapper implements RowMapper<Long> {
-        
+
         private final Map<String, Object> extAttributesValues;
 
         private final Locale locale;
@@ -469,18 +470,18 @@ select ld_docid
         for (int i = 0; i < records.size(); i++) {
             Object[] cols = (Object[]) records.get(i);
             Document doc = new Document();
-            doc.setId((Long) cols[0]);
-            doc.setDocRef((Long) cols[2]);
+            doc.setId(SqlUtil.getColumnLongValue(cols[0]));
+            doc.setDocRef((SqlUtil.getColumnLongValue(cols[2])));
             doc.setFileName((String) cols[14]);
             doc.setType((String) cols[17]);
             doc.setDocRefType((String) cols[27]);
             doc.setColor((String) cols[38]);
-            doc.setTenantId((Long) cols[40]);
+            doc.setTenantId(SqlUtil.getColumnLongValue(cols[40]));
             doc.setIndexingStatus((IndexingStatus) cols[12]);
             doc.setEmbeddingStatus((EmbeddingStatus) cols[43]);
 
             Folder f = new Folder();
-            f.setId((Long) cols[39]);
+            f.setId(SqlUtil.getColumnLongValue(cols[39]));
             doc.setFolder(f);
 
             // Replace with the real document if this is an alias
@@ -510,8 +511,8 @@ select ld_docid
                 } else
                     continue;
             } else {
-                doc.setStartPublishing((Date) cols[22]);
-                doc.setStopPublishing((Date) cols[23]);
+                doc.setStartPublishing(SqlUtil.getColumnDateValue(cols[22]));
+                doc.setStopPublishing(SqlUtil.getColumnDateValue(cols[23]));
                 doc.setPublished((Boolean) cols[24]);
 
                 enrichPublishedDocument(doc, cols, extendedAttributes, extendedAttributesValues, user);
@@ -527,16 +528,16 @@ select ld_docid
         if (doc.isPublishing() || user.isMemberOf(Group.GROUP_ADMIN) || user.isMemberOf("publisher")) {
             doc.setCustomId((String) cols[1]);
             doc.setVersion((String) cols[4]);
-            doc.setLastModified((Date) cols[5]);
-            doc.setDate((Date) cols[6]);
+            doc.setLastModified(SqlUtil.getColumnDateValue(cols[5]));
+            doc.setDate(SqlUtil.getColumnDateValue(cols[6]));
             doc.setPublisher((String) cols[7]);
-            doc.setCreation((Date) cols[8]);
+            doc.setCreation(SqlUtil.getColumnDateValue(cols[8]));
             doc.setCreator((String) cols[9]);
-            doc.setFileSize((Long) cols[10]);
+            doc.setFileSize(SqlUtil.getColumnLongValue(cols[10]));
             doc.setImmutable((Boolean) cols[11]);
             doc.setIndexingStatus((IndexingStatus) cols[12]);
             doc.setEmbeddingStatus((EmbeddingStatus) cols[43]);
-            doc.setLockUserId((Long) cols[13]);
+            doc.setLockUserId(SqlUtil.getColumnLongValue(cols[13]));
             doc.setStatus((DocumentStatus) cols[15]);
             doc.setSigned((Boolean) cols[16]);
             doc.setRating((Integer) cols[18]);
@@ -555,8 +556,8 @@ select ld_docid
             doc.setLanguage((String) cols[33]);
             doc.setLinks((Integer) cols[34]);
             doc.setTgs((String) cols[35]);
-            doc.setCreatorId((Long) cols[36]);
-            doc.setPublisherId((Long) cols[37]);
+            doc.setCreatorId(SqlUtil.getColumnLongValue(cols[36]));
+            doc.setPublisherId(SqlUtil.getColumnLongValue(cols[37]));
 
             for (String name : extendedAttributes) {
                 Object val = extendedAttributesValues.get(D_S.formatted(doc.getId(), name));

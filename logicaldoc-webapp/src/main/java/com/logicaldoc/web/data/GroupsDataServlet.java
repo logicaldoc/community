@@ -13,6 +13,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,7 +52,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
 			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<group>");
-			writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+			writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(cols[0])));
 			writer.print(String.format("<name><![CDATA[%s]]></name>", cols[1]));
 			writer.print(String.format("<description><![CDATA[%s]]></description>",
 					StringUtils.defaultString((String) cols[2])));

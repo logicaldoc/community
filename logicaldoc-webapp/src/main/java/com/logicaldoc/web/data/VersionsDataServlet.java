@@ -3,7 +3,6 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +18,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,19 +53,22 @@ public class VersionsDataServlet extends AbstractDataServlet {
             Object[] cols = (Object[]) gridRecord;
 
             writer.print("<version>");
-            writer.print(String.format("<id>%d</id>", (Long) cols[0]));
+            writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(cols[0])));
             writer.print(String.format("<user><![CDATA[%s]]></user>", StringUtils.defaultString((String) cols[1])));
             writer.print(String.format("<event><![CDATA[%s]]></event>", I18N.message((String) cols[2], locale)));
-            writer.print(String.format("<version>%s</version>",cols[3]));
+            writer.print(String.format("<version>%s</version>", cols[3]));
             writer.print(String.format("<fileVersion>%s</fileVersion>", cols[4]));
             writer.print(String.format("<revision>%s</revision>", cols[17]));
-            writer.print(String.format("<date>%s</date>", df.format((Date) cols[5])));
-            writer.print(String.format("<comment><![CDATA[%s]]></comment>", StringUtils.defaultString((String)cols[6])));
-            writer.print(String.format("<docid>%d</docid>", (Long) cols[7]));
+            writer.print(String.format("<date>%s</date>", df.format(SqlUtil.getColumnDateValue(cols[5]))));
+            writer.print(
+                    String.format("<comment><![CDATA[%s]]></comment>", StringUtils.defaultString((String) cols[6])));
+            writer.print(String.format("<docid>%d</docid>", SqlUtil.getColumnLongValue(cols[7])));
             writer.print(String.format("<filename><![CDATA[%s]]></filename>", cols[8]));
-            writer.print(String.format("<customid><![CDATA[%s]]></customid>", StringUtils.defaultString((String)cols[9])));
-            writer.print(String.format("<size>%d</size>", (Long) cols[10]));
-            writer.print(String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[11]))));
+            writer.print(
+                    String.format("<customid><![CDATA[%s]]></customid>", StringUtils.defaultString((String) cols[9])));
+            writer.print(String.format("<size>%d</size>", SqlUtil.getColumnLongValue(cols[10])));
+            writer.print(
+                    String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[11]))));
             writer.print(String.format("<type>%s</type>", cols[11]));
 
             if (cols[12] != null)
@@ -74,7 +77,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
                 writer.print(String.format("<workflowStatus><![CDATA[%s]]></workflowStatus>", cols[13]));
             if (cols[14] != null)
                 writer.print(String.format("<workflowStatusDisplay><![CDATA[%s]]></workflowStatusDisplay>", cols[14]));
-            writer.print(String.format("<userId>%d</userId>", (Long) cols[15]));
+            writer.print(String.format("<userId>%d</userId>", SqlUtil.getColumnLongValue(cols[15])));
             if (cols[16] != null)
                 writer.print(String.format("<color><![CDATA[%s]]></color>", cols[16]));
 

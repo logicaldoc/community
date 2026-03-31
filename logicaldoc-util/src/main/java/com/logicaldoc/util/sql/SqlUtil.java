@@ -15,77 +15,111 @@ import java.util.Date;
  */
 public class SqlUtil {
 
-	private SqlUtil() {
-		throw new IllegalStateException("Utility class");
-	}
+    private SqlUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
-	/**
-	 * Double the quotes in a string. This means that each character ' will be
-	 * replaced with '' (two quote characters)
-	 * 
-	 * @param input The incoming string
-	 * @return A string with doubled quotes
-	 */
-	public static String doubleQuotes(String input) {
-		if (input == null)
-			return "";
-		return input.replace("'", "''");
-	}
+    /**
+     * Double the quotes in a string. This means that each character ' will be
+     * replaced with '' (two quote characters)
+     * 
+     * @param input The incoming string
+     * @return A string with doubled quotes
+     */
+    public static String doubleQuotes(String input) {
+        if (input == null)
+            return "";
+        return input.replace("'", "''");
+    }
 
-	/**
-	 * Double the backslashes in a string. This means that each character \ will
-	 * be replaced with \\
-	 * 
-	 * @param input The incoming string
-	 * @return A string with doubled backslashes
-	 */
-	public static String doubleBackslashes(String input) {
-		if (input == null)
-			return "";
-		return input.replace("\\", "\\\\");
-	}
+    /**
+     * Double the backslashes in a string. This means that each character \ will
+     * be replaced with \\
+     * 
+     * @param input The incoming string
+     * @return A string with doubled backslashes
+     */
+    public static String doubleBackslashes(String input) {
+        if (input == null)
+            return "";
+        return input.replace("\\", "\\\\");
+    }
 
-	public static String doubleQuotesAndBackslashes(String input) {
-		return doubleBackslashes(doubleQuotes(input));
-	}
+    public static String doubleQuotesAndBackslashes(String input) {
+        return doubleBackslashes(doubleQuotes(input));
+    }
 
-	/**
-	 * Retrieves the date stored in a given column
-	 * 
-	 * @param resultSet The result set to use
-	 * @param column The column index
-	 * @return The date value
-	 * 
-	 * @throws SQLException Error in the database
-	 */
-	public static Date getColumnDateValue(ResultSet resultSet, int column) throws SQLException {
-		Date date;
-		if (resultSet.getObject(column) instanceof Timestamp)
-			date = resultSet.getTimestamp(column);
-		else if (resultSet.getObject(column) instanceof LocalDateTime localDateTime)
-			date = java.sql.Timestamp.valueOf(localDateTime);
-		else
-			date = resultSet.getDate(column);
-		return date;
-	}
+    /**
+     * Retrieves the date stored in a given column
+     * 
+     * @param resultSet The result set to use
+     * @param column The column index
+     * @return The date value
+     * 
+     * @throws SQLException Error in the database
+     */
+    public static Date getColumnDateValue(ResultSet resultSet, int column) throws SQLException {
+        Date date;
+        if (resultSet.getObject(column) instanceof Timestamp)
+            date = resultSet.getTimestamp(column);
+        else if (resultSet.getObject(column) instanceof LocalDateTime localDateTime)
+            date = java.sql.Timestamp.valueOf(localDateTime);
+        else
+            date = resultSet.getDate(column);
+        return date;
+    }
+    
+    /**
+     * Retrieves the date extracted from a column
+     * 
+     * @param value the extracted value
+     * @return The date value
+     */
+    public static Date getColumnDateValue(Object value) {
+        Date date=null;
+        if (value instanceof Date dt)
+            date = dt;
+        else if (value instanceof Timestamp ts)
+            date = ts;
+        else if (value instanceof LocalDateTime localDateTime)
+            date = java.sql.Timestamp.valueOf(localDateTime);
+        return date;
+    }
 
-	/**
-	 * Retrieves the long stored in a given column
-	 * 
-	 * @param resultSet The result set to use
-	 * @param column The column index
-	 * @return The long value
-	 * 
-	 * @throws SQLException Error in the database
-	 */
-	public static long getColumnLongValue(ResultSet resultSet, int column) throws SQLException {
-		Long lgn;
-		if (resultSet.getObject(column) instanceof Integer intg)
-			lgn = intg.longValue();
-		else if (resultSet.getObject(column) instanceof BigDecimal bigDec)
-			lgn = bigDec.longValue();
-		else
-			lgn = resultSet.getLong(column);
-		return lgn;
-	}
+    /**
+     * Retrieves the long stored in a given column
+     * 
+     * @param resultSet The result set to use
+     * @param column The column index
+     * @return The long value
+     * 
+     * @throws SQLException Error in the database
+     */
+    public static long getColumnLongValue(ResultSet resultSet, int column) throws SQLException {
+        Long lgn;
+        if (resultSet.getObject(column) instanceof Integer intg)
+            lgn = intg.longValue();
+        else if (resultSet.getObject(column) instanceof BigDecimal bigDec)
+            lgn = bigDec.longValue();
+        else
+            lgn = resultSet.getLong(column);
+        return lgn;
+    }
+
+    /**
+     * Retrieves the long extracted from a column
+     * 
+     * @param value The original column value
+     * @return The long value
+     */
+    public static long getColumnLongValue(Object value) {
+        long lgn = 0;
+        if (value instanceof Long lfnv)
+            lgn = lfnv.longValue();
+        else if (value instanceof Integer intg)
+            lgn = intg.longValue();
+        else if (value instanceof BigDecimal bigDec)
+            lgn = bigDec.longValue();
+        return lgn;
+    }
 }
