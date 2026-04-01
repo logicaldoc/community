@@ -351,7 +351,6 @@ public class FileUtil {
 	 * measure units: GB, MB, KB or Bytes
 	 * 
 	 * @param size Size to be rendered
-	 * @param locale The locale for the format symbols
 	 * 
 	 * @return the size as human readable text
 	 */
