@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.ai.embedding;
 
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -16,9 +17,14 @@ public class EmbeddingsAndVectorStorePanel extends AdminPanel {
 
 		body.setMembers(new EmbeddingSchemesPanel());
 
+		
 		Tab storesTab = new Tab(I18N.message("vectorstores"));
-		storesTab.setPane(new VectorStoresPanel());
-
+		if(Session.get().isDemo()) {
+		    storesTab.setDisabled(true);
+		} else {
+		    storesTab.setPane(new VectorStoresPanel());
+		}
+		
 		tabs.addTab(storesTab);
 	}
 }
