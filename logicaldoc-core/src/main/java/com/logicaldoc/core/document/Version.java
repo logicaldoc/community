@@ -1,6 +1,5 @@
 package com.logicaldoc.core.document;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,11 +7,14 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CollectionTable;
@@ -36,7 +38,11 @@ import jakarta.persistence.Table;
 @Cacheable
 public class Version extends AbstractDocument implements Comparable<Version> {
 
+    private static final String DEFAULT_START_VERSION = "1.0";
+
     private static final long serialVersionUID = 1L;
+
+    private static final Logger log = LoggerFactory.getLogger(Version.class);
 
     @Column(name = "ld_documentid", nullable = false)
     private long docId;
@@ -115,6 +121,32 @@ public class Version extends AbstractDocument implements Comparable<Version> {
         this.username = username;
     }
 
+    static String getStartVersion() {
+        try {
+            ContextProperties config = null;
+            if (Context.get() != null)
+                config = Context.get().getConfig();
+            else
+                config = new ContextProperties();
+
+            String startVersion = config.getString("document.startversion", DEFAULT_START_VERSION);
+
+            // Start version must me in the format major.minor or simply minor
+            if (startVersion.contains(".")) {
+                String[] parts = startVersion.split("\\.");
+                startVersion = "%d.%d".formatted(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+            } else {
+                startVersion = "%d.0".formatted(Integer.parseInt(startVersion));
+            }
+
+            return startVersion;
+        } catch (Exception e) {
+            log.warn("Invalid start version specification, fallback to default {}", DEFAULT_START_VERSION);
+            return DEFAULT_START_VERSION;
+        }
+
+    }
+
     /**
      * Calculate the new version name in the format <b>X</b>.<b>Y</b>.
      * 
@@ -131,15 +163,10 @@ public class Version extends AbstractDocument implements Comparable<Version> {
      * @return the new version name in the format <b>X</b>.<b>Y</b>
      */
     private String getNewVersionName(String oldVersionName, boolean major) {
-        if (StringUtils.isEmpty(oldVersionName)) {
-            try {
-                return "%d.0".formatted(new ContextProperties().getInt("document.startversion", 1));
-            } catch (IOException e) {
-                return "1.0";
-            }
-        }
-
-        return calculateNewVersion(oldVersionName, major);
+        if (StringUtils.isEmpty(oldVersionName))
+            return getStartVersion();
+        else
+            return calculateNewVersion(oldVersionName, major);
     }
 
     /**

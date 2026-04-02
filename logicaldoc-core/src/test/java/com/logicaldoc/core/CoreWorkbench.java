@@ -42,10 +42,11 @@ public class CoreWorkbench {
 	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws IOException, ParseException {
-		
-		PDDocument pdfDocument = PDDocument.load(new File("C:\\Users\\marco\\Downloads\\xssPDF-3.pdf"));
-		PDDocumentInformation information = pdfDocument.getDocumentInformation();
-		System.out.println(information);
+
+		String[] parts="pippo.pluto".split("\\.");
+		for (String part : parts) {
+            System.out.println(part);
+        }
 		
 //		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 //		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));

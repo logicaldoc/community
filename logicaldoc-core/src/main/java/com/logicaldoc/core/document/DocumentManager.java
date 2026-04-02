@@ -541,7 +541,7 @@ public class DocumentManager {
         for (DocumentListener listener : DocumentListenerManager.get().getListeners())
             listener.afterFileStore(doc, transaction, dictionary);
 
-        if(doc.isModified())
+        if (doc.isModified())
             documentDAO.store(doc);
     }
 
@@ -1172,13 +1172,7 @@ public class DocumentManager {
 
         docVO.setStatus(DocumentStatus.UNLOCKED);
         docVO.setType(type);
-
-        try {
-            docVO.setVersion("%d.0".formatted(config.getInt("document.startversion", 1)));
-        } catch (Exception e) {
-            docVO.setVersion("1.0");
-        }
-        
+        docVO.setVersion(Version.getStartVersion());
         docVO.setFileVersion(docVO.getVersion());
         docVO.setFileSize(file.length());
         docVO.setId(0L);
