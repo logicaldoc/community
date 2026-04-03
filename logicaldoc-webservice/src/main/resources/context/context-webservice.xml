@@ -190,7 +190,9 @@
     <!-- to support Java-to-JSON and vice-versa conversion -->    
     <!-- JAXRS providers -->
     <bean id="cxfJsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
-      <property name="dropRootElement" value="${webservice.json.droproot}" /> 
+      <property name="dropRootElement" value="${webservice.json.droproot}" />
+      <property name="dropCollectionWrapperElement" value="${webservice.json.dropcollectionwrapper}" />
+      <property name="serializeAsArray" value="${webservice.json.serializeasarray}" />
       <property name="supportUnwrapped" value="true" /> 
       
       <!-- THIS is what forces collections called "attributes" to always be an array -->

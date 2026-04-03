@@ -29,7 +29,11 @@ public class WebservicePlugin extends LogicalDOCPlugin {
 			pbean.setProperty("webservice.call.gridRecord", "true");
 			pbean.setProperty("webservice.call.syncfreq", "300");
 			pbean.setProperty("webservice.json.droproot", "true");
-
+			pbean.setProperty("webservice.json.dropcollectionwrapper", "true");
+			pbean.setProperty("webservice.json.serializeasarray", "true");
+			
+			
+			
 			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_STORE + ".max", "20");
 			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_STORE + ".type", "default");
 			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_COUNTER + ".max", "20");
