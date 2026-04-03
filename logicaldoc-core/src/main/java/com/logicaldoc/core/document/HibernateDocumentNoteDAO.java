@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -59,7 +61,30 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		if (note.getFileVersion() == null)
 			note.setFileVersion(doc.getFileVersion());
 
+		/*
+		 * In case of new note without any ACL, we force all those users/groups
+		 * declared at folder level or document level
+		 */
+		if (note.getId() == 0L && note.getAccessControlList().isEmpty()) {
+			documentDao.initialize(doc);
+			FolderDAO.get().initialize(doc.getFolder());
+
+			if (CollectionUtils.isNotEmpty(doc.getAccessControlList())) {
+				note.getAccessControlList().addAll(doc.getAccessControlList().stream().map(NoteAccessControlEntry::new)
+						.collect(Collectors.toSet()));
+			} else if (CollectionUtils.isNotEmpty(doc.getFolder().getAccessControlList())) {
+				note.getAccessControlList().addAll(doc.getFolder().getAccessControlList().stream()
+						.map(NoteAccessControlEntry::new).collect(Collectors.toSet()));
+			} else if (doc.getFolder().getSecurityRef() != null) {
+				Folder securityFolder = FolderDAO.get().findFolder(doc.getFolder().getSecurityRef());
+				FolderDAO.get().initialize(securityFolder);
+				note.getAccessControlList().addAll(securityFolder.getAccessControlList().stream()
+						.map(NoteAccessControlEntry::new).collect(Collectors.toSet()));
+			}
+		}
+
 		super.store(note);
+
 		if (note.getPage() == 0 && note.getAccessControlList().isEmpty()) {
 			documentDao.initialize(doc);
 			doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(note.getMessage()));
