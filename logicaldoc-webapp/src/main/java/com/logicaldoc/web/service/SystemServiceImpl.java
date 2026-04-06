@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.java.plugin.registry.PluginDescriptor;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -77,6 +78,7 @@ import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
+import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.data.LogDataServlet;
@@ -420,7 +422,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			guiTask.setSize(task.getSize());
 			guiTask.setIndeterminate(task.isIndeterminate());
 			guiTask.setCompletionPercentage(task.getCompletionPercentage());
-			
+
 			GUIScheduling guiScheduling = new GUIScheduling(task.getName());
 			guiScheduling.setEnabled(task.getScheduling().isEnabled());
 			guiScheduling.setMode(task.getScheduling().getMode());
@@ -428,8 +430,9 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				guiScheduling.setSimple(true);
 				guiScheduling.setDelay(task.getScheduling().getDelay());
 				guiScheduling.setInterval(task.getScheduling().getIntervalSeconds());
-				guiTask.setSchedulingLabel(I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds()
-						+ " " + I18N.message(SECONDS, locale).toLowerCase());
+				guiTask.setSchedulingLabel(
+						I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds() + " "
+								+ I18N.message(SECONDS, locale).toLowerCase());
 			} else if (task.getScheduling().getMode().equals(TaskTrigger.MODE_CRON)) {
 				guiScheduling.setSimple(false);
 				guiScheduling.setCronExpression(task.getScheduling().getCronExpression());
@@ -440,7 +443,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			guiScheduling.setPreviousFireTime(task.getScheduling().getPreviousFireTime());
 			guiScheduling.setNextFireTime(task.getScheduling().getNextFireTime());
 			guiScheduling.setLastDuration(TimeDiff.printDuration(task.getScheduling().getLastDuration()));
-			
+
 			guiTask.setScheduling(guiScheduling);
 
 			guiTask.setSendActivityReport(task.isSendActivityReport());
@@ -710,10 +713,17 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	private void appendDatesCondition(String tableAlias, Date from, Date till, StringBuilder query) {
 		if (from != null) {
-			query.append(AND + tableAlias + ".ld_date > '" + new Timestamp(from.getTime()) + "' ");
+			from = DateUtil.truncateToDay(from);
+			query.append(AND + tableAlias + ".ld_date >= '" + new Timestamp(from.getTime()) + "' ");
 		}
+
 		if (till != null) {
-			query.append(AND + tableAlias + ".ld_date < '" + new Timestamp(till.getTime()) + "' ");
+			till = DateUtil.truncateToDay(till);
+			till = DateUtils.addHours(till, 23);
+			till = DateUtils.addMinutes(till, 59);
+			till = DateUtils.addSeconds(till, 59);
+			till = DateUtils.addMilliseconds(till, 999);
+			query.append(AND + tableAlias + ".ld_date <= '" + new Timestamp(till.getTime()) + "' ");
 		}
 	}
 

@@ -191,6 +191,8 @@
     <!-- JAXRS providers -->
     <bean id="cxfJsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
       <property name="dropRootElement" value="${webservice.json.droproot}" /> 
+      <property name="dropCollectionWrapperElement" value="true" />
+      <property name="serializeAsArray" value="true" />
       <property name="supportUnwrapped" value="true" /> 
     </bean>
     <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
