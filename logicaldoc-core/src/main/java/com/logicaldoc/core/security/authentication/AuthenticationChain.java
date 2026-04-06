@@ -33,267 +33,267 @@ import com.logicaldoc.util.spring.Context;
 @Component("authenticationChain")
 public class AuthenticationChain extends AbstractAuthenticator {
 
-	private static final String IMPERSONATION_SEPARATOR = ">";
+    private static final String IMPERSONATION_SEPARATOR = ">";
 
-	private static final Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
 
-	private List<Authenticator> authenticators = new ArrayList<>();
+    private List<Authenticator> authenticators = new ArrayList<>();
 
-	@Override
-	public final User authenticate(String username, String password) throws AuthenticationException {
-		return authenticate(username, password, null, null);
-	}
+    @Override
+    public final User authenticate(String username, String password) throws AuthenticationException {
+        return authenticate(username, password, null, null);
+    }
 
-	@Override
-	public final User authenticate(String username, String password, String key, Client client)
-			throws AuthenticationException {
+    @Override
+    public final User authenticate(String username, String password, String key, Client client)
+            throws AuthenticationException {
 
-		String impersonatedUsername = null;
-		if (username.contains(IMPERSONATION_SEPARATOR)) {
-			impersonatedUsername = username.split(IMPERSONATION_SEPARATOR)[1].trim();
-			username = username.split(IMPERSONATION_SEPARATOR)[0].trim();
-		} else if (StringUtils.defaultString(key).contains(IMPERSONATION_SEPARATOR)) {
-			impersonatedUsername = key.split(IMPERSONATION_SEPARATOR)[1].trim();
-			key = key.split(IMPERSONATION_SEPARATOR)[0].trim();
-		}
+        String impersonatedUsername = null;
+        if (username.contains(IMPERSONATION_SEPARATOR)) {
+            impersonatedUsername = username.split(IMPERSONATION_SEPARATOR)[1].trim();
+            username = username.split(IMPERSONATION_SEPARATOR)[0].trim();
+        } else if (StringUtils.defaultString(key).contains(IMPERSONATION_SEPARATOR)) {
+            impersonatedUsername = key.split(IMPERSONATION_SEPARATOR)[1].trim();
+            key = key.split(IMPERSONATION_SEPARATOR)[0].trim();
+        }
 
-		init();
+        init();
 
-		User user = validateAnonymousUser(username, key, client);
+        User user = validateAnonymousUser(username, key, client);
 
-		List<AuthenticationException> errors = new ArrayList<>();
+        List<AuthenticationException> errors = new ArrayList<>();
 
-		if (user == null)
-			user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
+        if (user == null)
+            user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
 
-		/*
-		 * At the end we need to do in any case some default validations
-		 */
-		try {
-			defaultValidations(username, client);
-		} catch (AuthenticationException ae) {
-			errors.clear();
-			errors.add(ae);
-			user = null;
-		} catch (PersistenceException pe) {
-			log.error(pe.getMessage(), pe);
-			errors.clear();
-			user = null;
-		}
+        /*
+         * At the end we need to do in any case some default validations
+         */
+        try {
+            defaultValidations(username, client);
+        } catch (AuthenticationException ae) {
+            errors.clear();
+            errors.add(ae);
+            user = null;
+        } catch (PersistenceException pe) {
+            log.error(pe.getMessage(), pe);
+            errors.clear();
+            user = null;
+        }
 
-		log.debug("Collected authentication errors: {}", errors);
+        log.debug("Collected authentication errors: {}", errors);
 
-		user = handleImpersonation(user, impersonatedUsername, errors);
+        if (user != null) {
+            initializeUser(user);
 
-		if (user != null) {
-			initializeUser(user);
-		} else {
-			// In case of multiple errors, we consider the first one that is
-			// not a UserNotFound exception because it is normal that some
-			// authenticator does not find this user because not in it's domain
-			for (AuthenticationException err : errors)
-				if (!(err instanceof AccountNotFoundException))
-					throw err;
-			throw errors.get(0);
-		}
+            user = handleImpersonation(user, impersonatedUsername, errors);
+        } else {
+            // In case of multiple errors, we consider the first one that is
+            // not a UserNotFound exception because it is normal that some
+            // authenticator does not find this user because not in it's domain
+            for (AuthenticationException err : errors)
+                if (!(err instanceof AccountNotFoundException))
+                    throw err;
+            throw errors.get(0);
+        }
 
-		return user;
-	}
+        return user;
+    }
 
-	private User handleImpersonation(User user, String impersonatedUsername, List<AuthenticationException> errors) {
-		if (StringUtils.isNotEmpty(impersonatedUsername) && user != null)
-			try {
-				User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername);
-				UserDAO.get().initialize(impersonatedUser);
-				if (!impersonatedUser.getImpersonators().contains(user.getUsername())) {
-					log.error("User {} not allowed to impersonate {}", user, impersonatedUser);
-					errors.add(new ForbiddenImpersonationException(user.getUsername(), impersonatedUsername));
-					user = null;
-				} else {
-					log.error("User {} impersonates {}", user, impersonatedUser);
-					impersonatedUser.setImpersonator(user.getUsername());
-					user = impersonatedUser;
-				}
-			} catch (PersistenceException pe) {
-				log.error(pe.getMessage(), pe);
-				errors.clear();
-				user = null;
-			}
-		return user;
-	}
+    private User handleImpersonation(User user, String impersonatedUsername, List<AuthenticationException> errors) {
+        if (StringUtils.isNotEmpty(impersonatedUsername) && user != null)
+            try {
+                User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername);
+                UserDAO.get().initialize(impersonatedUser);
+                if (!impersonatedUser.getImpersonators().contains(user.getUsername())) {
+                    log.error("User {} not allowed to impersonate {}", user, impersonatedUser);
+                    errors.add(new ForbiddenImpersonationException(user.getUsername(), impersonatedUsername));
+                    user = null;
+                } else {
+                    log.error("User {} impersonates {}", user, impersonatedUser);
+                    impersonatedUser.setImpersonator(user.getUsername());
+                    user = impersonatedUser;
+                }
+            } catch (PersistenceException pe) {
+                log.error(pe.getMessage(), pe);
+                errors.clear();
+                user = null;
+            }
+        return user;
+    }
 
-	private void initializeUser(User user) {
-		try {
-			UserDAO userDao = UserDAO.get();
-			userDao.initialize(user);
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-		}
-	}
+    private void initializeUser(User user) {
+        try {
+            UserDAO userDao = UserDAO.get();
+            userDao.initialize(user);
+        } catch (PersistenceException e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
 
-	private User validateAnonymousUser(String username, String key, Client client) {
-		User user = null;
-		try {
-			user = checkAnonymousLogin(username, key, client);
-		} catch (AuthenticationException | PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		return user;
-	}
+    private User validateAnonymousUser(String username, String key, Client client) {
+        User user = null;
+        try {
+            user = checkAnonymousLogin(username, key, client);
+        } catch (AuthenticationException | PersistenceException e) {
+            log.error(e.getMessage(), e);
+        }
+        return user;
+    }
 
-	private User authenticateUsingAuthenticators(String username, String password, String key, Client client, User user,
-			List<AuthenticationException> errors) {
-		for (Authenticator cmp : authenticators) {
-			if (cmp.isEnabled()) {
-				// Validates an user for valid login credentials if a specific
-				// component handles this user explicitly (e.g. admin is
-				// DefaultAuthentication)
-				if (cmp.canAuthenticateUser(username)) {
-					try {
-						user = cmp.authenticate(username, password, key, client);
-					} catch (AuthenticationException ae) {
-						errors.add(ae);
-					}
-				}
+    private User authenticateUsingAuthenticators(String username, String password, String key, Client client, User user,
+            List<AuthenticationException> errors) {
+        for (Authenticator cmp : authenticators) {
+            if (cmp.isEnabled()) {
+                // Validates an user for valid login credentials if a specific
+                // component handles this user explicitly (e.g. admin is
+                // DefaultAuthentication)
+                if (cmp.canAuthenticateUser(username)) {
+                    try {
+                        user = cmp.authenticate(username, password, key, client);
+                    } catch (AuthenticationException ae) {
+                        errors.add(ae);
+                    }
+                }
 
-				if (user != null)
-					break;
-			}
-		}
-		return user;
-	}
+                if (user != null)
+                    break;
+            }
+        }
+        return user;
+    }
 
-	protected void defaultValidations(String username, Client client)
-			throws AuthenticationException, PersistenceException {
-		UserDAO userDao = UserDAO.get();
-		User user = userDao.findByUsername(username);
-		if (user == null)
-			return;
+    protected void defaultValidations(String username, Client client)
+            throws AuthenticationException, PersistenceException {
+        UserDAO userDao = UserDAO.get();
+        User user = userDao.findByUsername(username);
+        if (user == null)
+            return;
 
-		DefaultAuthenticator defaultValidator = Context.get(DefaultAuthenticator.class);
-		try {
-			defaultValidator.validateUser(user);
-		} catch (AccountInactiveException ie) {
-			userDao.initialize(user);
-			UserHistory transaction = new UserHistory();
-			transaction.setUser(user);
-			transaction.setClient(client);
-			transaction.setEvent(UserEvent.DISABLED);
-			transaction.setComment("inactive for too many days");
+        DefaultAuthenticator defaultValidator = Context.get(DefaultAuthenticator.class);
+        try {
+            defaultValidator.validateUser(user);
+        } catch (AccountInactiveException ie) {
+            userDao.initialize(user);
+            UserHistory transaction = new UserHistory();
+            transaction.setUser(user);
+            transaction.setClient(client);
+            transaction.setEvent(UserEvent.DISABLED);
+            transaction.setComment("inactive for too many days");
 
-			user.setEnabled(false);
-			userDao.store(user, transaction);
+            user.setEnabled(false);
+            userDao.store(user, transaction);
 
-			throw ie;
-		}
-	}
+            throw ie;
+        }
+    }
 
-	@Override
-	public User pickUser(String username) {
-		init();
+    @Override
+    public User pickUser(String username) {
+        init();
 
-		User user = null;
-		for (Authenticator cmp : authenticators) {
-			if (cmp.isEnabled()) {
-				// Validates an user for valid login credentials if a specific
-				// component handles this user explicitly (e.g. admin is
-				// DefaultAuthentication)
-				if (cmp.canAuthenticateUser(username)) {
-					try {
-						user = cmp.pickUser(username);
-					} catch (Exception t) {
-						log.warn("Cannot pick user {} using authenticator {}", username, cmp.getClass().getName(), t);
-					}
-				}
+        User user = null;
+        for (Authenticator cmp : authenticators) {
+            if (cmp.isEnabled()) {
+                // Validates an user for valid login credentials if a specific
+                // component handles this user explicitly (e.g. admin is
+                // DefaultAuthentication)
+                if (cmp.canAuthenticateUser(username)) {
+                    try {
+                        user = cmp.pickUser(username);
+                    } catch (Exception t) {
+                        log.warn("Cannot pick user {} using authenticator {}", username, cmp.getClass().getName(), t);
+                    }
+                }
 
-				if (user != null)
-					break;
-			}
-		}
+                if (user != null)
+                    break;
+            }
+        }
 
-		initializeUser(user);
-		return user;
-	}
+        initializeUser(user);
+        return user;
+    }
 
-	/*
-	 * Checks the anonymous login
-	 */
-	protected User checkAnonymousLogin(String username, String key, Client client)
-			throws AuthenticationException, PersistenceException {
-		String tenant = Tenant.DEFAULT_NAME;
+    /*
+     * Checks the anonymous login
+     */
+    protected User checkAnonymousLogin(String username, String key, Client client)
+            throws AuthenticationException, PersistenceException {
+        String tenant = Tenant.DEFAULT_NAME;
 
-		UserDAO userDao = UserDAO.get();
-		User user = userDao.getUser(username);
+        UserDAO userDao = UserDAO.get();
+        User user = userDao.getUser(username);
 
-		defaultValidations(username, client);
+        defaultValidations(username, client);
 
-		Tenant t = user != null ? TenantDAO.get().findById(user.getTenantId()) : null;
-		if (t != null)
-			tenant = t.getName();
+        Tenant t = user != null ? TenantDAO.get().findById(user.getTenantId()) : null;
+        if (t != null)
+            tenant = t.getName();
 
-		if (key != null) {
-			ContextProperties config = Context.get().getConfig();
-			if ("true".equals(config.getProperty(tenant + ".anonymous.enabled"))
-					&& username.equals(config.getProperty(tenant + ".anonymous.user"))
-					&& key.equals(config.getProperty(tenant + ".anonymous.key")))
-				return user;
-		}
+        if (key != null) {
+            ContextProperties config = Context.get().getConfig();
+            if ("true".equals(config.getProperty(tenant + ".anonymous.enabled"))
+                    && username.equals(config.getProperty(tenant + ".anonymous.user"))
+                    && key.equals(config.getProperty(tenant + ".anonymous.key")))
+                return user;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean canAuthenticateUser(String user) {
-		return false;
-	}
+    @Override
+    public boolean canAuthenticateUser(String user) {
+        return false;
+    }
 
-	/**
-	 * Populate the authenticators chain using the extension point
-	 * Authentication declared in the core plug-in.
-	 */
-	public synchronized void init() {
-		if (!authenticators.isEmpty())
-			return;
+    /**
+     * Populate the authenticators chain using the extension point
+     * Authentication declared in the core plug-in.
+     */
+    public synchronized void init() {
+        if (!authenticators.isEmpty())
+            return;
 
-		Context context = Context.get();
-		PluginRegistry registry = PluginRegistry.getInstance();
-		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Authentication");
+        Context context = Context.get();
+        PluginRegistry registry = PluginRegistry.getInstance();
+        Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Authentication");
 
-		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<>();
-		for (Extension extension : exts) {
-			sortedExts.add(extension);
-		}
-		Collections.sort(sortedExts, (e1, e2) -> {
-			int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
-			int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
-			if (position1 < position2)
-				return -1;
-			else if (position1 > position2)
-				return 1;
-			else
-				return 0;
-		});
+        // Sort the extensions according to ascending position
+        List<Extension> sortedExts = new ArrayList<>();
+        for (Extension extension : exts) {
+            sortedExts.add(extension);
+        }
+        Collections.sort(sortedExts, (e1, e2) -> {
+            int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
+            int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
+            if (position1 < position2)
+                return -1;
+            else if (position1 > position2)
+                return 1;
+            else
+                return 0;
+        });
 
-		for (Extension extension : sortedExts) {
-			// Retrieve the authenticator bean id
-			authenticators
-					.add((Authenticator) context.getBean(extension.getParameter("authenticatorId").valueAsString()));
-		}
+        for (Extension extension : sortedExts) {
+            // Retrieve the authenticator bean id
+            authenticators
+                    .add((Authenticator) context.getBean(extension.getParameter("authenticatorId").valueAsString()));
+        }
 
-		if (sortedExts.isEmpty()) {
-			authenticators.add(context.getBean(DefaultAuthenticator.class));
-			authenticators.add(context.getBean(ApiKeyAuthenticator.class));
-		}
+        if (sortedExts.isEmpty()) {
+            authenticators.add(context.getBean(DefaultAuthenticator.class));
+            authenticators.add(context.getBean(ApiKeyAuthenticator.class));
+        }
 
-		for (Authenticator auth : authenticators) {
-			log.warn("Added authenticator {}", auth.getClass().getSimpleName());
-		}
-		log.warn("Authentication chain initialized");
-	}
+        for (Authenticator auth : authenticators) {
+            log.warn("Added authenticator {}", auth.getClass().getSimpleName());
+        }
+        log.warn("Authentication chain initialized");
+    }
 
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
