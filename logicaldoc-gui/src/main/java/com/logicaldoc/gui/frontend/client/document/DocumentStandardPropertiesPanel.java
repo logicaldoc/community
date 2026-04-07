@@ -354,7 +354,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 
 		final TextItem newTagItem = prepareNewTagItem(ds);
 
-		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
+		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tags",
 				Util.getTagsHTML(document.getTags()));
 		tagsString.setEndRow(true);
 

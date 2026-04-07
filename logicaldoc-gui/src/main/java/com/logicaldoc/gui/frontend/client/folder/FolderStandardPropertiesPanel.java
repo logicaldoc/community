@@ -289,7 +289,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
 
-		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, folder.getTags());
+		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tags", ds, folder.getTags());
 		tagItem.setEndRow(true);
 		tagItem.setDisabled(!folder.isWrite());
 		if (folder.isWrite())
@@ -297,7 +297,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		final TextItem newTagItem = prepareNewTagItem(ds);
 
-		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
+		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tags",
 				Util.getTagsHTML(folder.getTags()));
 		tagsString.setEndRow(true);
 		FormItemIcon editTags = new FormItemIcon();
