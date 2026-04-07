@@ -329,7 +329,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, document.getId(), null);
 
-		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, document.getTags());
+		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tags", ds, document.getTags());
 		tagItem.setEndRow(true);
 		tagItem.setDisabled(!updateEnabled);
 		tagItem.addChangedHandler(changedHandler);
