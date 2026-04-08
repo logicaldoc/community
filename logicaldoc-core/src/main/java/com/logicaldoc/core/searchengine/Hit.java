@@ -2,6 +2,10 @@ package com.logicaldoc.core.searchengine;
 
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+
 import com.logicaldoc.core.document.Document;
 
 /**
@@ -11,69 +15,84 @@ import com.logicaldoc.core.document.Document;
  * @since 5.2
  */
 public class Hit extends Document implements Comparable<Hit> {
-	private static final long serialVersionUID = 1L;
 
-	private int score;
+    private static final long serialVersionUID = 1L;
 
-	private String content;
+    private static final Logger log = LoggerFactory.getLogger(Hit.class);
 
-	private String summary;
+    private int score;
 
-	public int getScore() {
-		return score;
-	}
+    private String content;
 
-	public void setScore(int score) {
-		this.score = score;
-	}
+    private String summary;
 
-	public String getContent() {
-		return content;
-	}
+    public Hit() {
+        // Empty constructor
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public Hit(Document document) {
+        try {
+            BeanUtils.copyProperties(document, this, "content", "summary");
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
 
-	public String getSummary() {
-		return summary;
-	}
+    public int getScore() {
+        return score;
+    }
 
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
+    public void setScore(int score) {
+        this.score = score;
+    }
 
-	@Override
-	public int compareTo(Hit other) {
-		if (this.equals(other))
-			return 0;
+    public String getContent() {
+        return content;
+    }
 
-		if (this.score > 0 && other.score > 0) {
-			int cmp = Integer.compare(other.score, this.score);
-			if (cmp != 0)
-				return cmp;
-		}
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-		String thisName = Objects.toString(this.getFileName(), "");
-		String otherName = Objects.toString(other.getFileName(), "");
-		if (thisName.equalsIgnoreCase(otherName)) {
-			return Long.compare(this.getId(), other.getId());
-		} else {
-			return thisName.compareToIgnoreCase(otherName);
-		}
-	}
+    public String getSummary() {
+        return summary;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(getClass().getName(), getId());
-	}
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!(obj instanceof Hit other))
-			return false;
-		return this.getId() == other.getId();
-	}
+    @Override
+    public int compareTo(Hit other) {
+        if (this.equals(other))
+            return 0;
+
+        if (this.score > 0 && other.score > 0) {
+            int cmp = Integer.compare(other.score, this.score);
+            if (cmp != 0)
+                return cmp;
+        }
+
+        String thisName = Objects.toString(this.getFileName(), "");
+        String otherName = Objects.toString(other.getFileName(), "");
+        if (thisName.equalsIgnoreCase(otherName)) {
+            return Long.compare(this.getId(), other.getId());
+        } else {
+            return thisName.compareToIgnoreCase(otherName);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass().getName(), getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof Hit other))
+            return false;
+        return this.getId() == other.getId();
+    }
 }

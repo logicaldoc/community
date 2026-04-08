@@ -14,6 +14,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.IndexingStatus;
@@ -179,8 +180,11 @@ public abstract class Filler extends PersistentObject {
         if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
             return;
 
-        if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX))
+        if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX)) {
             DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
+            document = DocumentDAO.get().findById(document.getId());
+            DocumentDAO.get().initialize(document);
+        }
 
         Hit hit = SearchEngine.get().getHit(document.getId());
         String extractedContent = hit != null ? hit.getContent() : "";
