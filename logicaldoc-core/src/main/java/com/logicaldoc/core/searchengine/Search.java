@@ -133,7 +133,8 @@ public abstract class Search {
 	 */
 	public final List<Hit> search() throws SearchException {
 		log.info("Launch search");
-		log.info("Expression: {}", options.getExpression());
+		if(log.isDebugEnabled())
+		    log.debug("Expression: {}", options.getExpression());
 
 		initSearchUser();
 
