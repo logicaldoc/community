@@ -39,6 +39,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class FillerProperties extends FillerDetailsTab {
 
+    private static final String TEMPLATE = "template";
+
     private static final String TAG = "tag";
 
     private static final String RETRIEVAL = "retrieval";
@@ -146,11 +148,6 @@ public class FillerProperties extends FillerDetailsTab {
                 modelSelector.setValue(filler.getModelId());
         }
 
-        // Threshold (only for tag)
-        FloatRangeValidator validator = new FloatRangeValidator();
-        validator.setMin(0);
-        validator.setMax(1);
-
         // Strategy selector
         SelectItem strategy = ItemFactory.newSelectItem(STRATEGY);
         LinkedHashMap<String, String> strategyMap = new LinkedHashMap<>();
@@ -176,15 +173,20 @@ public class FillerProperties extends FillerDetailsTab {
         if (filler.getEmbeddingSchemeId() != null)
             embeddingSelector.setValue(filler.getEmbeddingSchemeId());
 
+        // A threshold used by AI models
+        FloatRangeValidator thresholdValidator = new FloatRangeValidator();
+        thresholdValidator.setMin(0);
+        thresholdValidator.setMax(1);
         DoubleItem threshold = ItemFactory.newDoubleItem(THRESHOLD, filler.getThreshold());
-        threshold.setValidators(validator);
+        threshold.setValidators(thresholdValidator);
         threshold.addChangedHandler(changedHandler);
 
         // Criteria
-        AdvancedCriteria tagCriteria = new AdvancedCriteria(TYPE, OperatorId.EQUALS, TAG);
+        AdvancedCriteria thresholdCriteria = new AdvancedCriteria(OperatorId.OR, new Criterion[] {
+                new Criterion(TYPE, OperatorId.EQUALS, TAG), new Criterion(TYPE, OperatorId.EQUALS, TEMPLATE) });
 
-        threshold.setVisibleWhen(tagCriteria);
-        threshold.setRequiredWhen(tagCriteria);
+        threshold.setVisibleWhen(thresholdCriteria);
+        threshold.setRequiredWhen(thresholdCriteria);
 
         AdvancedCriteria modelVisible = new AdvancedCriteria(OperatorId.OR,
                 new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, LANGUAGE),
@@ -205,7 +207,7 @@ public class FillerProperties extends FillerDetailsTab {
                         new AdvancedCriteria(OperatorId.AND,
                                 new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, TAG),
                                         new Criterion(STRATEGY, OperatorId.EQUALS, RETRIEVAL) }),
-                        new Criterion(TYPE, OperatorId.EQUALS, "template") });
+                        new Criterion(TYPE, OperatorId.EQUALS, TEMPLATE) });
 
         embeddingSelector.setVisibleWhen(embeddingVisible);
         embeddingSelector.setRequiredWhen(embeddingVisible);
@@ -234,9 +236,6 @@ public class FillerProperties extends FillerDetailsTab {
 
             validateAI();
 
-            String threshold = form.getValueAsString(THRESHOLD);
-            filler.setThreshold(threshold != null ? Double.parseDouble(threshold) : null);
-
             // Chain handling
             if (CHAIN.equals(filler.getType())) {
                 if (chainGrid == null || chainGrid.getRecordList().isEmpty()) {
@@ -263,7 +262,10 @@ public class FillerProperties extends FillerDetailsTab {
         String modelId = form.getValueAsString(MODEL_ID);
         String embeddingId = form.getValueAsString(EMBEDDING_SCHEME);
 
-        if (filler.getType().equals("template")) {
+        String threshold = form.getValueAsString(THRESHOLD);
+        filler.setThreshold(threshold != null ? Double.parseDouble(threshold) : null);
+        
+        if (filler.getType().equals(TEMPLATE)) {
             filler.setModelId(null);
             filler.setEmbeddingSchemeId(Long.parseLong(embeddingId));
         } else {
