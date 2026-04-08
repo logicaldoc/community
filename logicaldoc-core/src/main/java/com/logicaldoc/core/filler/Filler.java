@@ -194,6 +194,13 @@ public abstract class Filler extends PersistentObject {
         fill(document, extractedContent, transaction, dictionary);
     }
 
+    protected boolean mustOverwrite(History transaction) {
+        if (transaction.getOverwrite() != null)
+            return transaction.getOverwrite().booleanValue();
+        else
+            return isOverwrite();
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
