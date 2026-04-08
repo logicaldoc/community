@@ -20,6 +20,8 @@ import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.frontend.client.ai.autofill.AutofillService;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.types.TitleOrientation;
@@ -131,6 +133,33 @@ public class ExtendedPropertiesPanel extends HLayout {
 		standardItems.clear();
 
 		templateItem = ItemFactory.newTemplateSelector(true, extensibleObject.getTemplateId());
+
+		FormItemIcon fillTemplate = new FormItemIcon();
+		fillTemplate.setPrompt(I18N.message("autofill"));
+		fillTemplate.setSrc("[SKIN]/icons/wand-magic-sparkles.png");
+
+		fillTemplate.addFormItemClickHandler(click -> {
+			if (!(extensibleObject instanceof GUIDocument doc))
+				return;
+
+			LD.contactingServer();
+
+			AutofillService.Instance.get().fillTemplate(doc, new DefaultAsyncCallback<GUIDocument>() {
+
+				@Override
+				protected void handleSuccess(GUIDocument result) {
+					LD.clearPrompt();
+
+					if (result.getTemplateId() != null) {
+						templateItem.setValue(result.getTemplateId().toString());
+						handleTemplateChangedSelection(null);
+					}
+
+					if (changedHandler != null)
+						changedHandler.onChanged(null);
+				}
+			});
+		});
 		if (changedHandler != null)
 			templateItem.addChangedHandler(changedHandler);
 		templateItem.setMultiple(false);
@@ -143,6 +172,9 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		if (templateChangedHandler != null)
 			templateItem.addChangedHandler(templateChangedHandler);
+
+		if (Feature.enabled(Feature.AUTOFILL) && extensibleObject instanceof GUIDocument)
+			templateItem.setIcons(fillTemplate);
 
 		if (Feature.visible(Feature.TEMPLATE)) {
 			standardItems.add(templateItem);
