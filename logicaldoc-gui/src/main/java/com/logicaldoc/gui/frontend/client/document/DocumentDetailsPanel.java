@@ -326,11 +326,6 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
         prepareRetentionPoliciesTab(changeHandler);
 
         /*
-         * Prepare the OCR tab
-         */
-        prepareCaptureTab(changeHandler);
-
-        /*
          * Prepare the versions tab
          */
         prepareVersionsTab();
@@ -379,6 +374,11 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
          * Prepare the security tab
          */
         prepareSecurityTab();
+        
+        /*
+         * Prepare the Capture tab
+         */
+        prepareCaptureTab(changeHandler);
     }
 
     private void prepareSubscriptionsTab() {
@@ -394,13 +394,25 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
                 try {
                     subscriptionsPanel = new DocumentSubscriptionsPanel(document);
                     subscriptionsTabPanel.addMember(subscriptionsPanel);
-                    if (tabSet.getTab(ID_TAB_SUBSCRIPTIONS) == null)
-                        tabSet.addTab(subscriptionsTab);
                 } catch (Exception t) {
                     // Nothing to do
                 }
             } else
                 tabSet.hideTab(subscriptionsTab);
+        }
+    }
+    
+    private void prepareCaptureTab(ChangedHandler changeHandler) {
+        if (capturePanel != null) {
+            capturePanel.destroy();
+            if (Boolean.TRUE.equals(captureTabPanel.contains(capturePanel)))
+                captureTabPanel.removeMember(capturePanel);
+        }
+        try {
+            capturePanel = new DocumentCapturePanel(document, changeHandler, true);
+            captureTabPanel.addMember(capturePanel);
+        } catch (Exception t) {
+            // Nothing to do
         }
     }
 
@@ -543,20 +555,6 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
             tabSet.hideTab(securityTab);
     }
 
-    private void prepareCaptureTab(ChangedHandler changeHandler) {
-        if (capturePanel != null) {
-            capturePanel.destroy();
-            if (Boolean.TRUE.equals(captureTabPanel.contains(capturePanel)))
-                captureTabPanel.removeMember(capturePanel);
-        }
-        try {
-            capturePanel = new DocumentCapturePanel(document, changeHandler, true);
-            captureTabPanel.addMember(capturePanel);
-        } catch (Exception t) {
-            // Nothing to do
-        }
-    }
-
     private void prepareStandardPropertiesTab(ChangedHandler changeHandler) {
         if (propertiesPanel != null) {
             propertiesPanel.destroy();
@@ -652,16 +650,16 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
         boolean stdValid = propertiesPanel.validate();
         boolean extValid = extendedPropertiesPanel.validate();
         boolean publishingValid = retentionPoliciesPanel.validate();
-        boolean ocrValid = capturePanel.validate();
+        boolean captureValid = capturePanel.validate();
         if (!stdValid)
             tabSet.selectTab(0);
         else if (!extValid)
             tabSet.selectTab(1);
         else if (!publishingValid)
             tabSet.selectTab(2);
-        else if (!ocrValid)
+        else if (!captureValid)
             tabSet.selectTab(captureTab);
-        return stdValid && extValid && publishingValid && ocrValid;
+        return stdValid && extValid && publishingValid && captureValid;
     }
 
     public void onSave() {
