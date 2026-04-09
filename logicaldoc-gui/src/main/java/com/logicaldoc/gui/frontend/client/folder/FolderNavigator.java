@@ -50,7 +50,13 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	// Indicates if the Navigator is in the process of opening this path
 	private GUIFolder[] pathToOpen = null;
 
-	int currentIndexInPathToOpen = 0;
+	private int currentIndexInPathToOpen = 0;
+	
+	// Indicates a folder to open at first draw
+	private Long folderToSelectOnFirstDraw = null;
+
+	 // Indicates a folder to seòect at first draw
+	private Long documentToSelectOnFirstDraw = null;
 
 	public FolderNavigator() {
 		super(FolderCursor.get());
@@ -131,8 +137,16 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 		installTimer();
 	}
+	
+	public void setFolderToSelectOnFirstDraw(Long folderToSelectOnFirstDraw) {
+        this.folderToSelectOnFirstDraw = folderToSelectOnFirstDraw;
+    }
 
-	private void addDropHandler() {
+    public void setDocumentToSelectOnFirstDraw(Long documentToSelectOnFirstDraw) {
+        this.documentToSelectOnFirstDraw = documentToSelectOnFirstDraw;
+    }
+
+    private void addDropHandler() {
 		addDropHandler(dropEvent -> {
 			if (EventHandler.getDragTarget() instanceof FolderNavigator) {
 				// Workspaces cannot be moved
@@ -283,15 +297,21 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		 * Redirect the user to the correct folder and/or document
 		 */
 		RequestInfo loc = WindowUtils.getRequestInfo();
-		if (loc.getParameter(FOLDER_ID) != null) {
-			DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter(FOLDER_ID)), null);
-		} else if (loc.getParameter("docId") != null) {
+		if (loc.getParameter("docId") != null) {
 			DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter("docId")));
+		} else if(documentToSelectOnFirstDraw!=null) {
+		    DocumentsPanel.get().openInFolder(documentToSelectOnFirstDraw);
+		} else if (loc.getParameter(FOLDER_ID) != null) {
+	        DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter(FOLDER_ID)), null);
+		} else if (folderToSelectOnFirstDraw != null) {
+            DocumentsPanel.get().openInFolder(folderToSelectOnFirstDraw, null);	        
 		} else {
 			openDefaultNode();
 		}
 
 		FolderNavigator.this.firstTime = false;
+		folderToSelectOnFirstDraw = null;
+		documentToSelectOnFirstDraw = null;
 	}
 
 	private void openDefaultNode() {
