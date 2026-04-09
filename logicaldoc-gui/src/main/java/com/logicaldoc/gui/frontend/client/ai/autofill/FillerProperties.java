@@ -15,6 +15,7 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -67,6 +68,10 @@ public class FillerProperties extends FillerDetailsTab {
 	private static final String EMBEDDING_SCHEME = "embeddingscheme";
 
 	private static final String CHAIN = "chain";
+	
+	private static final String OVERWRITE = "overwrite";
+	
+	private static final String FILL_ON_CHECKIN = "filloncheckin";
 
 	private DynamicForm form = new DynamicForm();
 
@@ -110,6 +115,16 @@ public class FillerProperties extends FillerDetailsTab {
 		// Label
 		TextItem label = ItemFactory.newTextItem(LABEL, filler.getLabel());
 		label.addChangedHandler(changedHandler);
+		
+		// Overwrite flag
+		CheckboxItem overwrite = new CheckboxItem(OVERWRITE, I18N.message("overwrite"));
+		overwrite.setValue(filler.isOverwrite());
+		overwrite.addChangedHandler(changedHandler);
+
+		// On check-in flag
+		CheckboxItem onCheckin = new CheckboxItem(FILL_ON_CHECKIN, I18N.message("filloncheckin"));
+		onCheckin.setValue(filler.isOnCheckin());
+		onCheckin.addChangedHandler(changedHandler);
 
 		// Description
 		TextAreaItem description = ItemFactory.newTextAreaItem(DESCRIPTION, filler.getDescription());
@@ -218,7 +233,7 @@ public class FillerProperties extends FillerDetailsTab {
 		embeddingSelector.setVisibleWhen(embeddingVisible);
 		embeddingSelector.setRequiredWhen(embeddingVisible);
 
-		form.setItems(id, type, strategy, name, label, modelSelector, embeddingSelector, threshold, description);
+		form.setItems(id, type, strategy, name, label, overwrite, onCheckin, modelSelector, embeddingSelector, threshold, description);
 
 		container.addMember(form);
 
@@ -239,6 +254,12 @@ public class FillerProperties extends FillerDetailsTab {
 			filler.setLabel(form.getValueAsString(LABEL));
 			filler.setDescription(form.getValueAsString(DESCRIPTION));
 			filler.setType(form.getValueAsString(TYPE));
+			
+			Boolean overwriteVal = (Boolean) form.getValue(OVERWRITE);
+			filler.setOverwrite(Boolean.TRUE.equals(overwriteVal));
+
+			Boolean onCheckinVal = (Boolean) form.getValue(FILL_ON_CHECKIN);
+			filler.setOnCheckin(Boolean.TRUE.equals(onCheckinVal));
 
 			validateAI();
 

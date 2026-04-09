@@ -33,6 +33,10 @@ public class GUIFiller implements Serializable {
 	private Double threshold = 0.7d;
 
 	private List<GUIFiller> chain = new ArrayList<>();
+	
+	private boolean overwrite;
+	
+	private boolean onCheckin;
 
 	public GUIFiller() {
 		// Empty constructor
@@ -122,5 +126,21 @@ public class GUIFiller implements Serializable {
 
 	public void setEmbeddingSchemeId(Long embeddingSchemeId) {
 		this.embeddingSchemeId = embeddingSchemeId;
+	}
+
+	public boolean isOverwrite() {
+		return overwrite;
+	}
+
+	public void setOverwrite(boolean overwrite) {
+		this.overwrite = overwrite;
+	}
+
+	public boolean isOnCheckin() {
+		return onCheckin;
+	}
+
+	public void setOnCheckin(boolean onCheckin) {
+		this.onCheckin = onCheckin;
 	}
 }
