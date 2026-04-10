@@ -33,117 +33,115 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class DigitalSignaturePanel extends DocumentDetailTab {
 
-	private static final String REASON = "reason";
+    private static final String REASON = "reason";
 
-	private VLayout container = new VLayout();
+    private VLayout container = new VLayout();
 
-	private ListGrid list = null;
+    private ListGrid list = null;
 
-	public DigitalSignaturePanel(final GUIDocument document) {
-		super(document, null);
-	}
+    public DigitalSignaturePanel(final GUIDocument document) {
+        super(document, null);
+    }
 
-	@Override
-	protected void onDraw() {
-		container.setMembersMargin(3);
-		addMember(container);
-		refresh(document);
-	}
+    @Override
+    protected void onDraw() {
+        container.setMembersMargin(3);
+        addMember(container);
+        refresh(document);
+    }
 
-	private void refresh(final GUIDocument document) {
-		if (list != null)
-			list.destroy();
-		container.removeMembers(container.getMembers());
+    private void refresh(final GUIDocument document) {
+        if (list != null)
+            list.destroy();
+        container.removeMembers(container.getMembers());
 
-		ListGridField id = new ListGridField("id");
-		id.setHidden(true);
+        ListGridField id = new ListGridField("id");
+        id.setHidden(true);
 
-		ListGridField date = new DateListGridField("date", "date");
-		ListGridField signedBy = new UserListGridField("comment", "userId", "signedby");
-		signedBy.setWidth("*");
-		ListGridField reasonColumn = new ListGridField(REASON, I18N.message(REASON));
-		reasonColumn.setWidth(250);
+        ListGridField date = new DateListGridField("date", "date");
+        ListGridField signedBy = new UserListGridField("comment", "userId", "signedby");
+        signedBy.setWidth("*");
+        ListGridField reasonColumn = new ListGridField(REASON, I18N.message(REASON));
+        reasonColumn.setWidth(250);
 
-		list = new ListGrid();
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setCanFreezeFields(true);
-		list.setAutoFetchData(true);
-		list.setDataSource(new DocumentHistoryDS(null, document.getId(), "event.signed", null));
-		list.setFields(date, signedBy, reasonColumn);
+        list = new ListGrid();
+        list.setEmptyMessage(I18N.message("notitemstoshow"));
+        list.setCanFreezeFields(true);
+        list.setAutoFetchData(true);
+        list.setDataSource(new DocumentHistoryDS(null, document.getId(), "event.signed", null));
+        list.setFields(date, signedBy, reasonColumn);
 
-		TextItem reason = ItemFactory.newTextItem(REASON, null);
-		reason.setWidth(400);
-		reason.setRequired(true);
-		reason.setWrapTitle(false);
+        TextItem reason = ItemFactory.newTextItem(REASON, null);
+        reason.setWidth(400);
+        reason.setRequired(true);
+        reason.setWrapTitle(false);
 
-		final CheckboxItem visualPositioning = new CheckboxItem();
-		visualPositioning.setName("visualpositioning");
-		visualPositioning.setTitle(I18N.message("visualpositioning"));
-		visualPositioning.setDisabled(true);
+        final CheckboxItem visualPositioning = new CheckboxItem();
+        visualPositioning.setName("visualpositioning");
+        visualPositioning.setTitle(I18N.message("visualpositioning"));
+        visualPositioning.setDisabled(true);
 
-		String url = Util.contextPath() + "export-keystore?cert=root&tenantId=" + Session.get().getTenantId();
-		StaticTextItem rootCert = ItemFactory.newStaticTextItem("rootcertificate",
-				"<a href='" + url + "' target='_blank'>" + I18N.message("downloadrootcert") + "</a>");
-		rootCert.setRequired(true);
-		rootCert.setWrap(false);
-		rootCert.setColSpan(7);
-		rootCert.setStartRow(true);
+        String url = Util.contextPath() + "export-keystore?cert=root&tenantId=" + Session.get().getTenantId();
+        StaticTextItem rootCert = ItemFactory.newStaticTextItem("rootcertificate",
+                "<a href='" + url + "' target='_blank'>" + I18N.message("downloadrootcert") + "</a>");
+        rootCert.setRequired(true);
+        rootCert.setWrap(false);
+        rootCert.setColSpan(7);
+        rootCert.setStartRow(true);
 
-		final DynamicForm form = new DynamicForm();
-		form.setWrapItemTitles(false);
-		form.setWidth(1);
-		form.setHeight(1);
-		form.setTitleOrientation(TitleOrientation.LEFT);
-		form.setNumCols(7);
+        final DynamicForm form = new DynamicForm();
+        form.setWrapItemTitles(false);
+        form.setWidth(1);
+        form.setHeight(1);
+        form.setTitleOrientation(TitleOrientation.LEFT);
+        form.setNumCols(7);
 
-		ButtonItem sign = new ButtonItem(I18N.message("signnow"));
-		sign.setEndRow(false);
-		sign.addClickHandler(event -> {
-			if (!form.validate())
-				return;
+        ButtonItem sign = new ButtonItem(I18N.message("signnow"));
+        sign.setEndRow(false);
+        sign.addClickHandler(event -> {
+            if (!form.validate())
+                return;
 
-			if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
-				VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(
-						Arrays.asList(document.getId()), form.getValueAsString(REASON));
-				dialog.show();
-			} else {
-				LD.contactingServer();
-				SignService.Instance.get().signDocuments(Arrays.asList(document.getId()), form.getValueAsString(REASON),
-						1, null, null, null, new DefaultAsyncCallback<>() {
-							
-							@Override
-							public void handleSuccess(Void ret) {
-								refresh(document);
-							}
-						});
-			}
-		});
+            if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
+                new VisualPositioningDigitalSignatureDialog(Arrays.asList(document.getId()),
+                        form.getValueAsString(REASON)).show();
+            } else {
+                LD.contactingServer();
+                SignService.Instance.get().signDocuments(Arrays.asList(document.getId()), form.getValueAsString(REASON),
+                        1, null, null, null, new DefaultAsyncCallback<>() {
 
-		if (document.getFolder().hasPermission(GUIAccessControlEntry.PERMISSION_SIGN))
-			form.setItems(sign, reason, visualPositioning, rootCert);
-		else {
-			form.setItems(rootCert);
-		}
+                            @Override
+                            public void handleSuccess(Void ret) {
+                                refresh(document);
+                            }
+                        });
+            }
+        });
 
-		container.addMember(list);
-		container.addMember(form);
+        if (document.getFolder().hasPermission(GUIAccessControlEntry.PERMISSION_SIGN))
+            form.setItems(sign, reason, visualPositioning, rootCert);
+        else {
+            form.setItems(rootCert);
+        }
 
-		SignService.Instance.get().isVisualSignatureEnabled(new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(Boolean enabled) {
-				visualPositioning.setDisabled(!enabled);
-			}
-		});
-	}
-	
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
-	
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+        container.addMember(list);
+        container.addMember(form);
+
+        SignService.Instance.get().isVisualSignatureEnabled(new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(Boolean enabled) {
+                visualPositioning.setDisabled(!enabled);
+            }
+        });
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

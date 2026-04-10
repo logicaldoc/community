@@ -10,6 +10,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -170,6 +171,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 			public void handleSuccess(Void arg0) {
 				GuiLog.info(I18N.message("event.signed"), null);
 				showPage(pageCursor.getValueAsInteger());
+				DocumentController.get().modified(firstSelectedDoc);
 			}
 		});
 	}

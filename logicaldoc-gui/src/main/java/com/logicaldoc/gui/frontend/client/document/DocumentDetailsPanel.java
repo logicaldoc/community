@@ -374,7 +374,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
          * Prepare the security tab
          */
         prepareSecurityTab();
-        
+
         /*
          * Prepare the Capture tab
          */
@@ -401,7 +401,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
                 tabSet.hideTab(subscriptionsTab);
         }
     }
-    
+
     private void prepareCaptureTab(ChangedHandler changeHandler) {
         if (capturePanel != null) {
             capturePanel.destroy();
