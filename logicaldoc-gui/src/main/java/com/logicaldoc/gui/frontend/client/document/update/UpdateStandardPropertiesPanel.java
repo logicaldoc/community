@@ -85,8 +85,6 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		List<FormItem> items = new ArrayList<>();
 
 		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
-		if (document.getLanguage() != null)
-			language = ItemFactory.newLanguageSelector(LANGUAGE, false, false);
 		language.setDisabled(!updateEnabled);
 		language.setValue(document.getLanguage());
 		items.add(language);

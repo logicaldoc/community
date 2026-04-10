@@ -541,6 +541,11 @@ public class DocumentManager {
         for (DocumentListener listener : DocumentListenerManager.get().getListeners())
             listener.afterFileStore(doc, transaction, dictionary);
 
+        if (StringUtils.isEmpty(doc.getLanguage())) {
+            doc.setLanguage("en");
+            doc.setModified(true);
+        }
+        
         if (doc.isModified())
             documentDAO.store(doc);
     }
