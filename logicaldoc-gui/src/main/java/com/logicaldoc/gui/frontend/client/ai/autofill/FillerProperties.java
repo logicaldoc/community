@@ -120,6 +120,7 @@ public class FillerProperties extends FillerDetailsTab {
 		CheckboxItem overwrite = new CheckboxItem(OVERWRITE, I18N.message("overwrite"));
 		overwrite.setValue(filler.isOverwrite());
 		overwrite.addChangedHandler(changedHandler);
+		
 		AdvancedCriteria overwriteVisible = new AdvancedCriteria(TYPE, OperatorId.NOT_EQUAL, CHAIN);
 		overwrite.setVisibleWhen(overwriteVisible);
 
