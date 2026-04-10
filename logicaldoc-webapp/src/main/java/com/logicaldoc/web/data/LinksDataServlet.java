@@ -105,7 +105,9 @@ public class LinksDataServlet extends AbstractDataServlet {
 
         // Get backward references to current document from referenced ones
         query.append(""" 
+                     
                      UNION 
+                     
                      select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, DOC2.ld_filename, DOC2.ld_color, E.ld_label
                        from ld_document_ext E, ld_document DOC1, ld_document DOC2 
                        where E.ld_type = %d
@@ -120,7 +122,7 @@ public class LinksDataServlet extends AbstractDataServlet {
             query.append(" and not DOC1.ld_id = %d".formatted(docId));
             query.append(" and not DOC2.ld_id = %d".formatted(docId));
         }
-        
+
         DocumentDAO.get().queryForResultSet(query.toString(), null, null, rows -> {
             while (rows.next()) {
                 List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
