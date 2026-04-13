@@ -31,103 +31,134 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class EmbeddingSettings extends Window {
 
-	private static final String BATCH_SETTING = "ai.embedding.batch";
+    private static final String BATCH_SETTING = "ai.embedding.batch";
 
-	private static final String SORTING_SETTING = "ai.embedding.sorting";
+    private static final String SORTING_SETTING = "ai.embedding.sorting";
 
-	private static final String SORTING_CUSTOM_SETTING = "ai.embedding.sorting.custom";
+    private static final String INCLUDES_SETTING = ".ai.embedding.includes";
 
-	private static final String THREAD_EMBEDDER_SETTING = "threadpool.Embedder.max";
+    private static final String EXCLUDES_SETTING = ".ai.embedding.excludes";
 
-	private DynamicForm form = new DynamicForm();
+    private static final String SORTING_CUSTOM_SETTING = "ai.embedding.sorting.custom";
 
-	public EmbeddingSettings() {
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+    private static final String THREAD_EMBEDDER_SETTING = "threadpool.Embedder.max";
+    
+    private static final String SEPARATEDCOMMA = "separatedcomma";
 
-		setTitle(I18N.message("settings"));
-		setAutoSize(true);
-		setCanDragResize(true);
-		setIsModal(true);
-		setShowModalMask(true);
-		centerInPage();
+    private DynamicForm form = new DynamicForm();
 
-		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(modelsSettingName(), BATCH_SETTING,
-				SORTING_SETTING, SORTING_CUSTOM_SETTING, THREAD_EMBEDDER_SETTING), new DefaultAsyncCallback<>() {
+    public EmbeddingSettings() {
+        setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-					@Override
-					public void handleSuccess(List<GUIParameter> params) {
-						init(params);
-					}
-				});
-	}
+        setTitle(I18N.message("settings"));
+        setAutoSize(true);
+        setCanDragResize(true);
+        setIsModal(true);
+        setShowModalMask(true);
+        centerInPage();
 
-	private void init(List<GUIParameter> params) {
-		ButtonItem save = new ButtonItem();
-		save.setTitle(I18N.message("save"));
-		save.setAutoFit(true);
-		save.setStartRow(true);
-		save.addClickHandler(event -> onSave());
+        SettingService.Instance.get().loadSettingsByNames(Arrays.asList(modelsSettingName(), includesSettingName(), excludesSettingName(), BATCH_SETTING,
+                SORTING_SETTING, SORTING_CUSTOM_SETTING, THREAD_EMBEDDER_SETTING), new DefaultAsyncCallback<>() {
 
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Integer.parseInt(Util.getValue(BATCH_SETTING, params)));
-		batch.setMin(1);
-		batch.setStep(1);
-		batch.setRequired(true);
+                    @Override
+                    public void handleSuccess(List<GUIParameter> params) {
+                        init(params);
+                    }
+                });
+    }
 
-		SelectItem sorting = ItemFactory.newSelectItem("sorting");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
-		opts.put("", I18N.message("none").toLowerCase());
-		opts.put("oldestfirst", I18N.message("oldestfirst"));
-		opts.put("mostrecentfirst", I18N.message("mostrecentfirst"));
-		opts.put("smallestfirst", I18N.message("smallestfirst"));
-		opts.put("biggestfirst", I18N.message("biggestfirst"));
-		sorting.setValueMap(opts);
-		sorting.setValue(Util.getValue(SORTING_SETTING, params));
+    private void init(List<GUIParameter> params) {
+        ButtonItem save = new ButtonItem();
+        save.setTitle(I18N.message("save"));
+        save.setAutoFit(true);
+        save.setStartRow(true);
+        save.addClickHandler(event -> onSave());
 
-		String customSortingValue = Util.getValue(SORTING_CUSTOM_SETTING, params);
-		sorting.setDisabled(customSortingValue != null && !customSortingValue.isEmpty());
-		sorting.setVisible(Session.get().isDefaultTenant());
+        SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Integer.parseInt(Util.getValue(BATCH_SETTING, params)));
+        batch.setMin(1);
+        batch.setStep(1);
+        batch.setRequired(true);
 
-		TextItem customSorting = ItemFactory.newTextItem("customsorting", customSortingValue);
-		customSorting.setWidth(300);
-		customSorting.addChangeHandler(changeEvent -> sorting
-				.setDisabled(changeEvent.getValue() != null && !changeEvent.getValue().toString().isEmpty()));
+        SelectItem sorting = ItemFactory.newSelectItem("sorting");
+        LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+        opts.put("", I18N.message("none").toLowerCase());
+        opts.put("oldestfirst", I18N.message("oldestfirst"));
+        opts.put("mostrecentfirst", I18N.message("mostrecentfirst"));
+        opts.put("smallestfirst", I18N.message("smallestfirst"));
+        opts.put("biggestfirst", I18N.message("biggestfirst"));
+        sorting.setValueMap(opts);
+        sorting.setValue(Util.getValue(SORTING_SETTING, params));
 
-		SpinnerItem threads = ItemFactory.newSpinnerItem("threads",
-				Integer.parseInt(Util.getValue(THREAD_EMBEDDER_SETTING, params)));
-		threads.setMin(1);
-		threads.setStep(1);
-		threads.setRequired(true);
+        String customSortingValue = Util.getValue(SORTING_CUSTOM_SETTING, params);
+        sorting.setDisabled(customSortingValue != null && !customSortingValue.isEmpty());
+        sorting.setVisible(Session.get().isDefaultTenant());
 
-		form.setNumCols(1);
-		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setFields(batch, sorting, customSorting, threads, save);
-		addItem(form);
-	}
+        TextItem customSorting = ItemFactory.newTextItem("customsorting", customSortingValue);
+        customSorting.setWidth(300);
+        customSorting.addChangeHandler(changeEvent -> sorting
+                .setDisabled(changeEvent.getValue() != null && !changeEvent.getValue().toString().isEmpty()));
 
-	private void onSave() {
-		if (!form.validate())
-			return;
-		List<GUIParameter> params = new ArrayList<>();
-		params.add(new GUIParameter(BATCH_SETTING, form.getValueAsString("batch")));
-		params.add(new GUIParameter(SORTING_SETTING, form.getValueAsString("sorting")));
-		params.add(new GUIParameter(SORTING_CUSTOM_SETTING, form.getValueAsString("customsorting")));
-		params.add(new GUIParameter(THREAD_EMBEDDER_SETTING, form.getValueAsString("threads")));
+        SpinnerItem threads = ItemFactory.newSpinnerItem("threads",
+                Integer.parseInt(Util.getValue(THREAD_EMBEDDER_SETTING, params)));
+        threads.setMin(1);
+        threads.setStep(1);
+        threads.setRequired(true);
+        
+        // Include Patters
+        TextItem includePatterns = ItemFactory.newTextItem("includepatterns", null);
+        includePatterns.setValue(Util.getValue(includesSettingName(), params));
+        includePatterns.setHint(I18N.message(SEPARATEDCOMMA));
+        includePatterns.setHintStyle("hint");
+        includePatterns.setWidth(300);
 
-		SettingService.Instance.get().saveSettings(params, new EmptyAsyncCallback<>());
-		destroy();
-	}
+        // Exclude Patters
+        TextItem excludePatterns = ItemFactory.newTextItem("excludepatterns", null);
+        excludePatterns.setValue(Util.getValue(excludesSettingName(), params));
+        excludePatterns.setHint(I18N.message(SEPARATEDCOMMA));
+        excludePatterns.setHintStyle("hint");
+        excludePatterns.setWidth(300);
 
-	private String modelsSettingName() {
-		return Session.get().getTenantName() + ".ai.models";
-	}
+        form.setNumCols(1);
+        form.setTitleOrientation(TitleOrientation.TOP);
+        form.setFields(includePatterns, excludePatterns, batch, sorting, customSorting, threads, save);
+        
+        addItem(form);
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    private void onSave() {
+        if (!form.validate())
+            return;
+        List<GUIParameter> params = new ArrayList<>();
+        params.add(new GUIParameter(BATCH_SETTING, form.getValueAsString("batch")));
+        params.add(new GUIParameter(SORTING_SETTING, form.getValueAsString("sorting")));
+        params.add(new GUIParameter(SORTING_CUSTOM_SETTING, form.getValueAsString("customsorting")));
+        params.add(new GUIParameter(THREAD_EMBEDDER_SETTING, form.getValueAsString("threads")));
+        params.add(new GUIParameter(includesSettingName(), form.getValueAsString("includepatterns")));
+        params.add(new GUIParameter(excludesSettingName(), form.getValueAsString("excludepatterns")));
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+        SettingService.Instance.get().saveSettings(params, new EmptyAsyncCallback<>());
+        destroy();
+    }
+
+    private String modelsSettingName() {
+        return Session.get().getTenantName() + ".ai.models";
+    }
+
+    private String includesSettingName() {
+        return Session.get().getTenantName() + INCLUDES_SETTING;
+    }
+
+    private String excludesSettingName() {
+        return Session.get().getTenantName() + EXCLUDES_SETTING;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
