@@ -55,7 +55,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	// Indicates a folder to open at first draw
 	private Long folderToSelectOnFirstDraw = null;
 
-	 // Indicates a folder to seòect at first draw
+	 // Indicates a folder to select at first draw
 	private Long documentToSelectOnFirstDraw = null;
 
 	public FolderNavigator() {
