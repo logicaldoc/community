@@ -552,7 +552,7 @@ public class DocumentManager {
              * it into the document being saved in order to prevent ORM error
              */
             Document existingDoc = documentDAO.findById(doc.getId());
-            if (existingDoc.getRecordVersion() != doc.getRecordVersion())
+            if (existingDoc!=null && existingDoc.getRecordVersion() != doc.getRecordVersion())
                 doc.setRecordVersion(existingDoc.getRecordVersion());
             documentDAO.store(doc);
         }
