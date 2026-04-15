@@ -2036,6 +2036,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         note.setLineColor(guiNote.getLineColor());
         note.setLineOpacity(guiNote.getLineOpacity());
         note.setLineWidth(guiNote.getLineWidth());
+        note.setOpacity(guiNote.getOpacity());
         note.setRotation(guiNote.getRotation());
 
         note.getAccessControlList().clear();
