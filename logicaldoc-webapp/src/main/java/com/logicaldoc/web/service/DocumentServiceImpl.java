@@ -1896,8 +1896,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         guiNote.setColor(note.getColor());
         guiNote.setDate(note.getDate());
         guiNote.setFileName(note.getFileName());
-        guiNote.setHeight(note.getHeight());
-        guiNote.setLeft(note.getLeft());
         guiNote.setLineColor(note.getLineColor());
         guiNote.setLineOpacity(note.getLineOpacity());
         guiNote.setLineWidth(note.getLineWidth());
@@ -1909,6 +1907,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         guiNote.setRotation(note.getRotation());
         guiNote.setShape(note.getShape());
         guiNote.setTop(note.getTop());
+        guiNote.setLeft(note.getLeft());
+        guiNote.setHeight(note.getHeight());
+        guiNote.setWidth(note.getWidth());
         guiNote.setType(note.getType());
         guiNote.setUserId(note.getUserId());
         guiNote.setUsername(note.getUsername());

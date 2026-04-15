@@ -21,174 +21,167 @@ import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
  */
 public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
-	private static final String COMMENT_ALT = "comment-alt";
+    private static final String COMMENT_ALT = "comment-alt";
 
-	private static final String SQUARE2 = "square";
+    private static final String SQUARE2 = "square";
 
-	private static final String LABEL = "label";
+    private static final String LABEL = "label";
 
-	private static final String CIRCLE = "circle";
+    private static final String CIRCLE = "circle";
 
-	private static final String COMMENT = "comment";
+    private static final String COMMENT = "comment";
 
-	private static final String COMMENT_FLIPPED = "comment-flipped";
+    private boolean editEnabled = true;
 
-	private boolean editEnabled = true;
+    private NoteChangedListener changedListener;
 
-	private NoteChangedListener changedListener;
+    /**
+     * Constructor
+     * 
+     * @param doc the document to be displayed
+     * @param fileVer file version specification, null to use the current
+     *        version
+     * @param changedListener the handler to invoke on save
+     * @param editEnabled if the user can edit the annotations
+     */
+    public AnnotationsWindow(GUIDocument doc, String fileVer, NoteChangedListener changedListener,
+            boolean editEnabled) {
+        super(doc, fileVer != null ? fileVer : doc.getFileVersion(), null);
 
-	/**
-	 * Constructor
-	 * 
-	 * @param doc the document to be displayed
-	 * @param fileVer file version specification, null to use the current
-	 *        version
-	 * @param changedListener the handler to invoke on save
-	 * @param editEnabled if the user can edit the annotations
-	 */
-	public AnnotationsWindow(GUIDocument doc, String fileVer, NoteChangedListener changedListener,
-			boolean editEnabled) {
-		super(doc, fileVer != null ? fileVer : doc.getFileVersion(), null);
+        this.changedListener = changedListener;
+        this.editEnabled = editEnabled;
+    }
 
-		this.changedListener = changedListener;
-		this.editEnabled = editEnabled;
-	}
+    @Override
+    protected DrawItem prepareAnnotationItem(GUIDocumentNote note) {
+        DrawItem drawItem = newAnnotationItem(note);
+        if (editEnabled && drawItem != null) {
+            AnnotationContextMenu contextMenu = new AnnotationContextMenu(drawItem, note);
+            contextMenu.addDeleteClickHandler(
+                    click -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+                        if (Boolean.TRUE.equals(confirm)) {
+                            notes.remove(note);
+                            drawItem.erase();
+                        }
+                    }));
 
-	@Override
-	protected DrawItem prepareAnnotationItem(GUIDocumentNote note) {
-		DrawItem drawItem = newAnnotationItem(note);
-		if (editEnabled && drawItem != null) {
-			AnnotationContextMenu contextMenu = new AnnotationContextMenu(drawItem, note);
-			contextMenu.addDeleteClickHandler(
-					click -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
-						if (Boolean.TRUE.equals(confirm)) {
-							notes.remove(note);
-							drawItem.erase();
-						}
-					}));
+            contextMenu.addSecurityClickHandler(click -> new NoteSecurityDialog(note, null).show());
 
-			contextMenu.addSecurityClickHandler(click -> new NoteSecurityDialog(note, null).show());
+            drawItem.setContextMenu(contextMenu);
+        }
+        return drawItem;
+    }
 
-			drawItem.setContextMenu(contextMenu);
-		}
-		return drawItem;
-	}
+    private void addNewNote(String shape) {
+        GUIDocumentNote newNote = new GUIDocumentNote();
+        newNote.setDocId(document.getId());
+        newNote.setFileVersion(fileVersion);
+        newNote.setPage((Integer) pageCursor.getValue());
+        newNote.setShowKnobs(true);
+        newNote.setMessage("new note");
+        newNote.setShape(shape);
 
-	private void addNewNote(String shape) {
-		GUIDocumentNote newNote = new GUIDocumentNote();
-		newNote.setDocId(document.getId());
-		newNote.setFileVersion(fileVersion);
-		newNote.setPage((Integer) pageCursor.getValue());
-		newNote.setShowKnobs(true);
-		newNote.setMessage("new note");
-		newNote.setShape(shape);
+        if (newNote.getShape().equals(COMMENT)) {
+            newNote.setHeight(0.06);
+            newNote.setShape(COMMENT);
+        } else if (newNote.getShape().equals(CIRCLE)) {
+            newNote.setHeight(0.10);
+        } else if (newNote.getShape().equals(LABEL)) {
+            newNote.setLineWidth(25);
+            newNote.setLineColor("red");
+        } else if (newNote.getShape().equals("line") || newNote.getShape().equals("arrow")) {
+            newNote.setLineColor("red");
+            newNote.setLineWidth(3);
+        }
+        notes.add(newNote);
 
-		if (newNote.getShape().equals(COMMENT) || newNote.getShape().equals(COMMENT_FLIPPED)) {
-			newNote.setHeight(0.06);
-			newNote.setShape(COMMENT);
-			if (shape.equals(COMMENT_FLIPPED))
-				newNote.setRotation(180.0);
-		} else if (newNote.getShape().equals(CIRCLE)) {
-			newNote.setHeight(0.10);
-		} else if (newNote.getShape().equals(LABEL)) {
-			newNote.setLineWidth(25);
-			newNote.setLineColor("red");
-		} else if (newNote.getShape().equals("line") || newNote.getShape().equals("arrow")) {
-			newNote.setLineColor("red");
-			newNote.setLineWidth(3);
-		}
-		notes.add(newNote);
+        DrawItem newItem = prepareAnnotationItem(newNote);
+        pageDrawingPane.addDrawItem(newItem, true);
+        currentPageItems.put(newItem, newNote);
+    }
 
-		DrawItem newItem = prepareAnnotationItem(newNote);
-		pageDrawingPane.addDrawItem(newItem, true);
-		currentPageItems.put(newItem, newNote);
-	}
+    @Override
+    protected void prepareAdditionalActions(ToolStrip toolStrip) {
+        if (editEnabled) {
+            ToolStripButton addLabel = AwesomeFactory.newToolStripButton("font", LABEL);
+            addLabel.addClickHandler(click -> addNewNote(LABEL));
 
-	@Override
-	protected void prepareAdditionalActions(ToolStrip toolStrip) {
-		if (editEnabled) {
-			ToolStripButton addLabel = AwesomeFactory.newToolStripButton("font", LABEL);
-			addLabel.addClickHandler(click -> addNewNote(LABEL));
+            toolStrip.addMenuButton(getPolygonMenuButton());
+            toolStrip.addMenuButton(getLineMenuButton());
+            toolStrip.addMenuButton(getShapeMenuButton());
+            toolStrip.addButton(addLabel);
+            toolStrip.addSeparator();
 
-			toolStrip.addMenuButton(getPolygonMenuButton());
-			toolStrip.addMenuButton(getLineMenuButton());
-			toolStrip.addMenuButton(getShapeMenuButton());
-			toolStrip.addButton(addLabel);
-			toolStrip.addSeparator();
+            ToolStripButton save = new ToolStripButton();
+            save.setTitle(I18N.message("save"));
+            save.addClickHandler(click -> onSave());
+            toolStrip.addButton(save);
 
-			ToolStripButton save = new ToolStripButton();
-			save.setTitle(I18N.message("save"));
-			save.addClickHandler(click -> onSave());
-			toolStrip.addButton(save);
+        }
+    }
 
-		}
-	}
+    private ToolStripMenuButton getShapeMenuButton() {
+        Menu menu = new Menu();
+        menu.setShowShadow(true);
+        menu.setShadowDepth(3);
 
-	private ToolStripMenuButton getShapeMenuButton() {
-		Menu menu = new Menu();
-		menu.setShowShadow(true);
-		menu.setShadowDepth(3);
+        MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("arrow-alt-right"));
+        arrow.addClickHandler(click -> addNewNote("thickarrow"));
 
-		MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("arrow-alt-right"));
-		arrow.addClickHandler(click -> addNewNote("thickarrow"));
+        MenuItem comment = new MenuItem(AwesomeFactory.getIconHtml(COMMENT_ALT));
+        comment.addClickHandler(click -> addNewNote(COMMENT));
 
-		MenuItem comment = new MenuItem(AwesomeFactory.getIconHtml(COMMENT_ALT));
-		comment.addClickHandler(click -> addNewNote(COMMENT));
+        menu.setData(comment, arrow);
 
-		MenuItem commentFlipped = new MenuItem(AwesomeFactory.getIconHtml(COMMENT_ALT, "fa-rotate-180", null));
-		commentFlipped.addClickHandler(click -> addNewNote(COMMENT_FLIPPED));
+        return AwesomeFactory.newToolStripToolStripMenuButton(COMMENT_ALT, null, null, "shape", menu);
+    }
 
-		menu.setData(comment, commentFlipped, arrow);
+    private ToolStripMenuButton getPolygonMenuButton() {
+        Menu menu = new Menu();
+        menu.setShowShadow(true);
+        menu.setShadowDepth(3);
 
-		return AwesomeFactory.newToolStripToolStripMenuButton(COMMENT_ALT, null, null, "shape", menu);
-	}
+        MenuItem square = new MenuItem(AwesomeFactory.getIconHtml(SQUARE2));
+        square.addClickHandler(click -> addNewNote(SQUARE2));
 
-	private ToolStripMenuButton getPolygonMenuButton() {
-		Menu menu = new Menu();
-		menu.setShowShadow(true);
-		menu.setShadowDepth(3);
+        MenuItem circle = new MenuItem(AwesomeFactory.getIconHtml(CIRCLE));
+        circle.addClickHandler(click -> addNewNote(CIRCLE));
 
-		MenuItem square = new MenuItem(AwesomeFactory.getIconHtml(SQUARE2));
-		square.addClickHandler(click -> addNewNote(SQUARE2));
+        menu.setItems(square, circle);
 
-		MenuItem circle = new MenuItem(AwesomeFactory.getIconHtml(CIRCLE));
-		circle.addClickHandler(click -> addNewNote(CIRCLE));
+        return AwesomeFactory.newToolStripToolStripMenuButton(SQUARE2, null, null, "polygon", menu);
+    }
 
-		menu.setItems(square, circle);
+    private ToolStripMenuButton getLineMenuButton() {
+        Menu menu = new Menu();
+        menu.setShowShadow(true);
+        menu.setShadowDepth(3);
 
-		return AwesomeFactory.newToolStripToolStripMenuButton(SQUARE2, null, null, "polygon", menu);
-	}
+        MenuItem line = new MenuItem(AwesomeFactory.getIconHtml("horizontal-rule"));
+        line.addClickHandler(click -> addNewNote("line"));
 
-	private ToolStripMenuButton getLineMenuButton() {
-		Menu menu = new Menu();
-		menu.setShowShadow(true);
-		menu.setShadowDepth(3);
+        MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("long-arrow-right"));
+        arrow.addClickHandler(click -> addNewNote("arrow"));
 
-		MenuItem line = new MenuItem(AwesomeFactory.getIconHtml("horizontal-rule"));
-		line.addClickHandler(click -> addNewNote("line"));
+        menu.setItems(line, arrow);
 
-		MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("long-arrow-right"));
-		arrow.addClickHandler(click -> addNewNote("arrow"));
+        return AwesomeFactory.newToolStripToolStripMenuButton("horizontal-rule", null, null, "line", menu);
+    }
 
-		menu.setItems(line, arrow);
+    @Override
+    protected void onNotesSaved() {
+        if (changedListener != null)
+            changedListener.onChanged(null);
+        destroy();
+    }
 
-		return AwesomeFactory.newToolStripToolStripMenuButton("horizontal-rule", null, null, "line", menu);
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
 
-	@Override
-	protected void onNotesSaved() {
-		if (changedListener != null)
-			changedListener.onChanged(null);
-		destroy();
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

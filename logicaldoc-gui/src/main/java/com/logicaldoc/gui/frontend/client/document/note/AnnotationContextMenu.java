@@ -68,6 +68,8 @@ public class AnnotationContextMenu extends Menu {
 
 		moveOrResize.setCheckIfCondition((target, menu, item) -> drawItem.getCanDrag());
 
+        MenuItem rotationMenuItem = prepareRotationMenuItem();
+		
 		MenuItem fillMenuItem = prepareFillMenuItem();
 
 		MenuItem lineMenuItem = prepareLineMenuItem();
@@ -81,6 +83,8 @@ public class AnnotationContextMenu extends Menu {
 				|| drawItem instanceof DrawGroup) {
 			if (editEnabled)
 				items.add(new MenuItemSeparator());
+			items.add(rotationMenuItem);
+			items.add(new MenuItemSeparator());
 			items.add(fillMenuItem);
 		}
 		items.add(new MenuItemSeparator());
@@ -104,6 +108,38 @@ public class AnnotationContextMenu extends Menu {
 		// Nothing to do
 	}
 
+	private MenuItem prepareRotationMenuItem() {
+	    SpinnerItem rotation = ItemFactory.newSpinnerItem("rotation", I18N.message("rotation"), (int)note.getRotation());
+	    rotation.setRequired(true);
+	    rotation.setMin(0);
+	    rotation.setMax(360);
+	    rotation.setStep(1);
+	    rotation.setDisabled(!editEnabled);
+	    rotation.addChangedHandler(event -> {
+	        double degrees = Double.parseDouble(event.getValue().toString());
+	        note.setRotation(degrees);
+	        drawItem.rotateTo(degrees);
+	    });
+	    
+        final DynamicForm rotationForm = new DynamicForm();
+        rotationForm.setSnapTo("TR");
+        rotationForm.setNumCols(4);
+        rotationForm.setTitleOrientation(TitleOrientation.LEFT);
+        rotationForm.setFields(rotation);
+
+        final HStack rotationEmbedded = new HStack(3);
+        rotationEmbedded.setDefaultLayoutAlign(VerticalAlignment.CENTER);
+        rotationEmbedded.setSnapTo("TR");
+        rotationEmbedded.setHeight100();
+        rotationEmbedded.setMembers(rotationForm);
+
+        final MenuItem rotationMenuItem = new MenuItem(I18N.message("rotation"));
+        rotationMenuItem.setShowRollOver(false);
+        rotationMenuItem.setEmbeddedComponentFields("key");
+        rotationMenuItem.setEmbeddedComponent(rotationEmbedded);
+        return rotationMenuItem;
+    }
+	
 	private MenuItem prepareFillMenuItem() {
 		ColorPickerItem fillColor = ItemFactory.newColorPickerItem("fillColor", I18N.message("color"), note.getColor(),
 				false, event -> {
