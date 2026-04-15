@@ -111,7 +111,7 @@ public class AnnotationContextMenu extends Menu {
 	private MenuItem prepareRotationMenuItem() {
 	    SpinnerItem rotation = ItemFactory.newSpinnerItem("rotation", I18N.message("rotation"), (int)note.getRotation());
 	    rotation.setRequired(true);
-	    rotation.setMin(0);
+	    rotation.setMin(-360);
 	    rotation.setMax(360);
 	    rotation.setStep(1);
 	    rotation.setDisabled(!editEnabled);

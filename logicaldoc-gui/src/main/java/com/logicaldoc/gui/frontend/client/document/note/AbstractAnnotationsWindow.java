@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
@@ -118,8 +119,25 @@ public abstract class AbstractAnnotationsWindow extends Window {
                     pageDrawingPane.addDrawItem(noteDrawItem, false);
                     noteDrawItem.draw();
                     currentPageItems.put(noteDrawItem, note);
+
+                    // By giving this command after draw we ensure the message
+                    // gets displayed
+                    noteDrawItem.setTitle(note.getMessage());
                 }
             }
+
+        /*
+         * After all shapes are drawn we give the title again to all of them to
+         * ensure the message gets reliably displayed
+         */
+        Timer timer = new Timer() {
+            public void run() {
+                for (Map.Entry<DrawItem, GUIDocumentNote> entry : currentPageItems.entrySet()) {
+                    entry.getKey().setTitle(entry.getValue().getMessage());
+                }
+            }
+        };
+        timer.schedule(100);
     }
 
     /**
@@ -400,8 +418,9 @@ public abstract class AbstractAnnotationsWindow extends Window {
      */
     public static void showKnowbs(DrawItem drawItem) {
         drawItem.setCanDrag(true);
-        
-        // DrawItem does not support events for rotations so we just leave the resize
+
+        // DrawItem does not support events for rotations so we just leave the
+        // resize
         if (drawItem instanceof DrawRect || drawItem instanceof DrawShape || drawItem instanceof DrawGroup
                 || drawItem instanceof DrawOval)
             drawItem.showKnobs(KnobType.RESIZE);
