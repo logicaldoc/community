@@ -106,1728 +106,1724 @@ import jakarta.servlet.http.HttpSession;
  */
 public class SecurityServiceImpl extends AbstractRemoteService implements SecurityService {
 
-	private static final String SECURITY_CSP = "security.csp";
-
-	private static final String SECURITY_GEOLOCATION_APIKEY = "security.geolocation.apikey";
-
-	private static final String SSL_REQUIRED = "ssl.required";
-
-	private static final String COOKIES_SECURE = "cookies.secure";
-
-	private static final String COOKIES_SAMESITE = "cookies.samesite";
-
-	private static final String ANONYMOUS_USER = "%s.anonymous.user";
-
-	private static final String SECURITY_PREVIEW_CONTENTCHECK = "%s.security.preview.contentcheck";
-
-	private static final String ANONYMOUS_KEY = "%s.anonymous.key";
-
-	private static final String ANONYMOUS_ENABLED = "%s.anonymous.enabled";
-
-	private static final String GUI_SAVELOGIN = "%s.gui.savelogin";
-
-	static final String PASSWORD_OCCURRENCE = "%s.password.occurrence";
-
-	static final String PASSWORD_SEQUENCE = "%s.password.sequence";
-
-	static final String PASSWORD_SPECIAL = "%s.password.special";
-
-	static final String PASSWORD_DIGIT = "%s.password.digit";
-
-	static final String PASSWORD_LOWERCASE = "%s.password.lowercase";
-
-	static final String PASSWORD_UPPERCASE = "%s.password.uppercase";
-
-	static final String PASSWORD_SIZE = "%s.password.size";
-
-	private static final String ADMIN = "admin";
-
-	private static final long serialVersionUID = 1L;
-
-	private static final Logger log = LoggerFactory.getLogger(SecurityServiceImpl.class);
-
-	public static GUITenant getTenant(long tenantId) {
-		Tenant tenant = null;
-		try {
-			if (tenantId == Tenant.SYSTEM_ID) {
-				tenant = new Tenant();
-				tenant.setId(Tenant.SYSTEM_ID);
-				tenant.setName(Tenant.SYSTEM_NAME);
-			} else {
-				tenant = TenantDAO.get().findById(tenantId);
-			}
-			return fromTenant(tenant);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
-
-	public static GUITenant fromTenant(Tenant tenant) {
-		if (tenant == null)
-			return null;
-		GUITenant guiTenant = new GUITenant();
-		guiTenant.setId(tenant.getId());
-		guiTenant.setTenantId(tenant.getTenantId());
-		guiTenant.setCity(tenant.getCity());
-		guiTenant.setCountry(tenant.getCountry());
-		guiTenant.setDisplayName(tenant.getDisplayName());
-		guiTenant.setEmail(tenant.getEmail());
-		guiTenant.setName(tenant.getName());
-		guiTenant.setPostalCode(tenant.getPostalCode());
-		guiTenant.setState(tenant.getState());
-		guiTenant.setStreet(tenant.getStreet());
-		guiTenant.setTelephone(tenant.getTelephone());
-		guiTenant.setMaxRepoDocs(tenant.getMaxDocuments());
-		guiTenant.setMaxRepoSize(tenant.getMaxRepoSize());
-		guiTenant.setMaxSessions(tenant.getMaxSessions());
-		guiTenant.setMaxApiCalls(tenant.getMaxApiCalls());
-		guiTenant.setMaxUsers(tenant.getMaxUsers());
-		guiTenant.setMaxGuests(tenant.getMaxGuests());
-		guiTenant.setMaxTickets(tenant.getMaxTickets());
-		guiTenant.setMaxWorkflows(tenant.getMaxWorkflows());
-		guiTenant.setMaxForms(tenant.getMaxForms());
-		guiTenant.setMaxReports(tenant.getMaxReports());
-		guiTenant.setMaxStamps(tenant.getMaxStamps());
-		guiTenant.setMaxImportFolders(tenant.getMaxImportFolders());
-		guiTenant.setMaxEmailAccounts(tenant.getMaxEmailAccounts());
-		guiTenant.setQuotaThreshold(tenant.getQuotaThreshold());
-		guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
-		guiTenant.setEnabled(tenant.isEnabled());
-		guiTenant.setExpire(tenant.getExpire());
-
-		return guiTenant;
-	}
-
-	public static GUITenant getTenant(String tenantName) throws PersistenceException {
-		Tenant tenant = TenantDAO.get().findByName(tenantName);
-		return fromTenant(tenant);
-	}
-
-	/**
-	 * Used internally by login procedures, instantiates a new GUISession by a
-	 * given authenticated user
-	 * 
-	 * @param session the current session
-	 * @param locale the current locale
-	 * 
-	 * @return session details
-	 * 
-	 * @throws ServerException a generic error
-	 */
-	public GUISession loadSession(Session session, String locale) throws ServerException {
-		GUISession guiSession = new GUISession();
-		guiSession.setSid(session.getSid());
-		guiSession.setSingleSignOn(
-				session.getDictionary().keySet().stream().anyMatch(k -> k.toLowerCase().contains("saml")));
-
-		DocumentDAO documentDao = DocumentDAO.get();
-		SystemMessageDAO messageDao = SystemMessageDAO.get();
-
-		User user = session.getUser();
-
-		GUIUser guiUser = getUser(user.getId());
-
-		if (StringUtils.isEmpty(locale) || "null".equals(locale)) {
-			guiUser.setLanguage(user.getLanguage());
-			locale = user.getLanguage();
-		} else {
-			guiUser.setLanguage(locale);
-		}
-
-		GUIInfo info = new InfoServiceImpl().getInfo(locale, session.getTenantName(), true);
-		guiSession.setInfo(info);
-
-		try {
-			guiUser.setPasswordExpired(false);
-			guiUser.setLockedDocs(documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.LOCKED).size());
-			guiUser.setCheckedOutDocs(
-					documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.CHECKEDOUT).size());
-			guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
-			guiUser.setQuota(user.getQuota());
-			guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
-			guiUser.setCertDN(user.getCertDN());
-			guiUser.setCertExpire(user.getCertExpire());
-			guiUser.setSecondFactor(user.getSecondFactor());
-
-			guiSession.setSid(session.getSid());
-			guiSession.setUser(guiUser);
-			guiSession.setLoggedIn(true);
-
-			MenuDAO mdao = MenuDAO.get();
-			List<Long> menus = mdao.findMenuIdByUserId(session.getUserId(), true);
-			guiUser.setMenus(menus);
-
-			loadDashlets(guiUser);
-
-			/*
-			 * Prepare an incoming message, if any
-			 */
-			GenericDAO gDao = GenericDAO.get();
-			Generic welcome = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, session.getTenantId());
-			if (welcome != null && StringUtils.isNotEmpty(welcome.getString1())) {
-				Map<String, Object> dictionary = new HashMap<>();
-				dictionary.put(Automation.LOCALE, user.getLocale());
-				dictionary.put(Automation.TENANT_ID, session.getTenantId());
-				dictionary.put("session", session);
-				dictionary.put("user", guiSession.getUser());
-
-				Automation automation = new Automation("incomingmessage");
-				String welcomeMessage = automation.evaluate(welcome.getString1(), dictionary);
-				guiSession.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
-			}
-
-			// Define the current locale
-			session.getDictionary().put(LOCALE, user.getLocale());
-			session.getDictionary().put(USER, user);
-
-			ContextProperties config = Context.get().getConfig();
-			guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(session.getTenantName()), 12));
-
-			return guiSession;
-		} catch (PersistenceException | AutomationException e) {
-			return throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public GUISession getSession(String locale, String sid) {
-		try {
-			Session sess = null;
-			if (StringUtils.isEmpty(sid))
-				sess = validateSession();
-			else
-				sess = validateSession(sid);
-			return loadSession(sess, locale);
-		} catch (ServerException e) {
-			log.debug(e.getMessage());
-			return null;
-		}
-	}
-
-	@Override
-	public void logout() {
-		try {
-			Session session = validateSession();
-			if (session == null)
-				return;
-
-			FileUtils.forceDelete(UserUtil.getUserResource(session.getUserId(), "temp"));
-			log.info("User {} logged out and closed session {}", session.getUsername(), session.getSid());
-			kill(session.getSid());
-		} catch (InvalidSessionServerException | IOException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
-			boolean notify) {
-		try {
-			UserDAO userDao = UserDAO.get();
-			User user = userDao.findById(userId);
-			if (user == null)
-				throw new ServerException(String.format("User %s not found", userId));
-			userDao.initialize(user);
-
-			User currentUser = getSessionUser();
-
-			/*
-			 * A non admin user cannot change the password of other users
-			 */
-			MenuDAO mDao = MenuDAO.get();
-			if (currentUser != null && currentUser.getId() != userId
-					&& !mDao.isReadAllowed(Menu.SECURITY, currentUser.getId()))
-				throw new PermissionException(String.format("User %s not allowed to change the password of user %s",
-						currentUser.getUsername(), user.getUsername()));
-
-			if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword()))
-				throw new ServerException("Wrong old passord");
-
-			UserHistory history = null;
-			// The password was changed
-			user.setDecodedPassword(newPassword);
-			user.setPasswordChanged(new Date());
-			user.setRepass("");
-
-			// Add a user history entry
-			history = new UserHistory();
-			history.setUser(user);
-			history.setEvent(UserEvent.PASSWORDCHANGED);
-			history.setComment("");
-
-			/*
-			 * If the credentials must be notified, we have to mark the password
-			 * as expired for security reasons, so the user will change it at
-			 * first login.
-			 */
-			user.setPasswordExpired(notify || requestorUserId == null || !requestorUserId.equals(userId));
-
-			userDao.store(user, history);
-			if (notify)
-				notifyAccount(user, newPassword);
-
-			return new GUIValue("0", null);
-		} catch (PasswordWeakException e) {
-			log.error(e.getMessage(), e);
-			return new GUIValue("4", e.getMessages().stream().collect(Collectors.joining("\n")));
-		} catch (PasswordAlreadyUsedException e) {
-			log.error(e.getMessage(), e);
-			return new GUIValue("3", e.getFormattedDate());
-		} catch (MessagingException e) {
-			log.warn(e.getMessage(), e);
-			return new GUIValue("2", null);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return new GUIValue("1", null);
-		}
-	}
-
-	private User getSessionUser() {
-		User currentUser = null;
-		try {
-			currentUser = getSessionUser(getThreadLocalRequest());
-		} catch (Exception e) {
-			// Do nothing
-		}
-		return currentUser;
-	}
-
-	@Override
-	public void addUserToGroup(long groupId, long userId) throws ServerException {
-		checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		UserDAO userDao = UserDAO.get();
-		try {
-			User user = userDao.findById(userId, true);
-			user.addGroup(GroupDAO.get().findById(groupId));
-			userDao.store(user);
-			userDao.initialize(user);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void deleteGroup(long groupId) throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		UserDAO userDao = UserDAO.get();
-		GroupDAO groupDao = GroupDAO.get();
-		try {
-			Group grp = groupDao.findById(groupId);
-			groupDao.initialize(grp);
-			for (User user : grp.getUsers()) {
-				userDao.initialize(user);
-				user.removeGroup(groupId);
-				userDao.store(user);
-			}
-			groupDao.delete(groupId);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void deleteUser(long userId) throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-		UserDAO userDao = UserDAO.get();
-
-		// Create the user history event
-		UserHistory transaction = new UserHistory();
-		transaction.setSession(session);
-		transaction.setEvent(UserEvent.DELETED);
-		transaction.setComment("");
-		try {
-			transaction.setUser(userDao.findById(userId));
-			userDao.delete(userId, transaction);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public GUIGroup getGroup(long groupId) throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		validateSession();
-
-		try {
-			Group group = GroupDAO.get().findById(groupId);
-
-			if (group != null) {
-				GUIGroup grp = new GUIGroup();
-				grp.setId(groupId);
-				grp.setDescription(group.getDescription());
-				grp.setName(group.getName());
-				grp.setSource(group.getSource());
-				return grp;
-			}
-
-			return null;
-		} catch (PersistenceException e) {
-			return throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public GUIUser getUser(long userId) throws ServerException {
-		Session session = validateSession();
-
-		UserDAO userDao = UserDAO.get();
-
-		try {
-			User user = userDao.findById(userId);
-			if (user != null) {
-				userDao.initialize(user);
-
-				GUIUser guiUser = new GUIUser();
-				guiUser.setId(userId);
-				guiUser.setTenant(getTenant(user.getTenantId()));
-				guiUser.setAddress(user.getStreet());
-				guiUser.setCell(user.getTelephone2());
-				guiUser.setPhone(user.getTelephone());
-				guiUser.setCity(user.getCity());
-				guiUser.setCountry(user.getCountry());
-				guiUser.setEmail(user.getEmail());
-				guiUser.setEmail2(user.getEmail2());
-				guiUser.setDepartment(user.getDepartment());
-				guiUser.setBuilding(user.getBuilding());
-				guiUser.setOrganizationalUnit(user.getOrganizationalUnit());
-				guiUser.setCompany(user.getCompany());
-				guiUser.setEnabled(user.isEnabled());
-				guiUser.setFirstName(user.getFirstName());
-				guiUser.setLanguage(user.getLanguage());
-				guiUser.setName(user.getName());
-				guiUser.setPostalCode(user.getPostalcode());
-				guiUser.setState(user.getState());
-				guiUser.setUsername(user.getUsername());
-				guiUser.setEvalFormEnabled(user.isEvalFormEnabled());
-				guiUser.setPasswordExpires(user.isPasswordExpires());
-				guiUser.setPasswordExpired(user.isPasswordExpired());
-				guiUser.setLegals(user.isLegals());
-				guiUser.setWelcomeScreen(user.getWelcomeScreen());
-				guiUser.setDefaultWorkspace(user.getDefaultWorkspace());
-				guiUser.setIpWhitelist(user.getIpWhiteList());
-				guiUser.setIpBlacklist(user.getIpBlackList());
-				guiUser.setEmailSignature(user.getEmailSignature());
-				guiUser.setEmailSignature2(user.getEmailSignature2());
-				guiUser.setCertExpire(user.getCertExpire());
-				guiUser.setCertDN(user.getCertDN());
-				guiUser.setSecondFactor(user.getSecondFactor());
-				guiUser.setKey(user.getKey());
-				guiUser.setType(user.getType().ordinal());
-				guiUser.setDocsGrid(user.getDocsGrid());
-				guiUser.setHitsGrid(user.getHitsGrid());
-				guiUser.setDateFormat(user.getDateFormat());
-				guiUser.setDateFormatShort(user.getDateFormatShort());
-				guiUser.setDateFormatLong(user.getDateFormatLong());
-				guiUser.setSearchPref(user.getSearchPref());
-				guiUser.setExpire(user.getExpire());
-				guiUser.setEnforceWorkingTime(user.isEnforceWorkingTime());
-				guiUser.setMaxInactivity(user.getMaxInactivity());
-				guiUser.setTimeZone(user.getTimeZone());
-				guiUser.setSource(user.getSource().ordinal());
-				guiUser.setCreation(user.getCreation());
-				guiUser.setLastLogin(user.getLastLogin());
-
-				List<GUIGroup> grps = new ArrayList<>();
-				for (Group group : user.getGroups()) {
-					GUIGroup guiGroup = new GUIGroup();
-					guiGroup.setId(group.getId());
-					guiGroup.setName(group.getName());
-					guiGroup.setDescription(group.getDescription());
-					guiGroup.setType(group.getType().ordinal());
-					guiGroup.setSource(group.getSource());
-					grps.add(guiGroup);
-				}
-				guiUser.setGroups(grps);
-
-				guiUser.getImpersonators().addAll(user.getImpersonators());
-
-				guiUser.setQuota(user.getQuota());
-				guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
-				guiUser.setSessionsQuota(user.getSessionsQuota());
-				guiUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
-
-				guiUser.setTenant(getTenant(user.getTenantId()));
-
-				ContextProperties config = Context.get().getConfig();
-				guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(guiUser.getTenant().getName()), 12));
-
-				loadDashlets(guiUser);
-
-				loadWorkingTimes(guiUser);
-
-				guiUser.setCustomActions(getMenus(Menu.CUSTOM_ACTIONS, guiUser.getLanguage(), true));
-
-				return guiUser;
-			}
-		} catch (NumberFormatException | PersistenceException | ServerException e) {
-			throwServerException(session, log, e);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Retrieves the dashlets configuration
-	 * 
-	 * @param usr current user
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	protected static void loadDashlets(GUIUser usr) throws PersistenceException {
-		DashletServiceImpl dashletService = new DashletServiceImpl();
-		UserDAO userDao = UserDAO.get();
-		List<GUIDashlet> dashlets = new ArrayList<>();
-		Map<String, Generic> map = userDao.findUserSettings(usr.getId(), "dashlet");
-
-		for (Generic generic : map.values()) {
-			// This could be a dashlet name or an ID
-			String dashletIdentifier = generic.getSubtype().substring(generic.getSubtype().indexOf('-') + 1);
-			try {
-				GUIDashlet dashlet = null;
-				if (StringUtils.isNumeric(dashletIdentifier))
-					dashlet = dashletService.get(Long.parseLong(dashletIdentifier));
-				else
-					dashlet = dashletService.get(dashletIdentifier);
-
-				dashlet.setColumn(generic.getInteger2() != null ? generic.getInteger2().intValue() : 0);
-				dashlet.setRow(generic.getInteger3() != null ? generic.getInteger3().intValue() : 0);
-				dashlet.setIndex(generic.getString1() != null ? Integer.parseInt(generic.getString1()) : 0);
-				dashlets.add(dashlet);
-			} catch (NumberFormatException | ServerException e) {
-				// Nothing to do
-			}
-		}
-		usr.setDashlets(dashlets);
-	}
-
-	@Override
-	public void removeFromGroup(long groupId, List<Long> userIds) throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
-
-		checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
-
-		try {
-			UserDAO userDao = UserDAO.get();
-			Group group = GroupDAO.get().findById(groupId);
-			for (long id : userIds) {
-				User user = userDao.findById(id, true);
-				user.removeGroup(group.getId());
-				userDao.store(user);
-			}
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public GUIGroup saveGroup(GUIGroup group) throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
-
-		try {
-			GroupDAO groupDao = GroupDAO.get();
-			Group grp;
-			if (group.getId() != 0) {
-				grp = groupDao.findById(group.getId());
-				groupDao.initialize(grp);
-
-				grp.setName(group.getName());
-				grp.setDescription(group.getDescription());
-
-				if (group.getInheritGroupId() == null || group.getInheritGroupId().longValue() == 0) {
-					groupDao.store(grp);
-				} else {
-					groupDao.insert(grp, group.getInheritGroupId().longValue());
-				}
-			} else {
-				grp = new Group();
-				grp.setTenantId(session.getTenantId());
-				grp.setName(group.getName());
-				grp.setDescription(group.getDescription());
-
-				groupDao.store(grp);
-
-				if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() != 0)
-					groupDao.inheritACLs(grp, group.getInheritGroupId().longValue());
-			}
-
-			group.setId(grp.getId());
-			return group;
-		} catch (PersistenceException e) {
-			return throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public GUIUser saveUser(GUIUser guiUser, GUIInfo info) throws ServerException {
-		Session session = validateSession();
-
-		UserDAO userDao = UserDAO.get();
-		boolean createNew = false;
-
-		// Disallow the editing of other users if you do not have access to
-		// the Security
-		disallowEditingOfOtherUsers(guiUser, session);
-
-		try {
-			User user = getOrCreateUser(guiUser);
-
-			createNew = user.getId() == 0L;
-
-			user.setTenantId(session.getTenantId());
-			user.setCity(guiUser.getCity());
-			user.setCountry(guiUser.getCountry());
-			user.setEmail(guiUser.getEmail());
-			user.setEmail2(guiUser.getEmail2());
-			user.setFirstName(guiUser.getFirstName());
-			user.setName(guiUser.getName());
-			user.setLanguage(guiUser.getLanguage());
-			user.setPostalcode(guiUser.getPostalCode());
-			user.setState(guiUser.getState());
-			user.setStreet(guiUser.getAddress());
-			user.setTelephone(guiUser.getPhone());
-			user.setTelephone2(guiUser.getCell());
-			user.setBuilding(guiUser.getBuilding());
-			user.setOrganizationalUnit(guiUser.getOrganizationalUnit());
-			user.setDepartment(guiUser.getDepartment());
-			user.setCompany(guiUser.getCompany());
-			user.setUsername(guiUser.getUsername());
-			user.setEnabled(guiUser.isEnabled());
-			user.setPasswordExpires(guiUser.isPasswordExpires());
-			user.setPasswordExpired(guiUser.isPasswordExpired());
-			user.setEvalFormEnabled(guiUser.isEvalFormEnabled());
-			user.setLegals(guiUser.isLegals());
-			user.setWelcomeScreen(guiUser.getWelcomeScreen());
-			user.setIpWhiteList(guiUser.getIpWhitelist());
-			user.setIpBlackList(guiUser.getIpBlacklist());
-			user.setEmailSignature(guiUser.getEmailSignature());
-			user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
-			user.setQuota(guiUser.getQuota());
-			user.setSessionsQuota(guiUser.getSessionsQuota());
-			user.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
-			user.setKey(guiUser.getKey());
-			user.setType(guiUser.getType());
-			user.setDocsGrid(guiUser.getDocsGrid());
-			user.setHitsGrid(guiUser.getHitsGrid());
-			user.setDateFormat(guiUser.getDateFormat());
-			user.setDateFormatShort(guiUser.getDateFormatShort());
-			user.setDateFormatLong(guiUser.getDateFormatLong());
-			user.setSearchPref(guiUser.getSearchPref());
-			user.setEnforceWorkingTime(guiUser.isEnforceWorkingTime());
-			user.setSecondFactor(guiUser.getSecondFactor());
-			user.setMaxInactivity(guiUser.getMaxInactivity() == null || guiUser.getMaxInactivity() == 0 ? null
-					: guiUser.getMaxInactivity());
-			user.setTimeZone(guiUser.getTimeZone());
-
-			setExpire(user, guiUser);
-
-			String decodedPassword = StringUtils.defaultString(user.getDecodedPassword(), "-");
-			if (createNew) {
-				User existingUser = userDao.findByUsername(guiUser.getUsername());
-				if (existingUser != null) {
-					log.warn("Tried to create duplicate username {}", guiUser.getUsername());
-					guiUser.setWelcomeScreen(-99);
-					return guiUser;
-				}
-
-				String tenant = session.getTenantName();
-
-				// Generate an initial password(that must be changed)
-				ContextProperties config = Context.get().getConfig();
-				decodedPassword = PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
-						config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
-						config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),
-						config.getInt(PASSWORD_DIGIT.formatted(tenant), 1),
-						config.getInt(PASSWORD_SPECIAL.formatted(tenant), 1),
-						config.getInt(PASSWORD_SEQUENCE.formatted(tenant), 4),
-						config.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
-				user.setDecodedPassword(decodedPassword);
-				user.setPasswordExpired(true);
-				user.setPasswordChanged(new Date());
-			}
-
-			saveWorkingTimes(user, guiUser.getWorkingTimes());
-
-			UserHistory transaction = new UserHistory();
-			transaction.setSession(session);
-			transaction.setEvent(UserEvent.UPDATED);
-			userDao.store(user, transaction);
-
-			guiUser.setId(user.getId());
-
-			user = userDao.findById(user.getId());
-			userDao.initialize(user);
-
-			user.getImpersonators().clear();
-			user.getImpersonators().addAll(guiUser.getImpersonators());
-
-			setGroups(user, guiUser, transaction);
-
-			// Notify the user by email
-			if (createNew && user.getSource().equals(UserSource.DEFAULT))
-				user.setDecodedPassword(decodedPassword);
-			notifyUser(guiUser, user, createNew);
-		} catch (MessagingException me) {
-			log.warn(me.getMessage(), me);
-		} catch (Exception e) {
-			return throwServerException(session, log, e);
-		}
-
-		return getUser(guiUser.getId());
-	}
-
-	private void notifyUser(GUIUser guiUser, User user, boolean createNew)
-			throws MessagingException, AutomationException {
-		if (createNew && guiUser.isNotifyCredentials())
-			notifyAccount(user, user.getDecodedPassword());
-	}
-
-	private void disallowEditingOfOtherUsers(GUIUser guiUser, Session session)
-			throws InvalidSessionServerException, AccessDeniedException {
-		if (guiUser.getId() != session.getUserId() && getThreadLocalRequest() != null)
-			checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-	}
-
-	private void setGroups(User user, GUIUser guiUser, UserHistory transaction) throws PersistenceException {
-		UserDAO userDao = UserDAO.get();
-		GroupDAO groupDao = GroupDAO.get();
-
-		user.removeGroupMemberships(null);
-		for (Long groupId : guiUser.getGroups().stream().map(g -> g.getId()).toList())
-			user.addGroup(groupDao.findById(groupId));
-
-		Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
-		groupDao.initialize(adminGroup);
-
-		// The admin user must be always member of admin group
-		if (ADMIN.equals(guiUser.getUsername()) && !guiUser.isMemberOf(Group.GROUP_ADMIN))
-			user.addGroup(adminGroup);
-
-		// Use a fake transaction just to avoid event triggering
-		UserHistory fakeTransaction = new UserHistory(transaction);
-		fakeTransaction.setNotifyEvent(false);
-		userDao.store(user, fakeTransaction);
-	}
-
-	private void setExpire(User usr, GUIUser guiUser) {
-		if (guiUser.getExpire() != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(guiUser.getExpire());
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 0);
-			usr.setExpire(cal.getTime());
-		} else
-			usr.setExpire(null);
-	}
-
-	private User getOrCreateUser(GUIUser guiUser) throws PersistenceException {
-		UserDAO userDao = UserDAO.get();
-		User usr;
-		if (guiUser.getId() != 0) {
-			usr = userDao.findById(guiUser.getId());
-			userDao.initialize(usr);
-		} else {
-			usr = new User();
-		}
-		return usr;
-	}
-
-	private void saveWorkingTimes(User user, List<GUIWorkingTime> guiWts) {
-		user.getWorkingTimes().clear();
-		Calendar cal = Calendar.getInstance();
-		for (GUIWorkingTime guiWorkingTime : guiWts) {
-			cal.setTime(guiWorkingTime.getStart());
-			int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-			int hourStart = cal.get(Calendar.HOUR_OF_DAY);
-			int minuteStart = cal.get(Calendar.MINUTE);
-			WorkingTime wt = new WorkingTime(dayOfWeek, hourStart, minuteStart);
-
-			cal.setTime(guiWorkingTime.getEnd());
-			wt.setHourEnd(cal.get(Calendar.HOUR_OF_DAY));
-			wt.setMinuteEnd(cal.get(Calendar.MINUTE));
-
-			wt.setLabel(guiWorkingTime.getLabel());
-			wt.setDescription(guiWorkingTime.getDescription());
-
-			user.getWorkingTimes().add(wt);
-		}
-	}
-
-	private void loadWorkingTimes(GUIUser guiUser) throws PersistenceException {
-		UserDAO userDao = UserDAO.get();
-		User user = userDao.findById(guiUser.getId());
-		if (user == null)
-			return;
-		else
-			userDao.initialize(user);
-
-		List<GUIWorkingTime> guiWts = new ArrayList<>();
-		if (user.getWorkingTimes() != null)
-			for (WorkingTime workingTime : user.getWorkingTimes()) {
-				int dayOfWeek = workingTime.getDayOfWeek();
-
-				Calendar cal = Calendar.getInstance();
-				// Set the calendar to the last Sunday
-				cal.add(Calendar.DAY_OF_WEEK, -(cal.get(Calendar.DAY_OF_WEEK) - 1));
-
-				// Now shift the day of week of the working time
-				cal.add(Calendar.DAY_OF_WEEK, dayOfWeek - 1);
-				cal.set(Calendar.HOUR_OF_DAY, workingTime.getHourStart());
-				cal.set(Calendar.MINUTE, workingTime.getMinuteStart());
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 99);
-				Date start = cal.getTime();
-
-				cal.set(Calendar.HOUR_OF_DAY, workingTime.getHourEnd());
-				cal.set(Calendar.MINUTE, workingTime.getMinuteEnd());
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 99);
-				Date end = cal.getTime();
-
-				GUIWorkingTime guiWt = new GUIWorkingTime(workingTime.getLabel(), start, end);
-				guiWt.setDescription(workingTime.getDescription());
-
-				guiWts.add(guiWt);
-			}
-
-		guiUser.setWorkingTimes(guiWts);
-	}
-
-	/**
-	 * Notify the user with it's new account
-	 * 
-	 * @param user The created user
-	 * @param password The decoded password
-	 * 
-	 * @throws MessagingException Cannot notify user
-	 * @throws AutomationException the script has been evaluated but produced an
-	 *         error
-	 */
-	private void notifyAccount(User user, String password) throws MessagingException, AutomationException {
-		EMail email;
-		email = new EMail();
-		email.setHtml(true);
-		Recipient recipient = new Recipient();
-		recipient.setAddress(user.getEmail());
-		recipient.setRead(1);
-		email.addRecipient(recipient);
-		email.setFolder("outbox");
-		email.setUsername(user.getUsername());
-		email.setSentDate(new Date());
-
-		Locale locale = user.getLocale();
-		email.setLocale(locale);
-
-		/*
-		 * Prepare the template
-		 */
-		Map<String, Object> dictionary = new HashMap<>();
-		ContextProperties config = Context.get().getConfig();
-		String address = config.getProperty("server.url");
-		dictionary.put("url", address);
-		dictionary.put("user", user);
-		dictionary.put("password", password);
-		dictionary.put(Automation.LOCALE, locale);
-
-		new EMailSender(user.getTenantId()).send(email, "psw.rec1", dictionary);
-	}
-
-	@Override
-	public GUIUser saveProfile(GUIUser guiUser) throws ServerException {
-		Session session = validateSession();
-
-		UserDAO userDao = UserDAO.get();
-
-		// Disallow the editing of other users if you do not have access to
-		// the Security
-		if (guiUser.getId() != session.getUserId())
-			checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		try {
-			User user = userDao.findById(guiUser.getId());
-			userDao.initialize(user);
-
-			user.setFirstName(guiUser.getFirstName());
-			user.setName(guiUser.getName());
-			user.setEmail(guiUser.getEmail());
-			user.setEmail2(guiUser.getEmail2());
-			user.setLanguage(guiUser.getLanguage());
-			user.setStreet(guiUser.getAddress());
-			user.setPostalcode(guiUser.getPostalCode());
-			user.setCity(guiUser.getCity());
-			user.setCountry(guiUser.getCountry());
-			user.setState(guiUser.getState());
-			user.setTelephone(guiUser.getPhone());
-			user.setTelephone2(guiUser.getCell());
-			user.setCompany(guiUser.getCompany());
-			user.setBuilding(guiUser.getBuilding());
-			user.setOrganizationalUnit(guiUser.getOrganizationalUnit());
-			user.setDepartment(guiUser.getDepartment());
-
-			user.setWelcomeScreen(guiUser.getWelcomeScreen());
-			user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
-			user.setEmailSignature(guiUser.getEmailSignature());
-			user.setEmailSignature2(guiUser.getEmailSignature2());
-			user.setTimeZone(guiUser.getTimeZone());
-			user.setDocsGrid(guiUser.getDocsGrid());
-			user.setHitsGrid(guiUser.getHitsGrid());
-
-			user.setDateFormat(guiUser.getDateFormat());
-			user.setDateFormatShort(guiUser.getDateFormatShort());
-			user.setDateFormatLong(guiUser.getDateFormatLong());
-			user.setSearchPref(guiUser.getSearchPref());
-
-			user.setEvalFormEnabled(guiUser.isEvalFormEnabled());
-
-			UserHistory transaction = new UserHistory();
-			transaction.setSession(session);
-			transaction.setEvent(UserEvent.UPDATED);
-			userDao.store(user, transaction);
-
-			return guiUser;
-		} catch (PersistenceException e) {
-			return throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public GUIUser saveInterfaceSettings(GUIUser user) throws ServerException {
-		Session session = validateSession();
-
-		UserDAO userDao = UserDAO.get();
-
-		// Disallow the editing of other users if you do not have access to
-		// the Security
-		if (user.getId() != session.getUserId())
-			checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		try {
-			User usr = userDao.findById(user.getId());
-			userDao.initialize(usr);
-
-			usr.setWelcomeScreen(user.getWelcomeScreen());
-			usr.setDefaultWorkspace(user.getDefaultWorkspace());
-			usr.setDocsGrid(user.getDocsGrid());
-			usr.setHitsGrid(user.getHitsGrid());
-
-			userDao.store(usr);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-
-		return user;
-	}
-
-	@Override
-	public void kill(String sid) {
-		// Kill the LogicalDOC session
-		SessionManager.get().kill(sid);
-
-		// Also kill the servlet container session, if any
-		HttpSession httpSession = SessionManager.get().getServletSession(sid);
-
-		try {
-			if (httpSession != null)
-				httpSession.invalidate();
-		} catch (Exception e) {
-			// Ignore
-		}
-
-		SessionManager.get().removeSid(getThreadLocalRequest());
-	}
-
-	@Override
-	public GUISecuritySettings loadSettings() throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		GUISecuritySettings securitySettings = new GUISecuritySettings();
-
-		UserDAO userDao = UserDAO.get();
-		ContextProperties pbean = Context.get().getConfig();
-
-		String tenant = session.getTenantName();
-		securitySettings.setPwdExpiration(pbean.getInt("%s.password.ttl".formatted(tenant), 90));
-		securitySettings.setPwdSize(pbean.getInt(PASSWORD_SIZE.formatted(tenant), 8));
-		securitySettings.setPwdLowerCase(pbean.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2));
-		securitySettings.setPwdUpperCase(pbean.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2));
-		securitySettings.setPwdDigit(pbean.getInt(PASSWORD_DIGIT.formatted(tenant), 1));
-		securitySettings.setPwdSpecial(pbean.getInt(PASSWORD_SPECIAL.formatted(tenant), 1));
-		securitySettings.setPwdSequence(pbean.getInt(PASSWORD_SEQUENCE.formatted(tenant), 3));
-		securitySettings.setPwdOccurrence(pbean.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
-		securitySettings.setPwdEnforceHistory(pbean.getInt("%s.password.enforcehistory".formatted(tenant), 3));
-		securitySettings.setPwdCheckLogin(pbean.getBoolean("%s.password.checklogin".formatted(tenant), false));
-
-		securitySettings.setMaxInactivity(pbean.getInt("%s.security.user.maxinactivity".formatted(tenant)));
-		if (StringUtils.isNotEmpty(pbean.getProperty(GUI_SAVELOGIN.formatted(tenant))))
-			securitySettings.setSaveLogin("true".equals(pbean.getProperty(GUI_SAVELOGIN.formatted(tenant))));
-		securitySettings.setIgnoreLoginCase("true".equals(pbean.getProperty("login.ignorecase")));
-		securitySettings.setAllowSidInRequest(pbean.getBoolean("security.acceptsid", false));
-		securitySettings.setAllowClientId(pbean.getBoolean("security.useclientid", true));
-		if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))))
-			securitySettings
-					.setEnableAnonymousLogin("true".equals(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))));
-		if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant))))
-			securitySettings.setAnonymousKey(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant)));
-		if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)))) {
-			try {
-				User user = userDao.findByUsername(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)));
-				if (user != null)
-					securitySettings.setAnonymousUser(getUser(user.getId()));
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage(), e);
-			}
-		}
-		if (StringUtils.isNotEmpty(pbean.getProperty(SSL_REQUIRED)))
-			securitySettings.setForceSsl("true".equals(pbean.getProperty(SSL_REQUIRED)));
-		if (StringUtils.isNotEmpty(pbean.getProperty(COOKIES_SECURE)))
-			securitySettings.setCookiesSecure("true".equals(pbean.getProperty(COOKIES_SECURE)));
-		securitySettings.setCookiesSameSite(pbean.getProperty(COOKIES_SAMESITE, "unset"));
-
-		securitySettings.setAlertNewDevice(pbean.getBoolean("%s.alertnewdevice".formatted(tenant), true));
-
-		securitySettings.setGeolocationEnabled(pbean.getBoolean("security.geolocation.enabled", true));
-		securitySettings.setGeolocationCache(pbean.getBoolean("security.geolocation.cache", false));
-		securitySettings.setGeolocationKey(pbean.getProperty(SECURITY_GEOLOCATION_APIKEY));
-		securitySettings.setGeolocationDbVer(Geolocation.get().getDatabaseVersion());
-
-		securitySettings.setContentSecurityPolicy(pbean.getProperty(SECURITY_CSP));
-
-		securitySettings.setPreviewContentCheck(pbean.getBoolean(SECURITY_PREVIEW_CONTENTCHECK, true));
-
-		log.debug("Security settings data loaded successfully.");
-
-		return securitySettings;
-	}
-
-	@Override
-	public boolean saveSettings(GUISecuritySettings settings) throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		boolean restartRequired = false;
-
-		ContextProperties conf = Context.get().getConfig();
-
-		if (session.getTenantId() == Tenant.DEFAULT_ID) {
-			conf.setProperty("login.ignorecase", Boolean.toString(settings.isIgnoreLoginCase()));
-			conf.setProperty(SSL_REQUIRED, Boolean.toString(settings.isForceSsl()));
-			conf.setProperty(COOKIES_SECURE, Boolean.toString(settings.isCookiesSecure()));
-			conf.setProperty("security.acceptsid", Boolean.toString(settings.isAllowSidInRequest()));
-			conf.setProperty("security.useclientid", Boolean.toString(settings.isAllowClientId()));
-
-			conf.setProperty("security.geolocation.enabled", Boolean.toString(settings.isGeolocationEnabled()));
-			conf.setProperty("security.geolocation.cache", Boolean.toString(settings.isGeolocationCache()));
-			conf.setProperty(SECURITY_GEOLOCATION_APIKEY,
-					settings.getGeolocationKey() != null ? settings.getGeolocationKey() : "");
-
-			String currentCsp = conf.getProperty(SECURITY_CSP, "");
-			restartRequired = currentCsp.equals(settings.getContentSecurityPolicy());
-			conf.setProperty(SECURITY_CSP, settings.getContentSecurityPolicy());
-
-			try {
-				// Update the WEB-INF/web.xml
-				ServletContext context = getServletContext();
-				String policy = "true".equals(conf.getProperty(SSL_REQUIRED)) ? "CONFIDENTIAL" : "NONE";
-				WebConfigurator webConfigurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
-				restartRequired = restartRequired || webConfigurator.setTransportGuarantee(policy);
-
-				// Update the META-INF/context.xml
-				conf.setProperty(COOKIES_SAMESITE, settings.getCookiesSameSite());
-				WebContextConfigurator webContextConfigurator = new WebContextConfigurator(
-						context.getRealPath("/META-INF/context.xml"));
-				restartRequired = restartRequired
-						|| webContextConfigurator.setSameSiteCookies(settings.getCookiesSameSite());
-			} catch (Exception e) {
-				log.warn(e.getMessage(), e);
-			}
-
-			// Invalidate then Geolocation
-			Geolocation.get().dispose();
-		}
-
-		String tenant = session.getTenantName();
-		conf.setProperty("%s.password.ttl".formatted(tenant), Integer.toString(settings.getPwdExpiration()));
-		conf.setProperty("%s.security.user.maxinactivity".formatted(tenant),
-				settings.getMaxInactivity() == null || settings.getMaxInactivity().intValue() <= 0 ? ""
-						: Integer.toString(settings.getMaxInactivity()));
-		conf.setProperty("%s.password.enforcehistory".formatted(tenant),
-				Integer.toString(settings.getPwdEnforceHistory()));
-		conf.setProperty("%s.password.checklogin".formatted(tenant), Boolean.toString(settings.isPwdCheckLogin()));
-		conf.setProperty(PASSWORD_SIZE.formatted(tenant), Integer.toString(settings.getPwdSize()));
-		conf.setProperty(PASSWORD_LOWERCASE.formatted(tenant), Integer.toString(settings.getPwdLowerCase()));
-		conf.setProperty(PASSWORD_UPPERCASE.formatted(tenant), Integer.toString(settings.getPwdUpperCase()));
-		conf.setProperty(PASSWORD_DIGIT.formatted(tenant), Integer.toString(settings.getPwdDigit()));
-		conf.setProperty(PASSWORD_SPECIAL.formatted(tenant), Integer.toString(settings.getPwdSpecial()));
-		conf.setProperty(PASSWORD_SEQUENCE.formatted(tenant), Integer.toString(settings.getPwdSequence()));
-		conf.setProperty(PASSWORD_OCCURRENCE.formatted(tenant), Integer.toString(settings.getPwdOccurrence()));
-		conf.setProperty(GUI_SAVELOGIN.formatted(tenant), Boolean.toString(settings.isSaveLogin()));
-		conf.setProperty("%s.alertnewdevice".formatted(tenant), Boolean.toString(settings.isAlertNewDevice()));
-		conf.setProperty(ANONYMOUS_ENABLED.formatted(tenant), Boolean.toString(settings.isEnableAnonymousLogin()));
-		conf.setProperty(ANONYMOUS_KEY.formatted(tenant), settings.getAnonymousKey().trim());
-		conf.setProperty(SECURITY_PREVIEW_CONTENTCHECK.formatted(tenant),
-				Boolean.toString(settings.isPreviewContentCheck()));
-
-		if (settings.getAnonymousUser() != null)
-			conf.setProperty(ANONYMOUS_USER.formatted(tenant), settings.getAnonymousUser().getUsername());
-
-		try {
-			conf.write();
-			log.info("Security settings data written successfully.");
-			return restartRequired;
-		} catch (IOException e) {
-			return throwServerException(session, log, e);
-		}
-	}
-
-	private void saveACL(Session session, Menu menu, List<GUIAccessControlEntry> aces)
-			throws PermissionException, PersistenceException {
-		MenuDAO mdao = MenuDAO.get();
-		if (!mdao.isReadAllowed(Menu.SECURITY, session.getUserId()))
-			throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
-
-		GroupDAO gdao = GroupDAO.get();
-		mdao.initialize(menu);
-
-		// Remove all current tenant rights
-		Set<AccessControlEntry> grps = new HashSet<>();
-		for (AccessControlEntry mg : menu.getAccessControlList()) {
-			Group group = gdao.findById(mg.getGroupId());
-			if (group != null && group.getTenantId() != session.getTenantId())
-				grps.add(mg);
-		}
-		menu.getAccessControlList().clear();
-
-		for (GUIAccessControlEntry right : aces) {
-			Group group = gdao.findById(right.getEntityId());
-			if (group == null || group.getTenantId() != session.getTenantId())
-				continue;
-
-			AccessControlEntry ace = new AccessControlEntry();
-			ace.setGroupId(right.getEntityId());
-			ace.setRead(right.isRead());
-			ace.setWrite(right.isWrite());
-			grps.add(ace);
-		}
-
-		menu.setAccessControlList(grps);
-		mdao.store(menu);
-	}
-
-	@Override
-	public void saveACL(GUIMenu menu) throws ServerException {
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-		MenuDAO mdao = MenuDAO.get();
-		try {
-			saveACL(session, mdao.findById(menu.getId()), menu.getAccessControlList());
-		} catch (PermissionException | PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void deleteMenu(long menuId) throws ServerException {
-		Session session = validateSession();
-
-		MenuDAO dao = MenuDAO.get();
-		try {
-			Menu menu = dao.findById(menuId);
-			if (menu == null)
-				throw new ServerException("Unexisting menu identified by " + menuId);
-			if (menu.getType() == Menu.TYPE_DEFAULT)
-				throw new PermissionException("Cannot delete legacy menu " + menuId);
-			dao.delete(menuId);
-		} catch (PermissionException | PersistenceException | ServerException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void saveMenus(List<GUIMenu> menus, String locale) throws ServerException {
-		validateSession();
-
-		for (GUIMenu guiMenu : menus)
-			saveMenu(guiMenu, locale);
-	}
-
-	@Override
-	public GUIMenu saveMenu(GUIMenu guiMenu, String locale) throws ServerException {
-		Session session = validateSession();
-
-		MenuDAO dao = MenuDAO.get();
-		try {
-			Menu menu = new Menu();
-			if (guiMenu.getId() != 0L) {
-				menu = dao.findById(guiMenu.getId());
-				dao.initialize(menu);
-			} else {
-				menu.setTenantId(session.getTenantId());
-			}
-
-			menu.setName(guiMenu.getName().replace("/", ""));
-			menu.setAutomation(guiMenu.getAutomation());
-			menu.setEnabled(guiMenu.isEnabled());
-			menu.setDescription(guiMenu.getDescription());
-			menu.setPosition(guiMenu.getPosition());
-			menu.setParentId(guiMenu.getParentId());
-			menu.setRoutineId(guiMenu.getRoutineId());
-			menu.setType(guiMenu.getType());
-
-			menu.getAccessControlList().clear();
-			for (GUIAccessControlEntry right : guiMenu.getAccessControlList())
-				menu.getAccessControlList().add(new AccessControlEntry(right.getEntityId()));
-
-			dao.store(menu);
-			return getMenu(menu.getId(), locale);
-		} catch (PersistenceException | ServerException e) {
-			return throwServerException(session, log, e);
-		}
-
-	}
-
-	@Override
-	public List<GUIMenu> getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException {
-		Session session = validateSession();
-
-		MenuDAO dao = MenuDAO.get();
-
-		List<Menu> menus = dao.findByUserId(session.getUserId(), parentId, enabledOnly);
-		List<GUIMenu> guiMenus = menus.stream().filter(m -> m.getTenantId() == session.getTenantId()).map(m -> {
-			try {
-				return toGUIMenu(m, locale);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-				return null;
-			}
-		}).collect(Collectors.toList());
-		guiMenus.sort((m1, m2) -> {
-			if (m1.getPosition() == m2.getPosition())
-				return m1.getName().compareToIgnoreCase(m2.getName());
-			return m1.getPosition() < m2.getPosition() ? -1 : 1;
-		});
-
-		return guiMenus;
-
-	}
-
-	@Override
-	public GUIMenu getMenu(long menuId, String locale) throws ServerException {
-		Session session = validateSession();
-
-		try {
-			Menu menu = MenuDAO.get().findById(menuId);
-			if (menu == null)
-				return null;
-
-			GUIMenu f = toGUIMenu(menu, locale);
-			List<GUIAccessControlEntry> acl = new ArrayList<>();
-			for (AccessControlEntry fg : menu.getAccessControlList()) {
-				Group group = GroupDAO.get().findById(fg.getGroupId());
-				if (group == null || group.getTenantId() != session.getTenantId())
-					continue;
-
-				GUIAccessControlEntry ace = new GUIAccessControlEntry();
-				ace.setEntityId(fg.getGroupId());
-				acl.add(ace);
-			}
-			f.setAccessControlList(acl);
-			return f;
-		} catch (PersistenceException e) {
-			return throwServerException(session, log, e);
-		}
-
-	}
-
-	private GUIMenu toGUIMenu(Menu menu, String locale) throws PersistenceException {
-		GUIMenu f = new GUIMenu();
-		f.setId(menu.getId());
-		f.setName(menu.getName());
-		f.setEnabled(menu.isEnabled());
-		f.setAutomation(menu.getAutomation());
-		f.setRoutineId(menu.getRoutineId());
-		f.setPosition(menu.getPosition());
-		f.setDescription(menu.getDescription());
-		f.setParentId(menu.getParentId());
-		f.setType(menu.getType());
-
-		MenuDAO dao = MenuDAO.get();
-		dao.initialize(menu);
-
-		List<GUIAccessControlEntry> acl = new ArrayList<>();
-
-		GroupDAO gdao = GroupDAO.get();
-		UserDAO udao = UserDAO.get();
-		for (AccessControlEntry mg : menu.getAccessControlList()) {
-			GUIAccessControlEntry ace = new GUIAccessControlEntry();
-			ace.setEntityId(mg.getGroupId());
-			ace.setWrite(mg.isWrite());
-
-			Group group = gdao.findById(mg.getGroupId());
-			if (group == null)
-				continue;
-
-			if (group.getType() == GroupType.DEFAULT) {
-				ace.setLabel(group.getName());
-				ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
-			} else {
-				User user = udao.findByGroup(group.getId()).iterator().next();
-				ace.setLabel(user.getUsername());
-				ace.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
-						+ user.getUsername() + ")");
-			}
-
-			acl.add(ace);
-		}
-		f.setAccessControlList(acl);
-
-		return f;
-	}
-
-	@Override
-	public List<GUIUser> searchUsers(String username, String groupId) throws ServerException {
-		Session session = validateSession();
-
-		UserDAO userDao = UserDAO.get();
-
-		StringBuilder query = new StringBuilder(
-				"select A.ld_id, A.ld_username, A.ld_name, A.ld_firstname from ld_user A ");
-		if (StringUtils.isNotEmpty(groupId))
-			query.append(", ld_usergroup B");
-		query.append(" where A.ld_deleted=0 and A.ld_type=" + UserType.DEFAULT.ordinal());
-		if (StringUtils.isNotEmpty(username))
-			query.append(" and A.ld_username like '%" + SqlUtil.doubleQuotes(username) + "%'");
-		if (StringUtils.isNotEmpty(groupId))
-			query.append(" and A.ld_id=B.ld_userid and B.ld_groupid=" + Long.parseLong(groupId));
-
-		try {
-			return userDao.query(query.toString(), new RowMapper<>() {
-
-				@Override
-				public GUIUser mapRow(ResultSet rs, int row) throws SQLException {
-					GUIUser user = new GUIUser();
-					user.setId(rs.getLong(1));
-					user.setUsername(rs.getString(2));
-					user.setName(rs.getString(3));
-					user.setFirstName(rs.getString(4));
-					return user;
-				}
-			}, null);
-		} catch (PersistenceException e) {
-			return throwServerException(session, log, e);
-		}
-
-	}
-
-	@Override
-	public List<GUISequence> loadBlockedEntities() throws ServerException {
-		Session session = validateSession();
-		if (session.getTenantId() != Tenant.DEFAULT_ID)
-			return new ArrayList<>();
-
-		ContextProperties config = Context.get().getConfig();
-		List<Sequence> seqs = new ArrayList<>();
-		long max = config.getInt("throttle.username.max", 0);
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MINUTE, -config.getInt("throttle.username.wait", 0));
-		Date oldestDate = cal.getTime();
-
-		Map<String, Object> params = new HashMap<>();
-		params.put("oldestDate", oldestDate);
-		params.put("max", max);
-
-		final String NAME_CONDITION = "_entity.name like '";
-		final String MORE_CONDITIONS = "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate";
-
-		SequenceDAO dao = SequenceDAO.get();
-		try {
-			if (max > 0)
-				seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_USERNAME + MORE_CONDITIONS, params,
-						null, null));
-
-			max = config.getInt("throttle.ip.max", 0);
-			cal = Calendar.getInstance();
-			cal.add(Calendar.MINUTE, -config.getInt("throttle.ip.wait", 0));
-			if (max > 0)
-				seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_IP + MORE_CONDITIONS, params, null,
-						null));
-
-			max = config.getInt("throttle.apikey.max", 0);
-			cal = Calendar.getInstance();
-			cal.add(Calendar.MINUTE, -config.getInt("throttle.apikey.wait", 0));
-			if (max > 0)
-				seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_APIKEY + MORE_CONDITIONS, params,
-						null, null));
-
-			ArrayList<GUISequence> ret = new ArrayList<>();
-			for (Sequence seq : seqs) {
-				GUISequence guiSeq = new GUISequence();
-				guiSeq.setId(seq.getId());
-				guiSeq.setValue(seq.getValue());
-				guiSeq.setLastModified(seq.getLastModified());
-				guiSeq.setName(seq.getName());
-				ret.add(guiSeq);
-			}
-			return ret;
-		} catch (PersistenceException e) {
-			return throwServerException(session, log, e);
-		}
-
-	}
-
-	@Override
-	public void removeBlockedEntities(List<Long> ids) throws ServerException {
-		Session session = validateSession();
-		if (session.getTenantId() != Tenant.DEFAULT_ID)
-			return;
-
-		SequenceDAO dao = SequenceDAO.get();
-		try {
-			for (long id : ids) {
-				dao.delete(id);
-			}
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void replicateUsersSettings(long masterUserId, List<Long> userIds, boolean gui, boolean groups)
-			throws ServerException {
-		Session session = validateSession();
-
-		UserDAO userDao = UserDAO.get();
-		try {
-			User masterUser = userDao.findById(masterUserId);
-			userDao.initialize(masterUser);
-			Set<Group> masterGroups = masterUser.getGroups();
-
-			for (Long userId : userIds) {
-				User user = userDao.findById(userId);
-				userDao.initialize(user);
-
-				if (gui) {
-					user.setDefaultWorkspace(masterUser.getDefaultWorkspace());
-					user.setWelcomeScreen(masterUser.getWelcomeScreen());
-					user.setDocsGrid(masterUser.getDocsGrid());
-					user.setHitsGrid(masterUser.getHitsGrid());
-				}
-
-				if (groups && !user.isReadonly()) {
-					user.removeGroupMemberships(null);
-					for (Group grp : masterGroups) {
-						if (!grp.isUserGroup())
-							user.addGroup(grp);
-					}
-				}
-
-				UserHistory transaction = new UserHistory();
-				transaction.setSession(session);
-				transaction.setComment(String.format("Settings replicated from %s", masterUser.getUsername()));
-				userDao.store(user, transaction);
-
-				log.info("Replicated the settings to user {}", user.getName());
-			}
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void updateDeviceLabel(long deviceId, String label) throws ServerException {
-		Session session = validateSession();
-		DeviceDAO dDao = DeviceDAO.get();
-		try {
-			Device device = dDao.findById(deviceId);
-			if (device != null) {
-				device.setLabel(StringUtils.isNotEmpty(label) ? label.trim() : null);
-				dDao.store(device);
-			}
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-
-	}
-
-	@Override
-	public String trustDevice(String label) throws ServerException {
-		Session session = validateSession();
-		if (session.getClient() != null && session.getClient().getDevice() != null) {
-			Device device = session.getClient().getDevice();
-			if (label != null)
-				device.setLabel(label);
-			try {
-				device = DeviceDAO.get().trustDevice(session.getUser(), device);
-			} catch (PersistenceException e) {
-				return throwServerException(session, log, e);
-			}
-			return device.getDeviceId();
-		} else
-			return null;
-
-	}
-
-	@Override
-	public Boolean isTrustedDevice(String deviceId) throws ServerException {
-		Session session = validateSession();
-		// If the second factor is not enabled on the user, the device is
-		// always trusted
-		if (StringUtils.isEmpty(session.getUser().getSecondFactor()))
-			return true;
-
-		Device device = DeviceDAO.get().findByDeviceId(deviceId);
-		return device != null && device.getUserId() == session.getUserId() && device.isTrusted();
-	}
-
-	@Override
-	public void deleteTrustedDevices(List<Long> ids) throws ServerException {
-		Session session = validateSession();
-		DeviceDAO dDao = DeviceDAO.get();
-		for (Long id : ids)
-			try {
-				dDao.delete(id);
-			} catch (NumberFormatException | PersistenceException e) {
-				throwServerException(session, log, e);
-			}
-	}
-
-	@Override
-	public String syncGeolocationDB(String key) throws ServerException {
-		Session session = validateSession();
-		Context.get().getConfig().setProperty(SECURITY_GEOLOCATION_APIKEY, key != null ? key : "");
-		try {
-			Context.get().getConfig().write();
-
-			Geolocation.get().syncDB(key);
-			return Geolocation.get().getDatabaseVersion();
-		} catch (IOException e) {
-			return throwServerException(session, log, e);
-		}
-
-	}
-
-	@Override
-	public void saveAvatar(long userId) throws ServerException {
-		Session session = validateSession();
-
-		Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
-		Map.Entry<String, File> file = uploadedFilesMap.entrySet().iterator().next();
-		try {
-			UserDAO userDao = UserDAO.get();
-			User user = userDao.findById(userId);
-			if (user != null)
-				UserUtil.saveAvatar(user, file.getValue(), FileUtil.getExtension(file.getKey()));
-		} catch (PersistenceException e) {
-			log.error("Unable to store the avatar", e);
-		} finally {
-			UploadServlet.cleanUploads(session.getSid());
-		}
-	}
-
-	@Override
-	public void resetAvatar(long userId) throws ServerException {
-		Session session = validateSession();
-
-		try {
-			UserDAO userDao = UserDAO.get();
-			User user = userDao.findById(userId);
-			if (user != null)
-				UserUtil.generateDefaultAvatar(user);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-
-	}
-
-	@Override
-	public void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds) throws ServerException {
-		Session session = validateSession();
-
-		Set<Long> uniqueUserIds = userIds.stream().distinct().collect(Collectors.toSet());
-
-		if (groupIds != null) {
-			UserDAO gDao = UserDAO.get();
-			groupIds.stream().forEach(gId -> {
-				try {
-					Set<User> usrs = gDao.findByGroup(gId);
-					for (User user : usrs)
-						uniqueUserIds.add(user.getId());
-				} catch (PersistenceException e) {
-					log.error(e.getMessage(), e);
-				}
-			});
-		}
-
-		UserDAO userDao = UserDAO.get();
-		try {
-			User srcUser = userDao.findById(srcUserId);
-			userDao.initialize(srcUser);
-
-			for (Long userId : uniqueUserIds) {
-				User user = userDao.findById(userId);
-				userDao.initialize(user);
-				if (srcUser.getWorkingTimes() != null)
-					for (WorkingTime wt : srcUser.getWorkingTimes())
-						user.getWorkingTimes().add(new WorkingTime(wt));
-				UserHistory transaction = new UserHistory();
-				transaction.setSession(session);
-				transaction.setEvent(UserEvent.UPDATED);
-				userDao.store(user, transaction);
-			}
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-
-	}
-
-	@Override
-	public void changeStatus(long userId, boolean enabled) throws ServerException {
-		checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-
-		UserDAO userDao = UserDAO.get();
-		try {
-			User user = userDao.findById(userId, true);
-			if (user == null)
-				throw new ServerException(String.format("User %s not found", userId));
-
-			if (!enabled && ADMIN.equals(user.getUsername()))
-				throw new ServerException("Cannot diable the admin user");
-
-			UserHistory transaction = new UserHistory();
-			transaction.setSession(session);
-			transaction.setEvent(enabled ? UserEvent.UPDATED : UserEvent.DISABLED);
-
-			user.setEnabled(enabled);
-			userDao.store(user, transaction);
-		} catch (PersistenceException | ServerException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public String generatePassword() throws InvalidSessionServerException {
-		Session session = validateSession();
-		String tenant = session.getTenantName();
-
-		// Generate an initial password(that must be changed)
-		ContextProperties config = Context.get().getConfig();
-		return PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
-				config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
-				config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),
-				config.getInt(PASSWORD_DIGIT.formatted(tenant), 1),
-				config.getInt(PASSWORD_SPECIAL.formatted(tenant), 1),
-				config.getInt(PASSWORD_SEQUENCE.formatted(tenant), 4),
-				config.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
-	}
-
-	@Override
-	public String generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
-			int maxSequenceSize, int maxOccurrences) {
-		return PasswordGenerator.generate(length, uppercaseChars, lowercaseChars, digits, specialChars, maxSequenceSize,
-				maxOccurrences);
-	}
-
-	@Override
-	public List<String> validatePassword(String password, int minLength, int uppercaseChars, int lowercaseChars,
-			int digits, int specialChars, int maxSequenceSize, int maxOccurrences) {
-		PasswordCriteria criteria = new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
-				specialChars);
-		criteria.setMaxSequenceSize(maxSequenceSize);
-		criteria.setMaxOccurrences(maxOccurrences);
-
-		PasswordValidator validator = new PasswordValidator(criteria, null);
-		return validator.validate(password);
-	}
-
-	@Override
-	public String createApiKey(String name) throws ServerException {
-		Session session = validateSession();
-
-		try {
-			ApiKeyDAO dao = ApiKeyDAO.get();
-			ApiKey apiKey = dao.findByName(name, session.getUserId());
-			if (apiKey != null)
-				throw new ServerException("A key with same name already exists");
-
-			apiKey = new ApiKey(session.getUserId(), name);
-			dao.store(apiKey);
-
-			UserHistory transaction = new UserHistory();
-			transaction.setSession(session);
-			transaction.setComment(name + " (" + apiKey.getLabel() + ")");
-			transaction.setEvent(UserEvent.NEWAPIKEY);
-
-			UserHistoryDAO.get().store(transaction);
-
-			return apiKey.getDecodedKey();
-		} catch (PersistenceException e) {
-			return throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void deleteApiKey(long keyId) throws ServerException {
-		Session session = validateSession();
-
-		try {
-			ApiKeyDAO dao = ApiKeyDAO.get();
-			dao.delete(keyId);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void updateApiKey(long keyId, String newName) throws ServerException {
-		Session session = validateSession();
-
-		try {
-			ApiKeyDAO dao = ApiKeyDAO.get();
-			ApiKey apiKey = dao.findById(keyId);
-			apiKey.setName(newName);
-			dao.store(apiKey);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void deleteImpersonifiers(List<String> usernames) throws ServerException {
-		Session session = validateSession();
-		
-		try {
-			UserDAO dao = UserDAO.get();
-			User user = dao.findById(session.getUserId());
-			dao.initialize(user);
-			user.getImpersonators().removeAll(usernames);
-
-			UserHistory transaction = new UserHistory(session);
-			transaction.setEvent(UserEvent.IMPERSONATORS_CHANGED);
-			dao.store(user, transaction);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
-
-	@Override
-	public void addImpersonifier(String username) throws ServerException {
-		Session session = validateSession();
-		
-		try {
-			UserDAO dao = UserDAO.get();
-			User user = dao.findById(session.getUserId());
-			dao.initialize(user);
-			user.getImpersonators().add(username);
-			
-			UserHistory transaction = new UserHistory(session);
-			transaction.setEvent(UserEvent.IMPERSONATORS_CHANGED);
-			dao.store(user, transaction);
-		} catch (PersistenceException e) {
-			throwServerException(session, log, e);
-		}
-	}
+    private static final String SECURITY_CSP = "security.csp";
+
+    private static final String SECURITY_GEOLOCATION_APIKEY = "security.geolocation.apikey";
+
+    private static final String SSL_REQUIRED = "ssl.required";
+
+    private static final String COOKIES_SECURE = "cookies.secure";
+
+    private static final String COOKIES_SAMESITE = "cookies.samesite";
+
+    private static final String ANONYMOUS_USER = "%s.anonymous.user";
+
+    private static final String SECURITY_PREVIEW_CONTENTCHECK = "%s.security.preview.contentcheck";
+
+    private static final String ANONYMOUS_KEY = "%s.anonymous.key";
+
+    private static final String ANONYMOUS_ENABLED = "%s.anonymous.enabled";
+
+    private static final String GUI_SAVELOGIN = "%s.gui.savelogin";
+
+    static final String PASSWORD_OCCURRENCE = "%s.password.occurrence";
+
+    static final String PASSWORD_SEQUENCE = "%s.password.sequence";
+
+    static final String PASSWORD_SPECIAL = "%s.password.special";
+
+    static final String PASSWORD_DIGIT = "%s.password.digit";
+
+    static final String PASSWORD_LOWERCASE = "%s.password.lowercase";
+
+    static final String PASSWORD_UPPERCASE = "%s.password.uppercase";
+
+    static final String PASSWORD_SIZE = "%s.password.size";
+
+    private static final String ADMIN = "admin";
+
+    private static final long serialVersionUID = 1L;
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityServiceImpl.class);
+
+    public static GUITenant getTenant(long tenantId) {
+        Tenant tenant = null;
+        try {
+            if (tenantId == Tenant.SYSTEM_ID) {
+                tenant = new Tenant();
+                tenant.setId(Tenant.SYSTEM_ID);
+                tenant.setName(Tenant.SYSTEM_NAME);
+            } else {
+                tenant = TenantDAO.get().findById(tenantId);
+            }
+            return fromTenant(tenant);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public static GUITenant fromTenant(Tenant tenant) {
+        if (tenant == null)
+            return null;
+        GUITenant guiTenant = new GUITenant();
+        guiTenant.setId(tenant.getId());
+        guiTenant.setTenantId(tenant.getTenantId());
+        guiTenant.setCity(tenant.getCity());
+        guiTenant.setCountry(tenant.getCountry());
+        guiTenant.setDisplayName(tenant.getDisplayName());
+        guiTenant.setEmail(tenant.getEmail());
+        guiTenant.setName(tenant.getName());
+        guiTenant.setPostalCode(tenant.getPostalCode());
+        guiTenant.setState(tenant.getState());
+        guiTenant.setStreet(tenant.getStreet());
+        guiTenant.setTelephone(tenant.getTelephone());
+        guiTenant.setMaxRepoDocs(tenant.getMaxDocuments());
+        guiTenant.setMaxRepoSize(tenant.getMaxRepoSize());
+        guiTenant.setMaxSessions(tenant.getMaxSessions());
+        guiTenant.setMaxApiCalls(tenant.getMaxApiCalls());
+        guiTenant.setMaxUsers(tenant.getMaxUsers());
+        guiTenant.setMaxGuests(tenant.getMaxGuests());
+        guiTenant.setMaxTickets(tenant.getMaxTickets());
+        guiTenant.setMaxWorkflows(tenant.getMaxWorkflows());
+        guiTenant.setMaxForms(tenant.getMaxForms());
+        guiTenant.setMaxReports(tenant.getMaxReports());
+        guiTenant.setMaxStamps(tenant.getMaxStamps());
+        guiTenant.setMaxImportFolders(tenant.getMaxImportFolders());
+        guiTenant.setMaxEmailAccounts(tenant.getMaxEmailAccounts());
+        guiTenant.setQuotaThreshold(tenant.getQuotaThreshold());
+        guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
+        guiTenant.setEnabled(tenant.isEnabled());
+        guiTenant.setExpire(tenant.getExpire());
+
+        return guiTenant;
+    }
+
+    public static GUITenant getTenant(String tenantName) throws PersistenceException {
+        Tenant tenant = TenantDAO.get().findByName(tenantName);
+        return fromTenant(tenant);
+    }
+
+    /**
+     * Used internally by login procedures, instantiates a new GUISession by a
+     * given authenticated user
+     * 
+     * @param session the current session
+     * @param locale the current locale
+     * 
+     * @return session details
+     * 
+     * @throws ServerException a generic error
+     */
+    public GUISession loadSession(Session session, String locale) throws ServerException {
+        GUISession guiSession = new GUISession();
+        guiSession.setSid(session.getSid());
+        guiSession.setSingleSignOn(
+                session.getDictionary().keySet().stream().anyMatch(k -> k.toLowerCase().contains("saml")));
+
+        DocumentDAO documentDao = DocumentDAO.get();
+        SystemMessageDAO messageDao = SystemMessageDAO.get();
+
+        User user = session.getUser();
+
+        GUIUser guiUser = getUser(user.getId());
+
+        if (StringUtils.isEmpty(locale) || "null".equals(locale)) {
+            guiUser.setLanguage(user.getLanguage());
+            locale = user.getLanguage();
+        } else {
+            guiUser.setLanguage(locale);
+        }
+
+        GUIInfo info = new InfoServiceImpl().getInfo(locale, session.getTenantName(), true);
+        guiSession.setInfo(info);
+
+        try {
+            guiUser.setPasswordExpired(false);
+            guiUser.setLockedDocs(documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.LOCKED).size());
+            guiUser.setCheckedOutDocs(
+                    documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.CHECKEDOUT).size());
+            guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
+            guiUser.setQuota(user.getQuota());
+            guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
+            guiUser.setCertDN(user.getCertDN());
+            guiUser.setCertExpire(user.getCertExpire());
+            guiUser.setSecondFactor(user.getSecondFactor());
+
+            guiSession.setSid(session.getSid());
+            guiSession.setUser(guiUser);
+            guiSession.setLoggedIn(true);
+
+            MenuDAO mdao = MenuDAO.get();
+            List<Long> menus = mdao.findMenuIdByUserId(session.getUserId(), true);
+            guiUser.setMenus(menus);
+
+            loadDashlets(guiUser);
+
+            /*
+             * Prepare an incoming message, if any
+             */
+            GenericDAO gDao = GenericDAO.get();
+            Generic welcome = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, session.getTenantId());
+            if (welcome != null && StringUtils.isNotEmpty(welcome.getString1())) {
+                Map<String, Object> dictionary = new HashMap<>();
+                dictionary.put(Automation.LOCALE, user.getLocale());
+                dictionary.put(Automation.TENANT_ID, session.getTenantId());
+                dictionary.put("session", session);
+                dictionary.put("user", guiSession.getUser());
+
+                Automation automation = new Automation("incomingmessage");
+                String welcomeMessage = automation.evaluate(welcome.getString1(), dictionary);
+                guiSession.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
+            }
+
+            // Define the current locale
+            session.getDictionary().put(LOCALE, user.getLocale());
+            session.getDictionary().put(USER, user);
+
+            ContextProperties config = Context.get().getConfig();
+            guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(session.getTenantName()), 12));
+
+            return guiSession;
+        } catch (PersistenceException | AutomationException e) {
+            return throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public GUISession getSession(String locale, String sid) {
+        try {
+            Session sess = null;
+            if (StringUtils.isEmpty(sid))
+                sess = validateSession();
+            else
+                sess = validateSession(sid);
+            return loadSession(sess, locale);
+        } catch (ServerException e) {
+            log.debug(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public void logout() {
+        try {
+            Session session = validateSession();
+            if (session == null)
+                return;
+
+            FileUtils.forceDelete(UserUtil.getUserResource(session.getUserId(), "temp"));
+            log.info("User {} logged out and closed session {}", session.getUsername(), session.getSid());
+            kill(session.getSid());
+        } catch (InvalidSessionServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
+            boolean notify) {
+        try {
+            UserDAO userDao = UserDAO.get();
+            User user = userDao.findById(userId);
+            if (user == null)
+                throw new ServerException(String.format("User %s not found", userId));
+            userDao.initialize(user);
+
+            User currentUser = getSessionUser();
+
+            /*
+             * A non admin user cannot change the password of other users
+             */
+            MenuDAO mDao = MenuDAO.get();
+            if (currentUser != null && currentUser.getId() != userId
+                    && !mDao.isReadAllowed(Menu.SECURITY, currentUser.getId()))
+                throw new PermissionException(String.format("User %s not allowed to change the password of user %s",
+                        currentUser.getUsername(), user.getUsername()));
+
+            if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword()))
+                throw new ServerException("Wrong old passord");
+
+            UserHistory history = null;
+            // The password was changed
+            user.setDecodedPassword(newPassword);
+            user.setPasswordChanged(new Date());
+            user.setRepass("");
+
+            // Add a user history entry
+            history = new UserHistory();
+            history.setUser(user);
+            history.setEvent(UserEvent.PASSWORDCHANGED);
+            history.setComment("");
+
+            /*
+             * If the credentials must be notified, we have to mark the password
+             * as expired for security reasons, so the user will change it at
+             * first login.
+             */
+            user.setPasswordExpired(notify || requestorUserId == null || !requestorUserId.equals(userId));
+
+            userDao.store(user, history);
+            if (notify)
+                notifyAccount(user, newPassword);
+
+            return new GUIValue("0", null);
+        } catch (PasswordWeakException e) {
+            log.error(e.getMessage(), e);
+            return new GUIValue("4", e.getMessages().stream().collect(Collectors.joining("\n")));
+        } catch (PasswordAlreadyUsedException e) {
+            log.error(e.getMessage(), e);
+            return new GUIValue("3", e.getFormattedDate());
+        } catch (MessagingException e) {
+            log.warn(e.getMessage(), e);
+            return new GUIValue("2", null);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return new GUIValue("1", null);
+        }
+    }
+
+    private User getSessionUser() {
+        User currentUser = null;
+        try {
+            currentUser = getSessionUser(getThreadLocalRequest());
+        } catch (Exception e) {
+            // Do nothing
+        }
+        return currentUser;
+    }
+
+    @Override
+    public void addUserToGroup(long groupId, long userId) throws ServerException {
+        checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        UserDAO userDao = UserDAO.get();
+        try {
+            User user = userDao.findById(userId, true);
+            user.addGroup(GroupDAO.get().findById(groupId));
+            userDao.store(user);
+            userDao.initialize(user);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void deleteGroup(long groupId) throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        UserDAO userDao = UserDAO.get();
+        GroupDAO groupDao = GroupDAO.get();
+        try {
+            Group grp = groupDao.findById(groupId);
+            groupDao.initialize(grp);
+            for (User user : grp.getUsers()) {
+                userDao.initialize(user);
+                user.removeGroup(groupId);
+                userDao.store(user);
+            }
+            groupDao.delete(groupId);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void deleteUser(long userId) throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        UserDAO userDao = UserDAO.get();
+
+        // Create the user history event
+        UserHistory transaction = new UserHistory();
+        transaction.setSession(session);
+        transaction.setEvent(UserEvent.DELETED);
+        transaction.setComment("");
+        try {
+            transaction.setUser(userDao.findById(userId));
+            userDao.delete(userId, transaction);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public GUIGroup getGroup(long groupId) throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        validateSession();
+
+        try {
+            Group group = GroupDAO.get().findById(groupId);
+
+            if (group != null) {
+                GUIGroup grp = new GUIGroup();
+                grp.setId(groupId);
+                grp.setDescription(group.getDescription());
+                grp.setName(group.getName());
+                grp.setSource(group.getSource());
+                return grp;
+            }
+
+            return null;
+        } catch (PersistenceException e) {
+            return throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public GUIUser getUser(long userId) throws ServerException {
+        Session session = validateSession();
+
+        UserDAO userDao = UserDAO.get();
+
+        try {
+            User user = userDao.findById(userId);
+            if (user != null) {
+                userDao.initialize(user);
+
+                GUIUser guiUser = new GUIUser();
+                guiUser.setId(userId);
+                guiUser.setTenant(getTenant(user.getTenantId()));
+                guiUser.setAddress(user.getStreet());
+                guiUser.setCell(user.getTelephone2());
+                guiUser.setPhone(user.getTelephone());
+                guiUser.setCity(user.getCity());
+                guiUser.setCountry(user.getCountry());
+                guiUser.setEmail(user.getEmail());
+                guiUser.setEmail2(user.getEmail2());
+                guiUser.setDepartment(user.getDepartment());
+                guiUser.setBuilding(user.getBuilding());
+                guiUser.setOrganizationalUnit(user.getOrganizationalUnit());
+                guiUser.setCompany(user.getCompany());
+                guiUser.setEnabled(user.isEnabled());
+                guiUser.setFirstName(user.getFirstName());
+                guiUser.setLanguage(user.getLanguage());
+                guiUser.setName(user.getName());
+                guiUser.setPostalCode(user.getPostalcode());
+                guiUser.setState(user.getState());
+                guiUser.setUsername(user.getUsername());
+                guiUser.setPasswordExpires(user.isPasswordExpires());
+                guiUser.setPasswordExpired(user.isPasswordExpired());
+                guiUser.setLegals(user.isLegals());
+                guiUser.setWelcomeScreen(user.getWelcomeScreen());
+                guiUser.setDefaultWorkspace(user.getDefaultWorkspace());
+                guiUser.setIpWhitelist(user.getIpWhiteList());
+                guiUser.setIpBlacklist(user.getIpBlackList());
+                guiUser.setEmailSignature(user.getEmailSignature());
+                guiUser.setEmailSignature2(user.getEmailSignature2());
+                guiUser.setCertExpire(user.getCertExpire());
+                guiUser.setCertDN(user.getCertDN());
+                guiUser.setSecondFactor(user.getSecondFactor());
+                guiUser.setKey(user.getKey());
+                guiUser.setType(user.getType().ordinal());
+                guiUser.setDocsGrid(user.getDocsGrid());
+                guiUser.setHitsGrid(user.getHitsGrid());
+                guiUser.setDateFormat(user.getDateFormat());
+                guiUser.setDateFormatShort(user.getDateFormatShort());
+                guiUser.setDateFormatLong(user.getDateFormatLong());
+                guiUser.setSearchPref(user.getSearchPref());
+                guiUser.setExpire(user.getExpire());
+                guiUser.setEnforceWorkingTime(user.isEnforceWorkingTime());
+                guiUser.setMaxInactivity(user.getMaxInactivity());
+                guiUser.setTimeZone(user.getTimeZone());
+                guiUser.setSource(user.getSource().ordinal());
+                guiUser.setCreation(user.getCreation());
+                guiUser.setLastLogin(user.getLastLogin());
+
+                List<GUIGroup> grps = new ArrayList<>();
+                for (Group group : user.getGroups()) {
+                    GUIGroup guiGroup = new GUIGroup();
+                    guiGroup.setId(group.getId());
+                    guiGroup.setName(group.getName());
+                    guiGroup.setDescription(group.getDescription());
+                    guiGroup.setType(group.getType().ordinal());
+                    guiGroup.setSource(group.getSource());
+                    grps.add(guiGroup);
+                }
+                guiUser.setGroups(grps);
+
+                guiUser.getImpersonators().addAll(user.getImpersonators());
+
+                guiUser.setQuota(user.getQuota());
+                guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
+                guiUser.setSessionsQuota(user.getSessionsQuota());
+                guiUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
+
+                guiUser.setTenant(getTenant(user.getTenantId()));
+
+                ContextProperties config = Context.get().getConfig();
+                guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(guiUser.getTenant().getName()), 12));
+
+                loadDashlets(guiUser);
+
+                loadWorkingTimes(guiUser);
+
+                guiUser.setCustomActions(getMenus(Menu.CUSTOM_ACTIONS, guiUser.getLanguage(), true));
+
+                return guiUser;
+            }
+        } catch (NumberFormatException | PersistenceException | ServerException e) {
+            throwServerException(session, log, e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Retrieves the dashlets configuration
+     * 
+     * @param usr current user
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    protected static void loadDashlets(GUIUser usr) throws PersistenceException {
+        DashletServiceImpl dashletService = new DashletServiceImpl();
+        UserDAO userDao = UserDAO.get();
+        List<GUIDashlet> dashlets = new ArrayList<>();
+        Map<String, Generic> map = userDao.findUserSettings(usr.getId(), "dashlet");
+
+        for (Generic generic : map.values()) {
+            // This could be a dashlet name or an ID
+            String dashletIdentifier = generic.getSubtype().substring(generic.getSubtype().indexOf('-') + 1);
+            try {
+                GUIDashlet dashlet = null;
+                if (StringUtils.isNumeric(dashletIdentifier))
+                    dashlet = dashletService.get(Long.parseLong(dashletIdentifier));
+                else
+                    dashlet = dashletService.get(dashletIdentifier);
+
+                dashlet.setColumn(generic.getInteger2() != null ? generic.getInteger2().intValue() : 0);
+                dashlet.setRow(generic.getInteger3() != null ? generic.getInteger3().intValue() : 0);
+                dashlet.setIndex(generic.getString1() != null ? Integer.parseInt(generic.getString1()) : 0);
+                dashlets.add(dashlet);
+            } catch (NumberFormatException | ServerException e) {
+                // Nothing to do
+            }
+        }
+        usr.setDashlets(dashlets);
+    }
+
+    @Override
+    public void removeFromGroup(long groupId, List<Long> userIds) throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
+
+        checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
+
+        try {
+            UserDAO userDao = UserDAO.get();
+            Group group = GroupDAO.get().findById(groupId);
+            for (long id : userIds) {
+                User user = userDao.findById(id, true);
+                user.removeGroup(group.getId());
+                userDao.store(user);
+            }
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public GUIGroup saveGroup(GUIGroup group) throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
+
+        try {
+            GroupDAO groupDao = GroupDAO.get();
+            Group grp;
+            if (group.getId() != 0) {
+                grp = groupDao.findById(group.getId());
+                groupDao.initialize(grp);
+
+                grp.setName(group.getName());
+                grp.setDescription(group.getDescription());
+
+                if (group.getInheritGroupId() == null || group.getInheritGroupId().longValue() == 0) {
+                    groupDao.store(grp);
+                } else {
+                    groupDao.insert(grp, group.getInheritGroupId().longValue());
+                }
+            } else {
+                grp = new Group();
+                grp.setTenantId(session.getTenantId());
+                grp.setName(group.getName());
+                grp.setDescription(group.getDescription());
+
+                groupDao.store(grp);
+
+                if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() != 0)
+                    groupDao.inheritACLs(grp, group.getInheritGroupId().longValue());
+            }
+
+            group.setId(grp.getId());
+            return group;
+        } catch (PersistenceException e) {
+            return throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public GUIUser saveUser(GUIUser guiUser, GUIInfo info) throws ServerException {
+        Session session = validateSession();
+
+        UserDAO userDao = UserDAO.get();
+        boolean createNew = false;
+
+        // Disallow the editing of other users if you do not have access to
+        // the Security
+        disallowEditingOfOtherUsers(guiUser, session);
+
+        try {
+            User user = getOrCreateUser(guiUser);
+
+            createNew = user.getId() == 0L;
+
+            user.setTenantId(session.getTenantId());
+            user.setCity(guiUser.getCity());
+            user.setCountry(guiUser.getCountry());
+            user.setEmail(guiUser.getEmail());
+            user.setEmail2(guiUser.getEmail2());
+            user.setFirstName(guiUser.getFirstName());
+            user.setName(guiUser.getName());
+            user.setLanguage(guiUser.getLanguage());
+            user.setPostalcode(guiUser.getPostalCode());
+            user.setState(guiUser.getState());
+            user.setStreet(guiUser.getAddress());
+            user.setTelephone(guiUser.getPhone());
+            user.setTelephone2(guiUser.getCell());
+            user.setBuilding(guiUser.getBuilding());
+            user.setOrganizationalUnit(guiUser.getOrganizationalUnit());
+            user.setDepartment(guiUser.getDepartment());
+            user.setCompany(guiUser.getCompany());
+            user.setUsername(guiUser.getUsername());
+            user.setEnabled(guiUser.isEnabled());
+            user.setPasswordExpires(guiUser.isPasswordExpires());
+            user.setPasswordExpired(guiUser.isPasswordExpired());
+            user.setLegals(guiUser.isLegals());
+            user.setWelcomeScreen(guiUser.getWelcomeScreen());
+            user.setIpWhiteList(guiUser.getIpWhitelist());
+            user.setIpBlackList(guiUser.getIpBlacklist());
+            user.setEmailSignature(guiUser.getEmailSignature());
+            user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
+            user.setQuota(guiUser.getQuota());
+            user.setSessionsQuota(guiUser.getSessionsQuota());
+            user.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
+            user.setKey(guiUser.getKey());
+            user.setType(guiUser.getType());
+            user.setDocsGrid(guiUser.getDocsGrid());
+            user.setHitsGrid(guiUser.getHitsGrid());
+            user.setDateFormat(guiUser.getDateFormat());
+            user.setDateFormatShort(guiUser.getDateFormatShort());
+            user.setDateFormatLong(guiUser.getDateFormatLong());
+            user.setSearchPref(guiUser.getSearchPref());
+            user.setEnforceWorkingTime(guiUser.isEnforceWorkingTime());
+            user.setSecondFactor(guiUser.getSecondFactor());
+            user.setMaxInactivity(guiUser.getMaxInactivity() == null || guiUser.getMaxInactivity() == 0 ? null
+                    : guiUser.getMaxInactivity());
+            user.setTimeZone(guiUser.getTimeZone());
+
+            setExpire(user, guiUser);
+
+            String decodedPassword = StringUtils.defaultString(user.getDecodedPassword(), "-");
+            if (createNew) {
+                User existingUser = userDao.findByUsername(guiUser.getUsername());
+                if (existingUser != null) {
+                    log.warn("Tried to create duplicate username {}", guiUser.getUsername());
+                    guiUser.setWelcomeScreen(-99);
+                    return guiUser;
+                }
+
+                String tenant = session.getTenantName();
+
+                // Generate an initial password(that must be changed)
+                ContextProperties config = Context.get().getConfig();
+                decodedPassword = PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
+                        config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
+                        config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),
+                        config.getInt(PASSWORD_DIGIT.formatted(tenant), 1),
+                        config.getInt(PASSWORD_SPECIAL.formatted(tenant), 1),
+                        config.getInt(PASSWORD_SEQUENCE.formatted(tenant), 4),
+                        config.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
+                user.setDecodedPassword(decodedPassword);
+                user.setPasswordExpired(true);
+                user.setPasswordChanged(new Date());
+            }
+
+            saveWorkingTimes(user, guiUser.getWorkingTimes());
+
+            UserHistory transaction = new UserHistory();
+            transaction.setSession(session);
+            transaction.setEvent(UserEvent.UPDATED);
+            userDao.store(user, transaction);
+
+            guiUser.setId(user.getId());
+
+            user = userDao.findById(user.getId());
+            userDao.initialize(user);
+
+            user.getImpersonators().clear();
+            user.getImpersonators().addAll(guiUser.getImpersonators());
+
+            setGroups(user, guiUser, transaction);
+
+            // Notify the user by email
+            if (createNew && user.getSource().equals(UserSource.DEFAULT))
+                user.setDecodedPassword(decodedPassword);
+            notifyUser(guiUser, user, createNew);
+        } catch (MessagingException me) {
+            log.warn(me.getMessage(), me);
+        } catch (Exception e) {
+            return throwServerException(session, log, e);
+        }
+
+        return getUser(guiUser.getId());
+    }
+
+    private void notifyUser(GUIUser guiUser, User user, boolean createNew)
+            throws MessagingException, AutomationException {
+        if (createNew && guiUser.isNotifyCredentials())
+            notifyAccount(user, user.getDecodedPassword());
+    }
+
+    private void disallowEditingOfOtherUsers(GUIUser guiUser, Session session)
+            throws InvalidSessionServerException, AccessDeniedException {
+        if (guiUser.getId() != session.getUserId() && getThreadLocalRequest() != null)
+            checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+    }
+
+    private void setGroups(User user, GUIUser guiUser, UserHistory transaction) throws PersistenceException {
+        UserDAO userDao = UserDAO.get();
+        GroupDAO groupDao = GroupDAO.get();
+
+        user.removeGroupMemberships(null);
+        for (Long groupId : guiUser.getGroups().stream().map(g -> g.getId()).toList())
+            user.addGroup(groupDao.findById(groupId));
+
+        Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
+        groupDao.initialize(adminGroup);
+
+        // The admin user must be always member of admin group
+        if (ADMIN.equals(guiUser.getUsername()) && !guiUser.isMemberOf(Group.GROUP_ADMIN))
+            user.addGroup(adminGroup);
+
+        // Use a fake transaction just to avoid event triggering
+        UserHistory fakeTransaction = new UserHistory(transaction);
+        fakeTransaction.setNotifyEvent(false);
+        userDao.store(user, fakeTransaction);
+    }
+
+    private void setExpire(User usr, GUIUser guiUser) {
+        if (guiUser.getExpire() != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(guiUser.getExpire());
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 0);
+            usr.setExpire(cal.getTime());
+        } else
+            usr.setExpire(null);
+    }
+
+    private User getOrCreateUser(GUIUser guiUser) throws PersistenceException {
+        UserDAO userDao = UserDAO.get();
+        User usr;
+        if (guiUser.getId() != 0) {
+            usr = userDao.findById(guiUser.getId());
+            userDao.initialize(usr);
+        } else {
+            usr = new User();
+        }
+        return usr;
+    }
+
+    private void saveWorkingTimes(User user, List<GUIWorkingTime> guiWts) {
+        user.getWorkingTimes().clear();
+        Calendar cal = Calendar.getInstance();
+        for (GUIWorkingTime guiWorkingTime : guiWts) {
+            cal.setTime(guiWorkingTime.getStart());
+            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int hourStart = cal.get(Calendar.HOUR_OF_DAY);
+            int minuteStart = cal.get(Calendar.MINUTE);
+            WorkingTime wt = new WorkingTime(dayOfWeek, hourStart, minuteStart);
+
+            cal.setTime(guiWorkingTime.getEnd());
+            wt.setHourEnd(cal.get(Calendar.HOUR_OF_DAY));
+            wt.setMinuteEnd(cal.get(Calendar.MINUTE));
+
+            wt.setLabel(guiWorkingTime.getLabel());
+            wt.setDescription(guiWorkingTime.getDescription());
+
+            user.getWorkingTimes().add(wt);
+        }
+    }
+
+    private void loadWorkingTimes(GUIUser guiUser) throws PersistenceException {
+        UserDAO userDao = UserDAO.get();
+        User user = userDao.findById(guiUser.getId());
+        if (user == null)
+            return;
+        else
+            userDao.initialize(user);
+
+        List<GUIWorkingTime> guiWts = new ArrayList<>();
+        if (user.getWorkingTimes() != null)
+            for (WorkingTime workingTime : user.getWorkingTimes()) {
+                int dayOfWeek = workingTime.getDayOfWeek();
+
+                Calendar cal = Calendar.getInstance();
+                // Set the calendar to the last Sunday
+                cal.add(Calendar.DAY_OF_WEEK, -(cal.get(Calendar.DAY_OF_WEEK) - 1));
+
+                // Now shift the day of week of the working time
+                cal.add(Calendar.DAY_OF_WEEK, dayOfWeek - 1);
+                cal.set(Calendar.HOUR_OF_DAY, workingTime.getHourStart());
+                cal.set(Calendar.MINUTE, workingTime.getMinuteStart());
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 99);
+                Date start = cal.getTime();
+
+                cal.set(Calendar.HOUR_OF_DAY, workingTime.getHourEnd());
+                cal.set(Calendar.MINUTE, workingTime.getMinuteEnd());
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 99);
+                Date end = cal.getTime();
+
+                GUIWorkingTime guiWt = new GUIWorkingTime(workingTime.getLabel(), start, end);
+                guiWt.setDescription(workingTime.getDescription());
+
+                guiWts.add(guiWt);
+            }
+
+        guiUser.setWorkingTimes(guiWts);
+    }
+
+    /**
+     * Notify the user with it's new account
+     * 
+     * @param user The created user
+     * @param password The decoded password
+     * 
+     * @throws MessagingException Cannot notify user
+     * @throws AutomationException the script has been evaluated but produced an
+     *         error
+     */
+    private void notifyAccount(User user, String password) throws MessagingException, AutomationException {
+        EMail email;
+        email = new EMail();
+        email.setHtml(true);
+        Recipient recipient = new Recipient();
+        recipient.setAddress(user.getEmail());
+        recipient.setRead(1);
+        email.addRecipient(recipient);
+        email.setFolder("outbox");
+        email.setUsername(user.getUsername());
+        email.setSentDate(new Date());
+
+        Locale locale = user.getLocale();
+        email.setLocale(locale);
+
+        /*
+         * Prepare the template
+         */
+        Map<String, Object> dictionary = new HashMap<>();
+        ContextProperties config = Context.get().getConfig();
+        String address = config.getProperty("server.url");
+        dictionary.put("url", address);
+        dictionary.put("user", user);
+        dictionary.put("password", password);
+        dictionary.put(Automation.LOCALE, locale);
+
+        new EMailSender(user.getTenantId()).send(email, "psw.rec1", dictionary);
+    }
+
+    @Override
+    public GUIUser saveProfile(GUIUser guiUser) throws ServerException {
+        Session session = validateSession();
+
+        UserDAO userDao = UserDAO.get();
+
+        // Disallow the editing of other users if you do not have access to
+        // the Security
+        if (guiUser.getId() != session.getUserId())
+            checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        try {
+            User user = userDao.findById(guiUser.getId());
+            userDao.initialize(user);
+
+            user.setFirstName(guiUser.getFirstName());
+            user.setName(guiUser.getName());
+            user.setEmail(guiUser.getEmail());
+            user.setEmail2(guiUser.getEmail2());
+            user.setLanguage(guiUser.getLanguage());
+            user.setStreet(guiUser.getAddress());
+            user.setPostalcode(guiUser.getPostalCode());
+            user.setCity(guiUser.getCity());
+            user.setCountry(guiUser.getCountry());
+            user.setState(guiUser.getState());
+            user.setTelephone(guiUser.getPhone());
+            user.setTelephone2(guiUser.getCell());
+            user.setCompany(guiUser.getCompany());
+            user.setBuilding(guiUser.getBuilding());
+            user.setOrganizationalUnit(guiUser.getOrganizationalUnit());
+            user.setDepartment(guiUser.getDepartment());
+
+            user.setWelcomeScreen(guiUser.getWelcomeScreen());
+            user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
+            user.setEmailSignature(guiUser.getEmailSignature());
+            user.setEmailSignature2(guiUser.getEmailSignature2());
+            user.setTimeZone(guiUser.getTimeZone());
+            user.setDocsGrid(guiUser.getDocsGrid());
+            user.setHitsGrid(guiUser.getHitsGrid());
+
+            user.setDateFormat(guiUser.getDateFormat());
+            user.setDateFormatShort(guiUser.getDateFormatShort());
+            user.setDateFormatLong(guiUser.getDateFormatLong());
+            user.setSearchPref(guiUser.getSearchPref());
+
+            UserHistory transaction = new UserHistory();
+            transaction.setSession(session);
+            transaction.setEvent(UserEvent.UPDATED);
+            userDao.store(user, transaction);
+
+            return guiUser;
+        } catch (PersistenceException e) {
+            return throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public GUIUser saveInterfaceSettings(GUIUser user) throws ServerException {
+        Session session = validateSession();
+
+        UserDAO userDao = UserDAO.get();
+
+        // Disallow the editing of other users if you do not have access to
+        // the Security
+        if (user.getId() != session.getUserId())
+            checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        try {
+            User usr = userDao.findById(user.getId());
+            userDao.initialize(usr);
+
+            usr.setWelcomeScreen(user.getWelcomeScreen());
+            usr.setDefaultWorkspace(user.getDefaultWorkspace());
+            usr.setDocsGrid(user.getDocsGrid());
+            usr.setHitsGrid(user.getHitsGrid());
+
+            userDao.store(usr);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+
+        return user;
+    }
+
+    @Override
+    public void kill(String sid) {
+        // Kill the LogicalDOC session
+        SessionManager.get().kill(sid);
+
+        // Also kill the servlet container session, if any
+        HttpSession httpSession = SessionManager.get().getServletSession(sid);
+
+        try {
+            if (httpSession != null)
+                httpSession.invalidate();
+        } catch (Exception e) {
+            // Ignore
+        }
+
+        SessionManager.get().removeSid(getThreadLocalRequest());
+    }
+
+    @Override
+    public GUISecuritySettings loadSettings() throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        GUISecuritySettings securitySettings = new GUISecuritySettings();
+
+        UserDAO userDao = UserDAO.get();
+        ContextProperties pbean = Context.get().getConfig();
+
+        String tenant = session.getTenantName();
+        securitySettings.setPwdExpiration(pbean.getInt("%s.password.ttl".formatted(tenant), 90));
+        securitySettings.setPwdSize(pbean.getInt(PASSWORD_SIZE.formatted(tenant), 8));
+        securitySettings.setPwdLowerCase(pbean.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2));
+        securitySettings.setPwdUpperCase(pbean.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2));
+        securitySettings.setPwdDigit(pbean.getInt(PASSWORD_DIGIT.formatted(tenant), 1));
+        securitySettings.setPwdSpecial(pbean.getInt(PASSWORD_SPECIAL.formatted(tenant), 1));
+        securitySettings.setPwdSequence(pbean.getInt(PASSWORD_SEQUENCE.formatted(tenant), 3));
+        securitySettings.setPwdOccurrence(pbean.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
+        securitySettings.setPwdEnforceHistory(pbean.getInt("%s.password.enforcehistory".formatted(tenant), 3));
+        securitySettings.setPwdCheckLogin(pbean.getBoolean("%s.password.checklogin".formatted(tenant), false));
+
+        securitySettings.setMaxInactivity(pbean.getInt("%s.security.user.maxinactivity".formatted(tenant)));
+        if (StringUtils.isNotEmpty(pbean.getProperty(GUI_SAVELOGIN.formatted(tenant))))
+            securitySettings.setSaveLogin("true".equals(pbean.getProperty(GUI_SAVELOGIN.formatted(tenant))));
+        securitySettings.setIgnoreLoginCase("true".equals(pbean.getProperty("login.ignorecase")));
+        securitySettings.setAllowSidInRequest(pbean.getBoolean("security.acceptsid", false));
+        securitySettings.setAllowClientId(pbean.getBoolean("security.useclientid", true));
+        if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))))
+            securitySettings
+                    .setEnableAnonymousLogin("true".equals(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))));
+        if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant))))
+            securitySettings.setAnonymousKey(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant)));
+        if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)))) {
+            try {
+                User user = userDao.findByUsername(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)));
+                if (user != null)
+                    securitySettings.setAnonymousUser(getUser(user.getId()));
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage(), e);
+            }
+        }
+        if (StringUtils.isNotEmpty(pbean.getProperty(SSL_REQUIRED)))
+            securitySettings.setForceSsl("true".equals(pbean.getProperty(SSL_REQUIRED)));
+        if (StringUtils.isNotEmpty(pbean.getProperty(COOKIES_SECURE)))
+            securitySettings.setCookiesSecure("true".equals(pbean.getProperty(COOKIES_SECURE)));
+        securitySettings.setCookiesSameSite(pbean.getProperty(COOKIES_SAMESITE, "unset"));
+
+        securitySettings.setAlertNewDevice(pbean.getBoolean("%s.alertnewdevice".formatted(tenant), true));
+
+        securitySettings.setGeolocationEnabled(pbean.getBoolean("security.geolocation.enabled", true));
+        securitySettings.setGeolocationCache(pbean.getBoolean("security.geolocation.cache", false));
+        securitySettings.setGeolocationKey(pbean.getProperty(SECURITY_GEOLOCATION_APIKEY));
+        securitySettings.setGeolocationDbVer(Geolocation.get().getDatabaseVersion());
+
+        securitySettings.setContentSecurityPolicy(pbean.getProperty(SECURITY_CSP));
+
+        securitySettings.setPreviewContentCheck(pbean.getBoolean(SECURITY_PREVIEW_CONTENTCHECK, true));
+
+        log.debug("Security settings data loaded successfully.");
+
+        return securitySettings;
+    }
+
+    @Override
+    public boolean saveSettings(GUISecuritySettings settings) throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        boolean restartRequired = false;
+
+        ContextProperties conf = Context.get().getConfig();
+
+        if (session.getTenantId() == Tenant.DEFAULT_ID) {
+            conf.setProperty("login.ignorecase", Boolean.toString(settings.isIgnoreLoginCase()));
+            conf.setProperty(SSL_REQUIRED, Boolean.toString(settings.isForceSsl()));
+            conf.setProperty(COOKIES_SECURE, Boolean.toString(settings.isCookiesSecure()));
+            conf.setProperty("security.acceptsid", Boolean.toString(settings.isAllowSidInRequest()));
+            conf.setProperty("security.useclientid", Boolean.toString(settings.isAllowClientId()));
+
+            conf.setProperty("security.geolocation.enabled", Boolean.toString(settings.isGeolocationEnabled()));
+            conf.setProperty("security.geolocation.cache", Boolean.toString(settings.isGeolocationCache()));
+            conf.setProperty(SECURITY_GEOLOCATION_APIKEY,
+                    settings.getGeolocationKey() != null ? settings.getGeolocationKey() : "");
+
+            String currentCsp = conf.getProperty(SECURITY_CSP, "");
+            restartRequired = currentCsp.equals(settings.getContentSecurityPolicy());
+            conf.setProperty(SECURITY_CSP, settings.getContentSecurityPolicy());
+
+            try {
+                // Update the WEB-INF/web.xml
+                ServletContext context = getServletContext();
+                String policy = "true".equals(conf.getProperty(SSL_REQUIRED)) ? "CONFIDENTIAL" : "NONE";
+                WebConfigurator webConfigurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
+                restartRequired = restartRequired || webConfigurator.setTransportGuarantee(policy);
+
+                // Update the META-INF/context.xml
+                conf.setProperty(COOKIES_SAMESITE, settings.getCookiesSameSite());
+                WebContextConfigurator webContextConfigurator = new WebContextConfigurator(
+                        context.getRealPath("/META-INF/context.xml"));
+                restartRequired = restartRequired
+                        || webContextConfigurator.setSameSiteCookies(settings.getCookiesSameSite());
+            } catch (Exception e) {
+                log.warn(e.getMessage(), e);
+            }
+
+            // Invalidate then Geolocation
+            Geolocation.get().dispose();
+        }
+
+        String tenant = session.getTenantName();
+        conf.setProperty("%s.password.ttl".formatted(tenant), Integer.toString(settings.getPwdExpiration()));
+        conf.setProperty("%s.security.user.maxinactivity".formatted(tenant),
+                settings.getMaxInactivity() == null || settings.getMaxInactivity().intValue() <= 0 ? ""
+                        : Integer.toString(settings.getMaxInactivity()));
+        conf.setProperty("%s.password.enforcehistory".formatted(tenant),
+                Integer.toString(settings.getPwdEnforceHistory()));
+        conf.setProperty("%s.password.checklogin".formatted(tenant), Boolean.toString(settings.isPwdCheckLogin()));
+        conf.setProperty(PASSWORD_SIZE.formatted(tenant), Integer.toString(settings.getPwdSize()));
+        conf.setProperty(PASSWORD_LOWERCASE.formatted(tenant), Integer.toString(settings.getPwdLowerCase()));
+        conf.setProperty(PASSWORD_UPPERCASE.formatted(tenant), Integer.toString(settings.getPwdUpperCase()));
+        conf.setProperty(PASSWORD_DIGIT.formatted(tenant), Integer.toString(settings.getPwdDigit()));
+        conf.setProperty(PASSWORD_SPECIAL.formatted(tenant), Integer.toString(settings.getPwdSpecial()));
+        conf.setProperty(PASSWORD_SEQUENCE.formatted(tenant), Integer.toString(settings.getPwdSequence()));
+        conf.setProperty(PASSWORD_OCCURRENCE.formatted(tenant), Integer.toString(settings.getPwdOccurrence()));
+        conf.setProperty(GUI_SAVELOGIN.formatted(tenant), Boolean.toString(settings.isSaveLogin()));
+        conf.setProperty("%s.alertnewdevice".formatted(tenant), Boolean.toString(settings.isAlertNewDevice()));
+        conf.setProperty(ANONYMOUS_ENABLED.formatted(tenant), Boolean.toString(settings.isEnableAnonymousLogin()));
+        conf.setProperty(ANONYMOUS_KEY.formatted(tenant), settings.getAnonymousKey().trim());
+        conf.setProperty(SECURITY_PREVIEW_CONTENTCHECK.formatted(tenant),
+                Boolean.toString(settings.isPreviewContentCheck()));
+
+        if (settings.getAnonymousUser() != null)
+            conf.setProperty(ANONYMOUS_USER.formatted(tenant), settings.getAnonymousUser().getUsername());
+
+        try {
+            conf.write();
+            log.info("Security settings data written successfully.");
+            return restartRequired;
+        } catch (IOException e) {
+            return throwServerException(session, log, e);
+        }
+    }
+
+    private void saveACL(Session session, Menu menu, List<GUIAccessControlEntry> aces)
+            throws PermissionException, PersistenceException {
+        MenuDAO mdao = MenuDAO.get();
+        if (!mdao.isReadAllowed(Menu.SECURITY, session.getUserId()))
+            throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
+
+        GroupDAO gdao = GroupDAO.get();
+        mdao.initialize(menu);
+
+        // Remove all current tenant rights
+        Set<AccessControlEntry> grps = new HashSet<>();
+        for (AccessControlEntry mg : menu.getAccessControlList()) {
+            Group group = gdao.findById(mg.getGroupId());
+            if (group != null && group.getTenantId() != session.getTenantId())
+                grps.add(mg);
+        }
+        menu.getAccessControlList().clear();
+
+        for (GUIAccessControlEntry right : aces) {
+            Group group = gdao.findById(right.getEntityId());
+            if (group == null || group.getTenantId() != session.getTenantId())
+                continue;
+
+            AccessControlEntry ace = new AccessControlEntry();
+            ace.setGroupId(right.getEntityId());
+            ace.setRead(right.isRead());
+            ace.setWrite(right.isWrite());
+            grps.add(ace);
+        }
+
+        menu.setAccessControlList(grps);
+        mdao.store(menu);
+    }
+
+    @Override
+    public void saveACL(GUIMenu menu) throws ServerException {
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        MenuDAO mdao = MenuDAO.get();
+        try {
+            saveACL(session, mdao.findById(menu.getId()), menu.getAccessControlList());
+        } catch (PermissionException | PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void deleteMenu(long menuId) throws ServerException {
+        Session session = validateSession();
+
+        MenuDAO dao = MenuDAO.get();
+        try {
+            Menu menu = dao.findById(menuId);
+            if (menu == null)
+                throw new ServerException("Unexisting menu identified by " + menuId);
+            if (menu.getType() == Menu.TYPE_DEFAULT)
+                throw new PermissionException("Cannot delete legacy menu " + menuId);
+            dao.delete(menuId);
+        } catch (PermissionException | PersistenceException | ServerException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void saveMenus(List<GUIMenu> menus, String locale) throws ServerException {
+        validateSession();
+
+        for (GUIMenu guiMenu : menus)
+            saveMenu(guiMenu, locale);
+    }
+
+    @Override
+    public GUIMenu saveMenu(GUIMenu guiMenu, String locale) throws ServerException {
+        Session session = validateSession();
+
+        MenuDAO dao = MenuDAO.get();
+        try {
+            Menu menu = new Menu();
+            if (guiMenu.getId() != 0L) {
+                menu = dao.findById(guiMenu.getId());
+                dao.initialize(menu);
+            } else {
+                menu.setTenantId(session.getTenantId());
+            }
+
+            menu.setName(guiMenu.getName().replace("/", ""));
+            menu.setAutomation(guiMenu.getAutomation());
+            menu.setEnabled(guiMenu.isEnabled());
+            menu.setDescription(guiMenu.getDescription());
+            menu.setPosition(guiMenu.getPosition());
+            menu.setParentId(guiMenu.getParentId());
+            menu.setRoutineId(guiMenu.getRoutineId());
+            menu.setType(guiMenu.getType());
+
+            menu.getAccessControlList().clear();
+            for (GUIAccessControlEntry right : guiMenu.getAccessControlList())
+                menu.getAccessControlList().add(new AccessControlEntry(right.getEntityId()));
+
+            dao.store(menu);
+            return getMenu(menu.getId(), locale);
+        } catch (PersistenceException | ServerException e) {
+            return throwServerException(session, log, e);
+        }
+
+    }
+
+    @Override
+    public List<GUIMenu> getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException {
+        Session session = validateSession();
+
+        MenuDAO dao = MenuDAO.get();
+
+        List<Menu> menus = dao.findByUserId(session.getUserId(), parentId, enabledOnly);
+        List<GUIMenu> guiMenus = menus.stream().filter(m -> m.getTenantId() == session.getTenantId()).map(m -> {
+            try {
+                return toGUIMenu(m, locale);
+            } catch (PersistenceException e) {
+                log.error(e.getMessage(), e);
+                return null;
+            }
+        }).collect(Collectors.toList());
+        guiMenus.sort((m1, m2) -> {
+            if (m1.getPosition() == m2.getPosition())
+                return m1.getName().compareToIgnoreCase(m2.getName());
+            return m1.getPosition() < m2.getPosition() ? -1 : 1;
+        });
+
+        return guiMenus;
+
+    }
+
+    @Override
+    public GUIMenu getMenu(long menuId, String locale) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            Menu menu = MenuDAO.get().findById(menuId);
+            if (menu == null)
+                return null;
+
+            GUIMenu f = toGUIMenu(menu, locale);
+            List<GUIAccessControlEntry> acl = new ArrayList<>();
+            for (AccessControlEntry fg : menu.getAccessControlList()) {
+                Group group = GroupDAO.get().findById(fg.getGroupId());
+                if (group == null || group.getTenantId() != session.getTenantId())
+                    continue;
+
+                GUIAccessControlEntry ace = new GUIAccessControlEntry();
+                ace.setEntityId(fg.getGroupId());
+                acl.add(ace);
+            }
+            f.setAccessControlList(acl);
+            return f;
+        } catch (PersistenceException e) {
+            return throwServerException(session, log, e);
+        }
+
+    }
+
+    private GUIMenu toGUIMenu(Menu menu, String locale) throws PersistenceException {
+        GUIMenu f = new GUIMenu();
+        f.setId(menu.getId());
+        f.setName(menu.getName());
+        f.setEnabled(menu.isEnabled());
+        f.setAutomation(menu.getAutomation());
+        f.setRoutineId(menu.getRoutineId());
+        f.setPosition(menu.getPosition());
+        f.setDescription(menu.getDescription());
+        f.setParentId(menu.getParentId());
+        f.setType(menu.getType());
+
+        MenuDAO dao = MenuDAO.get();
+        dao.initialize(menu);
+
+        List<GUIAccessControlEntry> acl = new ArrayList<>();
+
+        GroupDAO gdao = GroupDAO.get();
+        UserDAO udao = UserDAO.get();
+        for (AccessControlEntry mg : menu.getAccessControlList()) {
+            GUIAccessControlEntry ace = new GUIAccessControlEntry();
+            ace.setEntityId(mg.getGroupId());
+            ace.setWrite(mg.isWrite());
+
+            Group group = gdao.findById(mg.getGroupId());
+            if (group == null)
+                continue;
+
+            if (group.getType() == GroupType.DEFAULT) {
+                ace.setLabel(group.getName());
+                ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
+            } else {
+                User user = udao.findByGroup(group.getId()).iterator().next();
+                ace.setLabel(user.getUsername());
+                ace.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
+                        + user.getUsername() + ")");
+            }
+
+            acl.add(ace);
+        }
+        f.setAccessControlList(acl);
+
+        return f;
+    }
+
+    @Override
+    public List<GUIUser> searchUsers(String username, String groupId) throws ServerException {
+        Session session = validateSession();
+
+        UserDAO userDao = UserDAO.get();
+
+        StringBuilder query = new StringBuilder(
+                "select A.ld_id, A.ld_username, A.ld_name, A.ld_firstname from ld_user A ");
+        if (StringUtils.isNotEmpty(groupId))
+            query.append(", ld_usergroup B");
+        query.append(" where A.ld_deleted=0 and A.ld_type=" + UserType.DEFAULT.ordinal());
+        if (StringUtils.isNotEmpty(username))
+            query.append(" and A.ld_username like '%" + SqlUtil.doubleQuotes(username) + "%'");
+        if (StringUtils.isNotEmpty(groupId))
+            query.append(" and A.ld_id=B.ld_userid and B.ld_groupid=" + Long.parseLong(groupId));
+
+        try {
+            return userDao.query(query.toString(), new RowMapper<>() {
+
+                @Override
+                public GUIUser mapRow(ResultSet rs, int row) throws SQLException {
+                    GUIUser user = new GUIUser();
+                    user.setId(rs.getLong(1));
+                    user.setUsername(rs.getString(2));
+                    user.setName(rs.getString(3));
+                    user.setFirstName(rs.getString(4));
+                    return user;
+                }
+            }, null);
+        } catch (PersistenceException e) {
+            return throwServerException(session, log, e);
+        }
+
+    }
+
+    @Override
+    public List<GUISequence> loadBlockedEntities() throws ServerException {
+        Session session = validateSession();
+        if (session.getTenantId() != Tenant.DEFAULT_ID)
+            return new ArrayList<>();
+
+        ContextProperties config = Context.get().getConfig();
+        List<Sequence> seqs = new ArrayList<>();
+        long max = config.getInt("throttle.username.max", 0);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MINUTE, -config.getInt("throttle.username.wait", 0));
+        Date oldestDate = cal.getTime();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("oldestDate", oldestDate);
+        params.put("max", max);
+
+        final String NAME_CONDITION = "_entity.name like '";
+        final String MORE_CONDITIONS = "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate";
+
+        SequenceDAO dao = SequenceDAO.get();
+        try {
+            if (max > 0)
+                seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_USERNAME + MORE_CONDITIONS, params,
+                        null, null));
+
+            max = config.getInt("throttle.ip.max", 0);
+            cal = Calendar.getInstance();
+            cal.add(Calendar.MINUTE, -config.getInt("throttle.ip.wait", 0));
+            if (max > 0)
+                seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_IP + MORE_CONDITIONS, params, null,
+                        null));
+
+            max = config.getInt("throttle.apikey.max", 0);
+            cal = Calendar.getInstance();
+            cal.add(Calendar.MINUTE, -config.getInt("throttle.apikey.wait", 0));
+            if (max > 0)
+                seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_APIKEY + MORE_CONDITIONS, params,
+                        null, null));
+
+            ArrayList<GUISequence> ret = new ArrayList<>();
+            for (Sequence seq : seqs) {
+                GUISequence guiSeq = new GUISequence();
+                guiSeq.setId(seq.getId());
+                guiSeq.setValue(seq.getValue());
+                guiSeq.setLastModified(seq.getLastModified());
+                guiSeq.setName(seq.getName());
+                ret.add(guiSeq);
+            }
+            return ret;
+        } catch (PersistenceException e) {
+            return throwServerException(session, log, e);
+        }
+
+    }
+
+    @Override
+    public void removeBlockedEntities(List<Long> ids) throws ServerException {
+        Session session = validateSession();
+        if (session.getTenantId() != Tenant.DEFAULT_ID)
+            return;
+
+        SequenceDAO dao = SequenceDAO.get();
+        try {
+            for (long id : ids) {
+                dao.delete(id);
+            }
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void replicateUsersSettings(long masterUserId, List<Long> userIds, boolean gui, boolean groups)
+            throws ServerException {
+        Session session = validateSession();
+
+        UserDAO userDao = UserDAO.get();
+        try {
+            User masterUser = userDao.findById(masterUserId);
+            userDao.initialize(masterUser);
+            Set<Group> masterGroups = masterUser.getGroups();
+
+            for (Long userId : userIds) {
+                User user = userDao.findById(userId);
+                userDao.initialize(user);
+
+                if (gui) {
+                    user.setDefaultWorkspace(masterUser.getDefaultWorkspace());
+                    user.setWelcomeScreen(masterUser.getWelcomeScreen());
+                    user.setDocsGrid(masterUser.getDocsGrid());
+                    user.setHitsGrid(masterUser.getHitsGrid());
+                }
+
+                if (groups && !user.isReadonly()) {
+                    user.removeGroupMemberships(null);
+                    for (Group grp : masterGroups) {
+                        if (!grp.isUserGroup())
+                            user.addGroup(grp);
+                    }
+                }
+
+                UserHistory transaction = new UserHistory();
+                transaction.setSession(session);
+                transaction.setComment(String.format("Settings replicated from %s", masterUser.getUsername()));
+                userDao.store(user, transaction);
+
+                log.info("Replicated the settings to user {}", user.getName());
+            }
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void updateDeviceLabel(long deviceId, String label) throws ServerException {
+        Session session = validateSession();
+        DeviceDAO dDao = DeviceDAO.get();
+        try {
+            Device device = dDao.findById(deviceId);
+            if (device != null) {
+                device.setLabel(StringUtils.isNotEmpty(label) ? label.trim() : null);
+                dDao.store(device);
+            }
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+
+    }
+
+    @Override
+    public String trustDevice(String label) throws ServerException {
+        Session session = validateSession();
+        if (session.getClient() != null && session.getClient().getDevice() != null) {
+            Device device = session.getClient().getDevice();
+            if (label != null)
+                device.setLabel(label);
+            try {
+                device = DeviceDAO.get().trustDevice(session.getUser(), device);
+            } catch (PersistenceException e) {
+                return throwServerException(session, log, e);
+            }
+            return device.getDeviceId();
+        } else
+            return null;
+
+    }
+
+    @Override
+    public Boolean isTrustedDevice(String deviceId) throws ServerException {
+        Session session = validateSession();
+        // If the second factor is not enabled on the user, the device is
+        // always trusted
+        if (StringUtils.isEmpty(session.getUser().getSecondFactor()))
+            return true;
+
+        Device device = DeviceDAO.get().findByDeviceId(deviceId);
+        return device != null && device.getUserId() == session.getUserId() && device.isTrusted();
+    }
+
+    @Override
+    public void deleteTrustedDevices(List<Long> ids) throws ServerException {
+        Session session = validateSession();
+        DeviceDAO dDao = DeviceDAO.get();
+        for (Long id : ids)
+            try {
+                dDao.delete(id);
+            } catch (NumberFormatException | PersistenceException e) {
+                throwServerException(session, log, e);
+            }
+    }
+
+    @Override
+    public String syncGeolocationDB(String key) throws ServerException {
+        Session session = validateSession();
+        Context.get().getConfig().setProperty(SECURITY_GEOLOCATION_APIKEY, key != null ? key : "");
+        try {
+            Context.get().getConfig().write();
+
+            Geolocation.get().syncDB(key);
+            return Geolocation.get().getDatabaseVersion();
+        } catch (IOException e) {
+            return throwServerException(session, log, e);
+        }
+
+    }
+
+    @Override
+    public void saveAvatar(long userId) throws ServerException {
+        Session session = validateSession();
+
+        Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
+        Map.Entry<String, File> file = uploadedFilesMap.entrySet().iterator().next();
+        try {
+            UserDAO userDao = UserDAO.get();
+            User user = userDao.findById(userId);
+            if (user != null)
+                UserUtil.saveAvatar(user, file.getValue(), FileUtil.getExtension(file.getKey()));
+        } catch (PersistenceException e) {
+            log.error("Unable to store the avatar", e);
+        } finally {
+            UploadServlet.cleanUploads(session.getSid());
+        }
+    }
+
+    @Override
+    public void resetAvatar(long userId) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            UserDAO userDao = UserDAO.get();
+            User user = userDao.findById(userId);
+            if (user != null)
+                UserUtil.generateDefaultAvatar(user);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+
+    }
+
+    @Override
+    public void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds) throws ServerException {
+        Session session = validateSession();
+
+        Set<Long> uniqueUserIds = userIds.stream().distinct().collect(Collectors.toSet());
+
+        if (groupIds != null) {
+            UserDAO gDao = UserDAO.get();
+            groupIds.stream().forEach(gId -> {
+                try {
+                    Set<User> usrs = gDao.findByGroup(gId);
+                    for (User user : usrs)
+                        uniqueUserIds.add(user.getId());
+                } catch (PersistenceException e) {
+                    log.error(e.getMessage(), e);
+                }
+            });
+        }
+
+        UserDAO userDao = UserDAO.get();
+        try {
+            User srcUser = userDao.findById(srcUserId);
+            userDao.initialize(srcUser);
+
+            for (Long userId : uniqueUserIds) {
+                User user = userDao.findById(userId);
+                userDao.initialize(user);
+                if (srcUser.getWorkingTimes() != null)
+                    for (WorkingTime wt : srcUser.getWorkingTimes())
+                        user.getWorkingTimes().add(new WorkingTime(wt));
+                UserHistory transaction = new UserHistory();
+                transaction.setSession(session);
+                transaction.setEvent(UserEvent.UPDATED);
+                userDao.store(user, transaction);
+            }
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+
+    }
+
+    @Override
+    public void changeStatus(long userId, boolean enabled) throws ServerException {
+        checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+        UserDAO userDao = UserDAO.get();
+        try {
+            User user = userDao.findById(userId, true);
+            if (user == null)
+                throw new ServerException(String.format("User %s not found", userId));
+
+            if (!enabled && ADMIN.equals(user.getUsername()))
+                throw new ServerException("Cannot diable the admin user");
+
+            UserHistory transaction = new UserHistory();
+            transaction.setSession(session);
+            transaction.setEvent(enabled ? UserEvent.UPDATED : UserEvent.DISABLED);
+
+            user.setEnabled(enabled);
+            userDao.store(user, transaction);
+        } catch (PersistenceException | ServerException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public String generatePassword() throws InvalidSessionServerException {
+        Session session = validateSession();
+        String tenant = session.getTenantName();
+
+        // Generate an initial password(that must be changed)
+        ContextProperties config = Context.get().getConfig();
+        return PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
+                config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
+                config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),
+                config.getInt(PASSWORD_DIGIT.formatted(tenant), 1),
+                config.getInt(PASSWORD_SPECIAL.formatted(tenant), 1),
+                config.getInt(PASSWORD_SEQUENCE.formatted(tenant), 4),
+                config.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
+    }
+
+    @Override
+    public String generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
+            int maxSequenceSize, int maxOccurrences) {
+        return PasswordGenerator.generate(length, uppercaseChars, lowercaseChars, digits, specialChars, maxSequenceSize,
+                maxOccurrences);
+    }
+
+    @Override
+    public List<String> validatePassword(String password, int minLength, int uppercaseChars, int lowercaseChars,
+            int digits, int specialChars, int maxSequenceSize, int maxOccurrences) {
+        PasswordCriteria criteria = new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
+                specialChars);
+        criteria.setMaxSequenceSize(maxSequenceSize);
+        criteria.setMaxOccurrences(maxOccurrences);
+
+        PasswordValidator validator = new PasswordValidator(criteria, null);
+        return validator.validate(password);
+    }
+
+    @Override
+    public String createApiKey(String name) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            ApiKeyDAO dao = ApiKeyDAO.get();
+            ApiKey apiKey = dao.findByName(name, session.getUserId());
+            if (apiKey != null)
+                throw new ServerException("A key with same name already exists");
+
+            apiKey = new ApiKey(session.getUserId(), name);
+            dao.store(apiKey);
+
+            UserHistory transaction = new UserHistory();
+            transaction.setSession(session);
+            transaction.setComment(name + " (" + apiKey.getLabel() + ")");
+            transaction.setEvent(UserEvent.NEWAPIKEY);
+
+            UserHistoryDAO.get().store(transaction);
+
+            return apiKey.getDecodedKey();
+        } catch (PersistenceException e) {
+            return throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void deleteApiKey(long keyId) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            ApiKeyDAO dao = ApiKeyDAO.get();
+            dao.delete(keyId);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void updateApiKey(long keyId, String newName) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            ApiKeyDAO dao = ApiKeyDAO.get();
+            ApiKey apiKey = dao.findById(keyId);
+            apiKey.setName(newName);
+            dao.store(apiKey);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void deleteImpersonifiers(List<String> usernames) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            UserDAO dao = UserDAO.get();
+            User user = dao.findById(session.getUserId());
+            dao.initialize(user);
+            user.getImpersonators().removeAll(usernames);
+
+            UserHistory transaction = new UserHistory(session);
+            transaction.setEvent(UserEvent.IMPERSONATORS_CHANGED);
+            dao.store(user, transaction);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void addImpersonifier(String username) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            UserDAO dao = UserDAO.get();
+            User user = dao.findById(session.getUserId());
+            dao.initialize(user);
+            user.getImpersonators().add(username);
+
+            UserHistory transaction = new UserHistory(session);
+            transaction.setEvent(UserEvent.IMPERSONATORS_CHANGED);
+            dao.store(user, transaction);
+        } catch (PersistenceException e) {
+            throwServerException(session, log, e);
+        }
+    }
 }
