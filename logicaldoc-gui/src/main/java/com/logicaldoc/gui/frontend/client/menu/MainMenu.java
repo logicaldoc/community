@@ -41,7 +41,6 @@ import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorization;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxService;
 import com.logicaldoc.gui.frontend.client.google.drive.DriveMenuItem;
-import com.logicaldoc.gui.frontend.client.menu.features.Features;
 import com.logicaldoc.gui.frontend.client.onlyoffice.OnlyOfficeCreate;
 import com.logicaldoc.gui.frontend.client.onlyoffice.OnlyOfficeEditor;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
@@ -155,8 +154,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
             addFormItem(tenantItem);
         }
 
-        addSeparator();
-        addActivableFeaturesButton();
         addSeparator();
         addSupportButton();
         addLogoutButton();
@@ -642,18 +639,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
             Util.redirectToRoot();
         });
         return density;
-    }
-
-    private void addActivableFeaturesButton() {
-        ToolStripButton activable = AwesomeFactory.newToolStripButton("lightbulb-on", I18N.message("activablefeatures"),
-                I18N.message("activablefeatures"));
-        activable.addClickHandler(event -> Features.get().show());
-
-        if (!Session.get().isDemo()
-                && Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
-                && Feature.enabled(Feature.OFFICE) && com.logicaldoc.gui.common.client.Menu
-                        .enabled(com.logicaldoc.gui.common.client.Menu.ACTIVABLE_FEATURES))
-            addButton(activable);
     }
 
     private void addSupportButton() {
