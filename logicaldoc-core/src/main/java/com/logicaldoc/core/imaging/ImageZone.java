@@ -14,79 +14,101 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public class ImageZone implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Upper-left corner of the zone (percentage of the width 0..1)
-	 */
-	@Column(name = "ld_left")
-	private Double left = 0.0;
+    /**
+     * Upper-left corner of the zone (may be a coordinate or a percentage of the
+     * width 0..1)
+     */
+    @Column(name = "ld_left")
+    protected double left = 0.0;
 
-	/**
-	 * Upper-left corner of the zone (percentage of the height 0..1)
-	 */
-	@Column(name = "ld_top")
-	private Double top = 0.0;
+    /**
+     * Upper-left corner of the zone (may be a coordinate or a percentage of the
+     * height 0..1)
+     */
+    @Column(name = "ld_top")
+    protected double top = 0.0;
 
-	/**
-	 * Width of the zone (percentage of the width 0..1)
-	 */
-	@Column(name = "ld_width")
-	private Double width = 0.15;
+    /**
+     * Width of the zone (may be a coordinate or a percentage of the width 0..1)
+     */
+    @Column(name = "ld_width")
+    protected double width = 0.15;
 
-	/**
-	 * Height of the zone (percentage of the height 0..1)
-	 */
-	@Column(name = "ld_height")
-	private Double height = 0.10;
+    /**
+     * Height of the zone (may be a coordinate or a percentage of the height
+     * 0..1)
+     */
+    @Column(name = "ld_height")
+    protected double height = 0.10;
 
-	public ImageZone() {
-		super();
-	}
+    public ImageZone() {
+        super();
+    }
 
-	public ImageZone(ImageZone source) {
-		this.left = source.left;
-		this.top = source.top;
-		this.width = source.width;
-		this.height = source.height;
-	}
+    public ImageZone(double left, double top, double width, double height) {
+        super();
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+    }
 
-	public Double getLeft() {
-		return left;
-	}
+    public ImageZone(ImageZone source) {
+        this.left = source.left;
+        this.top = source.top;
+        this.width = source.width;
+        this.height = source.height;
+    }
 
-	public void setLeft(Double left) {
-		this.left = left;
-	}
+    public Point getCorner1() {
+        return new Point(left, top);
+    }
 
-	public Double getTop() {
-		return top;
-	}
+    public Point getCorner2() {
+        return new Point(left + width, top + height);
+    }
 
-	public void setTop(Double top) {
-		this.top = top;
-	}
+    public double getLeft() {
+        return left;
+    }
 
-	public Double getWidth() {
-		return width;
-	}
+    public void setLeft(double left) {
+        this.left = left;
+    }
 
-	public void setWidth(Double width) {
-		this.width = width;
-	}
+    public double getTop() {
+        return top;
+    }
 
-	public Double getHeight() {
-		return height;
-	}
+    public void setTop(double top) {
+        this.top = top;
+    }
 
-	public void setHeight(Double height) {
-		this.height = height;
-	}
+    public double getWidth() {
+        return width;
+    }
 
-	public void setArea(double left, double top, double width, double height) {
-		this.left = left;
-		this.top = top;
-		this.width = width;
-		this.height = height;
-	}
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public void setArea(double left, double top, double width, double height) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+    }
+
+    public record Point(double x, double y) {
+    }
 }

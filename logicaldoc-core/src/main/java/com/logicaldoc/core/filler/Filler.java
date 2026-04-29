@@ -13,6 +13,8 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
@@ -54,13 +56,13 @@ public abstract class Filler extends PersistentObject {
     private static final Logger log = LoggerFactory.getLogger(Filler.class);
 
     @Column(name = "ld_name", length = 255, nullable = false)
-    private String name;
+    protected String name;
 
     @Column(name = "ld_label", length = 255, nullable = true)
-    private String label;
+    protected String label;
 
     @Column(name = "ld_description", nullable = true)
-    private String description;
+    protected String description;
 
     /**
      * Specifies if the document must be re-filled at checkin
@@ -69,10 +71,16 @@ public abstract class Filler extends PersistentObject {
     protected boolean checkin = false;
 
     /**
-     * Specifies if already filled properties must be overwrite
+     * Specifies if already filled properties must be overwritten
      */
     @Column(name = "ld_overwrite", nullable = false)
     protected boolean overwrite = false;
+
+    /**
+     * Optional automation procedure invoked after the filling
+     */
+    @Column(name = "ld_automation", nullable = true)
+    protected String automation;
 
     public String getName() {
         return name;
@@ -112,6 +120,14 @@ public abstract class Filler extends PersistentObject {
 
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
+    }
+
+    public String getAutomation() {
+        return automation;
+    }
+
+    public void setAutomation(String automation) {
+        this.automation = automation;
     }
 
     /**
@@ -156,7 +172,7 @@ public abstract class Filler extends PersistentObject {
      * @throws FeatureDisabledException An involved feature is disabled
      * @throws SearchException Error in case of search
      */
-    public abstract void fill(Fillable fillable, String content, History transaction, Map<String, Object> dictionary)
+    protected abstract void fill(Document fillable, String content, History transaction, Map<String, Object> dictionary)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException;
 
     /**
@@ -172,9 +188,12 @@ public abstract class Filler extends PersistentObject {
      *         extracted
      * @throws FeatureDisabledException An involved feature is disabled
      * @throws SearchException Error in case of search
+     * @throws AutomationException Error in the automation execution(if any
+     *         automation script has been provided)
      */
     public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-            throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException {
+            throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException,
+            AutomationException {
 
         if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
             return;
@@ -191,7 +210,14 @@ public abstract class Filler extends PersistentObject {
 
         if (log.isDebugEnabled())
             log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
+
         fill(document, extractedContent, transaction, dictionary);
+
+        if (StringUtils.isNotEmpty(automation)) {
+            Automation script = new Automation("Filler-%s".formatted(name), null, getTenantId());
+            script.evaluate(automation, Map.of("filler", this, "document", document, "transaction", transaction,
+                    "fillerDictionary", dictionary));
+        }
     }
 
     protected boolean mustOverwrite(History transaction) {

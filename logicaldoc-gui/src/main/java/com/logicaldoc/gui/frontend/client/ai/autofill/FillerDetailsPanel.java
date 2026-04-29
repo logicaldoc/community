@@ -16,109 +16,141 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class FillerDetailsPanel extends VLayout {
 
-	private GUIFiller filler;
+    private GUIFiller filler;
 
-	private Layout standardTabPanel;
+    private Layout standardTabPanel;
 
-	private FillerProperties standardPanel;
+    private FillerProperties standardPanel;
 
-	private EditingTabSet tabSet;
+    private EditingTabSet tabSet;
 
-	private FillersPanel fillersPanel;
+    private FillersPanel fillersPanel;
 
-	public FillerDetailsPanel(FillersPanel fillersPanel) {
-		super();
+    private Layout automationTabPanel;
 
-		this.fillersPanel = fillersPanel;
-		setHeight100();
-		setWidth100();
-		setMembersMargin(10);
+    private FillerAutomationPanel automationPanel;
 
-		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
-			if (filler.getId() != 0) {
-				AutofillService.Instance.get().getFiller(filler.getId(), new DefaultAsyncCallback<>() {
+    public FillerDetailsPanel(FillersPanel fillersPanel) {
+        super();
 
-					@Override
-					public void handleSuccess(GUIFiller filler) {
-						setFiller(filler);
-					}
+        this.fillersPanel = fillersPanel;
+        setHeight100();
+        setWidth100();
+        setMembersMargin(10);
 
-				});
-			} else {
-				setFiller(new GUIFiller());
-			}
-			tabSet.hideSave();
-		});
+        tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+            if (filler.getId() != 0) {
+                AutofillService.Instance.get().getFiller(filler.getId(), new DefaultAsyncCallback<>() {
 
-		Tab propertiesTab = new Tab(I18N.message("properties"));
-		standardTabPanel = new HLayout();
-		standardTabPanel.setWidth100();
-		standardTabPanel.setHeight100();
-		propertiesTab.setPane(standardTabPanel);
-		tabSet.addTab(propertiesTab);
+                    @Override
+                    public void handleSuccess(GUIFiller filler) {
+                        setFiller(filler);
+                    }
 
-		addMember(tabSet);
-	}
+                });
+            } else {
+                setFiller(new GUIFiller());
+            }
+            tabSet.hideSave();
+        });
 
-	private void refresh() {
-		tabSet.hideSave();
+        Tab propertiesTab = new Tab(I18N.message("properties"));
+        standardTabPanel = new HLayout();
+        standardTabPanel.setWidth100();
+        standardTabPanel.setHeight100();
+        propertiesTab.setPane(standardTabPanel);
+        tabSet.addTab(propertiesTab);
 
-		/*
-		 * Prepare the standard properties tab
-		 */
-		if (standardPanel != null) {
-			standardPanel.destroy();
-			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
-				standardTabPanel.removeMember(standardPanel);
-		}
+        Tab automationTab = new Tab(I18N.message("automation"));
+        automationTabPanel = new HLayout();
+        automationTabPanel.setWidth100();
+        automationTabPanel.setHeight100();
+        automationTab.setPane(automationTabPanel);
+        tabSet.addTab(automationTab);
 
-		standardPanel = new FillerProperties(filler, event -> onModified());
-		standardTabPanel.addMember(standardPanel);
+        addMember(tabSet);
+    }
 
-	}
+    private void refresh() {
+        tabSet.hideSave();
 
-	public GUIFiller getFiller() {
-		return filler;
-	}
+        /*
+         * Prepare the standard properties tab
+         */
+        if (standardPanel != null) {
+            standardPanel.destroy();
+            if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
+                standardTabPanel.removeMember(standardPanel);
+        }
 
-	public void setFiller(GUIFiller filler) {
-		this.filler = filler;
-		refresh();
-	}
+        standardPanel = new FillerProperties(filler, event -> onModified());
+        standardTabPanel.addMember(standardPanel);
 
-	public void onModified() {
-		tabSet.displaySave();
-	}
+        /*
+         * Prepare the automation tab
+         */
+        if (automationPanel != null) {
+            automationPanel.destroy();
+            if (Boolean.TRUE.equals(automationTabPanel.contains(automationPanel)))
+                automationTabPanel.removeMember(automationPanel);
+        }
+        automationPanel = new FillerAutomationPanel(filler, event -> onModified());
+        automationTabPanel.addMember(automationPanel);
+    }
 
-	private boolean validate() {
-		boolean stdValid = standardPanel.validate();
-		if (!stdValid)
-			tabSet.selectTab(0);
-		return stdValid;
-	}
+    public GUIFiller getFiller() {
+        return filler;
+    }
 
-	public void onSave() {
-		if (validate()) {
-			AutofillService.Instance.get().saveFiller(filler, new DefaultAsyncCallback<>() {
-				@Override
-				public void handleSuccess(GUIFiller filler) {
-					tabSet.hideSave();
-					if (filler != null) {
-						fillersPanel.updateRecord(filler);
-						fillersPanel.showFillerDetails(filler);
-					}
-				}
-			});
-		}
-	}
+    public void setFiller(GUIFiller filler) {
+        this.filler = filler;
+        refresh();
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    public void onModified() {
+        tabSet.displaySave();
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    private boolean validate() {
+        boolean stdValid = standardPanel.validate();
+
+        boolean automationValid = true;
+        try {
+            automationValid = automationPanel.validate();
+        } catch (Exception t) {
+            // Nothing to do
+        }
+
+        if (!stdValid)
+            tabSet.selectTab(0);
+        else if (!automationValid)
+            tabSet.selectTab(1);
+
+        return stdValid && automationValid;
+    }
+
+    public void onSave() {
+        if (validate()) {
+            AutofillService.Instance.get().saveFiller(filler, new DefaultAsyncCallback<>() {
+                @Override
+                public void handleSuccess(GUIFiller filler) {
+                    tabSet.hideSave();
+                    if (filler != null) {
+                        fillersPanel.updateRecord(filler);
+                        fillersPanel.showFillerDetails(filler);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

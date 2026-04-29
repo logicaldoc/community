@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.runtime.Aspect;
 import com.logicaldoc.core.runtime.FeatureDisabledException;
@@ -56,7 +57,7 @@ public class ChainFiller extends Filler {
 	}
 
 	@Override
-	public void fill(Fillable fillable, String content, History transaction, Map<String, Object> dictionary)
+	protected void fill(Document fillable, String content, History transaction, Map<String, Object> dictionary)
 			throws PersistenceException, IOException, FeatureDisabledException, SearchException {
 
 		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))

@@ -2,6 +2,7 @@ package com.logicaldoc.core.filler;
 
 import java.util.Map;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.history.History;
 
 import jakarta.persistence.Cacheable;
@@ -23,7 +24,7 @@ public class MockFiller extends Filler {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void fill(Fillable filler, String content, History transaction, Map<String, Object> dictionary) {
+	protected void fill(Document doc, String content, History transaction, Map<String, Object> dictionary) {
 		// Do nothing
 	}
 }

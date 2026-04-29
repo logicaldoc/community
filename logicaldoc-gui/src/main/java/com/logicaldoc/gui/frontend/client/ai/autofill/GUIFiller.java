@@ -12,135 +12,205 @@ import java.util.List;
  */
 public class GUIFiller implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private long id = 0;
+    private long id = 0;
 
-	private String name;
+    private String name;
 
-	private String label;
+    private String label;
 
-	private String description;
+    private String description;
 
-	private String type;
+    private String type;
 
-	private String model;
+    private String model;
 
-	private Long modelId;
+    private Long modelId;
 
-	private Long embeddingSchemeId;
+    private Long embeddingSchemeId;
 
-	private Double threshold = 0.7d;
+    private Double threshold = 0.7d;
 
-	private List<GUIFiller> chain = new ArrayList<>();
-	
-	private boolean overwrite;
-	
-	private boolean onCheckin;
+    private String attribute;
 
-	public GUIFiller() {
-		// Empty constructor
-	}
+    private String candidate;
 
-	public GUIFiller(long id, String name) {
-		super();
-		this.id = id;
-		this.name = name;
-	}
+    private String format;
 
-	public long getId() {
-		return id;
-	}
+    private String decimalSeparator = ",";
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    private String groupingSeparator = ".";
 
-	public String getName() {
-		return name;
-	}
+    private List<GUIFiller> chain = new ArrayList<>();
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private boolean overwrite;
 
-	public String getLabel() {
-		return label;
-	}
+    private boolean onCheckin;
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    private String automation;
 
-	public String getDescription() {
-		return description;
-	}
+    private List<GUICriterion> criteria = new ArrayList<>();
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public GUIFiller() {
+        // Empty constructor
+    }
 
-	public String getType() {
-		return type;
-	}
+    public GUIFiller(long id, String name) {
+        super();
+        this.id = id;
+        this.name = name;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public Long getModelId() {
-		return modelId;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setModelId(Long modelId) {
-		this.modelId = modelId;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getModel() {
-		return model;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setModel(String model) {
-		this.model = model;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public Double getThreshold() {
-		return threshold;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public void setThreshold(Double threshold) {
-		this.threshold = threshold;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public List<GUIFiller> getChain() {
-		return chain;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setChain(List<GUIFiller> chain) {
-		this.chain = chain;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public Long getEmbeddingSchemeId() {
-		return embeddingSchemeId;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setEmbeddingSchemeId(Long embeddingSchemeId) {
-		this.embeddingSchemeId = embeddingSchemeId;
-	}
+    public Long getModelId() {
+        return modelId;
+    }
 
-	public boolean isOverwrite() {
-		return overwrite;
-	}
+    public void setModelId(Long modelId) {
+        this.modelId = modelId;
+    }
 
-	public void setOverwrite(boolean overwrite) {
-		this.overwrite = overwrite;
-	}
+    public String getModel() {
+        return model;
+    }
 
-	public boolean isOnCheckin() {
-		return onCheckin;
-	}
+    public void setModel(String model) {
+        this.model = model;
+    }
 
-	public void setOnCheckin(boolean onCheckin) {
-		this.onCheckin = onCheckin;
-	}
+    public Double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(Double threshold) {
+        this.threshold = threshold;
+    }
+
+    public List<GUIFiller> getChain() {
+        return chain;
+    }
+
+    public void setChain(List<GUIFiller> chain) {
+        this.chain = chain;
+    }
+
+    public Long getEmbeddingSchemeId() {
+        return embeddingSchemeId;
+    }
+
+    public void setEmbeddingSchemeId(Long embeddingSchemeId) {
+        this.embeddingSchemeId = embeddingSchemeId;
+    }
+
+    public boolean isOverwrite() {
+        return overwrite;
+    }
+
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
+    }
+
+    public boolean isOnCheckin() {
+        return onCheckin;
+    }
+
+    public void setOnCheckin(boolean onCheckin) {
+        this.onCheckin = onCheckin;
+    }
+
+    public String getAutomation() {
+        return automation;
+    }
+
+    public void setAutomation(String automation) {
+        this.automation = automation;
+    }
+
+    public String getAttribute() {
+        return attribute;
+    }
+
+    public void setAttribute(String attribute) {
+        this.attribute = attribute;
+    }
+
+    public String getCandidate() {
+        return candidate;
+    }
+
+    public void setCandidate(String candidate) {
+        this.candidate = candidate;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public String getDecimalSeparator() {
+        return decimalSeparator;
+    }
+
+    public void setDecimalSeparator(String decimalSeparator) {
+        this.decimalSeparator = decimalSeparator;
+    }
+
+    public String getGroupingSeparator() {
+        return groupingSeparator;
+    }
+
+    public void setGroupingSeparator(String groupingSeparator) {
+        this.groupingSeparator = groupingSeparator;
+    }
+
+    public List<GUICriterion> getCriteria() {
+        return criteria;
+    }
+
+    public void setCriteria(List<GUICriterion> criteria) {
+        this.criteria = criteria;
+    }
 }

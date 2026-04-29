@@ -258,11 +258,11 @@ create table ld_search (ld_id bigint not null, ld_lastmodified timestamp not nul
 create table ld_apikey (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, ld_lastused timestamp, ld_key varchar(255) not null,
                         ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id));
-
 create table ld_filler (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 
 						ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_title varchar(255), ld_label varchar(255),
 						ld_description varchar(4000), ld_type varchar(50) not null, ld_modelid bigint, ld_embeddingschemeid bigint, ld_threshold float, 
-						ld_checkin int not null, ld_overwrite int not null, primary key (ld_id));
+						ld_checkin int not null, ld_overwrite int not null, ld_automation varchar(10000), ld_attribute varchar(255),
+						ld_candidate varchar(255), ld_format varchar(1000), ld_dsep varchar(2), ld_gsep varchar(2), primary key (ld_id));
 create table ld_filler_chain (ld_fillerid bigint not null, ld_chainedid bigint not null, ld_position int not null, primary key (ld_fillerid, ld_chainedid));      
 
                           
