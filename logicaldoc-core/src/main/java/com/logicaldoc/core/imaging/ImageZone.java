@@ -110,5 +110,11 @@ public class ImageZone implements Serializable {
     }
 
     public record Point(double x, double y) {
+        public double distance(Point other) {
+            double w = Math.abs(this.x() - other.x());
+            double h = Math.abs(this.y() - other.y());
+
+            return Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
+        }
     }
 }
