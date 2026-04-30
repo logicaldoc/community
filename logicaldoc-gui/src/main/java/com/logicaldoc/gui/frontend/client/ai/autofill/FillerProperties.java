@@ -27,6 +27,7 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -394,17 +395,15 @@ public class FillerProperties extends FillerDetailsTab {
         criteriaGrid.setLeaveScrollbarGap(false);
         criteriaGrid.setShowHeader(true);
         criteriaGrid.setSelectionType(SelectionStyle.MULTIPLE);
-        criteriaGrid.setCanEdit(false);
-        criteriaGrid.setShowRowNumbers(true);
+        criteriaGrid.setCanEdit(true);
+        criteriaGrid.setShowRowNumbers(false);
         criteriaGrid.setCanReorderRecords(true);
         criteriaGrid.setAutoFetchData(true);
         criteriaGrid.setShowRecordComponents(true);
         criteriaGrid.setShowRecordComponentsByCell(true);
         criteriaGrid.addDropCompleteHandler(dropCompleted -> changedHandler.onChanged(null));
-        criteriaGrid.addCellContextClickHandler(event -> {
-            showChainContextMenu();
-            event.cancel();
-        });
+        criteriaGrid.addEditCompleteHandler(editCompleted -> changedHandler.onChanged(null));
+        criteriaGrid.addCellContextClickHandler(rightClick -> showGridContextMenu(rightClick, criteriaGrid));
 
         SelectItem operatorSelector = ItemFactory.newSelectItem(OPERATOR);
         operatorSelector.setValueMap("INCLUDED", "LEFT", "RIGHT", "ABOVE", "BELOW", "LEFTMOST", "RIGHTMOST", "TOPMOST",
@@ -415,7 +414,7 @@ public class FillerProperties extends FillerDetailsTab {
         operator.setCanEdit(true);
         operator.setAutoFitWidth(true);
         operator.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
-    
+
         ListGridField operand = new ListGridField(OPERAND, I18N.message(OPERAND));
         operand.setCanEdit(true);
         operand.setAutoFitWidth(true);
@@ -447,6 +446,7 @@ public class FillerProperties extends FillerDetailsTab {
             rec.setAttribute(OPERAND, newEntry.getOperand());
             rec.setAttribute(METRIC, newEntry.getMetric());
             criteriaGrid.addData(rec);
+            changedHandler.onChanged(null);
         });
 
         // Configure the chain stack
@@ -487,10 +487,7 @@ public class FillerProperties extends FillerDetailsTab {
         chainGrid.setShowRecordComponents(true);
         chainGrid.setShowRecordComponentsByCell(true);
         chainGrid.addDropCompleteHandler(dropCompleted -> changedHandler.onChanged(null));
-        chainGrid.addCellContextClickHandler(event -> {
-            showChainContextMenu();
-            event.cancel();
-        });
+        chainGrid.addCellContextClickHandler(rightClick -> showGridContextMenu(rightClick, chainGrid));
 
         ListGridField id = new IdListGridField();
 
@@ -571,17 +568,17 @@ public class FillerProperties extends FillerDetailsTab {
         return addFiller;
     }
 
-    private void showChainContextMenu() {
-        Menu contextMenu = new Menu();
+    private void showGridContextMenu(CellContextClickEvent event, ListGrid grid) {
+        event.cancel();
 
         MenuItem delete = new MenuItem();
         delete.setTitle(I18N.message("ddelete"));
-
         delete.addClickHandler(click -> {
-            chainGrid.removeSelectedData();
+            grid.removeSelectedData();
             changedHandler.onChanged(null);
         });
 
+        Menu contextMenu = new Menu();
         contextMenu.setItems(delete);
         contextMenu.showContextMenu();
     }
