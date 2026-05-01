@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.panels;
 
 import com.google.gwt.user.client.Window;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
@@ -36,131 +37,131 @@ import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
  */
 public class MainPanel extends VLayout implements SessionObserver {
 
-	private static final String SEARCH = "search";
+    private static final String SEARCH = "search";
 
-	private static final String DOCUMENT = "documents";
+    private static final String DOCUMENT = "documents";
 
-	private TabSet tabSet = new TabSet();
+    private TabSet tabSet = new TabSet();
 
-	private Tab documentsTab;
+    private Tab documentsTab;
 
-	private Tab searchTab;
+    private Tab searchTab;
 
-	private Tab dashboardTab;
+    private Tab dashboardTab;
 
-	private Tab administrationTab;
+    private Tab administrationTab;
 
-	private static MainPanel instance;
+    private static MainPanel instance;
 
-	private IncomingMessage incomingMessage = null;
+    private IncomingMessage incomingMessage = null;
 
-	public static MainPanel get() {
-		if (instance == null)
-			instance = new MainPanel();
-		return instance;
-	}
+    public static MainPanel get() {
+        if (instance == null)
+            instance = new MainPanel();
+        return instance;
+    }
 
-	private MainPanel() {
-		setOverflow(Overflow.HIDDEN);
-	}
+    private MainPanel() {
+        setOverflow(Overflow.HIDDEN);
+    }
 
-	@Override
-	public void onDraw() {
-		Session.get().addObserver(this);
+    @Override
+    public void onDraw() {
+        Session.get().addObserver(this);
 
-		setWidth100();
-		setHeight100();
+        setWidth100();
+        setHeight100();
 
-		documentsTab = new Tab(I18N.message(DOCUMENT));
-		documentsTab.setName(DOCUMENT);
-		searchTab = new Tab(I18N.message(SEARCH));
-		searchTab.setName(SEARCH);
-		dashboardTab = new Tab(I18N.message("dashboard"));
-		dashboardTab.setName("dashboard");
-		administrationTab = new Tab(I18N.message("administration"));
-		administrationTab.setName("administration");
+        documentsTab = new Tab(I18N.message(DOCUMENT));
+        documentsTab.setName(DOCUMENT);
+        searchTab = new Tab(I18N.message(SEARCH));
+        searchTab.setName(SEARCH);
+        dashboardTab = new Tab(I18N.message("dashboard"));
+        dashboardTab.setName("dashboard");
+        administrationTab = new Tab(I18N.message("administration"));
+        administrationTab.setName("administration");
 
-		Window.addResizeHandler(event -> {
-			int width = Window.getClientWidth();
-			int height = Window.getClientHeight();
-			tabSet.setSize(width + "px", height - 95 + "px");
-			redraw();
-		});
+        Window.addResizeHandler(event -> {
+            int width = Window.getClientWidth();
+            int height = Window.getClientHeight();
+            tabSet.setSize(width + "px", height - 95 + "px");
+            redraw();
+        });
 
-		/*
-		 * Setup notification logic
-		 */
-		TabSelectedHandler selectionHandler = event -> MainMenu.get().onTabSeleted(event.getTab().getName());
+        /*
+         * Setup notification logic
+         */
+        TabSelectedHandler selectionHandler = event -> MainMenu.get().onTabSeleted(event.getTab().getName());
 
-		documentsTab.addTabSelectedHandler(selectionHandler);
-		searchTab.addTabSelectedHandler(selectionHandler);
-		dashboardTab.addTabSelectedHandler(selectionHandler);
-		administrationTab.addTabSelectedHandler(selectionHandler);
-	}
+        documentsTab.addTabSelectedHandler(selectionHandler);
+        searchTab.addTabSelectedHandler(selectionHandler);
+        dashboardTab.addTabSelectedHandler(selectionHandler);
+        administrationTab.addTabSelectedHandler(selectionHandler);
+    }
 
-	@Override
-	public void onUserLoggedIn(final GUIUser user) {
-		prepareIncomingMessage();
+    @Override
+    public void onUserLoggedIn(final GUIUser user) {
+        prepareIncomingMessage();
 
-		setMembers(new TopPanel(), incomingMessage, MainMenu.get(), tabSet, new StatusBar(true));
+        setMembers(new TopPanel(), incomingMessage, MainMenu.get(), tabSet, new StatusBar(true));
 
-		prepareMainTabs(user);
+        prepareMainTabs(user);
 
-		/*
-		 * Check if there are alerts
-		 */
-		if (user.isMemberOf(Constants.GROUP_ADMIN) && !Session.get().isDemo())
-			retrieveAlerts();
-	}
+        /*
+         * Check if there are alerts
+         */
+        if (user.isMemberOf(Constants.GROUP_ADMIN) && !Session.get().isDemo())
+            retrieveAlerts();
+    }
 
-	private void retrieveAlerts() {
-		InfoService.Instance.get().getInfo(I18N.getLocale(), Session.get().getTenantName(), false,
-				new IgnoreAsyncCallback<>() {
-					@Override
-					public void onSuccess(GUIInfo info) {
-						StringBuilder alerts = new StringBuilder();
-						for (GUIMessage warning : info.getAlerts()) {
-							if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()) {
-								if (!"".equals(alerts.toString()))
-									alerts.append(" -- ");
-								alerts.append(warning.getMessage());
-							}
-						}
-						if (!"".equals(alerts.toString()))
-							SC.warn(alerts.toString());
-					}
-				});
-	}
+    private void retrieveAlerts() {
+        InfoService.Instance.get().getInfo(I18N.getLocale(), Session.get().getTenantName(), false,
+                new IgnoreAsyncCallback<>() {
+                    @Override
+                    public void onSuccess(GUIInfo info) {
+                        StringBuilder alerts = new StringBuilder();
+                        for (GUIMessage warning : info.getAlerts()) {
+                            if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()) {
+                                if (!"".equals(alerts.toString()))
+                                    alerts.append(" -- ");
+                                alerts.append(warning.getMessage());
+                            }
+                        }
+                        if (!"".equals(alerts.toString()))
+                            SC.warn(alerts.toString());
+                    }
+                });
+    }
 
-	private void prepareMainTabs(final GUIUser user) {
-		long welcomeScreen = Menu.DASHBOARD;
-		if (user.getWelcomeScreen() != null)
-			welcomeScreen = user.getWelcomeScreen().intValue();
+    private void prepareMainTabs(final GUIUser user) {
+        long welcomeScreen = Menu.DASHBOARD;
+        if (user.getWelcomeScreen() != null)
+            welcomeScreen = user.getWelcomeScreen().intValue();
 
-		if (Menu.enabled(Menu.DASHBOARD)) {
-			dashboardTab.setPane(DashboardPanel.get());
-			tabSet.addTab(dashboardTab);
-		}
+        if (Menu.enabled(Menu.DASHBOARD)) {
+            dashboardTab.setPane(DashboardPanel.get());
+            tabSet.addTab(dashboardTab);
+        }
 
-		if (Menu.enabled(Menu.DOCUMENTS)) {
-			documentsTab.setPane(DocumentsPanel.get());
-			tabSet.addTab(documentsTab);
-		}
+        if (Menu.enabled(Menu.DOCUMENTS)) {
+            documentsTab.setPane(DocumentsPanel.get());
+            tabSet.addTab(documentsTab);
+        }
 
-		if (Menu.enabled(Menu.SEARCH)) {
-			searchTab.setPane(SearchPanel.get());
-			tabSet.addTab(searchTab);
-		}
+        if (Menu.enabled(Menu.SEARCH)) {
+            searchTab.setPane(SearchPanel.get());
+            tabSet.addTab(searchTab);
+        }
 
-		if (Menu.enabled(Menu.ADMINISTRATION)) {
-			administrationTab.setPane(AdminScreen.get());
-			tabSet.addTab(administrationTab);
-		}
+        if (Menu.enabled(Menu.ADMINISTRATION)) {
+            administrationTab.setPane(AdminScreen.get());
+            tabSet.addTab(administrationTab);
+        }
 
-		openDefaultTab(welcomeScreen);
-	}
+        openDefaultTab(welcomeScreen);
+    }
 
-	private void openDefaultTab(long welcomeScreen) {
+    private void openDefaultTab(long welcomeScreen) {
 		RequestInfo loc = WindowUtils.getRequestInfo();
 		if ((loc.getParameter("folderId") != null || loc.getParameter("docId") != null)
 				&& Menu.enabled(Menu.DOCUMENTS)) {
@@ -169,6 +170,12 @@ public class MainPanel extends VLayout implements SessionObserver {
 			 * Documents tab
 			 */
 			tabSet.selectTab(documentsTab);
+		} else if (loc.getParameter("taskId") != null && Menu.enabled(Menu.DASHBOARD) && Feature.enabled(Feature.WORKFLOW)) {
+	            /*
+	             * The user clicked on a task link so we have to open the
+	             * Workflow tab inside the Dashboard
+	             */
+	            tabSet.selectTab(dashboardTab);			
 		} else {
 			if (welcomeScreen == Menu.DOCUMENTS && Menu.enabled(Menu.DOCUMENTS))
 				tabSet.selectTab(documentsTab);
@@ -179,76 +186,76 @@ public class MainPanel extends VLayout implements SessionObserver {
 		}
 	}
 
-	private void prepareIncomingMessage() {
-		incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(),
-				event -> MainPanel.this.getIncomingMessage().setVisible(false));
-		incomingMessage.setVisible(
-				Session.get().getIncomingMessage() != null && !Session.get().getIncomingMessage().isEmpty());
-	}
+    private void prepareIncomingMessage() {
+        incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(),
+                event -> MainPanel.this.getIncomingMessage().setVisible(false));
+        incomingMessage.setVisible(
+                Session.get().getIncomingMessage() != null && !Session.get().getIncomingMessage().isEmpty());
+    }
 
-	public void selectSearchTab() {
-		tabSet.selectTab(searchTab);
-		if (Search.get().getOptions().isFulltext())
-			SearchMenu.get().openFulltextSection();
-	}
+    public void selectSearchTab() {
+        tabSet.selectTab(searchTab);
+        if (Search.get().getOptions().isFulltext())
+            SearchMenu.get().openFulltextSection();
+    }
 
-	public void selectDocumentsTab() {
-		tabSet.selectTab(documentsTab);
-	}
+    public void selectDocumentsTab() {
+        tabSet.selectTab(documentsTab);
+    }
 
-	public void selectDashboardTab() {
-		tabSet.selectTab(dashboardTab);
-	}
+    public void selectDashboardTab() {
+        tabSet.selectTab(dashboardTab);
+    }
 
-	public void selectUserTab() {
-		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.USER_ID);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.USER_ID);
-	}
+    public void selectUserTab() {
+        selectDashboardTab();
+        DashboardPanel.get().setDefaultOpenTab(DashboardPanel.USER_ID);
+        DashboardPanel.get().getTabSet().selectTab(DashboardPanel.USER_ID);
+    }
 
-	public void selectWorkflowTab() {
-		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.WORKFLOW);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.WORKFLOW);
-	}
+    public void selectWorkflowTab() {
+        selectDashboardTab();
+        DashboardPanel.get().setDefaultOpenTab(DashboardPanel.WORKFLOW);
+        DashboardPanel.get().getTabSet().selectTab(DashboardPanel.WORKFLOW);
+    }
 
-	public void selectMessagesTab() {
-		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.MESSAGES);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.MESSAGES);
-	}
+    public void selectMessagesTab() {
+        selectDashboardTab();
+        DashboardPanel.get().setDefaultOpenTab(DashboardPanel.MESSAGES);
+        DashboardPanel.get().getTabSet().selectTab(DashboardPanel.MESSAGES);
+    }
 
-	public void selectCalendarTab() {
-		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR);
-	}
+    public void selectCalendarTab() {
+        selectDashboardTab();
+        DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR);
+        DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR);
+    }
 
-	public void selectReadingsTab() {
-		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.READINGREQUESTS);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.READINGREQUESTS);
-	}
+    public void selectReadingsTab() {
+        selectDashboardTab();
+        DashboardPanel.get().setDefaultOpenTab(DashboardPanel.READINGREQUESTS);
+        DashboardPanel.get().getTabSet().selectTab(DashboardPanel.READINGREQUESTS);
+    }
 
-	public boolean isOnDocumentsTab() {
-		return DOCUMENT.equals(tabSet.getSelectedTab().getName());
-	}
+    public boolean isOnDocumentsTab() {
+        return DOCUMENT.equals(tabSet.getSelectedTab().getName());
+    }
 
-	public boolean isOnSearchTab() {
-		return SEARCH.equals(tabSet.getSelectedTab().getName());
-	}
+    public boolean isOnSearchTab() {
+        return SEARCH.equals(tabSet.getSelectedTab().getName());
+    }
 
-	public IncomingMessage getIncomingMessage() {
-		return incomingMessage;
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    public IncomingMessage getIncomingMessage() {
+        return incomingMessage;
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

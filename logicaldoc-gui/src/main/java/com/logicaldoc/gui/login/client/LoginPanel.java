@@ -662,7 +662,8 @@ public class LoginPanel extends VLayout {
 	}
 
 	protected void onAuthenticationSuccess(GUISession session) {
-		SC.clearPrompt();
+	    SC.clearPrompt();
+	    
 		boolean saveLoginEnabled = Boolean.parseBoolean(info.getConfig("gui.savelogin"));
 		CookiesManager.saveLogin(saveLoginEnabled, rememberMe.getValueAsBoolean(), username.getValueAsString(),
 				password.getValueAsString());

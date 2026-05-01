@@ -45,12 +45,14 @@
         class="com.logicaldoc.core.security.spring.LDAuthenticationSuccessHandler" />
     <bean id="LDAuthenticationFailureHandler"
         class="com.logicaldoc.core.security.spring.LDAuthenticationFailureHandler" />
+
+    <bean id="queryStringFilter" class="com.logicaldoc.core.security.spring.QueryStringFilter" />
+	<bean id="AnonymousLoginFilter" class="com.logicaldoc.core.security.spring.AnonymousLoginFilter" />
+	<bean id="SessionFilter" class="com.logicaldoc.core.security.spring.SessionFilter" />
     
-    <bean id="AnonymousLoginFilter" class="com.logicaldoc.core.security.spring.AnonymousLoginFilter" />
-    <bean id="SessionFilter" class="com.logicaldoc.core.security.spring.SessionFilter" />
     <bean id="LDSecurityContextRepository"
         class="com.logicaldoc.core.security.spring.LDSecurityContextRepository" />
-    
+
     
     <security:authentication-manager id="authenticationManager">
         <security:authentication-provider ref='LDAuthenticationProvider' />
@@ -157,10 +159,13 @@
             authentication-details-source-ref="LDAuthenticationDetailsSource"
             authentication-success-handler-ref="LDAuthenticationSuccessHandler"
             authentication-failure-handler-ref="LDAuthenticationFailureHandler" />
-        <!-- Exclude the default session management -->
-        <!-- security:session-management session-fixation-protection="none" / -->
-        <!-- Some session-related custom filters -->
-        <security:custom-filter ref="SessionFilter" before="PRE_AUTH_FILTER" />
-        <security:custom-filter ref="AnonymousLoginFilter" before="ANONYMOUS_FILTER" />
+            
+		<!-- Exclude the default session management -->
+		<!-- security:session-management session-fixation-protection="none" / -->
+
+		<!-- Some session-related custom filters -->
+		<security:custom-filter ref="queryStringFilter" after="REQUEST_CACHE_FILTER" />
+		<security:custom-filter ref="SessionFilter" before="PRE_AUTH_FILTER" />
+		<security:custom-filter ref="AnonymousLoginFilter" before="ANONYMOUS_FILTER" />
     </security:http>
 </beans>
