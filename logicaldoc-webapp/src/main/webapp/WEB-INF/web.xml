@@ -831,8 +831,12 @@
     <url-pattern>/frontend/dropbox</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-	<servlet-name>Display</servlet-name>
-	<url-pattern>/display</url-pattern>
+    <servlet-name>Display</servlet-name>
+    <url-pattern>/display</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Display</servlet-name>
+    <url-pattern>/display/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>StoresData</servlet-name>

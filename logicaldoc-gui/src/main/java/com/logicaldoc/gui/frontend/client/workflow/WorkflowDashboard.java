@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.PortalLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -187,7 +186,6 @@ public class WorkflowDashboard extends VLayout {
         WorkflowService.Instance.get().getWorkflowDetailsByTask(taskId, new DefaultAsyncCallback<>() {
             @Override
             public void handleSuccess(GUIWorkflow result) {
-                SC.say(result.getSelectedTask().getOwner());
                 if (result != null)
                     new TaskDetailsDialog(WorkflowDashboard.this, result,
                             !Session.get().getUser().getUsername().equals(result.getSelectedTask().getOwner())).show();

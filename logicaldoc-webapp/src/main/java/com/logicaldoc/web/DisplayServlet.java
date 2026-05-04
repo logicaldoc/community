@@ -13,7 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * This servlet is used to serve those requests for displaying details of a
  * document or a folder. Basically it redirect to /frontend.jsp replicating the
- * received query string.
+ * received query string. It the query string is empty, then the servlet path is
+ * analyzed: the firstsegment is interpreted as the parameter's name and the
+ * second one as parameter's value
  * 
  * @author Marco Meschieri - LogicaLDOC
  * @since 7.5.1
@@ -34,10 +36,15 @@ public class DisplayServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         String query = StringUtils.defaultString(request.getQueryString());
-        String redirectUrl = "%s/frontend.jsp?%s";
 
         try {
-            response.sendRedirect(redirectUrl.formatted(request.getContextPath(), query));
+            if (StringUtils.isNoneEmpty(query)) {
+                response.sendRedirect("%s/frontend.jsp?%s".formatted(request.getContextPath(), query));
+            } else {
+                String[] pathInfo = request.getPathInfo().substring(1).split("/");
+                response.sendRedirect(
+                        "%s/frontend.jsp?%s=%s".formatted(request.getContextPath(), pathInfo[0], pathInfo[1]));
+            }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             try {
