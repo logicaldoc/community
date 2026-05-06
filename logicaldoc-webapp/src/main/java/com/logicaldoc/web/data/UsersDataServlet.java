@@ -90,6 +90,7 @@ public class UsersDataServlet extends AbstractDataServlet {
         writer.print(String.format("<email><![CDATA[%s]]></email>", StringUtils.defaultString(user.getEmail())));
         writer.print(String.format("<phone><![CDATA[%s]]></phone>", StringUtils.defaultString(user.getTelephone())));
         writer.print(String.format("<cell><![CDATA[%s]]></cell>", StringUtils.defaultString(user.getTelephone2())));
+        writer.print(String.format("<whatsapp><![CDATA[%s]]></whatsapp>", StringUtils.defaultString(user.getWhatsapp())));
         writer.print(String.format("<city><![CDATA[%s]]></city>", StringUtils.defaultString(user.getCity())));
         writer.print(String.format("<department><![CDATA[%s]]></department>",
                 StringUtils.defaultString(user.getDepartment())));

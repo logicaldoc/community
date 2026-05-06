@@ -17,7 +17,7 @@ public class WorkflowTasksDS extends DataSource {
 		color.setHidden(true);
 		DataSourceTextField workflow = new DataSourceTextField("workflow");
 		DataSourceTextField workflowDisplay = new DataSourceTextField("workflowDisplay");
-		DataSourceTextField pooledassignees = new DataSourceTextField("pooledassignees");
+		DataSourceTextField candidates = new DataSourceTextField("candidates");
 		DataSourceTextField documents = new DataSourceTextField("documents");
 		DataSourceTextField documentIds = new DataSourceTextField("documentIds");
 		DataSourceDateField startdate = new DataSourceDateField("startdate");
@@ -29,7 +29,7 @@ public class WorkflowTasksDS extends DataSource {
 		display.setHidden(true);
 
 		setFields(id, processId, name, workflowDisplay, startdate, duedate, enddate, workflow, documents, lastnote, documentIds,
-				pooledassignees, templateVersion, display, color);
+				candidates, templateVersion, display, color);
 		setDataURL("data/workflowtasks.xml?1=1" + (type != null ? "&type=" + type : "")
 				+ (taskId != null ? "&taskId=" + taskId : "") + (max != null ? ("&max=" + max) : ""));
 		setClientOnly(true);

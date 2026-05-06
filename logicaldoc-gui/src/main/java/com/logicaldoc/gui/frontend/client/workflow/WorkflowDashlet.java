@@ -120,7 +120,7 @@ public class WorkflowDashlet extends Portlet {
         ListGridField templateVersion = new VersionListGridField("templateVersion", "version");
         templateVersion.setHidden(true);
 
-        ListGridField pooledAssignees = new ListGridField("pooledassignees", I18N.message("pooledassignees"), 150);
+        ListGridField candidates = new ListGridField("candidates", I18N.message("candidates"), 150);
         ListGridField documents = new ListGridField("documents", I18N.message("documents"), 300);
         ListGridField documentIds = new ListGridField("documentIds", I18N.message("documentids"), 200);
         documentIds.setHidden(true);
@@ -160,7 +160,7 @@ public class WorkflowDashlet extends Portlet {
         if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ALL
                 || type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
             list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, name, id,
-                    processId, documents, lastnote, documentIds, pooledAssignees);
+                    processId, documents, lastnote, documentIds, candidates);
         else
             list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, id, processId,
                     name, documents, lastnote, documentIds);

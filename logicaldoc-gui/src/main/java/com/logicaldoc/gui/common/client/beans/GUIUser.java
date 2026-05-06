@@ -77,6 +77,8 @@ public class GUIUser implements Serializable {
 
     private String cell = "";
 
+    private String whatsapp = "";
+
     private String department;
 
     private String organizationalUnit;
@@ -344,6 +346,14 @@ public class GUIUser implements Serializable {
 
     public void setCell(String cell) {
         this.cell = cell;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 
     public boolean isEnabled() {

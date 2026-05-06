@@ -486,8 +486,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 guiUser.setId(userId);
                 guiUser.setTenant(getTenant(user.getTenantId()));
                 guiUser.setAddress(user.getStreet());
-                guiUser.setCell(user.getTelephone2());
                 guiUser.setPhone(user.getTelephone());
+                guiUser.setCell(user.getTelephone2());
+                guiUser.setWhatsapp(user.getWhatsapp());
                 guiUser.setCity(user.getCity());
                 guiUser.setCountry(user.getCountry());
                 guiUser.setEmail(user.getEmail());
@@ -690,6 +691,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             user.setStreet(guiUser.getAddress());
             user.setTelephone(guiUser.getPhone());
             user.setTelephone2(guiUser.getCell());
+            user.setWhatsapp(guiUser.getWhatsapp());
             user.setBuilding(guiUser.getBuilding());
             user.setOrganizationalUnit(guiUser.getOrganizationalUnit());
             user.setDepartment(guiUser.getDepartment());
@@ -963,6 +965,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             user.setState(guiUser.getState());
             user.setTelephone(guiUser.getPhone());
             user.setTelephone2(guiUser.getCell());
+            user.setWhatsapp(guiUser.getWhatsapp());
             user.setCompany(guiUser.getCompany());
             user.setBuilding(guiUser.getBuilding());
             user.setOrganizationalUnit(guiUser.getOrganizationalUnit());

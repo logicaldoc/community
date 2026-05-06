@@ -102,6 +102,7 @@ public class Profile extends Window {
         TextItem state = ItemFactory.newTextItem("state", user.getState());
         TextItem phone = ItemFactory.newTextItem("phone", user.getPhone());
         TextItem cell = ItemFactory.newTextItem("cell", user.getCell());
+        TextItem whatsapp = ItemFactory.newTextItem("whatsapp", user.getWhatsapp());
         TextItem company = ItemFactory.newTextItem("company", user.getCompany());
         TextItem department = ItemFactory.newTextItem("department", user.getDepartment());
         TextItem organizationalUnit = ItemFactory.newTextItem("organizationalunit", user.getOrganizationalUnit());
@@ -117,7 +118,7 @@ public class Profile extends Window {
                 Util.formatSizeW7(user.getQuotaCount()));
         quotaCount.setWrap(false);
 
-        detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell,
+        detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell, whatsapp,
                 company, department, organizationalUnit, building, timeZone, quotaCount, quota);
 
         HLayout detailsPanel = new HLayout();
@@ -312,6 +313,7 @@ public class Profile extends Window {
         u.setState(vm.getValueAsString("state"));
         u.setPhone(vm.getValueAsString("phone"));
         u.setCell(vm.getValueAsString("cell"));
+        u.setWhatsapp(vm.getValueAsString("whatsapp"));
         u.setCompany(vm.getValueAsString("company"));
         u.setDepartment(vm.getValueAsString("department"));
         u.setBuilding(vm.getValueAsString("building"));
@@ -366,6 +368,7 @@ public class Profile extends Window {
                 user.setCountry(ret.getCountry());
                 user.setState(ret.getState());
                 user.setPhone(ret.getPhone());
+                user.setWhatsapp(ret.getWhatsapp());
                 user.setCell(ret.getCell());
                 user.setCompany(ret.getCompany());
                 user.setBuilding(ret.getBuilding());

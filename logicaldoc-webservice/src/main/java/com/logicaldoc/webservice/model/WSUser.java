@@ -113,6 +113,9 @@ public class WSUser {
     private String telephone2 = "";
 
     @WSDoc(required = false)
+    private String whatsapp = "";
+
+    @WSDoc(required = false)
     private String company;
 
     @WSDoc(required = false)
@@ -271,6 +274,14 @@ public class WSUser {
 
     public String getTelephone() {
         return telephone;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 
     public void setUsername(String uname) {
@@ -481,6 +492,7 @@ public class WSUser {
             user.setStreet(getStreet());
             user.setTelephone(getTelephone());
             user.setTelephone2(getTelephone2());
+            user.setWhatsapp(getWhatsapp());
             user.setCompany(getCompany());
             user.setDepartment(getDepartment());
             user.setBuilding(getBuilding());
@@ -558,6 +570,7 @@ public class WSUser {
             wsUser.setStreet(user.getStreet());
             wsUser.setTelephone(user.getTelephone());
             wsUser.setTelephone2(user.getTelephone2());
+            wsUser.setWhatsapp(user.getWhatsapp());
             wsUser.setCompany(user.getCompany());
             wsUser.setDepartment(user.getDepartment());
             wsUser.setBuilding(user.getBuilding());

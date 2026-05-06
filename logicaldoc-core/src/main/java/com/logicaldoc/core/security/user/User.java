@@ -108,6 +108,9 @@ public class User extends PersistentObject implements Serializable {
     @Column(name = "ld_telephone2", length = 255)
     private String telephone2 = "";
 
+    @Column(name = "ld_whatsapp", length = 255)
+    private String whatsapp = "";
+    
     /**
      * Groups this user belongs to
      */
@@ -390,6 +393,14 @@ public class User extends PersistentObject implements Serializable {
 
     public String getTelephone() {
         return telephone;
+    }
+    
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 
     /**

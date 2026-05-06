@@ -60,6 +60,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					usr.setStreet(null);
 					usr.setTelephone(null);
 					usr.setTelephone2(null);
+					usr.setWhatsapp(null);
 				}
 			}
 
@@ -142,6 +143,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setStreet(wsUser.getStreet());
 				usr.setTelephone(wsUser.getTelephone());
 				usr.setTelephone2(wsUser.getTelephone2());
+				usr.setWhatsapp(wsUser.getWhatsapp());
 				usr.setCompany(wsUser.getCompany());
 				usr.setDepartment(wsUser.getDepartment());
 				usr.setOrganizationalUnit(wsUser.getOrganizationalUnit());

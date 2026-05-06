@@ -32,6 +32,7 @@ public class UsersDS extends DataSource {
 		DataSourceTextField timeZone = new DataSourceTextField("timeZone");
 		DataSourceTextField phone = new DataSourceTextField("phone");
 		DataSourceTextField cell = new DataSourceTextField("cell");
+		DataSourceTextField whatsapp = new DataSourceTextField("whatsapp");
 		DataSourceTextField city = new DataSourceTextField("city");
 		DataSourceTextField department = new DataSourceTextField("department");
 		DataSourceTextField building = new DataSourceTextField("building");
@@ -46,7 +47,7 @@ public class UsersDS extends DataSource {
 		DataSourceDateField creation = new DataSourceDateField("creation");
 		DataSourceTextField source = new DataSourceTextField("source");
 
-		setFields(id, username, label, enabled, name, firstName, email, phone, cell, city, company, department,
+		setFields(id, username, label, enabled, name, firstName, email, phone, cell, whatsapp, city, company, department,
 				organizationalUnit, building, groups, usergroup, guest, lastlogin, expire, creation, avatar, timeZone,
 				source, secondFactor);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="

@@ -87,7 +87,7 @@ public class DocTool {
      */
     public String displayUrl(long tenantId, long docId) {
         try {
-            return "%sdownload?tenant=%s&docId=%d".formatted(getServerUrl(), TenantDAO.get().getTenantName(tenantId),
+            return "%sdisplay?tenant=%s&docId=%d".formatted(getServerUrl(), TenantDAO.get().getTenantName(tenantId),
                     docId);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
