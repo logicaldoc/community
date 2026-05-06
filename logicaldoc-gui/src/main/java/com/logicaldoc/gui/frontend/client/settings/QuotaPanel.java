@@ -58,8 +58,7 @@ public class QuotaPanel extends AdminPanel {
 		});
 
 		IButton save = new IButton(I18N.message("save"));
-		save.setMinWidth(80);
-		save.addClickHandler(event -> {
+		save.addClickHandler(click -> {
 			if (tenantQuota.validate())
 				TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 					@Override
@@ -70,8 +69,7 @@ public class QuotaPanel extends AdminPanel {
 				});
 		});
 
-		body.setMembers(tenantQuota);
-		addMember(save);
+		body.setMembers(tenantQuota, save);
 	}
 
 	@Override

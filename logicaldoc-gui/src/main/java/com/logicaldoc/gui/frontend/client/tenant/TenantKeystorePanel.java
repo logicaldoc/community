@@ -151,7 +151,7 @@ public class TenantKeystorePanel extends VLayout {
 
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(5);
-		buttons.setMargin(3);
+        buttons.setLayoutTopMargin(10);
 
 		IButton createNew = prepareCreateNewButton();
 
@@ -319,7 +319,6 @@ public class TenantKeystorePanel extends VLayout {
 
 	private IButton prepareSaveButton() {
 		IButton save = new IButton(I18N.message("save"));
-		save.setAutoFit(true);
 		save.addClickHandler(event -> {
 			if (!validate())
 				return;

@@ -14,6 +14,7 @@ import com.logicaldoc.gui.frontend.client.settings.gui.GUISettingsPanel;
 import com.logicaldoc.gui.frontend.client.settings.messages.OutgoingEmailPanel;
 import com.logicaldoc.gui.frontend.client.settings.protocols.ProtocolsPanel;
 import com.logicaldoc.gui.frontend.client.settings.searchindex.SearchIndexPanel;
+import com.logicaldoc.gui.frontend.client.whatsapp.WhatsappPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -26,180 +27,193 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class SettingsMenu extends VLayout {
 
-	public SettingsMenu() {
-		setMargin(10);
-		setMembersMargin(5);
-		setOverflow(Overflow.AUTO);
+    public SettingsMenu() {
+        setMargin(10);
+        setMembersMargin(5);
+        setOverflow(Overflow.AUTO);
 
-		addSearchAndIndexing();
+        addSearchAndIndexing();
 
-		addStores();
+        addStores();
 
-		addGuiSettings();
+        addGuiSettings();
 
-		addOcr();
+        addOcr();
 
-		addProtocols();
+        addProtocols();
 
-		addOutgoingEmail();
+        addOutgoingEmail();
 
-		addQuota();
+        addQuota();
 
-		addKeystore();
+        addKeystore();
 
-		addAutomation();
+        addAutomation();
 
-		addComparators();
+        addComparators();
 
-		addAuditing();
+        addAuditing();
 
-		addProxy();
+        addProxy();
 
-		addParameters();
-	}
+        addWhatsapp();
 
-	private void addProxy() {
-		Button parameters = new Button(I18N.message("proxy"));
-		parameters.setWidth100();
-		parameters.setHeight(25);
-		parameters.addClickHandler(click -> AdminScreen.get().setContent(new ProxyPanel()));
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PROXY))
-			addMember(parameters);
-	}
+        addParameters();
+    }
 
-	private void addParameters() {
-		Button parameters = new Button(I18N.message("parameters"));
-		parameters.setWidth100();
-		parameters.setHeight(25);
-		parameters.addClickHandler(click -> AdminScreen.get().setContent(new ParametersPanel()));
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
-			addMember(parameters);
-	}
+    private void addProxy() {
+        Button parameters = new Button(I18N.message("proxy"));
+        parameters.setWidth100();
+        parameters.setHeight(25);
+        parameters.addClickHandler(click -> AdminScreen.get().setContent(new ProxyPanel()));
+        if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PROXY))
+            addMember(parameters);
+    }
 
-	private void addAuditing() {
-		Button auditing = new Button(I18N.message("auditing"));
-		auditing.setWidth100();
-		auditing.setHeight(25);
-		auditing.addClickHandler(click -> AdminScreen.get().setContent(new AuditingPanel()));
-		if (Menu.enabled(Menu.AUDITING)) {
-			addMember(auditing);
-		}
-	}
+    private void addParameters() {
+        Button parameters = new Button(I18N.message("parameters"));
+        parameters.setWidth100();
+        parameters.setHeight(25);
+        parameters.addClickHandler(click -> AdminScreen.get().setContent(new ParametersPanel()));
+        if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
+            addMember(parameters);
+    }
 
-	private void addComparators() {
-		Button comparators = new Button(I18N.message("comparators"));
-		comparators.setWidth100();
-		comparators.setHeight(25);
-		comparators.addClickHandler(click -> AdminScreen.get().setContent(new ComparatorsPanel()));
-		if (Feature.visible(Feature.COMPARISON) && Menu.enabled(Menu.COMPARATORS)) {
-			addMember(comparators);
-			if (!Feature.enabled(Feature.COMPARISON))
-				setFeatureDisabled(comparators);
-		}
-	}
+    private void addAuditing() {
+        Button auditing = new Button(I18N.message("auditing"));
+        auditing.setWidth100();
+        auditing.setHeight(25);
+        auditing.addClickHandler(click -> AdminScreen.get().setContent(new AuditingPanel()));
+        if (Menu.enabled(Menu.AUDITING))
+            addMember(auditing);
+    }
 
-	private void setFeatureDisabled(Button button) {
-		button.setDisabled(true);
-		button.setTooltip(I18N.message("featuredisabled"));
-	}
+    private void addWhatsapp() {
+        Button whatsapp = new Button(I18N.message("whatsapp"));
+        whatsapp.setWidth100();
+        whatsapp.setHeight(25);
+        whatsapp.addClickHandler(click -> AdminScreen.get().setContent(new WhatsappPanel()));
+        if (Feature.visible(Feature.WHATSAPP) && Menu.enabled(Menu.WHATSAPP)) {
+            addMember(whatsapp);
+            if (!Feature.enabled(Feature.WHATSAPP))
+                setFeatureDisabled(whatsapp);
+        }
+    }
 
-	private void addAutomation() {
-		Button automation = new Button(I18N.message("automation"));
-		automation.setWidth100();
-		automation.setHeight(25);
-		automation.addClickHandler(click -> AdminScreen.get().setContent(new AutomationSettingsPanel()));
-		if (Feature.visible(Feature.AUTOMATION) && Menu.enabled(Menu.AUTOMATION)) {
-			addMember(automation);
-			if (!Feature.enabled(Feature.AUTOMATION))
-				setFeatureDisabled(automation);
-		}
-	}
+    private void addComparators() {
+        Button comparators = new Button(I18N.message("comparators"));
+        comparators.setWidth100();
+        comparators.setHeight(25);
+        comparators.addClickHandler(click -> AdminScreen.get().setContent(new ComparatorsPanel()));
+        if (Feature.visible(Feature.COMPARISON) && Menu.enabled(Menu.COMPARATORS)) {
+            addMember(comparators);
+            if (!Feature.enabled(Feature.COMPARISON))
+                setFeatureDisabled(comparators);
+        }
+    }
 
-	private void addKeystore() {
-		Button keystore = new Button(I18N.message("keystore"));
-		keystore.setWidth100();
-		keystore.setHeight(25);
-		keystore.addClickHandler(click -> AdminScreen.get().setContent(new KeystorePanel()));
-		if (Feature.enabled(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.KEYSTORE))
-			addMember(keystore);
-	}
+    private void setFeatureDisabled(Button button) {
+        button.setDisabled(true);
+        button.setTooltip(I18N.message("featuredisabled"));
+    }
 
-	private void addQuota() {
-		Button quota = new Button(I18N.message("quota"));
-		quota.setWidth100();
-		quota.setHeight(25);
-		quota.addClickHandler(click -> AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId())));
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.QUOTA))
-			addMember(quota);
-	}
+    private void addAutomation() {
+        Button automation = new Button(I18N.message("automation"));
+        automation.setWidth100();
+        automation.setHeight(25);
+        automation.addClickHandler(click -> AdminScreen.get().setContent(new AutomationSettingsPanel()));
+        if (Feature.visible(Feature.AUTOMATION) && Menu.enabled(Menu.AUTOMATION)) {
+            addMember(automation);
+            if (!Feature.enabled(Feature.AUTOMATION))
+                setFeatureDisabled(automation);
+        }
+    }
 
-	private void addOutgoingEmail() {
-		Button smtp = new Button(I18N.message("outgoingemail"));
-		smtp.setWidth100();
-		smtp.setHeight(25);
-		smtp.addClickHandler(click -> SettingService.Instance.get().loadEmailSettings(new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(GUIEmailSettings settings) {
-				AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
-			}
+    private void addKeystore() {
+        Button keystore = new Button(I18N.message("keystore"));
+        keystore.setWidth100();
+        keystore.setHeight(25);
+        keystore.addClickHandler(click -> AdminScreen.get().setContent(new KeystorePanel()));
+        if (Feature.enabled(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.KEYSTORE))
+            addMember(keystore);
+    }
 
-		}));
+    private void addQuota() {
+        Button quota = new Button(I18N.message("quota"));
+        quota.setWidth100();
+        quota.setHeight(25);
+        quota.addClickHandler(click -> AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId())));
+        if (Session.get().isDefaultTenant() && Menu.enabled(Menu.QUOTA))
+            addMember(quota);
+    }
 
-		if (Session.get().isDemo())
-			setFeatureDisabled(smtp);
+    private void addOutgoingEmail() {
+        Button smtp = new Button(I18N.message("outgoingemail"));
+        smtp.setWidth100();
+        smtp.setHeight(25);
+        smtp.addClickHandler(click -> SettingService.Instance.get().loadEmailSettings(new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(GUIEmailSettings settings) {
+                AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
+            }
 
-		if (Menu.enabled(Menu.OUTGOING_EMAIL))
-			addMember(smtp);
-	}
+        }));
 
-	private void addProtocols() {
-		Button protocols = new Button(I18N.message("protocols"));
-		protocols.setWidth100();
-		protocols.setHeight(25);
-		protocols.addClickHandler(event -> AdminScreen.get().setContent(new ProtocolsPanel()));
-		if (Feature.visible(Feature.PROTOCOLS) && Menu.enabled(Menu.CLIENTS)) {
-			addMember(protocols);
-			if (!Feature.enabled(Feature.PROTOCOLS))
-				setFeatureDisabled(protocols);
-		}
-	}
+        if (Session.get().isDemo())
+            setFeatureDisabled(smtp);
 
-	private void addOcr() {
-		Button ocr = new Button(I18N.message("ocr"));
-		ocr.setWidth100();
-		ocr.setHeight(25);
-		ocr.addClickHandler(event -> AdminScreen.get().setContent(new OCRSettingsPanel()));
-		if (Feature.visible(Feature.OCR) && Menu.enabled(Menu.OCR)) {
-			addMember(ocr);
-			if (!Feature.enabled(Feature.OCR))
-				setFeatureDisabled(ocr);
-		}
-	}
+        if (Menu.enabled(Menu.OUTGOING_EMAIL))
+            addMember(smtp);
+    }
 
-	private void addGuiSettings() {
-		Button guiSettings = new Button(I18N.message("guisettings"));
-		guiSettings.setWidth100();
-		guiSettings.setHeight(25);
-		guiSettings.addClickHandler(event -> AdminScreen.get().setContent(new GUISettingsPanel()));
-		if (Menu.enabled(Menu.GUI_SETTINGS))
-			addMember(guiSettings);
-	}
+    private void addProtocols() {
+        Button protocols = new Button(I18N.message("protocols"));
+        protocols.setWidth100();
+        protocols.setHeight(25);
+        protocols.addClickHandler(event -> AdminScreen.get().setContent(new ProtocolsPanel()));
+        if (Feature.visible(Feature.PROTOCOLS) && Menu.enabled(Menu.CLIENTS)) {
+            addMember(protocols);
+            if (!Feature.enabled(Feature.PROTOCOLS))
+                setFeatureDisabled(protocols);
+        }
+    }
 
-	private void addStores() {
-		Button stores = new Button(I18N.message("stores"));
-		stores.setWidth100();
-		stores.setHeight(25);
-		stores.addClickHandler(event -> AdminScreen.get().setContent(new RepositoriesPanel()));
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.STORES))
-			addMember(stores);
-	}
+    private void addOcr() {
+        Button ocr = new Button(I18N.message("ocr"));
+        ocr.setWidth100();
+        ocr.setHeight(25);
+        ocr.addClickHandler(event -> AdminScreen.get().setContent(new OCRSettingsPanel()));
+        if (Feature.visible(Feature.OCR) && Menu.enabled(Menu.OCR)) {
+            addMember(ocr);
+            if (!Feature.enabled(Feature.OCR))
+                setFeatureDisabled(ocr);
+        }
+    }
 
-	private void addSearchAndIndexing() {
-		Button searchAndIndexing = new Button(I18N.message("searchandindexing"));
-		searchAndIndexing.setWidth100();
-		searchAndIndexing.setHeight(25);
-		searchAndIndexing.addClickHandler(event -> AdminScreen.get().setContent(new SearchIndexPanel()));
-		if (Menu.enabled(Menu.SEARCH_AND_INDEXING))
-			addMember(searchAndIndexing);
-	}
+    private void addGuiSettings() {
+        Button guiSettings = new Button(I18N.message("guisettings"));
+        guiSettings.setWidth100();
+        guiSettings.setHeight(25);
+        guiSettings.addClickHandler(event -> AdminScreen.get().setContent(new GUISettingsPanel()));
+        if (Menu.enabled(Menu.GUI_SETTINGS))
+            addMember(guiSettings);
+    }
+
+    private void addStores() {
+        Button stores = new Button(I18N.message("stores"));
+        stores.setWidth100();
+        stores.setHeight(25);
+        stores.addClickHandler(event -> AdminScreen.get().setContent(new RepositoriesPanel()));
+        if (Session.get().isDefaultTenant() && Menu.enabled(Menu.STORES))
+            addMember(stores);
+    }
+
+    private void addSearchAndIndexing() {
+        Button searchAndIndexing = new Button(I18N.message("searchandindexing"));
+        searchAndIndexing.setWidth100();
+        searchAndIndexing.setHeight(25);
+        searchAndIndexing.addClickHandler(event -> AdminScreen.get().setContent(new SearchIndexPanel()));
+        if (Menu.enabled(Menu.SEARCH_AND_INDEXING))
+            addMember(searchAndIndexing);
+    }
 }

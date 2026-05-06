@@ -128,7 +128,7 @@ public class Menu {
 	public static final long STORES = 105;
 
 	public static final long AUDITING = 106;
-
+	
 	public static final long OFFICE = -1090;
 
 	public static final long CLUSTERING = -1110;
@@ -233,6 +233,8 @@ public class Menu {
 	
 	public static final long FILLERS = 3030;
 
+    public static final long WHATSAPP = -2150;
+	
 	private static Set<Long> menus = new HashSet<>();
 
 	private Menu() {

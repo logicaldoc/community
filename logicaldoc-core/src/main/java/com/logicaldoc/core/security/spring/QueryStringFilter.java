@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Since there is no way to replicate the original query string in
- * <form-login login-page="...">, we define this custom filter that does the
+ * &lt;form-login login-page="..."&gt;, we define this custom filter that does the
  * job(we suggest to put it after REQUEST_CACHE_FILTER).
  * 
  * @author Marco Meschieri - LogicalDOC

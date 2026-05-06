@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 
 /**
- * Shows the quota details.
+ * Shows the Auditing details.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6.3
@@ -153,11 +153,9 @@ public class AuditingPanel extends AdminPanel {
 			form.setItems(eventsSelector);
 
 		IButton save = new IButton(I18N.message("save"));
-		save.setMinWidth(80);
-		save.addClickHandler(event -> onSave(vm));
+        save.addClickHandler(click -> onSave(vm));
 
-		body.setMembers(form);
-		addMember(save);
+		body.setMembers(form, save);
 	}
 
 	private void onSave(ValuesManager vm) {

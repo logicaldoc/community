@@ -187,10 +187,9 @@ public class OCRSettingsPanel extends AdminPanel {
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(click -> save());
 
-		body.setMembers(form);
+		body.setMembers(form, save);
 		if (Session.get().isDefaultTenant())
 			initEngineForm(engine.getValueAsString(), params);
-		addMember(save);
 
 		Tab history = new Tab();
 		history.setTitle(I18N.message("history"));

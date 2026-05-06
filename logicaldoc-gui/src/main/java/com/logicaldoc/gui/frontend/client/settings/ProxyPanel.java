@@ -122,8 +122,9 @@ public class ProxyPanel extends AdminPanel {
 		});
 
 		HLayout buttons = new HLayout();
-		buttons.setMembersMargin(2);
-		buttons.setMembers(save, test);
+        buttons.setMembersMargin(5);
+        buttons.setLayoutTopMargin(10);
+        buttons.setMembers(save, test);
 
 		body.setMembers(form, buttons);
 	}

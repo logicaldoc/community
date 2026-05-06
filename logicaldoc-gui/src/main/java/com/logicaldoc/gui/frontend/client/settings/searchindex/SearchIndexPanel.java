@@ -630,7 +630,6 @@ public class SearchIndexPanel extends AdminPanel {
 
 	private IButton prepareSaveButton() {
 		IButton save = new IButton(I18N.message("save"));
-		save.setAutoFit(true);
 		save.addClickHandler(saveClick -> {
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;

@@ -233,6 +233,8 @@ public class Feature {
 	
 	public static final int AUTOFILL = 110;
 	
+	public static final int WHATSAPP = 111;
+	
 	private static Set<String> features = new HashSet<>();
 
 	private Feature() {

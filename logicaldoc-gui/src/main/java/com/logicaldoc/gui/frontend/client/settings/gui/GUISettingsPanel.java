@@ -15,9 +15,9 @@ import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -65,8 +65,6 @@ public class GUISettingsPanel extends AdminPanel {
 		parametersForm.setNumCols(4);
 		parametersForm.setPadding(5);
 		parametersForm.setAutoWidth();
-
-		body.setMembers(parametersForm);
 
 		Tab languages = new Tab();
 		languages.setTitle(I18N.message("languages"));
@@ -437,14 +435,6 @@ public class GUISettingsPanel extends AdminPanel {
 		SelectItem charset = ItemFactory.newCharsetSelector(CHARSET);
 		charset.setValue(Util.getParameterValue(settings, CHARSET));
 
-		ButtonItem save = new ButtonItem();
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(click -> {
-			if (Boolean.FALSE.equals(vm.validate()))
-				return;
-			onSave();
-		});
-
 		parametersForm.setItems(welcome, density, banner, previewSize, previewTimeout, previewMaxFileSize, uploadMax,
 				thumbSize, thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, avatarSize, uploadDisallow,
 				showAvatarsInGrids, textExtensions, attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize,
@@ -455,7 +445,16 @@ public class GUISettingsPanel extends AdminPanel {
 				rpcTimeout, sessionHeartbeat, popupTimeout, charset, lockOnEditing, askVersionCommentOnSave,
 				reactToRemoteEvents, showPushErrors, saveInputs, showVersionAlertsInLogin, showLicenseAlertsInLogin,
 				showQuotaAlertsInLogin, showUpdateAlertsInLogin, showPatchAlertsInLogin, showLanguageInLogin,
-				showLostPassword, save);
+				showLostPassword);
+        
+        IButton save = new IButton(I18N.message("save"));
+        save.addClickHandler(click -> {
+            if (Boolean.FALSE.equals(vm.validate()))
+                return;
+            onSave();
+        });
+        
+        body.setMembers(parametersForm, save);
 	}
 
 	private void onSave() {
