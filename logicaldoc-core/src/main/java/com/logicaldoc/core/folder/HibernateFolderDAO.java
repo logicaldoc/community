@@ -135,6 +135,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             }
 
             setTags(folder);
+            
+            // Remove any initialization and validation in attributes
+            for (Attribute attribute : folder.getAttributes().values()) {
+                attribute.setInitialization(null);
+                attribute.setValidation(null);
+            }
 
             if (folder.getTemplate() == null) {
                 folder.setOcrTemplateId(null);
