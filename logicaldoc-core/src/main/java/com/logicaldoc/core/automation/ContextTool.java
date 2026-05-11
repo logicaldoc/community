@@ -2,6 +2,7 @@ package com.logicaldoc.core.automation;
 
 import java.util.List;
 
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
 
 /**
@@ -13,23 +14,32 @@ import com.logicaldoc.util.spring.Context;
 @AutomationDictionary
 public class ContextTool {
 
-	/**
-	 * Gets a specific bean instance
-	 * 
-	 * @param id identifier of the bean
-	 * 
-	 * @return the instance
-	 */
-	public Object getBean(String id) {
-		return Context.get(id);
-	}
+    /**
+     * Gets a specific bean instance
+     * 
+     * @param id identifier of the bean
+     * 
+     * @return the instance
+     */
+    public Object getBean(String id) {
+        return Context.get(id);
+    }
 
-	/**
-	 * Gets the collection of all the identifiers in the context
-	 * 
-	 * @return list of bean identifiers
-	 */
-	public List<String> getBeanIds() {
-		return Context.get().getBeanIds();
-	}
+    /**
+     * Gets the collection of all the identifiers in the context
+     * 
+     * @return list of bean identifiers
+     */
+    public List<String> getBeanIds() {
+        return Context.get().getBeanIds();
+    }
+
+    /**
+     * Gets the general configuration
+     * 
+     * @return the general configuration
+     */
+    public ContextProperties getConfig() {
+        return Context.get().getConfig();
+    }
 }

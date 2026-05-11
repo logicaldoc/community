@@ -2,6 +2,8 @@ package com.logicaldoc.core.communication;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
@@ -10,6 +12,8 @@ import com.logicaldoc.util.LocaleUtil;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 /**
@@ -23,128 +27,161 @@ import jakarta.persistence.Table;
 @Cacheable
 public class MessageTemplate extends PersistentObject {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final String TYPE_SYSTEM = "system";
+    public enum Type {
+        SYSTEM, USER, WHATSAPP
+    };
 
-	public static final String TYPE_USER = "user";
+    @Column(name = "ld_name", length = 255, nullable = false)
+    private String name = "";
 
-	@Column(name = "ld_name", length = 255, nullable = false)
-	private String name = "";
+    @Column(name = "ld_language", length = 10, nullable = false)
+    private String language = "en";
 
-	@Column(name = "ld_language", length = 10, nullable = false)
-	private String language = "en";
+    @Column(name = "ld_description", length = 1000)
+    private String description = "";
 
-	@Column(name = "ld_description", length = 1000)
-	private String description = "";
+    @Column(name = "ld_body")
+    private String body;
 
-	@Column(name = "ld_body", length = 4000)
-	private String body;
+    @Column(name = "ld_subject")
+    private String subject;
 
-	@Column(name = "ld_subject", length = 1000)
-	private String subject;
+    @Column(name = "ld_footer")
+    private String footer;
 
-	@Column(name = "ld_type", length = 255)
-	private String type = TYPE_SYSTEM;
+    @Column(name = "ld_buttons")
+    private String buttons;
 
-	public MessageTemplate() {
-	}
+    @Column(name = "ld_type")
+    @Enumerated(EnumType.STRING)
+    private Type type = Type.SYSTEM;
 
-	public MessageTemplate(MessageTemplate source) {
-		body = source.getBody();
-		description = source.getDescription();
-		language = source.getLanguage();
-		name = source.getName();
-		subject = source.getSubject();
-		setTenantId(source.getTenantId());
-	}
+    public MessageTemplate() {
+    }
 
-	private String getFormattedContent(Map<String, Object> dictionary, String text) throws AutomationException {
-		Automation script = new Automation(getName(), LocaleUtil.toLocale(language), getTenantId());
-		String content = script.evaluate(text, dictionary);
-		if (content != null)
-			content = content.trim();
-		return content;
-	}
+    public MessageTemplate(MessageTemplate source) {
+        body = source.getBody();
+        description = source.getDescription();
+        language = source.getLanguage();
+        name = source.getName();
+        subject = source.getSubject();
+        footer = source.getFooter();
+        buttons = source.getButtons();
+        setTenantId(source.getTenantId());
+    }
 
-	public String getFormattedBody(Map<String, Object> dictionary) throws AutomationException {
-		return getFormattedContent(dictionary, getBody());
-	}
+    private String getFormattedContent(Map<String, Object> dictionary, String text) throws AutomationException {
+        Automation script = new Automation(getName(), LocaleUtil.toLocale(language), getTenantId());
+        String content = script.evaluate(text, dictionary);
+        if (content != null)
+            content = content.trim();
+        return content;
+    }
 
-	public String getFormattedSubject(Map<String, Object> dictionary) throws AutomationException {
-		return getFormattedContent(dictionary, getSubject());
-	}
+    public String getFormattedBody(Map<String, Object> dictionary) throws AutomationException {
+        return getFormattedContent(dictionary, StringUtils.defaultString(getBody()));
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getFormattedSubject(Map<String, Object> dictionary) throws AutomationException {
+        return getFormattedContent(dictionary, StringUtils.defaultString(getSubject()));
+    }
+    
+    public String getFormattedButtons(Map<String, Object> dictionary) throws AutomationException {
+        return getFormattedContent(dictionary, StringUtils.defaultString(getButtons()));
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getFormattedFooter(Map<String, Object> dictionary) throws AutomationException {
+        return getFormattedContent(dictionary, StringUtils.defaultString(getFooter()));
+    }
+    
+    public String getName() {
+        return name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getLanguage() {
-		return language;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    public String getLanguage() {
+        return language;
+    }
 
-	public String getBody() {
-		return body;
-	}
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public String getBody() {
+        return body;
+    }
 
-	public String getSubject() {
-		return subject;
-	}
+    public void setBody(String body) {
+        this.body = body;
+    }
 
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
+    public String getSubject() {
+        return subject;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getFooter() {
+        return footer;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+    public void setFooter(String footer) {
+        this.footer = footer;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MessageTemplate other = (MessageTemplate) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
+    public String getButtons() {
+        return buttons;
+    }
+
+    public void setButtons(String buttons) {
+        this.buttons = buttons;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MessageTemplate other = (MessageTemplate) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
 }

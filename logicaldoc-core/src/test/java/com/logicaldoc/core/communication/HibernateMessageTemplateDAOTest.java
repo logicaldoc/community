@@ -3,6 +3,7 @@ package com.logicaldoc.core.communication;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -59,10 +60,10 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByTypeLanguage() throws PersistenceException {
-		Collection<MessageTemplate> coll = dao.findByTypeAndLanguage(MessageTemplate.TYPE_SYSTEM, "en", 1L);
+		Collection<MessageTemplate> coll = dao.findByTypeAndLanguage(MessageTemplate.Type.SYSTEM, "en", 1L);
 		assertEquals(6, coll.size());
-		coll = dao.findByTypeAndLanguage("xxx", "en", 1L);
-		assertEquals(0, coll.size());
+		coll = dao.findByTypeAndLanguage(MessageTemplate.Type.WHATSAPP, "en", 1L);
+		assertTrue(coll.isEmpty());
 	}
 
 	@Test

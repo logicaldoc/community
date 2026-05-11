@@ -2,6 +2,7 @@ package com.logicaldoc.util.http;
 
 import java.io.IOException;
 
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -22,6 +23,14 @@ public class StringHttpClientResponseHandler extends BaseHttpClientResponseHandl
 	}
 
 	@Override
+    public String handleResponse(ClassicHttpResponse response) throws IOException {
+	    if(response.getEntity()!=null)
+            return handleEntity(response.getEntity());
+        else
+            return response.getReasonPhrase();
+    }
+
+    @Override
 	public String handleEntity(HttpEntity entity) throws IOException {
 		// Extract body from response
 		String content;

@@ -10,65 +10,85 @@ import java.io.Serializable;
  */
 public class GUIMessageTemplate implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Long id;
+    private Long id;
 
-	private String name;
+    private String name;
 
-	private String language;
+    private String language;
 
-	private String subject;
+    private String subject;
 
-	private String body;
-	
-	private String type;
+    private String body;
 
-	public Long getId() {
-		return id;
-	}
+    private String footer;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    private String buttons;
 
-	public String getName() {
-		return name;
-	}
+    private String type;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getLanguage() {
-		return language;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getSubject() {
-		return subject;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
+    public String getLanguage() {
+        return language;
+    }
 
-	public String getBody() {
-		return body;
-	}
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public String getSubject() {
+        return subject;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getFooter() {
+        return footer;
+    }
+
+    public void setFooter(String footer) {
+        this.footer = footer;
+    }
+
+    public String getButtons() {
+        return buttons;
+    }
+
+    public void setButtons(String buttons) {
+        this.buttons = buttons;
+    }
 }

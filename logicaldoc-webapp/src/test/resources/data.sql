@@ -345,7 +345,7 @@ insert into ld_note (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, 
 values(4, '2011-04-18 00:00:00', '2011-04-18 00:00:00',1,1,'Admin',1,'2011-04-18 00:00:00','message for note 4',1,1,0,80,0.5,0.5,0.15,0.10,'1.0',1,80,0);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'test','user','en', '$product','$product',1,1);
+values(500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'test','USER','en', '$product','$product',1,1);
 
 
 create table ld_workflowhistory (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 

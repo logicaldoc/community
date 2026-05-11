@@ -74,6 +74,6 @@ public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate>
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<MessageTemplate> findByTypeAndLanguage(String type, String language, long tenantId)
+	public List<MessageTemplate> findByTypeAndLanguage(MessageTemplate.Type type, String language, long tenantId)
 			throws PersistenceException;
 }

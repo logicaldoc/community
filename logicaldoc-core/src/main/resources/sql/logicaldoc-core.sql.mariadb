@@ -197,7 +197,7 @@ create table ld_note (ld_id bigint not null, ld_lastmodified datetime not null, 
 create table ld_note_acl (ld_noteid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, ld_security int not null, ld_delete int not null, primary key (ld_noteid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                      
 create table ld_messagetemplate (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                                  ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_language varchar(10) not null,
-                                 ld_description varchar(1000), ld_body varchar(4000), ld_type varchar(255),
+                                 ld_description varchar(1000), ld_body varchar(4000), ld_type varchar(255), ld_footer varchar(4000), ld_buttons varchar(4000),
                                  ld_subject varchar(1000), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_contact (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null, 
                          ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint null,
@@ -771,7 +771,7 @@ values (2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,4,1,CURRENT_TIMESTAMP,'admi
 
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'task.report','system','en', '$product - $task',
+values(1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'task.report','SYSTEM','en', '$product - $task',
 '<p>$I18N.get(''startedon''): <b>$DateTool.format($started, true)</b><br />
 $I18N.get(''finishedon''): <b>$DateTool.format($ended, true)</b><br />
 $I18N.get(''duration''): <b>$DateTool.printDuration($duration)</b></p>
@@ -783,7 +783,7 @@ $I18N.get(''duration''): <b>$DateTool.printDuration($duration)</b></p>
 <p>#end $report</p>',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'psw.rec1','system','en', '$product - $I18N.get(''emailnotifyaccountobject'')', 
+values(2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'psw.rec1','SYSTEM','en', '$product - $I18N.get(''emailnotifyaccountobject'')', 
 '$I18N.format(''emailnotifyaccount'', $user.fullName)<br/>
 $I18N.get(''username''): <b>$user.username</b><br/>
 $I18N.get(''password''): <b>$password</b><br/>
@@ -791,12 +791,12 @@ $I18N.get(''clickhere''): <a href="$url">$url</a><br/><br/>
 $I18N.get(''askedtochangepswdatlogin'')',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'psw.rec2','system','en', '$product - $I18N.get(''passwordrequest'')',
+values(3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'psw.rec2','SYSTEM','en', '$product - $I18N.get(''passwordrequest'')',
 '$product - $I18N.get(''passwordrequest'')<br/><br/>
 $I18N.get(''clickhere''): <a href="$url">$url</a>',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'newdoc','system','en', '$product - $I18N.get(''newdocscreated'')',
+values(4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'newdoc','SYSTEM','en', '$product - $I18N.get(''newdocscreated'')',
 '$I18N.get(''newdocscreated'')<br/>
 <hr/>
 $message
@@ -810,10 +810,10 @@ $I18N.get(''date''): <b>$DateTool.format($CURRENT_DATE, true)</b><br/>
 #end',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'empty','user','en', null,null,1,1);
+values(5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'empty','USER','en', null,null,1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'newdevice','system','en', '$I18N.get(''newloginto'') $product $I18N.get(''ffrom'') $device.browser $I18N.get(''on'') $device.operativeSystem',
+values(7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'newdevice','SYSTEM','en', '$I18N.get(''newloginto'') $product $I18N.get(''ffrom'') $device.browser $I18N.get(''on'') $device.operativeSystem',
 '$I18N.get(''wenoticednewlogin'') <b>$user.username</b> $I18N.get(''fromnewdevice'')<br/>
 $I18N.get(''device''): $device.browser $I18N.get(''on'') $device.operativeSystem<br/>
 $I18N.get(''dateandtime''): $DateTool.formatDate($event.date)<br/>
@@ -829,7 +829,7 @@ $I18N.get(''ipgeolocation''): $client.geolocation<br/>
 <li>$I18N.get(''reporttosysadmin'')</li></ul>',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
-values(8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'checkin','system','en', '$product - $I18N.get(''newdocversion'')',
+values(8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'checkin','SYSTEM','en', '$product - $I18N.get(''newdocversion'')',
 '$I18N.get(''newdocversion'')<br/>
 <hr/>
 $message

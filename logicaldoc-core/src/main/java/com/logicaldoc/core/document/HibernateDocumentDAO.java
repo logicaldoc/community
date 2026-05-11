@@ -289,6 +289,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
                     a -> a.getType() == Attribute.TYPE_DOCUMENT && a.getIntValue() != null && a.getIntValue() != 0L)
                     .count());
 
+            // Remove any initialization and validation in attributes
+            for (Attribute attribute : doc.getAttributes().values()) {
+                attribute.setInitialization(null);
+                attribute.setValidation(null);
+            }
+            
             /*
              * Avoid documents inside folder alias
              */
