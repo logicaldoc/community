@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.spring;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -17,8 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Since there is no way to replicate the original query string in
- * &lt;form-login login-page="..."&gt;, we define this custom filter that does the
- * job(we suggest to put it after REQUEST_CACHE_FILTER).
+ * &lt;form-login login-page="..."&gt;, we define this custom filter that does
+ * the job(we suggest to put it after REQUEST_CACHE_FILTER).
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.3
@@ -33,10 +34,10 @@ public class QueryStringFilter extends GenericFilterBean {
     private String loginPage = "/login.jsp";
 
     /**
-     * All URIs that starts with this path will be passed through standard filter chain
+     * List of base URIs to consider, all the rest will be skipped
      */
-    private String loginPath = "/login";
-    
+    private List<String> baseUris = List.of("/display", "/frontend", "/mobile", "/download");
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
@@ -50,9 +51,10 @@ public class QueryStringFilter extends GenericFilterBean {
          * context, then we redirect to login page replicating the query string
          * of the original request
          */
-        if ((SecurityContextHolder.getContext().getAuthentication() == null
-                || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
-                && !request.getRequestURI().contains(loginPath) && StringUtils.isNotEmpty(queryString)) {
+        if (baseUris.stream().anyMatch(baseUri -> request.getRequestURI().startsWith(baseUri))
+                && (SecurityContextHolder.getContext().getAuthentication() == null
+                        || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+                && StringUtils.isNotEmpty(queryString)) {
 
             String redirectUrl = "%s?%s".formatted(loginPage, queryString);
 
@@ -70,13 +72,5 @@ public class QueryStringFilter extends GenericFilterBean {
 
     public void setLoginPage(String loginPage) {
         this.loginPage = loginPage;
-    }
-
-    public String getLoginPath() {
-        return loginPath;
-    }
-
-    public void setLoginPath(String loginPath) {
-        this.loginPath = loginPath;
     }
 }

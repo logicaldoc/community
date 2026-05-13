@@ -131,7 +131,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 		updateSignature();
 
-		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new DefaultAsyncCallback<>() {
+		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "USER", new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(List<GUIMessageTemplate> templates) {
 				LinkedHashMap<String, String> map = new LinkedHashMap<>();

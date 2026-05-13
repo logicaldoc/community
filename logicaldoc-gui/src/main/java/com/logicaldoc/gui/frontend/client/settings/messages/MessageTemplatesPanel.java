@@ -251,27 +251,26 @@ public class MessageTemplatesPanel extends VLayout {
     }
 
     private void reload() {
-        String lang = langSelector.getValueAsString();
-
-        MessageService.Instance.get().loadTemplates(lang, null, new DefaultAsyncCallback<>() {
-            @Override
-            public void handleSuccess(List<GUIMessageTemplate> templates) {
-                List<ListGridRecord> records = new ArrayList<>();
-                for (GUIMessageTemplate pat : templates) {
-                    ListGridRecord rec = new ListGridRecord();
-                    rec.setAttribute("id", pat.getId());
-                    rec.setAttribute("name", pat.getName());
-                    rec.setAttribute(LANGUAGE, pat.getName());
-                    rec.setAttribute(SUBJECT, pat.getSubject());
-                    rec.setAttribute("body", pat.getBody());
-                    rec.setAttribute("type", pat.getType());
-                    rec.setAttribute("footer", pat.getFooter());
-                    rec.setAttribute("buttons", pat.getButtons());
-                    records.add(rec);
-                }
-                list.setData(records.toArray(new ListGridRecord[0]));
-            }
-        });
+        MessageService.Instance.get().loadTemplates(langSelector.getValueAsString(), null,
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(List<GUIMessageTemplate> templates) {
+                        List<ListGridRecord> records = new ArrayList<>();
+                        for (GUIMessageTemplate template : templates) {
+                            ListGridRecord rec = new ListGridRecord();
+                            rec.setAttribute("id", template.getId());
+                            rec.setAttribute("name", template.getName());
+                            rec.setAttribute(LANGUAGE, template.getName());
+                            rec.setAttribute(SUBJECT, template.getSubject());
+                            rec.setAttribute("body", template.getBody());
+                            rec.setAttribute("type", template.getType());
+                            rec.setAttribute("footer", template.getFooter());
+                            rec.setAttribute("buttons", template.getButtons());
+                            records.add(rec);
+                        }
+                        list.setData(records.toArray(new ListGridRecord[0]));
+                    }
+                });
     }
 
     @Override
