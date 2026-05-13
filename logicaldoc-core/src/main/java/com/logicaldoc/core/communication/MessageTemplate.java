@@ -54,6 +54,9 @@ public class MessageTemplate extends PersistentObject {
     @Column(name = "ld_buttons")
     private String buttons;
 
+    @Column(name = "ld_category")
+    private String category = "UTILITY";
+
     @Column(name = "ld_type")
     @Enumerated(EnumType.STRING)
     private Type type = Type.SYSTEM;
@@ -69,6 +72,8 @@ public class MessageTemplate extends PersistentObject {
         subject = source.getSubject();
         footer = source.getFooter();
         buttons = source.getButtons();
+        category = source.getCategory();
+        type = source.getType();
         setTenantId(source.getTenantId());
     }
 
@@ -87,7 +92,7 @@ public class MessageTemplate extends PersistentObject {
     public String getFormattedSubject(Map<String, Object> dictionary) throws AutomationException {
         return getFormattedContent(dictionary, StringUtils.defaultString(getSubject()));
     }
-    
+
     public String getFormattedButtons(Map<String, Object> dictionary) throws AutomationException {
         return getFormattedContent(dictionary, StringUtils.defaultString(getButtons()));
     }
@@ -95,7 +100,15 @@ public class MessageTemplate extends PersistentObject {
     public String getFormattedFooter(Map<String, Object> dictionary) throws AutomationException {
         return getFormattedContent(dictionary, StringUtils.defaultString(getFooter()));
     }
-    
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getName() {
         return name;
     }

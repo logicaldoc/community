@@ -162,6 +162,8 @@ public final class Constants {
 	public static final String TWOFA_YUBIKEY = "yubikey";
 
 	public static final String TWOFA_EMAIL_AUTHENTICATOR = "emailauthenticator";
+	
+	public static final String TWOFA_WHATSAPP_AUTHENTICATOR = "whatsappauthenticator";
 
 	public static final String TWOFA_DUO = "duo";
 

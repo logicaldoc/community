@@ -220,7 +220,7 @@ public class ParameterConditionRow extends HLayout {
 			return map;
 
 		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
-				|| criteriaField.equals("rating") || criteriaField.equals("published")
+				|| criteriaField.equals("rating") || criteriaField.equals("published") || criteriaField.equals("signed")
 				|| criteriaField.equals("indexed") || criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT)
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
 			map.put(GREATERTHAN, I18N.message(GREATERTHAN).toLowerCase());
@@ -359,7 +359,7 @@ public class ParameterConditionRow extends HLayout {
 	private boolean isInteger(String criteriaField) {
 		return criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
 				|| criteriaField.equals("rating") || criteriaField.equals("template")
-				|| criteriaField.equals("published") || criteriaField.equals("indexed")
+				|| criteriaField.equals("published") || criteriaField.equals("indexed") || criteriaField.equals("signed")
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT);
 	}
 

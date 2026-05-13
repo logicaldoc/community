@@ -31,185 +31,204 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
-	private static final String TWOFA = ".2fa.";
+    private static final String TWOFA = ".2fa.";
 
-	private static final String TWOFA_STAR = ".2fa.*";
+    private static final String TWOFA_STAR = ".2fa.*";
 
-	private static final String ENABLED = ".enabled";
+    private static final String ENABLED = ".enabled";
 
-	private static final String ALLOWTRUSTED = "allowtrusted";
+    private static final String ALLOWTRUSTED = ".allowtrusted";
 
-	private ValuesManager vm = new ValuesManager();
+    private ValuesManager vm = new ValuesManager();
 
-	public TwoFactorsAuthenticationSettings() {
-		super("twofactorsauth");
+    public TwoFactorsAuthenticationSettings() {
+        super("twofactorsauth");
 
-		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(Session.get().getTenantName() + TWOFA_STAR),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(List<GUIParameter> params) {
-						init(params);
-					}
-				});
-	}
+        SettingService.Instance.get().loadSettingsByNames(Arrays.asList(Session.get().getTenantName() + TWOFA_STAR),
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(List<GUIParameter> params) {
+                        init(params);
+                    }
+                });
+    }
 
-	private void init(List<GUIParameter> parameters) {
-		DynamicForm form = new DynamicForm();
-		form.setWidth(1);
-		form.setValuesManager(vm);
-		form.setTitleOrientation(TitleOrientation.LEFT);
-		form.setNumCols(1);
+    private void init(List<GUIParameter> parameters) {
+        DynamicForm form = new DynamicForm();
+        form.setWidth(1);
+        form.setValuesManager(vm);
+        form.setTitleOrientation(TitleOrientation.LEFT);
+        form.setNumCols(1);
 
-		Map<String, String> settings = Util.convertToMap(parameters);
-		ToggleItem enable2fa = ItemFactory.newToggleItem("enable2fa", Boolean.valueOf(settings.get("enabled")));
-		enable2fa.setWrapTitle(false);
-		enable2fa.setRequired(true);
-		enable2fa.setDisabled(Session.get().isDemo());
+        Map<String, String> settings = Util.convertToMap(parameters);
+        ToggleItem enable2fa = ItemFactory.newToggleItem("enable2fa", Boolean.valueOf(settings.get("enabled")));
+        enable2fa.setWrapTitle(false);
+        enable2fa.setRequired(true);
+        enable2fa.setDisabled(Session.get().isDemo());
 
-		ToggleItem allowTrustedDevices = ItemFactory.newToggleItem(ALLOWTRUSTED, I18N.message("alwaysallowtrusteddev"),
-				Boolean.valueOf(settings.get("ALLOWTRUSTED")));
-		allowTrustedDevices.setWrapTitle(false);
-		allowTrustedDevices.setRequired(true);
+        ToggleItem allowTrustedDevices = ItemFactory.newToggleItem("allowtrusted2fa", I18N.message("alwaysallowtrusteddev"),
+                Boolean.valueOf(settings.get("allowtrusted")));
+        allowTrustedDevices.setWrapTitle(false);
+        allowTrustedDevices.setRequired(true);
 
-		form.setFields(enable2fa, allowTrustedDevices);
+        form.setFields(enable2fa, allowTrustedDevices);
 
-		/*
-		 * EmailAuthenticator section
-		 */
-		DynamicForm emailForm = new DynamicForm();
-		emailForm.setValuesManager(vm);
-		emailForm.setTitleOrientation(TitleOrientation.TOP);
-		emailForm.setIsGroup(true);
-		emailForm.setGroupTitle("Email Authenticator");
-		emailForm.setNumCols(1);
+        /*
+         * EmailAuthenticator section
+         */
+        DynamicForm emailForm = new DynamicForm();
+        emailForm.setValuesManager(vm);
+        emailForm.setTitleOrientation(TitleOrientation.TOP);
+        emailForm.setIsGroup(true);
+        emailForm.setGroupTitle("Email Authenticator");
+        emailForm.setNumCols(1);
 
-		ToggleItem enableEmail = ItemFactory.newToggleItem("enableEmail", I18N.message("enableemailthenticator"),
-				Boolean.valueOf(settings.get(Constants.TWOFA_EMAIL_AUTHENTICATOR + ENABLED)));
-		enableEmail.setWrapTitle(false);
-		enableEmail.setRequired(true);
-		enableEmail.setDisabled(Session.get().isDemo());
-		emailForm.setFields(enableEmail);
+        ToggleItem enableEmail = ItemFactory.newToggleItem("enableEmail", I18N.message("enableemailthenticator"),
+                Boolean.valueOf(settings.get(Constants.TWOFA_EMAIL_AUTHENTICATOR + ENABLED)));
+        enableEmail.setWrapTitle(false);
+        enableEmail.setRequired(true);
+        enableEmail.setDisabled(Session.get().isDemo());
+        emailForm.setFields(enableEmail);
 
-		/*
-		 * GoogleAuthenticator section
-		 */
-		DynamicForm googleForm = new DynamicForm();
-		googleForm.setValuesManager(vm);
-		googleForm.setTitleOrientation(TitleOrientation.TOP);
-		googleForm.setIsGroup(true);
-		googleForm.setGroupTitle("Google Authenticator");
-		googleForm.setNumCols(1);
+        /*
+         * WhatsappAuthenticator section
+         */
+        DynamicForm whatsappForm = new DynamicForm();
+        whatsappForm.setValuesManager(vm);
+        whatsappForm.setTitleOrientation(TitleOrientation.TOP);
+        whatsappForm.setIsGroup(true);
+        whatsappForm.setGroupTitle("Wahtsapp Authenticator");
+        whatsappForm.setNumCols(1);
 
-		ToggleItem enableGoolge = ItemFactory.newToggleItem("enableGoolge", I18N.message("enablegoogleauthenticator"),
-				Boolean.valueOf(settings.get(Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED)));
-		enableGoolge.setWrapTitle(false);
-		enableGoolge.setRequired(true);
-		enableGoolge.setDisabled(Session.get().isDemo());
-		googleForm.setFields(enableGoolge);
+        ToggleItem enableWhatsapp = ItemFactory.newToggleItem("enableWhatsapp", I18N.message("enablewhatsappauthenticator"),
+                Boolean.valueOf(settings.get(Constants.TWOFA_WHATSAPP_AUTHENTICATOR + ENABLED)));
+        enableWhatsapp.setWrapTitle(false);
+        enableWhatsapp.setRequired(true);
+        enableWhatsapp.setDisabled(Session.get().isDemo());
+        whatsappForm.setFields(enableWhatsapp);
 
-		/*
-		 * Yubikey section
-		 */
-		DynamicForm yubikeyForm = new DynamicForm();
-		yubikeyForm.setValuesManager(vm);
-		yubikeyForm.setTitleOrientation(TitleOrientation.TOP);
-		yubikeyForm.setIsGroup(true);
-		yubikeyForm.setGroupTitle("YubiKey");
-		yubikeyForm.setNumCols(1);
+        /*
+         * GoogleAuthenticator section
+         */
+        DynamicForm googleForm = new DynamicForm();
+        googleForm.setValuesManager(vm);
+        googleForm.setTitleOrientation(TitleOrientation.TOP);
+        googleForm.setIsGroup(true);
+        googleForm.setGroupTitle("Google Authenticator");
+        googleForm.setNumCols(1);
 
-		ToggleItem enableYubikey = ItemFactory.newToggleItem("enableYubikey",
-				Boolean.valueOf(settings.get("yubikey.enabled")));
-		enableYubikey.setWrapTitle(false);
-		enableYubikey.setRequired(true);
-		enableYubikey.setDisabled(Session.get().isDemo());
-		yubikeyForm.setFields(enableYubikey);
+        ToggleItem enableGoolge = ItemFactory.newToggleItem("enableGoolge", I18N.message("enablegoogleauthenticator"),
+                Boolean.valueOf(settings.get(Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED)));
+        enableGoolge.setWrapTitle(false);
+        enableGoolge.setRequired(true);
+        enableGoolge.setDisabled(Session.get().isDemo());
+        googleForm.setFields(enableGoolge);
 
-		/*
-		 * Duo section
-		 */
-		DynamicForm duoForm = new DynamicForm();
-		duoForm.setValuesManager(vm);
-		duoForm.setTitleOrientation(TitleOrientation.TOP);
-		duoForm.setIsGroup(true);
-		duoForm.setGroupTitle("Duo");
-		duoForm.setNumCols(1);
+        /*
+         * Yubikey section
+         */
+        DynamicForm yubikeyForm = new DynamicForm();
+        yubikeyForm.setValuesManager(vm);
+        yubikeyForm.setTitleOrientation(TitleOrientation.TOP);
+        yubikeyForm.setIsGroup(true);
+        yubikeyForm.setGroupTitle("YubiKey");
+        yubikeyForm.setNumCols(1);
 
-		ToggleItem enableDuo = ItemFactory.newToggleItem("enableDuo", I18N.message("enableduo"),
-				Boolean.valueOf(settings.get(Constants.TWOFA_DUO + ENABLED)));
-		enableDuo.setWrapTitle(false);
-		enableDuo.setRequired(true);
-		enableDuo.setDisabled(Session.get().isDemo());
+        ToggleItem enableYubikey = ItemFactory.newToggleItem("enableYubikey",
+                Boolean.valueOf(settings.get("yubikey.enabled")));
+        enableYubikey.setWrapTitle(false);
+        enableYubikey.setRequired(true);
+        enableYubikey.setDisabled(Session.get().isDemo());
+        yubikeyForm.setFields(enableYubikey);
 
-		TextItem duoIntegrationKey = ItemFactory.newTextItem("duoIntegrationKey", I18N.message("integrationkey"),
-				settings.get(Constants.TWOFA_DUO + ".integrationkey"));
-		duoIntegrationKey.setWidth(350);
-		TextItem duoSecretKey = ItemFactory.newPasswordItem("duoSecretKey", I18N.message("secretkey"),
-				settings.get(Constants.TWOFA_DUO + ".secretkey"));
-		duoSecretKey.setWidth(350);
-		TextItem duoApiHostname = ItemFactory.newTextItem("duoApiHostname", I18N.message("apihostname"),
-				settings.get(Constants.TWOFA_DUO + ".apihost"));
-		duoApiHostname.setWidth(350);
+        /*
+         * Duo section
+         */
+        DynamicForm duoForm = new DynamicForm();
+        duoForm.setValuesManager(vm);
+        duoForm.setTitleOrientation(TitleOrientation.TOP);
+        duoForm.setIsGroup(true);
+        duoForm.setGroupTitle("Duo");
+        duoForm.setNumCols(1);
 
-		duoForm.setFields(enableDuo, duoIntegrationKey, duoSecretKey, duoApiHostname);
+        ToggleItem enableDuo = ItemFactory.newToggleItem("enableDuo", I18N.message("enableduo"),
+                Boolean.valueOf(settings.get(Constants.TWOFA_DUO + ENABLED)));
+        enableDuo.setWrapTitle(false);
+        enableDuo.setRequired(true);
+        enableDuo.setDisabled(Session.get().isDemo());
 
-		IButton save = prepareSaveButton();
+        TextItem duoIntegrationKey = ItemFactory.newTextItem("duoIntegrationKey", I18N.message("integrationkey"),
+                settings.get(Constants.TWOFA_DUO + ".integrationkey"));
+        duoIntegrationKey.setWidth(350);
+        TextItem duoSecretKey = ItemFactory.newPasswordItem("duoSecretKey", I18N.message("secretkey"),
+                settings.get(Constants.TWOFA_DUO + ".secretkey"));
+        duoSecretKey.setWidth(350);
+        TextItem duoApiHostname = ItemFactory.newTextItem("duoApiHostname", I18N.message("apihostname"),
+                settings.get(Constants.TWOFA_DUO + ".apihost"));
+        duoApiHostname.setWidth(350);
 
-		VLayout panel = new VLayout();
-		panel.setWidth100();
-		panel.setMembersMargin(8);
-		panel.setMembers(form, emailForm, googleForm, yubikeyForm, duoForm);
+        duoForm.setFields(enableDuo, duoIntegrationKey, duoSecretKey, duoApiHostname);
 
-		body.setMembers(panel);
-		addMember(save);
-	}
+        IButton save = prepareSaveButton();
 
-	private IButton prepareSaveButton() {
-		IButton save = new IButton();
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(event -> {
-			if (Boolean.FALSE.equals(vm.validate()))
-				return;
+        VLayout panel = new VLayout();
+        panel.setWidth100();
+        panel.setMembersMargin(8);
+        panel.setMembers(form, emailForm, whatsappForm, googleForm, yubikeyForm, duoForm);
 
-			String tenant = Session.get().getTenantName();
-			final List<GUIParameter> params = new ArrayList<>();
-			params.add(new GUIParameter(tenant + ".2fa.enabled", vm.getValueAsString("enable2fa")));
-			params.add(new GUIParameter(tenant + ".2fa.allowtrusted", vm.getValueAsString(ALLOWTRUSTED)));
-			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED,
-					vm.getValueAsString("enableGoolge")));
-			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_YUBIKEY + ENABLED,
-					vm.getValueAsString("enableYubikey")));
-			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_EMAIL_AUTHENTICATOR + ENABLED,
-					vm.getValueAsString("enableEmail")));
-			params.add(
-					new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ENABLED, vm.getValueAsString("enableDuo")));
-			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".integrationkey",
-					vm.getValueAsString("duoIntegrationKey")));
-			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".secretkey",
-					vm.getValueAsString("duoSecretKey")));
-			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".apihost",
-					vm.getValueAsString("duoApiHostname")));
-			doSaveSettings(params);
-		});
-		return save;
-	}
+        body.setMembers(panel);
+        addMember(save);
+    }
 
-	private void doSaveSettings(final List<GUIParameter> params) {
-		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(Void arg) {
-				Session.get().updateConfig(params);
-				GuiLog.info(I18N.message("settingssaved"), null);
-			}
-		});
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    private IButton prepareSaveButton() {
+        IButton save = new IButton();
+        save.setTitle(I18N.message("save"));
+        save.addClickHandler(event -> {
+            if (Boolean.FALSE.equals(vm.validate()))
+                return;
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+            String tenant = Session.get().getTenantName();
+            final List<GUIParameter> params = new ArrayList<>();
+            params.add(new GUIParameter(tenant + TWOFA + ENABLED, vm.getValueAsString("enable2fa")));
+            params.add(new GUIParameter(tenant + TWOFA + ALLOWTRUSTED, vm.getValueAsString("allowtrusted2fa")));
+            params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED,
+                    vm.getValueAsString("enableGoolge")));
+            params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_YUBIKEY + ENABLED,
+                    vm.getValueAsString("enableYubikey")));
+            params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_EMAIL_AUTHENTICATOR + ENABLED,
+                    vm.getValueAsString("enableEmail")));
+            params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_WHATSAPP_AUTHENTICATOR + ENABLED,
+                    vm.getValueAsString("enableWhatsapp")));
+            params.add(
+                    new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ENABLED, vm.getValueAsString("enableDuo")));
+            params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".integrationkey",
+                    vm.getValueAsString("duoIntegrationKey")));
+            params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".secretkey",
+                    vm.getValueAsString("duoSecretKey")));
+            params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".apihost",
+                    vm.getValueAsString("duoApiHostname")));
+            doSaveSettings(params);
+        });
+        return save;
+    }
+
+    private void doSaveSettings(final List<GUIParameter> params) {
+        SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(Void arg) {
+                Session.get().updateConfig(params);
+                GuiLog.info(I18N.message("settingssaved"), null);
+            }
+        });
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

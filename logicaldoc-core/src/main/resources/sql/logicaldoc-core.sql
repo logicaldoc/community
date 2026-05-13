@@ -201,7 +201,7 @@ create table ld_note_acl (ld_noteid bigint not null, ld_groupid bigint not null,
 create table ld_messagetemplate (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                                  ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_language varchar(10) not null,
                                  ld_description varchar(1000), ld_body varchar(4000), ld_type varchar(255), ld_footer varchar(4000), ld_buttons varchar(4000),
-                                 ld_subject varchar(1000), primary key (ld_id));
+                                 ld_subject varchar(1000), ld_category varchar(255), primary key (ld_id));
 create table ld_contact (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 
                          ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint null,
                          ld_firstname varchar(255), ld_lastname varchar(255), ld_email varchar(512),

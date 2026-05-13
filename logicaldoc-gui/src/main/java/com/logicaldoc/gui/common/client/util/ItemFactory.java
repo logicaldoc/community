@@ -2762,6 +2762,9 @@ public class ItemFactory {
         if (!enabledOnly
                 || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + DOT_ENABLED))
             map.put(Constants.TWOFA_EMAIL_AUTHENTICATOR, "Email");
+        if (!enabledOnly
+                || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_WHATSAPP_AUTHENTICATOR + DOT_ENABLED))
+            map.put(Constants.TWOFA_WHATSAPP_AUTHENTICATOR, "Whatsapp");
         if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_DUO + DOT_ENABLED))
             map.put(Constants.TWOFA_DUO, "Duo");
         select.setValueMap(map);

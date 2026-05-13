@@ -42,7 +42,7 @@ public class WhatsappPanel extends AdminPanel {
 
         TextItem numberId = ItemFactory.newTextItem("numberid", settings.get(1));
 
-        TextItem accessToken = ItemFactory.newTextItem("accesstoken", settings.get(2));
+        TextItem accessToken = ItemFactory.newPasswordItem("accesstoken", "accesstoken", settings.get(2));
         accessToken.setWidth(400);
 
         TextItem templatePrefix = ItemFactory.newSimpleTextItem("templateprefix", settings.get(3));
