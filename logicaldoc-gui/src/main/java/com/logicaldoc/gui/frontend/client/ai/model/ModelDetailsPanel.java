@@ -59,7 +59,7 @@ public class ModelDetailsPanel extends VLayout {
 				AIService.Instance.get().getModel(model.getId(), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void handleSuccess(GUIModel sampler) {
+					public void handleSuccess(GUIModel model) {
 						setModel(model);
 					}
 
@@ -159,7 +159,7 @@ public class ModelDetailsPanel extends VLayout {
 		statsTabPanel.addMember(statsPanel);
 
 		toggleEvaluationTab();
-		
+
 		toggleTrainingTab();
 
 		historyPanel = new ModelHistoryPanel(model.getId());
@@ -172,14 +172,13 @@ public class ModelDetailsPanel extends VLayout {
 		else
 			tabSet.hideTab(EVALUATION);
 	}
-	
-	protected void toggleTrainingTab() {
-	    if (model.getTraining() != null && model.getTraining().isTrainable())
-	        tabSet.showTab(TRAINING);
-	    else
-	        tabSet.hideTab(TRAINING);
-	}
 
+	protected void toggleTrainingTab() {
+		if (model.getTraining() != null && model.getTraining().isTrainable())
+			tabSet.showTab(TRAINING);
+		else
+			tabSet.hideTab(TRAINING);
+	}
 
 	public GUIModel getModel() {
 		return model;

@@ -64,6 +64,8 @@ public class ModelProperties extends ModelDetailsTab {
 
 	private static final String NEURAL = "neural";
 
+	private static final String YOLO = "yolo";
+
 	private static final String EMBEDDER = "embedder";
 
 	private static final String ACTIVATION = "activation";
@@ -81,6 +83,8 @@ public class ModelProperties extends ModelDetailsTab {
 	private static final AdvancedCriteria NEURAL_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL);
 
 	private static final AdvancedCriteria EMBEDDER_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, EMBEDDER);
+
+	private static final AdvancedCriteria YOLO_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, YOLO);
 
 	private DynamicForm form = new DynamicForm();
 
@@ -169,7 +173,7 @@ public class ModelProperties extends ModelDetailsTab {
 		categories.setWidth(400);
 		categories.setHint(I18N.message("catvalsseparated"));
 		categories.setShowHintInField(true);
-		setNeuralNetworkVisibility(categories);
+		setCategorizedModelVisibility(categories);
 
 		SelectItem activationSelector = activationSeletor();
 		setNeuralNetworkVisibility(activationSelector);
@@ -372,10 +376,17 @@ public class ModelProperties extends ModelDetailsTab {
 	}
 
 	private void setNLPVisibility(FormItem item) {
-
 		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
 				new Criterion[] { new AdvancedCriteria(TYPE, OperatorId.EQUALS, "classifier"),
 						new AdvancedCriteria(TYPE, OperatorId.EQUALS, TOKENS) });
+
+		applyTrainableVisibility(item, criteria);
+	}
+
+	private void setCategorizedModelVisibility(FormItem item) {
+
+		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
+				new Criterion[] { NEURAL_CRITERIA, YOLO_CRITERIA });
 
 		applyTrainableVisibility(item, criteria);
 	}
