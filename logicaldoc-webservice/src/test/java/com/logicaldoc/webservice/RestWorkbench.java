@@ -80,7 +80,15 @@ public class RestWorkbench {
 
 		String sid = authClient.loginApiKey(apiKey);
 		System.err.println(sid);
-//		
+		
+		
+//		WSDocument doc = docClient.getDocument(36188012751L);
+		WSDocument doc = docClient.getDocument(723662124L);
+		System.out.println(doc.getAttributes());
+//		doc.getAttribute(doc.getAttribute("InvoiceNo").getStringValue()+"zz");
+//		docClient.update(doc);
+		
+		
 //		docMetadataClient.setAttributeOptions(188055552L, "test", new String[] {"value1", "value2", "value3"});
 //		
 //		authClient.logout(sid);
@@ -173,16 +181,16 @@ public class RestWorkbench {
 
 		// long start_time = System.nanoTime();
 
-		WSSearchOptions options = new WSSearchOptions();
-		options.setLanguage("en");
-		options.setExpression("release");
-		options.setExpressionLanguage("en");
-		options.setFields(List.of("fileName", "content"));
-		options.setFolderId(4L);
-		options.setSearchInSubPath(1);
-		options.setMaxHits(50);
-		
-		find(options);
+//		WSSearchOptions options = new WSSearchOptions();
+//		options.setLanguage("en");
+//		options.setExpression("release");
+//		options.setExpressionLanguage("en");
+//		options.setFields(List.of("fileName", "content"));
+//		options.setFolderId(4L);
+//		options.setSearchInSubPath(1);
+//		options.setMaxHits(50);
+//		
+//		find(options);
 
 		/*
 		 * WSSearchOptions wsso = buildSearchOptions("en",
