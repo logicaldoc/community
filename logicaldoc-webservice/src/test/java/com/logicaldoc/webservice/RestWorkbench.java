@@ -49,7 +49,7 @@ public class RestWorkbench {
 
 	private static RestBookmarkClient bookmarkClient = null;
 
-	private static String BASE_PATH = "http://localhost:9080";
+	private static String BASE_PATH = "http://localhost:1000";
 
 	public static void main(String[] args) throws Exception {
 		// String test1="<?xml version=\"1.0\"
@@ -83,7 +83,7 @@ public class RestWorkbench {
 		
 		
 //		WSDocument doc = docClient.getDocument(36188012751L);
-		WSDocument doc = docClient.getDocument(723662124L);
+		WSDocument doc = docClient.getDocument(36188012751L);
 		System.out.println(doc.getAttributes());
 //		doc.getAttribute(doc.getAttribute("InvoiceNo").getStringValue()+"zz");
 //		docClient.update(doc);
