@@ -36,6 +36,7 @@ import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
+import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.http.StringHttpClientResponseHandler;
@@ -234,7 +235,7 @@ public class StatsCollector extends Task {
 			long histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
 			long userHistories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
 			long votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
-			long tickets = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_ticket where ld_id in (0,2)");
+			long tickets = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_ticket where ld_type in (%d,%d)".formatted(Ticket.DOWNLOAD, Ticket.VIEW));
 
 			/*
 			 * Save the last update time
