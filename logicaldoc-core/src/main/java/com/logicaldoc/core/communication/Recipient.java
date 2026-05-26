@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 /**
  * A generic recipient of a message or email
@@ -15,113 +17,108 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class Recipient implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final int TYPE_SYSTEM = 0;
+    public enum Type {
+        SYSTEM, EMAIL;
+    }
 
-	public static final int TYPE_EMAIL = 1;
+    public enum Mode {
+        TO, CC, BCC, REPLYTO, MESSAGE;
+    }
+    
+    // The login
+    @Column(name = "ld_name", nullable = false)
+    private String name = "";
 
-	public static final String MODE_EMAIL_TO = "TO";
+    // The system login or the email address
+    @Column(name = "ld_address", nullable = false)
+    private String address = "";
 
-	public static final String MODE_EMAIL_CC = "CC";
+    @Column(name = "ld_mode", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Mode mode = Mode.TO;
 
-	public static final String MODE_EMAIL_BCC = "BCC";
+    @Column(name = "ld_type", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    private Type type = Type.SYSTEM;
 
-	public static final String MODE_EMAIL_REPLYTO = "REPLYTO";
+    @Column(name = "ld_read", nullable = false)
+    private int read = 0;
 
-	// The login
-	@Column(name = "ld_name", nullable = false)
-	private String name = "";
+    public Recipient(String name, String address) {
+        super();
+        this.name = name;
+        this.address = StringUtils.trimToEmpty(address);
+    }
 
-	// The system login or the email address
-	@Column(name = "ld_address", nullable = false)
-	private String address = "";
+    public Recipient() {
+    }
 
-	// The recipient mode (for the system message is not useful, for the email
-	// can be To, CC, CCN, ecc.)
-	@Column(name = "ld_mode", nullable = false)
-	private String mode = MODE_EMAIL_TO;
+    public Recipient(Recipient source) {
+        super();
+        this.name = source.name;
+        this.address = source.address;
+        this.mode = source.mode;
+        this.type = source.type;
+        this.read = source.read;
+    }
 
-	// The recipient type (i.e. system, user, group, email)
-	@Column(name = "ld_type", nullable = false)
-	private int type = TYPE_SYSTEM;
+    public String getName() {
+        return name;
+    }
 
-	@Column(name = "ld_read", nullable = false)
-	private int read = 0;
+    public String getAddress() {
+        return address;
+    }
 
-	public Recipient(String name, String address) {
-		super();
-		this.name = name;
-		this.address = StringUtils.trimToEmpty(address);
-	}
+    public void setName(String nme) {
+        name = nme;
+    }
 
-	public Recipient() {
-	}
+    public void setAddress(String addr) {
+        address = StringUtils.trimToEmpty(addr);
+    }
 
-	public Recipient(Recipient source) {
-		super();
-		this.name = source.name;
-		this.address = source.address;
-		this.mode = source.mode;
-		this.type = source.type;
-		this.read = source.read;
-	}
+    @Override
+    public boolean equals(Object arg0) {
+        if (!(arg0 instanceof Recipient))
+            return false;
+        Recipient other = (Recipient) arg0;
+        return other.getAddress().equals(address);
+    }
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public int hashCode() {
+        return address.hashCode();
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public Mode getMode() {
+        return mode;
+    }
 
-	public void setName(String nme) {
-		name = nme;
-	}
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
 
-	public void setAddress(String addr) {
-		address = StringUtils.trimToEmpty(addr);
-	}
+    public Type getType() {
+        return type;
+    }
 
-	@Override
-	public boolean equals(Object arg0) {
-		if (!(arg0 instanceof Recipient))
-			return false;
-		Recipient other = (Recipient) arg0;
-		return other.getAddress().equals(address);
-	}
+    public void setType(Type type) {
+        this.type = type;
+    }
 
-	@Override
-	public int hashCode() {
-		return address.hashCode();
-	}
+    public int getRead() {
+        return read;
+    }
 
-	public String getMode() {
-		return mode;
-	}
+    public void setRead(int read) {
+        this.read = read;
+    }
 
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public int getRead() {
-		return read;
-	}
-
-	public void setRead(int read) {
-		this.read = read;
-	}
-
-	@Override
-	public String toString() {
-		return address;
-	}
+    @Override
+    public String toString() {
+        return address;
+    }
 }

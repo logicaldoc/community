@@ -74,8 +74,8 @@ public class LongRunningOperationCompleteListener<T> implements ThreadCompleteLi
 			Recipient recipient = new Recipient();
 			recipient.setName(user.getUsername());
 			recipient.setAddress(user.getUsername());
-			recipient.setType(Recipient.TYPE_SYSTEM);
-			recipient.setMode("message");
+			recipient.setType(Recipient.Type.SYSTEM);
+			recipient.setMode(Recipient.Mode.MESSAGE);
 			Set<Recipient> recipients = new HashSet<>();
 			recipients.add(recipient);
 			SystemMessage sysmess = new SystemMessage();

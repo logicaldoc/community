@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.communication.Recipient.Mode;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -58,13 +59,13 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByRecipient() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findByRecipient("sebastian", Message.TYPE_SYSTEM, null);
+		Collection<SystemMessage> coll = testSubject.findByRecipient("sebastian", Message.Type.SYSTEM, null);
 		assertEquals(1, coll.size());
-		coll = testSubject.findByRecipient("marco", 1, null);
-		assertEquals(2, coll.size());
-		coll = testSubject.findByRecipient("paperino", 2, null);
+		coll = testSubject.findByRecipient("marco", Message.Type.SYSTEM, null);
 		assertEquals(0, coll.size());
-		coll = testSubject.findByRecipient("xxxx", Message.TYPE_SYSTEM, null);
+		coll = testSubject.findByRecipient("paperino", Message.Type.NOTIFICATION, null);
+		assertEquals(0, coll.size());
+		coll = testSubject.findByRecipient("xxxx", Message.Type.NOTIFICATION, null);
 		assertEquals(0, coll.size());
 	}
 
@@ -73,39 +74,32 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 		testSubject.deleteExpiredMessages("sebastian");
 		assertNotNull(testSubject.findById(1));
 
-		testSubject.deleteExpiredMessages(Message.TYPE_SYSTEM);
+		testSubject.deleteExpiredMessages(Message.Type.SYSTEM);
 		assertNotNull(testSubject.findById(1));
 	}
 
 	@Test
 	public void testGetUnreadCount() throws PersistenceException {
-		assertEquals(1, testSubject.getUnreadCount("sebastian", Message.TYPE_SYSTEM));
-		assertEquals(2, testSubject.getUnreadCount("marco", 1));
-		assertEquals(0, testSubject.getUnreadCount("admin", Message.TYPE_SYSTEM));
+		assertEquals(1, testSubject.getUnreadCount("sebastian", Message.Type.SYSTEM));
+		assertEquals(2, testSubject.getUnreadCount("marco", Message.Type.NOTIFICATION));
+		assertEquals(0, testSubject.getUnreadCount("admin", Message.Type.SYSTEM));
 	}
 
 	@Test
 	public void testFindByType() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findByType(0);
-		assertEquals(2, coll.size());
-		coll = testSubject.findByType(1);
-		assertEquals(2, coll.size());
-		coll = testSubject.findByType(2);
+		Collection<SystemMessage> coll = testSubject.findByType(Message.Type.SYSTEM);
 		assertEquals(1, coll.size());
-		coll = testSubject.findByType(3);
-		assertEquals(0, coll.size());
+		coll = testSubject.findByType(Message.Type.NOTIFICATION);
+		assertEquals(2, coll.size());
 	}
 
 	@Test
 	public void testFindByMode() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findByMode("CC");
+		Collection<SystemMessage> coll = testSubject.findByMode(Mode.CC);
 		assertEquals(1, coll.size());
-		coll = testSubject.findByMode("sms");
+		coll = testSubject.findByMode(Mode.MESSAGE);
 		assertEquals(2, coll.size());
-		coll = testSubject.findByMode("socket");
-		assertEquals(0, coll.size());
-		coll = testSubject.findByMode("xxxx");
-		assertEquals(0, coll.size());
+
 	}
 
 	@Test
@@ -114,21 +108,21 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 		Recipient recipient = new Recipient();
 		recipient.setName("pippo");
 		recipient.setAddress("pippo");
-		recipient.setType(Recipient.TYPE_SYSTEM);
-		recipient.setMode("test1");
+		recipient.setType(Recipient.Type.SYSTEM);
+		recipient.setMode(Recipient.Mode.TO);
 		recipients.add(recipient);
 		recipient = new Recipient();
 		recipient.setName("paperino");
 		recipient.setAddress("paperino");
-		recipient.setType(Recipient.TYPE_EMAIL);
-		recipient.setMode("test2");
+		recipient.setType(Recipient.Type.EMAIL);
+		recipient.setMode(Recipient.Mode.TO);
 		recipients.add(recipient);
 
 		SystemMessage message = new SystemMessage();
 		message.setAuthor("admin");
 		message.setMessageText("text");
 		message.setLastNotified(new Date());
-		message.setType(Message.TYPE_SYSTEM);
+		message.setType(Message.Type.SYSTEM);
 		message.setStatus(SystemMessage.STATUS_NEW);
 		message.setRecipients(recipients);
 		testSubject.store(message);
@@ -157,14 +151,10 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindMessagesToBeSent() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findMessagesToBeSent(0, 5);
+		Collection<SystemMessage> coll = testSubject.findMessagesToBeSent(Message.Type.SYSTEM, 5);
 		assertEquals(1, coll.size());
-		coll = testSubject.findMessagesToBeSent(1, 5);
+		coll = testSubject.findMessagesToBeSent(Message.Type.NOTIFICATION, 5);
 		assertEquals(2, coll.size());
-		coll = testSubject.findMessagesToBeSent(2, 5);
-		assertEquals(0, coll.size());
-		coll = testSubject.findMessagesToBeSent(3, 5);
-		assertEquals(0, coll.size());
 
 		// Update an already existing message
 		SystemMessage message = testSubject.findById(1);
@@ -174,17 +164,17 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 		testSubject.store(message);
 		message = testSubject.findById(1);
 		assertNotNull(message);
-		coll = testSubject.findMessagesToBeSent(1, 5);
+		coll = testSubject.findMessagesToBeSent(Message.Type.NOTIFICATION, 5);
 		assertEquals(1, coll.size());
 
 		message = testSubject.findById(2);
 		assertNotNull(message);
 		assertEquals("message text2", message.getMessageText());
-		message.setType(0);
+		message.setType(Message.Type.SYSTEM);
 		testSubject.store(message);
 		message = testSubject.findById(2);
 		assertNotNull(message);
-		coll = testSubject.findMessagesToBeSent(0, 5);
+		coll = testSubject.findMessagesToBeSent(Message.Type.SYSTEM, 5);
 		assertEquals(2, coll.size());
 	}
 }

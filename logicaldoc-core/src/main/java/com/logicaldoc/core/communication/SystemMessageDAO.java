@@ -36,7 +36,7 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * @throws PersistenceException @throws PersistenceException Error in the
 	 *         database
 	 */
-	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read) throws PersistenceException;
+	public List<SystemMessage> findByRecipient(String recipient, Message.Type type, Integer read) throws PersistenceException;
 
 	/**
 	 * This methods gets the number of unread messages for the specified
@@ -49,7 +49,7 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public int getUnreadCount(String recipient, int type) throws PersistenceException;
+	public int getUnreadCount(String recipient, Message.Type type) throws PersistenceException;
 
 	/**
 	 * Removes all system expired messages for the specified recipient
@@ -67,7 +67,7 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public void deleteExpiredMessages(int type) throws PersistenceException;
+	public void deleteExpiredMessages(Message.Type type) throws PersistenceException;
 
 	/**
 	 * This method selects all the messages for the specified type
@@ -77,17 +77,17 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<SystemMessage> findByType(int type) throws PersistenceException;
+	public List<SystemMessage> findByType(Message.Type type) throws PersistenceException;
 
 	/**
-	 * This method selects all the messages for the specified mode
+	 * This method selects all the messages withrecipients for the specified mode
 	 * 
 	 * @param mode The message mode
 	 * @return The list of messages of the given mode
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<SystemMessage> findByMode(String mode) throws PersistenceException;
+	public List<SystemMessage> findByMode(Recipient.Mode mode) throws PersistenceException;
 
 	/**
 	 * This method selects all the messages for the specified type that are not
@@ -101,5 +101,5 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<SystemMessage> findMessagesToBeSent(int type, int maxTrials) throws PersistenceException;
+	public List<SystemMessage> findMessagesToBeSent(Message.Type type, int maxTrials) throws PersistenceException;
 }

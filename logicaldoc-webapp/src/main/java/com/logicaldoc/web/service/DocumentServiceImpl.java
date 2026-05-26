@@ -509,7 +509,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                  * Save also as system message
                  */
                 SystemMessage sys = new SystemMessage();
-                sys.setType(Message.TYPE_SYSTEM);
+                sys.setType(Message.Type.SYSTEM);
                 sys.setAuthor(mail.getAuthor());
                 sys.setSentDate(new Date());
                 sys.setMessageText(mail.getMessageText());
@@ -540,8 +540,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                 Recipient recipient = new Recipient();
                 recipient.setName(user.getName());
                 recipient.setAddress(user.getEmail());
-                recipient.setType(Recipient.TYPE_EMAIL);
-                recipient.setMode(Recipient.MODE_EMAIL_BCC);
+                recipient.setType(Recipient.Type.EMAIL);
+                recipient.setMode(Recipient.Mode.BCC);
                 recipient.setRead(1);
 
                 // Add the recipient to the recipients list according to the
@@ -559,7 +559,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             Recipient rec = new Recipient();
             rec.setName(user.getUsername());
             rec.setAddress(user.getEmail());
-            rec.setType(Recipient.TYPE_SYSTEM);
+            rec.setType(Recipient.Type.SYSTEM);
             if (systemRecipientsMap.containsKey(user.getLocale())) {
                 systemRecipientsMap.get(user.getLocale()).add(rec);
             } else {
@@ -3048,12 +3048,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         Recipient sysRecipient = new Recipient();
         sysRecipient.setName(user.getUsername());
         sysRecipient.setAddress(user.getEmail());
-        sysRecipient.setType(Recipient.TYPE_SYSTEM);
-        sysRecipient.setMode(MESSAGE);
+        sysRecipient.setType(Recipient.Type.SYSTEM);
+        sysRecipient.setMode(Recipient.Mode.MESSAGE);
 
         SystemMessage sys = new SystemMessage();
         sys.setTenantId(user.getTenantId());
-        sys.setType(Message.TYPE_SYSTEM);
+        sys.setType(Message.Type.SYSTEM);
         sys.setHtml(false);
         sys.setAuthor("SYSTEM");
         sys.setSentDate(new Date());
@@ -3070,8 +3070,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             Recipient emailRecipient = new Recipient();
             emailRecipient.setName(user.getUsername());
             emailRecipient.setAddress(user.getEmail());
-            emailRecipient.setType(Recipient.TYPE_EMAIL);
-            emailRecipient.setMode(Recipient.MODE_EMAIL_TO);
+            emailRecipient.setType(Recipient.Type.EMAIL);
             emailRecipient.setRead(1);
 
             EMail mail = new EMail();

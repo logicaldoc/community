@@ -10,6 +10,8 @@ import com.logicaldoc.core.PersistentObject;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
@@ -24,179 +26,180 @@ import jakarta.persistence.Transient;
 @MappedSuperclass
 public abstract class Message extends PersistentObject {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final int TYPE_SYSTEM = 0;
+    public enum Type {
+        SYSTEM, NOTIFICATION;
+    }
 
-	public static final int TYPE_NOTIFICATION = 1;
+    @Column(name = "ld_author", length = 255)
+    private String author = "";
 
-	@Column(name = "ld_author", length = 255)
-	private String author = "";
-	
-	@Column(name = "ld_messagetext")
-	private String messageText = "";
+    @Column(name = "ld_messagetext")
+    private String messageText = "";
 
-	@Column(name = "ld_subject", length = 255)
-	private String subject = "";
+    @Column(name = "ld_subject", length = 255)
+    private String subject = "";
 
-	/**
-	 * When the message was sent
-	 */
-	@Column(name = "ld_sentdate", nullable = false, columnDefinition = "DATETIME(3)")
-	private Date sentDate = new Date();
+    /**
+     * When the message was sent
+     */
+    @Column(name = "ld_sentdate", nullable = false, columnDefinition = "DATETIME(3)")
+    private Date sentDate = new Date();
 
-	/**
-	 * When the message was received
-	 */
-	@Transient
-	private Date receivedDate = new Date();
+    /**
+     * When the message was received
+     */
+    @Transient
+    private Date receivedDate = new Date();
 
-	@Column(name = "ld_type", nullable = false)
-	private int type = Message.TYPE_SYSTEM;
+    @Column(name = "ld_type", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    private Type type = Type.SYSTEM;
 
-	@ElementCollection
-	@CollectionTable(name = "ld_recipient", joinColumns = @JoinColumn(name = "ld_messageid"))
-	private Set<Recipient> recipients = new HashSet<>();
+    @ElementCollection
+    @CollectionTable(name = "ld_recipient", joinColumns = @JoinColumn(name = "ld_messageid"))
+    private Set<Recipient> recipients = new HashSet<>();
 
-	/**
-	 * The locale in which the message is written
-	 */
-	@Transient
-	protected Locale locale;
+    /**
+     * The locale in which the message is written
+     */
+    @Transient
+    protected Locale locale;
 
-	@Column(name = "ld_html", nullable = false)
-	protected boolean html = false;
+    @Column(name = "ld_html", nullable = false)
+    protected boolean html = false;
 
-	/**
-	 * A flag that can be used to specify if the message has to be notified
-	 */
-	@Transient
-	protected boolean notify = true;
+    /**
+     * A flag that can be used to specify if the message has to be notified
+     */
+    @Transient
+    protected boolean notify = true;
 
-	public boolean isNotify() {
-		return notify;
-	}
+    public boolean isNotify() {
+        return notify;
+    }
 
-	public void setNotify(boolean notify) {
-		this.notify = notify;
-	}
+    public void setNotify(boolean notify) {
+        this.notify = notify;
+    }
 
-	public String getMessageText() {
-		return messageText;
-	}
+    public String getMessageText() {
+        return messageText;
+    }
 
-	public String getAuthor() {
-		return author;
-	}
+    public String getAuthor() {
+        return author;
+    }
 
-	public String getSubject() {
-		return subject;
-	}
+    public String getSubject() {
+        return subject;
+    }
 
-	public void setMessageText(String mess) {
-		messageText = mess;
-	}
+    public void setMessageText(String mess) {
+        messageText = mess;
+    }
 
-	public void setAuthor(String auth) {
-		author = auth;
-	}
+    public void setAuthor(String auth) {
+        author = auth;
+    }
 
-	public void setSubject(String subj) {
-		subject = subj;
-	}
+    public void setSubject(String subj) {
+        subject = subj;
+    }
 
-	public Date getSentDate() {
-		return sentDate;
-	}
+    public Date getSentDate() {
+        return sentDate;
+    }
 
-	public void setSentDate(Date sentDate) {
-		this.sentDate = sentDate;
-	}
+    public void setSentDate(Date sentDate) {
+        this.sentDate = sentDate;
+    }
 
-	public int getType() {
-		return type;
-	}
+    public Type getType() {
+        return type;
+    }
 
-	public void setType(int type) {
-		this.type = type;
-	}
+    public void setType(Type type) {
+        this.type = type;
+    }
 
-	public Recipient getRecipient(String name) {
-		for (Recipient recipient : recipients) {
-			if (name.equals(recipient.getName()))
-				return recipient;
-		}
-		return null;
-	}
+    public Recipient getRecipient(String name) {
+        for (Recipient recipient : recipients) {
+            if (name.equals(recipient.getName()))
+                return recipient;
+        }
+        return null;
+    }
 
-	public boolean wasReadBy(String name) {
-		Recipient rec = getRecipient(name);
-		if (rec != null)
-			return rec.getRead() == 1;
-		else
-			return false;
-	}
+    public boolean wasReadBy(String name) {
+        Recipient rec = getRecipient(name);
+        if (rec != null)
+            return rec.getRead() == 1;
+        else
+            return false;
+    }
 
-	public Set<Recipient> getRecipients() {
-		return recipients;
-	}
+    public Set<Recipient> getRecipients() {
+        return recipients;
+    }
 
-	public void setRecipients(Set<Recipient> recipients) {
-		this.recipients = recipients;
-	}
+    public void setRecipients(Set<Recipient> recipients) {
+        this.recipients = recipients;
+    }
 
-	public Locale getLocale() {
-		return locale;
-	}
+    public Locale getLocale() {
+        return locale;
+    }
 
-	public void setLocale(Locale locale) {
-		this.locale = locale;
-	}
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
 
-	public boolean isHtml() {
-		return html;
-	}
+    public boolean isHtml() {
+        return html;
+    }
 
-	public void setHtml(boolean html) {
-		this.html = html;
-	}
+    public void setHtml(boolean html) {
+        this.html = html;
+    }
 
-	public Date getReceivedDate() {
-		return receivedDate;
-	}
+    public Date getReceivedDate() {
+        return receivedDate;
+    }
 
-	public void setReceivedDate(Date receivedDate) {
-		this.receivedDate = receivedDate;
-	}
+    public void setReceivedDate(Date receivedDate) {
+        this.receivedDate = receivedDate;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((author == null) ? 0 : author.hashCode());
-		result = prime * result + ((subject == null) ? 0 : subject.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((author == null) ? 0 : author.hashCode());
+        result = prime * result + ((subject == null) ? 0 : subject.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Message other = (Message) obj;
-		if (author == null) {
-			if (other.author != null)
-				return false;
-		} else if (!author.equals(other.author))
-			return false;
-		if (subject == null) {
-			if (other.subject != null)
-				return false;
-		} else if (!subject.equals(other.subject))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Message other = (Message) obj;
+        if (author == null) {
+            if (other.author != null)
+                return false;
+        } else if (!author.equals(other.author))
+            return false;
+        if (subject == null) {
+            if (other.subject != null)
+                return false;
+        } else if (!subject.equals(other.subject))
+            return false;
+        return true;
+    }
 }

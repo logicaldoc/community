@@ -84,9 +84,8 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
                     Recipient recipient = new Recipient();
                     recipient.setName(message.getAuthor());
                     recipient.setAddress(message.getAuthor());
-                    recipient.setType(Recipient.TYPE_SYSTEM);
+                    recipient.setType(Recipient.Type.SYSTEM);
                     recipient.setRead(0);
-                    recipient.setMode("");
                     Set<Recipient> recipients = new HashSet<>();
                     recipients.add(recipient);
                     SystemMessage sysmess = new SystemMessage();
@@ -132,15 +131,14 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
             m.setAuthor(session.getUsername());
             m.setSentDate(new Date());
             m.setStatus(SystemMessage.STATUS_NEW);
-            m.setType(Message.TYPE_SYSTEM);
+            m.setType(Message.Type.SYSTEM);
             m.setLastNotified(new Date());
             m.setMessageText(HTMLSanitizer.sanitizeSimpleText(message.getMessage()));
             m.setSubject(HTMLSanitizer.sanitizeSimpleText(message.getSubject()));
             Recipient recipient = new Recipient();
             recipient.setName(user.getUsername());
             recipient.setAddress(user.getUsername());
-            recipient.setType(Recipient.TYPE_SYSTEM);
-            recipient.setMode("message");
+            recipient.setType(Recipient.Type.SYSTEM);
             Set<Recipient> recipients = new HashSet<>();
             recipients.add(recipient);
             m.setRecipients(recipients);
@@ -168,8 +166,8 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
                     type != null ? MessageTemplate.Type.valueOf(type) : null, "en", session.getTenantId());
             Map<String, MessageTemplate> templates = new HashMap<>();
 
-            List<MessageTemplate> tmp = dao.findByTypeAndLanguage(type != null ? MessageTemplate.Type.valueOf(type) : null, language,
-                    session.getTenantId());
+            List<MessageTemplate> tmp = dao.findByTypeAndLanguage(
+                    type != null ? MessageTemplate.Type.valueOf(type) : null, language, session.getTenantId());
             for (MessageTemplate m : tmp) {
                 templates.put(m.getName(), m);
             }

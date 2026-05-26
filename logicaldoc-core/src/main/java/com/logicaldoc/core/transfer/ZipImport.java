@@ -41,190 +41,190 @@ import com.logicaldoc.util.io.ZipUtil;
  */
 public class ZipImport {
 
-	protected User user;
+    protected User user;
 
-	private static final Logger log = LoggerFactory.getLogger(ZipImport.class);
+    private static final Logger log = LoggerFactory.getLogger(ZipImport.class);
 
-	protected File zipFile;
+    protected File zipFile;
 
-	private boolean notifyUser = true;
+    private boolean notifyUser = true;
 
-	protected String sessionId = null;
+    protected String sessionId = null;
 
-	protected Document docVo = null;
+    protected Document docVo = null;
 
-	protected String fileNameCharset = "UTF-8";
+    protected String fileNameCharset = "UTF-8";
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param docVo Value object for the common documents
-	 * @param fileNameCharset the charset to use to process the zip
-	 */
-	public ZipImport(Document docVo, String fileNameCharset) {
-		this.docVo = docVo;
-		if (fileNameCharset != null)
-			this.fileNameCharset = fileNameCharset;
-	}
+    /**
+     * Constructor.
+     * 
+     * @param docVo Value object for the common documents
+     * @param fileNameCharset the charset to use to process the zip
+     */
+    public ZipImport(Document docVo, String fileNameCharset) {
+        this.docVo = docVo;
+        if (fileNameCharset != null)
+            this.fileNameCharset = fileNameCharset;
+    }
 
-	public void process(File zipsource, Folder parent, long userId, String sessionId) throws PersistenceException {
-		this.zipFile = zipsource;
-		this.sessionId = sessionId;
+    public void process(File zipsource, Folder parent, long userId, String sessionId) throws PersistenceException {
+        this.zipFile = zipsource;
+        this.sessionId = sessionId;
 
-		UserDAO userDao = UserDAO.get();
-		this.user = userDao.findById(userId);
+        UserDAO userDao = UserDAO.get();
+        this.user = userDao.findById(userId);
 
-		File dir = prepareUnzipDir(userId);
+        File dir = prepareUnzipDir(userId);
 
-		try (ZipUtil zipUtil = new ZipUtil()) {
-			zipUtil.unzip(zipFile, dir);
-			File[] files = dir.listFiles();
-			addEntries(parent, files);
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		} finally {
-			try {
-				FileUtils.deleteDirectory(dir);
-			} catch (IOException e) {
-				log.warn("Cannot delete temporary folder {}", dir.getPath());
-			}
-		}
+        try (ZipUtil zipUtil = new ZipUtil()) {
+            zipUtil.unzip(zipFile, dir);
+            File[] files = dir.listFiles();
+            addEntries(parent, files);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            try {
+                FileUtils.deleteDirectory(dir);
+            } catch (IOException e) {
+                log.warn("Cannot delete temporary folder {}", dir.getPath());
+            }
+        }
 
-		if (notifyUser)
-			try {
-				sendNotificationMessage();
-			} catch (Exception e) {
-				log.warn("Cannot notify zip import", e);
-			}
-	}
+        if (notifyUser)
+            try {
+                sendNotificationMessage();
+            } catch (Exception e) {
+                log.warn("Cannot notify zip import", e);
+            }
+    }
 
-	private void addEntries(Folder parentFolder, File[] files) {
-		for (int i = 0; i < files.length; i++) {
-			if (StringUtils.isNotEmpty(files[i].getName())
-					|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
-				try {
-					addEntry(files[i], parentFolder);
-				} catch (PersistenceException e) {
-					log.error("Error adding entry {}", files[i].getName());
-					log.error(e.getMessage(), e);
-				}
-		}
-	}
+    private void addEntries(Folder parentFolder, File[] files) {
+        for (int i = 0; i < files.length; i++) {
+            if (StringUtils.isNotEmpty(files[i].getName())
+                    || StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
+                try {
+                    addEntry(files[i], parentFolder);
+                } catch (PersistenceException e) {
+                    log.error("Error adding entry {}", files[i].getName());
+                    log.error(e.getMessage(), e);
+                }
+        }
+    }
 
-	private File prepareUnzipDir(long userId) {
-		File dir = UserUtil.getUserResource(userId, "unzip");
-		if (dir.exists()) {
-			try {
-				FileUtils.deleteDirectory(dir);
-			} catch (IOException e) {
-				// Nothing to do
-			}
-		}
+    private File prepareUnzipDir(long userId) {
+        File dir = UserUtil.getUserResource(userId, "unzip");
+        if (dir.exists()) {
+            try {
+                FileUtils.deleteDirectory(dir);
+            } catch (IOException e) {
+                // Nothing to do
+            }
+        }
 
-		try {
-			FileUtils.forceMkdir(dir);
-		} catch (IOException e) {
-			// Nothing to do
-		}
-		return dir;
-	}
+        try {
+            FileUtils.forceMkdir(dir);
+        } catch (IOException e) {
+            // Nothing to do
+        }
+        return dir;
+    }
 
-	public void process(String zipsource, Folder parent, long userId, String sessionId) throws PersistenceException {
-		File srcfile = new File(zipsource);
-		process(srcfile, parent, userId, sessionId);
-	}
+    public void process(String zipsource, Folder parent, long userId, String sessionId) throws PersistenceException {
+        File srcfile = new File(zipsource);
+        process(srcfile, parent, userId, sessionId);
+    }
 
-	/**
-	 * Stores a file in the repository of logicaldoc and inserts some
-	 * information in the database of logicaldoc (folder, document, version,
-	 * history, searchdocument).
-	 * 
-	 * @param file
-	 * @param parent
-	 * @throws PersistenceException
-	 */
-	protected void addEntry(File file, Folder parent) throws PersistenceException {
-		FolderDAO dao = FolderDAO.get();
-		String folderName = file.getName();
-		FolderHistory transaction = new FolderHistory();
-		transaction.setUser(user);
-		transaction.setSessionId(sessionId);
+    /**
+     * Stores a file in the repository of logicaldoc and inserts some
+     * information in the database of logicaldoc (folder, document, version,
+     * history, searchdocument).
+     * 
+     * @param file
+     * @param parent
+     * @throws PersistenceException
+     */
+    protected void addEntry(File file, Folder parent) throws PersistenceException {
+        FolderDAO dao = FolderDAO.get();
+        String folderName = file.getName();
+        FolderHistory transaction = new FolderHistory();
+        transaction.setUser(user);
+        transaction.setSessionId(sessionId);
 
-		Session session = SessionManager.get().get(sessionId);
-		transaction.setSession(session);
+        Session session = SessionManager.get().get(sessionId);
+        transaction.setSession(session);
 
-		if (file.isDirectory()) {
-			// creates a logicaldoc folder
-			Folder folderVO = new Folder();
-			folderVO.setName(folderName);
-			Folder folder = dao.create(parent, folderVO, true, transaction);
+        if (file.isDirectory()) {
+            // creates a logicaldoc folder
+            Folder folderVO = new Folder();
+            folderVO.setName(folderName);
+            Folder folder = dao.create(parent, folderVO, true, transaction);
 
-			File[] files = file.listFiles();
+            File[] files = file.listFiles();
 
-			for (int i = 0; i < files.length; i++)
-				if (StringUtils.isNotEmpty(files[i].getName())
-						|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
-					addEntry(files[i], folder);
-		} else if (file.length() > 0L) {
-			// creates a document
-			try {
-				DocumentHistory history = new DocumentHistory();
-				history.setEvent(DocumentEvent.STORED);
-				history.setComment("");
-				history.setUser(user);
-				history.setSessionId(sessionId);
-				if (session != null)
-					history.setSession(session);
+            for (int i = 0; i < files.length; i++)
+                if (StringUtils.isNotEmpty(files[i].getName())
+                        || StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
+                    addEntry(files[i], folder);
+        } else if (file.length() > 0L) {
+            // creates a document
+            try {
+                DocumentHistory history = new DocumentHistory();
+                history.setEvent(DocumentEvent.STORED);
+                history.setComment("");
+                history.setUser(user);
+                history.setSessionId(sessionId);
+                if (session != null)
+                    history.setSession(session);
 
-				Document doc = new Document(docVo);
-				doc.setId(0L);
-				doc.setFolder(parent);
+                Document doc = new Document(docVo);
+                doc.setId(0L);
+                doc.setFolder(parent);
 
-				DocumentManager.get().create(file, doc, history);
-			} catch (Exception e) {
-				log.error("InMemoryZipImport addEntry failed", e);
-			}
-		}
-	}
+                DocumentManager.get().create(file, doc, history);
+            } catch (Exception e) {
+                log.error("InMemoryZipImport addEntry failed", e);
+            }
+        }
+    }
 
-	/**
-	 * Sends a system message to the user that imported the zip
-	 */
-	protected void sendNotificationMessage() {
-		SystemMessageDAO smdao = SystemMessageDAO.get();
-		Date now = new Date();
-		Recipient recipient = new Recipient();
-		recipient.setName(user.getUsername());
-		recipient.setAddress(user.getUsername());
-		recipient.setType(Recipient.TYPE_SYSTEM);
-		recipient.setMode("message");
-		Set<Recipient> recipients = new HashSet<>();
-		recipients.add(recipient);
-		SystemMessage sysmess = new SystemMessage();
-		sysmess.setAuthor("SYSTEM");
-		sysmess.setRecipients(recipients);
-		ResourceBundle bundle = ResourceBundle.getBundle("i18n.messages", user.getLocale());
-		sysmess.setSubject(bundle.getString("zip.import.subject"));
-		String message = bundle.getString("zip.import.body");
-		String body = MessageFormat.format(message, zipFile != null ? zipFile.getName() : "");
-		sysmess.setMessageText(body);
-		sysmess.setSentDate(now);
-		sysmess.setConfirmation(0);
-		sysmess.setPrio(0);
-		sysmess.setDateScope(1);
+    /**
+     * Sends a system message to the user that imported the zip
+     */
+    protected void sendNotificationMessage() {
+        SystemMessageDAO smdao = SystemMessageDAO.get();
+        Date now = new Date();
+        Recipient recipient = new Recipient();
+        recipient.setName(user.getUsername());
+        recipient.setAddress(user.getUsername());
+        recipient.setType(Recipient.Type.SYSTEM);
+        recipient.setMode(Recipient.Mode.MESSAGE);
+        Set<Recipient> recipients = new HashSet<>();
+        recipients.add(recipient);
+        SystemMessage sysmess = new SystemMessage();
+        sysmess.setAuthor("SYSTEM");
+        sysmess.setRecipients(recipients);
+        ResourceBundle bundle = ResourceBundle.getBundle("i18n.messages", user.getLocale());
+        sysmess.setSubject(bundle.getString("zip.import.subject"));
+        String message = bundle.getString("zip.import.body");
+        String body = MessageFormat.format(message, zipFile != null ? zipFile.getName() : "");
+        sysmess.setMessageText(body);
+        sysmess.setSentDate(now);
+        sysmess.setConfirmation(0);
+        sysmess.setPrio(0);
+        sysmess.setDateScope(1);
 
-		try {
-			smdao.store(sysmess);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+        try {
+            smdao.store(sysmess);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
-	public boolean isNotifyUser() {
-		return notifyUser;
-	}
+    public boolean isNotifyUser() {
+        return notifyUser;
+    }
 
-	public void setNotifyUser(boolean notifyUser) {
-		this.notifyUser = notifyUser;
-	}
+    public void setNotifyUser(boolean notifyUser) {
+        this.notifyUser = notifyUser;
+    }
 }

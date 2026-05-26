@@ -393,8 +393,7 @@ public abstract class Task implements Runnable {
 			Set<Recipient> rec = new HashSet<>();
 			Recipient r = new Recipient();
 			r.setAddress(recipient.getEmail());
-			r.setType(Recipient.TYPE_EMAIL);
-			r.setMode(Recipient.MODE_EMAIL_TO);
+			r.setType(Recipient.Type.EMAIL);
 			rec.add(r);
 			email.setRecipients(rec);
 

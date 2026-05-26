@@ -243,7 +243,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             guiUser.setLockedDocs(documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.LOCKED).size());
             guiUser.setCheckedOutDocs(
                     documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.CHECKEDOUT).size());
-            guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
+            guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.Type.SYSTEM));
             guiUser.setQuota(user.getQuota());
             guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
             guiUser.setCertDN(user.getCertDN());

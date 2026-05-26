@@ -293,7 +293,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 					Recipient recipient = new Recipient();
 					recipient.setAddress(user.getEmail());
 					recipient.setName(user.getFullName());
-					recipient.setMode(Recipient.MODE_EMAIL_TO);
+					recipient.setMode(Recipient.Mode.TO);
 					email.getRecipients().add(recipient);
 
 					EMailSender.get().sendAsync(email, "newdevice", dictionaryMap);

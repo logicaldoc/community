@@ -363,7 +363,7 @@ values     (3,'2009-10-29 00:00:00','2008-10-22 00:00:00',0,'admin','message tex
 
 insert into ld_recipient
 			(ld_messageid, ld_name, ld_address, ld_mode, ld_type, ld_read)
-values     (1,'sebastian','sebastian','pippo',0, 0);
+values     (1,'sebastian','sebastian','MESSAGE',0, 0);
 
 insert into ld_recipient
 			(ld_messageid, ld_name, ld_address, ld_mode, ld_type, ld_read)
@@ -371,7 +371,7 @@ values     (3,'sebastian','sebastian','CC',0, 0);
 
 insert into ld_recipient
 			(ld_messageid, ld_name, ld_address, ld_mode, ld_type, ld_read)
-values     (1,'marco','marco@acme.com','sms',1, 0);
+values     (1,'marco','marco@acme.com','MESSAGE',1, 0);
 
 insert into ld_recipient
 			(ld_messageid, ld_name, ld_address, ld_mode, ld_type, ld_Read)
@@ -379,7 +379,7 @@ values     (2,'marco','marco@acme.com','CCN',1, 0);
 
 insert into ld_recipient
 			(ld_messageid, ld_name, ld_address, ld_mode, ld_type, ld_read)
-values     (3,'paperino','topolino','sms',2, 0);
+values     (3,'paperino','topolino','MESSAGE',2, 0);
 
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
 values   (1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,3,'test',1,1);
