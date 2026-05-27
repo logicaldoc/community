@@ -21,17 +21,17 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 
 	public static final int TYPE_HTML = 3;
 
-	public static final int PAGE_OPT_ALL = 0;
+	public static final int PAGE_ALL = 0;
 
-	public static final int PAGE_OPT_FIRST = 1;
+	public static final int PAGE_FIRST = 1;
 
-	public static final int PAGE_OPT_LAST = 2;
+	public static final int PAGE_LAST = 2;
 
-	public static final int PAGE_OPT_SEL = 3;
+	public static final int PAGE_SELECTION = 3;
 
 	private int type = TYPE_TEXT;
 
-	private int pageOption = PAGE_OPT_ALL;
+	private int page = PAGE_ALL;
 
 	private String pageSelection = "1";
 
@@ -214,12 +214,12 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 			return (double) imageWidth / (double) imageHeight;
 	}
 
-	public int getPageOption() {
-		return pageOption;
+	public int getPage() {
+		return page;
 	}
 
-	public void setPageOption(int pageOption) {
-		this.pageOption = pageOption;
+	public void setPage(int page) {
+		this.page = page;
 	}
 
 	public String getPageSelection() {

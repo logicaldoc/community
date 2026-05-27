@@ -116,7 +116,7 @@ public class StampProperties extends StampDetailsTab {
 
 		final TextItem pageSelection = preparePageSeletionItem();
 
-		final RadioGroupItem pageOption = preparePageOptionItem(pageSelection);
+		final RadioGroupItem page = preparePageItem(pageSelection);
 
 		SpinnerItem opacity = prepareOpacitySpinner();
 
@@ -124,7 +124,7 @@ public class StampProperties extends StampDetailsTab {
 
 		TextItem font = prepareFontItem();
 
-		form1.setItems(name, type, pageOption, pageSelection, exprx, rotation, expry, opacity, exprw, description,
+		form1.setItems(name, type, page, pageSelection, exprx, rotation, expry, opacity, exprw, description,
 				exprh);
 
 		form2.setItems(text, color, size, font, barcodeFormat, imageWidth, imageHeight, barcodeLabel);
@@ -315,33 +315,33 @@ public class StampProperties extends StampDetailsTab {
 	private TextItem preparePageSeletionItem() {
 		final TextItem pageSelection = ItemFactory.newTextItem("pageSelection", I18N.message("sselection"),
 				stamp.getPageSelection());
-		pageSelection.setVisible(stamp.getPageOption() == GUIStamp.PAGE_OPT_SEL);
+		pageSelection.setVisible(stamp.getPage() == GUIStamp.PAGE_SELECTION);
 		if (changedHandler != null)
 			pageSelection.addChangedHandler(changedHandler);
 		return pageSelection;
 	}
 
-	private RadioGroupItem preparePageOptionItem(final TextItem pageSelection) {
-		final RadioGroupItem pageOption = ItemFactory.newRadioGroup("pageOption", "stampin");
+	private RadioGroupItem preparePageItem(final TextItem pageSelection) {
+		final RadioGroupItem page = ItemFactory.newRadioGroup("page", "stampin");
 		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<>();
-		pageOptions.put("" + GUIStamp.PAGE_OPT_ALL, I18N.message("allpages"));
-		pageOptions.put("" + GUIStamp.PAGE_OPT_FIRST, I18N.message("firstpage"));
-		pageOptions.put("" + GUIStamp.PAGE_OPT_LAST, I18N.message("lastpage"));
-		pageOptions.put("" + GUIStamp.PAGE_OPT_SEL, I18N.message("selection"));
-		pageOption.setValueMap(pageOptions);
-		pageOption.setValue("" + stamp.getPageOption());
-		pageOption.setWrap(false);
-		pageOption.setEndRow(true);
+		pageOptions.put("" + GUIStamp.PAGE_ALL, I18N.message("allpages"));
+		pageOptions.put("" + GUIStamp.PAGE_FIRST, I18N.message("firstpage"));
+		pageOptions.put("" + GUIStamp.PAGE_LAST, I18N.message("lastpage"));
+		pageOptions.put("" + GUIStamp.PAGE_SELECTION, I18N.message("selection"));
+		page.setValueMap(pageOptions);
+		page.setValue("" + stamp.getPage());
+		page.setWrap(false);
+		page.setEndRow(true);
 		if (changedHandler != null)
-			pageOption.addChangedHandler((ChangedEvent pageOptionChanged) -> {
-				if (pageOptionChanged.getValue().equals("" + GUIStamp.PAGE_OPT_SEL))
+			page.addChangedHandler((ChangedEvent pageOptionChanged) -> {
+				if (pageOptionChanged.getValue().equals("" + GUIStamp.PAGE_SELECTION))
 					pageSelection.show();
 				else
 					pageSelection.hide();
 				if (changedHandler != null)
 					changedHandler.onChanged(null);
 			});
-		return pageOption;
+		return page;
 	}
 
 	private SelectItem prepareTypeItem() {
@@ -426,7 +426,7 @@ public class StampProperties extends StampDetailsTab {
 		if (vm.getValueAsString("font") != null)
 			stamp.setFont(vm.getValueAsString("font"));
 
-		stamp.setPageOption(Integer.parseInt(vm.getValueAsString("pageOption")));
+		stamp.setPage(Integer.parseInt(vm.getValueAsString("page")));
 		stamp.setPageSelection(vm.getValueAsString("pageSelection"));
 
 		if (vm.getValueAsString(IMAGE_WIDTH) != null)

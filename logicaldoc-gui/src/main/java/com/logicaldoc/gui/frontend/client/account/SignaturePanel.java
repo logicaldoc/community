@@ -85,20 +85,20 @@ public class SignaturePanel extends StampProperties {
 
 		final TextItem pageSelection = ItemFactory.newTextItem("pageSelection", I18N.message("sselection"),
 				stamp.getPageSelection());
-		pageSelection.setVisible(stamp.getPageOption() == GUIStamp.PAGE_OPT_SEL);
+		pageSelection.setVisible(stamp.getPage() == GUIStamp.PAGE_SELECTION);
 		if (changedHandler != null)
 			pageSelection.addChangedHandler(changedHandler);
 
 		final SelectItem pageOption = ItemFactory.newSelectItem("pageOption", "stampin");
 		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<>();
-		pageOptions.put("" + GUIStamp.PAGE_OPT_ALL, I18N.message("allpages"));
-		pageOptions.put("" + GUIStamp.PAGE_OPT_FIRST, I18N.message("firstpage"));
-		pageOptions.put("" + GUIStamp.PAGE_OPT_LAST, I18N.message("lastpage"));
-		pageOptions.put("" + GUIStamp.PAGE_OPT_SEL, I18N.message("selection"));
+		pageOptions.put("" + GUIStamp.PAGE_ALL, I18N.message("allpages"));
+		pageOptions.put("" + GUIStamp.PAGE_FIRST, I18N.message("firstpage"));
+		pageOptions.put("" + GUIStamp.PAGE_LAST, I18N.message("lastpage"));
+		pageOptions.put("" + GUIStamp.PAGE_SELECTION, I18N.message("selection"));
 		pageOption.setValueMap(pageOptions);
-		pageOption.setValue("" + stamp.getPageOption());
+		pageOption.setValue("" + stamp.getPage());
 		pageOption.addChangedHandler(event -> {
-			if (event.getValue().equals("" + GUIStamp.PAGE_OPT_SEL))
+			if (event.getValue().equals("" + GUIStamp.PAGE_SELECTION))
 				pageSelection.show();
 			else
 				pageSelection.hide();
