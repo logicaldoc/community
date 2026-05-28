@@ -277,7 +277,7 @@ public class CronExpressionComposer extends Window {
 		map.put("SAT", I18N.message(SATURDAY));
 		map.put("SUN", I18N.message(SUNDAY));
 
-		SelectItem days = ItemFactory.newSelectItem("weekly-days", "ddayspippo");
+		SelectItem days = ItemFactory.newSelectItem("weekly-days", "ddays");
 		days.setWidth(200);
 		days.setMultiple(true);
 		days.setValueMap(map);

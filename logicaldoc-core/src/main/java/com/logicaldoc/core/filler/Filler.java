@@ -171,9 +171,10 @@ public abstract class Filler extends PersistentObject {
      * @throws IOException I/O error
      * @throws FeatureDisabledException An involved feature is disabled
      * @throws SearchException Error in case of search
+     * @throws AutomationException Error in the automation (if the filler makes use of automation)
      */
     protected abstract void fill(Document fillable, String content, History transaction, Map<String, Object> dictionary)
-            throws PersistenceException, IOException, FeatureDisabledException, SearchException;
+            throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException;
 
     /**
      * Fills a document using the body text as input
