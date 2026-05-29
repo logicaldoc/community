@@ -451,7 +451,7 @@ public class FillerProperties extends FillerDetailsTab {
 			criteriaGrid.addData(rec);
 		}
 
-		IButton addCriterion = new IButton("addcriterion");
+		IButton addCriterion = new IButton(I18N.message("addcriterion"));
 		addCriterion.addClickHandler(click -> {
 			GUICriterion newEntry = new GUICriterion();
 			filler.getCriteria().add(newEntry);
