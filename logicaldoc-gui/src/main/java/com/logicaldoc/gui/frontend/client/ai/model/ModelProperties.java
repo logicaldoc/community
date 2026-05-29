@@ -146,7 +146,6 @@ public class ModelProperties extends ModelDetailsTab {
 				windowSize.setValue(10);
 		});
 		type.setRequired(true);
-		type.setDisabled(model.getId() != 0L);
 		type.setVisible(model.getId() == 0L);
 
 		StaticTextItem typeValue = ItemFactory.newStaticTextItem("typeValue", TYPE,
@@ -173,7 +172,10 @@ public class ModelProperties extends ModelDetailsTab {
 		categories.setWidth(400);
 		categories.setHint(I18N.message("catvalsseparated"));
 		categories.setShowHintInField(true);
-		setCategorizedModelVisibility(categories);
+		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
+                new Criterion[] { NEURAL_CRITERIA, YOLO_CRITERIA });
+		categories.setVisibleWhen(criteria);
+		categories.setRequiredWhen(criteria);
 
 		SelectItem activationSelector = activationSeletor();
 		setNeuralNetworkVisibility(activationSelector);
@@ -379,14 +381,6 @@ public class ModelProperties extends ModelDetailsTab {
 		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
 				new Criterion[] { new AdvancedCriteria(TYPE, OperatorId.EQUALS, "classifier"),
 						new AdvancedCriteria(TYPE, OperatorId.EQUALS, TOKENS) });
-
-		applyTrainableVisibility(item, criteria);
-	}
-
-	private void setCategorizedModelVisibility(FormItem item) {
-
-		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
-				new Criterion[] { NEURAL_CRITERIA, YOLO_CRITERIA });
 
 		applyTrainableVisibility(item, criteria);
 	}

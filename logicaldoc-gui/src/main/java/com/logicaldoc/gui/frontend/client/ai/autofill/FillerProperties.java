@@ -210,7 +210,7 @@ public class FillerProperties extends FillerDetailsTab {
 		if (filler.getEmbeddingSchemeId() != null)
 			embeddingSelector.setValue(filler.getEmbeddingSchemeId());
 
-		// A threshold used by AI models (UI as percentage 0–100)
+		// A threshold used by AI models (UI as percentage)
 		SpinnerItem threshold = new SpinnerItem(THRESHOLD);
 		threshold.setTitle(I18N.message("threshold"));
 		threshold.setMin(0);
