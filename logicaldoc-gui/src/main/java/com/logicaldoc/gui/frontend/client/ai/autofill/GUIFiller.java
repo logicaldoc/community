@@ -41,6 +41,10 @@ public class GUIFiller implements Serializable {
     private String decimalSeparator = ",";
 
     private String groupingSeparator = ".";
+    
+    private String exclusionRegex;
+
+	private String inclusionRegex;
 
     private List<GUIFiller> chain = new ArrayList<>();
 
@@ -49,8 +53,10 @@ public class GUIFiller implements Serializable {
     private boolean onCheckin;
 
     private String automation;
+    
+    private String automationBefore;
 
-    private List<GUICriterion> criteria = new ArrayList<>();
+	private List<GUICriterion> criteria = new ArrayList<>();
 
     public GUIFiller() {
         // Empty constructor
@@ -165,6 +171,14 @@ public class GUIFiller implements Serializable {
     public void setAutomation(String automation) {
         this.automation = automation;
     }
+    
+    public String getAutomationBefore() {
+		return automationBefore;
+	}
+
+	public void setAutomationBefore(String automationBefore) {
+		this.automationBefore = automationBefore;
+	}
 
     public String getAttribute() {
         return attribute;
@@ -213,4 +227,20 @@ public class GUIFiller implements Serializable {
     public void setCriteria(List<GUICriterion> criteria) {
         this.criteria = criteria;
     }
+    
+    public String getExclusionRegex() {
+		return exclusionRegex;
+	}
+
+	public void setExclusionRegex(String exclusionRegex) {
+		this.exclusionRegex = exclusionRegex;
+	}
+
+	public String getInclusionRegex() {
+		return inclusionRegex;
+	}
+
+	public void setInclusionRegex(String inclusionRegex) {
+		this.inclusionRegex = inclusionRegex;
+	}
 }

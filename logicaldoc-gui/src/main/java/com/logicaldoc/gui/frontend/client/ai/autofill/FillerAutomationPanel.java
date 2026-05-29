@@ -15,58 +15,66 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class FillerAutomationPanel extends FillerDetailsTab {
 
-    private DynamicForm form = new DynamicForm();
+	private DynamicForm form = new DynamicForm();
 
-    private HLayout container = new HLayout();
+	private HLayout container = new HLayout();
 
-    public FillerAutomationPanel(GUIFiller filler, ChangedHandler changedHandler) {
-        super(filler, changedHandler);
-        setWidth100();
-        setHeight100();
-        setMembers(container);
-    }
+	public FillerAutomationPanel(GUIFiller filler, ChangedHandler changedHandler) {
+		super(filler, changedHandler);
+		setWidth100();
+		setHeight100();
+		setMembers(container);
+	}
 
-    @Override
-    public void onDraw() {
-        form.clearValues();
-        form.clearErrors(false);
-        form.destroy();
+	@Override
+	public void onDraw() {
+		form.clearValues();
+		form.clearErrors(false);
+		form.destroy();
 
-        if (Boolean.TRUE.equals(container.contains(form)))
-            container.removeChild(form);
+		if (Boolean.TRUE.equals(container.contains(form)))
+			container.removeChild(form);
 
-        form = new DynamicForm();
-        form.setWidth100();
-        form.setHeight100();
-        form.setNumCols(1);
-        form.setTitleOrientation(TitleOrientation.TOP);
+		form = new DynamicForm();
+		form.setWidth100();
+		form.setHeight100();
+		form.setNumCols(1);
+		form.setTitleOrientation(TitleOrientation.TOP);
 
-        TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
-                filler.getAutomation(), changedHandler, false);
-        automation.setRequired(false);
-        automation.setWidth("*");
-        automation.setHeight("*");
-        automation.addChangedHandler(changedHandler);
+		TextAreaItem automationBefore = ItemFactory.newTextAreaItemForAutomation("automationBefore", "automationbefore",
+				filler.getAutomationBefore(), changedHandler, false);
+		automationBefore.setRequired(false);
+		automationBefore.setWidth("*");
+		automationBefore.setHeight("*");
+		automationBefore.addChangedHandler(changedHandler);
 
-        form.setItems(automation);
+		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
+				filler.getAutomation(), changedHandler, false);
+		automation.setRequired(false);
+		automation.setWidth("*");
+		automation.setHeight("*");
+		automation.addChangedHandler(changedHandler);
 
-        container.addMember(form);
-    }
+		form.setItems(automationBefore, automation);
 
-    boolean validate() {
-        if (form.validate()) {
-            filler.setAutomation(form.getValueAsString("automation"));
-        }
-        return !form.hasErrors();
-    }
+		container.addMember(form);
+	}
 
-    @Override
-    public boolean equals(Object other) {
-        return super.equals(other);
-    }
+	boolean validate() {
+		if (form.validate()) {
+			filler.setAutomationBefore(form.getValueAsString("automationBefore"));
+			filler.setAutomation(form.getValueAsString("automation"));
+		}
+		return !form.hasErrors();
+	}
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

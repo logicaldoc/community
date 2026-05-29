@@ -245,6 +245,12 @@ public class FillerProperties extends FillerDetailsTab {
 		TextItem groupingSep = ItemFactory.newTextItem("groupingseparator", filler.getGroupingSeparator());
 		groupingSep.setWidth(80);
 		groupingSep.addChangedHandler(changedHandler);
+		
+		TextItem exclusionRegex = ItemFactory.newTextItem("exclusionregex", filler.getExclusionRegex());
+		exclusionRegex.addChangedHandler(changedHandler);
+
+		TextItem inclusionRegex = ItemFactory.newTextItem("inclusionregex", filler.getInclusionRegex());
+		inclusionRegex.addChangedHandler(changedHandler);
 
 		// Criteria
 		AdvancedCriteria thresholdCriteria = new AdvancedCriteria(OperatorId.OR, new Criterion[] {
@@ -286,9 +292,12 @@ public class FillerProperties extends FillerDetailsTab {
 		format.setVisibleWhen(attributeSelected);
 		decimalSep.setVisibleWhen(attributeSelected);
 		groupingSep.setVisibleWhen(attributeSelected);
+		exclusionRegex.setVisibleWhen(attributeSelected);
+		inclusionRegex.setVisibleWhen(attributeSelected);
 
 		form.setItems(id, type, strategy, name, label, overwrite, onCheckin, modelSelector, embeddingSelector,
-				threshold, candidate, attribute, format, decimalSep, groupingSep, description);
+				threshold, candidate, attribute, format, decimalSep, groupingSep, exclusionRegex,
+			    inclusionRegex, description);
 
 		container.addMember(form);
 
@@ -317,6 +326,8 @@ public class FillerProperties extends FillerDetailsTab {
 			filler.setFormat(form.getValueAsString("format"));
 			filler.setDecimalSeparator(form.getValueAsString("decimalseparator"));
 			filler.setGroupingSeparator(form.getValueAsString("groupingseparator"));
+			filler.setExclusionRegex(form.getValueAsString("exclusionregex"));
+			filler.setInclusionRegex(form.getValueAsString("inclusionregex"));
 
 			Boolean overwriteVal = (Boolean) form.getValue(OVERWRITE);
 			filler.setOverwrite(Boolean.TRUE.equals(overwriteVal));
