@@ -88,15 +88,15 @@ public class ImageUtil {
     /**
      * Crops an area and stores it in a given image file
      * 
-     * @param originalFile The original image to croop
+     * @param originalFile The original image to crop
      * @param zone the zone definition
      * @param file the output file
      * 
      * @throws IOException an I/O error
      */
     public static void cropToFile(File originalFile, ImageZone zone, File file) throws IOException {
-        BufferedImage scanImage = ImageIO.read(originalFile);
-        BufferedImage zoneImage = ImageUtil.crop(scanImage, zone);
+        BufferedImage originalImage = ImageIO.read(originalFile);
+        BufferedImage zoneImage = ImageUtil.crop(originalImage, zone);
         // write the zone image to a file
         ImageIO.write(zoneImage, FileUtil.getExtension(file.getName()), file);
     }
