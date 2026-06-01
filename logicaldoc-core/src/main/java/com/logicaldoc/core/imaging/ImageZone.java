@@ -117,4 +117,9 @@ public class ImageZone implements Serializable {
             return Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
         }
     }
+
+    @Override
+    public String toString() {
+        return "ImageZone [left=" + left + ", top=" + top + ", width=" + width + ", height=" + height + "]";
+    }
 }

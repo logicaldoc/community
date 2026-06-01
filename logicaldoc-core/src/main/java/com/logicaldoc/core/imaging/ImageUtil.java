@@ -110,10 +110,10 @@ public class ImageUtil {
      * @return the cropped image
      */
     public static BufferedImage crop(BufferedImage originalImage, ImageZone zone) {
-        int x = (int) zone.getLeft();
-        int y = (int) zone.getTop();
-        int w = (int) zone.getWidth();
-        int h = (int) zone.getHeight();
+        int x = (int) Math.floor(zone.getLeft());
+        int y = (int) Math.floor(zone.getTop());
+        int w = (int) Math.ceil(zone.getWidth());
+        int h = (int) Math.ceil(zone.getHeight());
 
         if (zone.getLeft() <= 1 && zone.getTop() <= 1 && zone.getWidth() <= 1 && zone.getHeight() <= 1) {
             /*
@@ -123,10 +123,10 @@ public class ImageUtil {
             int width = originalImage.getWidth();
             int height = originalImage.getHeight();
 
-            x = (int) (zone.getLeft() * width);
-            y = (int) (zone.getTop() * height);
-            w = (int) (zone.getWidth() * width);
-            h = (int) (zone.getHeight() * height);
+            x = (int) Math.floor(zone.getLeft() * width);
+            y = (int) Math.floor(zone.getTop() * height);
+            w = (int) Math.ceil(zone.getWidth() * width);
+            h = (int) Math.ceil(zone.getHeight() * height);
         }
 
         return originalImage.getSubimage(x, y, w, h);
