@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.ai.model;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -16,6 +18,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DoubleItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -286,13 +289,15 @@ public class ModelProperties extends ModelDetailsTab {
         minAlpha.addChangedHandler(changedHandler);
         setEmbedderVisibility(minAlpha);
 
-        TextItem categories = ItemFactory.newTextItem("categories", model.getCategories());
-        categories.addChangedHandler(changedHandler);
+        MultiComboBoxItem categories = ItemFactory.newMultiComboBoxItem("categories", "categories", null,
+                model.getCategoriesArray());
+        categories.setShowPending(true);
+        categories.setAddUnknownValues(true);
         categories.setColSpan(4);
-        categories.setValue(model.getCategories());
-        categories.setWidth(400);
-        categories.setHint(I18N.message("catvalsseparated"));
-        categories.setShowHintInField(true);
+        categories.setWidth("*");
+        categories.addChangedHandler(changedHandler);
+        categories.setValueMap(model.getCategoriesArray());
+
         AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
                 new Criterion[] { NEURAL_CRITERIA, YOLO_CRITERIA });
         categories.setVisibleWhen(criteria);
@@ -315,7 +320,7 @@ public class ModelProperties extends ModelDetailsTab {
         trainingImagesHeight.addChangedHandler(changedHandler);
         trainingImagesHeight.setVisibleWhen(YOLO_CRITERIA);
         trainingImagesHeight.setRequiredWhen(YOLO_CRITERIA);
-        
+
         form.setItems(id, typeValue, type, name, label, features, categories, activationSelector, weightInit, loss,
                 updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
                 minWordFrequency, windowSize, chunkSize, minChunkSize, minChunkSizeChars, maxChunks, workers, alpha,
@@ -337,7 +342,20 @@ public class ModelProperties extends ModelDetailsTab {
         model.setLanguage(form.getValueAsString(LANGUAGE));
         model.setType(form.getValueAsString(TYPE));
         model.setFeatures(form.getValueAsString("features"));
-        model.setCategories(form.getValueAsString("categories"));
+
+        List<String> categories = new ArrayList<>();
+        for (Object cat : (Object[]) form.getValue("categories")) {
+            String str = cat.toString();
+            if (str.contains(",")) {
+                String[] subcats = str.split(",");
+                for (String subcat : subcats)
+                    categories.add(subcat.trim());
+            } else {
+                categories.add(str.trim());
+            }
+        }
+        model.setCategoriesArray(categories.toArray(new String[0]));
+
         model.setActivation(form.getValueAsString(ACTIVATION));
         model.setWeightInit(form.getValueAsString("weightInit"));
         model.setLoss(form.getValueAsString("loss"));
@@ -368,7 +386,7 @@ public class ModelProperties extends ModelDetailsTab {
 
         model.setTrainingImagesWidth(Integer.parseInt(form.getValueAsString("trainingimageswidth")));
         model.setTrainingImagesHeight(Integer.parseInt(form.getValueAsString("trainingimagesheight")));
-        
+
         if (NEURAL.equals(model.getType())) {
             com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
             if (layerRecords.length < 2) {

@@ -175,6 +175,27 @@ public class GUIModel implements Serializable {
         return categories;
     }
 
+    public String[] getCategoriesArray() {
+        if (categories == null || categories.isEmpty())
+            return new String[0];
+        String[] array = categories.split(",");
+        for (int i = 0; i < array.length; i++)
+            array[i] = array[i].trim();
+        return array;
+    }
+
+    public void setCategoriesArray(String[] cats) {
+        categories = "";
+        if (cats == null || cats.length == 0)
+            return;
+
+        for (int i = 0; i < cats.length; i++) {
+            if (i > 0)
+                categories += ",";
+            categories += cats[i].trim();
+        }
+    }
+
     public void setFeatures(String features) {
         this.features = features;
     }
