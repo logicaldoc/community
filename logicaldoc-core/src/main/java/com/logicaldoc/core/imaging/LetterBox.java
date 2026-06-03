@@ -14,6 +14,11 @@ import java.awt.image.BufferedImage;
  */
 public class LetterBox extends BufferedImage {
 
+    private BufferedImage src;
+
+    /**
+     * The generated letterbox image
+     */
     private BufferedImage image;
 
     private double scale = 1;
@@ -22,9 +27,14 @@ public class LetterBox extends BufferedImage {
 
     private int offsetY;
 
-    private int originalWidth = 0;
+    public BufferedImage getImage() {
+        return image;
+    }
 
-    private int originalHeight = 0;
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+    
 
     /**
      * Constructor
@@ -38,12 +48,14 @@ public class LetterBox extends BufferedImage {
     public LetterBox(BufferedImage src, int targetW, int targetH, Color padColor) {
         super(targetW, targetH, BufferedImage.TYPE_3BYTE_BGR);
 
-        originalWidth = src.getWidth();
-        originalHeight = src.getHeight();
+        this.src = src;
 
-        scale = Math.min((double) targetW / originalWidth, (double) targetH / originalHeight);
-        int newW = (int) Math.round(originalWidth * scale);
-        int newH = (int) Math.round(originalHeight * scale);
+        int srcWidth = src.getWidth();
+        int srcHeight = src.getHeight();
+
+        scale = Math.min((double) targetW / srcWidth, (double) targetH / srcHeight);
+        int newW = (int) Math.round(srcWidth * scale);
+        int newH = (int) Math.round(srcHeight * scale);
 
         Graphics2D g = createGraphics();
         try {
@@ -59,22 +71,24 @@ public class LetterBox extends BufferedImage {
         }
     }
 
-    public ImageZone translateToOriginal(ImageZone imageZone) {
+    /**
+     * Crop a sub-image of the source image corresponding to a zone related to the letterbox.
+     * 
+     * @param imageZone The zone to crop expressed in coordinates related to letterbox
+     * 
+     * @return The zone with image taken from the source image
+     */
+    public ImageZone cropFromFromSource(ImageZone imageZone) {
         // Translate coordinates back to original image
         double x = Math.max(0, Math.floor((imageZone.getLeft() - offsetX) / scale));
         double y = Math.max(0, Math.floor((imageZone.getTop() - offsetY) / scale));
-        double w = Math.min(originalWidth - x, Math.floor(imageZone.getWidth() / scale));
-        double h = Math.min(originalHeight - y, Math.floor(imageZone.getHeight() / scale));
+        double w = Math.min(src.getWidth() - x, Math.floor(imageZone.getWidth() / scale));
+        double h = Math.min(src.getHeight()- y, Math.floor(imageZone.getHeight() / scale));
 
-        return new ImageZone(x, y, w, h);
-    }
-
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    public void setImage(BufferedImage image) {
-        this.image = image;
+        ImageZone label = new ImageZone(x, y, w, h);
+        label.setImage(ImageUtil.crop(src, label));
+        
+        return label;
     }
 
     @Override

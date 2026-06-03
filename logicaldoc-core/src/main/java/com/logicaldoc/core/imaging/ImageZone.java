@@ -1,5 +1,6 @@
 package com.logicaldoc.core.imaging;
 
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
 import jakarta.persistence.Column;
@@ -43,6 +44,8 @@ public class ImageZone implements Serializable {
     @Column(name = "ld_height")
     protected double height = 0.10;
 
+    protected transient BufferedImage image;
+
     public ImageZone() {
         super();
     }
@@ -60,6 +63,15 @@ public class ImageZone implements Serializable {
         this.top = source.top;
         this.width = source.width;
         this.height = source.height;
+        this.image = source.image;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
     }
 
     public Point getCorner1() {
