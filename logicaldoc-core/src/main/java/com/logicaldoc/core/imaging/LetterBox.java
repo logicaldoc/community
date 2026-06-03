@@ -16,25 +16,11 @@ public class LetterBox extends BufferedImage {
 
     private BufferedImage src;
 
-    /**
-     * The generated letterbox image
-     */
-    private BufferedImage image;
-
     private double scale = 1;
 
     private int offsetX;
 
     private int offsetY;
-
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    public void setImage(BufferedImage image) {
-        this.image = image;
-    }
-    
 
     /**
      * Constructor
@@ -72,9 +58,11 @@ public class LetterBox extends BufferedImage {
     }
 
     /**
-     * Crop a sub-image of the source image corresponding to a zone related to the letterbox.
+     * Crop a sub-image of the source image corresponding to a zone related to
+     * the letterbox.
      * 
-     * @param imageZone The zone to crop expressed in coordinates related to letterbox
+     * @param imageZone The zone to crop expressed in coordinates related to
+     *        letterbox
      * 
      * @return The zone with image taken from the source image
      */
@@ -83,11 +71,11 @@ public class LetterBox extends BufferedImage {
         double x = Math.max(0, Math.floor((imageZone.getLeft() - offsetX) / scale));
         double y = Math.max(0, Math.floor((imageZone.getTop() - offsetY) / scale));
         double w = Math.min(src.getWidth() - x, Math.floor(imageZone.getWidth() / scale));
-        double h = Math.min(src.getHeight()- y, Math.floor(imageZone.getHeight() / scale));
+        double h = Math.min(src.getHeight() - y, Math.floor(imageZone.getHeight() / scale));
 
         ImageZone label = new ImageZone(x, y, w, h);
         label.setImage(ImageUtil.crop(src, label));
-        
+
         return label;
     }
 
