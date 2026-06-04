@@ -32,7 +32,7 @@ public class LetterBox extends BufferedImage {
      *        used)
      */
     public LetterBox(BufferedImage src, int targetW, int targetH, Color padColor) {
-        super(targetW, targetH, BufferedImage.TYPE_3BYTE_BGR);
+        super(targetW, targetH, BufferedImage.TYPE_INT_RGB);
 
         this.src = src;
 
