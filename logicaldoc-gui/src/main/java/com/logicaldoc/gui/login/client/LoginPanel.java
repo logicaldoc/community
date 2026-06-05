@@ -537,8 +537,10 @@ public class LoginPanel extends VLayout {
                                                     @Override
                                                     public void onSuccess(String transactionId) {
                                                         String sfa = user.getSecondFactor().toLowerCase();
-                                                        secretKey.setTitle(
-                                                                I18N.message(sfa + ".inputsecretkey", user.getEmail()));
+                                                        secretKey.setTitle(I18N.message(sfa + ".inputsecretkey",
+                                                                sfa.toLowerCase().contains("whatsapp")
+                                                                        ? user.getWhatsapp()
+                                                                        : user.getEmail()));
                                                         secretKey.setHint(I18N.message(sfa + ".inputsecretkey.hint"));
                                                         if (transactionId != null) {
                                                             // Probably a push

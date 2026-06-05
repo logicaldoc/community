@@ -912,7 +912,8 @@ select distinct(A.ld_folderid)
                         ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, 
                         ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, 
                         ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, 
-                        ld_automation LDAUTOMATION, ld_store LDSTORE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID
+                        ld_automation LDAUTOMATION, ld_store LDSTORE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID,
+                        ld_revision as LDREVISION 
                    from ld_folder_acl 
                    where ld_folderid = %d
                      and ld_groupid in (select ld_groupid 
@@ -945,6 +946,7 @@ select distinct(A.ld_folderid)
         permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
         permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
         permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
+        permissionColumn.put("LDREVISION", Permission.REVISION);
 
         queryForResultSet(query.toString(), null, null, rows -> {
             while (rows.next()) {
