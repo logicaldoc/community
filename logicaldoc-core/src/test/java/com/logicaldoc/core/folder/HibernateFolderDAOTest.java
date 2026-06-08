@@ -1217,11 +1217,12 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         assertTrue(permissions.contains(Permission.SIGN));
 
         permissions = testSubject.getAllowedPermissions(6, 4);
-        assertEquals(11, permissions.size());
+        assertEquals(12, permissions.size());
         assertTrue(permissions.contains(Permission.READ));
         assertTrue(permissions.contains(Permission.WRITE));
         assertTrue(permissions.contains(Permission.MOVE));
         assertTrue(permissions.contains(Permission.EMAIL));
+        assertTrue(permissions.contains(Permission.REVISION));
 
         permissions = testSubject.getAllowedPermissions(999, 1);
         assertEquals(Permission.all().size(), permissions.size());
