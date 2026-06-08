@@ -14,10 +14,12 @@ public interface AutofillServiceAsync {
 	void getFiller(long fillerId, AsyncCallback<GUIFiller> callback);
 
 	void fillTags(GUIDocument document, AsyncCallback<GUIDocument> callback);
-	
+
 	void fillLanguage(GUIDocument document, AsyncCallback<GUIDocument> callback);
-	
+
 	void fillTemplate(GUIDocument document, AsyncCallback<GUIDocument> callback);
-	
+
 	void fill(GUIDocument document, long fillerId, AsyncCallback<GUIDocument> callback);
+
+	void testRegex(String sample, String regex, boolean inclusive, AsyncCallback<String> callback);
 }

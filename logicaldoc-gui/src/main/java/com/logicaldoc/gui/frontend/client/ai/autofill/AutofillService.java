@@ -72,7 +72,7 @@ public interface AutofillService extends RemoteService {
 	 * @throws ServerException Error in server application
 	 */
 	public GUIDocument fillLanguage(GUIDocument document) throws ServerException;
-	
+
 	/**
 	 * Fills the template
 	 * 
@@ -83,7 +83,7 @@ public interface AutofillService extends RemoteService {
 	 * @throws ServerException Error in server application
 	 */
 	public GUIDocument fillTemplate(GUIDocument document) throws ServerException;
-	
+
 	/**
 	 * Fills using a specified filler
 	 * 
@@ -95,7 +95,21 @@ public interface AutofillService extends RemoteService {
 	 * @throws ServerException Error in server application
 	 */
 	public GUIDocument fill(GUIDocument document, long fillerId) throws ServerException;
-	
+
+	/**
+	 * Tests the exclusion and inclusion regular expressions against a sample
+	 * text.
+	 *
+	 * @param sample the sample text to process
+	 * @param regex the regular expression used to process the sample
+	 * @param inclusive how regular expression must be interpreted
+	 *
+	 * @return the evaluation result
+	 *
+	 * @throws ServerException Error in server application
+	 */
+	public String testRegex(String sample, String regex, boolean inclusive) throws ServerException;
+
 	public static class Instance {
 		private static AutofillServiceAsync inst;
 
