@@ -6,7 +6,6 @@ import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.RegexTesterDialog;
 import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingSchemesDS;
 import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.smartgwt.client.data.AdvancedCriteria;

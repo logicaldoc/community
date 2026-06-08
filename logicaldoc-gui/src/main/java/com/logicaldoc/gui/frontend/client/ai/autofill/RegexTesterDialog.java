@@ -1,9 +1,8 @@
-package com.logicaldoc.gui.common.client.widgets;
+package com.logicaldoc.gui.frontend.client.ai.autofill;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.ai.autofill.AutofillService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
@@ -34,7 +33,7 @@ public class RegexTesterDialog extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-		setTitle(I18N.message("testregex"));
+		setTitle(I18N.message("regexrester"));
 		setAutoSize(true);
 		setCanDragResize(true);
 		setIsModal(true);
@@ -49,7 +48,7 @@ public class RegexTesterDialog extends Window {
 		form.setNumCols(1);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem regexItem = ItemFactory.newTextItem("regularexpression", originalRegexItem.getValueAsString());
+		TextItem regexItem = ItemFactory.newTextItem("rregularexpression", originalRegexItem.getValueAsString());
 		regexItem.setWidth(400);
 
 		TextAreaItem sample = ItemFactory.newTextAreaItem("sampletoevaluate", "");

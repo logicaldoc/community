@@ -18,31 +18,37 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class ChatGPTTray extends MenuTray {
 
-	public ChatGPTTray() {
-		TextItem question = ItemFactory.newTextItem("chatgpt", "");
-		question.setWidth(250);
-		question.addKeyPressHandler(event -> {
-			if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName()))
-				onAsk(question.getValueAsString());
-		});
+    public ChatGPTTray() {
+        TextItem question = ItemFactory.newTextItem("chatgpt", "");
+        question.setWidth(250);
+        question.addKeyPressHandler(event -> {
+            if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName()))
+                onAsk(question.getValueAsString());
+        });
 
-		FormItemIcon ask = new FormItemIcon();
-		ask.setInline(true);
-		ask.setInlineIconAlign(Alignment.RIGHT);
-		ask.setText(AwesomeFactory.getIconHtml("paper-plane"));
-		question.setIcons(ask);
-		ask.addFormItemClickHandler(click -> onAsk(question.getValueAsString()));
+        FormItemIcon ask = new FormItemIcon();
+        ask.setInline(true);
+        ask.setInlineIconAlign(Alignment.RIGHT);
+        ask.setText(AwesomeFactory.getIconHtml("paper-plane"));
+        ask.setPrompt(I18N.message("ask"));
+        ask.addFormItemClickHandler(click -> onAsk(question.getValueAsString()));
+        question.setIcons(ask);
 
-		setItems(question);
-	}
+        setItems(question);
+    }
 
-	private void onAsk(String question) {
-		if(!validate())
-			return;
-		
-		if (DocumentController.get().getCurrentSelection().isEmpty())
-			SC.warn(I18N.message("nodocsselected"));
-		else
-			ChatGPTThread.get().open(question);
-	}
+    private void onAsk(String question) {
+        if (!validate())
+            return;
+
+        if (DocumentController.get().getCurrentSelection().isEmpty())
+            SC.warn(I18N.message("nodocsselected"));
+        else
+            ChatGPTThread.get().open(question);
+    }
+
+    @Override
+    public String getName() {
+        return "chatgpt";
+    }
 }

@@ -137,7 +137,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
         if (Feature.enabled(Feature.MULTI_TENANT) && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
                 && Session.get().getUser().getTenant().getTenantId() == Constants.TENANT_DEFAULTID) {
             SelectItem tenantItem = ItemFactory.newTenantSelector();
-            tenantItem.setShowTitle(false);
+            tenantItem.setShowTitle(true);
             tenantItem.setValue(Long.toString(Session.get().getInfo().getTenant().getId()));
             tenantItem.addChangedHandler(event -> {
                 long tenantId = Long.parseLong(event.getValue().toString());
@@ -194,7 +194,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
         trayPanel.addMember(trays.get(0));
         addMember(trayPanel);
 
-        ToolStripButton rotateTrays = AwesomeFactory.newToolStripButton("exchange-alt", null, null);
+        ToolStripButton rotateTrays = AwesomeFactory.newToolStripButton("exchange-alt",
+                I18N.message("switchto", I18N.message(trays.get(1).getName())), null);
         rotateTrays.addClickHandler(click -> {
             if (currentTray >= trays.size() - 1)
                 currentTray = 0;
@@ -202,6 +203,12 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
                 currentTray++;
             trayPanel.removeMembers(trayPanel.getMembers());
             trayPanel.addMember(trays.get(currentTray));
+
+            int nextTray = currentTray + 1;
+            if (nextTray > trays.size() - 1)
+                nextTray = 0;
+
+            rotateTrays.setTooltip(I18N.message("switchto", I18N.message(trays.get(nextTray).getName())));
         });
         if (trays.size() > 1)
             addButton(rotateTrays);
@@ -626,7 +633,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
     private SelectItem getDensitySelector() {
         SelectItem density = ItemFactory.newDensitySelector();
-        density.setShowTitle(false);
+        density.setShowTitle(true);
         String dens = Session.get().getInfo().getConfig("gui.density");
         if (CookiesManager.get(CookiesManager.COOKIE_DENSITY) != null)
             dens = CookiesManager.get(CookiesManager.COOKIE_DENSITY);

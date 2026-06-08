@@ -439,8 +439,8 @@ public class Version extends AbstractDocument implements Comparable<Version> {
         if (versionDate == null) {
             if (other.versionDate != null)
                 return false;
-        } else if (!versionDate.equals(other.versionDate))
-            return false;
-        return true;
+        } 
+
+        return versionDate.equals(other.versionDate);
     }
 }

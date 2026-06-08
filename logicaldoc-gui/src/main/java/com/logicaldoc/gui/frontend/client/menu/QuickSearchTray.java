@@ -51,6 +51,7 @@ public class QuickSearchTray extends MenuTray {
 		search.setInline(true);
 		search.setInlineIconAlign(Alignment.RIGHT);
 		search.setText(AwesomeFactory.getIconHtml(SEARCH));
+		search.setPrompt(I18N.message("search"));
 		search.addFormItemClickHandler(event -> onSearch());
 
 		searchBox.setShowTitle(false);
@@ -166,4 +167,9 @@ public class QuickSearchTray extends MenuTray {
 	public int hashCode() {
 		return super.hashCode();
 	}
+
+    @Override
+    public String getName() {
+        return "quicksearch";
+    }
 }
