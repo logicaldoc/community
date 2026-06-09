@@ -252,19 +252,18 @@ public class FillerProperties extends FillerDetailsTab {
 		FormItemIcon testRegexExclusion = new FormItemIcon();
 		testRegexExclusion.setPrompt(I18N.message("testregex"));
 		testRegexExclusion.setSrc("[SKIN]/icons/pencil.png");
-		testRegexExclusion.addFormItemClickHandler(click -> 
-			new RegexTesterDialog(exclusionRegex, false).show());
+		testRegexExclusion.addFormItemClickHandler(click -> new RegexTesterDialog(exclusionRegex, false).show());
 		exclusionRegex.setIcons(testRegexExclusion);
-		
+		exclusionRegex.addChangedHandler(changedHandler);
+
 		TextItem inclusionRegex = ItemFactory.newTextItem("inclusionregex", "inclusionregex",
 				filler.getInclusionRegex());
 		FormItemIcon testRegexInclusion = new FormItemIcon();
 		testRegexInclusion.setPrompt(I18N.message("testregex"));
 		testRegexInclusion.setSrc("[SKIN]/icons/pencil.png");
-		testRegexInclusion.addFormItemClickHandler(click -> 
-			new RegexTesterDialog(inclusionRegex, true).show());
+		testRegexInclusion.addFormItemClickHandler(click -> new RegexTesterDialog(inclusionRegex, true).show());
 		inclusionRegex.setIcons(testRegexInclusion);
-		
+		inclusionRegex.addChangedHandler(changedHandler);
 
 		// Criteria
 		AdvancedCriteria thresholdCriteria = new AdvancedCriteria(OperatorId.OR, new Criterion[] {
