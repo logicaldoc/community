@@ -607,7 +607,7 @@ public class ItemFactory {
         densitySelector.setValueMap(opts);
         densitySelector.setName("density");
         densitySelector.setTitle(I18N.message("uidensity"));
-        densitySelector.setWidth(100);
+		densitySelector.setWrapTitle(false);
 
         densitySelector.setValue(Session.get().getConfig("gui.density"));
 
