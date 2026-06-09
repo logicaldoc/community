@@ -239,8 +239,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
     private Long ocrTemplateId = null;
 
     /**
-     * Indicates if the document has been processed by the zonal OCR: <b>0</b> =
-     * to process, <b>1</b> = processed
+     * Indicates if the document has been processed by the zonal OCR
      */
     @Column(name = "ld_ocrd", nullable = false)
     private boolean ocrd = false;

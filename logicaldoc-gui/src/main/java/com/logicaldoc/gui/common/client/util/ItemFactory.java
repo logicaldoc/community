@@ -2553,6 +2553,19 @@ public class ItemFactory {
     }
 
     /**
+     * Creates a new FloatItem.
+     * 
+     * @param name The item name (mandatory)
+     * @param value The item value (optional)
+     * 
+     * @return the new item
+     */
+    public static FloatItem newFloatItem(String name, Float value) {
+        return newFloatItem(name, name, value);
+    }
+    
+
+    /**
      * Creates a new FloatItem for the Extended AttributesDS.
      * 
      * @param name The item name (mandatory)

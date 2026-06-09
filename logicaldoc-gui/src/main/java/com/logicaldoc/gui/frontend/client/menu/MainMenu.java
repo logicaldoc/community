@@ -138,6 +138,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
                 && Session.get().getUser().getTenant().getTenantId() == Constants.TENANT_DEFAULTID) {
             SelectItem tenantItem = ItemFactory.newTenantSelector();
             tenantItem.setShowTitle(true);
+            tenantItem.setWrapTitle(false);
             tenantItem.setValue(Long.toString(Session.get().getInfo().getTenant().getId()));
             tenantItem.addChangedHandler(event -> {
                 long tenantId = Long.parseLong(event.getValue().toString());
@@ -634,6 +635,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
     private SelectItem getDensitySelector() {
         SelectItem density = ItemFactory.newDensitySelector();
         density.setShowTitle(true);
+        density.setWrapTitle(false);
         String dens = Session.get().getInfo().getConfig("gui.density");
         if (CookiesManager.get(CookiesManager.COOKIE_DENSITY) != null)
             dens = CookiesManager.get(CookiesManager.COOKIE_DENSITY);

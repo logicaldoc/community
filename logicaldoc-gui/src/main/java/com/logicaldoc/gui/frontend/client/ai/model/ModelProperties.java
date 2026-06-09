@@ -157,15 +157,14 @@ public class ModelProperties extends ModelDetailsTab {
 
         StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(model.getId()));
         id.setVisible(model.getId() != 0L);
-
-        TextItem features = ItemFactory.newTextItem("features", model.getFeatures());
+        
+        TextItem features = ItemFactory.newTextItem("features", model.getFeatureNames());
         features.addChangedHandler(changedHandler);
         features.setColSpan(4);
         features.setWidth(400);
         features.setHint(I18N.message("featuresseparated"));
         features.setShowHintInField(true);
         features.setShowHintInField(true);
-        features.setValue(model.getFeatures());
         setNeuralNetworkVisibility(features);
 
         SelectItem activationSelector = activationSeletor();
@@ -341,7 +340,7 @@ public class ModelProperties extends ModelDetailsTab {
         model.setDescription(form.getValueAsString("description"));
         model.setLanguage(form.getValueAsString(LANGUAGE));
         model.setType(form.getValueAsString(TYPE));
-        model.setFeatures(form.getValueAsString("features"));
+        model.setFeatureNames(form.getValueAsString("features"));
 
         List<String> categories = new ArrayList<>();
         for (Object cat : (Object[]) form.getValue("categories")) {

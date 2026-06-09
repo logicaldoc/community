@@ -20,6 +20,8 @@ public class GUIQueryResult implements Serializable {
 	private double score = 0L;
 
 	private String value;
+	
+	private String payload;
 
 	public GUIQueryResult() {
 		super();
@@ -55,4 +57,12 @@ public class GUIQueryResult implements Serializable {
 	public void setValue(String value) {
 		this.value = value;
 	}
+
+    public String getPayload() {
+        return payload;
+    }
+
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
 }

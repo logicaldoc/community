@@ -21,87 +21,91 @@ import com.smartgwt.client.widgets.form.fields.SubmitItem;
  */
 public class Upload extends VerticalPanel {
 
-	private Uploader uploader = new Uploader();
+    private Uploader uploader = new Uploader();
 
-	private final Label progressLabel = new Label();
+    private final Label progressLabel = new Label();
 
-	private String uploadedFile;
+    private String uploadedFile;
 
-	public Upload(SubmitItem submitButton) {
-		this(null, submitButton);
-	}
+    public Upload() {
+        this(null, null);
+    }
 
-	public Upload(IButton confirmButton) {
-		this(confirmButton, null);
-	}
+    public Upload(SubmitItem submitButton) {
+        this(null, submitButton);
+    }
 
-	public Upload(IButton confirmButton, SubmitItem submitButton) {
-		progressLabel.setStyleName("progressLabel");
-		uploader.setUploadURL(Util.contextPath() + "upload").setButtonText(I18N.message("clicktoupload"))
-				.setButtonHeight(22).setFileSizeLimit(Session.get().getConfig("upload.maxsize") + " MB")
-				.setButtonCursor(Uploader.Cursor.HAND).setButtonAction(Uploader.ButtonAction.SELECT_FILE)
-				.setUploadProgressHandler(uploadProgressEvent -> {
-					progressLabel.setText(NumberFormat.getPercentFormat().format(
-							uploadProgressEvent.getBytesComplete() / (double) uploadProgressEvent.getBytesTotal()));
-					return true;
-				}).setUploadSuccessHandler(uploadSuccessEvent -> {
-					resetText();
-					String fileName = uploadSuccessEvent.getFile().getName();
-					String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+    public Upload(IButton confirmButton) {
+        this(confirmButton, null);
+    }
 
-					if (!Util.isAllowedForUpload(fileName)) {
-						uploader.cancelUpload(uploadSuccessEvent.getFile().getId(), false);
-						fileName = null;
-						SC.warn(I18N.message("disallowedext", fileExtension));
-						return false;
-					}
+    public Upload(IButton confirmButton, SubmitItem submitButton) {
+        progressLabel.setStyleName("progressLabel");
+        uploader.setUploadURL(Util.contextPath() + "upload").setButtonText(I18N.message("clicktoupload"))
+                .setButtonHeight(22).setFileSizeLimit(Session.get().getConfig("upload.maxsize") + " MB")
+                .setButtonCursor(Uploader.Cursor.HAND).setButtonAction(Uploader.ButtonAction.SELECT_FILE)
+                .setUploadProgressHandler(uploadProgressEvent -> {
+                    progressLabel.setText(NumberFormat.getPercentFormat().format(
+                            uploadProgressEvent.getBytesComplete() / (double) uploadProgressEvent.getBytesTotal()));
+                    return true;
+                }).setUploadSuccessHandler(uploadSuccessEvent -> {
+                    resetText();
+                    String fileName = uploadSuccessEvent.getFile().getName();
+                    String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
 
-					progressLabel.setText(fileName);
-					uploadedFile = fileName;
+                    if (!Util.isAllowedForUpload(fileName)) {
+                        uploader.cancelUpload(uploadSuccessEvent.getFile().getId(), false);
+                        fileName = null;
+                        SC.warn(I18N.message("disallowedext", fileExtension));
+                        return false;
+                    }
 
-					if (confirmButton != null)
-						confirmButton.setDisabled(false);
-					if (submitButton != null)
-						submitButton.setDisabled(false);
+                    progressLabel.setText(fileName);
+                    uploadedFile = fileName;
 
-					return true;
-				}).setFileDialogCompleteHandler(fileDialogCompleteEvent -> {
-					if (fileDialogCompleteEvent.getTotalFilesInQueue() > 0
-							&& uploader.getStats().getUploadsInProgress() <= 0) {
-						progressLabel.setText("0%");
-						uploader.startUpload();
-					}
-					return true;
-				}).setFileQueueErrorHandler(fileQueueErrorEvent -> {
-					resetText();
-					SC.warn(I18N.message("uploadoffile") + " " + fileQueueErrorEvent.getFile().getName() + " "
-							+ I18N.message("failedueto") + " [" + fileQueueErrorEvent.getErrorCode().toString() + "]: "
-							+ fileQueueErrorEvent.getMessage());
-					uploadedFile = null;
-					return true;
-				}).setUploadErrorHandler(uploadErrorEvent -> {
-					resetText();
-					SC.warn(I18N.message("uploadoffile") + " " + uploadErrorEvent.getFile().getName() + " "
-							+ I18N.message("failedueto") + " [" + uploadErrorEvent.getErrorCode().toString() + "]: "
-							+ uploadErrorEvent.getMessage());
-					uploadedFile = null;
-					return true;
-				});
-		add(uploader);
-		add(progressLabel);
-		setCellHorizontalAlignment(uploader, HasHorizontalAlignment.ALIGN_LEFT);
-		setCellHorizontalAlignment(progressLabel, HasHorizontalAlignment.ALIGN_LEFT);
-	}
+                    if (confirmButton != null)
+                        confirmButton.setDisabled(false);
+                    if (submitButton != null)
+                        submitButton.setDisabled(false);
 
-	private void resetText() {
-		progressLabel.setText("");
-	}
+                    return true;
+                }).setFileDialogCompleteHandler(fileDialogCompleteEvent -> {
+                    if (fileDialogCompleteEvent.getTotalFilesInQueue() > 0
+                            && uploader.getStats().getUploadsInProgress() <= 0) {
+                        progressLabel.setText("0%");
+                        uploader.startUpload();
+                    }
+                    return true;
+                }).setFileQueueErrorHandler(fileQueueErrorEvent -> {
+                    resetText();
+                    SC.warn(I18N.message("uploadoffile") + " " + fileQueueErrorEvent.getFile().getName() + " "
+                            + I18N.message("failedueto") + " [" + fileQueueErrorEvent.getErrorCode().toString() + "]: "
+                            + fileQueueErrorEvent.getMessage());
+                    uploadedFile = null;
+                    return true;
+                }).setUploadErrorHandler(uploadErrorEvent -> {
+                    resetText();
+                    SC.warn(I18N.message("uploadoffile") + " " + uploadErrorEvent.getFile().getName() + " "
+                            + I18N.message("failedueto") + " [" + uploadErrorEvent.getErrorCode().toString() + "]: "
+                            + uploadErrorEvent.getMessage());
+                    uploadedFile = null;
+                    return true;
+                });
+        add(uploader);
+        add(progressLabel);
+        setCellHorizontalAlignment(uploader, HasHorizontalAlignment.ALIGN_LEFT);
+        setCellHorizontalAlignment(progressLabel, HasHorizontalAlignment.ALIGN_LEFT);
+    }
 
-	public void setFileTypes(String fileTypes) {
-		uploader.setFileTypes(fileTypes);
-	}
+    private void resetText() {
+        progressLabel.setText("");
+    }
 
-	public String getUploadedFile() {
-		return uploadedFile;
-	}
+    public void setFileTypes(String fileTypes) {
+        uploader.setFileTypes(fileTypes);
+    }
+
+    public String getUploadedFile() {
+        return uploadedFile;
+    }
 }

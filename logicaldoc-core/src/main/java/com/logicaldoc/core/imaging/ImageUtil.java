@@ -265,6 +265,22 @@ public class ImageUtil {
     }
 
     /**
+     * Encodes in Base64 the given image
+     * 
+     * @param image the image to encode
+     * 
+     * @return the encoded image
+     * 
+     * @throws IOException error in the elaboration of the image
+     */
+    public static String encode(BufferedImage image) throws IOException {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream();) {
+            ImageIO.write(image, "png", os);
+            return Base64.encodeBase64String(os.toByteArray());
+        }
+    }
+
+    /**
      * Prints the first page of the given file into the output as .jpg image
      * 
      * @param originalFile the original file

@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A GUI bean representing an AI model
@@ -28,8 +26,6 @@ public class GUIModel implements Serializable {
     private String description;
 
     private String type = "neural";
-
-    private String features;
 
     private String categories;
 
@@ -79,6 +75,8 @@ public class GUIModel implements Serializable {
     private GUIUpdater updater = new GUIUpdater();
 
     private GUIChunking chunking = new GUIChunking();
+
+    private List<GUIFeatureDescriptor> featureDescriptors = new ArrayList<>();
 
     public GUIModel(long id, String name) {
         super();
@@ -163,12 +161,26 @@ public class GUIModel implements Serializable {
         getTraining().setTrainable(!NOT_TRAINABLE_TYPES.contains(type));
     }
 
-    public String getFeatures() {
-        return features;
+    public List<GUIFeatureDescriptor> getFeatureDescriptors() {
+        return featureDescriptors;
     }
 
-    public List<String> getFeaturesList() {
-        return Stream.of(features.split(",")).map(String::trim).collect(Collectors.toList());
+    public void setFeatureDescriptors(List<GUIFeatureDescriptor> featureDescriptors) {
+        this.featureDescriptors = featureDescriptors;
+    }
+
+    public String getFeatureNames() {
+        List<String> names = new ArrayList<>();
+        for (GUIFeatureDescriptor fd : featureDescriptors)
+            names.add(fd.getName());
+        return names.toString().replace("[", "").replace("]", "").replace(" ", "");
+    }
+
+    public void setFeatureNames(String names) {
+        String[] tokens = names.split(",");
+        featureDescriptors.clear();
+        for (String token : tokens)
+            featureDescriptors.add(new GUIFeatureDescriptor(token.trim()));
     }
 
     public String getCategories() {
@@ -194,10 +206,6 @@ public class GUIModel implements Serializable {
                 categories += ",";
             categories += cats[i].trim();
         }
-    }
-
-    public void setFeatures(String features) {
-        this.features = features;
     }
 
     public void setCategories(String categories) {
