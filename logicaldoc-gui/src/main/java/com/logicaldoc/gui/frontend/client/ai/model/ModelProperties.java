@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.ai.model;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -157,14 +158,16 @@ public class ModelProperties extends ModelDetailsTab {
 
         StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(model.getId()));
         id.setVisible(model.getId() != 0L);
-        
-        TextItem features = ItemFactory.newTextItem("features", model.getFeatureNames());
-        features.addChangedHandler(changedHandler);
+
+        String[] faturesArray = model.getFeatureDescriptors().stream().map(fd -> fd.getName())
+                .collect(Collectors.toList()).toArray(new String[0]);
+        MultiComboBoxItem features = ItemFactory.newMultiComboBoxItem("features", "features", null, faturesArray);
+        features.setShowPending(true);
+        features.setAddUnknownValues(true);
         features.setColSpan(4);
-        features.setWidth(400);
-        features.setHint(I18N.message("featuresseparated"));
-        features.setShowHintInField(true);
-        features.setShowHintInField(true);
+        features.setWidth("*");
+        features.addChangedHandler(changedHandler);
+        features.setValueMap(faturesArray);
         setNeuralNetworkVisibility(features);
 
         SelectItem activationSelector = activationSeletor();
@@ -340,7 +343,6 @@ public class ModelProperties extends ModelDetailsTab {
         model.setDescription(form.getValueAsString("description"));
         model.setLanguage(form.getValueAsString(LANGUAGE));
         model.setType(form.getValueAsString(TYPE));
-        model.setFeatureNames(form.getValueAsString("features"));
 
         List<String> categories = new ArrayList<>();
         for (Object cat : (Object[]) form.getValue("categories")) {
@@ -354,6 +356,19 @@ public class ModelProperties extends ModelDetailsTab {
             }
         }
         model.setCategoriesArray(categories.toArray(new String[0]));
+        
+        List<String> features = new ArrayList<>();
+        for (Object cat : (Object[]) form.getValue("features")) {
+            String str = cat.toString();
+            if (str.contains(",")) {
+                String[] subcats = str.split(",");
+                for (String subcat : subcats)
+                    features.add(subcat.trim());
+            } else {
+                features.add(str.trim());
+            }
+        }
+        model.setFeatureNames(features.stream().collect(Collectors.joining(",")));
 
         model.setActivation(form.getValueAsString(ACTIVATION));
         model.setWeightInit(form.getValueAsString("weightInit"));
