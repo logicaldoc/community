@@ -203,9 +203,8 @@ public abstract class Filler extends PersistentObject {
      */
     public String fill(Document document, String content, History transaction, Map<String, Object> dictionary)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
-        System.out.println("A");
-        String value = fillDocument(document, content, transaction, dictionary);
-        System.out.println("B "+value);
+        
+        String value = fillDocument(document, content, transaction, dictionary);        
         
         if (transaction != null && document.isModified()) {
             DocumentHistory fillHistory = new DocumentHistory(transaction);
