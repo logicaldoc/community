@@ -336,7 +336,7 @@ public abstract class History extends PersistentObject implements Comparable<His
     public void setKeyLabel(String keyLabel) {
         this.keyLabel = keyLabel;
     }
-    
+
     public Boolean getOverwrite() {
         return overwrite;
     }
@@ -346,11 +346,16 @@ public abstract class History extends PersistentObject implements Comparable<His
     }
 
     protected void copyAttributesFrom(History source) {
+        /*
+         * Handle with care, here we cannot use the setter method because
+         * implementations may try to use event's entity toString
+         */
+        this.event = source.event;
+
         setTenantId(source.getTenantId());
         setDate(source.getDate());
         setCreation(source.getCreation());
         setUser(source.getUser());
-        this.event = source.event;
         setComment(source.getComment());
         setPath(source.getPath());
         setNotified(source.isNotified());

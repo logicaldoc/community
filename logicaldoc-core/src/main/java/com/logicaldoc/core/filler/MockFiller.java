@@ -21,10 +21,10 @@ import jakarta.persistence.Entity;
 @Cacheable
 public class MockFiller extends Filler {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void fill(Document doc, String content, History transaction, Map<String, Object> dictionary) {
-		// Do nothing
-	}
+    @Override
+    protected String fillDocument(Document doc, String content, History transaction, Map<String, Object> dictionary) {
+        return "";
+    }
 }
