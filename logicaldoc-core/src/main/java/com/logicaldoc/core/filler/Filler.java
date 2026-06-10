@@ -16,6 +16,8 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.IndexingStatus;
@@ -28,6 +30,7 @@ import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.searchengine.SearchException;
+import com.logicaldoc.util.Value;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -159,29 +162,68 @@ public abstract class Filler extends PersistentObject {
     }
 
     /**
-     * Fills an object instance
+     * Fills a {@link Document}
      * 
-     * @param fillable the instance to fill
+     * @param document the instance to fill
      * @param content the content of the object, if not specified it will be
      *        taken from the transaction's file.
      * @param transaction the current transaction
      * @param dictionary Dictionary of the execution pipeline
      * 
+     * @return String representation of the filled content
+     * 
      * @throws PersistenceException Error in the data layer
      * @throws IOException I/O error
      * @throws FeatureDisabledException An involved feature is disabled
      * @throws SearchException Error in case of search
-     * @throws AutomationException Error in the automation (if the filler makes use of automation)
+     * @throws AutomationException Error in the automation (if the filler makes
+     *         use of automation)
      */
-    protected abstract void fill(Document fillable, String content, History transaction, Map<String, Object> dictionary)
+    protected abstract String fillDocument(Document document, String content, History transaction,
+            Map<String, Object> dictionary)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException;
 
     /**
-     * Fills a document using the body text as input
+     * Fills a {@link Document} and then records a FILLED event.
+     * 
+     * @param document the instance to fill
+     * @param content the content of the object, if not specified it will be
+     *        taken from the transaction's file.
+     * @param transaction the current transaction
+     * @param dictionary Dictionary of the execution pipeline
+     * 
+     * @return String representation of the filled content
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws IOException I/O error
+     * @throws FeatureDisabledException An involved feature is disabled
+     * @throws SearchException Error in case of search
+     * @throws AutomationException Error in the automation (if the filler makes
+     *         use of automation)
+     */
+    public String fill(Document document, String content, History transaction, Map<String, Object> dictionary)
+            throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
+        
+        String value = fillDocument(document, content, transaction, dictionary);        
+        
+        if (transaction != null && document.isModified()) {
+            DocumentHistory fillHistory = new DocumentHistory(transaction);
+            fillHistory.setEvent(DocumentEvent.FILLED);
+            fillHistory.setComment("%s > %s".formatted(this.getClass().getSimpleName(), value));
+            DocumentDAO.get().saveDocumentHistory(document, fillHistory);
+        }
+
+        return value;
+    }
+
+    /**
+     * Fills a {@link Document} using the body text as input
      * 
      * @param document the document to fill
      * @param transaction the current transaction
      * @param dictionary Dictionary of the execution pipeline
+     * 
+     * @return String representation of the filled content
      * 
      * @throws PersistenceException Error in the data layer
      * @throws IOException I/O error
@@ -192,12 +234,12 @@ public abstract class Filler extends PersistentObject {
      * @throws AutomationException Error in the automation execution(if any
      *         automation script has been provided)
      */
-    public void fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
+    public String fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
             throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException,
             AutomationException {
 
         if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
-            return;
+            return null;
 
         if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX)) {
             DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
@@ -212,13 +254,16 @@ public abstract class Filler extends PersistentObject {
         if (log.isDebugEnabled())
             log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
 
-        fill(document, extractedContent, transaction, dictionary);
-
+        String result = fill(document, extractedContent, transaction, dictionary);
+        
+        Value<String> extractedValue = new Value<>();
         if (StringUtils.isNotEmpty(automation)) {
             Automation script = new Automation("Filler-%s".formatted(name), null, getTenantId());
             script.evaluate(automation, Map.of("filler", this, "document", document, "transaction", transaction,
-                    "fillerDictionary", dictionary));
+                    "fillerDictionary", dictionary, "value", extractedValue));
         }
+
+        return StringUtils.defaultIfEmpty(extractedValue.getValue(), result);
     }
 
     protected boolean mustOverwrite(History transaction) {
