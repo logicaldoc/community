@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.RegexComposer;
 import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingSchemesDS;
 import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -247,23 +248,11 @@ public class FillerProperties extends FillerDetailsTab {
 		groupingSep.setWidth(80);
 		groupingSep.addChangedHandler(changedHandler);
 
-		TextItem exclusionRegex = ItemFactory.newTextItem("exclusionregex", "exclusionregex",
-				filler.getExclusionRegex());
-		FormItemIcon testRegexExclusion = new FormItemIcon();
-		testRegexExclusion.setPrompt(I18N.message("testregex"));
-		testRegexExclusion.setSrc("[SKIN]/icons/pencil.png");
-		testRegexExclusion.addFormItemClickHandler(click -> new RegexTesterDialog(exclusionRegex, false).show());
-		exclusionRegex.setIcons(testRegexExclusion);
-		exclusionRegex.addChangedHandler(changedHandler);
+		// exclusion regex
+		TextItem exclusionRegex = prepareRegexField(false);
 
-		TextItem inclusionRegex = ItemFactory.newTextItem("inclusionregex", "inclusionregex",
-				filler.getInclusionRegex());
-		FormItemIcon testRegexInclusion = new FormItemIcon();
-		testRegexInclusion.setPrompt(I18N.message("testregex"));
-		testRegexInclusion.setSrc("[SKIN]/icons/pencil.png");
-		testRegexInclusion.addFormItemClickHandler(click -> new RegexTesterDialog(inclusionRegex, true).show());
-		inclusionRegex.setIcons(testRegexInclusion);
-		inclusionRegex.addChangedHandler(changedHandler);
+		// inclusion regex
+		TextItem inclusionRegex = prepareRegexField(true);
 
 		// Criteria
 		AdvancedCriteria thresholdCriteria = new AdvancedCriteria(OperatorId.OR, new Criterion[] {
@@ -319,6 +308,27 @@ public class FillerProperties extends FillerDetailsTab {
 		prepareCriteria();
 	}
 
+	private TextItem prepareRegexField(boolean inclusive) {
+		String name = inclusive ? "inclusionregex" : "exclusionregex";
+
+		TextItem item = ItemFactory.newTextItem(name, name,
+				inclusive ? filler.getInclusionRegex() : filler.getExclusionRegex());
+
+		FormItemIcon compose = new FormItemIcon();
+		compose.setPrompt(I18N.message("regexcomposer"));
+		compose.setSrc("[SKIN]/icons/hat-wizard.png");
+		compose.addFormItemClickHandler(click -> new RegexComposer(item, inclusive, changedHandler).show());
+
+		FormItemIcon test = new FormItemIcon();
+		test.setPrompt(I18N.message("regexrester"));
+		test.setSrc("[SKIN]/icons/flask.png");
+		test.addFormItemClickHandler(click -> new RegexTesterDialog(item, inclusive, changedHandler).show());
+		item.setIcons(compose, test);
+		item.addChangedHandler(changedHandler);
+
+		return item;
+	}
+
 	private String modelTypesSuitableForFiller(String fillerType) {
 		return switch (fillerType) {
 			case TAG -> "zeroshot,classifier";
@@ -339,12 +349,12 @@ public class FillerProperties extends FillerDetailsTab {
 			filler.setFormat(form.getValueAsString("format"));
 			filler.setDecimalSeparator(form.getValueAsString("decimalseparator"));
 			filler.setGroupingSeparator(form.getValueAsString("groupingseparator"));
+
 			filler.setExclusionRegex(form.getValueAsString("exclusionregex"));
 			filler.setInclusionRegex(form.getValueAsString("inclusionregex"));
 
 			Boolean overwriteVal = (Boolean) form.getValue(OVERWRITE);
 			filler.setOverwrite(Boolean.TRUE.equals(overwriteVal));
-
 			Boolean onCheckinVal = (Boolean) form.getValue(FILL_ON_CHECKIN);
 			filler.setOnCheckin(Boolean.TRUE.equals(onCheckinVal));
 

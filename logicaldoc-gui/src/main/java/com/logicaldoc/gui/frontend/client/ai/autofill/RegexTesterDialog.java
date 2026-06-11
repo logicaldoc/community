@@ -11,6 +11,7 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -27,9 +28,12 @@ public class RegexTesterDialog extends Window {
 
 	private final boolean inclusive;
 
-	public RegexTesterDialog(TextItem exclusionField, boolean inclusive) {
+	private final ChangedHandler changedHandler;
+
+	public RegexTesterDialog(TextItem exclusionField, boolean inclusive, ChangedHandler changedHandler) {
 		this.originalRegexItem = exclusionField;
 		this.inclusive = inclusive;
+		this.changedHandler = changedHandler;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
@@ -72,6 +76,16 @@ public class RegexTesterDialog extends Window {
 
 		ButtonItem save = new ButtonItem(I18N.message("save"));
 		save.addClickHandler(click -> originalRegexItem.setValue(regexItem.getValueAsString()));
+
+		save.addClickHandler(click -> {
+
+			originalRegexItem.setValue(regexItem.getValueAsString());
+
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+
+			destroy();
+		});
 
 		form.setItems(regexItem, sample, evaluate, result, save);
 
