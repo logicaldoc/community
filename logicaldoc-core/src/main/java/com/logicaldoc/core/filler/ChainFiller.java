@@ -60,7 +60,9 @@ public class ChainFiller extends Filler {
 	}
 
 	@Override
-	protected String fillDocument(Document document, String content, History transaction, Map<String, Object> dictionary)
+    protected String fillDocument(Document document, String content, History transaction,
+            Map<String, Object> dictionary,
+            StringBuilder explication)
 			throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
 
 		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
@@ -86,7 +88,7 @@ public class ChainFiller extends Filler {
 			if (log.isDebugEnabled())
 				log.debug("Invoking filler {}", filler.getClass().getSimpleName());
 
-			String extraction = filler.fillDocument(document, content, transaction, pipelineDict);
+			String extraction = filler.fillDocument(document, content, transaction, pipelineDict, explication);
 			if (log.isDebugEnabled())
                 log.debug("Filler {} extracted {}", filler.getClass().getSimpleName(), extraction);
 			if(StringUtils.isNotEmpty(extraction))

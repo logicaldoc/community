@@ -140,9 +140,6 @@ public class ReportDetailsPanel extends VLayout {
 		boolean valid = propertiesPanel.validate();
 		if (!valid)
 			tabSet.selectTab(0);
-		valid = valid && securityPanel.validate();
-		if (!valid)
-			tabSet.selectTab(1);
 		return valid;
 	}
 

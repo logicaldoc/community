@@ -162,13 +162,15 @@ public abstract class Filler extends PersistentObject {
     }
 
     /**
-     * Fills a {@link Document}
+     * Place where implementations put the logic to fill a {@link Document}
      * 
      * @param document the instance to fill
      * @param content the content of the object, if not specified it will be
      *        taken from the transaction's file.
      * @param transaction the current transaction
      * @param dictionary Dictionary of the execution pipeline
+     * @param explication optional buffer to receive the explication of the
+     *        processing
      * 
      * @return String representation of the filled content
      * 
@@ -180,7 +182,7 @@ public abstract class Filler extends PersistentObject {
      *         use of automation)
      */
     protected abstract String fillDocument(Document document, String content, History transaction,
-            Map<String, Object> dictionary)
+            Map<String, Object> dictionary, StringBuilder explication)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException;
 
     /**
@@ -191,6 +193,8 @@ public abstract class Filler extends PersistentObject {
      *        taken from the transaction's file.
      * @param transaction the current transaction
      * @param dictionary Dictionary of the execution pipeline
+     * @param explication optional buffer to receive the explication of the
+     *        processing
      * 
      * @return String representation of the filled content
      * 
@@ -201,11 +205,12 @@ public abstract class Filler extends PersistentObject {
      * @throws AutomationException Error in the automation (if the filler makes
      *         use of automation)
      */
-    public String fill(Document document, String content, History transaction, Map<String, Object> dictionary)
+    public final String fill(Document document, String content, History transaction, Map<String, Object> dictionary,
+            StringBuilder explication)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
-        
-        String value = fillDocument(document, content, transaction, dictionary);        
-        
+
+        String value = fillDocument(document, content, transaction, dictionary, explication);
+
         if (transaction != null && document.isModified()) {
             DocumentHistory fillHistory = new DocumentHistory(transaction);
             fillHistory.setEvent(DocumentEvent.FILLED);
@@ -222,6 +227,8 @@ public abstract class Filler extends PersistentObject {
      * @param document the document to fill
      * @param transaction the current transaction
      * @param dictionary Dictionary of the execution pipeline
+     * @param explication optional buffer to receive the explication of the
+     *        processing
      * 
      * @return String representation of the filled content
      * 
@@ -234,9 +241,9 @@ public abstract class Filler extends PersistentObject {
      * @throws AutomationException Error in the automation execution(if any
      *         automation script has been provided)
      */
-    public String fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-            throws PersistenceException, IOException, FeatureDisabledException, ParsingException, SearchException,
-            AutomationException {
+    public final String fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary,
+            StringBuilder explication) throws PersistenceException, IOException, FeatureDisabledException,
+            ParsingException, SearchException, AutomationException {
 
         if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
             return null;
@@ -254,8 +261,8 @@ public abstract class Filler extends PersistentObject {
         if (log.isDebugEnabled())
             log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
 
-        String result = fill(document, extractedContent, transaction, dictionary);
-        
+        String result = fill(document, extractedContent, transaction, dictionary, explication);
+
         Value<String> extractedValue = new Value<>();
         if (StringUtils.isNotEmpty(automation)) {
             Automation script = new Automation("Filler-%s".formatted(name), null, getTenantId());

@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -29,194 +30,230 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ReportSecurityPanel extends ReportDetailsTab {
 
-	private static final String AVATAR = "avatar";
+    private static final String AVATAR = "avatar";
 
-	private static final String ENTITY = "entity";
+    private static final String ENTITY = "entity";
 
-	private static final String ENTITY_ID = "entityId";
+    private static final String ENTITY_ID = "entityId";
 
-	private RefreshableListGrid aclGrid;
+    private RefreshableListGrid aclGrid;
 
-	public ReportSecurityPanel(GUIReport report, final ChangedHandler changedHandler) {
-		super(report, changedHandler);
-		setWidth100();
-		setHeight100();
+    public ReportSecurityPanel(GUIReport report, final ChangedHandler changedHandler) {
+        super(report, changedHandler);
+        setWidth100();
+        setHeight100();
 
-		this.report = report;
-	}
+        this.report = report;
+    }
 
-	@Override
-	protected void onDraw() {
-		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID);
-		entityId.setCanEdit(false);
-		entityId.setHidden(true);
-		entityId.setAutoFitWidth(true);
+    @Override
+    protected void onDraw() {
+        ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID);
+        entityId.setCanEdit(false);
+        entityId.setHidden(true);
+        entityId.setAutoFitWidth(true);
 
-		ListGridField entity = new UserListGridField(ENTITY, AVATAR, ENTITY);
-		entity.setCanEdit(false);
-		entity.setAutoFitWidth(true);
-		entity.setRotateTitle(false);
+        ListGridField entity = new UserListGridField(ENTITY, AVATAR, ENTITY);
+        entity.setCanEdit(false);
+        entity.setAutoFitWidth(true);
+        entity.setRotateTitle(false);
 
-		ListGridField read = new ListGridField(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(),
-				I18N.message(GUIAccessControlEntry.PERMISSION_READ.toLowerCase()));
-		read.setType(ListGridFieldType.BOOLEAN);
-		read.setCanEdit(true);
+        ListGridField read = new ListGridField(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(),
+                I18N.message(GUIAccessControlEntry.PERMISSION_READ.toLowerCase()));
+        read.setType(ListGridFieldType.BOOLEAN);
+        read.setCanEdit(true);
 
-		ListGridField write = new ListGridField(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(),
-				I18N.message(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase()));
-		write.setType(ListGridFieldType.BOOLEAN);
-		write.setCanEdit(true);
+        ListGridField write = new ListGridField(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(),
+                I18N.message(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase()));
+        write.setType(ListGridFieldType.BOOLEAN);
+        write.setCanEdit(true);
 
-		aclGrid = new RefreshableListGrid();
-		aclGrid.setCanFreezeFields(true);
-		aclGrid.setSelectionType(SelectionStyle.MULTIPLE);
-		aclGrid.setAutoFetchData(true);
-		aclGrid.setFields(entityId, entity, read, write);
-		aclGrid.setDataSource(new ReportAclDS(report.getId()));
-		aclGrid.setCanEdit(report.isWrite());
+        aclGrid = new RefreshableListGrid();
+        aclGrid.setCanFreezeFields(true);
+        aclGrid.setSelectionType(SelectionStyle.MULTIPLE);
+        aclGrid.setAutoFetchData(true);
+        aclGrid.setFields(entityId, entity, read, write);
+        aclGrid.setDataSource(new ReportAclDS(report.getId()));
+        aclGrid.setCanEdit(report.isWrite());
 
-		HLayout buttons = new HLayout();
-		buttons.setMembersMargin(4);
-		buttons.setWidth100();
-		buttons.setHeight(20);
-		
-		
-		if (report.isWrite()) {
-			aclGrid.addCellSavedHandler(changed -> changedHandler.onChanged(null));
-			aclGrid.addCellContextClickHandler(click -> {
-				showContextMenu();
-				click.cancel();
-			});
-			
-			addGroupSelector(buttons);
-			addUserSelector(buttons);
-		}
+        HLayout buttons = new HLayout();
+        buttons.setMembersMargin(4);
+        buttons.setWidth100();
+        buttons.setHeight(20);
 
-		VLayout body = new VLayout();
-		body.setMembers(aclGrid, buttons);
-		addMember(body);
-	}
+        if (report.isWrite()) {
+            aclGrid.addCellContextClickHandler(event -> {
+                if (event.getColNum() == 0)
+                    showContextMenu();
+                event.cancel();
+            });
+            aclGrid.addEditCompleteHandler(event -> {
+                for (ListGridRecord rec : aclGrid.getSelectedRecords()) {
+                    GUIAccessControlEntry acl = report.getAce(rec.getAttributeAsLong(ENTITY_ID));
+                    if (acl != null) {
+                        acl.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false)));
+                        acl.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), false)));
+                    }
+                }
+                changedHandler.onChanged(null);
+            });
+            
+            addGroupSelector(buttons);
+            addUserSelector(buttons);
+        }
 
-	private void showContextMenu() {
-		Menu menu = new Menu();
+        VLayout body = new VLayout();
+        body.setMembers(aclGrid, buttons);
+        addMember(body);
+    }
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> aclGrid.removeSelectedData());
+    private void showContextMenu() {
+        Menu menu = new Menu();
 
-		menu.addItem(delete);
-		menu.showContextMenu();
-	}
+        MenuItem delete = new MenuItem();
+        delete.setTitle(I18N.message("ddelete"));
+        delete.addClickHandler(event -> onDelete());
 
-	private void addUserSelector(HLayout buttons) {
-		final DynamicForm userForm = new DynamicForm();
-		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
-		userForm.setItems(user);
+        menu.addItem(delete);
+        menu.showContextMenu();
+    }
 
-		user.addChangedHandler(changed -> {
-			ListGridRecord selectedRecord = user.getSelectedRecord();
-			if (selectedRecord == null)
-				return;
+    private void onDelete() {
+        ListGridRecord[] selection = aclGrid.getSelectedRecords();
+        if (selection == null || selection.length == 0)
+            return;
 
-			/*
-			 * Check if the selected user is already present in the rights table
-			 */
-			ListGridRecord[] records = aclGrid.getRecords();
-			for (ListGridRecord test : records) {
-				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("usergroup"))) {
-					user.clearValue();
-					return;
-				}
-			}
+        LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
+            if (Boolean.TRUE.equals(value)) {
+                for (ListGridRecord listGridRecord : selection)
+                    report.removeAce(listGridRecord.getAttributeAsLong(ENTITY_ID));
+                aclGrid.removeSelectedData();
+                changedHandler.onChanged(null);
+            }
+        });
+    }
 
-			// Update the rights table
-			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("usergroup"));
-			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
-			rec.setAttribute(ENTITY,
-					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
-			rec.setAttribute(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false);
+    private void addUserSelector(HLayout buttons) {
+        final DynamicForm userForm = new DynamicForm();
+        final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
+        userForm.setItems(user);
 
-			aclGrid.addData(rec);
-			if (changedHandler != null)
-				changedHandler.onChanged(null);
+        user.addChangedHandler(changed -> {
+            ListGridRecord selectedRecord = user.getSelectedRecord();
+            if (selectedRecord == null)
+                return;
 
-			user.clearValue();
-		});
-		buttons.addMember(userForm);
-	}
+            /*
+             * Check if the selected user is already present in the rights table
+             */
+            ListGridRecord[] records = aclGrid.getRecords();
+            for (ListGridRecord test : records) {
+                if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("usergroup"))) {
+                    user.clearValue();
+                    return;
+                }
+            }
 
-	private void addGroupSelector(HLayout buttons) {
-		// Prepare the combo and button for adding a new Group
-		final DynamicForm groupForm = new DynamicForm();
-		final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
-		groupForm.setItems(group);
-		group.addChangedHandler(changed -> {
-			ListGridRecord selectedRecord = group.getSelectedRecord();
-			if (selectedRecord == null)
-				return;
+            // Update the rights table
+            ListGridRecord rec = new ListGridRecord();
+            rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("usergroup"));
+            rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
+            rec.setAttribute(ENTITY,
+                    selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
+            rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
+            rec.setAttribute(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false);
 
-			// Check if the selected user is already present in the rights
-			// table
-			ListGridRecord[] records = aclGrid.getRecords();
-			for (ListGridRecord test : records) {
-				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
-					group.clearValue();
-					return;
-				}
-			}
+            addRecord(rec);
 
-			// Update the rights table
-			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
-			rec.setAttribute(AVATAR, "group");
-			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
-			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
-			rec.setAttribute(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false);
+            user.clearValue();
+        });
+        buttons.addMember(userForm);
+    }
 
-			aclGrid.addData(rec);
-			if (changedHandler != null)
-				changedHandler.onChanged(null);
-			group.clearValue();
-		});
-		buttons.addMember(groupForm);
-	}
+    private void addRecord(ListGridRecord rec) {
+        aclGrid.addData(rec);
 
-	/**
-	 * Create an array of all rights defined
-	 * 
-	 * @return array of rights
-	 */
-	public List<GUIAccessControlEntry> getACL() {
-		ListGridRecord[] records = aclGrid.getRecords();
-		List<GUIAccessControlEntry> acl = new ArrayList<>();
-		for (ListGridRecord rec : records) {
-			GUIAccessControlEntry ace = new GUIAccessControlEntry();
-			ace.setName(rec.getAttributeAsString(ENTITY));
-			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			ace.setRead(Boolean.TRUE
-					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase())));
-			ace.setWrite(Boolean.TRUE
-					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase())));
-			acl.add(ace);
-		}
-		return acl;
-	}
+        GUIAccessControlEntry ace = new GUIAccessControlEntry();
+        ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
+        ace.setRead(Boolean.TRUE
+                .equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), false)));
+        ace.setWrite(Boolean.TRUE
+                .equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false)));
+        report.addAce(ace);
 
-	boolean validate() {
-		report.getAccessControlList().clear();
-		report.setAccessControlList(getACL());
-		return true;
-	}
+        if (changedHandler != null)
+            changedHandler.onChanged(null);
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    private void addGroupSelector(HLayout buttons) {
+        // Prepare the combo and button for adding a new Group
+        final DynamicForm groupForm = new DynamicForm();
+        final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
+        groupForm.setItems(group);
+        group.addChangedHandler(changed -> {
+            ListGridRecord selectedRecord = group.getSelectedRecord();
+            if (selectedRecord == null)
+                return;
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+            // Check if the selected user is already present in the rights
+            // table
+            ListGridRecord[] records = aclGrid.getRecords();
+            for (ListGridRecord test : records) {
+                if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
+                    group.clearValue();
+                    return;
+                }
+            }
+
+            // Update the rights table
+            ListGridRecord rec = new ListGridRecord();
+            rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
+            rec.setAttribute(AVATAR, "group");
+            rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
+            rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
+            rec.setAttribute(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false);
+
+            addRecord(rec);
+
+            group.clearValue();
+        });
+        buttons.addMember(groupForm);
+    }
+
+    /**
+     * Create an array of all rights defined
+     * 
+     * @return array of rights
+     */
+    public List<GUIAccessControlEntry> getACL() {
+        ListGridRecord[] records = aclGrid.getRecords();
+        List<GUIAccessControlEntry> acl = new ArrayList<>();
+        for (ListGridRecord rec : records) {
+            GUIAccessControlEntry ace = new GUIAccessControlEntry();
+            ace.setName(rec.getAttributeAsString(ENTITY));
+            ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+            ace.setRead(Boolean.TRUE
+                    .equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase())));
+            ace.setWrite(Boolean.TRUE
+                    .equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase())));
+            acl.add(ace);
+        }
+        return acl;
+    }
+
+    boolean validate() {
+        report.getAccessControlList().clear();
+        report.setAccessControlList(getACL());
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

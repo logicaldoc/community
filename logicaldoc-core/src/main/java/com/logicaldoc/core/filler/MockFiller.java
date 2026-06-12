@@ -24,7 +24,8 @@ public class MockFiller extends Filler {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected String fillDocument(Document doc, String content, History transaction, Map<String, Object> dictionary) {
+    protected String fillDocument(Document doc, String content, History transaction, Map<String, Object> dictionary,
+            StringBuilder explication) {
         return "";
     }
 }

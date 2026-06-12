@@ -13,174 +13,201 @@ import java.util.List;
  */
 public class GUIReport implements Serializable {
 
-	public static final int STATUS_IDLE = 0;
+    public static final int STATUS_IDLE = 0;
 
-	public static final int STATUS_RUNNING = 1;
+    public static final int STATUS_RUNNING = 1;
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private long id = 0;
+    private long id = 0;
 
-	private GUIFolder outputFolder = null;
+    private GUIFolder outputFolder = null;
 
-	private boolean enabled = true;
+    private boolean enabled = true;
 
-	private String name;
+    private String name;
 
-	private String description;
+    private String description;
 
-	private int status = STATUS_IDLE;
+    private int status = STATUS_IDLE;
 
-	private Long outputDocId = null;
+    private Long outputDocId = null;
 
-	private String outputFormat = "html";
+    private String outputFormat = "html";
 
-	private int updatePolicy = 0;
+    private int updatePolicy = 0;
 
-	private Date lastRun;
+    private Date lastRun;
 
-	private Date lastModified;
+    private Date lastModified;
 
-	private long recordVersion = 0;
+    private long recordVersion = 0;
 
-	private String log;
+    private String log;
 
-	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
+    private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
 
-	/**
-	 * Permissions granted to the current user on this report
-	 */
-	private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
+    /**
+     * Permissions granted to the current user on this report
+     */
+    private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
 
-	public GUIReport() {
-		super();
-	}
+    public GUIReport() {
+        super();
+    }
 
-	public long getId() {
-		return id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public boolean isEnabled() {
-		return enabled;
-	}
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-	public GUIFolder getOutputFolder() {
-		return outputFolder;
-	}
+    public GUIFolder getOutputFolder() {
+        return outputFolder;
+    }
 
-	public void setOutputFolder(GUIFolder outputFolder) {
-		this.outputFolder = outputFolder;
-	}
+    public void setOutputFolder(GUIFolder outputFolder) {
+        this.outputFolder = outputFolder;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public int getStatus() {
-		return status;
-	}
+    public int getStatus() {
+        return status;
+    }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
-	public Long getOutputDocId() {
-		return outputDocId;
-	}
+    public Long getOutputDocId() {
+        return outputDocId;
+    }
 
-	public void setOutputDocId(Long outputDocId) {
-		this.outputDocId = outputDocId;
-	}
+    public void setOutputDocId(Long outputDocId) {
+        this.outputDocId = outputDocId;
+    }
 
-	public String getOutputFormat() {
-		return outputFormat;
-	}
+    public String getOutputFormat() {
+        return outputFormat;
+    }
 
-	public void setOutputFormat(String outputFormat) {
-		this.outputFormat = outputFormat;
-	}
+    public void setOutputFormat(String outputFormat) {
+        this.outputFormat = outputFormat;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public int getUpdatePolicy() {
-		return updatePolicy;
-	}
+    public int getUpdatePolicy() {
+        return updatePolicy;
+    }
 
-	public void setUpdatePolicy(int updatePolicy) {
-		this.updatePolicy = updatePolicy;
-	}
+    public void setUpdatePolicy(int updatePolicy) {
+        this.updatePolicy = updatePolicy;
+    }
 
-	public Date getLastRun() {
-		return lastRun;
-	}
+    public Date getLastRun() {
+        return lastRun;
+    }
 
-	public void setLastRun(Date lastRun) {
-		this.lastRun = lastRun;
-	}
+    public void setLastRun(Date lastRun) {
+        this.lastRun = lastRun;
+    }
 
-	public Date getLastModified() {
-		return lastModified;
-	}
+    public Date getLastModified() {
+        return lastModified;
+    }
 
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
 
-	public long getRecordVersion() {
-		return recordVersion;
-	}
+    public long getRecordVersion() {
+        return recordVersion;
+    }
 
-	public void setRecordVersion(long recordVersion) {
-		this.recordVersion = recordVersion;
-	}
+    public void setRecordVersion(long recordVersion) {
+        this.recordVersion = recordVersion;
+    }
 
-	public String getLog() {
-		return log;
-	}
+    public String getLog() {
+        return log;
+    }
 
-	public void setLog(String log) {
-		this.log = log;
-	}
+    public void setLog(String log) {
+        this.log = log;
+    }
 
-	public List<GUIAccessControlEntry> getAccessControlList() {
-		return accessControlList;
-	}
+    public List<GUIAccessControlEntry> getAccessControlList() {
+        return accessControlList;
+    }
 
-	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
-		this.accessControlList = accessControlList;
-	}
+    public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+        this.accessControlList = accessControlList;
+    }
 
-	public GUIAccessControlEntry getAllowedPermissions() {
-		return allowedPermissions;
-	}
+    public GUIAccessControlEntry getAllowedPermissions() {
+        return allowedPermissions;
+    }
 
-	public void setAllowedPermissions(GUIAccessControlEntry allowedPermissions) {
-		this.allowedPermissions = allowedPermissions;
-	}
+    public void setAllowedPermissions(GUIAccessControlEntry allowedPermissions) {
+        this.allowedPermissions = allowedPermissions;
+    }
 
-	public boolean isRead() {
-		return allowedPermissions.isRead();
-	}
+    public boolean isRead() {
+        return allowedPermissions.isRead();
+    }
 
-	public boolean isWrite() {
-		return allowedPermissions.isWrite();
-	}
+    public boolean isWrite() {
+        return allowedPermissions.isWrite();
+    }
+
+    public GUIAccessControlEntry getAce(long entityId) {
+        for (GUIAccessControlEntry acl : accessControlList) {
+            if (acl.getEntityId() == entityId)
+                return acl;
+        }
+        return null;
+    }
+
+    public void removeAce(long entityId) {
+        List<GUIAccessControlEntry> newAce = new ArrayList<>();
+        for (GUIAccessControlEntry ace : accessControlList) {
+            if (ace.getEntityId() != entityId)
+                newAce.add(ace);
+        }
+        accessControlList = newAce;
+    }
+
+    public void addAce(GUIAccessControlEntry ace) {
+        GUIAccessControlEntry existingAce = getAce(ace.getEntityId());
+        if (existingAce == null) {
+            accessControlList.add(ace);
+        } else {
+            existingAce.setRead(ace.isRead());
+            existingAce.setWrite(ace.isWrite());
+        }
+    }
 }
