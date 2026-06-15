@@ -20,108 +20,110 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 @RemoteServiceRelativePath("autofill")
 public interface AutofillService extends RemoteService {
 
-	/**
-	 * Deletes some fillers
-	 * 
-	 * @param fillerId identifiers of the fillers
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteFillers(List<Long> fillerId) throws ServerException;
+    /**
+     * Deletes some fillers
+     * 
+     * @param fillerId identifiers of the fillers
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteFillers(List<Long> fillerId) throws ServerException;
 
-	/**
-	 * Creates or updates a filler
-	 * 
-	 * @param filler the filler to save
-	 * 
-	 * @return the saved filler
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIFiller saveFiller(GUIFiller filler) throws ServerException;
+    /**
+     * Creates or updates a filler
+     * 
+     * @param filler the filler to save
+     * 
+     * @return the saved filler
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIFiller saveFiller(GUIFiller filler) throws ServerException;
 
-	/**
-	 * Retrieves a filler from the data layer
-	 * 
-	 * @param fillerId identifier of the filler
-	 * 
-	 * @return the filler
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIFiller getFiller(long fillerId) throws ServerException;
+    /**
+     * Retrieves a filler from the data layer
+     * 
+     * @param fillerId identifier of the filler
+     * 
+     * @return the filler
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIFiller getFiller(long fillerId) throws ServerException;
 
-	/**
-	 * Fills the tags
-	 * 
-	 * @param document The document to process
-	 * 
-	 * @return the same document with proposed tags
-	 * 
-	 * @throws ServerException Error in server application
-	 */
-	public GUIDocument fillTags(GUIDocument document) throws ServerException;
+    /**
+     * Fills the tags
+     * 
+     * @param document The document to process
+     * 
+     * @return the same document with proposed tags
+     * 
+     * @throws ServerException Error in server application
+     */
+    public GUIDocument fillTags(GUIDocument document) throws ServerException;
 
-	/**
-	 * Fills the language
-	 * 
-	 * @param document The document to process
-	 * 
-	 * @return the same document with proposed language
-	 * 
-	 * @throws ServerException Error in server application
-	 */
-	public GUIDocument fillLanguage(GUIDocument document) throws ServerException;
+    /**
+     * Fills the language
+     * 
+     * @param document The document to process
+     * 
+     * @return the same document with proposed language
+     * 
+     * @throws ServerException Error in server application
+     */
+    public GUIDocument fillLanguage(GUIDocument document) throws ServerException;
 
-	/**
-	 * Fills the template
-	 * 
-	 * @param document The document to process
-	 * 
-	 * @return the same document with proposed template
-	 * 
-	 * @throws ServerException Error in server application
-	 */
-	public GUIDocument fillTemplate(GUIDocument document) throws ServerException;
+    /**
+     * Fills the template
+     * 
+     * @param document The document to process
+     * 
+     * @return the same document with proposed template
+     * 
+     * @throws ServerException Error in server application
+     */
+    public GUIDocument fillTemplate(GUIDocument document) throws ServerException;
 
-	/**
-	 * Fills using a specified filler
-	 * 
-	 * @param document The document to process
-	 * @param fillerId Identifier of the filler to use
-	 * 
-	 * @return the same document with proposed metadat
-	 * 
-	 * @throws ServerException Error in server application
-	 */
-	public GUIDocument fill(GUIDocument document, long fillerId) throws ServerException;
+    /**
+     * Fills using a specified filler
+     * 
+     * @param document The document to process
+     * @param fillerId Identifier of the filler to use
+     * @param explain if true, the elaboration plan gets illustrated in the
+     *        'summary' field of the document
+     * 
+     * @return the same document with proposed metadat
+     * 
+     * @throws ServerException Error in server application
+     */
+    public GUIDocument fill(GUIDocument document, long fillerId, boolean explain) throws ServerException;
 
-	/**
-	 * Tests the exclusion and inclusion regular expressions against a sample
-	 * text.
-	 *
-	 * @param sample the sample text to process
-	 * @param regex the regular expression used to process the sample
-	 * @param inclusive how regular expression must be interpreted
-	 *
-	 * @return the evaluation result
-	 *
-	 * @throws ServerException Error in server application
-	 */
-	public String testRegex(String sample, String regex, boolean inclusive) throws ServerException;
+    /**
+     * Tests the exclusion and inclusion regular expressions against a sample
+     * text.
+     *
+     * @param sample the sample text to process
+     * @param regex the regular expression used to process the sample
+     * @param inclusive how regular expression must be interpreted
+     *
+     * @return the evaluation result
+     *
+     * @throws ServerException Error in server application
+     */
+    public String testRegex(String sample, String regex, boolean inclusive) throws ServerException;
 
-	public static class Instance {
-		private static AutofillServiceAsync inst;
+    public static class Instance {
+        private static AutofillServiceAsync inst;
 
-		private Instance() {
-		}
+        private Instance() {
+        }
 
-		public static AutofillServiceAsync get() {
-			if (inst == null) {
-				inst = GWT.create(AutofillService.class);
-				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
-			}
-			return inst;
-		}
-	}
+        public static AutofillServiceAsync get() {
+            if (inst == null) {
+                inst = GWT.create(AutofillService.class);
+                ((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
+            }
+            return inst;
+        }
+    }
 }

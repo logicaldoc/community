@@ -85,6 +85,127 @@ public abstract class Filler extends PersistentObject {
     @Column(name = "ld_automation", nullable = true)
     protected String automation;
 
+    private static String EXPLICATION_TOP = """
+            <html>
+            <header>
+              <style>
+                body {
+                  font-family: arial;
+                  font-size: 0.9rem;
+                }
+                
+                th {
+                 white-space: nowrap; 
+                 text-align: left; 
+                 background-color: WhiteSmoke;
+                 vertical-align: middle; 
+                 height: 1px;
+                }
+                
+                th.title {
+                 background-color: RoyalBlue;
+                 color: White;
+                 font-weight: bold;
+                }
+                
+                .accordion {
+                  background-color: #eee;
+                  color: #444;
+                  cursor: pointer;
+                  padding: 8px;
+                  width: 100\u0025;
+                  border: none;
+                  text-align: left;
+                  outline: none;
+                  font-size: 15px;
+                  transition: 0.4s;
+                }
+                
+                .active, .accordion:hover {
+                  background-color: #ccc; 
+                }
+                
+                .panel {
+                  padding: 0 18px;
+                  display: none;
+                  background-color: white;
+                  overflow: hidden;
+                }    
+                
+                    
+          /* Thumbnail */
+          .thumb {
+            max-width: 300px;
+            cursor: pointer;
+          }
+
+          /* Lightbox overlay (hidden by default) */
+          .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+          }
+
+          /* Show when targeted */
+          .lightbox:target {
+            display: flex;
+          }
+
+          .lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            box-shadow: 0 0 20px #000;
+          }
+
+          /* Click anywhere to close */
+          .lightbox-close {
+            position: fixed;
+            inset: 0;
+          }
+                            
+              </style>
+            </header>
+            <body>
+        """;
+
+    private static String EXPLICATION_BOTTOM = """        
+                <script>
+                    var acc = document.getElementsByClassName("accordion");
+                    var i;
+                    
+                    for (i = 0; i < acc.length; i++) {
+                      acc[i].addEventListener("click", function() {
+                        this.classList.toggle("active");
+                        var panel = this.nextElementSibling;
+                        if (panel.style.display === "block") {
+                          panel.style.display = "none";
+                        } else {
+                          panel.style.display = "block";
+                        }
+                      });
+                    }
+                </script>       
+            </body>
+        </html>
+        """;
+
+    protected static String FILLER_EXPLICATION_TOP = """
+        <table align='left' border='1' width='100%%'>
+            <thead>
+               <tr>
+                 <th class='title'>%s &nbsp;&nbsp; <small><em>%s</em></small></th>
+               </tr>
+            </thead>
+            <tbody>
+            <tr><td>
+        """;
+
+    protected static String FILLER_EXPLICATION_BOTTOM = "</td></tr></tbody></table>";
+
     public String getName() {
         return name;
     }
@@ -133,6 +254,10 @@ public abstract class Filler extends PersistentObject {
         this.automation = automation;
     }
 
+    protected String getExplicationSubtitle() {
+        return "";
+    }
+    
     /**
      * Factory method for instantiating a new filler
      * 
@@ -209,7 +334,17 @@ public abstract class Filler extends PersistentObject {
             StringBuilder explication)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
 
+        if (explication != null) {
+            explication.append(EXPLICATION_TOP);
+            explication.append(FILLER_EXPLICATION_TOP.formatted(this.getClass().getSimpleName(), getExplicationSubtitle()));
+        }
+
         String value = fillDocument(document, content, transaction, dictionary, explication);
+
+        if (explication != null) {
+            explication.append(FILLER_EXPLICATION_BOTTOM);
+            explication.append(EXPLICATION_BOTTOM);
+        }
 
         if (transaction != null && document.isModified()) {
             DocumentHistory fillHistory = new DocumentHistory(transaction);

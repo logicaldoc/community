@@ -126,6 +126,13 @@ public class WindowUtils {
 	public static native void openUrl(String url, String window, String specs)/*-{
 		$wnd.open(url, window, specs);
 	}-*/;
+	
+	public static native void openHTML(String html, String window, String specs)/*-{
+        var win = $wnd.open("", window, specs);
+        win.document.open();
+        win.document.write(html);
+        win.document.close();    
+    }-*/;
 
 	public static native void focus()/*-{
 		$wnd.focus();

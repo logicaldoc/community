@@ -232,7 +232,7 @@ public class FillerProperties extends FillerDetailsTab {
 		candidate.addChangedHandler(changedHandler);
 
 		// Name of attribute to fill
-		SelectItem attribute = ItemFactory.newAttributeSelector();
+		SelectItem attribute = ItemFactory.newAttributeSelectorForFiller();
 		attribute.setValue(filler.getAttribute());
 		attribute.addChangedHandler(changedHandler);
 

@@ -607,7 +607,7 @@ public class ItemFactory {
         densitySelector.setValueMap(opts);
         densitySelector.setName("density");
         densitySelector.setTitle(I18N.message("uidensity"));
-		densitySelector.setWrapTitle(false);
+        densitySelector.setWrapTitle(false);
 
         densitySelector.setValue(Session.get().getConfig("gui.density"));
 
@@ -2192,10 +2192,10 @@ public class ItemFactory {
     }
 
     public static SelectItem newAttributesSelector(String context) {
-        return newAttributesSelector(context, false);
+        return newAttributesSelector(context, false, false);
     }
 
-    public static SelectItem newAttributesSelector(String context, boolean sections) {
+    public static SelectItem newAttributesSelector(String context, boolean sections, boolean extOnly) {
         final SelectItem selectItem = new SelectItem("attributes", I18N.message("attributes"));
         selectItem.setMultiple(true);
         selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
@@ -2217,11 +2217,11 @@ public class ItemFactory {
     }
 
     public static SelectItem newAttributesSelector(boolean sections) {
-        return newAttributesSelector(null, sections);
+        return newAttributesSelector(null, sections, false);
     }
 
-    public static SelectItem newAttributeSelector() {
-        final SelectItem selectItem = newAttributesSelector(false);
+    public static SelectItem newAttributeSelectorForFiller() {
+        final SelectItem selectItem = newAttributesSelector("filler", false, true);
         selectItem.setMultiple(false);
         selectItem.setName("attribute");
         selectItem.setTitle(I18N.message("attribute"));
@@ -2563,7 +2563,6 @@ public class ItemFactory {
     public static FloatItem newFloatItem(String name, Float value) {
         return newFloatItem(name, name, value);
     }
-    
 
     /**
      * Creates a new FloatItem for the Extended AttributesDS.
@@ -2775,8 +2774,8 @@ public class ItemFactory {
         if (!enabledOnly
                 || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + DOT_ENABLED))
             map.put(Constants.TWOFA_EMAIL_AUTHENTICATOR, "Email");
-        if (!enabledOnly
-                || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_WHATSAPP_AUTHENTICATOR + DOT_ENABLED))
+        if (!enabledOnly || Session.get()
+                .getTenantConfigAsBoolean("2fa." + Constants.TWOFA_WHATSAPP_AUTHENTICATOR + DOT_ENABLED))
             map.put(Constants.TWOFA_WHATSAPP_AUTHENTICATOR, "Whatsapp");
         if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_DUO + DOT_ENABLED))
             map.put(Constants.TWOFA_DUO, "Duo");

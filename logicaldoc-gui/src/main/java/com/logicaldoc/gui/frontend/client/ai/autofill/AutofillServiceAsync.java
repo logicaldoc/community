@@ -19,7 +19,7 @@ public interface AutofillServiceAsync {
 
 	void fillTemplate(GUIDocument document, AsyncCallback<GUIDocument> callback);
 
-	void fill(GUIDocument document, long fillerId, AsyncCallback<GUIDocument> callback);
+	void fill(GUIDocument document, long fillerId, boolean explain, AsyncCallback<GUIDocument> callback);
 
 	void testRegex(String sample, String regex, boolean inclusive, AsyncCallback<String> callback);
 }

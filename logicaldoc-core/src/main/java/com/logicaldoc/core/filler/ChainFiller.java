@@ -42,84 +42,88 @@ import jakarta.persistence.OrderColumn;
 @Cacheable
 public class ChainFiller extends Filler {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(ChainFiller.class);
+    private static final Logger log = LoggerFactory.getLogger(ChainFiller.class);
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@JoinTable(name = "ld_filler_chain", joinColumns = @JoinColumn(name = "ld_fillerid"), inverseJoinColumns = @JoinColumn(name = "ld_chainedid"))
-	@OrderColumn(name = "ld_position")
-	private List<Filler> chain = new ArrayList<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @JoinTable(name = "ld_filler_chain", joinColumns = @JoinColumn(name = "ld_fillerid"), inverseJoinColumns = @JoinColumn(name = "ld_chainedid"))
+    @OrderColumn(name = "ld_position")
+    private List<Filler> chain = new ArrayList<>();
 
-	public List<Filler> getChain() {
-		return chain;
-	}
+    public List<Filler> getChain() {
+        return chain;
+    }
 
-	public void setChain(List<Filler> chain) {
-		this.chain = chain;
-	}
+    public void setChain(List<Filler> chain) {
+        this.chain = chain;
+    }
 
-	@Override
+    @Override
     protected String fillDocument(Document document, String content, History transaction,
-            Map<String, Object> dictionary,
-            StringBuilder explication)
-			throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
+            Map<String, Object> dictionary, StringBuilder explication)
+            throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
 
-		if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
-			return null;
+        if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+            return null;
 
-		if (transaction == null) {
-			log.warn("Skipping filler chain: transaction is null");
-			return null;
-		}
+        if (transaction == null) {
+            log.warn("Skipping filler chain: transaction is null");
+            return null;
+        }
 
-		if (chain == null || chain.isEmpty())
-			return null;
+        if (chain == null || chain.isEmpty())
+            return null;
 
-		Map<String, Object> pipelineDict = MapUtils.isNotEmpty(dictionary) ? new HashMap<>(dictionary)
-				: new HashMap<>();
+        Map<String, Object> pipelineDict = MapUtils.isNotEmpty(dictionary) ? new HashMap<>(dictionary)
+                : new HashMap<>();
 
+        List<String> extractions = new ArrayList<>();
+        for (Filler filler : chain) {
+            if (filler == null)
+                continue;
 
-		List<String> extractions = new ArrayList<>();
-		for (Filler filler : chain) {
-			if (filler == null)
-				continue;
+            if (log.isDebugEnabled())
+                log.debug("Invoking filler {}", filler.getClass().getSimpleName());
 
-			if (log.isDebugEnabled())
-				log.debug("Invoking filler {}", filler.getClass().getSimpleName());
+            if (explication != null)
+                explication.append(FILLER_EXPLICATION_TOP.formatted(filler.getClass().getSimpleName(), filler.getExplicationSubtitle()));
 
-			String extraction = filler.fillDocument(document, content, transaction, pipelineDict, explication);
-			if (log.isDebugEnabled())
+            String extraction = filler.fillDocument(document, content, transaction, pipelineDict, explication);
+            if (log.isDebugEnabled())
                 log.debug("Filler {} extracted {}", filler.getClass().getSimpleName(), extraction);
-			if(StringUtils.isNotEmpty(extraction))
-			    extractions.add("%s > %s".formatted(filler.getClass().getSimpleName(), extraction));
-		}
-		
-		return StringUtils.defaultIfEmpty(extractions.stream().collect(Collectors.joining(" | ")), null);
-	}
+            if (StringUtils.isNotEmpty(extraction))
+                extractions.add("%s > %s".formatted(filler.getClass().getSimpleName(), extraction));
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((chain == null) ? 0 : chain.hashCode());
-		return result;
-	}
+            if (explication != null)
+                explication.append(FILLER_EXPLICATION_BOTTOM);
+        }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ChainFiller other = (ChainFiller) obj;
-		if (chain == null) {
-			if (other.chain != null)
-				return false;
-		} else if (!chain.equals(other.chain))
-			return false;
-		return true;
-	}
+        return StringUtils.defaultIfEmpty(extractions.stream().collect(Collectors.joining(" | ")), null);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((chain == null) ? 0 : chain.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ChainFiller other = (ChainFiller) obj;
+        if (chain == null) {
+            if (other.chain != null)
+                return false;
+        } else if (!chain.equals(other.chain))
+            return false;
+        return true;
+    }
 }

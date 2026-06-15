@@ -81,7 +81,7 @@ public class ResponsesStatsPanel extends VLayout {
 		grid.setCanDrag(false);
 		grid.setWidth100();
 
-		grid.setDataSource(new AttributesDS(form.getTemplateId(), null, false));
+		grid.setDataSource(new AttributesDS(form.getTemplateId(), null, false, false));
 
 		DetailViewerField chart = new DetailViewerField("name");
 		chart.setDetailFormatter((value, rec, field) -> {

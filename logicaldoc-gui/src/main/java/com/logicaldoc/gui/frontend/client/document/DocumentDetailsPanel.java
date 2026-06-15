@@ -96,7 +96,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
     protected PublishingPanel retentionPoliciesPanel;
 
-    protected DocumentCapturePanel capturePanel;
+    protected CapturePanel capturePanel;
 
     protected DocumentSecurityPanel securityPanel;
 
@@ -409,7 +409,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
                 captureTabPanel.removeMember(capturePanel);
         }
         try {
-            capturePanel = new DocumentCapturePanel(document, changeHandler, true);
+            capturePanel = new CapturePanel(document, changeHandler, true);
             captureTabPanel.addMember(capturePanel);
         } catch (Exception t) {
             // Nothing to do
