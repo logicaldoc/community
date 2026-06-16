@@ -18,7 +18,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -141,11 +140,11 @@ public class DocumentCapturePanel extends DocumentDetailTab {
             explainFill.setDisabled(changed.getValue() == null);
         });
 
-        CheckboxItem fillOnCheckin = ItemFactory.newCheckbox("filloncheckin");
-        fillOnCheckin.setWrapTitle(false);
-        fillOnCheckin.setDisabled(!updateEnabled || !Feature.enabled(Feature.AUTOFILL));
-        fillOnCheckin.setValue(document.isFillOnCheckin());
-        fillOnCheckin.addChangedHandler(changedHandler);
+        SelectItem fillMode = ItemFactory.newFillModeSelector();
+        fillMode.setWrapTitle(false);
+        fillMode.setDisabled(!updateEnabled || !Feature.enabled(Feature.AUTOFILL));
+        fillMode.setValue(document.getFillMode());
+        fillMode.addChangedHandler(changedHandler);
 
         fill.addClickHandler(event -> {
             LD.contactingServer();
@@ -181,9 +180,9 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 
         if (processButton)
             form.setItems(ocrTemplate, ocrProcessed, processOcr, barcodeTemplate, barcodeProcessed, processBarcode,
-                    filler, fillOnCheckin, fill, explainFill);
+                    filler, fillMode, fill, explainFill);
         else
-            form.setItems(ocrTemplate, barcodeTemplate, filler, fillOnCheckin);
+            form.setItems(ocrTemplate, barcodeTemplate, filler, fillMode);
 
         addMember(form);
     }
@@ -211,7 +210,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
             else {
                 document.setFillerId(Long.parseLong(values.get(FILLER).toString()));
             }
-            document.setFillOnCheckin(Boolean.parseBoolean(values.get("filloncheckin").toString()));
+            document.setFillMode(Integer.parseInt(values.get("fillmode").toString()));
         }
         return !vm.hasErrors();
     }

@@ -894,7 +894,7 @@ public class DocumentManager {
         else
             document.setFilled(docVO.isFilled());
         document.setFillerId(docVO.getFillerId());
-        document.setFillOnCheckin(docVO.getFillOnCheckin());
+        document.setFillMode(docVO.getFillMode());
     }
 
     private DocumentHistory checkDocumentRenamed(Document document, Document docVO, DocumentHistory transaction) {

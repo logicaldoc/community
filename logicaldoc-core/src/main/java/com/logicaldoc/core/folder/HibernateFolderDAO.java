@@ -2231,7 +2231,7 @@ SELECT COUNT(*) from ld_document D, ld_folder F
             folder.setOcrTemplateId(parent.getOcrTemplateId());
             folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
             folder.setFillerId(parent.getFillerId());
-            folder.setFillOnCheckin(parent.getFillOnCheckin());
+            folder.setFillMode(parent.getFillMode());
 
             FolderHistory tr = new FolderHistory(transaction);
             tr.setFolderId(folder.getId());

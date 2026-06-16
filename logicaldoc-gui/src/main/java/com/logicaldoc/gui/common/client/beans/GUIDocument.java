@@ -147,8 +147,8 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
      * Identifier of the Filler to be used by the autofill
      */
     private Long fillerId = null;
-    
-    private boolean fillOnCheckin = true;
+
+    private int fillMode = 0;
 
     private boolean filled = false;
 
@@ -163,20 +163,19 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
      */
     private boolean bulkUpdate = false;
 
-    
     private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
 
     /**
      * Permissions granted to the current user on this document
      */
     private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
-    
-    public boolean isFillOnCheckin() {
-        return fillOnCheckin;
+
+    public int getFillMode() {
+        return fillMode;
     }
 
-    public void setFillOnCheckin(boolean fillOnCheckin) {
-        this.fillOnCheckin = fillOnCheckin;
+    public void setFillMode(int fillMode) {
+        this.fillMode = fillMode;
     }
 
     public boolean isFilled() {

@@ -32,154 +32,154 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class DocumentsUploader extends Window {
 
-	private static final String CHARSET = "charset";
+    private static final String CHARSET = "charset";
 
-	private IButton submitButton;
+    private IButton submitButton;
 
-	private ValuesManager vm;
+    private ValuesManager vm;
 
-	private boolean zipImport = true;
+    private boolean zipImport = true;
 
-	private DynamicForm form;
+    private DynamicForm form;
 
-	private MultipleUpload uploader;
+    private MultipleUpload uploader;
 
-	public DocumentsUploader() {
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("adddocuments"));
-		setCanDragResize(true);
-		setIsModal(true);
-		setShowModalMask(true);
-		centerInPage();
-		setMinWidth(480);
-		setAutoSize(true);
+    public DocumentsUploader() {
+        setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+        setTitle(I18N.message("adddocuments"));
+        setCanDragResize(true);
+        setIsModal(true);
+        setShowModalMask(true);
+        centerInPage();
+        setMinWidth(480);
+        setAutoSize(true);
 
-		submitButton = new IButton(I18N.message("submit"));
-		submitButton.addClickHandler(event -> onSubmit());
-		submitButton.setDisabled(true);
+        submitButton = new IButton(I18N.message("submit"));
+        submitButton.addClickHandler(event -> onSubmit());
+        submitButton.setDisabled(true);
 
-		prepareForm();
+        prepareForm();
 
-		VLayout layout = new VLayout();
-		layout.setMembersMargin(5);
-		layout.setWidth100();
+        VLayout layout = new VLayout();
+        layout.setMembersMargin(5);
+        layout.setWidth100();
 
-		layout.addMember(form);
+        layout.addMember(form);
 
-		uploader = new MultipleUpload(submitButton);
-		layout.addMember(uploader);
-		layout.addMember(submitButton);
+        uploader = new MultipleUpload(submitButton);
+        layout.addMember(uploader);
+        layout.addMember(submitButton);
 
-		// Clean the upload folder if the window is closed
-		addCloseClickHandler(
-				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						destroy();
-					}
-				}));
+        // Clean the upload folder if the window is closed
+        addCloseClickHandler(
+                event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        destroy();
+                    }
+                }));
 
-		addItem(layout);
+        addItem(layout);
 
-		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
-	}
+        // Just to clean the upload folder
+        DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
+    }
 
-	private void prepareForm() {
-		form = new DynamicForm();
-		form.setWidth100();
-		form.setAlign(Alignment.LEFT);
-		form.setColWidths("1px, 100%");
-		vm = new ValuesManager();
-		form.setValuesManager(vm);
+    private void prepareForm() {
+        form = new DynamicForm();
+        form.setWidth100();
+        form.setAlign(Alignment.LEFT);
+        form.setColWidths("1px, 100%");
+        vm = new ValuesManager();
+        form.setValuesManager(vm);
 
-		final StaticTextItem fileNameWaring = ItemFactory.newStaticTextItem("fileNameWarning",
-				I18N.message("attention"), I18N.message("filenamewarning"));
-		fileNameWaring.setRequired(true);
+        final StaticTextItem fileNameWaring = ItemFactory.newStaticTextItem("fileNameWarning",
+                I18N.message("attention"), I18N.message("filenamewarning"));
+        fileNameWaring.setRequired(true);
 
-		final SelectItem charset = ItemFactory.newCharsetSelector(CHARSET);
-		charset.setValue(Session.get().getConfig(CHARSET) != null ? Session.get().getConfig(CHARSET) : "UTF-8");
-		charset.setHidden(true);
+        final SelectItem charset = ItemFactory.newCharsetSelector(CHARSET);
+        charset.setValue(Session.get().getConfig(CHARSET) != null ? Session.get().getConfig(CHARSET) : "UTF-8");
+        charset.setHidden(true);
 
-		final CheckboxItem zipItem = new CheckboxItem();
-		zipItem.setName("zip");
-		zipItem.setTitle(I18N.message("importfromzip"));
-		zipItem.setValue(!zipImport);
-		zipItem.setTitleAlign(Alignment.LEFT);
-		zipItem.addChangedHandler(event -> {
-			if (Boolean.TRUE.equals(event.getValue()))
-				charset.show();
-			else
-				charset.hide();
-		});
+        final CheckboxItem zipItem = new CheckboxItem();
+        zipItem.setName("zip");
+        zipItem.setTitle(I18N.message("importfromzip"));
+        zipItem.setValue(!zipImport);
+        zipItem.setTitleAlign(Alignment.LEFT);
+        zipItem.addChangedHandler(event -> {
+            if (Boolean.TRUE.equals(event.getValue()))
+                charset.show();
+            else
+                charset.hide();
+        });
 
-		final CheckboxItem immediateIndexing = new CheckboxItem();
-		immediateIndexing.setName("immediateIndexing");
-		immediateIndexing.setTitle(I18N.message("immediateindexing"));
-		immediateIndexing.setValue(false);
-		immediateIndexing.setTitleAlign(Alignment.LEFT);
+        final CheckboxItem immediateIndexing = new CheckboxItem();
+        immediateIndexing.setName("immediateIndexing");
+        immediateIndexing.setTitle(I18N.message("immediateindexing"));
+        immediateIndexing.setValue(false);
+        immediateIndexing.setTitleAlign(Alignment.LEFT);
 
-		if (!FolderController.get().getCurrentFolder().hasPermission(GUIAccessControlEntry.PERMISSION_IMPORT)) {
-			zipItem.setDisabled(true);
-			zipItem.setValue(false);
-		}
+        if (!FolderController.get().getCurrentFolder().hasPermission(GUIAccessControlEntry.PERMISSION_IMPORT)) {
+            zipItem.setDisabled(true);
+            zipItem.setValue(false);
+        }
 
-		zipItem.addChangeHandler(event -> zipImport = !zipImport);
+        zipItem.addChangeHandler(event -> zipImport = !zipImport);
 
-		form.setItems(zipItem, charset, immediateIndexing, fileNameWaring);
-	}
+        form.setItems(zipItem, charset, immediateIndexing, fileNameWaring);
+    }
 
-	public void onSubmit() {
-		if (Boolean.FALSE.equals(vm.validate()))
-			return;
+    public void onSubmit() {
+        if (Boolean.FALSE.equals(vm.validate()))
+            return;
 
-		if (uploader.getUploadedFiles().isEmpty()) {
-			SC.warn(I18N.message("filerequired"));
-			return;
-		}
+        if (uploader.getUploadedFiles().isEmpty()) {
+            SC.warn(I18N.message("filerequired"));
+            return;
+        }
 
-		GUIFolder folder = FolderController.get().getCurrentFolder();
-		GUIDocument metadata = new GUIDocument();
-		metadata.setFolder(folder);
-		metadata.setLanguage(I18N.getDefaultLocaleForDoc());
-		metadata.setTemplateId(folder.getTemplateId());
-		metadata.setTemplate(folder.getTemplate());
-		metadata.setAttributes(folder.getAttributes());
-		metadata.setTags(folder.getTags());
-		metadata.setOcrTemplateId(folder.getOcrTemplateId());
-		metadata.setBarcodeTemplateId(folder.getBarcodeTemplateId());
-		metadata.setFillerId(folder.getFillerId());
-		metadata.setFillOnCheckin(folder.isFillOnCheckin());
+        GUIFolder folder = FolderController.get().getCurrentFolder();
+        GUIDocument metadata = new GUIDocument();
+        metadata.setFolder(folder);
+        metadata.setLanguage(I18N.getDefaultLocaleForDoc());
+        metadata.setTemplateId(folder.getTemplateId());
+        metadata.setTemplate(folder.getTemplate());
+        metadata.setAttributes(folder.getAttributes());
+        metadata.setTags(folder.getTags());
+        metadata.setOcrTemplateId(folder.getOcrTemplateId());
+        metadata.setBarcodeTemplateId(folder.getBarcodeTemplateId());
+        metadata.setFillerId(folder.getFillerId());
+        metadata.setFillMode(folder.getFillMode());
 
-		UpdateDialog bulk = new UpdateDialog(null, metadata, UpdateDialog.CONTEXT_UPLOAD, false,
-				vm.getValueAsString(CHARSET));
-		bulk.setZip(getImportZip());
-		bulk.setCharset(getCharset());
-		bulk.setImmediateIndexing(getImmediateIndexing());
-		bulk.show();
+        UpdateDialog bulk = new UpdateDialog(null, metadata, UpdateDialog.CONTEXT_UPLOAD, false,
+                vm.getValueAsString(CHARSET));
+        bulk.setZip(getImportZip());
+        bulk.setCharset(getCharset());
+        bulk.setImmediateIndexing(getImmediateIndexing());
+        bulk.show();
 
-		destroy();
-	}
+        destroy();
+    }
 
-	public String getCharset() {
-		return vm.getValueAsString(CHARSET);
-	}
+    public String getCharset() {
+        return vm.getValueAsString(CHARSET);
+    }
 
-	public boolean getImportZip() {
-		return Boolean.valueOf(vm.getValueAsString("zip"));
-	}
+    public boolean getImportZip() {
+        return Boolean.valueOf(vm.getValueAsString("zip"));
+    }
 
-	public boolean getImmediateIndexing() {
-		return Boolean.valueOf(vm.getValueAsString("immediateIndexing"));
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    public boolean getImmediateIndexing() {
+        return Boolean.valueOf(vm.getValueAsString("immediateIndexing"));
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

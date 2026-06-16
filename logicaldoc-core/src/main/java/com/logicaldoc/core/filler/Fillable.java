@@ -3,6 +3,8 @@ package com.logicaldoc.core.filler;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 
 /**
@@ -24,12 +26,16 @@ public abstract class Fillable extends ExtensibleObject {
     @Column(name = "ld_fillerid", nullable = true)
     protected Long fillerId;
 
+    public enum FillMode {
+        ALL, IMMEDIATE, DEFERRED;
+    }
+    
     /**
-     * Indicates id the object should be filled when created and each time it
-     * gets checked-in or if it must be filled by the task Autofiller only.
+     * Indicates id the object should be filled by listener, by task or both
      */
-    @Column(name = "ld_filloncheckin", nullable = true)
-    protected Boolean fillOnCheckin = true;
+    @Column(name = "ld_fillmode", nullable = true)
+    @Enumerated(EnumType.ORDINAL)
+    protected FillMode fillMode = FillMode.ALL;
 
     public Long getFillerId() {
         return fillerId;
@@ -39,12 +45,12 @@ public abstract class Fillable extends ExtensibleObject {
         this.fillerId = fillerId;
     }
 
-    public Boolean getFillOnCheckin() {
-        return fillOnCheckin;
+    public FillMode getFillMode() {
+        return fillMode;
     }
 
-    public void setFillOnCheckin(Boolean fillOnCheckin) {
-        this.fillOnCheckin = fillOnCheckin;
+    public void setFillMode(FillMode fillMode) {
+        this.fillMode = fillMode;
     }
 
     @Override

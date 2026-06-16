@@ -108,18 +108,17 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
      */
     private Long fillerId = null;
 
-    private boolean fillOnCheckin = true;
+    private int fillMode = 0;
 
     public GUIFolder() {
 
     }
-
-    public boolean isFillOnCheckin() {
-        return fillOnCheckin;
+    public int getFillMode() {
+        return fillMode;
     }
 
-    public void setFillOnCheckin(boolean fillOnCheckin) {
-        this.fillOnCheckin = fillOnCheckin;
+    public void setFillMode(int fillMode) {
+        this.fillMode = fillMode;
     }
 
     public boolean isWorkspace() {

@@ -943,7 +943,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
         setTemplateId(docVO.getTemplateId());
         setTemplateName(docVO.getTemplateName());
         setFillerId(docVO.getFillerId());
-        setFillOnCheckin(docVO.getFillOnCheckin());
+        setFillMode(docVO.getFillMode());
 
         setAttributes(new HashMap<>());
         try {

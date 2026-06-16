@@ -27,9 +27,9 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
-    private static final String FILLER = "filler";
+    private static final String FILLMODE = "fillmode";
 
-    private static final String FILLONCHECKIN = "filloncheckin";
+    private static final String FILLER = "filler";
 
     private static final String PREVENTDUPLICATIONS = "preventduplications";
 
@@ -168,13 +168,12 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
         filler.setDisabled(!Feature.enabled(Feature.AUTOFILL));
         filler.addChangedHandler(changedHandler);
 
-        SelectItem fillOnCheckin = ItemFactory.newBooleanDropDown(FILLONCHECKIN);
-        if (importFolder.getFillOnCheckin() != null)
-            fillOnCheckin.setValue(importFolder.getFillOnCheckin() ? "yes" : "no");
-        fillOnCheckin.setDisabled(!Feature.enabled(Feature.AUTOFILL));
-        fillOnCheckin.addChangedHandler(changedHandler);
+        SelectItem fillMode = ItemFactory.newFillModeSelector(true);
+        fillMode.setWrapTitle(false);
+        fillMode.setValue(importFolder.getFillMode());
+        fillMode.addChangedHandler(changedHandler);
 
-        form.setItems(depth, size, startDate, template, ocrTemplate, barcodeTemplate, filler, fillOnCheckin, tags,
+        form.setItems(depth, size, startDate, template, ocrTemplate, barcodeTemplate, filler, fillMode, tags,
                 updatePolicy, importEmpty, preventDuplications, inheritRights, delImport);
 
         formsContainer.addMember(form);
@@ -231,10 +230,10 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
             importFolder.setFillerId(null);
         else
             importFolder.setFillerId(Long.parseLong(form.getValueAsString(FILLER)));
-        if (form.getValue(FILLONCHECKIN) == null || "".equals(form.getValueAsString(FILLONCHECKIN)))
-            importFolder.setFillOnCheckin(null);
+        if (form.getValue(FILLMODE) == null || "".equals(form.getValueAsString(FILLMODE)))
+            importFolder.setFillMode(null);
         else
-            importFolder.setFillOnCheckin("yes".equals(form.getValueAsString(FILLONCHECKIN)));
+            importFolder.setFillMode(Integer.parseInt(form.getValueAsString(FILLMODE)));
     }
 
     private void collectSizeMax() {

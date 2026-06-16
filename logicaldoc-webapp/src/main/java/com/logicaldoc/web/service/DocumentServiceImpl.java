@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -77,6 +76,7 @@ import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
+import com.logicaldoc.core.filler.Fillable.FillMode;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
@@ -880,7 +880,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         guiDocument.setBarcoded(realDoc.isBarcoded());
         guiDocument.setBarcodeTemplateId(realDoc.getBarcodeTemplateId());
         guiDocument.setFillerId(realDoc.getFillerId());
-        guiDocument.setFillOnCheckin(Optional.of(realDoc.getFillOnCheckin()).orElse(false));
+        guiDocument.setFillMode(realDoc.getFillMode().ordinal());
 
         if (realDoc.getRating() != null)
             guiDocument.setRating(realDoc.getRating());
@@ -1321,7 +1321,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         docVO.setOcrTemplateId(guiDocument.getOcrTemplateId());
         docVO.setBarcodeTemplateId(guiDocument.getBarcodeTemplateId());
         docVO.setFillerId(guiDocument.getFillerId());
-        docVO.setFillOnCheckin(guiDocument.isFillOnCheckin());
+        docVO.setFillMode(FillMode.values()[guiDocument.getFillMode()]);
 
         if (guiDocument.getTemplateId() != null) {
             docVO.setTemplateId(guiDocument.getTemplateId());

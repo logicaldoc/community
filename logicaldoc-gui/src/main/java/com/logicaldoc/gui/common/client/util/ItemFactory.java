@@ -1044,6 +1044,23 @@ public class ItemFactory {
         return item;
     }
 
+    public static SelectItem newFillModeSelector() {
+        return newFillModeSelector(false);
+    }
+    
+    public static SelectItem newFillModeSelector(boolean withEmpty) {
+        SelectItem item = newSelectItem("fillmode", "fillmode");
+        item.setDisabled(!Feature.enabled(Feature.AUTOFILL));
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        if (withEmpty)
+            map.put("", "");
+        map.put("0", I18N.message("all"));
+        map.put("1", I18N.message("immediate"));
+        map.put("2", I18N.message("deferred"));
+        item.setValueMap(map);
+        return item;
+    }
+
     public static RadioGroupItem newBooleanSelector(String name) {
         return newBooleanSelector(name, name);
     }

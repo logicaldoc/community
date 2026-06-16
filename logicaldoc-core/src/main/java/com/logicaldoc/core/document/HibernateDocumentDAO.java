@@ -34,6 +34,7 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.communication.EventCollector;
+import com.logicaldoc.core.filler.Fillable.FillMode;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
@@ -436,11 +437,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         /*
          * Check for Filler at folder level
          */
-        if (doc.getFillerId() == null && doc.getFolder().getFillerId() != null)
+        if (doc.getFillerId() == null)
             doc.setFillerId(doc.getFolder().getFillerId());
-        if (doc.getFillOnCheckin() == null && doc.getFolder().getFillOnCheckin() != null)
-            doc.setFillOnCheckin(doc.getFolder().getFillOnCheckin());
-        
+        if (doc.getFillMode() == null)
+            doc.setFillMode(doc.getFolder().getFillMode());
+        if (doc.getFillMode() == null)
+            doc.setFillMode(FillMode.ALL);
         
         /*
          * Check for OCR template at folder level

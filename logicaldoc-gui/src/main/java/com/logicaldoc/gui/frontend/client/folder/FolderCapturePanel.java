@@ -14,7 +14,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
@@ -90,13 +89,13 @@ public class FolderCapturePanel extends FolderDetailTab {
         filler.addChangedHandler(changedHandler);
         filler.addChangedHandler(changed -> applySubFolders.setDisabled(true));
 
-        CheckboxItem fillOnCheckin = ItemFactory.newCheckbox("filloncheckin");
-        fillOnCheckin.setWrapTitle(false);
-        fillOnCheckin.setDisabled(!Feature.enabled(Feature.AUTOFILL));
-        fillOnCheckin.setValue(folder.isFillOnCheckin());
-        fillOnCheckin.addChangedHandler(changedHandler);
+        SelectItem fillMode = ItemFactory.newFillModeSelector();
+        fillMode.setWrapTitle(false);
+        fillMode.setDisabled(!Feature.enabled(Feature.AUTOFILL));
+        fillMode.setValue(folder.getFillMode());
+        fillMode.addChangedHandler(changedHandler);
 
-        form.setItems(ocrTemplate, barcodeTemplate, filler, fillOnCheckin, applySubFolders);
+        form.setItems(ocrTemplate, barcodeTemplate, filler, fillMode, applySubFolders);
         addMember(form);
     }
 
@@ -123,7 +122,7 @@ public class FolderCapturePanel extends FolderDetailTab {
             else {
                 folder.setFillerId(Long.parseLong(values.get(FILLER).toString()));
             }
-            folder.setFillOnCheckin(Boolean.parseBoolean(values.get("filloncheckin").toString()));
+            folder.setFillMode(Integer.parseInt(values.get("fillmode").toString()));
         }
         return !vm.hasErrors();
     }

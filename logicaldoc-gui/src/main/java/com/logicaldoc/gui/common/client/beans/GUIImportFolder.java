@@ -89,9 +89,9 @@ public class GUIImportFolder implements Serializable {
 
     private String automationEnd;
 
-    protected Long fillerId;
+    private Long fillerId;
 
-    protected Boolean fillOnCheckin;
+    private Integer fillMode;
 
     public GUIImportFolder() {
         super();
@@ -105,12 +105,12 @@ public class GUIImportFolder implements Serializable {
         this.fillerId = fillerId;
     }
 
-    public Boolean getFillOnCheckin() {
-        return fillOnCheckin;
+    public Integer getFillMode() {
+        return fillMode;
     }
 
-    public void setFillOnCheckin(Boolean fillOnCheckin) {
-        this.fillOnCheckin = fillOnCheckin;
+    public void setFillMode(Integer fillMode) {
+        this.fillMode = fillMode;
     }
 
     public long getId() {
