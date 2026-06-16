@@ -438,7 +438,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
          */
         if (doc.getFillerId() == null && doc.getFolder().getFillerId() != null)
             doc.setFillerId(doc.getFolder().getFillerId());
-
+        if (doc.getFillOnCheckin() == null && doc.getFolder().getFillOnCheckin() != null)
+            doc.setFillOnCheckin(doc.getFolder().getFillOnCheckin());
+        
+        
         /*
          * Check for OCR template at folder level
          */

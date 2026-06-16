@@ -147,6 +147,9 @@ public class DocumentsUploader extends Window {
 		metadata.setAttributes(folder.getAttributes());
 		metadata.setTags(folder.getTags());
 		metadata.setOcrTemplateId(folder.getOcrTemplateId());
+		metadata.setBarcodeTemplateId(folder.getBarcodeTemplateId());
+		metadata.setFillerId(folder.getFillerId());
+		metadata.setFillOnCheckin(folder.isFillOnCheckin());
 
 		UpdateDialog bulk = new UpdateDialog(null, metadata, UpdateDialog.CONTEXT_UPLOAD, false,
 				vm.getValueAsString(CHARSET));

@@ -239,10 +239,16 @@ public abstract class AbstractDocument extends Fillable implements Transactional
     private Long ocrTemplateId = null;
 
     /**
-     * Indicates if the document has been processed by the zonal OCR
+     * Indicates if the document has been processed by the Zonal OCR
      */
     @Column(name = "ld_ocrd", nullable = false)
     private boolean ocrd = false;
+
+    /**
+     * Indicates if the document has been processed by the Filler
+     */
+    @Column(name = "ld_filled", nullable = true)
+    protected boolean filled = false;
 
     @Transient
     private String decodedPassword;
@@ -262,9 +268,18 @@ public abstract class AbstractDocument extends Fillable implements Transactional
 
     protected AbstractDocument() {
         super();
+        setFilled(false);
     }
 
     public abstract long getFolderId();
+
+    public boolean isFilled() {
+        return filled;
+    }
+
+    public void setFilled(boolean filled) {
+        this.filled = filled;
+    }
 
     /**
      * The working version (the most recent version)
@@ -928,6 +943,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
         setTemplateId(docVO.getTemplateId());
         setTemplateName(docVO.getTemplateName());
         setFillerId(docVO.getFillerId());
+        setFillOnCheckin(docVO.getFillOnCheckin());
 
         setAttributes(new HashMap<>());
         try {

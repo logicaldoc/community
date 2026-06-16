@@ -212,6 +212,7 @@ public class DocumentManager {
                 document.setIndexingStatus(IndexingStatus.TO_INDEX);
             document.setOcrd(false);
             document.setBarcoded(false);
+            document.setFilled(false);
             document.setSigned(false);
             document.setStamped(false);
 
@@ -353,6 +354,7 @@ public class DocumentManager {
 
             document.setStamped(false);
             document.setSigned(false);
+            document.setFilled(false);
             document.setOcrd(false);
             document.setBarcoded(false);
 
@@ -398,6 +400,7 @@ public class DocumentManager {
                 documentDAO.initialize(document);
 
                 document.copyAttributes(oldDocument);
+                document.setFilled(oldDocument.isFilled());
                 document.setOcrd(oldDocument.isOcrd());
                 document.setOcrTemplateId(oldDocument.getOcrTemplateId());
                 document.setBarcoded(oldDocument.isBarcoded());
@@ -552,7 +555,7 @@ public class DocumentManager {
              * it into the document being saved in order to prevent ORM error
              */
             Document existingDoc = documentDAO.findById(doc.getId());
-            if (existingDoc!=null && existingDoc.getRecordVersion() != doc.getRecordVersion())
+            if (existingDoc != null && existingDoc.getRecordVersion() != doc.getRecordVersion())
                 doc.setRecordVersion(existingDoc.getRecordVersion());
             documentDAO.store(doc);
         }
@@ -859,7 +862,7 @@ public class DocumentManager {
 
             setBarcodeTemplate(document, docVO);
 
-            document.setFillerId(docVO.getFillerId());
+            setFiller(document, docVO);
 
             // create a new version
             Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
@@ -880,6 +883,18 @@ public class DocumentManager {
         } else {
             throw new PersistenceException(String.format("Document %s is immutable", document));
         }
+    }
+
+    private void setFiller(Document document, Document docVO) {
+        if ((document.getFillerId() == null && docVO.getFillerId() != null)
+                || (document.getFillerId() != null && docVO.getFillerId() == null)
+                || (document.getFillerId() == null && docVO.getFillerId() == null)
+                || !document.getFillerId().equals(docVO.getFillerId()))
+            document.setFilled(false);
+        else
+            document.setFilled(docVO.isFilled());
+        document.setFillerId(docVO.getFillerId());
+        document.setFillOnCheckin(docVO.getFillOnCheckin());
     }
 
     private DocumentHistory checkDocumentRenamed(Document document, Document docVO, DocumentHistory transaction) {
@@ -1268,6 +1283,7 @@ public class DocumentManager {
             cloned.setLinks(0);
             cloned.setOcrd(false);
             cloned.setBarcoded(false);
+            cloned.setFilled(false);
 
             if (!security)
                 cloned.getAccessControlList().clear();

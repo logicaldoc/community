@@ -1,6 +1,5 @@
 package com.logicaldoc.core.task;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -23,103 +22,102 @@ import com.logicaldoc.core.security.user.UserDAO;
  */
 public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats> implements Callable<T> {
 
-	/**
-	 * IDs of the documents in the current segment
-	 */
-	protected List<Long> docIds = new ArrayList<>();
+    /**
+     * IDs of the documents in the current segment
+     */
+    protected List<Long> docIds = new ArrayList<>();
 
-	/**
-	 * Indicates the completion of this processing
-	 */
-	protected boolean completed = false;
+    /**
+     * Indicates the completion of this processing
+     */
+    protected boolean completed = false;
 
-	/**
-	 * Indicates the request to interrupt the current elaboration
-	 */
-	protected boolean interrupt = false;
+    /**
+     * Indicates the request to interrupt the current elaboration
+     */
+    protected boolean interrupt = false;
 
-	/**
-	 * The logger to use
-	 */
-	protected Logger log;
+    /**
+     * The logger to use
+     */
+    protected Logger log;
 
-	/**
-	 * The parent task
-	 */
-	protected Task task;
+    /**
+     * The parent task
+     */
+    protected Task task;
 
-	protected T stats;
+    protected T stats;
 
-	protected DocumentProcessorCallable(List<Long> docIds, Task task, Logger log) {
-		this.docIds = docIds;
-		this.log = log;
-		this.task = task;
-		this.stats = prepareStats();
-	}
+    protected DocumentProcessorCallable(List<Long> docIds, Task task, Logger log) {
+        this.docIds = docIds;
+        this.log = log;
+        this.task = task;
+        this.stats = prepareStats();
+    }
 
-	@Override
-	public T call() throws Exception {
-		User user = loadUser();
-		DocumentDAO documentDao = DocumentDAO.get();
-		for (Long id : docIds) {
-			log.debug("Process document {}", id);
+    @Override
+    public T call() throws Exception {
+        User user = loadUser();
+        DocumentDAO documentDao = DocumentDAO.get();
+        for (Long id : docIds) {
+            log.debug("Process document {}", id);
 
-			try {
-				Document doc = documentDao.findById(id);
-				documentDao.initialize(doc);
+            try {
+                Document doc = documentDao.findById(id);
+                documentDao.initialize(doc);
 
-				processDocument(doc, user);
+                processDocument(doc, user);
 
-				stats.setProcessed(stats.getProcessed() + 1);
-				task.next();
-				log.debug("Processed document {}", doc);
-			} catch (Exception e) {
-				stats.setErrors(stats.getErrors() + 1);
-				log.error("Error processing document {}", id);
-				log.error(e.getMessage(), e);
-			}
+                stats.setProcessed(stats.getProcessed() + 1);
+                task.next();
+                log.debug("Processed document {}", doc);
+            } catch (Exception e) {
+                stats.setErrors(stats.getErrors() + 1);
+                log.error("Error processing document {}", id);
+                log.error(e.getMessage(), e);
+            }
 
-			if (interrupt)
-				break;
-		}
+            if (interrupt)
+                break;
+        }
 
-		return stats;
-	}
+        return stats;
+    }
 
-	private User loadUser() throws PersistenceException {
-		User user = UserDAO.get().findByUsername(getDefaultUser());
-		if (user == null)
-			user = UserDAO.get().findByUsername("_system");
-		return user;
-	}
+    private User loadUser() throws PersistenceException {
+        User user = UserDAO.get().findByUsername(getDefaultUser());
+        if (user == null)
+            user = UserDAO.get().findByUsername("_system");
+        return user;
+    }
 
-	protected String getDefaultUser() {
-		return "_system";
-	}
+    protected String getDefaultUser() {
+        return "_system";
+    }
 
-	public boolean isCompleted() {
-		return completed;
-	}
+    public boolean isCompleted() {
+        return completed;
+    }
 
-	public void interrupt() {
-		interrupt = true;
-	}
+    public void interrupt() {
+        interrupt = true;
+    }
 
-	/**
-	 * Concrete implementations put here the processing logic
-	 * 
-	 * @param document the document to be processed
-	 * @param user the user to process the document in the name of
-	 * 
-	 * @throws IOException I/O error
-	 * @throws PersistenceException Error in the persistence layer
-	 */
-	protected abstract void processDocument(Document document, User user) throws PersistenceException, IOException;
+    /**
+     * Concrete implementations put here the processing logic
+     * 
+     * @param document the document to be processed
+     * @param user the user to process the document in the name of
+     * 
+     * @throws Exception whatever error
+     */
+    protected abstract void processDocument(Document document, User user) throws Exception;
 
-	/**
-	 * Instantiates the right stats
-	 * 
-	 * @return the stats
-	 */
-	protected abstract T prepareStats();
+    /**
+     * Instantiates the right stats
+     * 
+     * @return the stats
+     */
+    protected abstract T prepareStats();
 }

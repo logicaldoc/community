@@ -2,6 +2,7 @@ package com.logicaldoc.core.filler;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -257,7 +258,7 @@ public abstract class Filler extends PersistentObject {
     protected String getExplicationSubtitle() {
         return "";
     }
-    
+
     /**
      * Factory method for instantiating a new filler
      * 
@@ -334,18 +335,37 @@ public abstract class Filler extends PersistentObject {
             StringBuilder explication)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
 
+        if (document.getFormId() != null)
+            throw new PersistenceException("Cannot fill a form");
+        if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+            return null;
+        
         if (explication != null) {
             explication.append(EXPLICATION_TOP);
-            explication.append(FILLER_EXPLICATION_TOP.formatted(this.getClass().getSimpleName(), getExplicationSubtitle()));
+            explication.append(
+                    FILLER_EXPLICATION_TOP.formatted(this.getClass().getSimpleName(), getExplicationSubtitle()));
         }
 
+        if(dictionary==null)
+            dictionary = new HashMap<>();
+        
         String value = fillDocument(document, content, transaction, dictionary, explication);
+
+        // In any case after filling we must update the filled flag
+        if (!document.isFilled()) {
+            document.setFilled(true);
+            DocumentDAO.get().store(document);
+
+            if (log.isDebugEnabled())
+                log.debug("Document {} marked as filled", document);
+        }
 
         if (explication != null) {
             explication.append(FILLER_EXPLICATION_BOTTOM);
             explication.append(EXPLICATION_BOTTOM);
         }
 
+        // Record the filled event just in case of concrete modification
         if (transaction != null && document.isModified()) {
             DocumentHistory fillHistory = new DocumentHistory(transaction);
             fillHistory.setEvent(DocumentEvent.FILLED);
@@ -379,9 +399,6 @@ public abstract class Filler extends PersistentObject {
     public final String fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary,
             StringBuilder explication) throws PersistenceException, IOException, FeatureDisabledException,
             ParsingException, SearchException, AutomationException {
-
-        if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL) || document.getFormId() != null)
-            return null;
 
         if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX)) {
             DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));

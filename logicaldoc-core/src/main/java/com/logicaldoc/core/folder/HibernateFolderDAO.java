@@ -141,7 +141,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
                 attribute.setInitialization(null);
                 attribute.setValidation(null);
             }
-            
+
             if (folder.getTemplate() == null) {
                 folder.setOcrTemplateId(null);
                 folder.setBarcodeTemplateId(null);
@@ -2231,6 +2231,7 @@ SELECT COUNT(*) from ld_document D, ld_folder F
             folder.setOcrTemplateId(parent.getOcrTemplateId());
             folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
             folder.setFillerId(parent.getFillerId());
+            folder.setFillOnCheckin(parent.getFillOnCheckin());
 
             FolderHistory tr = new FolderHistory(transaction);
             tr.setFolderId(folder.getId());

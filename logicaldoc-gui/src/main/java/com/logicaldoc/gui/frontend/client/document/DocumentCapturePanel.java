@@ -10,14 +10,15 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.frontend.client.ai.autofill.AutofillService;
-import com.logicaldoc.gui.frontend.client.ai.autofill.FillerSelector;
+import com.logicaldoc.gui.frontend.client.filler.AutofillService;
+import com.logicaldoc.gui.frontend.client.filler.FillerSelector;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -28,7 +29,7 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
-public class CapturePanel extends DocumentDetailTab {
+public class DocumentCapturePanel extends DocumentDetailTab {
     private static final String PROCESS = "process";
 
     private static final String FILLER = "filler";
@@ -43,7 +44,7 @@ public class CapturePanel extends DocumentDetailTab {
 
     private boolean processButton = true;
 
-    public CapturePanel(GUIDocument document, ChangedHandler changedHandler, boolean processButton) {
+    public DocumentCapturePanel(GUIDocument document, ChangedHandler changedHandler, boolean processButton) {
         super(document, changedHandler);
         setWidth100();
         setHeight100();
@@ -66,13 +67,12 @@ public class CapturePanel extends DocumentDetailTab {
         form.setValuesManager(vm);
         form.setTitleOrientation(TitleOrientation.TOP);
         form.setWrapItemTitles(false);
-        form.setNumCols(3);
+        form.setNumCols(4);
 
         ButtonItem processOcr = new ButtonItem("processOcr", I18N.message(PROCESS));
         processOcr.setAutoFit(true);
         processOcr.setEndRow(true);
         processOcr.setDisabled(!updateEnabled || document.getOcrTemplateId() == null);
-        processOcr.setColSpan(1);
         processOcr.addClickHandler(event -> {
             LD.contactingServer();
             ZonalOCRService.Instance.get().process(document.getId(), new DefaultAsyncCallback<>() {
@@ -86,7 +86,6 @@ public class CapturePanel extends DocumentDetailTab {
 
         SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
                 document.getOcrTemplateId());
-        ocrTemplate.setColSpan(3);
         ocrTemplate.setWrapTitle(false);
         ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) || documentTemplateId == null);
         ocrTemplate.addChangedHandler(changedHandler);
@@ -96,7 +95,6 @@ public class CapturePanel extends DocumentDetailTab {
         processBarcode.setAutoFit(true);
         processBarcode.setEndRow(true);
         processBarcode.setDisabled(!updateEnabled || document.getBarcodeTemplateId() == null);
-        processBarcode.setColSpan(1);
         processBarcode.addClickHandler(event -> {
             LD.contactingServer();
             BarcodeService.Instance.get().process(document.getId(), new DefaultAsyncCallback<>() {
@@ -110,7 +108,6 @@ public class CapturePanel extends DocumentDetailTab {
 
         SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
                 document.getBarcodeTemplateId());
-        barcodeTemplate.setColSpan(3);
         barcodeTemplate.setWrapTitle(false);
         barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
         barcodeTemplate.addChangedHandler(changedHandler);
@@ -126,17 +123,15 @@ public class CapturePanel extends DocumentDetailTab {
 
         ButtonItem fill = new ButtonItem("fill", I18N.message(PROCESS));
         fill.setAutoFit(true);
+        fill.setEndRow(false);
         fill.setDisabled(document.getFillerId() == null);
-
         ButtonItem explainFill = new ButtonItem("explain", I18N.message("explain"));
         explainFill.setAutoFit(true);
-        explainFill.setEndRow(true);
         explainFill.setDisabled(document.getFillerId() == null);
 
         ChangedHandler disableFillHandler = changed -> fill.setDisabled(true);
 
         FillerSelector filler = new FillerSelector(true, document.getFillerId());
-        filler.setColSpan(3);
         filler.setWrapTitle(false);
         filler.setDisabled(!updateEnabled || !Feature.enabled(Feature.AUTOFILL));
         filler.addChangedHandler(changedHandler);
@@ -145,6 +140,12 @@ public class CapturePanel extends DocumentDetailTab {
             fill.setDisabled(changed.getValue() == null);
             explainFill.setDisabled(changed.getValue() == null);
         });
+
+        CheckboxItem fillOnCheckin = ItemFactory.newCheckbox("filloncheckin");
+        fillOnCheckin.setWrapTitle(false);
+        fillOnCheckin.setDisabled(!updateEnabled || !Feature.enabled(Feature.AUTOFILL));
+        fillOnCheckin.setValue(document.isFillOnCheckin());
+        fillOnCheckin.addChangedHandler(changedHandler);
 
         fill.addClickHandler(event -> {
             LD.contactingServer();
@@ -180,9 +181,9 @@ public class CapturePanel extends DocumentDetailTab {
 
         if (processButton)
             form.setItems(ocrTemplate, ocrProcessed, processOcr, barcodeTemplate, barcodeProcessed, processBarcode,
-                    filler, fill, explainFill);
+                    filler, fillOnCheckin, fill, explainFill);
         else
-            form.setItems(ocrTemplate, barcodeTemplate, filler);
+            form.setItems(ocrTemplate, barcodeTemplate, filler, fillOnCheckin);
 
         addMember(form);
     }
@@ -210,6 +211,7 @@ public class CapturePanel extends DocumentDetailTab {
             else {
                 document.setFillerId(Long.parseLong(values.get(FILLER).toString()));
             }
+            document.setFillOnCheckin(Boolean.parseBoolean(values.get("filloncheckin").toString()));
         }
         return !vm.hasErrors();
     }

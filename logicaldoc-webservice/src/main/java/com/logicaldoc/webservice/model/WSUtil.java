@@ -44,531 +44,533 @@ import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.time.DateUtil;
 
 public class WSUtil {
-	private static final Logger log = LoggerFactory.getLogger(WSUtil.class);
-
-	private WSUtil() {
-	}
-
-	public static WSDocument toWSDocument(AbstractDocument document) {
-		WSDocument wsDoc = new WSDocument();
-
-		try {
-			wsDoc.setId(document.getId());
-			wsDoc.setCustomId(document.getCustomId());
-			wsDoc.setRevision(document.getRevision());
-			wsDoc.setLanguage(document.getLanguage());
-			wsDoc.setComment(document.getComment());
-			wsDoc.setLastNote(document.getLastNote());
-			wsDoc.setWorkflowStatus(document.getWorkflowStatus());
-			wsDoc.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
-			wsDoc.setColor(document.getColor());
-
-			setTemplateIntoWsDocument(document, wsDoc);
-
-			wsDoc.setImmutable(document.isImmutable() ? 1 : 0);
-
-			setFolderIntoWsDocument(document, wsDoc);
-
-			wsDoc.setIndexed(document.getIndexed().ordinal());
-			wsDoc.setEmbedded(document.getEmbeddingStatus().ordinal());
-			wsDoc.setVersion(document.getVersion());
-			wsDoc.setFileVersion(document.getFileVersion());
-			wsDoc.setPublisher(document.getPublisher());
-			wsDoc.setPublisherId(document.getPublisherId());
-			wsDoc.setCreator(document.getCreator());
-			wsDoc.setCreatorId(document.getCreatorId());
-			wsDoc.setStatus(document.getStatus().ordinal());
-			wsDoc.setType(document.getType());
-			wsDoc.setLockUserId(document.getLockUserId());
-			wsDoc.setFileName(document.getFileName());
-			wsDoc.setFileSize(document.getFileSize());
-			wsDoc.setDigest(document.getDigest());
-			wsDoc.setLastModified(DateUtil.format(document.getLastModified()));
-			wsDoc.setPages(document.getPages());
-			wsDoc.setSigned(document.isSigned() ? 1 : 0);
-			wsDoc.setStamped(document.isStamped() ? 1 : 0);
-			wsDoc.setNature(document.getNature());
-			wsDoc.setFormId(document.getFormId());
-			wsDoc.setPasswordProtected(document.isPasswordProtected() ? 1 : 0);
-			wsDoc.setOcrTemplateId(document.getOcrTemplateId());
-			wsDoc.setOcrd(document.isOcrd() ? 1 : 0);
-			wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
-			wsDoc.setBarcoded(document.isBarcoded() ? 1 : 0);
-			wsDoc.setFillerId(document.getFillerId());
-
-			if (document instanceof Document doc) {
-				wsDoc.setDocRef(doc.getDocRef());
-				wsDoc.setDocRefType(doc.getDocRefType());
-				wsDoc.setRating(doc.getRating());
-			}
-
-			setDatesIntoWsDocument(document, wsDoc);
-
-			wsDoc.setPublished(document.isPublished() ? 1 : 0);
-
-			// Populate the attributes
-			setAttributesIntoWsDocument(document, wsDoc);
-
-			// Set the tags
-			if (document instanceof Document doc)
-				wsDoc.setTags(doc.getTags().stream().map(Tag::getTag).collect(Collectors.toList()));
-			else if (document instanceof Version ver)
-				wsDoc.setTags(Arrays.asList(ver.getTgs().split(",")));
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-
-		return wsDoc;
-	}
-
-	private static void setAttributesIntoWsDocument(AbstractDocument document, WSDocument wsDoc) {
-		if (MapUtils.isEmpty(document.getAttributes())) {
-			wsDoc.setAttributes(new ArrayList<>());
-			return;
-		}
-
-		if (MapUtils.isNotEmpty(document.getAttributes()))
-			extractAttributes(document, wsDoc);
-	}
-
-	private static void extractAttributes(AbstractDocument sourceDocument, WSDocument wsDoc) {
-		List<WSAttribute> attributes = new ArrayList<>();
-		for (String name : sourceDocument.getAttributeNames()) {
-			Attribute attr = sourceDocument.getAttribute(name);
-
-			WSAttribute wsAttribute = new WSAttribute();
-			wsAttribute.setName(name);
-			wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
-			wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
-			wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
-			wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
-			wsAttribute.setParent(attr.getParent());
-			wsAttribute.setPosition(attr.getPosition());
-			wsAttribute.setEditor(attr.getEditor());
-			wsAttribute.setValidation(attr.getValidation());
-			wsAttribute.setSetId(attr.getSetId());
-			wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
-			wsAttribute.setDoubleValue(attr.getDoubleValue());
-			wsAttribute.setIntValue(attr.getIntValue());
-			wsAttribute.setStringValue(attr.getStringValue());
-			wsAttribute.setStringValues(attr.getStringValues());
-			wsAttribute.setType(attr.getType());
-			wsAttribute.setDependsOn(attr.getDependsOn());
-			attributes.add(wsAttribute);
-		}
-		wsDoc.setAttributes(attributes);
-	}
-
-	private static void setFolderIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
-		if (document instanceof Document doc && doc.getFolder() != null)
-			wsDocument.setFolderId(doc.getFolder().getId());
-		else if (document instanceof Version ver)
-			wsDocument.setFolderId(ver.getFolderId());
-	}
-
-	private static void setTemplateIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
-		if (document.getTemplate() != null)
-			wsDocument.setTemplateId(document.getTemplate().getId());
-	}
-
-	private static void setDatesIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
-		String date = null;
-		if (document.getDate() != null)
-			date = DateUtil.format(document.getDate());
-		wsDocument.setDate(date);
-		date = null;
-		if (document.getCreation() != null)
-			date = DateUtil.format(document.getCreation());
-		wsDocument.setCreation(date);
-		date = null;
-		if (document.getStartPublishing() != null)
-			date = DateUtil.format(document.getStartPublishing());
-		wsDocument.setStartPublishing(date);
-		date = null;
-		if (document.getStopPublishing() != null)
-			date = DateUtil.format(document.getStopPublishing());
-		wsDocument.setStopPublishing(date);
-	}
-
-	public static Document toDocument(WSDocument wsDoc) throws PersistenceException {
-		FolderDAO fdao = FolderDAO.get();
-		Folder folder = fdao.findById(wsDoc.getFolderId());
-		if (folder == null)
-			throw new PersistenceException("error - folder %d not found".formatted(wsDoc.getFolderId()));
-
-		Document doc = new Document();
-		doc.setFileName(wsDoc.getFileName());
-		doc.setFolder(folder);
-		doc.setComment(wsDoc.getComment());
-		doc.setWorkflowStatus(wsDoc.getWorkflowStatus());
-		doc.setWorkflowStatusDisplay(wsDoc.getWorkflowStatusDisplay());
-		doc.setColor(wsDoc.getColor());
-		doc.setLocale(LocaleUtil.toLocale(wsDoc.getLanguage()));
-
-		setTags(wsDoc, doc);
-
-		setAttributesIntoDocument(wsDoc, doc);
-
-		doc.setCustomId(wsDoc.getCustomId());
-		doc.setRevision(wsDoc.getRevision());
-		doc.setLanguage(wsDoc.getLanguage());
-		doc.setImmutable(wsDoc.getImmutable() == 1);
-
-		setIndexingStatus(wsDoc, doc);
-		doc.setEmbeddingStatus(EmbeddingStatus.values()[wsDoc.getEmbedded()]);
-
-		doc.setVersion(wsDoc.getVersion());
-		doc.setFileVersion(wsDoc.getFileVersion());
-		doc.setPages(wsDoc.getPages());
-		doc.setNature(wsDoc.getNature());
-		doc.setFormId(wsDoc.getFormId());
-
-		setDatesIntoDocument(wsDoc, doc);
-
-		doc.setPublisher(wsDoc.getPublisher());
-		doc.setPublisherId(wsDoc.getPublisherId());
-		doc.setCreator(wsDoc.getCreator());
-		doc.setCreatorId(wsDoc.getCreatorId());
-		doc.setStatus(wsDoc.getStatus());
-		doc.setType(wsDoc.getType());
-		doc.setLockUserId(wsDoc.getLockUserId());
-		doc.setFileSize(wsDoc.getFileSize());
-		doc.setDigest(wsDoc.getDigest());
-		doc.setDocRef(wsDoc.getDocRef());
-		doc.setDocRefType(wsDoc.getDocRefType());
-
-		setRating(wsDoc, doc);
-
-		doc.setPublished(wsDoc.getPublished() == 1);
-
-		doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
-		doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
-		doc.setFillerId(wsDoc.getFillerId());
-
-		doc.setSigned(wsDoc.getSigned() == 1);
-		doc.setBarcoded(wsDoc.getBarcoded() == 1);
-
-		return doc;
-	}
-
-	private static void setRating(WSDocument wsDoc, Document doc) {
-		if (wsDoc.getRating() != null)
-			doc.setRating(wsDoc.getRating());
-	}
-
-	private static void setIndexingStatus(WSDocument wsDoc, Document doc) {
-		if (wsDoc.getIndexed() != WSDocument.INDEX_INDEXED)
-			doc.setIndexingStatus(wsDoc.getIndexed());
-	}
-
-	private static void setTags(WSDocument wsDoc, Document doc) {
-		if (CollectionUtils.isNotEmpty(wsDoc.getTags()))
-			doc.setTagsFromWords(new HashSet<>(wsDoc.getTags()));
-	}
-
-	private static void setAttributesIntoDocument(WSDocument wsDoc, Document doc) throws PersistenceException {
-		Template template = null;
-		Map<String, Attribute> attrs = new HashMap<>();
-		if (wsDoc.getTemplateId() != null) {
-			TemplateDAO templDao = TemplateDAO.get();
-			template = templDao.findById(wsDoc.getTemplateId());
-			doc.setTemplate(template);
-			if (template != null) {
-				doc.setTemplateId(template.getId());
-				if (CollectionUtils.isNotEmpty(wsDoc.getAttributes())) {
-					for (WSAttribute wsAtt : wsDoc.getAttributes()) {
-						Attribute att = new Attribute();
-						att.setMandatory(wsAtt.getMandatory() == 1);
-						att.setHidden(wsAtt.getHidden() == 1);
-						att.setReadonly(wsAtt.getReadonly() == 1);
-						att.setMultiple(wsAtt.getMultiple() == 1);
-						att.setParent(wsAtt.getParent());
-						att.setDependsOn(wsAtt.getDependsOn());
-						att.setPosition(wsAtt.getPosition());
-						att.setIntValue(wsAtt.getIntValue());
-						att.setStringValue(wsAtt.getStringValue());
-						att.setDoubleValue(wsAtt.getDoubleValue());
-						att.setDateValue(convertStringToDate(wsAtt.getDateValue()));
-						att.setSetId(wsAtt.getSetId());
-						att.setType(wsAtt.getType());
-						att.setDependsOn(wsAtt.getDependsOn());
-
-						attrs.put(wsAtt.getName(), att);
-					}
-				}
-			}
-		}
-		doc.setAttributes(attrs);
-	}
-
-	private static void setDatesIntoDocument(WSDocument wsDocument, Document document) {
-		Date newdate = null;
-		if (StringUtils.isNotEmpty(wsDocument.getDate()))
-			newdate = convertStringToDate(wsDocument.getDate());
-		document.setDate(newdate);
-
-		Date creationDate = null;
-		if (StringUtils.isNotEmpty(wsDocument.getCreation()))
-			creationDate = convertStringToDate(wsDocument.getCreation());
-		document.setCreation(creationDate);
-
-		if (StringUtils.isNotEmpty(wsDocument.getStartPublishing()))
-			document.setStartPublishing(convertStringToDate(wsDocument.getStartPublishing()));
-		if (StringUtils.isNotEmpty(wsDocument.getStopPublishing()))
-			document.setStopPublishing(convertStringToDate(wsDocument.getStopPublishing()));
-	}
-
-	public static String convertDateToString(Date date) {
-		if (date == null)
-			return null;
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-		try {
-			return df.format(date);
-		} catch (Exception e) {
-			df = new SimpleDateFormat("yyyy-MM-dd");
-			return df.format(date);
-		}
-	}
-
-	public static Date convertStringToDate(String date) {
-		if (StringUtils.isEmpty(date))
-			return null;
-
-		try {
-			return DateUtils.parseDate(date, "yyyy-MM-dd HH:mm:ss.SSS Z", "yyyy-MM-dd HH:mm:ss.SS Z",
-					"yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
-		} catch (Exception e) {
-			log.error("Unparseable date {}", date);
-			log.error(e.getMessage(), e);
-		}
-
-		return null;
-	}
-
-	public static WSAttributeSet toWSAttributeSet(AttributeSet attributeSet) throws PersistenceException {
-		WSAttributeSet wsAttributeSet = new WSAttributeSet();
-
-		wsAttributeSet.setId(attributeSet.getId());
-		wsAttributeSet.setName(attributeSet.getName());
-		wsAttributeSet.setDescription(attributeSet.getDescription());
-		wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
-
-		AttributeSetDAO setDao = AttributeSetDAO.get();
-		setDao.initialize(attributeSet);
-
-		// Populate extended attributes
-		List<WSAttribute> wsAttributes;
-		if (MapUtils.isNotEmpty(attributeSet.getAttributes())) {
-			wsAttributes = new ArrayList<>();
-			for (String name : attributeSet.getAttributeNames()) {
-				Attribute attr = attributeSet.getTemplateAttribute(name);
-				WSAttribute wsAttribute = new WSAttribute();
-				wsAttribute.setName(name);
-				wsAttribute.setLabel(attr.getLabel());
-				wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
-				wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
-				wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
-				wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
-				wsAttribute.setParent(attr.getParent());
-				wsAttribute.setPosition(attr.getPosition());
-				wsAttribute.setStringValues(attr.getStringValues());
-				wsAttribute.setStringValue(attr.getStringValue());
-				wsAttribute.setIntValue(attr.getIntValue());
-				wsAttribute.setDoubleValue(attr.getDoubleValue());
-				wsAttribute.setDateValue(DateUtil.format(attr.getDateValue()));
-				wsAttribute.setEditor(attr.getEditor());
-				wsAttribute.setSetId(attr.getSetId());
-				wsAttribute.setType(attr.getType());
-				wsAttribute.setDependsOn(attr.getDependsOn());
-				wsAttribute.setValidation(attr.getValidation());
-				wsAttribute.setInitialization(attr.getInitialization());
-				wsAttributes.add(wsAttribute);
-			}
-			wsAttributeSet.setAttributes(wsAttributes);
-		}
-
-		return wsAttributeSet;
-	}
-
-	public static AttributeSet toAttributeSet(WSAttributeSet wsSet) {
-		AttributeSet set = new AttributeSet();
-
-		set.setId(wsSet.getId());
-		set.setName(wsSet.getName());
-		set.setDescription(wsSet.getDescription());
-
-		Map<String, Attribute> attributes = null;
-		if (CollectionUtils.isNotEmpty(wsSet.getAttributes())) {
-			set.getAttributes().clear();
-			attributes = new HashMap<>();
-			for (WSAttribute wsAtt : wsSet.getAttributes()) {
-				Attribute att = new Attribute();
-				att.setLabel(wsAtt.getLabel());
-				att.setMandatory(wsAtt.getMandatory() == 1);
-				att.setHidden(wsAtt.getHidden() == 1);
-				att.setReadonly(wsAtt.getReadonly() == 1);
-				att.setMultiple(wsAtt.getMultiple() == 1);
-				att.setParent(wsAtt.getParent());
-				att.setDependsOn(wsAtt.getDependsOn());
-				att.setPosition(wsAtt.getPosition());
-				att.setStringValue(wsAtt.getStringValue());
-				att.setIntValue(wsAtt.getIntValue());
-				att.setDoubleValue(wsAtt.getDoubleValue());
-				att.setDateValue(convertStringToDate(wsAtt.getStringValue()));
-				att.setEditor(wsAtt.getEditor());
-				att.setSetId(wsAtt.getSetId());
-				att.setType(wsAtt.getType());
-				att.setDependsOn(wsAtt.getDependsOn());
-				att.setValidation(wsAtt.getValidation());
-				att.setInitialization(wsAtt.getInitialization());
-				attributes.put(wsAtt.getName(), att);
-			}
-			set.setTemplateAttributes(attributes);
-		}
-
-		return set;
-	}
-
-	public static Template toTemplate(WSTemplate wsTemplate) {
-		Template template = new Template();
-
-		template.setId(wsTemplate.getId());
-		template.setName(wsTemplate.getName());
-		template.setDescription(wsTemplate.getDescription());
-		template.setValidation(wsTemplate.getValidation());
-		template.setInitialization(wsTemplate.getInitialization());
-
-		Map<String, Attribute> attributes = null;
-		if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
-			template.getAttributes().clear();
-			attributes = new HashMap<>();
-			for (WSAttribute wsAtt : wsTemplate.getAttributes()) {
-				Attribute att = new Attribute();
-				att.setLabel(wsAtt.getLabel());
-				att.setHidden(wsAtt.getHidden() == 1);
-				att.setReadonly(wsAtt.getReadonly() == 1);
-				att.setMultiple(wsAtt.getMultiple() == 1);
-				att.setParent(wsAtt.getParent());
-				att.setDependsOn(wsAtt.getDependsOn());
-				att.setPosition(wsAtt.getPosition());
-				att.setType(wsAtt.getType());
-				att.setStringValue(wsAtt.getStringValue());
-				att.setIntValue(wsAtt.getIntValue());
-				att.setDoubleValue(wsAtt.getDoubleValue());
-				att.setDateValue(convertStringToDate(wsAtt.getStringValue()));
-				att.setEditor(wsAtt.getEditor());
-				att.setSetId(wsAtt.getSetId());
-				att.setDependsOn(wsAtt.getDependsOn());
-				att.setValidation(wsAtt.getValidation());
-				att.setInitialization(wsAtt.getInitialization());
-				attributes.put(wsAtt.getName(), att);
-			}
-			template.setTemplateAttributes(attributes);
-		}
-
-		return template;
-	}
-
-	public static WSTemplate toWSTemplate(Template template) {
-		WSTemplate wsTemplate = new WSTemplate();
-
-		try {
-			wsTemplate.setId(template.getId());
-			wsTemplate.setName(template.getName());
-			wsTemplate.setDescription(template.getDescription());
-			wsTemplate.setValidation(template.getValidation());
-			wsTemplate.setInitialization(template.getInitialization());
-			wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
-
-			TemplateDAO templateDao = TemplateDAO.get();
-			templateDao.initialize(template);
-			wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
-
-			// Populate extended attributes
-			populateTemplateAttributes(template, wsTemplate);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-
-		return wsTemplate;
-	}
-
-	private static void populateTemplateAttributes(Template sourceTemplate, WSTemplate wsTemplate) {
-		List<WSAttribute> attributes;
-		if (MapUtils.isNotEmpty(sourceTemplate.getAttributes())) {
-			attributes = new ArrayList<>();
-			for (String name : sourceTemplate.getAttributeNames()) {
-				Attribute attr = sourceTemplate.getTemplateAttribute(name);
-				WSAttribute attribute = new WSAttribute();
-				attribute.setName(name);
-				attribute.setLabel(attr.getLabel());
-				attribute.setMandatory(attr.isMandatory() ? 1 : 0);
-				attribute.setHidden(attr.isHidden() ? 1 : 0);
-				attribute.setReadonly(attr.isReadonly() ? 1 : 0);
-				attribute.setMultiple(attr.isMultiple() ? 1 : 0);
-				attribute.setParent(attr.getParent());
-				attribute.setPosition(attr.getPosition());
-				attribute.setStringValue(attr.getStringValue());
-				attribute.setStringValues(attr.getStringValues());
-				attribute.setIntValue(attr.getIntValue());
-				attribute.setDoubleValue(attr.getDoubleValue());
-				attribute.setDateValue(DateUtil.format(attr.getDateValue()));
-				attribute.setEditor(attr.getEditor());
-				attribute.setSetId(attr.getSetId());
-				attribute.setType(attr.getType());
-				attribute.setDependsOn(attr.getDependsOn());
-				attribute.setValidation(attr.getValidation());
-				attribute.setInitialization(attr.getInitialization());
-				attributes.add(attribute);
-			}
-			wsTemplate.setAttributes(attributes);
-		}
-	}
-
-	public static WSAccessControlEntry toWSAccessControlEntry(AccessControlEntry ace) throws PersistenceException {
-		WSAccessControlEntry wsAce = new WSAccessControlEntry();
-		try {
-			BeanUtils.copyProperties(wsAce, ace);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			throw new PersistenceException(e.getMessage(), e);
-		}
-
-		Group group = GroupDAO.get().findById(ace.getGroupId());
-		if (group.getName().startsWith("_user_"))
-			wsAce.setUserId(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)));
-
-		return wsAce;
-	}
-
-	public static AccessControlEntry toAccessControlEntry(WSAccessControlEntry wsAce) throws PersistenceException {
-		return fillAccessControlEntry(new AccessControlEntry(), wsAce);
-	}
-
-	public static DocumentAccessControlEntry toDocumentAccessControlEntry(WSAccessControlEntry wsAce)
-			throws PersistenceException {
-		return (DocumentAccessControlEntry) fillAccessControlEntry(new DocumentAccessControlEntry(), wsAce);
-	}
-
-	public static FolderAccessControlEntry toFolderAccessControlEntry(WSAccessControlEntry wsAce)
-			throws PersistenceException {
-		return (FolderAccessControlEntry) fillAccessControlEntry(new FolderAccessControlEntry(), wsAce);
-	}
-
-	private static AccessControlEntry fillAccessControlEntry(AccessControlEntry ace, WSAccessControlEntry wsAce)
-			throws PersistenceException {
-		try {
-			BeanUtils.copyProperties(ace, wsAce);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			throw new PersistenceException(e.getMessage(), e);
-		}
-
-		if (wsAce.getUserId() != 0L) {
-			UserDAO userDao = UserDAO.get();
-			User user = userDao.findById(wsAce.getUserId());
-			userDao.initialize(user);
-			ace.setGroupId(user.getUserGroup().getId());
-		}
-		return ace;
-	}
+    private static final Logger log = LoggerFactory.getLogger(WSUtil.class);
+
+    private WSUtil() {
+    }
+
+    public static WSDocument toWSDocument(AbstractDocument document) {
+        WSDocument wsDoc = new WSDocument();
+
+        try {
+            wsDoc.setId(document.getId());
+            wsDoc.setCustomId(document.getCustomId());
+            wsDoc.setRevision(document.getRevision());
+            wsDoc.setLanguage(document.getLanguage());
+            wsDoc.setComment(document.getComment());
+            wsDoc.setLastNote(document.getLastNote());
+            wsDoc.setWorkflowStatus(document.getWorkflowStatus());
+            wsDoc.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
+            wsDoc.setColor(document.getColor());
+
+            setTemplateIntoWsDocument(document, wsDoc);
+
+            wsDoc.setImmutable(document.isImmutable() ? 1 : 0);
+
+            setFolderIntoWsDocument(document, wsDoc);
+
+            wsDoc.setIndexed(document.getIndexed().ordinal());
+            wsDoc.setEmbedded(document.getEmbeddingStatus().ordinal());
+            wsDoc.setVersion(document.getVersion());
+            wsDoc.setFileVersion(document.getFileVersion());
+            wsDoc.setPublisher(document.getPublisher());
+            wsDoc.setPublisherId(document.getPublisherId());
+            wsDoc.setCreator(document.getCreator());
+            wsDoc.setCreatorId(document.getCreatorId());
+            wsDoc.setStatus(document.getStatus().ordinal());
+            wsDoc.setType(document.getType());
+            wsDoc.setLockUserId(document.getLockUserId());
+            wsDoc.setFileName(document.getFileName());
+            wsDoc.setFileSize(document.getFileSize());
+            wsDoc.setDigest(document.getDigest());
+            wsDoc.setLastModified(DateUtil.format(document.getLastModified()));
+            wsDoc.setPages(document.getPages());
+            wsDoc.setSigned(document.isSigned() ? 1 : 0);
+            wsDoc.setStamped(document.isStamped() ? 1 : 0);
+            wsDoc.setNature(document.getNature());
+            wsDoc.setFormId(document.getFormId());
+            wsDoc.setPasswordProtected(document.isPasswordProtected() ? 1 : 0);
+            wsDoc.setOcrTemplateId(document.getOcrTemplateId());
+            wsDoc.setOcrd(document.isOcrd() ? 1 : 0);
+            wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
+            wsDoc.setBarcoded(document.isBarcoded() ? 1 : 0);
+            wsDoc.setFillerId(document.getFillerId());
+            wsDoc.setFillOnCheckin(document.getFillOnCheckin() ? 1 : 0);
+
+            if (document instanceof Document doc) {
+                wsDoc.setDocRef(doc.getDocRef());
+                wsDoc.setDocRefType(doc.getDocRefType());
+                wsDoc.setRating(doc.getRating());
+            }
+
+            setDatesIntoWsDocument(document, wsDoc);
+
+            wsDoc.setPublished(document.isPublished() ? 1 : 0);
+
+            // Populate the attributes
+            setAttributesIntoWsDocument(document, wsDoc);
+
+            // Set the tags
+            if (document instanceof Document doc)
+                wsDoc.setTags(doc.getTags().stream().map(Tag::getTag).collect(Collectors.toList()));
+            else if (document instanceof Version ver)
+                wsDoc.setTags(Arrays.asList(ver.getTgs().split(",")));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return wsDoc;
+    }
+
+    private static void setAttributesIntoWsDocument(AbstractDocument document, WSDocument wsDoc) {
+        if (MapUtils.isEmpty(document.getAttributes())) {
+            wsDoc.setAttributes(new ArrayList<>());
+            return;
+        }
+
+        if (MapUtils.isNotEmpty(document.getAttributes()))
+            extractAttributes(document, wsDoc);
+    }
+
+    private static void extractAttributes(AbstractDocument sourceDocument, WSDocument wsDoc) {
+        List<WSAttribute> attributes = new ArrayList<>();
+        for (String name : sourceDocument.getAttributeNames()) {
+            Attribute attr = sourceDocument.getAttribute(name);
+
+            WSAttribute wsAttribute = new WSAttribute();
+            wsAttribute.setName(name);
+            wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
+            wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
+            wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
+            wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
+            wsAttribute.setParent(attr.getParent());
+            wsAttribute.setPosition(attr.getPosition());
+            wsAttribute.setEditor(attr.getEditor());
+            wsAttribute.setValidation(attr.getValidation());
+            wsAttribute.setSetId(attr.getSetId());
+            wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
+            wsAttribute.setDoubleValue(attr.getDoubleValue());
+            wsAttribute.setIntValue(attr.getIntValue());
+            wsAttribute.setStringValue(attr.getStringValue());
+            wsAttribute.setStringValues(attr.getStringValues());
+            wsAttribute.setType(attr.getType());
+            wsAttribute.setDependsOn(attr.getDependsOn());
+            attributes.add(wsAttribute);
+        }
+        wsDoc.setAttributes(attributes);
+    }
+
+    private static void setFolderIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
+        if (document instanceof Document doc && doc.getFolder() != null)
+            wsDocument.setFolderId(doc.getFolder().getId());
+        else if (document instanceof Version ver)
+            wsDocument.setFolderId(ver.getFolderId());
+    }
+
+    private static void setTemplateIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
+        if (document.getTemplate() != null)
+            wsDocument.setTemplateId(document.getTemplate().getId());
+    }
+
+    private static void setDatesIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
+        String date = null;
+        if (document.getDate() != null)
+            date = DateUtil.format(document.getDate());
+        wsDocument.setDate(date);
+        date = null;
+        if (document.getCreation() != null)
+            date = DateUtil.format(document.getCreation());
+        wsDocument.setCreation(date);
+        date = null;
+        if (document.getStartPublishing() != null)
+            date = DateUtil.format(document.getStartPublishing());
+        wsDocument.setStartPublishing(date);
+        date = null;
+        if (document.getStopPublishing() != null)
+            date = DateUtil.format(document.getStopPublishing());
+        wsDocument.setStopPublishing(date);
+    }
+
+    public static Document toDocument(WSDocument wsDoc) throws PersistenceException {
+        FolderDAO fdao = FolderDAO.get();
+        Folder folder = fdao.findById(wsDoc.getFolderId());
+        if (folder == null)
+            throw new PersistenceException("error - folder %d not found".formatted(wsDoc.getFolderId()));
+
+        Document doc = new Document();
+        doc.setFileName(wsDoc.getFileName());
+        doc.setFolder(folder);
+        doc.setComment(wsDoc.getComment());
+        doc.setWorkflowStatus(wsDoc.getWorkflowStatus());
+        doc.setWorkflowStatusDisplay(wsDoc.getWorkflowStatusDisplay());
+        doc.setColor(wsDoc.getColor());
+        doc.setLocale(LocaleUtil.toLocale(wsDoc.getLanguage()));
+
+        setTags(wsDoc, doc);
+
+        setAttributesIntoDocument(wsDoc, doc);
+
+        doc.setCustomId(wsDoc.getCustomId());
+        doc.setRevision(wsDoc.getRevision());
+        doc.setLanguage(wsDoc.getLanguage());
+        doc.setImmutable(wsDoc.getImmutable() == 1);
+
+        setIndexingStatus(wsDoc, doc);
+        doc.setEmbeddingStatus(EmbeddingStatus.values()[wsDoc.getEmbedded()]);
+
+        doc.setVersion(wsDoc.getVersion());
+        doc.setFileVersion(wsDoc.getFileVersion());
+        doc.setPages(wsDoc.getPages());
+        doc.setNature(wsDoc.getNature());
+        doc.setFormId(wsDoc.getFormId());
+
+        setDatesIntoDocument(wsDoc, doc);
+
+        doc.setPublisher(wsDoc.getPublisher());
+        doc.setPublisherId(wsDoc.getPublisherId());
+        doc.setCreator(wsDoc.getCreator());
+        doc.setCreatorId(wsDoc.getCreatorId());
+        doc.setStatus(wsDoc.getStatus());
+        doc.setType(wsDoc.getType());
+        doc.setLockUserId(wsDoc.getLockUserId());
+        doc.setFileSize(wsDoc.getFileSize());
+        doc.setDigest(wsDoc.getDigest());
+        doc.setDocRef(wsDoc.getDocRef());
+        doc.setDocRefType(wsDoc.getDocRefType());
+
+        setRating(wsDoc, doc);
+
+        doc.setPublished(wsDoc.getPublished() == 1);
+
+        doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
+        doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
+        doc.setFillerId(wsDoc.getFillerId());
+        doc.setFillOnCheckin(wsDoc.getFillOnCheckin() == 1);
+
+        doc.setSigned(wsDoc.getSigned() == 1);
+        doc.setBarcoded(wsDoc.getBarcoded() == 1);
+
+        return doc;
+    }
+
+    private static void setRating(WSDocument wsDoc, Document doc) {
+        if (wsDoc.getRating() != null)
+            doc.setRating(wsDoc.getRating());
+    }
+
+    private static void setIndexingStatus(WSDocument wsDoc, Document doc) {
+        if (wsDoc.getIndexed() != WSDocument.INDEX_INDEXED)
+            doc.setIndexingStatus(wsDoc.getIndexed());
+    }
+
+    private static void setTags(WSDocument wsDoc, Document doc) {
+        if (CollectionUtils.isNotEmpty(wsDoc.getTags()))
+            doc.setTagsFromWords(new HashSet<>(wsDoc.getTags()));
+    }
+
+    private static void setAttributesIntoDocument(WSDocument wsDoc, Document doc) throws PersistenceException {
+        Template template = null;
+        Map<String, Attribute> attrs = new HashMap<>();
+        if (wsDoc.getTemplateId() != null) {
+            TemplateDAO templDao = TemplateDAO.get();
+            template = templDao.findById(wsDoc.getTemplateId());
+            doc.setTemplate(template);
+            if (template != null) {
+                doc.setTemplateId(template.getId());
+                if (CollectionUtils.isNotEmpty(wsDoc.getAttributes())) {
+                    for (WSAttribute wsAtt : wsDoc.getAttributes()) {
+                        Attribute att = new Attribute();
+                        att.setMandatory(wsAtt.getMandatory() == 1);
+                        att.setHidden(wsAtt.getHidden() == 1);
+                        att.setReadonly(wsAtt.getReadonly() == 1);
+                        att.setMultiple(wsAtt.getMultiple() == 1);
+                        att.setParent(wsAtt.getParent());
+                        att.setDependsOn(wsAtt.getDependsOn());
+                        att.setPosition(wsAtt.getPosition());
+                        att.setIntValue(wsAtt.getIntValue());
+                        att.setStringValue(wsAtt.getStringValue());
+                        att.setDoubleValue(wsAtt.getDoubleValue());
+                        att.setDateValue(convertStringToDate(wsAtt.getDateValue()));
+                        att.setSetId(wsAtt.getSetId());
+                        att.setType(wsAtt.getType());
+                        att.setDependsOn(wsAtt.getDependsOn());
+
+                        attrs.put(wsAtt.getName(), att);
+                    }
+                }
+            }
+        }
+        doc.setAttributes(attrs);
+    }
+
+    private static void setDatesIntoDocument(WSDocument wsDocument, Document document) {
+        Date newdate = null;
+        if (StringUtils.isNotEmpty(wsDocument.getDate()))
+            newdate = convertStringToDate(wsDocument.getDate());
+        document.setDate(newdate);
+
+        Date creationDate = null;
+        if (StringUtils.isNotEmpty(wsDocument.getCreation()))
+            creationDate = convertStringToDate(wsDocument.getCreation());
+        document.setCreation(creationDate);
+
+        if (StringUtils.isNotEmpty(wsDocument.getStartPublishing()))
+            document.setStartPublishing(convertStringToDate(wsDocument.getStartPublishing()));
+        if (StringUtils.isNotEmpty(wsDocument.getStopPublishing()))
+            document.setStopPublishing(convertStringToDate(wsDocument.getStopPublishing()));
+    }
+
+    public static String convertDateToString(Date date) {
+        if (date == null)
+            return null;
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        try {
+            return df.format(date);
+        } catch (Exception e) {
+            df = new SimpleDateFormat("yyyy-MM-dd");
+            return df.format(date);
+        }
+    }
+
+    public static Date convertStringToDate(String date) {
+        if (StringUtils.isEmpty(date))
+            return null;
+
+        try {
+            return DateUtils.parseDate(date, "yyyy-MM-dd HH:mm:ss.SSS Z", "yyyy-MM-dd HH:mm:ss.SS Z",
+                    "yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
+        } catch (Exception e) {
+            log.error("Unparseable date {}", date);
+            log.error(e.getMessage(), e);
+        }
+
+        return null;
+    }
+
+    public static WSAttributeSet toWSAttributeSet(AttributeSet attributeSet) throws PersistenceException {
+        WSAttributeSet wsAttributeSet = new WSAttributeSet();
+
+        wsAttributeSet.setId(attributeSet.getId());
+        wsAttributeSet.setName(attributeSet.getName());
+        wsAttributeSet.setDescription(attributeSet.getDescription());
+        wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
+
+        AttributeSetDAO setDao = AttributeSetDAO.get();
+        setDao.initialize(attributeSet);
+
+        // Populate extended attributes
+        List<WSAttribute> wsAttributes;
+        if (MapUtils.isNotEmpty(attributeSet.getAttributes())) {
+            wsAttributes = new ArrayList<>();
+            for (String name : attributeSet.getAttributeNames()) {
+                Attribute attr = attributeSet.getTemplateAttribute(name);
+                WSAttribute wsAttribute = new WSAttribute();
+                wsAttribute.setName(name);
+                wsAttribute.setLabel(attr.getLabel());
+                wsAttribute.setMandatory(attr.isMandatory() ? 1 : 0);
+                wsAttribute.setHidden(attr.isHidden() ? 1 : 0);
+                wsAttribute.setReadonly(attr.isReadonly() ? 1 : 0);
+                wsAttribute.setMultiple(attr.isMultiple() ? 1 : 0);
+                wsAttribute.setParent(attr.getParent());
+                wsAttribute.setPosition(attr.getPosition());
+                wsAttribute.setStringValues(attr.getStringValues());
+                wsAttribute.setStringValue(attr.getStringValue());
+                wsAttribute.setIntValue(attr.getIntValue());
+                wsAttribute.setDoubleValue(attr.getDoubleValue());
+                wsAttribute.setDateValue(DateUtil.format(attr.getDateValue()));
+                wsAttribute.setEditor(attr.getEditor());
+                wsAttribute.setSetId(attr.getSetId());
+                wsAttribute.setType(attr.getType());
+                wsAttribute.setDependsOn(attr.getDependsOn());
+                wsAttribute.setValidation(attr.getValidation());
+                wsAttribute.setInitialization(attr.getInitialization());
+                wsAttributes.add(wsAttribute);
+            }
+            wsAttributeSet.setAttributes(wsAttributes);
+        }
+
+        return wsAttributeSet;
+    }
+
+    public static AttributeSet toAttributeSet(WSAttributeSet wsSet) {
+        AttributeSet set = new AttributeSet();
+
+        set.setId(wsSet.getId());
+        set.setName(wsSet.getName());
+        set.setDescription(wsSet.getDescription());
+
+        Map<String, Attribute> attributes = null;
+        if (CollectionUtils.isNotEmpty(wsSet.getAttributes())) {
+            set.getAttributes().clear();
+            attributes = new HashMap<>();
+            for (WSAttribute wsAtt : wsSet.getAttributes()) {
+                Attribute att = new Attribute();
+                att.setLabel(wsAtt.getLabel());
+                att.setMandatory(wsAtt.getMandatory() == 1);
+                att.setHidden(wsAtt.getHidden() == 1);
+                att.setReadonly(wsAtt.getReadonly() == 1);
+                att.setMultiple(wsAtt.getMultiple() == 1);
+                att.setParent(wsAtt.getParent());
+                att.setDependsOn(wsAtt.getDependsOn());
+                att.setPosition(wsAtt.getPosition());
+                att.setStringValue(wsAtt.getStringValue());
+                att.setIntValue(wsAtt.getIntValue());
+                att.setDoubleValue(wsAtt.getDoubleValue());
+                att.setDateValue(convertStringToDate(wsAtt.getStringValue()));
+                att.setEditor(wsAtt.getEditor());
+                att.setSetId(wsAtt.getSetId());
+                att.setType(wsAtt.getType());
+                att.setDependsOn(wsAtt.getDependsOn());
+                att.setValidation(wsAtt.getValidation());
+                att.setInitialization(wsAtt.getInitialization());
+                attributes.put(wsAtt.getName(), att);
+            }
+            set.setTemplateAttributes(attributes);
+        }
+
+        return set;
+    }
+
+    public static Template toTemplate(WSTemplate wsTemplate) {
+        Template template = new Template();
+
+        template.setId(wsTemplate.getId());
+        template.setName(wsTemplate.getName());
+        template.setDescription(wsTemplate.getDescription());
+        template.setValidation(wsTemplate.getValidation());
+        template.setInitialization(wsTemplate.getInitialization());
+
+        Map<String, Attribute> attributes = null;
+        if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
+            template.getAttributes().clear();
+            attributes = new HashMap<>();
+            for (WSAttribute wsAtt : wsTemplate.getAttributes()) {
+                Attribute att = new Attribute();
+                att.setLabel(wsAtt.getLabel());
+                att.setHidden(wsAtt.getHidden() == 1);
+                att.setReadonly(wsAtt.getReadonly() == 1);
+                att.setMultiple(wsAtt.getMultiple() == 1);
+                att.setParent(wsAtt.getParent());
+                att.setDependsOn(wsAtt.getDependsOn());
+                att.setPosition(wsAtt.getPosition());
+                att.setType(wsAtt.getType());
+                att.setStringValue(wsAtt.getStringValue());
+                att.setIntValue(wsAtt.getIntValue());
+                att.setDoubleValue(wsAtt.getDoubleValue());
+                att.setDateValue(convertStringToDate(wsAtt.getStringValue()));
+                att.setEditor(wsAtt.getEditor());
+                att.setSetId(wsAtt.getSetId());
+                att.setDependsOn(wsAtt.getDependsOn());
+                att.setValidation(wsAtt.getValidation());
+                att.setInitialization(wsAtt.getInitialization());
+                attributes.put(wsAtt.getName(), att);
+            }
+            template.setTemplateAttributes(attributes);
+        }
+
+        return template;
+    }
+
+    public static WSTemplate toWSTemplate(Template template) {
+        WSTemplate wsTemplate = new WSTemplate();
+
+        try {
+            wsTemplate.setId(template.getId());
+            wsTemplate.setName(template.getName());
+            wsTemplate.setDescription(template.getDescription());
+            wsTemplate.setValidation(template.getValidation());
+            wsTemplate.setInitialization(template.getInitialization());
+            wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
+
+            TemplateDAO templateDao = TemplateDAO.get();
+            templateDao.initialize(template);
+            wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
+
+            // Populate extended attributes
+            populateTemplateAttributes(template, wsTemplate);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return wsTemplate;
+    }
+
+    private static void populateTemplateAttributes(Template sourceTemplate, WSTemplate wsTemplate) {
+        List<WSAttribute> attributes;
+        if (MapUtils.isNotEmpty(sourceTemplate.getAttributes())) {
+            attributes = new ArrayList<>();
+            for (String name : sourceTemplate.getAttributeNames()) {
+                Attribute attr = sourceTemplate.getTemplateAttribute(name);
+                WSAttribute attribute = new WSAttribute();
+                attribute.setName(name);
+                attribute.setLabel(attr.getLabel());
+                attribute.setMandatory(attr.isMandatory() ? 1 : 0);
+                attribute.setHidden(attr.isHidden() ? 1 : 0);
+                attribute.setReadonly(attr.isReadonly() ? 1 : 0);
+                attribute.setMultiple(attr.isMultiple() ? 1 : 0);
+                attribute.setParent(attr.getParent());
+                attribute.setPosition(attr.getPosition());
+                attribute.setStringValue(attr.getStringValue());
+                attribute.setStringValues(attr.getStringValues());
+                attribute.setIntValue(attr.getIntValue());
+                attribute.setDoubleValue(attr.getDoubleValue());
+                attribute.setDateValue(DateUtil.format(attr.getDateValue()));
+                attribute.setEditor(attr.getEditor());
+                attribute.setSetId(attr.getSetId());
+                attribute.setType(attr.getType());
+                attribute.setDependsOn(attr.getDependsOn());
+                attribute.setValidation(attr.getValidation());
+                attribute.setInitialization(attr.getInitialization());
+                attributes.add(attribute);
+            }
+            wsTemplate.setAttributes(attributes);
+        }
+    }
+
+    public static WSAccessControlEntry toWSAccessControlEntry(AccessControlEntry ace) throws PersistenceException {
+        WSAccessControlEntry wsAce = new WSAccessControlEntry();
+        try {
+            BeanUtils.copyProperties(wsAce, ace);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new PersistenceException(e.getMessage(), e);
+        }
+
+        Group group = GroupDAO.get().findById(ace.getGroupId());
+        if (group.getName().startsWith("_user_"))
+            wsAce.setUserId(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)));
+
+        return wsAce;
+    }
+
+    public static AccessControlEntry toAccessControlEntry(WSAccessControlEntry wsAce) throws PersistenceException {
+        return fillAccessControlEntry(new AccessControlEntry(), wsAce);
+    }
+
+    public static DocumentAccessControlEntry toDocumentAccessControlEntry(WSAccessControlEntry wsAce)
+            throws PersistenceException {
+        return (DocumentAccessControlEntry) fillAccessControlEntry(new DocumentAccessControlEntry(), wsAce);
+    }
+
+    public static FolderAccessControlEntry toFolderAccessControlEntry(WSAccessControlEntry wsAce)
+            throws PersistenceException {
+        return (FolderAccessControlEntry) fillAccessControlEntry(new FolderAccessControlEntry(), wsAce);
+    }
+
+    private static AccessControlEntry fillAccessControlEntry(AccessControlEntry ace, WSAccessControlEntry wsAce)
+            throws PersistenceException {
+        try {
+            BeanUtils.copyProperties(ace, wsAce);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new PersistenceException(e.getMessage(), e);
+        }
+
+        if (wsAce.getUserId() != 0L) {
+            UserDAO userDao = UserDAO.get();
+            User user = userDao.findById(wsAce.getUserId());
+            userDao.initialize(user);
+            ace.setGroupId(user.getUserGroup().getId());
+        }
+        return ace;
+    }
 }

@@ -19,7 +19,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.QRFormItemIcon;
-import com.logicaldoc.gui.frontend.client.ai.autofill.AutofillService;
+import com.logicaldoc.gui.frontend.client.filler.AutofillService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.TitleOrientation;

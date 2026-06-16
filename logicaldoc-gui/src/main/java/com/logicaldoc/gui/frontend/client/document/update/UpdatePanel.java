@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.frontend.client.document.CapturePanel;
+import com.logicaldoc.gui.frontend.client.document.DocumentCapturePanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentSecurityPanel;
 import com.logicaldoc.gui.frontend.client.document.PublishingPanel;
@@ -52,7 +52,7 @@ public class UpdatePanel extends VLayout {
 
 	protected UpdateNotificationPanel notificationPanel;
 
-	protected CapturePanel capturePanel;
+	protected DocumentCapturePanel capturePanel;
 
 	protected DocumentSecurityPanel securityPanel;
 
@@ -200,7 +200,7 @@ public class UpdatePanel extends VLayout {
 			if (Boolean.TRUE.equals(captureTabPanel.contains(capturePanel)))
 				captureTabPanel.removeMember(capturePanel);
 		}
-		capturePanel = new CapturePanel(document, nothingToDo, false);
+		capturePanel = new DocumentCapturePanel(document, nothingToDo, false);
 		captureTabPanel.addMember(capturePanel);
 
 		/*

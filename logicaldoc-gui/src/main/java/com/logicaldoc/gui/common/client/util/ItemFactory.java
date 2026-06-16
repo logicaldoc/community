@@ -1030,6 +1030,20 @@ public class ItemFactory {
         return radioGroupItem;
     }
 
+    public static SelectItem newBooleanDropDown(String name) {
+        return newBooleanDropDown(name, name);
+    }
+
+    public static SelectItem newBooleanDropDown(String name, String title) {
+        SelectItem item = newSelectItem(name, title);
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        map.put("", "");
+        map.put("yes", I18N.message("yes"));
+        map.put("no", I18N.message("no"));
+        item.setValueMap(map);
+        return item;
+    }
+
     public static RadioGroupItem newBooleanSelector(String name) {
         return newBooleanSelector(name, name);
     }
@@ -2595,6 +2609,10 @@ public class ItemFactory {
         if (srcItem.getValue() != null)
             item.setValue(srcItem.getValue());
         return item;
+    }
+
+    public static RadioGroupItem newYesNoRadioItem(String name) {
+        return newYesNoRadioItem(name, name);
     }
 
     /**

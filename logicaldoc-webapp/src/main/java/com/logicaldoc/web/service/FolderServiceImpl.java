@@ -8,6 +8,7 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -188,6 +189,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         guiFolder.setOcrTemplateId(folder.getOcrTemplateId());
         guiFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
         guiFolder.setFillerId(folder.getFillerId());
+        guiFolder.setFillOnCheckin(Optional.of(folder.getFillOnCheckin()).orElse(false));
+
         if (computePath)
             guiFolder.setPathExtended(dao.computePathExtended(folder.getId()));
 
@@ -651,6 +654,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             folder.setOcrTemplateId(guiFolder.getOcrTemplateId());
             folder.setBarcodeTemplateId(guiFolder.getBarcodeTemplateId());
             folder.setFillerId(guiFolder.getFillerId());
+            folder.setFillOnCheckin(guiFolder.isFillOnCheckin());
 
             updateExtendedAttributes(folder, guiFolder);
 

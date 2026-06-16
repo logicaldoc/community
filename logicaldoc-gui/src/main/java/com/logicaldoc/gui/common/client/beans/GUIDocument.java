@@ -13,743 +13,764 @@ import java.util.stream.Collectors;
  * @since 6.0
  */
 public class GUIDocument extends GUIExtensibleObject implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final int DOC_LOCKED = 2;
+    public static final int DOC_LOCKED = 2;
 
-	public static final int DOC_UNLOCKED = 0;
+    public static final int DOC_UNLOCKED = 0;
 
-	private Long docRef;
+    private Long docRef;
 
-	private String docRefType;
+    private String docRefType;
 
-	private String customId;
+    private String customId;
 
-	private List<String> tags = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 
-	private String tagsString;
+    private String tagsString;
 
-	private String type;
+    private String type;
 
-	private String version;
+    private String version;
 
-	private String fileVersion;
+    private String fileVersion;
 
-	private String revision;
+    private String revision;
 
-	private String fileName;
+    private String fileName;
 
-	private Date date;
+    private Date date;
 
-	private Date creation;
+    private Date creation;
 
-	private String creator;
+    private String creator;
 
-	private Long creatorId;
+    private Long creatorId;
 
-	private String publisher;
+    private String publisher;
 
-	private Long publisherId;
+    private Long publisherId;
 
-	private String language;
+    private String language;
 
-	private long fileSize = 0;
+    private long fileSize = 0;
 
-	private Date lastModified;
+    private Date lastModified;
 
-	private String pathExtended;
+    private String pathExtended;
 
-	private GUIFolder folder;
+    private GUIFolder folder;
 
-	private String icon = "generic";
+    private String icon = "generic";
 
-	private Long lockUserId;
+    private Long lockUserId;
 
-	private String lockUser;
+    private String lockUser;
 
-	private int status = DOC_UNLOCKED;
+    private int status = DOC_UNLOCKED;
 
-	private boolean immutable = false;
+    private boolean immutable = false;
 
-	private boolean signed = false;
+    private boolean signed = false;
 
-	private boolean stamped = false;
+    private boolean stamped = false;
 
-	private boolean bookmarked = false;
+    private boolean bookmarked = false;
 
-	private int indexed = 0;
-	
-	private int embedded = 0;
+    private int indexed = 0;
 
-	private String comment;
+    private int embedded = 0;
 
-	private String lastNote;
+    private String comment;
 
-	private String workflowStatus;
+    private String lastNote;
 
-	private String workflowStatusDisplay;
+    private String workflowStatus;
 
-	private String color;
+    private String workflowStatusDisplay;
 
-	private int rating = 0;
+    private String color;
 
-	private boolean published = true;
+    private int rating = 0;
 
-	private Date startPublishing = new Date();
+    private boolean published = true;
 
-	private Date stopPublishing;
+    private Date startPublishing = new Date();
 
-	private String summary;
+    private Date stopPublishing;
 
-	private int score;
+    private String summary;
 
-	private String extResId;
+    private int score;
 
-	private int pages = 1;
+    private String extResId;
 
-	private int previewPages = 1;
+    private int pages = 1;
 
-	private int nature = 0;
+    private int previewPages = 1;
 
-	private Long formId = null;
+    private int nature = 0;
 
-	// Users to be notified of the upload
-	private List<Long> notifyUsers = new ArrayList<>();
-
-	// Optional message to send to users
-	private String notifyMessage;
-
-	private boolean passwordProtected = false;
-
-	private int links = 0;
-
-	/**
-	 * Counter of extended attributes of type Document
-	 */
-	private int docAttrs = 0;
-
-	/**
-	 * Identifier of the Zonal OCR template to use to process this document
-	 */
-	private Long ocrTemplateId = null;
-
-	/**
-	 * Indicates if the document has been processed by the zonal OCR
-	 */
-	private boolean ocrd = false;
-
-	/**
-	 * Identifier of the barcode template to use to process this document
-	 */
-	private Long barcodeTemplateId = null;
-	
-	/**
-	 * Identifier of the Filler to be used by the autofill
-	 */
-	private Long fillerId = null;
-
-	/**
-	 * Indicates if the document has been processed by the barcodes processorsS
-	 */
-	private boolean barcoded = false;
-
-	/**
-	 * Just to indicate if this document is being used for collecting the
-	 * metadata of a bulk update
-	 */
-	private boolean bulkUpdate = false;
-
-	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
-
-	/**
-	 * Permissions granted to the current user on this document
-	 */
-	private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
-
-	public String getCustomId() {
-		return customId;
-	}
-
-	public void setCustomId(String customId) {
-		this.customId = customId;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public List<String> getTags() {
-		return tags;
-	}
-
-	public void setTags(List<String> tags) {
-		this.tags = tags;
-	}
-
-	public void clearTags() {
-		tags.clear();
-	}
-
-	public void addTag(String tag) {
-		if (!tags.contains(tag))
-			tags.add(tag);
-	}
-
-	public void removeTag(String tag) {
-		tags.remove(tag);
-	}
-
-	public boolean isImmutable() {
-		return immutable;
-	}
-
-	public void setImmutable(boolean immutable) {
-		this.immutable = immutable;
-	}
-
-	public boolean isPublished() {
-		return published;
-	}
-
-	public void setPublished(boolean published) {
-		this.published = published;
-	}
-
-	public String getTgs() {
-		return tags.stream().collect(Collectors.joining(","));
-	}
-
-	public String getTagsString() {
-		if (tagsString != null && !tagsString.isEmpty())
-			return tagsString;
-		else
-			return tags.stream().collect(Collectors.joining(" "));
-	}
-
-	public String getCreator() {
-		return creator;
-	}
-
-	public void setCreator(String creator) {
-		this.creator = creator;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public String getPublisher() {
-		return publisher;
-	}
-
-	public void setPublisher(String publisher) {
-		this.publisher = publisher;
-	}
-
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
-	}
-
-	public String getFileVersion() {
-		return fileVersion;
-	}
-
-	public void setFileVersion(String fileVersion) {
-		this.fileVersion = fileVersion;
-	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
-	public long getFileSize() {
-		return fileSize;
-	}
-
-	public void setFileSize(long fileSize) {
-		this.fileSize = fileSize;
-	}
-
-	public Date getLastModified() {
-		return lastModified;
-	}
-
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
-
-	public String getIcon() {
-		return icon;
-	}
-
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-
-	public Long getLockUserId() {
-		return lockUserId;
-	}
-
-	public void setLockUserId(Long lockUserId) {
-		this.lockUserId = lockUserId;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	public GUIFolder getFolder() {
-		return folder;
-	}
-
-	public void setFolder(GUIFolder folder) {
-		this.folder = folder;
-	}
-
-	public String getPathExtended() {
-		return pathExtended;
-	}
-
-	public void setPathExtended(String pathExtended) {
-		this.pathExtended = pathExtended;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-	public String getWorkflowStatus() {
-		return workflowStatus;
-	}
-
-	public void setWorkflowStatus(String workflowStatus) {
-		this.workflowStatus = workflowStatus;
-	}
-
-	public String getWorkflowStatusDisplay() {
-		return workflowStatusDisplay;
-	}
-
-	public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
-		this.workflowStatusDisplay = workflowStatusDisplay;
-	}
-
-	public boolean isSigned() {
-		return signed;
-	}
-
-	public void setSigned(boolean signed) {
-		this.signed = signed;
-	}
-
-	public boolean isStamped() {
-		return stamped;
-	}
-
-	public void setStamped(boolean stamped) {
-		this.stamped = stamped;
-	}
-
-	public boolean isOcrd() {
-		return ocrd;
-	}
-
-	public void setOcrd(boolean ocrd) {
-		this.ocrd = ocrd;
-	}
-
-	public boolean isBarcoded() {
-		return barcoded;
-	}
-
-	public void setBarcoded(boolean barcoded) {
-		this.barcoded = barcoded;
-	}
-
-	public int getRating() {
-		return rating;
-	}
-
-	public void setRating(int rating) {
-		this.rating = rating;
-	}
-
-	public Date getStartPublishing() {
-		return startPublishing;
-	}
-
-	public void setStartPublishing(Date startPublishing) {
-		this.startPublishing = startPublishing;
-	}
-
-	public Date getStopPublishing() {
-		return stopPublishing;
-	}
-
-	public void setStopPublishing(Date stopPublishing) {
-		this.stopPublishing = stopPublishing;
-	}
-
-	public String getSummary() {
-		return summary;
-	}
-
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
-
-	public int getScore() {
-		return score;
-	}
-
-	public void setScore(int score) {
-		this.score = score;
-	}
-
-	public Long getDocRef() {
-		return docRef;
-	}
-
-	public void setDocRef(Long docRef) {
-		this.docRef = docRef;
-	}
-
-	public String getExtResId() {
-		return extResId;
-	}
-
-	public void setExtResId(String extResId) {
-		this.extResId = extResId;
-	}
-
-	public String getDocRefType() {
-		return docRefType;
-	}
-
-	public void setDocRefType(String docRefType) {
-		this.docRefType = docRefType;
-	}
-
-	public int getPages() {
-		return pages;
-	}
-
-	public void setPages(int pages) {
-		this.pages = pages;
-	}
-
-	public void setTagsString(String tagsString) {
-		this.tagsString = tagsString;
-	}
-
-	public int getNature() {
-		return nature;
-	}
-
-	public void setNature(int nature) {
-		this.nature = nature;
-	}
-
-	public Long getFormId() {
-		return formId;
-	}
-
-	public void setFormId(Long formId) {
-		this.formId = formId;
-	}
-
-	public String getLockUser() {
-		return lockUser;
-	}
-
-	public void setLockUser(String lockUser) {
-		this.lockUser = lockUser;
-	}
-
-	public List<Long> getNotifyUsers() {
-		return notifyUsers;
-	}
-
-	public void setNotifyUsers(List<Long> notifyUsers) {
-		this.notifyUsers = notifyUsers;
-	}
-
-	public String getNotifyMessage() {
-		return notifyMessage;
-	}
-
-	public void setNotifyMessage(String notifyMessage) {
-		this.notifyMessage = notifyMessage;
-	}
-
-	public int getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(int indexed) {
-		this.indexed = indexed;
-	}
-	
-	public int getEmbedded() {
-		return embedded;
-	}
-
-	public void setEmbedded(int embedded) {
-		this.embedded = embedded;
-	}
-
-	public boolean isPasswordProtected() {
-		return passwordProtected;
-	}
-
-	public void setPasswordProtected(boolean passwordProtected) {
-		this.passwordProtected = passwordProtected;
-	}
-
-	public boolean isBookmarked() {
-		return bookmarked;
-	}
-
-	public void setBookmarked(boolean bookmarked) {
-		this.bookmarked = bookmarked;
-	}
-
-	public int getLinks() {
-		return links;
-	}
-
-	public void setLinks(int links) {
-		this.links = links;
-	}
-
-	public Long getOcrTemplateId() {
-		return ocrTemplateId;
-	}
-
-	public void setOcrTemplateId(Long ocrTemplateId) {
-		this.ocrTemplateId = ocrTemplateId;
-	}
-
-	public Long getBarcodeTemplateId() {
-		return barcodeTemplateId;
-	}
-
-	public void setBarcodeTemplateId(Long barcodeTemplateId) {
-		this.barcodeTemplateId = barcodeTemplateId;
-	}
-
-	public Long getCreatorId() {
-		return creatorId;
-	}
-
-	public void setCreatorId(Long creatorId) {
-		this.creatorId = creatorId;
-	}
-
-	public Long getPublisherId() {
-		return publisherId;
-	}
-
-	public void setPublisherId(Long publisherId) {
-		this.publisherId = publisherId;
-	}
-
-	public int getPreviewPages() {
-		return previewPages;
-	}
-
-	public void setPreviewPages(int previewPages) {
-		this.previewPages = previewPages;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
-	public boolean isBulkUpdate() {
-		return bulkUpdate;
-	}
-
-	public void setBulkUpdate(boolean bulkUpdate) {
-		this.bulkUpdate = bulkUpdate;
-	}
-
-	public int getDocAttrs() {
-		if (docAttrs == 0 && getAttributes().isEmpty())
-			for (GUIAttribute att : getAttributes())
-				if (att.getType() == GUIAttribute.TYPE_DOCUMENT && att.getIntValue() != null)
-					docAttrs++;
-		return docAttrs;
-	}
-
-	public void setDocAttrs(int docAttrs) {
-		this.docAttrs = docAttrs;
-	}
-
-	public GUIAccessControlEntry getAllowedPermissions() {
-		return allowedPermissions;
-	}
-
-	public void setAllowedPermissions(GUIAccessControlEntry permissions) {
-		this.allowedPermissions = permissions;
-	}
-
-	public boolean isCustomid() {
-		return allowedPermissions.isCustomid();
-	}
-
-	public boolean isRevision() {
-		return allowedPermissions.isRevision();
-	}
-
-	public boolean isRead() {
-		return allowedPermissions.isRead();
-	}
-
-	public boolean isWrite() {
-		return allowedPermissions.isWrite();
-	}
-
-	public boolean isPreview() {
-		return allowedPermissions.isPreview();
-	}
-
-	public boolean isDownload() {
-		return allowedPermissions.isDownload();
-	}
-
-	public boolean isMove() {
-		return allowedPermissions.isMove();
-	}
-
-	public boolean isDelete() {
-		return allowedPermissions.isDelete();
-	}
-
-	public boolean isRename() {
-		return allowedPermissions.isRename();
-	}
-
-	public String getLastNote() {
-		return lastNote;
-	}
-
-	public void setLastNote(String lastNote) {
-		this.lastNote = lastNote;
-	}
-
-	public String getRevision() {
-		return revision;
-	}
-
-	public void setRevision(String revision) {
-		this.revision = revision;
-	}
-
-	public boolean hasPermission(String permission) {
-		return allowedPermissions.isPermissionAllowed(permission);
-	}
-
-	public List<GUIAccessControlEntry> getAccessControlList() {
-		return accessControlList;
-	}
-
-	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
-		this.accessControlList = accessControlList;
-	}
-	
-	public Long getFillerId() {
-		return fillerId;
-	}
-
-	public void setFillerId(Long fillerId) {
-		this.fillerId = fillerId;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-		result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
-		result = prime * result + ((folder == null) ? 0 : folder.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GUIDocument other = (GUIDocument) obj;
-		if (fileName == null) {
-			if (other.fileName != null)
-				return false;
-		} else if (!fileName.equals(other.fileName))
-			return false;
-		if (fileVersion == null) {
-			if (other.fileVersion != null)
-				return false;
-		} else if (!fileVersion.equals(other.fileVersion))
-			return false;
-		if (folder == null) {
-			if (other.folder != null)
-				return false;
-		} else if (!folder.equals(other.folder))
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
-			return false;
-		return true;
-	}
+    private Long formId = null;
+
+    // Users to be notified of the upload
+    private List<Long> notifyUsers = new ArrayList<>();
+
+    // Optional message to send to users
+    private String notifyMessage;
+
+    private boolean passwordProtected = false;
+
+    private int links = 0;
+
+    /**
+     * Counter of extended attributes of type Document
+     */
+    private int docAttrs = 0;
+
+    /**
+     * Identifier of the Zonal OCR template to use to process this document
+     */
+    private Long ocrTemplateId = null;
+
+    /**
+     * Indicates if the document has been processed by the zonal OCR
+     */
+    private boolean ocrd = false;
+
+    /**
+     * Identifier of the barcode template to use to process this document
+     */
+    private Long barcodeTemplateId = null;
+
+    /**
+     * Identifier of the Filler to be used by the autofill
+     */
+    private Long fillerId = null;
+    
+    private boolean fillOnCheckin = true;
+
+    private boolean filled = false;
+
+    /**
+     * Indicates if the document has been processed by the barcodes processorsS
+     */
+    private boolean barcoded = false;
+
+    /**
+     * Just to indicate if this document is being used for collecting the
+     * metadata of a bulk update
+     */
+    private boolean bulkUpdate = false;
+
+    
+    private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
+
+    /**
+     * Permissions granted to the current user on this document
+     */
+    private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
+    
+    public boolean isFillOnCheckin() {
+        return fillOnCheckin;
+    }
+
+    public void setFillOnCheckin(boolean fillOnCheckin) {
+        this.fillOnCheckin = fillOnCheckin;
+    }
+
+    public boolean isFilled() {
+        return filled;
+    }
+
+    public void setFilled(boolean filled) {
+        this.filled = filled;
+    }
+
+    public String getCustomId() {
+        return customId;
+    }
+
+    public void setCustomId(String customId) {
+        this.customId = customId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public void clearTags() {
+        tags.clear();
+    }
+
+    public void addTag(String tag) {
+        if (!tags.contains(tag))
+            tags.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        tags.remove(tag);
+    }
+
+    public boolean isImmutable() {
+        return immutable;
+    }
+
+    public void setImmutable(boolean immutable) {
+        this.immutable = immutable;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public String getTgs() {
+        return tags.stream().collect(Collectors.joining(","));
+    }
+
+    public String getTagsString() {
+        if (tagsString != null && !tagsString.isEmpty())
+            return tagsString;
+        else
+            return tags.stream().collect(Collectors.joining(" "));
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public Date getCreation() {
+        return creation;
+    }
+
+    public void setCreation(Date creation) {
+        this.creation = creation;
+    }
+
+    public String getFileVersion() {
+        return fileVersion;
+    }
+
+    public void setFileVersion(String fileVersion) {
+        this.fileVersion = fileVersion;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public Long getLockUserId() {
+        return lockUserId;
+    }
+
+    public void setLockUserId(Long lockUserId) {
+        this.lockUserId = lockUserId;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public GUIFolder getFolder() {
+        return folder;
+    }
+
+    public void setFolder(GUIFolder folder) {
+        this.folder = folder;
+    }
+
+    public String getPathExtended() {
+        return pathExtended;
+    }
+
+    public void setPathExtended(String pathExtended) {
+        this.pathExtended = pathExtended;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(String workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    public String getWorkflowStatusDisplay() {
+        return workflowStatusDisplay;
+    }
+
+    public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
+        this.workflowStatusDisplay = workflowStatusDisplay;
+    }
+
+    public boolean isSigned() {
+        return signed;
+    }
+
+    public void setSigned(boolean signed) {
+        this.signed = signed;
+    }
+
+    public boolean isStamped() {
+        return stamped;
+    }
+
+    public void setStamped(boolean stamped) {
+        this.stamped = stamped;
+    }
+
+    public boolean isOcrd() {
+        return ocrd;
+    }
+
+    public void setOcrd(boolean ocrd) {
+        this.ocrd = ocrd;
+    }
+
+    public boolean isBarcoded() {
+        return barcoded;
+    }
+
+    public void setBarcoded(boolean barcoded) {
+        this.barcoded = barcoded;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public Date getStartPublishing() {
+        return startPublishing;
+    }
+
+    public void setStartPublishing(Date startPublishing) {
+        this.startPublishing = startPublishing;
+    }
+
+    public Date getStopPublishing() {
+        return stopPublishing;
+    }
+
+    public void setStopPublishing(Date stopPublishing) {
+        this.stopPublishing = stopPublishing;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public Long getDocRef() {
+        return docRef;
+    }
+
+    public void setDocRef(Long docRef) {
+        this.docRef = docRef;
+    }
+
+    public String getExtResId() {
+        return extResId;
+    }
+
+    public void setExtResId(String extResId) {
+        this.extResId = extResId;
+    }
+
+    public String getDocRefType() {
+        return docRefType;
+    }
+
+    public void setDocRefType(String docRefType) {
+        this.docRefType = docRefType;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
+    public void setTagsString(String tagsString) {
+        this.tagsString = tagsString;
+    }
+
+    public int getNature() {
+        return nature;
+    }
+
+    public void setNature(int nature) {
+        this.nature = nature;
+    }
+
+    public Long getFormId() {
+        return formId;
+    }
+
+    public void setFormId(Long formId) {
+        this.formId = formId;
+    }
+
+    public String getLockUser() {
+        return lockUser;
+    }
+
+    public void setLockUser(String lockUser) {
+        this.lockUser = lockUser;
+    }
+
+    public List<Long> getNotifyUsers() {
+        return notifyUsers;
+    }
+
+    public void setNotifyUsers(List<Long> notifyUsers) {
+        this.notifyUsers = notifyUsers;
+    }
+
+    public String getNotifyMessage() {
+        return notifyMessage;
+    }
+
+    public void setNotifyMessage(String notifyMessage) {
+        this.notifyMessage = notifyMessage;
+    }
+
+    public int getIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(int indexed) {
+        this.indexed = indexed;
+    }
+
+    public int getEmbedded() {
+        return embedded;
+    }
+
+    public void setEmbedded(int embedded) {
+        this.embedded = embedded;
+    }
+
+    public boolean isPasswordProtected() {
+        return passwordProtected;
+    }
+
+    public void setPasswordProtected(boolean passwordProtected) {
+        this.passwordProtected = passwordProtected;
+    }
+
+    public boolean isBookmarked() {
+        return bookmarked;
+    }
+
+    public void setBookmarked(boolean bookmarked) {
+        this.bookmarked = bookmarked;
+    }
+
+    public int getLinks() {
+        return links;
+    }
+
+    public void setLinks(int links) {
+        this.links = links;
+    }
+
+    public Long getOcrTemplateId() {
+        return ocrTemplateId;
+    }
+
+    public void setOcrTemplateId(Long ocrTemplateId) {
+        this.ocrTemplateId = ocrTemplateId;
+    }
+
+    public Long getBarcodeTemplateId() {
+        return barcodeTemplateId;
+    }
+
+    public void setBarcodeTemplateId(Long barcodeTemplateId) {
+        this.barcodeTemplateId = barcodeTemplateId;
+    }
+
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public Long getPublisherId() {
+        return publisherId;
+    }
+
+    public void setPublisherId(Long publisherId) {
+        this.publisherId = publisherId;
+    }
+
+    public int getPreviewPages() {
+        return previewPages;
+    }
+
+    public void setPreviewPages(int previewPages) {
+        this.previewPages = previewPages;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public boolean isBulkUpdate() {
+        return bulkUpdate;
+    }
+
+    public void setBulkUpdate(boolean bulkUpdate) {
+        this.bulkUpdate = bulkUpdate;
+    }
+
+    public int getDocAttrs() {
+        if (docAttrs == 0 && getAttributes().isEmpty())
+            for (GUIAttribute att : getAttributes())
+                if (att.getType() == GUIAttribute.TYPE_DOCUMENT && att.getIntValue() != null)
+                    docAttrs++;
+        return docAttrs;
+    }
+
+    public void setDocAttrs(int docAttrs) {
+        this.docAttrs = docAttrs;
+    }
+
+    public GUIAccessControlEntry getAllowedPermissions() {
+        return allowedPermissions;
+    }
+
+    public void setAllowedPermissions(GUIAccessControlEntry permissions) {
+        this.allowedPermissions = permissions;
+    }
+
+    public boolean isCustomid() {
+        return allowedPermissions.isCustomid();
+    }
+
+    public boolean isRevision() {
+        return allowedPermissions.isRevision();
+    }
+
+    public boolean isRead() {
+        return allowedPermissions.isRead();
+    }
+
+    public boolean isWrite() {
+        return allowedPermissions.isWrite();
+    }
+
+    public boolean isPreview() {
+        return allowedPermissions.isPreview();
+    }
+
+    public boolean isDownload() {
+        return allowedPermissions.isDownload();
+    }
+
+    public boolean isMove() {
+        return allowedPermissions.isMove();
+    }
+
+    public boolean isDelete() {
+        return allowedPermissions.isDelete();
+    }
+
+    public boolean isRename() {
+        return allowedPermissions.isRename();
+    }
+
+    public String getLastNote() {
+        return lastNote;
+    }
+
+    public void setLastNote(String lastNote) {
+        this.lastNote = lastNote;
+    }
+
+    public String getRevision() {
+        return revision;
+    }
+
+    public void setRevision(String revision) {
+        this.revision = revision;
+    }
+
+    public boolean hasPermission(String permission) {
+        return allowedPermissions.isPermissionAllowed(permission);
+    }
+
+    public List<GUIAccessControlEntry> getAccessControlList() {
+        return accessControlList;
+    }
+
+    public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+        this.accessControlList = accessControlList;
+    }
+
+    public Long getFillerId() {
+        return fillerId;
+    }
+
+    public void setFillerId(Long fillerId) {
+        this.fillerId = fillerId;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+        result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
+        result = prime * result + ((folder == null) ? 0 : folder.hashCode());
+        result = prime * result + ((version == null) ? 0 : version.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        GUIDocument other = (GUIDocument) obj;
+        if (fileName == null) {
+            if (other.fileName != null)
+                return false;
+        } else if (!fileName.equals(other.fileName))
+            return false;
+        if (fileVersion == null) {
+            if (other.fileVersion != null)
+                return false;
+        } else if (!fileVersion.equals(other.fileVersion))
+            return false;
+        if (folder == null) {
+            if (other.folder != null)
+                return false;
+        } else if (!folder.equals(other.folder))
+            return false;
+        if (version == null) {
+            if (other.version != null)
+                return false;
+        } else if (!version.equals(other.version))
+            return false;
+        return true;
+    }
 }

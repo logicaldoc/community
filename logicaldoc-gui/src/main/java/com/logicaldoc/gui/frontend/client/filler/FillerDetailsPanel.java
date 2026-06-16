@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.autofill;
+package com.logicaldoc.gui.frontend.client.filler;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;

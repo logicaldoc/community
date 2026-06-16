@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.autofill;
+package com.logicaldoc.gui.frontend.client.filler;
 
 import java.io.Serializable;
 
