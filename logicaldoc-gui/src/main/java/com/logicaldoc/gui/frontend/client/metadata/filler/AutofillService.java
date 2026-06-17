@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.filler;
+package com.logicaldoc.gui.frontend.client.metadata.filler;
 
 import java.util.List;
 
@@ -112,6 +112,23 @@ public interface AutofillService extends RemoteService {
      */
     public String testRegex(String sample, String regex, boolean inclusive) throws ServerException;
 
+    
+    /**
+     * Reschedule all documents for processing
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void rescheduleAll() throws ServerException;
+
+    /**
+     * Marks a set of documents as not processable
+     * 
+     * @param ids document identifiers
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void markUnprocessable(List<Long> ids) throws ServerException;
+    
     public static class Instance {
         private static AutofillServiceAsync inst;
 

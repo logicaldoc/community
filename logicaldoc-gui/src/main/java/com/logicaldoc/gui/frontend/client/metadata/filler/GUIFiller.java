@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.filler;
+package com.logicaldoc.gui.frontend.client.metadata.filler;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.filler.RegexTesterDialog;
+import com.logicaldoc.gui.frontend.client.metadata.filler.RegexTesterDialog;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;

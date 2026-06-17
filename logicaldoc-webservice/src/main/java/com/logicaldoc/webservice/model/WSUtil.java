@@ -28,6 +28,7 @@ import com.logicaldoc.core.document.EmbeddingStatus;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.document.Version;
+import com.logicaldoc.core.filler.Fillable.FillMode;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -95,7 +96,7 @@ public class WSUtil {
             wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
             wsDoc.setBarcoded(document.isBarcoded() ? 1 : 0);
             wsDoc.setFillerId(document.getFillerId());
-            wsDoc.setFillOnCheckin(document.getFillOnCheckin() ? 1 : 0);
+            wsDoc.setFillMode(document.getFillMode().ordinal());
 
             if (document instanceof Document doc) {
                 wsDoc.setDocRef(doc.getDocRef());
@@ -245,7 +246,7 @@ public class WSUtil {
         doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
         doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
         doc.setFillerId(wsDoc.getFillerId());
-        doc.setFillOnCheckin(wsDoc.getFillOnCheckin() == 1);
+        doc.setFillMode(FillMode.values()[wsDoc.getFillMode()]);
 
         doc.setSigned(wsDoc.getSigned() == 1);
         doc.setBarcoded(wsDoc.getBarcoded() == 1);

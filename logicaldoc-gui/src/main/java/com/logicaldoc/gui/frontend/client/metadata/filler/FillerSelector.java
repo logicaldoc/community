@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.filler;
+package com.logicaldoc.gui.frontend.client.metadata.filler;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.MultipleAppearance;

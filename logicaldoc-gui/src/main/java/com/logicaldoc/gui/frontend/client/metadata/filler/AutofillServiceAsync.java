@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.filler;
+package com.logicaldoc.gui.frontend.client.metadata.filler;
 
 import java.util.List;
 
@@ -22,4 +22,8 @@ public interface AutofillServiceAsync {
 	void fill(GUIDocument document, long fillerId, boolean explain, AsyncCallback<GUIDocument> callback);
 
 	void testRegex(String sample, String regex, boolean inclusive, AsyncCallback<String> callback);
+	
+	void rescheduleAll(AsyncCallback<Void> callback);
+
+    void markUnprocessable(List<Long> ids, AsyncCallback<Void> asyncCallback);
 }

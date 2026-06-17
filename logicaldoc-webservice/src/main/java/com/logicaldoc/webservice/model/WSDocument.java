@@ -228,8 +228,8 @@ public class WSDocument implements Serializable {
 	@WSDoc(required = false, description = "identifier of the filler to use when autofilling")
 	private Long fillerId;
 
-	@WSDoc(required = false, description = "if the filler mus work on checkin")
-    private int fillOnCheckin = 1;
+	@WSDoc(required = false, description = "how the fill should be done: 0=all, 1=immediate, 2=deferred")
+    private int fillMode;
 	
 	public Collection<String> listAttributeNames() {
 		List<String> names = new ArrayList<>();
@@ -247,14 +247,6 @@ public class WSDocument implements Serializable {
 		return null;
 	}
 	
-	public int getFillOnCheckin() {
-        return fillOnCheckin;
-    }
-
-    public void setFillOnCheckin(int fillOnCheckin) {
-        this.fillOnCheckin = fillOnCheckin;
-    }
-
     public long getFileSize() {
 		return fileSize;
 	}
@@ -722,4 +714,12 @@ public class WSDocument implements Serializable {
 	public void setFillerId(Long fillerId) {
 		this.fillerId = fillerId;
 	}
+
+    public int getFillMode() {
+        return fillMode;
+    }
+
+    public void setFillMode(int fillMode) {
+        this.fillMode = fillMode;
+    }
 }

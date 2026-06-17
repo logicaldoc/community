@@ -21,7 +21,7 @@ import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.frontend.client.filler.AutofillService;
+import com.logicaldoc.gui.frontend.client.metadata.filler.AutofillService;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.types.TitleOrientation;

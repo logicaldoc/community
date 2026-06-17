@@ -1,9 +1,10 @@
-package com.logicaldoc.gui.frontend.client.filler;
+package com.logicaldoc.gui.frontend.client.metadata.filler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -11,7 +12,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
-import com.logicaldoc.gui.frontend.client.metadata.barcode.BarcodeQueuePanel;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -62,7 +62,7 @@ public class FillersPanel extends AdminPanel {
     public void onDraw() {
         tab.setPane(prepareFillersPanel());
         Tab processingQueueTab = new Tab(I18N.message("processingqueue"));
-        processingQueueTab.setPane(new BarcodeQueuePanel(100));
+        processingQueueTab.setPane(new AutofillQueuePanel(100));
         tabs.addTab(processingQueueTab);
 
     }
@@ -130,6 +130,12 @@ public class FillersPanel extends AdminPanel {
         add.setTitle(I18N.message("addfiller"));
         toolStrip.addButton(add);
         add.addClickHandler(event -> onAddFiller());
+
+        ToolStripButton settings = new ToolStripButton();
+        settings.setTitle(I18N.message("settings"));
+        settings.addClickHandler(click -> new AutofillSettings().show());
+        if (Session.get().isDefaultTenant())
+            toolStrip.addButton(settings);
 
         toolStrip.addFill();
 

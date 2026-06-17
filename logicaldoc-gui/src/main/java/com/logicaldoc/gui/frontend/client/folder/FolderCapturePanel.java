@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.frontend.client.filler.FillerSelector;
+import com.logicaldoc.gui.frontend.client.metadata.filler.FillerSelector;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;

@@ -6,7 +6,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.ai.embedding.EmbeddingsAndVectorStorePanel;
 import com.logicaldoc.gui.frontend.client.ai.robot.RobotsPanel;
-import com.logicaldoc.gui.frontend.client.filler.FillersPanel;
+import com.logicaldoc.gui.frontend.client.metadata.filler.FillersPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.layout.VLayout;
