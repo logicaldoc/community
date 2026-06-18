@@ -266,6 +266,11 @@ public class FillerProperties extends FillerDetailsTab {
         barcodeTemplateSelector.setVisibleWhen(barcodeCriteria);
         barcodeTemplateSelector.setRequiredWhen(barcodeCriteria);
 
+        SelectItem ocrTemplateSelector = ItemFactory.newOCRTemplateSelector(false, null, filler.getTemplateId());
+        AdvancedCriteria ocrCriteria = new AdvancedCriteria(TYPE, OperatorId.EQUALS, "zonalocr");
+        ocrTemplateSelector.setVisibleWhen(ocrCriteria);
+        ocrTemplateSelector.setRequiredWhen(ocrCriteria);
+
         AdvancedCriteria modelVisible = new AdvancedCriteria(OperatorId.OR,
                 new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, LANGUAGE),
                         new Criterion(TYPE, OperatorId.EQUALS, ATTRIBUTE),
@@ -304,7 +309,7 @@ public class FillerProperties extends FillerDetailsTab {
 
         form.setItems(id, type, strategy, name, label, overwrite, onCheckin, modelSelector, embeddingSelector,
                 threshold, candidate, attribute, format, decimalSep, groupingSep, exclusionRegex, inclusionRegex,
-                barcodeTemplateSelector, description);
+                barcodeTemplateSelector, ocrTemplateSelector, description);
 
         container.addMember(form);
 
@@ -367,6 +372,10 @@ public class FillerProperties extends FillerDetailsTab {
 
             if ("barcode".equals(filler.getType())) {
                 filler.setTemplateId(Long.parseLong(form.getValueAsString("barcodetemplate")));
+            }
+
+            if ("zonalocr".equals(filler.getType())) {
+                filler.setTemplateId(Long.parseLong(form.getValueAsString("ocrtemplate")));
             }
 
             // Chain handling
