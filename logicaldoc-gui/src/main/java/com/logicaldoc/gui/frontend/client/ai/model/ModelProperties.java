@@ -44,6 +44,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ModelProperties extends ModelDetailsTab {
 
+    private static final String THRESHOLD = "threshold";
+
     private static final String MINCHUNKSIZE = "minchunksize";
 
     private static final String TOKENS = "tokens";
@@ -322,11 +324,19 @@ public class ModelProperties extends ModelDetailsTab {
         trainingImagesHeight.addChangedHandler(changedHandler);
         trainingImagesHeight.setVisibleWhen(YOLO_CRITERIA);
         trainingImagesHeight.setRequiredWhen(YOLO_CRITERIA);
+        
+        SpinnerItem threshold = ItemFactory.newSpinnerItem(THRESHOLD, Math.round(model.getThreshold() * 100));
+        threshold.setMin(0);
+        threshold.setMax(100);
+        threshold.setStep(1);
+        threshold.addChangedHandler(changedHandler);
+        threshold.setVisibleWhen(YOLO_CRITERIA);
+        threshold.setRequiredWhen(YOLO_CRITERIA);
 
         form.setItems(id, typeValue, type, name, label, features, categories, activationSelector, weightInit, loss,
                 updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
                 minWordFrequency, windowSize, chunkSize, minChunkSize, minChunkSizeChars, maxChunks, workers, alpha,
-                minAlpha, trainingImagesWidth, trainingImagesHeight, description);
+                minAlpha, trainingImagesWidth, trainingImagesHeight, threshold, description);
 
         container.setMembersMargin(3);
         container.addMember(form);
@@ -401,6 +411,14 @@ public class ModelProperties extends ModelDetailsTab {
         model.setTrainingImagesWidth(Integer.parseInt(form.getValueAsString("trainingimageswidth")));
         model.setTrainingImagesHeight(Integer.parseInt(form.getValueAsString("trainingimagesheight")));
 
+        Integer thresholdValue = (Integer) form.getValue(THRESHOLD);
+        if (thresholdValue != null) {
+            model.setThreshold(thresholdValue / 100d);
+        } else {
+            model.setThreshold(0);
+        }
+
+        
         if (NEURAL.equals(model.getType())) {
             com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
             if (layerRecords.length < 2) {

@@ -266,7 +266,7 @@ create table ld_filler (ld_id bigint not null, ld_lastmodified timestamp not nul
 						ld_description varchar(4000), ld_type varchar(50) not null, ld_modelid bigint, ld_embeddingschemeid bigint, ld_threshold float, 
 						ld_checkin int not null, ld_overwrite int not null, ld_automation varchar(10000), ld_attribute varchar(255),
 						ld_candidate varchar(255), ld_format varchar(1000), ld_dsep varchar(2), ld_gsep varchar(2), ld_automationbefore varchar(10000),
-						ld_regexcl varchar(1000), ld_regincl varchar(1000), primary key (ld_id));
+						ld_regexcl varchar(1000), ld_regincl varchar(1000), ld_templateid bigint, primary key (ld_id));
 create table ld_filler_chain (ld_fillerid bigint not null, ld_chainedid bigint not null, ld_position int not null, primary key (ld_fillerid, ld_chainedid));      
 
                           

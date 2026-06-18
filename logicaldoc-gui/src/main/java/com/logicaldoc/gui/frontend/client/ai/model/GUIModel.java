@@ -59,6 +59,8 @@ public class GUIModel implements Serializable {
 
     double minAlpha = 0.0001D;
 
+    double threshold = 0.2D;
+
     /**
      * Words that do not appear this minimum number of times must be discarded
      */
@@ -366,5 +368,13 @@ public class GUIModel implements Serializable {
 
     public void setTrainingImagesHeight(int trainingImagesHeight) {
         this.trainingImagesHeight = trainingImagesHeight;
+    }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
     }
 }
