@@ -90,7 +90,20 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 			}
 		});
 
-		form.setItems(folder, format, include, exclude, startDate, deleteFomMailbox);
+		SelectItem template = ItemFactory.newTemplateSelector(true, null);
+		template.addChangedHandler(changedHandler);
+		template.setMultiple(false);
+		if (account.getTemplateId() != null)
+			template.setValue(account.getTemplateId().toString());
+
+		template.addChangedHandler(event -> {
+			if (form.getValueAsString("template") == null || form.getValueAsString("template").isEmpty())
+				account.setTemplateId(null);
+			else
+				account.setTemplateId(Long.parseLong(form.getValueAsString("template")));
+		});
+
+		form.setItems(folder, format, include, exclude, startDate, template, deleteFomMailbox);
 
 		formsContainer.addMember(form);
 	}
@@ -106,7 +119,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		}
 		return !form.hasErrors();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

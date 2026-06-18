@@ -118,7 +118,6 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		}
 	}
 
-	
 	/**
 	 * Saves the security settings in another thread waiting for the referenced
 	 * template to be available into the database.
@@ -160,14 +159,14 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		jdbcUpdate("delete from ld_template_acl where ld_templateid=" + template.getId());
 		for (AccessControlEntry ace : template.getAccessControlList()) {
 			jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_write, ld_read) values ("
-					+ template.getId() + ", " + ace.getGroupId() + ", " + (ace.isWrite() ? "1" : "0") + ", " + (ace.isRead() ? "1" : "0" )+ ")");
+					+ template.getId() + ", " + ace.getGroupId() + ", " + (ace.isWrite() ? "1" : "0") + ", "
+					+ (ace.isRead() ? "1" : "0") + ")");
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Stored security settings of template {}", template.getId());
 	}
 
-	
 	private void removeForbiddenPermissionsForGuests(Template template) throws PersistenceException {
 		// Remove the forbidden permissions for the guests
 		GroupDAO gDao = Context.get(GroupDAO.class);
@@ -178,7 +177,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			}
 		}
 	}
-	
+
 	@Override
 	public long countFolders(long id) {
 		try {
@@ -300,11 +299,17 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		Template originalTemplate = findById(id, true);
 		initialize(originalTemplate);
 		Template clonedTemplate = new Template();
-		clonedTemplate.setName(cloneName);
+
+		String finalName = cloneName;
+		int counter = 1;
+		while (findByName(finalName, originalTemplate.getTenantId()) != null)
+			finalName = cloneName + "-" + counter++;
+
+		clonedTemplate.setName(finalName);
 		if (originalTemplate.getLabel() != null)
 			clonedTemplate.setLabel(originalTemplate.getLabel() + "-Clone");
 		clonedTemplate.setDescription(originalTemplate.getDescription());
-		clonedTemplate.setReadonly(originalTemplate.isReadonly());
+		clonedTemplate.setReadonly(false);
 		clonedTemplate.setValidation(originalTemplate.getValidation());
 		clonedTemplate.setInitialization(originalTemplate.getInitialization());
 		clonedTemplate.setTemplateAttributes(originalTemplate.getTemplateAttributes().entrySet().stream()

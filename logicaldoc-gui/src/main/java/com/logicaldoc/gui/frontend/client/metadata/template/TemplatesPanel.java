@@ -131,10 +131,7 @@ public class TemplatesPanel extends VLayout {
 		toolStrip.addFill();
 
 		list.addCellContextClickHandler(event -> {
-			ListGridRecord rec = list.getSelectedRecord();
-			if (!Boolean.parseBoolean(rec.getAttributeAsString("readonly"))) {
-				showContextMenu();
-			}
+			showContextMenu();
 			event.cancel();
 		});
 
@@ -175,6 +172,8 @@ public class TemplatesPanel extends VLayout {
 		final ListGridRecord selectedRecord = list.getSelectedRecord();
 		final long selectedTemplateId = selectedRecord.getAttributeAsLong("id");
 
+		boolean readonly = Boolean.parseBoolean(selectedRecord.getAttributeAsString("readonly"));
+
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
@@ -201,10 +200,14 @@ public class TemplatesPanel extends VLayout {
 						templateIdToSelect = templateClone.getId();
 						showTemplateDetails(templateClone);
 					}
-
 				}));
 
-		contextMenu.setItems(clone, new MenuItemSeparator(),delete);
+		if (readonly) {
+			contextMenu.setItems(clone);
+		} else {
+			contextMenu.setItems(clone, new MenuItemSeparator(), delete);
+		}
+
 		contextMenu.showContextMenu();
 	}
 
@@ -250,7 +253,7 @@ public class TemplatesPanel extends VLayout {
 				Arrays.asList(GUIAccessControlEntry.PERMISSION_READ, GUIAccessControlEntry.PERMISSION_WRITE));
 		showTemplateDetails(newTemplate);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

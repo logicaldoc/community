@@ -91,6 +91,8 @@ public class GUIEmailAccount implements Serializable {
 
 	private String automationEnd;
 
+	private Long templateId;
+
 	public GUIEmailAccount() {
 		super();
 		target = null;
@@ -302,5 +304,13 @@ public class GUIEmailAccount implements Serializable {
 
 	public void setAutomationEnd(String automationEnd) {
 		this.automationEnd = automationEnd;
+	}
+
+	public Long getTemplateId() {
+		return templateId;
+	}
+
+	public void setTemplateId(Long templateid) {
+		this.templateId = templateid;
 	}
 }
