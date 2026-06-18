@@ -21,7 +21,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -36,8 +35,6 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template> implements TemplateDAO {
 
-	private static final String TENANT_ID_EQUAL = ".tenantId=";
-
 	@Resource(name = "userDAO")
 	protected UserDAO userDAO;
 
@@ -49,7 +46,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll() {
 		try {
-			return findByWhere(" 1=1", ENTITY + ".name", null);
+			return findByWhere(" 1=1", "_entity.name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -59,7 +56,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ENTITY + ".name", null);
+			return findByWhere(" _entity.tenantId = %d".formatted(tenantId), "_entity.name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -70,9 +67,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	public Template findByName(String name, long tenantId) throws PersistenceException {
 		Template template = null;
 
-		List<Template> coll = findByWhere(
-				ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-				null, null);
+		List<Template> coll = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
+				Map.of("name", name, "tenantId", tenantId), null, null);
 		if (CollectionUtils.isNotEmpty(coll))
 			template = coll.iterator().next();
 		if (template != null && template.getDeleted() == 1)
@@ -98,7 +94,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 		if (template != null) {
 			template.setDeleted(code);
-			template.setName(template.getName() + "." + template.getId());
+			template.setName("%s.%d".formatted(template.getName(), template.getId()));
 			saveOrUpdate(template);
 		}
 	}
@@ -132,7 +128,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		ThreadPools.get().schedule(() -> {
 			try {
 				// Wait for the document's record write
-				String documentWriteCheckQuery = "select count(*) from ld_template where ld_id=" + template.getId();
+				String documentWriteCheckQuery = "select count(*) from ld_template where ld_id = %d"
+						.formatted(template.getId());
 				int count = 0;
 				int tests = 0;
 				while (count == 0 && tests < 100) {
@@ -156,12 +153,12 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	}
 
 	private void storeAcl(Template template) throws PersistenceException {
-		jdbcUpdate("delete from ld_template_acl where ld_templateid=" + template.getId());
-		for (AccessControlEntry ace : template.getAccessControlList()) {
-			jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_write, ld_read) values ("
-					+ template.getId() + ", " + ace.getGroupId() + ", " + (ace.isWrite() ? "1" : "0") + ", "
-					+ (ace.isRead() ? "1" : "0") + ")");
-		}
+		jdbcUpdate("delete from ld_template_acl where ld_templateid = %d".formatted(template.getId()));
+		for (AccessControlEntry ace : template.getAccessControlList())
+			jdbcUpdate(
+					"insert into ld_template_acl(ld_templateid, ld_groupid, ld_write, ld_read) values (%d, %d, %d, %d)"
+							.formatted(template.getId(), ace.getGroupId(), ace.isWrite() ? 1 : 0,
+									ace.isRead() ? 1 : 0));
 
 		if (log.isDebugEnabled())
 			log.debug("Stored security settings of template {}", template.getId());
@@ -181,7 +178,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public long countFolders(long id) {
 		try {
-			return queryForLong("select count(*) from ld_folder where ld_deleted=0 and ld_templateid=%d".formatted(id));
+			return queryForLong(
+					"select count(*) from ld_folder where ld_deleted = 0 and ld_templateid = %d".formatted(id));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return 0;
@@ -190,13 +188,14 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 	@Override
 	public long countDocs(long id) throws PersistenceException {
-		return queryForLong("select count(*) from ld_document where ld_deleted=0 and ld_templateid=%d".formatted(id));
+		return queryForLong(
+				"select count(*) from ld_document where ld_deleted = 0 and ld_templateid = %d".formatted(id));
 	}
 
 	@Override
 	public List<Template> findByType(int type, long tenantId) throws PersistenceException {
-		return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-				ORDER_BY + ENTITY + ".name asc", null);
+		return findByWhere("_entity.type = :type and _entity.tenantId = :tenantId",
+				Map.of("type", type, "tenantId", tenantId), "order by _entity.name asc", null);
 	}
 
 	@Override
@@ -209,9 +208,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			// Manually initialize the collection of ACEs
 			template.getAccessControlList().clear();
 
-			queryForResultSet(
-					"select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid=" + template.getId(),
-					null, null, rows -> {
+			queryForResultSet("select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid = %d"
+					.formatted(template.getId()), null, null, rows -> {
 						while (rows.next()) {
 							AccessControlEntry ace = new AccessControlEntry(rows.getLong(1));
 							ace.setWrite(rows.getInt(2) == 1);
@@ -264,23 +262,21 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				return permissions;
 
 			// If the user is an administrator bypass all controls
-			if (user.isMemberOf(Group.GROUP_ADMIN)) {
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return Permission.all();
-			}
 
 			Set<Group> groups = user.getGroups();
 			if (groups.isEmpty())
 				return permissions;
 
-			StringBuilder query = new StringBuilder("select ld_write as LDWRITE");
-			query.append(" from ld_template_acl ");
-			query.append(" where ");
-			query.append(" ld_templateid=" + templateId);
-			query.append(" and ld_groupid in (select ld_groupid from ld_usergroup where ld_userid=");
-			query.append(Long.toString(userId));
-			query.append(")");
-
-			queryForResultSet(query.toString(), null, null, rows -> {
+			queryForResultSet("""
+					select ld_write as LDWRITE 
+					  from ld_template_acl 
+					 where ld_templateid = %d
+					   and ld_groupid in (select ld_groupid 
+					                        from ld_usergroup 
+					                       where ld_userid = %d
+	            """.formatted(templateId, userId), null, null, rows -> {
 				while (rows.next()) {
 					permissions.add(Permission.READ);
 					if (rows.getInt("LDWRITE") == 1)
@@ -303,11 +299,11 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		String finalName = cloneName;
 		int counter = 1;
 		while (findByName(finalName, originalTemplate.getTenantId()) != null)
-			finalName = cloneName + "-" + counter++;
+			finalName = "%s-%d".formatted(cloneName, counter++);
 
 		clonedTemplate.setName(finalName);
-		if (originalTemplate.getLabel() != null)
-			clonedTemplate.setLabel(originalTemplate.getLabel() + "-Clone");
+		clonedTemplate.setLabel(
+				originalTemplate.getLabel() != null ? "%s - Clone".formatted(originalTemplate.getLabel()) : null);
 		clonedTemplate.setDescription(originalTemplate.getDescription());
 		clonedTemplate.setReadonly(false);
 		clonedTemplate.setValidation(originalTemplate.getValidation());
@@ -315,9 +311,12 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		clonedTemplate.setTemplateAttributes(originalTemplate.getTemplateAttributes().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		store(clonedTemplate);
-		jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write) select "
-				+ clonedTemplate.getId() + ", ld_groupid, ld_read, ld_write from ld_template_acl where ld_templateid="
-				+ id);
+		jdbcUpdate("""
+                   insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write) 
+                                        select %d, ld_groupid, ld_read, ld_write 
+                                          from ld_template_acl 
+                                         where ld_templateid = %d
+                   """.formatted(clonedTemplate.getId(), id));
 		initialize(clonedTemplate);
 		return clonedTemplate;
 	}

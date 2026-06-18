@@ -123,8 +123,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	private void store(Template template) throws ServerException {
 		try {
-			TemplateDAO dao = TemplateDAO.get();
-			dao.store(template);
+			TemplateDAO.get().store(template);
 		} catch (Exception e) {
 			throw new ServerException(
 					String.format("Template has not been %s", template.getId() != 0L ? "updated" : "stored"), e);
@@ -134,9 +133,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	@Override
 	public GUITemplate clone(long templateId, String cloneName) throws ServerException {
 		try {
-			TemplateDAO dao = TemplateDAO.get();
-			Template clone = dao.clone(templateId, cloneName);
-			return getTemplate(clone.getId());
+			return getTemplate(TemplateDAO.get().clone(templateId, cloneName).getId());
 		} catch (Exception e) {
 			throw new ServerException(String.format("Template %d has not been cloned", templateId), e);
 		}
