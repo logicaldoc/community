@@ -102,7 +102,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		history.setFilename("pippo");
 		history.setVersion("2.0");
 
-		history.setPath("/" + "paperino");
+		history.setPath("/%s".formatted("paperino"));
 
 		history.setDate(new Date());
 		history.setUserId(1L);

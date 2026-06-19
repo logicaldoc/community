@@ -246,11 +246,16 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         Folder root = dao.findById(folderId);
         String pathPrefix = root.getPath();
         long[] stats = new long[] { 0L, 0L };
-        dao.queryForResultSet(
-                "select count(D.ld_id), sum(D.ld_filesize) from ld_document D, ld_folder F where D.ld_deleted=0 and F.ld_deleted=0 and D.ld_folderid=F.ld_id and (F.ld_id="
-                        + folderId + " or F.ld_path like '" + pathPrefix + "/%') " + " and not ld_status="
-                        + DocumentStatus.ARCHIVED.ordinal(),
-                null, null, rows -> {
+        dao.queryForResultSet("""
+                    select count(D.ld_id), sum(D.ld_filesize) 
+                      from ld_document D, ld_folder F 
+                     where D.ld_deleted = 0 
+                       and F.ld_deleted = 0 
+                       and D.ld_folderid = F.ld_id 
+                       and (F.ld_id = :folderId or F.ld_path like :path) 
+                       and not ld_status = :status
+                """, Map.of("folderId", folderId, "path", "%s/%%".formatted(pathPrefix), "status",
+                DocumentStatus.ARCHIVED.ordinal()), null, rows -> {
                     if (rows.next()) {
                         stats[0] = rows.getLong(1);
                         stats[1] = rows.getLong(2);

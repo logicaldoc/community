@@ -28,88 +28,88 @@ import net.sf.ehcache.Element;
  * @param <V> The object instance
  */
 public class EhCache<K extends Serializable, V extends Object> implements com.logicaldoc.util.cache.Cache<K, V> {
-	
-	private static final Logger log = LoggerFactory.getLogger(EhCache.class);
 
-	private net.sf.ehcache.Cache cache;
+    private static final Logger log = LoggerFactory.getLogger(EhCache.class);
 
-	private static CacheManager manager;
+    private net.sf.ehcache.Cache cache;
 
-	public EhCache(Cache cache) {
-		super();
-		this.cache = cache;
-	}
+    private static CacheManager manager;
 
-	public boolean contains(K key) {
-		try {
-			return (cache.get(key) != null);
-		} catch (CacheException e) {
-			throw new CacheException("contains failed", e);
-		}
-	}
+    public EhCache(Cache cache) {
+        super();
+        this.cache = cache;
+    }
 
-	@SuppressWarnings("unchecked")
-	public Collection<K> getKeys() {
-		return cache.getKeys();
-	}
+    public boolean contains(K key) {
+        try {
+            return (cache.get(key) != null);
+        } catch (CacheException e) {
+            throw new CacheException("contains failed", e);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public V get(K key) {
-		try {
-			Element element = cache.get(key);
-			if (element != null) {
-				return (V) element.getObjectValue();
-			} else {
-				return null;
-			}
-		} catch (IllegalStateException ie) {
-			throw new CacheException("Failed to get from EhCache as state invalid: \n" + "  state: " + cache.getStatus()
-					+ "\n" + "   key: " + key, ie);
-		} catch (CacheException e) {
-			throw new CacheException("Failed to get from EhCache: \n" + "   key: " + key, e);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public Collection<K> getKeys() {
+        return cache.getKeys();
+    }
 
-	public void put(K key, V value) {
-		Element element = new Element(key, value);
-		cache.put(element);
-	}
+    @SuppressWarnings("unchecked")
+    public V get(K key) {
+        try {
+            Element element = cache.get(key);
+            if (element != null) {
+                return (V) element.getObjectValue();
+            } else {
+                return null;
+            }
+        } catch (IllegalStateException ie) {
+            throw new CacheException("Failed to get from EhCache as state invalid: \n state: %s \n key: %s"
+                    .formatted(cache.getStatus(), key), ie);
+        } catch (CacheException e) {
+            throw new CacheException("Failed to get from EhCache: \n key: %s".formatted(key), e);
+        }
+    }
 
-	public void remove(K key) {
-		cache.remove(key);
-	}
+    public void put(K key, V value) {
+        Element element = new Element(key, value);
+        cache.put(element);
+    }
 
-	public void clear() {
-		cache.removeAll();
-	}
+    public void remove(K key) {
+        cache.remove(key);
+    }
 
-	@Override
-	public void flush() {
-		cache.flush();
-	}
+    public void clear() {
+        cache.removeAll();
+    }
 
-	@Override
-	public long getSize() {
-		return cache.getSize();
-	}
+    @Override
+    public void flush() {
+        cache.flush();
+    }
 
-	public static final synchronized void reloadManager() {
-		if (manager != null)
-			manager.shutdown();
-		getManager();
-	}
+    @Override
+    public long getSize() {
+        return cache.getSize();
+    }
 
-	public static final synchronized CacheManager getManager() {
-		if (manager == null) {
-			try {
-				System.setProperty(CacheManager.ENABLE_SHUTDOWN_HOOK_PROPERTY, "TRUE");
-				URL resource = Cache.class.getResource("/cache.xml");
-				manager = CacheManager.create(Paths.get(resource.toURI()).toFile().getAbsolutePath());
-			} catch (Exception e) {
-				log.error("Cannot initialize the cache manager");
-				return null;
-			}
-		}
-		return manager;
-	}
+    public static final synchronized void reloadManager() {
+        if (manager != null)
+            manager.shutdown();
+        getManager();
+    }
+
+    public static final synchronized CacheManager getManager() {
+        if (manager == null) {
+            try {
+                System.setProperty(CacheManager.ENABLE_SHUTDOWN_HOOK_PROPERTY, "TRUE");
+                URL resource = Cache.class.getResource("/cache.xml");
+                manager = CacheManager.create(Paths.get(resource.toURI()).toFile().getAbsolutePath());
+            } catch (Exception e) {
+                log.error("Cannot initialize the cache manager");
+                return null;
+            }
+        }
+        return manager;
+    }
 }
