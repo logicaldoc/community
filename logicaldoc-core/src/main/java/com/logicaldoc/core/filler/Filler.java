@@ -354,8 +354,6 @@ public abstract class Filler extends PersistentObject {
         // In any case after filling we must update the filled flag
         if (!document.isFilled()) {
             document.setFilled(true);
-            DocumentDAO.get().store(document);
-
             if (log.isDebugEnabled())
                 log.debug("Document {} marked as filled", document);
         }

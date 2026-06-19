@@ -73,6 +73,10 @@ public class ExportArchivesList extends VLayout {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 250);
 		name.setCanFilter(true);
 
+		ListGridField description = new ListGridField("description", I18N.message("description"), 250);
+		description.setCanFilter(true);
+		description.setHidden(true);
+		
 		ListGridField type = new ListGridField("type", I18N.message("type"), 130);
 		type.setHidden(true);
 		ListGridField typeLabel = new ListGridField("typelabel", I18N.message("type"), 130);
@@ -103,9 +107,9 @@ public class ExportArchivesList extends VLayout {
 		list.setWidth100();
 		list.setHeight100();
 		if (this.archivesType == GUIArchive.TYPE_STORE)
-			list.setFields(id, created, name, size, status, creator, closer, aosManager, pathOnServer);
+			list.setFields(id, created, name, description, size, status, creator, closer, aosManager, pathOnServer);
 		else
-			list.setFields(id, created, name, size, status, creator, closer, pathOnServer);
+			list.setFields(id, created, name, description, size, status, creator, closer, pathOnServer);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
