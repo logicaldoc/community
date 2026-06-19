@@ -413,7 +413,11 @@ public class ItemFactory {
     private ItemFactory() {
     }
 
-    public static ColorPickerItem newColorPickerItem(String name, String title, String value, boolean clearOption,
+    public static ColorPickerItem newColorPickerItem(
+            String name,
+            String title,
+            String value,
+            boolean clearOption,
             ChangedHandler changedHandler) {
         ColorPickerItem item = new ColorPickerItem(originalItemName(name));
 
@@ -505,7 +509,10 @@ public class ItemFactory {
         return date;
     }
 
-    public static MultiComboBoxItem newMultipleUsersSelector(String name, String title, boolean skipDisabled,
+    public static MultiComboBoxItem newMultipleUsersSelector(
+            String name,
+            String title,
+            boolean skipDisabled,
             long[] selection) {
         String[] ids = null;
 
@@ -527,7 +534,9 @@ public class ItemFactory {
         return item;
     }
 
-    public static FolderSelector newFolderSelectorForAttribute(String name, String title,
+    public static FolderSelector newFolderSelectorForAttribute(
+            String name,
+            String title,
             List<FormItemIcon> additionalIcons) {
         final FolderSelector item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER),
                 additionalIcons);
@@ -536,13 +545,19 @@ public class ItemFactory {
         return item;
     }
 
-    public static SelectItem newUserSelectorForAttribute(String name, String title, String groupIdOrName,
+    public static SelectItem newUserSelectorForAttribute(
+            String name,
+            String title,
+            String groupIdOrName,
             List<FormItemIcon> additionalIcons) {
         return new UserSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), title, groupIdOrName, false, true,
                 true, additionalIcons);
     }
 
-    public static DocumentSelector newDocumentSelectorForAttribute(String name, Long defaultFolderId, String title,
+    public static DocumentSelector newDocumentSelectorForAttribute(
+            String name,
+            Long defaultFolderId,
+            String title,
             List<FormItemIcon> additionalIcons) {
         final DocumentSelector item = new DocumentSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER),
                 defaultFolderId, additionalIcons);
@@ -956,13 +971,22 @@ public class ItemFactory {
         return group;
     }
 
-    public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required,
+    public static SelectItem newUserSelector(
+            String name,
+            String title,
+            String groupIdOrName,
+            boolean required,
             boolean skipDisabled) {
         return newUserSelector(name, title, groupIdOrName, !required, skipDisabled, true);
     }
 
-    public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required,
-            boolean skipDisabled, boolean withClear) {
+    public static SelectItem newUserSelector(
+            String name,
+            String title,
+            String groupIdOrName,
+            boolean required,
+            boolean skipDisabled,
+            boolean withClear) {
         return new UserSelector(name, title, groupIdOrName, !required, skipDisabled, withClear, null);
     }
 
@@ -989,7 +1013,10 @@ public class ItemFactory {
         return tenant;
     }
 
-    public static SelectItem newAutomationRoutineSelector(String name, Long value, final ChangedHandler handler,
+    public static SelectItem newAutomationRoutineSelector(
+            String name,
+            Long value,
+            final ChangedHandler handler,
             boolean showEmpty) {
         final SelectItem select = newSelectItem(originalItemName(name), "routine");
         select.setValueField("id");
@@ -1047,7 +1074,7 @@ public class ItemFactory {
     public static SelectItem newFillModeSelector() {
         return newFillModeSelector(false);
     }
-    
+
     public static SelectItem newFillModeSelector(boolean withEmpty) {
         SelectItem item = newSelectItem("fillmode", "fillmode");
         item.setDisabled(!Feature.enabled(Feature.AUTOFILL));
@@ -1097,7 +1124,10 @@ public class ItemFactory {
         return newCheckbox(name, name);
     }
 
-    public static MultiComboBoxItem newMultiComboBoxItem(String name, String title, DataSource options,
+    public static MultiComboBoxItem newMultiComboBoxItem(
+            String name,
+            String title,
+            DataSource options,
             Object[] values) {
         MultiComboBoxItem item = new MultiComboBoxItem(name, I18N.message(title));
         item.setLayoutStyle(MultiComboBoxLayoutStyle.FLOW);
@@ -1257,7 +1287,10 @@ public class ItemFactory {
         return securityOption;
     }
 
-    public static SelectItem newEventsSelector(String name, String title, final ChangedHandler handler,
+    public static SelectItem newEventsSelector(
+            String name,
+            String title,
+            final ChangedHandler handler,
             EventSelectorOptions options) {
         final SelectItem select = newMultipleSelector(originalItemName(name), title);
         select.setWidth(350);
@@ -1288,7 +1321,10 @@ public class ItemFactory {
         return select;
     }
 
-    public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler,
+    public static SelectItem newEventSelector(
+            String name,
+            String title,
+            final ChangedHandler handler,
             EventSelectorOptions options) {
         final SelectItem select = newSelectItem(originalItemName(name), title);
         select.setWidth(350);
@@ -1525,7 +1561,10 @@ public class ItemFactory {
         return item;
     }
 
-    public static RichTextItem newRichTextItemForAutomation(String name, String title, String value,
+    public static RichTextItem newRichTextItemForAutomation(
+            String name,
+            String title,
+            String value,
             ChangedHandler handler) {
         RichTextItem item = new RichTextItem(name, I18N.message(title));
         item.setOverflow(Overflow.HIDDEN);
@@ -1583,7 +1622,9 @@ public class ItemFactory {
         return item;
     }
 
-    private static FormItem buildComboBoxItemForStringAttribute(GUIAttribute att, String itemName,
+    private static FormItem buildComboBoxItemForStringAttribute(
+            GUIAttribute att,
+            String itemName,
             final String initialValue) {
         FormItem item;
         item = new ComboBoxItem(itemName);
@@ -1675,7 +1716,10 @@ public class ItemFactory {
         return password;
     }
 
-    public static PasswordItem newPasswordItemPreventAutocomplete(String name, String title, String value,
+    public static PasswordItem newPasswordItemPreventAutocomplete(
+            String name,
+            String title,
+            String value,
             boolean withGeneratorTool) {
         PasswordItem password = newPasswordItemPreventAutocomplete(name, title, value);
         if (withGeneratorTool) {
@@ -1704,8 +1748,12 @@ public class ItemFactory {
      * 
      * @return the opaque item
      */
-    public static StaticTextItem newSafePasswordItem(String name, String title, String value,
-            FormItem hiddenPasswordItem, ChangedHandler changedHandler) {
+    public static StaticTextItem newSafePasswordItem(
+            String name,
+            String title,
+            String value,
+            FormItem hiddenPasswordItem,
+            ChangedHandler changedHandler) {
         StaticTextItem item = newStaticTextItem(name, title, value == null || value.isEmpty() ? "" : "*****");
 
         FormItemIcon clear = new FormItemIcon();
@@ -1925,7 +1973,11 @@ public class ItemFactory {
      * 
      * @return the new item
      */
-    public static IntegerItem newValidateIntegerItem(String name, String title, Integer value, Integer min,
+    public static IntegerItem newValidateIntegerItem(
+            String name,
+            String title,
+            Integer value,
+            Integer min,
             Integer max) {
         IntegerItem item = newIntegerItem(originalItemName(name), I18N.message(title), value);
         IntegerRangeValidator rv = null;
@@ -2065,8 +2117,12 @@ public class ItemFactory {
         return newTextAreaItem(name, name, value);
     }
 
-    public static TextAreaItem newTextAreaItemForAutomation(String name, String title, String value,
-            ChangedHandler handler, boolean withHtmlEditor) {
+    public static TextAreaItem newTextAreaItemForAutomation(
+            String name,
+            String title,
+            String value,
+            ChangedHandler handler,
+            boolean withHtmlEditor) {
         TextAreaItem item = newTextAreaItem(name, title, value);
         appendAutomationEditorIcon(item, handler, withHtmlEditor);
         if (handler != null)
@@ -2074,7 +2130,10 @@ public class ItemFactory {
         return item;
     }
 
-    public static TextAreaItem newTextAreaItemForAutomation(String name, String value, ChangedHandler handler,
+    public static TextAreaItem newTextAreaItemForAutomation(
+            String name,
+            String value,
+            ChangedHandler handler,
             boolean withHtmlEditor) {
         return newTextAreaItemForAutomation(name, name, value, handler, withHtmlEditor);
     }
@@ -2193,7 +2252,9 @@ public class ItemFactory {
      * 
      * @return the item
      */
-    public static SelectItem newBarcodeTemplateSelector(boolean withEmpty, Long filterTemplateId,
+    public static SelectItem newBarcodeTemplateSelector(
+            boolean withEmpty,
+            Long filterTemplateId,
             Long selectedTemplateId) {
         SelectItem templateItem = new SelectItem("barcodetemplate", I18N.message("barcodetemplate"));
         templateItem.setDisplayField("name");
@@ -2223,10 +2284,10 @@ public class ItemFactory {
     }
 
     public static SelectItem newAttributesSelector(String context) {
-        return newAttributesSelector(context, false, false);
+        return newAttributesSelector(context, false);
     }
 
-    public static SelectItem newAttributesSelector(String context, boolean sections, boolean extOnly) {
+    public static SelectItem newAttributesSelector(String context, boolean sections) {
         final SelectItem selectItem = new SelectItem("attributes", I18N.message("attributes"));
         selectItem.setMultiple(true);
         selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
@@ -2248,11 +2309,11 @@ public class ItemFactory {
     }
 
     public static SelectItem newAttributesSelector(boolean sections) {
-        return newAttributesSelector(null, sections, false);
+        return newAttributesSelector(null, sections);
     }
 
     public static SelectItem newAttributeSelectorForFiller() {
-        final SelectItem selectItem = newAttributesSelector("filler", false, true);
+        final SelectItem selectItem = newAttributesSelector("filler", false);
         selectItem.setMultiple(false);
         selectItem.setName("attribute");
         selectItem.setTitle(I18N.message("attribute"));
@@ -2883,7 +2944,11 @@ public class ItemFactory {
      * 
      * @return the text item
      */
-    public static TextAreaItem newTextAreaItemForNote(String name, String title, String value, ChangedHandler handler,
+    public static TextAreaItem newTextAreaItemForNote(
+            String name,
+            String title,
+            String value,
+            ChangedHandler handler,
             boolean withSimplifiedHtmlEditor) {
         TextAreaItem item = newTextAreaItem(name, title, value);
         if (withSimplifiedHtmlEditor) {
@@ -2971,7 +3036,10 @@ public class ItemFactory {
      * 
      * @return the text item
      */
-    public static RichTextItem newRichTextItemForEmail(String name, String title, String value,
+    public static RichTextItem newRichTextItemForEmail(
+            String name,
+            String title,
+            String value,
             ChangedHandler chagnedHandler) {
         RichTextItem item = newRichTextItemForAutomation(name, title, value, chagnedHandler);
         item.setName(originalItemName(name));

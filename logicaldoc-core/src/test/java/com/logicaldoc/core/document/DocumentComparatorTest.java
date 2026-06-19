@@ -37,6 +37,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 	private FolderDAO folderDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

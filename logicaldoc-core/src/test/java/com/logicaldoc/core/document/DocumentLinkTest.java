@@ -29,6 +29,7 @@ public class DocumentLinkTest extends AbstractCoreTestCase {
 	private DocumentDAO docDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

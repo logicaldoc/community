@@ -28,6 +28,7 @@ public class HibernateGenericDAOTest extends AbstractCoreTestCase {
 	private GenericDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that

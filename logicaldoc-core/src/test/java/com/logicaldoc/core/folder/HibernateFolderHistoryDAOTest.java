@@ -33,6 +33,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
     private FolderHistoryDAO dao;
 
     @Before
+    @Override
     public void setUp() throws IOException, SQLException, PluginException {
         super.setUp();
 
@@ -47,9 +48,8 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
         assertNotNull(histories);
         assertEquals(4, histories.size());
 
-        for (FolderHistory history : histories) {
+        for (FolderHistory history : histories)
             dao.delete(history.getId());
-        }
 
         histories = (Collection<FolderHistory>) dao.findByUserId(4);
         assertNotNull(histories);

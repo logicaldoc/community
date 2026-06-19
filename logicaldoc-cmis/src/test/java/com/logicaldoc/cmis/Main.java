@@ -3,7 +3,7 @@ package com.logicaldoc.cmis;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +57,7 @@ public class Main {
                         "Found repositories include %s with id %s".formatted(repository.getName(), repository.getId()));
             }
             parameters.put(SessionParameter.REPOSITORY_ID, repositories.get(0).getId());
-            LOG.info("Managed Cmis Connection Factory created at %s".formatted(LocalDateTime.now()));
+            LOG.info("Managed Cmis Connection Factory created at %s".formatted(Instant.now()));
             Session session = sessionFactory.createSession(parameters);
 
             org.apache.chemistry.opencmis.client.api.Document document = createDocument(session, "103");

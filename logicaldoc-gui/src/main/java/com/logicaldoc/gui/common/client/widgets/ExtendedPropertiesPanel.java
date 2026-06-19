@@ -147,6 +147,27 @@ public class ExtendedPropertiesPanel extends HLayout {
         if (templateChangedHandler != null)
             templateItem.addChangedHandler(templateChangedHandler);
 
+        addAutofill();
+
+        if (Feature.visible(Feature.TEMPLATE)) {
+            standardItems.add(templateItem);
+
+            if (!Feature.enabled(Feature.TEMPLATE)) {
+                templateItem.setDisabled(true);
+                templateItem.setTooltip(I18N.message("featuredisabled"));
+            }
+        }
+
+        templateForm.setItems(standardItems.toArray(new FormItem[0]));
+
+        if (allowTemplateSelection)
+            addMember(templateForm);
+
+        if (Feature.enabled(Feature.TEMPLATE))
+            prepareExtendedAttributes(extensibleObject.getTemplateId());
+    }
+
+    private void addAutofill() {
         if (Feature.enabled(Feature.AUTOFILL) && extensibleObject instanceof GUIDocument) {
             FormItemIcon fillTemplate = new FormItemIcon();
             fillTemplate.setPrompt(I18N.message("autofill"));
@@ -175,23 +196,6 @@ public class ExtendedPropertiesPanel extends HLayout {
             });
             templateItem.setIcons(fillTemplate);
         }
-
-        if (Feature.visible(Feature.TEMPLATE)) {
-            standardItems.add(templateItem);
-
-            if (!Feature.enabled(Feature.TEMPLATE)) {
-                templateItem.setDisabled(true);
-                templateItem.setTooltip(I18N.message("featuredisabled"));
-            }
-        }
-
-        templateForm.setItems(standardItems.toArray(new FormItem[0]));
-
-        if (allowTemplateSelection)
-            addMember(templateForm);
-
-        if (Feature.enabled(Feature.TEMPLATE))
-            prepareExtendedAttributes(extensibleObject.getTemplateId());
     }
 
     private void handleTemplateChangedSelection(ChangedEvent event) {

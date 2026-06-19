@@ -77,10 +77,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
     @Column(name = "ld_templatename")
     private String templateName;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "ld_version_ext", joinColumns = @JoinColumn(name = "ld_versionid"))
-    @MapKeyColumn(name = "ld_name", length = 255)
-    @OrderBy("ld_position ASC, ld_name ASC")
+    @ElementCollection(fetch = FetchType.LAZY) @CollectionTable(name = "ld_version_ext", joinColumns = @JoinColumn(name = "ld_versionid")) @MapKeyColumn(name = "ld_name", length = 255) @OrderBy("ld_position ASC, ld_name ASC")
     private Map<String, Attribute> attributes = new HashMap<>();
 
     public Version() {
@@ -150,12 +147,10 @@ public class Version extends AbstractDocument implements Comparable<Version> {
     /**
      * Calculate the new version name in the format <b>X</b>.<b>Y</b>.
      * 
-     * <ul>
-     * <li>if the new version is a release, then X will be raised by 1 and Y
-     * will be 0 (e.g.: 12.3 will become 13.0)</li>
-     * <li>if the new version is not a release, then Y will be raised by 1
-     * (e.g.: 12.3 will become 12.4)</li>
-     * </ul>
+     * <ul> <li>if the new version is a release, then X will be raised by 1 and
+     * Y will be 0 (e.g.: 12.3 will become 13.0)</li> <li>if the new version is
+     * not a release, then Y will be raised by 1 (e.g.: 12.3 will become
+     * 12.4)</li> </ul>
      * 
      * @param oldVersionName the old version in the format <b>X</b>.<b>Y</b>
      * @param major if the new version is a major release or not
@@ -260,11 +255,9 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
     /**
      * Factory method that creates a Version and replicate all given document's
-     * properties.<br>
-     * The new version and fileVersion will be set in both Document and
-     * Version<br>
-     * <br>
-     * <b>Important:</b> The created Version is not persistent
+     * properties.<br> The new version and fileVersion will be set in both
+     * Document and Version<br> <br> <b>Important:</b> The created Version is
+     * not persistent
      * 
      * @param document The document to be versioned
      * @param user The user who made the changes
@@ -439,8 +432,8 @@ public class Version extends AbstractDocument implements Comparable<Version> {
         if (versionDate == null) {
             if (other.versionDate != null)
                 return false;
-        } 
-
-        return versionDate.equals(other.versionDate);
+        } else if (!versionDate.equals(other.versionDate))
+            return false;
+        return true;
     }
 }

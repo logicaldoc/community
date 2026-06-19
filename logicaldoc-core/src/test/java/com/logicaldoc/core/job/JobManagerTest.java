@@ -36,6 +36,7 @@ public class JobManagerTest extends AbstractCoreTestCase {
 	private JobManager testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

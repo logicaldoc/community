@@ -40,6 +40,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	private DocumentHistoryDAO historyDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

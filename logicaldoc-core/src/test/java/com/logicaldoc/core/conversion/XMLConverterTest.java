@@ -25,6 +25,7 @@ public class XMLConverterTest extends AbstractCoreTestCase {
 	private static final Logger log = LoggerFactory.getLogger(XMLConverterTest.class);
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

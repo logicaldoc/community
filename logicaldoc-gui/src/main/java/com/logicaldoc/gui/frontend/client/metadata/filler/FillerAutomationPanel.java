@@ -15,7 +15,9 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class FillerAutomationPanel extends FillerDetailsTab {
 
-	private DynamicForm form = new DynamicForm();
+	private static final String AUTOMATION = "automation";
+
+    private DynamicForm form = new DynamicForm();
 
 	private HLayout container = new HLayout();
 
@@ -48,7 +50,7 @@ public class FillerAutomationPanel extends FillerDetailsTab {
 		automationBefore.setHeight("*");
 		automationBefore.addChangedHandler(changedHandler);
 
-		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
+		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation(AUTOMATION, AUTOMATION,
 				filler.getAutomation(), changedHandler, false);
 		automation.setRequired(false);
 		automation.setWidth("*");
@@ -63,7 +65,7 @@ public class FillerAutomationPanel extends FillerDetailsTab {
 	boolean validate() {
 		if (form.validate()) {
 			filler.setAutomationBefore(form.getValueAsString("automationBefore"));
-			filler.setAutomation(form.getValueAsString("automation"));
+			filler.setAutomation(form.getValueAsString(AUTOMATION));
 		}
 		return !form.hasErrors();
 	}

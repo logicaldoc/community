@@ -43,6 +43,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	private DocumentDAO docDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

@@ -1,5 +1,6 @@
 package com.logicaldoc.core.task;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -7,8 +8,12 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.parser.ParsingException;
+import com.logicaldoc.core.runtime.FeatureDisabledException;
+import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 
@@ -110,9 +115,18 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
      * @param document the document to be processed
      * @param user the user to process the document in the name of
      * 
+     * @throws IOException I/O exception
+     * @throws PersistenceException Error in the data layer
+     * @throws AutomationException Error during Automation execution
+     * @throws SearchException Error during a search
+     * @throws ParsingException Error parsing the document
+     * @throws FeatureDisabledException Raised in case a required feature is
+     *         disabled
+     * 
      * @throws Exception whatever error
      */
-    protected abstract void processDocument(Document document, User user) throws Exception;
+    protected abstract void processDocument(Document document, User user) throws PersistenceException, IOException,
+            FeatureDisabledException, ParsingException, SearchException, AutomationException;
 
     /**
      * Instantiates the right stats

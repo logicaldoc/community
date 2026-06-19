@@ -51,7 +51,7 @@ public class QuickSearchTray extends MenuTray {
 		search.setInline(true);
 		search.setInlineIconAlign(Alignment.RIGHT);
 		search.setText(AwesomeFactory.getIconHtml(SEARCH));
-		search.setPrompt(I18N.message("search"));
+		search.setPrompt(I18N.message(SEARCH));
 		search.addFormItemClickHandler(event -> onSearch());
 
 		searchBox.setShowTitle(false);

@@ -25,6 +25,8 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
  */
 public class AutofillSettings extends Window {
 
+    private static final String AUTOFILL_BATCH = "autofill.batch";
+
     private ValuesManager vm;
 
     public AutofillSettings() {
@@ -55,7 +57,7 @@ public class AutofillSettings extends Window {
         vm = new ValuesManager();
         form.setValuesManager(vm);
 
-        SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt("autofill.batch"));
+        SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt(AUTOFILL_BATCH));
         batch.setStep(50);
         batch.setMin(1);
 
@@ -69,8 +71,8 @@ public class AutofillSettings extends Window {
 
     public void onSave() {
         String batch = vm.getValueAsString("batch");
-        Session.get().setConfig("autofill.batch", batch);
-        SettingService.Instance.get().saveSettings(Arrays.asList(new GUIParameter("autofill.batch", batch)),
+        Session.get().setConfig(AUTOFILL_BATCH, batch);
+        SettingService.Instance.get().saveSettings(Arrays.asList(new GUIParameter(AUTOFILL_BATCH, batch)),
                 new DefaultAsyncCallback<>() {
                     @Override
                     public void handleSuccess(Void ret) {

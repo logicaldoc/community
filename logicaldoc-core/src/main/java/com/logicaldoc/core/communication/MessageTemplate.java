@@ -31,7 +31,7 @@ public class MessageTemplate extends PersistentObject {
 
     public enum Type {
         SYSTEM, USER, WHATSAPP
-    };
+    }
 
     @Column(name = "ld_name", length = 255, nullable = false)
     private String name = "";
@@ -57,8 +57,7 @@ public class MessageTemplate extends PersistentObject {
     @Column(name = "ld_category")
     private String category = "UTILITY";
 
-    @Column(name = "ld_type")
-    @Enumerated(EnumType.STRING)
+    @Column(name = "ld_type") @Enumerated(EnumType.STRING)
     private Type type = Type.SYSTEM;
 
     public MessageTemplate() {

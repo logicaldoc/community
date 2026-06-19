@@ -525,40 +525,7 @@ public class LoginPanel extends VLayout {
 
                                     @Override
                                     public void onSuccess(GUIUser user) {
-                                        TfaService.Instance.get().generateKey(user.getUsername(),
-                                                new AsyncCallback<>() {
-
-                                                    @Override
-                                                    public void onFailure(Throwable caught) {
-                                                        unlockInput();
-                                                        SC.warn(caught.getMessage());
-                                                    }
-
-                                                    @Override
-                                                    public void onSuccess(String transactionId) {
-                                                        String sfa = user.getSecondFactor().toLowerCase();
-                                                        secretKey.setTitle(I18N.message(sfa + ".inputsecretkey",
-                                                                sfa.toLowerCase().contains("whatsapp")
-                                                                        ? user.getWhatsapp()
-                                                                        : user.getEmail()));
-                                                        secretKey.setHint(I18N.message(sfa + ".inputsecretkey.hint"));
-                                                        if (transactionId != null) {
-                                                            // Probably a push
-                                                            // message has been
-                                                            // sent to the
-                                                            // user's device
-                                                            secretKey.setValue(transactionId);
-
-                                                            LD.prompt(AwesomeFactory.getSpinnerIconHtml("pulse",
-                                                                    I18N.message(sfa + ".transaction.hint")));
-
-                                                            sendAuhtenticationRequest();
-                                                        } else {
-                                                            unlockInput();
-                                                            toggleInputForm();
-                                                        }
-                                                    }
-                                                });
+                                        generateTfaKey(user);
                                     }
                                 });
                             } else {
@@ -570,6 +537,39 @@ public class LoginPanel extends VLayout {
         } else {
             sendAuhtenticationRequest();
         }
+    }
+
+    private void generateTfaKey(GUIUser user) {
+        TfaService.Instance.get().generateKey(user.getUsername(), new AsyncCallback<>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                unlockInput();
+                SC.warn(caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(String transactionId) {
+                String sfa = user.getSecondFactor().toLowerCase();
+                secretKey.setTitle(I18N.message(sfa + ".inputsecretkey",
+                        sfa.toLowerCase().contains("whatsapp") ? user.getWhatsapp() : user.getEmail()));
+                secretKey.setHint(I18N.message(sfa + ".inputsecretkey.hint"));
+                if (transactionId != null) {
+                    // Probably a push
+                    // message has been
+                    // sent to the
+                    // user's device
+                    secretKey.setValue(transactionId);
+
+                    LD.prompt(AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message(sfa + ".transaction.hint")));
+
+                    sendAuhtenticationRequest();
+                } else {
+                    unlockInput();
+                    toggleInputForm();
+                }
+            }
+        });
     }
 
     protected void lockInput() {

@@ -24,33 +24,34 @@ import com.logicaldoc.util.spring.Context;
  */
 public class DigestProcessorTest extends AbstractCoreTestCase {
 
-	private DigestProcessor testSubject;
+    private DigestProcessor testSubject;
 
-	@Before
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Before
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		testSubject = Context.get(DigestProcessor.class);
-	}
+        testSubject = Context.get(DigestProcessor.class);
+    }
 
-	@Test
-	public void testRunTask() {
-		testSubject.run();
+    @Test
+    public void testRunTask() {
+        testSubject.run();
 
-		Context.get().getConfig().setProperty("digest.batch", "10");
-		assertEquals("10", Context.get().getConfig().getProperty("digest.batch"));
-		testSubject.run();
+        Context.get().getConfig().setProperty("digest.batch", "10");
+        assertEquals("10", Context.get().getConfig().getProperty("digest.batch"));
+        testSubject.run();
 
-		Context.get().getConfig().setProperty("digest.batch", "1");
-		assertEquals("1", Context.get().getConfig().getProperty("digest.batch"));
-		testSubject.run();
+        Context.get().getConfig().setProperty("digest.batch", "1");
+        assertEquals("1", Context.get().getConfig().getProperty("digest.batch"));
+        testSubject.run();
 
-		assertFalse(testSubject.isIndeterminate());
-		assertTrue(testSubject.isConcurrent());
-	}
+        assertFalse(testSubject.isIndeterminate());
+        assertTrue(testSubject.isConcurrent());
+    }
 
-	@Test
-	public void testPrepareReport() {
-		assertNotNull(testSubject.prepareReport(Locale.ENGLISH));
-	}
+    @Test
+    public void testPrepareReport() {
+        assertNotNull(testSubject.prepareReport(Locale.ENGLISH));
+    }
 }

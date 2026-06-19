@@ -44,6 +44,10 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ModelProperties extends ModelDetailsTab {
 
+    private static final String CATEGORIES = "categories";
+
+    private static final String FEATURES = "features";
+
     private static final String THRESHOLD = "threshold";
 
     private static final String MINCHUNKSIZE = "minchunksize";
@@ -163,7 +167,7 @@ public class ModelProperties extends ModelDetailsTab {
 
         String[] faturesArray = model.getFeatureDescriptors().stream().map(fd -> fd.getName())
                 .collect(Collectors.toList()).toArray(new String[0]);
-        MultiComboBoxItem features = ItemFactory.newMultiComboBoxItem("features", "features", null, faturesArray);
+        MultiComboBoxItem features = ItemFactory.newMultiComboBoxItem(FEATURES, FEATURES, null, faturesArray);
         features.setShowPending(true);
         features.setAddUnknownValues(true);
         features.setColSpan(4);
@@ -293,7 +297,7 @@ public class ModelProperties extends ModelDetailsTab {
         minAlpha.addChangedHandler(changedHandler);
         setEmbedderVisibility(minAlpha);
 
-        MultiComboBoxItem categories = ItemFactory.newMultiComboBoxItem("categories", "categories", null,
+        MultiComboBoxItem categories = ItemFactory.newMultiComboBoxItem(CATEGORIES, CATEGORIES, null,
                 model.getCategoriesArray());
         categories.setShowPending(true);
         categories.setAddUnknownValues(true);
@@ -324,7 +328,7 @@ public class ModelProperties extends ModelDetailsTab {
         trainingImagesHeight.addChangedHandler(changedHandler);
         trainingImagesHeight.setVisibleWhen(YOLO_CRITERIA);
         trainingImagesHeight.setRequiredWhen(YOLO_CRITERIA);
-        
+
         SpinnerItem threshold = ItemFactory.newSpinnerItem(THRESHOLD, Math.round(model.getThreshold() * 100));
         threshold.setMin(0);
         threshold.setMax(100);
@@ -354,31 +358,9 @@ public class ModelProperties extends ModelDetailsTab {
         model.setLanguage(form.getValueAsString(LANGUAGE));
         model.setType(form.getValueAsString(TYPE));
 
-        List<String> categories = new ArrayList<>();
-        for (Object cat : (Object[]) form.getValue("categories")) {
-            String str = cat.toString();
-            if (str.contains(",")) {
-                String[] subcats = str.split(",");
-                for (String subcat : subcats)
-                    categories.add(subcat.trim());
-            } else {
-                categories.add(str.trim());
-            }
-        }
-        model.setCategoriesArray(categories.toArray(new String[0]));
-        
-        List<String> features = new ArrayList<>();
-        for (Object cat : (Object[]) form.getValue("features")) {
-            String str = cat.toString();
-            if (str.contains(",")) {
-                String[] subcats = str.split(",");
-                for (String subcat : subcats)
-                    features.add(subcat.trim());
-            } else {
-                features.add(str.trim());
-            }
-        }
-        model.setFeatureNames(features.stream().collect(Collectors.joining(",")));
+        validateCategories();
+
+        validateFeatures();
 
         model.setActivation(form.getValueAsString(ACTIVATION));
         model.setWeightInit(form.getValueAsString("weightInit"));
@@ -418,7 +400,6 @@ public class ModelProperties extends ModelDetailsTab {
             model.setThreshold(0);
         }
 
-        
         if (NEURAL.equals(model.getType())) {
             com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
             if (layerRecords.length < 2) {
@@ -438,6 +419,36 @@ public class ModelProperties extends ModelDetailsTab {
         }
 
         return !form.hasErrors();
+    }
+
+    private void validateFeatures() {
+        List<String> features = new ArrayList<>();
+        for (Object cat : (Object[]) form.getValue(FEATURES)) {
+            String str = cat.toString();
+            if (str.contains(",")) {
+                String[] subcats = str.split(",");
+                for (String subcat : subcats)
+                    features.add(subcat.trim());
+            } else {
+                features.add(str.trim());
+            }
+        }
+        model.setFeatureNames(features.stream().collect(Collectors.joining(",")));
+    }
+
+    private void validateCategories() {
+        List<String> categories = new ArrayList<>();
+        for (Object cat : (Object[]) form.getValue(CATEGORIES)) {
+            String str = cat.toString();
+            if (str.contains(",")) {
+                String[] subcats = str.split(",");
+                for (String subcat : subcats)
+                    categories.add(subcat.trim());
+            } else {
+                categories.add(str.trim());
+            }
+        }
+        model.setCategoriesArray(categories.toArray(new String[0]));
     }
 
     private void setNeuralNetworkVisibility(FormItem item) {

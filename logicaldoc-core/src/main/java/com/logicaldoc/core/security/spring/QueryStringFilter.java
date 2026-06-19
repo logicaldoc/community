@@ -26,7 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class QueryStringFilter extends GenericFilterBean {
 
-    private static final Logger log = LoggerFactory.getLogger(SessionFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(QueryStringFilter.class);
 
     /**
      * The login page to redirect to

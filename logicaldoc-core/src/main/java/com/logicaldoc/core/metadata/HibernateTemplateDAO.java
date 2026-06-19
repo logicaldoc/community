@@ -35,289 +35,289 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template> implements TemplateDAO {
 
-	@Resource(name = "userDAO")
-	protected UserDAO userDAO;
+    @Resource(name = "userDAO")
+    protected UserDAO userDAO;
 
-	public HibernateTemplateDAO() {
-		super(Template.class);
-		super.log = LoggerFactory.getLogger(HibernateTemplateDAO.class);
-	}
+    public HibernateTemplateDAO() {
+        super(Template.class);
+        super.log = LoggerFactory.getLogger(HibernateTemplateDAO.class);
+    }
 
-	@Override
-	public List<Template> findAll() {
-		try {
-			return findByWhere(" 1=1", "_entity.name", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
-	}
+    @Override
+    public List<Template> findAll() {
+        try {
+            return findByWhere(" 1=1", "_entity.name", null);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
 
-	@Override
-	public List<Template> findAll(long tenantId) {
-		try {
-			return findByWhere(" _entity.tenantId = %d".formatted(tenantId), "_entity.name", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
-	}
+    @Override
+    public List<Template> findAll(long tenantId) {
+        try {
+            return findByWhere(" _entity.tenantId = %d".formatted(tenantId), "_entity.name", null);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
 
-	@Override
-	public Template findByName(String name, long tenantId) throws PersistenceException {
-		Template template = null;
+    @Override
+    public Template findByName(String name, long tenantId) throws PersistenceException {
+        Template template = null;
 
-		List<Template> coll = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
-				Map.of("name", name, "tenantId", tenantId), null, null);
-		if (CollectionUtils.isNotEmpty(coll))
-			template = coll.iterator().next();
-		if (template != null && template.getDeleted() == 1)
-			template = null;
+        List<Template> coll = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
+                Map.of("name", name, "tenantId", tenantId), null, null);
+        if (CollectionUtils.isNotEmpty(coll))
+            template = coll.iterator().next();
+        if (template != null && template.getDeleted() == 1)
+            template = null;
 
-		return template;
-	}
+        return template;
+    }
 
-	@Override
-	public void delete(long id, int code) throws PersistenceException {
-		if (!checkStoringAspect())
-			return;
+    @Override
+    public void delete(long id, int code) throws PersistenceException {
+        if (!checkStoringAspect())
+            return;
 
-		Template template = findById(id);
+        Template template = findById(id);
 
-		if (countDocs(id) > 0)
-			throw new PersistenceException(String.format("Some documents are referencing the template %s (%d)",
-					template.getName(), template.getId()));
+        if (countDocs(id) > 0)
+            throw new PersistenceException(String.format("Some documents are referencing the template %s (%d)",
+                    template.getName(), template.getId()));
 
-		if (countFolders(id) > 0)
-			throw new PersistenceException(String.format("Some folders are referencing the template %s (%d)",
-					template.getName(), template.getId()));
+        if (countFolders(id) > 0)
+            throw new PersistenceException(String.format("Some folders are referencing the template %s (%d)",
+                    template.getName(), template.getId()));
 
-		if (template != null) {
-			template.setDeleted(code);
-			template.setName("%s.%d".formatted(template.getName(), template.getId()));
-			saveOrUpdate(template);
-		}
-	}
+        if (template != null) {
+            template.setDeleted(code);
+            template.setName("%s.%d".formatted(template.getName(), template.getId()));
+            saveOrUpdate(template);
+        }
+    }
 
-	@Override
-	public void store(Template template) throws PersistenceException {
-		boolean isNew = template.getId() == 0L;
-		super.store(template);
+    @Override
+    public void store(Template template) throws PersistenceException {
+        boolean isNew = template.getId() == 0L;
+        super.store(template);
 
-		removeForbiddenPermissionsForGuests(template);
+        removeForbiddenPermissionsForGuests(template);
 
-		if (isNew) {
-			flush();
-			storeAclAsync(template);
-		} else {
-			storeAcl(template);
-		}
-	}
+        if (isNew) {
+            flush();
+            storeAclAsync(template);
+        } else {
+            storeAcl(template);
+        }
+    }
 
-	/**
-	 * Saves the security settings in another thread waiting for the referenced
-	 * template to be available into the database.
-	 * 
-	 * @param template the template to save
-	 */
-	private void storeAclAsync(Template template) {
-		/*
-		 * Probably the document's record has not been written yet, we should
-		 * fork a thread to wait for it's write.
-		 */
-		ThreadPools.get().schedule(() -> {
-			try {
-				// Wait for the document's record write
-				String documentWriteCheckQuery = "select count(*) from ld_template where ld_id = %d"
-						.formatted(template.getId());
-				int count = 0;
-				int tests = 0;
-				while (count == 0 && tests < 100) {
-					count = queryForInt(documentWriteCheckQuery);
-					Thread.sleep(1000L);
-					tests++;
-				}
+    /**
+     * Saves the security settings in another thread waiting for the referenced
+     * template to be available into the database.
+     * 
+     * @param template the template to save
+     */
+    private void storeAclAsync(Template template) {
+        /*
+         * Probably the document's record has not been written yet, we should
+         * fork a thread to wait for it's write.
+         */
+        ThreadPools.get().schedule(() -> {
+            try {
+                // Wait for the document's record write
+                String documentWriteCheckQuery = "select count(*) from ld_template where ld_id = %d"
+                        .formatted(template.getId());
+                int count = 0;
+                int tests = 0;
+                while (count == 0 && tests < 100) {
+                    count = queryForInt(documentWriteCheckQuery);
+                    Thread.sleep(1000L);
+                    tests++;
+                }
 
-				if (count > 0) {
-					if (log.isDebugEnabled())
-						log.debug("Record of template {} has been written", template.getId());
-					storeAcl(template);
-				}
-			} catch (PersistenceException ex) {
-				log.error(ex.getMessage(), ex);
-			} catch (InterruptedException ie) {
-				Thread.currentThread().interrupt();
-			}
-			return null;
-		}, "TemplateSecuritySave", 100L);
-	}
+                if (count > 0) {
+                    if (log.isDebugEnabled())
+                        log.debug("Record of template {} has been written", template.getId());
+                    storeAcl(template);
+                }
+            } catch (PersistenceException ex) {
+                log.error(ex.getMessage(), ex);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            return null;
+        }, "TemplateSecuritySave", 100L);
+    }
 
-	private void storeAcl(Template template) throws PersistenceException {
-		jdbcUpdate("delete from ld_template_acl where ld_templateid = %d".formatted(template.getId()));
-		for (AccessControlEntry ace : template.getAccessControlList())
-			jdbcUpdate(
-					"insert into ld_template_acl(ld_templateid, ld_groupid, ld_write, ld_read) values (%d, %d, %d, %d)"
-							.formatted(template.getId(), ace.getGroupId(), ace.isWrite() ? 1 : 0,
-									ace.isRead() ? 1 : 0));
+    private void storeAcl(Template template) throws PersistenceException {
+        jdbcUpdate("delete from ld_template_acl where ld_templateid = %d".formatted(template.getId()));
+        for (AccessControlEntry ace : template.getAccessControlList())
+            jdbcUpdate(
+                    "insert into ld_template_acl(ld_templateid, ld_groupid, ld_write, ld_read) values (%d, %d, %d, %d)"
+                            .formatted(template.getId(), ace.getGroupId(), ace.isWrite() ? 1 : 0,
+                                    ace.isRead() ? 1 : 0));
 
-		if (log.isDebugEnabled())
-			log.debug("Stored security settings of template {}", template.getId());
-	}
+        if (log.isDebugEnabled())
+            log.debug("Stored security settings of template {}", template.getId());
+    }
 
-	private void removeForbiddenPermissionsForGuests(Template template) throws PersistenceException {
-		// Remove the forbidden permissions for the guests
-		GroupDAO gDao = Context.get(GroupDAO.class);
-		for (AccessControlEntry ace : template.getAccessControlList()) {
-			Group group = gDao.findById(ace.getGroupId());
-			if (group != null && group.isGuest()) {
-				ace.setWrite(false);
-			}
-		}
-	}
+    private void removeForbiddenPermissionsForGuests(Template template) throws PersistenceException {
+        // Remove the forbidden permissions for the guests
+        GroupDAO gDao = Context.get(GroupDAO.class);
+        for (AccessControlEntry ace : template.getAccessControlList()) {
+            Group group = gDao.findById(ace.getGroupId());
+            if (group != null && group.isGuest()) {
+                ace.setWrite(false);
+            }
+        }
+    }
 
-	@Override
-	public long countFolders(long id) {
-		try {
-			return queryForLong(
-					"select count(*) from ld_folder where ld_deleted = 0 and ld_templateid = %d".formatted(id));
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
-	}
+    @Override
+    public long countFolders(long id) {
+        try {
+            return queryForLong(
+                    "select count(*) from ld_folder where ld_deleted = 0 and ld_templateid = %d".formatted(id));
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return 0;
+        }
+    }
 
-	@Override
-	public long countDocs(long id) throws PersistenceException {
-		return queryForLong(
-				"select count(*) from ld_document where ld_deleted = 0 and ld_templateid = %d".formatted(id));
-	}
+    @Override
+    public long countDocs(long id) throws PersistenceException {
+        return queryForLong(
+                "select count(*) from ld_document where ld_deleted = 0 and ld_templateid = %d".formatted(id));
+    }
 
-	@Override
-	public List<Template> findByType(int type, long tenantId) throws PersistenceException {
-		return findByWhere("_entity.type = :type and _entity.tenantId = :tenantId",
-				Map.of("type", type, "tenantId", tenantId), "order by _entity.name asc", null);
-	}
+    @Override
+    public List<Template> findByType(int type, long tenantId) throws PersistenceException {
+        return findByWhere("_entity.type = :type and _entity.tenantId = :tenantId",
+                Map.of("type", type, "tenantId", tenantId), "order by _entity.name asc", null);
+    }
 
-	@Override
-	public void initialize(Template template) {
-		try {
-			refresh(template);
+    @Override
+    public void initialize(Template template) {
+        try {
+            refresh(template);
 
-			log.trace("Initialized {} attributes", template.getTemplateAttributes().size());
+            log.trace("Initialized {} attributes", template.getTemplateAttributes().size());
 
-			// Manually initialize the collection of ACEs
-			template.getAccessControlList().clear();
+            // Manually initialize the collection of ACEs
+            template.getAccessControlList().clear();
 
-			queryForResultSet("select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid = %d"
-					.formatted(template.getId()), null, null, rows -> {
-						while (rows.next()) {
-							AccessControlEntry ace = new AccessControlEntry(rows.getLong(1));
-							ace.setWrite(rows.getInt(2) == 1);
-							ace.setRead(rows.getInt(3) == 1);
-							template.addAccessControlEntry(ace);
-						}
-					});
+            queryForResultSet("select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid = %d"
+                    .formatted(template.getId()), null, null, rows -> {
+                        while (rows.next()) {
+                            AccessControlEntry ace = new AccessControlEntry(rows.getLong(1));
+                            ace.setWrite(rows.getInt(2) == 1);
+                            ace.setRead(rows.getInt(3) == 1);
+                            template.addAccessControlEntry(ace);
+                        }
+                    });
 
-			log.trace("Initialized {} aces", template.getAccessControlList().size());
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-		}
-	}
+            log.trace("Initialized {} aces", template.getAccessControlList().size());
+        } catch (Exception e) {
+            if (log.isErrorEnabled())
+                log.error(e.getMessage(), e);
+        }
+    }
 
-	private boolean isWriteOrReadEnable(long templateId, long userId, boolean write) {
-		boolean result = true;
-		try {
-			Set<Permission> permissions = getAllowedPermissions(templateId, userId);
-			if (write)
-				return permissions.contains(Permission.WRITE);
-			else
-				return permissions.contains(Permission.READ);
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
-		}
+    private boolean isWriteOrReadEnable(long templateId, long userId, boolean write) {
+        boolean result = true;
+        try {
+            Set<Permission> permissions = getAllowedPermissions(templateId, userId);
+            if (write)
+                return permissions.contains(Permission.WRITE);
+            else
+                return permissions.contains(Permission.READ);
+        } catch (Exception e) {
+            if (log.isErrorEnabled())
+                log.error(e.getMessage(), e);
+            result = false;
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	@Override
-	public boolean isWriteEnable(long templateId, long userId) {
-		return isWriteOrReadEnable(templateId, userId, true);
-	}
+    @Override
+    public boolean isWriteEnable(long templateId, long userId) {
+        return isWriteOrReadEnable(templateId, userId, true);
+    }
 
-	@Override
-	public boolean isReadEnable(long templateId, long userId) {
-		return isWriteOrReadEnable(templateId, userId, false);
-	}
+    @Override
+    public boolean isReadEnable(long templateId, long userId) {
+        return isWriteOrReadEnable(templateId, userId, false);
+    }
 
-	@Override
-	public Set<Permission> getAllowedPermissions(long templateId, long userId) {
-		Set<Permission> permissions = new HashSet<>();
+    @Override
+    public Set<Permission> getAllowedPermissions(long templateId, long userId) {
+        Set<Permission> permissions = new HashSet<>();
 
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return permissions;
+        try {
+            User user = userDAO.findById(userId);
+            if (user == null)
+                return permissions;
 
-			// If the user is an administrator bypass all controls
-			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return Permission.all();
+            // If the user is an administrator bypass all controls
+            if (user.isMemberOf(Group.GROUP_ADMIN))
+                return Permission.all();
 
-			Set<Group> groups = user.getGroups();
-			if (groups.isEmpty())
-				return permissions;
+            Set<Group> groups = user.getGroups();
+            if (groups.isEmpty())
+                return permissions;
 
-			queryForResultSet("""
-					select ld_write as LDWRITE 
-					  from ld_template_acl 
-					 where ld_templateid = %d
-					   and ld_groupid in (select ld_groupid 
-					                        from ld_usergroup 
-					                       where ld_userid = %d
-	            """.formatted(templateId, userId), null, null, rows -> {
-				while (rows.next()) {
-					permissions.add(Permission.READ);
-					if (rows.getInt("LDWRITE") == 1)
-						permissions.add(Permission.WRITE);
-				}
-			});
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+            queryForResultSet("""
+                              select ld_write as LDWRITE
+                                from ld_template_acl
+                               where ld_templateid = %d
+                                 and ld_groupid in (select ld_groupid
+                                                      from ld_usergroup
+                                                     where ld_userid = %d
+                                      """.formatted(templateId, userId), null, null, rows -> {
+                while (rows.next()) {
+                    permissions.add(Permission.READ);
+                    if (rows.getInt("LDWRITE") == 1)
+                        permissions.add(Permission.WRITE);
+                }
+            });
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
-		return permissions;
-	}
+        return permissions;
+    }
 
-	@Override
-	public Template clone(long id, String cloneName) throws PersistenceException {
-		Template originalTemplate = findById(id, true);
-		initialize(originalTemplate);
-		Template clonedTemplate = new Template();
+    @Override
+    public Template clone(long id, String cloneName) throws PersistenceException {
+        Template originalTemplate = findById(id, true);
+        initialize(originalTemplate);
+        Template clonedTemplate = new Template();
 
-		String finalName = cloneName;
-		int counter = 1;
-		while (findByName(finalName, originalTemplate.getTenantId()) != null)
-			finalName = "%s-%d".formatted(cloneName, counter++);
+        String finalName = cloneName;
+        int counter = 1;
+        while (findByName(finalName, originalTemplate.getTenantId()) != null)
+            finalName = "%s-%d".formatted(cloneName, counter++);
 
-		clonedTemplate.setName(finalName);
-		clonedTemplate.setLabel(
-				originalTemplate.getLabel() != null ? "%s - Clone".formatted(originalTemplate.getLabel()) : null);
-		clonedTemplate.setDescription(originalTemplate.getDescription());
-		clonedTemplate.setReadonly(false);
-		clonedTemplate.setValidation(originalTemplate.getValidation());
-		clonedTemplate.setInitialization(originalTemplate.getInitialization());
-		clonedTemplate.setTemplateAttributes(originalTemplate.getTemplateAttributes().entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-		store(clonedTemplate);
-		jdbcUpdate("""
-                   insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write) 
-                                        select %d, ld_groupid, ld_read, ld_write 
-                                          from ld_template_acl 
+        clonedTemplate.setName(finalName);
+        clonedTemplate.setLabel(
+                originalTemplate.getLabel() != null ? "%s - Clone".formatted(originalTemplate.getLabel()) : null);
+        clonedTemplate.setDescription(originalTemplate.getDescription());
+        clonedTemplate.setReadonly(false);
+        clonedTemplate.setValidation(originalTemplate.getValidation());
+        clonedTemplate.setInitialization(originalTemplate.getInitialization());
+        clonedTemplate.setTemplateAttributes(originalTemplate.getTemplateAttributes().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        store(clonedTemplate);
+        jdbcUpdate("""
+                   insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write)
+                                        select %d, ld_groupid, ld_read, ld_write
+                                          from ld_template_acl
                                          where ld_templateid = %d
                    """.formatted(clonedTemplate.getId(), id));
-		initialize(clonedTemplate);
-		return clonedTemplate;
-	}
+        initialize(clonedTemplate);
+        return clonedTemplate;
+    }
 }

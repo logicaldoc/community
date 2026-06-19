@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
@@ -24,126 +25,126 @@ import jakarta.annotation.Resource;
  */
 public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, InitializingBean {
 
-	protected Logger log = LoggerFactory.getLogger(TaskTrigger.class);
+    protected Logger log = LoggerFactory.getLogger(TaskTrigger.class);
 
-	private SimpleTriggerFactoryBean simpleTrigger = null;
+    private SimpleTriggerFactoryBean simpleTrigger = null;
 
-	private CronTriggerFactoryBean cronTrigger = null;
+    private CronTriggerFactoryBean cronTrigger = null;
 
-	public static final String MODE_CRON = "cron";
+    public static final String MODE_CRON = "cron";
 
-	public static final String MODE_SIMPLE = "simple";
+    public static final String MODE_SIMPLE = "simple";
 
-	@Resource(name = "config")
-	protected ContextProperties config;
+    @Resource(name = "config")
+    protected ContextProperties config;
 
-	private Task task;
+    private Task task;
 
-	private JobDetail jobDetail;
+    private JobDetail jobDetail;
 
-	public TaskTrigger() {
-		super();
-	}
+    public TaskTrigger() {
+        super();
+    }
 
-	public Task getTask() {
-		return task;
-	}
+    public Task getTask() {
+        return task;
+    }
 
-	public String getName() {
-		if (task != null)
-			return task.getName();
-		else
-			return "";
-	}
+    public String getName() {
+        if (task != null)
+            return task.getName();
+        else
+            return "";
+    }
 
-	public void setTask(Task task) {
-		this.task = task;
-	}
+    public void setTask(Task task) {
+        this.task = task;
+    }
 
-	public SimpleTriggerFactoryBean getSimpleTrigger() {
-		return simpleTrigger;
-	}
+    public SimpleTriggerFactoryBean getSimpleTrigger() {
+        return simpleTrigger;
+    }
 
-	public CronTriggerFactoryBean getCronTrigger() {
-		return cronTrigger;
-	}
+    public CronTriggerFactoryBean getCronTrigger() {
+        return cronTrigger;
+    }
 
-	public void setJobDetail(JobDetail jobDetail) {
-		this.jobDetail = jobDetail;
-	}
+    public void setJobDetail(JobDetail jobDetail) {
+        this.jobDetail = jobDetail;
+    }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		// Nothing to do
-	}
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        // Nothing to do
+    }
 
-	@Override
-	public void setBeanName(String beanName) {
-		// Nothing to do
-	}
+    @Override
+    public void setBeanName(String beanName) {
+        // Nothing to do
+    }
 
-	@Override
-	public Trigger getObject() {
-		if (MODE_SIMPLE.equals(config.getProperty("schedule.mode." + getName()))) {
-			if (simpleTrigger == null) {
-				simpleTrigger = new SimpleTriggerFactoryBean();
-				simpleTrigger.setName(getName());
-				simpleTrigger.setRepeatInterval(Long.parseLong(config.getProperty("schedule.interval." + getName())));
-				simpleTrigger.setStartDelay(Long.parseLong(config.getProperty("schedule.delay." + getName())));
-				simpleTrigger.setJobDetail(jobDetail);
-				simpleTrigger.afterPropertiesSet();
-			}
-			cronTrigger = null;
-			return simpleTrigger.getObject();
-		} else {
-			if (cronTrigger == null) {
-				cronTrigger = new CronTriggerFactoryBean();
-				cronTrigger.setName(getName());
-				cronTrigger.setCronExpression(config.getProperty("schedule.cron." + getName()));
-				cronTrigger.setJobDetail(jobDetail);
-				try {
-					cronTrigger.afterPropertiesSet();
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
-				}
-			}
-			simpleTrigger = null;
-			return cronTrigger.getObject();
-		}
-	}
+    @Override
+    public Trigger getObject() {
+        if (MODE_SIMPLE.equals(config.getProperty("schedule.mode." + getName()))) {
+            if (simpleTrigger == null) {
+                simpleTrigger = new SimpleTriggerFactoryBean();
+                simpleTrigger.setName(getName());
+                simpleTrigger.setRepeatInterval(Long.parseLong(config.getProperty("schedule.interval." + getName())));
+                simpleTrigger.setStartDelay(Long.parseLong(config.getProperty("schedule.delay." + getName())));
+                simpleTrigger.setJobDetail(jobDetail);
+                simpleTrigger.afterPropertiesSet();
+            }
+            cronTrigger = null;
+            return simpleTrigger.getObject();
+        } else {
+            if (cronTrigger == null) {
+                cronTrigger = new CronTriggerFactoryBean();
+                cronTrigger.setName(getName());
+                cronTrigger.setCronExpression(config.getProperty("schedule.cron." + getName()));
+                cronTrigger.setJobDetail(jobDetail);
+                try {
+                    cronTrigger.afterPropertiesSet();
+                } catch (Exception e) {
+                    log.warn(e.getMessage(), e);
+                }
+            }
+            simpleTrigger = null;
+            return cronTrigger.getObject();
+        }
+    }
 
-	@Override
-	public Class<?> getObjectType() {
-		try {
-			if (MODE_SIMPLE.equals(config.getProperty("schedule.mode." + getName())))
-				return SimpleTrigger.class;
-			else
-				return CronTrigger.class;
-		} catch (Exception t) {
-			return SimpleTrigger.class;
-		}
-	}
+    @Override
+    public @NonNull Class<?> getObjectType() {
+        try {
+            if (MODE_SIMPLE.equals(config.getProperty("schedule.mode.%s".formatted(getName()))))
+                return SimpleTrigger.class;
+            else
+                return CronTrigger.class;
+        } catch (Exception t) {
+            return SimpleTrigger.class;
+        }
+    }
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
 
-	public void reload() {
-		this.cronTrigger = null;
-		this.simpleTrigger = null;
-		getObject();
-	}
+    public void reload() {
+        this.cronTrigger = null;
+        this.simpleTrigger = null;
+        getObject();
+    }
 
-	public long getRepeatInterval() {
-		SimpleTrigger triggerObject = simpleTrigger.getObject();
-		if (triggerObject != null)
-			return triggerObject.getRepeatInterval();
-		else
-			return -1;
-	}
+    public long getRepeatInterval() {
+        SimpleTrigger triggerObject = simpleTrigger.getObject();
+        if (triggerObject != null)
+            return triggerObject.getRepeatInterval();
+        else
+            return -1;
+    }
 
-	public JobDetail getJobDetail() {
-		return jobDetail;
-	}
+    public JobDetail getJobDetail() {
+        return jobDetail;
+    }
 }

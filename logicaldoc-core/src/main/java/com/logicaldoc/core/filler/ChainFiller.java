@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,9 +47,7 @@ public class ChainFiller extends Filler {
 
     private static final Logger log = LoggerFactory.getLogger(ChainFiller.class);
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-    @JoinTable(name = "ld_filler_chain", joinColumns = @JoinColumn(name = "ld_fillerid"), inverseJoinColumns = @JoinColumn(name = "ld_chainedid"))
-    @OrderColumn(name = "ld_position")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH) @JoinTable(name = "ld_filler_chain", joinColumns = @JoinColumn(name = "ld_fillerid"), inverseJoinColumns = @JoinColumn(name = "ld_chainedid")) @OrderColumn(name = "ld_position")
     private List<Filler> chain = new ArrayList<>();
 
     public List<Filler> getChain() {
@@ -60,19 +59,25 @@ public class ChainFiller extends Filler {
     }
 
     @Override
-    protected String fillDocument(Document document, String content, History transaction,
-            Map<String, Object> dictionary, StringBuilder explication)
+    protected String fillDocument(
+            Document document,
+            String content,
+            History transaction,
+            Map<String, Object> dictionary,
+            StringBuilder explication)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
 
-        if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
+        if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL)) {
+            debug("Aspect {} not enabled", Aspect.AUTOFILL.name());
             return null;
+        }
 
         if (transaction == null) {
             log.warn("Skipping filler chain: transaction is null");
             return null;
         }
 
-        if (chain == null || chain.isEmpty())
+        if (CollectionUtils.isEmpty(chain))
             return null;
 
         Map<String, Object> pipelineDict = MapUtils.isNotEmpty(dictionary) ? new HashMap<>(dictionary)
@@ -83,15 +88,14 @@ public class ChainFiller extends Filler {
             if (filler == null)
                 continue;
 
-            if (log.isDebugEnabled())
-                log.debug("Invoking filler {}", filler.getClass().getSimpleName());
+            debug("Invoking filler {}", filler.getClass().getSimpleName());
 
             if (explication != null)
-                explication.append(FILLER_EXPLICATION_TOP.formatted(filler.getClass().getSimpleName(), filler.getExplicationSubtitle()));
+                explication.append(FILLER_EXPLICATION_TOP.formatted(filler.getClass().getSimpleName(),
+                        filler.getExplicationSubtitle()));
 
             String extraction = filler.fillDocument(document, content, transaction, pipelineDict, explication);
-            if (log.isDebugEnabled())
-                log.debug("Filler {} extracted {}", filler.getClass().getSimpleName(), extraction);
+            debug("Filler {} extracted {}", filler.getClass().getSimpleName(), extraction);
             if (StringUtils.isNotEmpty(extraction))
                 extractions.add("%s > %s".formatted(filler.getClass().getSimpleName(), extraction));
 
@@ -100,6 +104,11 @@ public class ChainFiller extends Filler {
         }
 
         return StringUtils.defaultIfEmpty(extractions.stream().collect(Collectors.joining(" | ")), null);
+    }
+
+    private void debug(String message, Object... args) {
+        if (log.isDebugEnabled())
+            log.debug(message, args);
     }
 
     @Override

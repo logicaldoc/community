@@ -86,7 +86,7 @@ public abstract class Filler extends PersistentObject {
     @Column(name = "ld_automation", nullable = true)
     protected String automation;
 
-    private static String EXPLICATION_TOP = """
+    private static final String EXPLICATION_TOP = """
             <html>
             <header>
               <style>
@@ -173,7 +173,7 @@ public abstract class Filler extends PersistentObject {
             <body>
         """;
 
-    private static String EXPLICATION_BOTTOM = """        
+    private static final String EXPLICATION_BOTTOM = """        
                 <script>
                     var acc = document.getElementsByClassName("accordion");
                     var i;
@@ -194,7 +194,7 @@ public abstract class Filler extends PersistentObject {
         </html>
         """;
 
-    protected static String FILLER_EXPLICATION_TOP = """
+    protected static final String FILLER_EXPLICATION_TOP = """
         <table align='left' border='1' width='100%%'>
             <thead>
                <tr>
@@ -205,7 +205,7 @@ public abstract class Filler extends PersistentObject {
             <tr><td>
         """;
 
-    protected static String FILLER_EXPLICATION_BOTTOM = "</td></tr></tbody></table>";
+    protected static final String FILLER_EXPLICATION_BOTTOM = "</td></tr></tbody></table>";
 
     public String getName() {
         return name;

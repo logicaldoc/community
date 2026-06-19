@@ -68,6 +68,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     private static final Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
 
     @Before
+    @Override
     public void setUp() throws IOException, SQLException, PluginException {
         super.setUp();
 

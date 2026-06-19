@@ -31,7 +31,11 @@ public class AttributesDataServlet extends AbstractDataServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+    protected void service(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Session session,
+            Integer max,
             Locale locale) throws PersistenceException, IOException {
 
         Long templateId = null;
@@ -91,6 +95,17 @@ public class AttributesDataServlet extends AbstractDataServlet {
         /*
          * Iterate over the collection of extended attributes
          */
+        printExtendedAttributes(session, templateId, sections, extOnly, writer);
+
+        writer.write("</list>");
+    }
+
+    private void printExtendedAttributes(
+            Session session,
+            Long templateId,
+            boolean sections,
+            boolean extOnly,
+            PrintWriter writer) throws PersistenceException {
         Map<String, Attribute> attributes = new HashMap<>();
         if (templateId == null) {
             AttributeSetDAO dao = AttributeSetDAO.get();
@@ -114,8 +129,6 @@ public class AttributesDataServlet extends AbstractDataServlet {
                     (StringUtils.isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : ""), attribute.getType(),
                     writer);
         }
-
-        writer.write("</list>");
     }
 
     private void printAttibute(String name, String label, PrintWriter writer) {

@@ -65,6 +65,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO templateDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

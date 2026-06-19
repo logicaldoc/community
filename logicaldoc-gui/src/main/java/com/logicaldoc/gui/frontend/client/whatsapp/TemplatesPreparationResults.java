@@ -20,6 +20,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class TemplatesPreparationResults extends Window {
 
+    private static final String DETAILS = "details";
+    private static final String LANGUAGE = "language";
+    private static final String TEMPLATE = "template";
+    private static final String STATUS = "status";
     private List<TemplateResult> results;
 
     public TemplatesPreparationResults(List<TemplateResult> results) {
@@ -38,21 +42,21 @@ public class TemplatesPreparationResults extends Window {
 
     @Override
     protected void onDraw() {
-        ListGridField status = new ListGridField("status", I18N.message("status"));
+        ListGridField status = new ListGridField(STATUS, I18N.message(STATUS));
         status.setAutoFitWidth(true);
         status.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
         status.setCellFormatter((value, gridRecord, rowNum, colNum) -> "<span style='color: "
                 + ("success".equals(value.toString().toLowerCase()) ? "green" : "red") + "'>" + I18N.message(value.toString()) + "</span>");
 
-        ListGridField template = new ListGridField("template", I18N.message("template"));
+        ListGridField template = new ListGridField(TEMPLATE, I18N.message(TEMPLATE));
         template.setAutoFitWidth(true);
         template.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
         
-        ListGridField language = new ListGridField("language", I18N.message("language"));
+        ListGridField language = new ListGridField(LANGUAGE, I18N.message(LANGUAGE));
         language.setAutoFitWidth(true);
         language.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
         
-        ListGridField details = new ListGridField("details", I18N.message("details"));
+        ListGridField details = new ListGridField(DETAILS, I18N.message(DETAILS));
         details.setWidth("*");
         
         ListGrid list = new ListGrid();
@@ -66,10 +70,10 @@ public class TemplatesPreparationResults extends Window {
         List<ListGridRecord> records = new ArrayList<>();
         for (TemplateResult result : results) {
             ListGridRecord rec = new ListGridRecord();
-            rec.setAttribute("status", result.isSuccess() ? "success" : "failure");
-            rec.setAttribute("template", result.getTemplate());
-            rec.setAttribute("language", result.getLanguage());
-            rec.setAttribute("details", result.getDetails());
+            rec.setAttribute(STATUS, result.isSuccess() ? "success" : "failure");
+            rec.setAttribute(TEMPLATE, result.getTemplate());
+            rec.setAttribute(LANGUAGE, result.getLanguage());
+            rec.setAttribute(DETAILS, result.getDetails());
             records.add(rec);
         }
         list.setData(records.toArray(new ListGridRecord[0]));

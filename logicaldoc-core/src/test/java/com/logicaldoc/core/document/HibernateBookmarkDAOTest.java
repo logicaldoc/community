@@ -31,6 +31,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 	private BookmarkDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		

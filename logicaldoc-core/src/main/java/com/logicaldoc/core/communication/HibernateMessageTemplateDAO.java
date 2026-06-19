@@ -47,7 +47,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
     @Override
     public List<MessageTemplate> findByTypeAndLanguage(MessageTemplate.Type type, String language, long tenantId)
             throws PersistenceException {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         StringBuilder query = new StringBuilder("_entity.tenantId = %d".formatted(tenantId));
 
         if (StringUtils.isNotEmpty(language)) {

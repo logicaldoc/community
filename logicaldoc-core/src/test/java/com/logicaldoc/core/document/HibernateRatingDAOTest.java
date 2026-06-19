@@ -30,6 +30,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 	private RatingDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

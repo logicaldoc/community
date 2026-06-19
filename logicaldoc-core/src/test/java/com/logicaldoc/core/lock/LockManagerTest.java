@@ -35,6 +35,7 @@ public class LockManagerTest extends AbstractCoreTestCase {
 	private ContextProperties config;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

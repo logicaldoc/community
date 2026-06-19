@@ -138,7 +138,7 @@ public class FillerProperties extends FillerDetailsTab {
         label.addChangedHandler(changedHandler);
 
         // Overwrite flag
-        CheckboxItem overwrite = new CheckboxItem(OVERWRITE, I18N.message("overwrite"));
+        CheckboxItem overwrite = new CheckboxItem(OVERWRITE, I18N.message(OVERWRITE));
         overwrite.setValue(filler.isOverwrite());
         overwrite.addChangedHandler(changedHandler);
 
@@ -146,7 +146,7 @@ public class FillerProperties extends FillerDetailsTab {
         overwrite.setVisibleWhen(overwriteVisible);
 
         // On check-in flag
-        CheckboxItem onCheckin = new CheckboxItem(FILL_ON_CHECKIN, I18N.message("filloncheckin"));
+        CheckboxItem onCheckin = new CheckboxItem(FILL_ON_CHECKIN, I18N.message(FILL_ON_CHECKIN));
         onCheckin.setValue(filler.isOnCheckin());
         onCheckin.addChangedHandler(changedHandler);
 
@@ -164,22 +164,7 @@ public class FillerProperties extends FillerDetailsTab {
         modelSelector.addChangedHandler(changedHandler);
 
         // Type selector
-        SelectItem type = ItemFactory.newSelectItem(TYPE);
-        type.setOptionDataSource(new FillerTypesDS());
-        type.setValueField("id");
-        type.setDisplayField(LABEL);
-        type.setRequired(true);
-        type.setValue(filler.getType());
-        type.addChangedHandler(changedHandler);
-        type.addChangedHandler(event -> {
-            String selectedType = event.getValue().toString();
-            modelSelector.clearValue();
-            modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(selectedType)));
-            modelSelector.fetchData();
-
-            chainStack.setVisible(CHAIN.equals(selectedType));
-            criteriaStack.setVisible(ATTRIBUTE.equals(selectedType));
-        });
+        SelectItem type = prepareTypeSelector(modelSelector);
 
         if (filler.getType() != null) {
             modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(filler.getType())));
@@ -188,20 +173,7 @@ public class FillerProperties extends FillerDetailsTab {
         }
 
         // Strategy selector
-        SelectItem strategy = ItemFactory.newSelectItem(STRATEGY);
-        LinkedHashMap<String, String> strategyMap = new LinkedHashMap<>();
-        strategyMap.put(MODEL, I18N.message("strategy.model"));
-        strategyMap.put(RETRIEVAL, I18N.message("strategy.retrieval"));
-        strategy.setValueMap(strategyMap);
-        strategy.setRequired(true);
-
-        if (TAG.equals(filler.getType())) {
-            if (filler.getModelId() == null) {
-                strategy.setValue(RETRIEVAL);
-            } else {
-                strategy.setValue(MODEL);
-            }
-        }
+        SelectItem strategy = prepareStrategySelector();
 
         // EmbeddingScheme selector
         SelectItem embeddingSelector = ItemFactory.newSelectItem(EMBEDDING_SCHEME);
@@ -213,7 +185,7 @@ public class FillerProperties extends FillerDetailsTab {
             embeddingSelector.setValue(filler.getEmbeddingSchemeId());
 
         // A threshold used by AI models (UI as percentage)
-        SpinnerItem threshold = ItemFactory.newSpinnerItem("threshold", (Long) null);
+        SpinnerItem threshold = ItemFactory.newSpinnerItem(THRESHOLD, (Long) null);
         threshold.setMin(0);
         threshold.setMax(100);
         threshold.setStep(1);
@@ -318,6 +290,44 @@ public class FillerProperties extends FillerDetailsTab {
         prepareCriteria();
     }
 
+    private SelectItem prepareStrategySelector() {
+        SelectItem strategy = ItemFactory.newSelectItem(STRATEGY);
+        LinkedHashMap<String, String> strategyMap = new LinkedHashMap<>();
+        strategyMap.put(MODEL, I18N.message("strategy.model"));
+        strategyMap.put(RETRIEVAL, I18N.message("strategy.retrieval"));
+        strategy.setValueMap(strategyMap);
+        strategy.setRequired(true);
+
+        if (TAG.equals(filler.getType())) {
+            if (filler.getModelId() == null) {
+                strategy.setValue(RETRIEVAL);
+            } else {
+                strategy.setValue(MODEL);
+            }
+        }
+        return strategy;
+    }
+
+    private SelectItem prepareTypeSelector(SelectItem modelSelector) {
+        SelectItem type = ItemFactory.newSelectItem(TYPE);
+        type.setOptionDataSource(new FillerTypesDS());
+        type.setValueField("id");
+        type.setDisplayField(LABEL);
+        type.setRequired(true);
+        type.setValue(filler.getType());
+        type.addChangedHandler(changedHandler);
+        type.addChangedHandler(event -> {
+            String selectedType = event.getValue().toString();
+            modelSelector.clearValue();
+            modelSelector.setOptionDataSource(new ModelsDS(modelTypesSuitableForFiller(selectedType)));
+            modelSelector.fetchData();
+
+            chainStack.setVisible(CHAIN.equals(selectedType));
+            criteriaStack.setVisible(ATTRIBUTE.equals(selectedType));
+        });
+        return type;
+    }
+
     private TextItem prepareRegexField(boolean inclusive) {
         String name = inclusive ? "inclusionregex" : "exclusionregex";
 
@@ -349,61 +359,62 @@ public class FillerProperties extends FillerDetailsTab {
     }
 
     public boolean validate() {
-        if (form.validate()) {
-            filler.setName(form.getValueAsString(NAME));
-            filler.setLabel(form.getValueAsString(LABEL));
-            filler.setDescription(form.getValueAsString(DESCRIPTION));
-            filler.setType(form.getValueAsString(TYPE));
-            filler.setCandidate(form.getValueAsString(CANDIDATE));
-            filler.setAttribute(form.getValueAsString("attribute"));
-            filler.setFormat(form.getValueAsString("format"));
-            filler.setDecimalSeparator(form.getValueAsString("decimalseparator"));
-            filler.setGroupingSeparator(form.getValueAsString("groupingseparator"));
+        if (!form.validate())
+            return false;
 
-            filler.setExclusionRegex(form.getValueAsString("exclusionregex"));
-            filler.setInclusionRegex(form.getValueAsString("inclusionregex"));
+        filler.setName(form.getValueAsString(NAME));
+        filler.setLabel(form.getValueAsString(LABEL));
+        filler.setDescription(form.getValueAsString(DESCRIPTION));
+        filler.setType(form.getValueAsString(TYPE));
+        filler.setCandidate(form.getValueAsString(CANDIDATE));
+        filler.setAttribute(form.getValueAsString(ATTRIBUTE));
+        filler.setFormat(form.getValueAsString("format"));
+        filler.setDecimalSeparator(form.getValueAsString("decimalseparator"));
+        filler.setGroupingSeparator(form.getValueAsString("groupingseparator"));
 
-            Boolean overwriteVal = (Boolean) form.getValue(OVERWRITE);
-            filler.setOverwrite(Boolean.TRUE.equals(overwriteVal));
-            Boolean onCheckinVal = (Boolean) form.getValue(FILL_ON_CHECKIN);
-            filler.setOnCheckin(Boolean.TRUE.equals(onCheckinVal));
+        filler.setExclusionRegex(form.getValueAsString("exclusionregex"));
+        filler.setInclusionRegex(form.getValueAsString("inclusionregex"));
 
-            validateAI();
+        Boolean overwriteVal = (Boolean) form.getValue(OVERWRITE);
+        filler.setOverwrite(Boolean.TRUE.equals(overwriteVal));
+        Boolean onCheckinVal = (Boolean) form.getValue(FILL_ON_CHECKIN);
+        filler.setOnCheckin(Boolean.TRUE.equals(onCheckinVal));
 
-            if ("barcode".equals(filler.getType())) {
-                filler.setTemplateId(Long.parseLong(form.getValueAsString("barcodetemplate")));
+        validateAI();
+
+        if ("barcode".equals(filler.getType())) {
+            filler.setTemplateId(Long.parseLong(form.getValueAsString("barcodetemplate")));
+        }
+
+        if ("zonalocr".equals(filler.getType())) {
+            filler.setTemplateId(Long.parseLong(form.getValueAsString("ocrtemplate")));
+        }
+
+        // Chain handling
+        if (CHAIN.equals(filler.getType())) {
+            if (chainGrid == null || chainGrid.getRecordList().isEmpty()) {
+                GuiLog.error("fillerchainempty");
+                return false;
             }
 
-            if ("zonalocr".equals(filler.getType())) {
-                filler.setTemplateId(Long.parseLong(form.getValueAsString("ocrtemplate")));
+            filler.getChain().clear();
+
+            com.smartgwt.client.data.Record[] chainRecords = chainGrid.getRecordList().toArray();
+            for (com.smartgwt.client.data.Record chainRecord : chainRecords) {
+                Long id = chainRecord.getAttributeAsLong(ID);
+                String name = chainRecord.getAttribute(NAME);
+                filler.getChain().add(new GUIFiller(id, name));
             }
+        }
 
-            // Chain handling
-            if (CHAIN.equals(filler.getType())) {
-                if (chainGrid == null || chainGrid.getRecordList().isEmpty()) {
-                    GuiLog.error("fillerchainempty");
-                    return false;
-                }
+        // Criteria handling
+        if (ATTRIBUTE.equals(filler.getType())) {
+            filler.getCriteria().clear();
 
-                filler.getChain().clear();
-
-                com.smartgwt.client.data.Record[] chainRecords = chainGrid.getRecordList().toArray();
-                for (com.smartgwt.client.data.Record chainRecord : chainRecords) {
-                    Long id = chainRecord.getAttributeAsLong(ID);
-                    String name = chainRecord.getAttribute(NAME);
-                    filler.getChain().add(new GUIFiller(id, name));
-                }
-            }
-
-            // Criteria handling
-            if (ATTRIBUTE.equals(filler.getType())) {
-                filler.getCriteria().clear();
-
-                com.smartgwt.client.data.Record[] criteriaRecords = criteriaGrid.getRecordList().toArray();
-                for (com.smartgwt.client.data.Record criterionRecord : criteriaRecords)
-                    filler.getCriteria().add(new GUICriterion(criterionRecord.getAttribute("operator"),
-                            criterionRecord.getAttribute(OPERAND), criterionRecord.getAttributeAsDouble(METRIC)));
-            }
+            com.smartgwt.client.data.Record[] criteriaRecords = criteriaGrid.getRecordList().toArray();
+            for (com.smartgwt.client.data.Record criterionRecord : criteriaRecords)
+                filler.getCriteria().add(new GUICriterion(criterionRecord.getAttribute(OPERATOR),
+                        criterionRecord.getAttribute(OPERAND), criterionRecord.getAttributeAsDouble(METRIC)));
         }
 
         return !form.hasErrors();

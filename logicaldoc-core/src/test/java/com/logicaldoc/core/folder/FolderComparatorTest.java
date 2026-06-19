@@ -31,6 +31,7 @@ public class FolderComparatorTest extends AbstractCoreTestCase {
 	private TemplateDAO templateDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

@@ -291,10 +291,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
                     .count());
 
             // Remove any initialization and validation in attributes
-            for (Attribute attribute : doc.getAttributes().values()) {
-                attribute.setInitialization(null);
-                attribute.setValidation(null);
-            }
+            cleanValidationAndInitialization(doc);
             
             /*
              * Avoid documents inside folder alias
@@ -370,6 +367,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             updateAliases(doc);
         } catch (Exception e) {
             handleStoreError(transaction, e);
+        }
+    }
+
+    private void cleanValidationAndInitialization(Document doc) {
+        for (Attribute attribute : doc.getAttributes().values()) {
+            attribute.setInitialization(null);
+            attribute.setValidation(null);
         }
     }
 

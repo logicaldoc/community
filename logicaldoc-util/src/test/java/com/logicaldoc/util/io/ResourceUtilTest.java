@@ -12,38 +12,38 @@ import org.junit.Test;
 
 public class ResourceUtilTest {
 
-	@Test
-	public void testExistsResource() {
-		Assert.assertTrue(ResourceUtil.existsResource("/context.xml"));
-		Assert.assertFalse(ResourceUtil.existsResource("/pippo.txt"));
-	}
+    @Test
+    public void testExistsResource() {
+        Assert.assertTrue(ResourceUtil.existsResource("/context.xml"));
+        Assert.assertFalse(ResourceUtil.existsResource("/pippo.txt"));
+    }
 
-	@Test
-	public void testCopyResource() throws IOException {
-		File out = new File("target/out.txt");
-		try {
-			assertFalse(out.exists());
-			ResourceUtil.copyResource("context.xml", out);
-			assertTrue(out.length() > 0);
-		} finally {
-			FileUtil.delete(out);
-		}
-	}
+    @Test
+    public void testCopyResource() throws IOException {
+        File out = new File("target/out.txt");
+        try {
+            assertFalse(out.exists());
+            ResourceUtil.copyResource("context.xml", out);
+            assertTrue(out.length() > 0);
+        } finally {
+            FileUtil.delete(out);
+        }
+    }
 
-	@Test
-	public void testReadAsString() throws IOException {
-		assertTrue(ResourceUtil.readAsString("context.xml").contains("<beans default-lazy-init"));
-	}
+    @Test
+    public void testReadAsString() throws IOException {
+        assertTrue(ResourceUtil.readAsString("context.xml").contains("<beans default-lazy-init"));
+    }
 
-	@Test
-	public void testReadAsBytes() throws IOException {
-		File out = new File("target/out.txt");
-		try {
-			assertFalse(out.exists());
-			IOUtil.write(new ByteArrayInputStream(ResourceUtil.readAsBytes("context.xml")), out);
-			assertTrue(out.length() > 0);
-		} finally {
-			FileUtil.delete(out);
-		}
-	}
+    @Test
+    public void testReadAsBytes() throws IOException {
+        File out = new File("target/out.txt");
+        try (var br = new ByteArrayInputStream(ResourceUtil.readAsBytes("context.xml"));) {
+            assertFalse(out.exists());
+            IOUtil.write(br, out);
+            assertTrue(out.length() > 0);
+        } finally {
+            FileUtil.delete(out);
+        }
+    }
 }

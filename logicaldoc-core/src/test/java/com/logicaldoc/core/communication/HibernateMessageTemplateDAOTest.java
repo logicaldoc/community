@@ -30,6 +30,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 	private MessageTemplateDAO dao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

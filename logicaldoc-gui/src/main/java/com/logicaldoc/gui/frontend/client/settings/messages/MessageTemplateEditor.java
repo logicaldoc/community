@@ -21,6 +21,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class MessageTemplateEditor extends Window {
 
+    private static final String BUTTONS = "buttons";
+
+    private static final String WHATSAPP = "whatsapp";
+
+    private static final String FOOTER = "footer";
+
     private static final String SUBJECT = "subject";
 
     private ListGrid grid;
@@ -81,26 +87,26 @@ public class MessageTemplateEditor extends Window {
         bodyTextArea.setWidth("*");
         bodyTextArea.setHeight("*");
 
-        TextAreaItem footer = ItemFactory.newTextAreaItemForAutomation("footer", rec.getAttributeAsString("footer"),
+        TextAreaItem footer = ItemFactory.newTextAreaItemForAutomation(FOOTER, rec.getAttributeAsString(FOOTER),
                 null, false);
         footer.setRequired(false);
         footer.setWidth("*");
         footer.setHeight(30);
-        footer.setVisible(rec.getAttributeAsString("type").toLowerCase().equals("whatsapp"));
+        footer.setVisible(rec.getAttributeAsString("type").toLowerCase().equals(WHATSAPP));
 
-        TextAreaItem buttons = ItemFactory.newTextAreaItemForAutomation("buttons", rec.getAttributeAsString("buttons"),
+        TextAreaItem buttons = ItemFactory.newTextAreaItemForAutomation(BUTTONS, rec.getAttributeAsString(BUTTONS),
                 null, false);
         buttons.setRequired(false);
         buttons.setWidth("*");
         buttons.setHeight(100);
-        buttons.setVisible(rec.getAttributeAsString("type").toLowerCase().equals("whatsapp"));
+        buttons.setVisible(rec.getAttributeAsString("type").toLowerCase().equals(WHATSAPP));
 
         form.setWidth100();
         form.setHeight100();
         form.setTitleOrientation(TitleOrientation.TOP);
         form.setNumCols(1);
 
-        if (rec.getAttributeAsString("type").toLowerCase().equals("whatsapp"))
+        if (rec.getAttributeAsString("type").toLowerCase().equals(WHATSAPP))
             form.setItems(subject, bodyTextArea, footer, buttons);
         else
             form.setItems(subject, bodyRichText, footer, buttons);
@@ -112,8 +118,8 @@ public class MessageTemplateEditor extends Window {
         if (form.validate()) {
             rec.setAttribute(SUBJECT, form.getValueAsString(SUBJECT));
             rec.setAttribute("body", form.getValueAsString("body"));
-            rec.setAttribute("footer", form.getValueAsString("footer"));
-            rec.setAttribute("buttons", form.getValueAsString("buttons"));
+            rec.setAttribute(FOOTER, form.getValueAsString(FOOTER));
+            rec.setAttribute(BUTTONS, form.getValueAsString(BUTTONS));
             grid.refreshRow(grid.getRowNum(rec));
             destroy();
         }

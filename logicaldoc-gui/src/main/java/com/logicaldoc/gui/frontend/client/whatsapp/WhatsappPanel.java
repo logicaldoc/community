@@ -26,6 +26,10 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class WhatsappPanel extends AdminPanel {
 
+    private static final String SETTINGSSAVED = "settingssaved";
+
+    private static final String ACCESSTOKEN = "accesstoken";
+
     public WhatsappPanel() {
         super("auditing");
 
@@ -42,7 +46,7 @@ public class WhatsappPanel extends AdminPanel {
 
         TextItem numberId = ItemFactory.newTextItem("numberid", settings.get(1));
 
-        TextItem accessToken = ItemFactory.newPasswordItem("accesstoken", "accesstoken", settings.get(2));
+        TextItem accessToken = ItemFactory.newPasswordItem(ACCESSTOKEN, ACCESSTOKEN, settings.get(2));
         accessToken.setWidth(400);
 
         TextItem templatePrefix = ItemFactory.newSimpleTextItem("templateprefix", settings.get(3));
@@ -91,7 +95,7 @@ public class WhatsappPanel extends AdminPanel {
 
                 @Override
                 protected void handleSuccess(Void result) {
-                    GuiLog.info(I18N.message("settingssaved"), null);
+                    GuiLog.info(I18N.message(SETTINGSSAVED), null);
                 }
             });
         }
@@ -105,7 +109,7 @@ public class WhatsappPanel extends AdminPanel {
 
                 @Override
                 protected void handleSuccess(Void result) {
-                    GuiLog.info(I18N.message("settingssaved"), null);
+                    GuiLog.info(I18N.message(SETTINGSSAVED), null);
                     LD.contactingServer();
                     WhatsappService.Instance.get().testConnection(new DefaultAsyncCallback<>() {
                         @Override
@@ -129,7 +133,7 @@ public class WhatsappPanel extends AdminPanel {
 
                 @Override
                 protected void handleSuccess(Void result) {
-                    GuiLog.info(I18N.message("settingssaved"), null);
+                    GuiLog.info(I18N.message(SETTINGSSAVED), null);
                     LD.contactingServer();
                     LD.askForStringMandatory("activatenumber", "whatsapppin", null,
                             pin -> WhatsappService.Instance.get().activateNumber(pin, new DefaultAsyncCallback<>() {
@@ -156,7 +160,7 @@ public class WhatsappPanel extends AdminPanel {
 
                 @Override
                 protected void handleSuccess(Void result) {
-                    GuiLog.info(I18N.message("settingssaved"), null);
+                    GuiLog.info(I18N.message(SETTINGSSAVED), null);
                     LD.contactingServer();
                     WhatsappService.Instance.get().prepareTemplates(new DefaultAsyncCallback<List<TemplateResult>>() {
 
@@ -175,7 +179,7 @@ public class WhatsappPanel extends AdminPanel {
         List<String> settings = new ArrayList<>();
         settings.add(vm.getValueAsString("accountid"));
         settings.add(vm.getValueAsString("numberid"));
-        settings.add(vm.getValueAsString("accesstoken"));
+        settings.add(vm.getValueAsString(ACCESSTOKEN));
         settings.add(vm.getValueAsString("templateprefix"));
         settings.add(vm.getValueAsString("enabled"));
         return settings;

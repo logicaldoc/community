@@ -16,6 +16,7 @@ import com.logicaldoc.util.plugin.PluginException;
 public class FolderListenerManagerTest extends AbstractCoreTestCase {
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 	}

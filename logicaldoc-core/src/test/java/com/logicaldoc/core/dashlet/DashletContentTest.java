@@ -36,6 +36,7 @@ public class DashletContentTest extends AbstractCoreTestCase {
 	private DashletDAO dao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		FileUtil.delete(responseFile);
