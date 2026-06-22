@@ -55,7 +55,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 
 @Path("/")
@@ -944,12 +943,11 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Path("/thumbnail/{type}/{docpath:.*}")
 	@Produces("image/png")
 	@ApiResponses(value = {
-			@ApiResponse(description = "default response", content = @Content(mediaType = "image/png", schema = @Schema(type = "string", format = "binary"))) })
-	public Response getThumbnail(@PathParam("type")
-	String type, @PathParam("docpath")
-	String docPath, @PathParam("docpath")
-	List<PathSegment> docPathList) throws AuthenticationException, WebserviceException, PersistenceException,
-			IOException, PermissionException {
+			@ApiResponse(description = "Thumbnail image", content = @Content(mediaType = "image/png", schema = @Schema(type = "string", format = "binary"))) })
+	public Response getThumbnail(
+			@PathParam("type") @Parameter(description = "Type of thumbnail to generate (e.g., thumb, tile, mobile)", required = true) String type, 
+			@PathParam("docpath") @Parameter(description = "Path of the document. This parameter captures the full path using a greedy pattern and may include multiple nested folders.", required = true) String docPath) 
+					throws AuthenticationException, WebserviceException, PersistenceException, IOException, PermissionException {
 		String sid = validateSessionREST();
 
 		String myPath = "/" + docPath;

@@ -36,7 +36,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -524,28 +523,26 @@ public interface DocumentService {
 	String type) throws AuthenticationException, WebserviceException, PersistenceException, IOException;
 
 	/**
-	 * Retrieves the thumbnail image
-	 * 
-	 * @param type type of the thumbnail
-	 * @param docPath path of the document
-	 * @param docPathList path of the document
-	 * 
-	 * @return image content
-	 * 
+	 * Retrieves the thumbnail image of a document.
+	 *
+	 * @param type Type of thumbnail to generate (e.g., thumb, tile, mobile)
+	 * @param docPath Path of the document. This parameter captures the full path
+	 *                using a greedy pattern and may include multiple nested folders.
+	 *
+	 * @return The thumbnail image content.
+	 *
 	 * @throws IOException I/O error
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough
-	 *         permissions
+	 * @throws PermissionException The current user does not have enough permissions
 	 * @throws AuthenticationException Invalid credentials
-	 */
+	 */	
 	@GET
 	@Path("/thumbnail/{type}/{docpath:.*}")
-	@Produces("image/jpeg")
-	public Response getThumbnail(@PathParam("type")
-	String type, @PathParam("docpath")
-	String docPath, @PathParam("docpath")
-	List<PathSegment> docPathList)
+	@Produces("image/png")
+	public Response getThumbnail(
+		@PathParam("type") String type, 
+		@PathParam("docpath") String docPath)
 			throws AuthenticationException, WebserviceException, PersistenceException, IOException, PermissionException;
 
 	/**
