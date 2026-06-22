@@ -23,6 +23,7 @@ public class HibernateWebserviceCallDAOTest extends AbstractWebserviceTestCase {
 	private WebserviceCallDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that

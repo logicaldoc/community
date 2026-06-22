@@ -50,7 +50,7 @@ public class RestDocumentServiceTest extends AbstractWebserviceTestCase {
 		testSubject.uploadResource("", 1, "1.0", "mobile.png", dh);
 
 		// Then check that the server return the resource
-		Response res = testSubject.getThumbnail("mobile", "menu.adminxxx/text/menu.admin103/pippo", null);
+		Response res = testSubject.getThumbnail("mobile", "menu.adminxxx/text/menu.admin103/pippo");
 		assertNotNull(res);
 
 		assertEquals("image/png", res.getHeaderString("Content-Type"));

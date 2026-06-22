@@ -138,10 +138,13 @@ public class FulltextSearch extends Search {
 			for (Long id : accessibleFolderIds) {
 				if (!foldersFilter.isEmpty())
 					foldersFilter.append(" or ");
-				foldersFilter.append(HitField.FOLDER_ID + ":" + (id < 0 ? "\\" : "") + id);
+				foldersFilter.append(HitField.FOLDER_ID);
+				foldersFilter.append(":");
+				foldersFilter.append(id < 0 ? "\\" : "");
+				foldersFilter.append(Long.toString(id));
 			}
 
-			filters.add(" (" + foldersFilter.toString() + ") ");
+			filters.add(" (%s) ".formatted(foldersFilter.toString()));
 		}
 	}
 
@@ -157,10 +160,13 @@ public class FulltextSearch extends Search {
 	private StringBuilder prepareQuery(FulltextSearchOptions opt) {
 		StringBuilder query = new StringBuilder();
 		for (String field : opt.getFields()) {
-			if (query.length() > 0)
+			if (!query.isEmpty())
 				query.append(" OR ");
 
-			query.append(field + ":(" + opt.getExpression() + ")");
+			query.append(field);
+			query.append(":(");
+			query.append(opt.getExpression());
+			query.append(")");
 		}
 		return query;
 	}

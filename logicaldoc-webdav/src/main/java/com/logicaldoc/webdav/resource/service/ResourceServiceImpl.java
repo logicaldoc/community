@@ -267,7 +267,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 			requestPath = requestPath.replace("/store", "");
 
-			if (requestPath.length() > 0 && requestPath.substring(0, 1).equals("/"))
+			if (!requestPath.isEmpty() && requestPath.substring(0, 1).equals("/"))
 				requestPath = requestPath.substring(1);
 
 			String path = "/" + requestPath;

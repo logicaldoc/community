@@ -1649,7 +1649,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
         if (groupIds != null) {
             UserDAO gDao = UserDAO.get();
-            groupIds.stream().forEach(gId -> {
+            groupIds.forEach(gId -> {
                 try {
                     Set<User> usrs = gDao.findByGroup(gId);
                     for (User user : usrs)

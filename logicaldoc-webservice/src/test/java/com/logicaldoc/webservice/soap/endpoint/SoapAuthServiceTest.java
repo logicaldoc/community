@@ -37,6 +37,7 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 	private SoapAuthService soapAuthServiceImpl;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

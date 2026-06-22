@@ -18,114 +18,114 @@ import com.logicaldoc.core.security.Tenant;
  * @since 6.5
  */
 public class Hits implements Iterator<Hit>, Serializable {
-	
-	private static final String SCORE = "score";
 
-	private static final long serialVersionUID = 1L;
+    private static final String SCORE = "score";
 
-	private transient Iterator<SolrDocument> internal;
+    private static final long serialVersionUID = 1L;
 
-	private QueryResponse rsp;
+    private transient Iterator<SolrDocument> internal;
 
-	public Hits() {
-	}
+    private QueryResponse rsp;
 
-	public Hits(QueryResponse rsp) {
-		super();
-		this.rsp = rsp;
-		this.internal = rsp.getResults().iterator();
-	}
+    public Hits() {
+    }
 
-	public long getEstimatedCount() {
-		return rsp.getResults().getNumFound();
-	}
+    public Hits(QueryResponse rsp) {
+        super();
+        this.rsp = rsp;
+        this.internal = rsp.getResults().iterator();
+    }
 
-	public long getElapsedTime() {
-		return rsp.getElapsedTime();
-	}
+    public long getEstimatedCount() {
+        return rsp.getResults().getNumFound();
+    }
 
-	public long getCount() {
-		return rsp.getResults().size();
-	}
+    public long getElapsedTime() {
+        return rsp.getElapsedTime();
+    }
 
-	@Override
-	public boolean hasNext() {
-		return internal.hasNext();
-	}
+    public long getCount() {
+        return rsp.getResults().size();
+    }
 
-	@Override
-	public Hit next() {
-		SolrDocument doc = internal.next();
-		Hit hit = toHit(doc);
+    @Override
+    public boolean hasNext() {
+        return internal.hasNext();
+    }
 
-		// Compose the summary as concatenation of snippets
-		StringBuilder summary = new StringBuilder();
-		Object id = doc.getFieldValue("id");
-		if (rsp.getHighlighting() != null && rsp.getHighlighting().get(id) != null) {
-			List<String> snippets = rsp.getHighlighting().get(id).get("content");
-			if (snippets != null)
-				for (String string : snippets) {
-					if (summary.length() != 0)
-						summary.append(" ... ");
-					summary.append(string);
-				}
-		}
+    @Override
+    public Hit next() {
+        SolrDocument doc = internal.next();
+        Hit hit = toHit(doc);
 
-		Float score = (Float) doc.getFieldValue(SCORE);
-		if (score != null)
-			hit.setScore(createScore(rsp.getResults().getMaxScore(), score));
-		hit.setSummary(summary.toString());
+        // Compose the summary as concatenation of snippets
+        StringBuilder summary = new StringBuilder();
+        Object id = doc.getFieldValue("id");
+        if (rsp.getHighlighting() != null && rsp.getHighlighting().get(id) != null) {
+            List<String> snippets = rsp.getHighlighting().get(id).get("content");
+            if (snippets != null)
+                for (String string : snippets) {
+                    if (!summary.isEmpty())
+                        summary.append(" ... ");
+                    summary.append(string);
+                }
+        }
 
-		return hit;
-	}
+        Float score = (Float) doc.getFieldValue(SCORE);
+        if (score != null)
+            hit.setScore(createScore(rsp.getResults().getMaxScore(), score));
+        hit.setSummary(summary.toString());
 
-	@Override
-	public void remove() {
-		// Nothing to do
-	}
+        return hit;
+    }
 
-	public static Hit toHit(SolrDocument sdoc) {
-		Hit hit = new Hit();
+    @Override
+    public void remove() {
+        // Nothing to do
+    }
 
-		hit.setId(Long.parseLong((String) sdoc.get(HitField.ID.getName())));
-		if (sdoc.get(HitField.TENANT_ID.getName()) != null) {
-			hit.setTenantId((Long) sdoc.getFieldValue(HitField.TENANT_ID.getName()));
-		} else
-			hit.setTenantId(Tenant.DEFAULT_ID);
+    public static Hit toHit(SolrDocument sdoc) {
+        Hit hit = new Hit();
 
-		if (sdoc.getFieldValue(SCORE) != null) {
-			Float score = (Float) sdoc.getFieldValue(SCORE);
-			hit.setScore((int) (score * 100));
-		}
+        hit.setId(Long.parseLong((String) sdoc.get(HitField.ID.getName())));
+        if (sdoc.get(HitField.TENANT_ID.getName()) != null) {
+            hit.setTenantId((Long) sdoc.getFieldValue(HitField.TENANT_ID.getName()));
+        } else
+            hit.setTenantId(Tenant.DEFAULT_ID);
 
-		Folder folder = new Folder();
-		hit.setFolder(folder);
-		
-		if (sdoc.get(HitField.FOLDER_ID.getName()) != null)
-			folder.setId((Long) sdoc.get(HitField.FOLDER_ID.getName()));
+        if (sdoc.getFieldValue(SCORE) != null) {
+            Float score = (Float) sdoc.getFieldValue(SCORE);
+            hit.setScore((int) (score * 100));
+        }
 
-		if (sdoc.get(HitField.FOLDER_NAME.getName()) != null)
-			folder.setName(sdoc.getFieldValue(HitField.FOLDER_NAME.getName()).toString());
+        Folder folder = new Folder();
+        hit.setFolder(folder);
 
-		if (sdoc.getFieldValue(HitField.LANGUAGE.getName()) != null)
-			hit.setLanguage(sdoc.getFieldValue(HitField.LANGUAGE.getName()).toString());
+        if (sdoc.get(HitField.FOLDER_ID.getName()) != null)
+            folder.setId((Long) sdoc.get(HitField.FOLDER_ID.getName()));
 
-		return hit;
-	}
+        if (sdoc.get(HitField.FOLDER_NAME.getName()) != null)
+            folder.setName(sdoc.getFieldValue(HitField.FOLDER_NAME.getName()).toString());
 
-	protected static int createScore(float max, float score) {
-		float normalized = 1;
-		if (score != max) {
-			normalized = score / max;
-		}
+        if (sdoc.getFieldValue(HitField.LANGUAGE.getName()) != null)
+            hit.setLanguage(sdoc.getFieldValue(HitField.LANGUAGE.getName()).toString());
 
-		float temp = normalized * 100;
-		int tgreen = Math.round(temp);
+        return hit;
+    }
 
-		if (tgreen < 1) {
-			tgreen = 1;
-		}
+    protected static int createScore(float max, float score) {
+        float normalized = 1;
+        if (score != max) {
+            normalized = score / max;
+        }
 
-		return tgreen;
-	}
+        float temp = normalized * 100;
+        int tgreen = Math.round(temp);
+
+        if (tgreen < 1) {
+            tgreen = 1;
+        }
+
+        return tgreen;
+    }
 }

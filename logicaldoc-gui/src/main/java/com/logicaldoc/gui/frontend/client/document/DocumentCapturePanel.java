@@ -43,8 +43,6 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 
 	private boolean processButton = true;
 
-	private boolean all = true;
-
 	public DocumentCapturePanel(GUIDocument document, ChangedHandler changedHandler, boolean processButton) {
 		super(document, changedHandler);
 		setWidth100();

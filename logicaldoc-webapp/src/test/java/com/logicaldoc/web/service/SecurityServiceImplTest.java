@@ -60,6 +60,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
     private GroupDAO groupDAO;
 
     @Before
+    @Override
     public void setUp() throws IOException, SQLException, PluginException {
         super.setUp();
 

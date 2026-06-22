@@ -102,7 +102,11 @@ public class DocumentsDataServlet extends AbstractDataServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+    protected void service(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Session session,
+            Integer max,
             Locale locale) throws PersistenceException, IOException {
 
         int maxRecords = max != null ? max : 100;
@@ -163,8 +167,14 @@ public class DocumentsDataServlet extends AbstractDataServlet {
         writer.write("</list>");
     }
 
-    private void printDocument(PrintWriter writer, Document document, Document hiliteDoc, List<Long> bookmarks,
-            List<String> extendedAttributes, final Map<String, Object> extendedAttributesValues, String tenant) {
+    private void printDocument(
+            PrintWriter writer,
+            Document document,
+            Document hiliteDoc,
+            List<Long> bookmarks,
+            List<String> extendedAttributes,
+            final Map<String, Object> extendedAttributesValues,
+            String tenant) {
 
         writer.print("<document>");
         writer.print(String.format("<id>%d</id>", document.getId()));
@@ -245,7 +255,10 @@ public class DocumentsDataServlet extends AbstractDataServlet {
         writer.print("</document>");
     }
 
-    private void printExtendedAttributes(PrintWriter writer, Document document, List<String> extendedAttributes,
+    private void printExtendedAttributes(
+            PrintWriter writer,
+            Document document,
+            List<String> extendedAttributes,
             final Map<String, Object> extendedAttributesValues) {
         DateFormat df = getDateFormat();
         if (!extendedAttributesValues.isEmpty())
@@ -324,7 +337,11 @@ public class DocumentsDataServlet extends AbstractDataServlet {
         }
     }
 
-    private void findDocumentsByStatus(Session session, int maxRecords, int page, Integer status,
+    private void findDocumentsByStatus(
+            Session session,
+            int maxRecords,
+            int page,
+            Integer status,
             List<Document> documentsInCurrentPage) throws PersistenceException {
         DocumentDAO dao = DocumentDAO.get();
 
@@ -340,10 +357,16 @@ public class DocumentsDataServlet extends AbstractDataServlet {
         }
     }
 
-    private Document findDocumentsByFilters(HttpServletRequest request, Session session, Locale locale, int maxRecords,
-            int page, List<Document> documentsInCurrentPage, List<String> extendedAttributes,
-            String extendedAttributesSpec, final Map<String, Object> extendedAttributesValues)
-            throws PersistenceException, IOException {
+    private Document findDocumentsByFilters(
+            HttpServletRequest request,
+            Session session,
+            Locale locale,
+            int maxRecords,
+            int page,
+            List<Document> documentsInCurrentPage,
+            List<String> extendedAttributes,
+            String extendedAttributesSpec,
+            final Map<String, Object> extendedAttributesValues) throws PersistenceException, IOException {
 
         UserDAO udao = UserDAO.get();
         User sessionUser = udao.findById(session.getUserId());
@@ -382,19 +405,26 @@ public class DocumentsDataServlet extends AbstractDataServlet {
         return retrieveHiliteDoc(documentsInCurrentPage, folderId, hiliteDocId);
     }
 
-    private List<Document> exeucuteQuery(HttpServletRequest request, List<String> extendedAttributes,
-            final Map<String, Object> extendedAttributesValues, User user, Long folderId, Long formId, String filename)
-            throws PersistenceException {
+    private List<Document> exeucuteQuery(
+            HttpServletRequest request,
+            List<String> extendedAttributes,
+            final Map<String, Object> extendedAttributesValues,
+            User user,
+            Long folderId,
+            Long formId,
+            String filename) throws PersistenceException {
 
         DocumentDAO dao = DocumentDAO.get();
-        StringBuilder query = new StringBuilder("""
-select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexingStatus, A.lockUserId, A.fileName, A.status,
-       A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
-       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote, A.revision, A.embeddingStatus
-  from Document as A
-  left outer join A.template as B
- where A.deleted = 0
-   and not A.status = %d""".formatted(DocumentStatus.ARCHIVED.ordinal()));
+        StringBuilder query = new StringBuilder(
+                """
+                select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexingStatus, A.lockUserId, A.fileName, A.status,
+                       A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
+                       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote, A.revision, A.embeddingStatus
+                  from Document as A
+                  left outer join A.template as B
+                 where A.deleted = 0
+                   and not A.status = %d"""
+                        .formatted(DocumentStatus.ARCHIVED.ordinal()));
 
         if (folderId != null) {
             query.append(" and A.folder.id = %d".formatted(folderId));
@@ -445,12 +475,12 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
                 .collect(Collectors.joining(","));
 
         StringBuilder forbiddenDocsQuery = new StringBuilder("""
-select ld_docid
-  from ld_document_acl, ld_document
- where ld_docid=ld_id
-   and ld_deleted = 0
-   and ld_read = 0
-   and ld_groupId in(""");
+                                                             select ld_docid
+                                                               from ld_document_acl, ld_document
+                                                              where ld_docid=ld_id
+                                                                and ld_deleted = 0
+                                                                and ld_read = 0
+                                                                and ld_groupId in(""");
         forbiddenDocsQuery.append(groupIdsString);
         forbiddenDocsQuery.append(") and ld_folderid = ");
         forbiddenDocsQuery.append(Long.toString(folderId));
@@ -458,8 +488,11 @@ select ld_docid
         return docDao.queryForList(forbiddenDocsQuery.toString(), Long.class);
     }
 
-    private List<Document> enrichRecords(List<?> records, List<String> extendedAttributes,
-            final Map<String, Object> extendedAttributesValues, User user) throws PersistenceException {
+    private List<Document> enrichRecords(
+            List<?> records,
+            List<String> extendedAttributes,
+            final Map<String, Object> extendedAttributesValues,
+            User user) throws PersistenceException {
 
         DocumentDAO dao = DocumentDAO.get();
 
@@ -523,8 +556,12 @@ select ld_docid
         return documents;
     }
 
-    private void enrichPublishedDocument(Document doc, Object[] cols, List<String> extendedAttributes,
-            final Map<String, Object> extendedAttributesValues, User user) {
+    private void enrichPublishedDocument(
+            Document doc,
+            Object[] cols,
+            List<String> extendedAttributes,
+            final Map<String, Object> extendedAttributesValues,
+            User user) {
         if (doc.isPublishing() || user.isMemberOf(Group.GROUP_ADMIN) || user.isMemberOf("publisher")) {
             doc.setCustomId((String) cols[1]);
             doc.setVersion((String) cols[4]);
@@ -568,7 +605,10 @@ select ld_docid
         }
     }
 
-    private void enrichAliasExtendedAttributes(Document doc, long aliasId, List<String> extendedAttributes,
+    private void enrichAliasExtendedAttributes(
+            Document doc,
+            long aliasId,
+            List<String> extendedAttributes,
             final Map<String, Object> extendedAttributesValues) {
         if (doc.getTemplate() != null)
             doc.setTemplateName(doc.getTemplate().getName());
@@ -612,7 +652,10 @@ select ld_docid
         return hiliteDoc;
     }
 
-    private void takeDocumentsInCurrentPage(List<Document> documents, List<Document> documentRecords, int maxRecords,
+    private void takeDocumentsInCurrentPage(
+            List<Document> documents,
+            List<Document> documentRecords,
+            int maxRecords,
             int page) {
         int begin = (page - 1) * maxRecords;
         int end = Math.min(begin + maxRecords - 1, documents.size() - 1);
@@ -631,7 +674,7 @@ select ld_docid
                 String field = token.split(" ")[0].trim();
                 String direction = token.split(" ")[1].trim();
 
-                if (ciSort.length() > 0)
+                if (!ciSort.isEmpty())
                     ciSort.append(",");
                 ciSort.append("lower(");
                 ciSort.append(field);
@@ -643,9 +686,13 @@ select ld_docid
         }
     }
 
-    private void retrieveExtendedAttributesValues(Locale locale, List<String> extendedAttributes,
-            String extendedAttributesSpec, final Map<String, Object> extAttributesValues, Long folderId, Long formId)
-            throws PersistenceException {
+    private void retrieveExtendedAttributesValues(
+            Locale locale,
+            List<String> extendedAttributes,
+            String extendedAttributesSpec,
+            final Map<String, Object> extAttributesValues,
+            Long folderId,
+            Long formId) throws PersistenceException {
         DocumentDAO dao = DocumentDAO.get();
         if (extendedAttributes.isEmpty())
             return;
@@ -653,10 +700,10 @@ select ld_docid
         log.debug("Search for extended attributes {}", extendedAttributesSpec);
 
         StringBuilder query = new StringBuilder("""
-                                                select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, 
+                                                select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue,
                                                        ld_doublevalue, ld_datevalue, ld_stringvalues
-                                                       from ld_document_ext where ld_docid in (select D.ld_id 
-                                                                                                 from ld_document D 
+                                                       from ld_document_ext where ld_docid in (select D.ld_id
+                                                                                                 from ld_document D
                                                                                                 where D.ld_deleted = 0
                                                 """);
         if (folderId != null)
@@ -703,7 +750,9 @@ select ld_docid
         return folderId;
     }
 
-    private String prepareExtendedAttributes(HttpServletRequest request, Session session,
+    private String prepareExtendedAttributes(
+            HttpServletRequest request,
+            Session session,
             List<String> extendedAttributes) {
         String extAttributeNames = Context.get().getConfig().getProperty(session.getTenantName() + ".search.extattr");
         if (request.getParameter("extattr") != null)
