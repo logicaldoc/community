@@ -24,116 +24,116 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  * @since 8.4.2
  */
 public class FolderCapturePanel extends FolderDetailTab {
-    private static final String FILLER = "filler";
+	private static final String FILLER = "filler";
 
-    private static final String BARCODETEMPLATE = "barcodetemplate";
+	private static final String BARCODETEMPLATE = "barcodetemplate";
 
-    private static final String OCRTEMPLATE = "ocrtemplate";
+	private static final String OCRTEMPLATE = "ocrtemplate";
 
-    private DynamicForm form = new DynamicForm();
+	private DynamicForm form = new DynamicForm();
 
-    private ValuesManager vm = new ValuesManager();
+	private ValuesManager vm = new ValuesManager();
 
-    public FolderCapturePanel(GUIFolder folder, ChangedHandler changedHandler) {
-        super(folder, changedHandler);
-        setWidth100();
-        setHeight100();
-        setMembersMargin(20);
-        refresh(folder.getTemplateId());
-    }
+	public FolderCapturePanel(GUIFolder folder, ChangedHandler changedHandler) {
+		super(folder, changedHandler);
+		setWidth100();
+		setHeight100();
+		setMembersMargin(20);
+		refresh(folder.getTemplateId());
+	}
 
-    public void refresh(Long documentTemplateId) {
-        vm.clearValues();
-        vm.clearErrors(false);
+	public void refresh(Long documentTemplateId) {
+		vm.clearValues();
+		vm.clearErrors(false);
 
-        if (form != null)
-            form.destroy();
+		if (form != null)
+			form.destroy();
 
-        if (Boolean.TRUE.equals(contains(form)))
-            removeChild(form);
-        form = new DynamicForm();
-        form.setValuesManager(vm);
-        form.setTitleOrientation(TitleOrientation.TOP);
-        form.setNumCols(3);
-        form.setWrapItemTitles(false);
+		if (Boolean.TRUE.equals(contains(form)))
+			removeChild(form);
+		form = new DynamicForm();
+		form.setValuesManager(vm);
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setNumCols(3);
+		form.setWrapItemTitles(false);
 
-        ButtonItem applySubFolders = new ButtonItem(I18N.message("applytosubfolders"));
-        applySubFolders.setAutoFit(true);
-        applySubFolders.setEndRow(true);
-        applySubFolders.setDisabled(!folder.isWrite());
-        applySubFolders.setColSpan(1);
-        applySubFolders.addClickHandler(click -> {
-            LD.contactingServer();
-            FolderService.Instance.get().applyCapture(folder.getId(), new EmptyAsyncCallback<>());
-        });
+		ButtonItem applySubFolders = new ButtonItem(I18N.message("applytosubfolders"));
+		applySubFolders.setAutoFit(true);
+		applySubFolders.setEndRow(true);
+		applySubFolders.setDisabled(!folder.isWrite());
+		applySubFolders.setColSpan(1);
+		applySubFolders.addClickHandler(click -> {
+			LD.contactingServer();
+			FolderService.Instance.get().applyCapture(folder.getId(), new EmptyAsyncCallback<>());
+		});
 
-        SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
-                folder.getOcrTemplateId());
-        ocrTemplate.setWrapTitle(false);
-        ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) && folder.getTemplateId() == null);
-        ocrTemplate.addChangedHandler(changedHandler);
-        ocrTemplate.addChangedHandler(changed -> applySubFolders.setDisabled(true));
-        ocrTemplate.setDisabled(documentTemplateId == null);
+		SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
+				folder.getOcrTemplateId());
+		ocrTemplate.setWrapTitle(false);
+		ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) && folder.getTemplateId() == null);
+		ocrTemplate.addChangedHandler(changedHandler);
+		ocrTemplate.addChangedHandler(changed -> applySubFolders.setDisabled(true));
+		ocrTemplate.setDisabled(documentTemplateId == null);
 
-        SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
-                folder.getBarcodeTemplateId());
-        barcodeTemplate.setWrapTitle(false);
-        barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
-        barcodeTemplate.addChangedHandler(changedHandler);
-        barcodeTemplate.addChangedHandler(changed -> applySubFolders.setDisabled(true));
-        barcodeTemplate.setEndRow(true);
+		SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
+				folder.getBarcodeTemplateId());
+		barcodeTemplate.setWrapTitle(false);
+		barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
+		barcodeTemplate.addChangedHandler(changedHandler);
+		barcodeTemplate.addChangedHandler(changed -> applySubFolders.setDisabled(true));
+		barcodeTemplate.setEndRow(true);
 
-        FillerSelector filler = new FillerSelector(true, folder.getFillerId());
-        filler.setWrapTitle(false);
-        filler.setDisabled(!Feature.enabled(Feature.AUTOFILL));
-        filler.addChangedHandler(changedHandler);
-        filler.addChangedHandler(changed -> applySubFolders.setDisabled(true));
+		FillerSelector filler = new FillerSelector(true, folder.getFillerId());
+		filler.setWrapTitle(false);
+		filler.setDisabled(!Feature.enabled(Feature.AUTOFILL));
+		filler.addChangedHandler(changedHandler);
+		filler.addChangedHandler(changed -> applySubFolders.setDisabled(true));
 
-        SelectItem fillMode = ItemFactory.newFillModeSelector();
-        fillMode.setWrapTitle(false);
-        fillMode.setDisabled(!Feature.enabled(Feature.AUTOFILL));
-        fillMode.setValue(folder.getFillMode());
-        fillMode.addChangedHandler(changedHandler);
+		SelectItem fillMode = ItemFactory.newFillModeSelector();
+		fillMode.setWrapTitle(false);
+		fillMode.setDisabled(!Feature.enabled(Feature.AUTOFILL));
+		fillMode.setValue(folder.getFillMode());
+		fillMode.addChangedHandler(changedHandler);
 
-        form.setItems(ocrTemplate, barcodeTemplate, filler, fillMode, applySubFolders);
-        addMember(form);
-    }
+		form.setItems(ocrTemplate, barcodeTemplate, filler, fillMode, applySubFolders);
+		addMember(form);
+	}
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean validate() {
-        Map<String, Object> values = vm.getValues();
-        vm.validate();
-        if (Boolean.FALSE.equals(vm.hasErrors())) {
-            if (values.get(OCRTEMPLATE) == null || values.get(OCRTEMPLATE).toString().isEmpty())
-                folder.setOcrTemplateId(null);
-            else {
-                folder.setOcrTemplateId(Long.parseLong(values.get(OCRTEMPLATE).toString()));
-            }
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean validate() {
+		Map<String, Object> values = vm.getValues();
+		vm.validate();
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
+			if (values.get(OCRTEMPLATE) == null || values.get(OCRTEMPLATE).toString().isEmpty())
+				folder.setOcrTemplateId(null);
+			else {
+				folder.setOcrTemplateId(Long.parseLong(values.get(OCRTEMPLATE).toString()));
+			}
 
-            if (values.get(BARCODETEMPLATE) == null || values.get(BARCODETEMPLATE).toString().isEmpty())
-                folder.setBarcodeTemplateId(null);
-            else {
-                folder.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
-            }
+			if (values.get(BARCODETEMPLATE) == null || values.get(BARCODETEMPLATE).toString().isEmpty())
+				folder.setBarcodeTemplateId(null);
+			else {
+				folder.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
+			}
 
-            if (values.get(FILLER) == null || values.get(FILLER).toString().isEmpty())
-                folder.setFillerId(null);
-            else {
-                folder.setFillerId(Long.parseLong(values.get(FILLER).toString()));
-            }
-            folder.setFillMode(Integer.parseInt(values.get("fillmode").toString()));
-        }
-        return !vm.hasErrors();
-    }
+			if (values.get(FILLER) == null || values.get(FILLER).toString().isEmpty())
+				folder.setFillerId(null);
+			else {
+				folder.setFillerId(Long.parseLong(values.get(FILLER).toString()));
+			}
+			folder.setFillMode(Integer.parseInt(values.get("fillmode").toString()));
+		}
+		return !vm.hasErrors();
+	}
 
-    @Override
-    public boolean equals(Object other) {
-        return super.equals(other);
-    }
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

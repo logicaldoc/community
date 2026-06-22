@@ -349,15 +349,14 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	@Override
 	public void setSelectedOcrTemplate(GUIOCRTemplate selectedOcrTemplate) {
 		super.setSelectedOcrTemplate(selectedOcrTemplate);
-		refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null,
-				selectedOcrTemplate.getId());
+		refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null, selectedOcrTemplate.getId());
 	}
 
 	@Override
 	protected ZoneCanvas newZoneCanvas(GUIZone zone) {
 		return new BarcodeZoneCanvas(zone, this);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

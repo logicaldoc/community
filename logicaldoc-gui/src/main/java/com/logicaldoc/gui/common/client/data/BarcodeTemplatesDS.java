@@ -17,8 +17,10 @@ public class BarcodeTemplatesDS extends DataSource {
 	 * 
 	 * @param withEmpty if the result must contain an empty element also
 	 * @param templateId optional identifier of the document template
+	 * @param all if all barcode templates must be retrieved despite of the
+	 *        template they are assigned to
 	 */
-	public BarcodeTemplatesDS(boolean withEmpty, Long templateId) {
+	public BarcodeTemplatesDS(boolean withEmpty, Long templateId, boolean all) {
 		setTitleField("template");
 		setRecordXPath("/list/template");
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -29,7 +31,7 @@ public class BarcodeTemplatesDS extends DataSource {
 		zonal.setHidden(true);
 		setFields(id, name, zonal, description);
 		setDataURL("data/barcodetemplates.xml?withempty=" + withEmpty
-				+ (templateId != null ? "&templateId=" + templateId : ""));
+				+ (templateId != null ? "&templateId=" + templateId : "") + (all ? "&all=true" : ""));
 		setClientOnly(true);
 	}
 }
