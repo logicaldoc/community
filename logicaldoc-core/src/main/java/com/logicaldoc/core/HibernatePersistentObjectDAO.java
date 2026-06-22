@@ -539,7 +539,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			StringBuilder ids = new StringBuilder();
 			for (T t : entities) {
-				if (ids.length() > 0)
+				if (!ids.isEmpty())
 					ids.append(",");
 				ids.append(Long.toString(t.getId()));
 			}

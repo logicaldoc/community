@@ -24,6 +24,7 @@ public class HibernatePasswordHistoryDAOTest extends AbstractCoreTestCase {
 	private PasswordHistoryDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

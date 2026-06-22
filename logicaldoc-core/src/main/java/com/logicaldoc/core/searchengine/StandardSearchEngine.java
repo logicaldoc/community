@@ -123,11 +123,11 @@ public class StandardSearchEngine implements SearchEngine {
 			StringBuilder sb = new StringBuilder();
 			List<DocumentNote> notes = noteDao.findByDocId(doc.getId(), User.USERID_ADMIN, doc.getFileVersion());
 			for (DocumentNote note : notes) {
-				if (sb.length() > 0)
+				if (!sb.isEmpty())
 					sb.append("\n\n");
 				sb.append(note.getMessage());
 			}
-			if (sb.length() > 0)
+			if (!sb.isEmpty())
 				hit.addField(HitField.NOTES.getName(), sb.toString());
 
 			try {

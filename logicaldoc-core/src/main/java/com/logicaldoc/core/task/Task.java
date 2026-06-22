@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -228,7 +229,7 @@ public abstract class Task implements Runnable {
 			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId))) {
 				stopWatch.start();
 				runTask();
-				getScheduling().setLastDuration(stopWatch.getTime());
+				getScheduling().setLastDuration(stopWatch.getTime(TimeUnit.MILLISECONDS));
 			}
 		} catch (InterruptedException ie) {
 			log.error("The task gets interrupted");
@@ -250,7 +251,7 @@ public abstract class Task implements Runnable {
 			}
 			
 			stopWatch.stop();
-			getScheduling().setLastDuration(stopWatch.getTime());
+			getScheduling().setLastDuration(stopWatch.getTime(TimeUnit.MILLISECONDS));
 			saveWork();
 			if(log.isErrorEnabled())
 				log.info("Task {} completed in {}", getName(), TimeDiff.printDuration(getScheduling().getLastDuration()));

@@ -53,7 +53,7 @@ public class SampleClient {
         checkoutCheckin();
     }
 
-    private static void checkoutCheckin() throws IOException {
+    static void checkoutCheckin() throws IOException {
         // user in groups author and admin
         Folder root = connect("admin", "12345678");
         root.getName();
@@ -106,7 +106,7 @@ public class SampleClient {
      * @param target
      * @param delFolderName
      */
-    private static void cleanup(Folder target, String delFolderName) {
+    static void cleanup(Folder target, String delFolderName) {
         try {
             CmisObject object = session.getObjectByPath(target.getPath() + delFolderName);
             Folder delFolder = (Folder) object;
@@ -120,7 +120,7 @@ public class SampleClient {
      * 
      * @param target
      */
-    private static void listFolder(int depth, Folder target) {
+    static void listFolder(int depth, Folder target) {
         String indent = StringUtils.repeat("\t", depth);
         for (Iterator<CmisObject> it = target.getChildren().iterator(); it.hasNext();) {
             CmisObject o = it.next();
@@ -139,7 +139,7 @@ public class SampleClient {
      * @param target
      * @param delDocName
      */
-    private static void deleteDocument(Folder target, String delDocName) {
+    static void deleteDocument(Folder target, String delDocName) {
         try {
             CmisObject object = session.getObjectByPath(target.getPath() + delDocName);
             Document delDoc = (Document) object;
@@ -155,7 +155,7 @@ public class SampleClient {
      * @param target
      * @param newDocName
      */
-    private static void createDocument(Folder target, String newDocName) {
+    static void createDocument(Folder target, String newDocName) {
         Map<String, String> props = new HashMap<String, String>();
         props.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
         props.put(PropertyIds.NAME, newDocName);
@@ -181,12 +181,11 @@ public class SampleClient {
      * @param createFolderName
      * @return newly created folder
      */
-    private static Folder createFolder(Folder target, String newFolderName) {
+    static Folder createFolder(Folder target, String newFolderName) {
         Map<String, String> props = new HashMap<String, String>();
         props.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
         props.put(PropertyIds.NAME, newFolderName);
-        Folder newFolder = target.createFolder(props);
-        return newFolder;
+        return target.createFolder(props);
     }
 
     /**
@@ -194,7 +193,7 @@ public class SampleClient {
      * 
      * @return root folder object
      */
-    private static Folder connect() {
+    static Folder connect() {
         return connect("admin", "12345678");
     }
 
@@ -203,7 +202,7 @@ public class SampleClient {
      * 
      * @return root folder object
      */
-    private static Folder connect(String username, String password) {
+    static Folder connect(String username, String password) {
         SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
         Map<String, String> parameter = new HashMap<String, String>();
         parameter.put(SessionParameter.USER, username);

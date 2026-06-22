@@ -237,13 +237,13 @@ public class Geolocation {
 			sb.append(city);
 
 		if (state != null) {
-			if (sb.length() > 0)
+			if (!sb.isEmpty())
 				sb.append(", ");
 			sb.append(state);
 		}
 
 		if (country != null) {
-			if (sb.length() > 0) {
+			if (!sb.isEmpty()) {
 				sb.append(" (");
 				sb.append(countryCode);
 				sb.append(")");

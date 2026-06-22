@@ -162,8 +162,9 @@ public class WorkflowDesigner extends AdminPanel {
 				transitions.add(transition);
 				StringBuilder sb = new StringBuilder("");
 				for (Point point : connection.getMovablePoints()) {
-					sb.append("" + point.getLeft());
-					sb.append("," + point.getTop());
+					sb.append(Integer.toString(point.getLeft()));
+					sb.append(",");
+					sb.append(Integer.toString(point.getTop()));
 					sb.append(";");
 				}
 

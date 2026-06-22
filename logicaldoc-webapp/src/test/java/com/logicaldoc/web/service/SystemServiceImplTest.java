@@ -185,7 +185,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 		hits = testSubject.search(null, null, null, null, 100, null, new ArrayList<>(), 5L);
 		assertEquals(5, hits.size());
 
-		hits = testSubject.search(1L, null, new Date(), new Date(), 100, "unxisting",
+		hits = testSubject.search(1L, null, referenceInstant, referenceInstant, 100, "unxisting",
 				List.of(DocumentEvent.STORED.toString()), 5L);
 		assertEquals(0, hits.size());
 	}
@@ -195,7 +195,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 		List<GUIHistory> hits = testSubject.searchApiCalls(null, null, null, null, null, null, 100);
 		assertEquals(7, hits.size());
 
-		hits = testSubject.searchApiCalls(1L, new Date(), new Date(), "unexisting", "soap", "boh", 100);
+		hits = testSubject.searchApiCalls(1L, referenceInstant, referenceInstant, "unexisting", "soap", "boh", 100);
 		assertEquals(0, hits.size());
 	}
 
@@ -262,7 +262,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 				while (true)
 					;
 			}
-		}, Map.of(), DateUtils.addDays(new Date(), 1));
+		}, Map.of(), DateUtils.addDays(referenceInstant, 1));
 
 		String triggerName = jobManager.getTriggers("xyz", null).get(0).getKey().getName();
 		testSubject.unscheduleJobs(List.of(new GUIValue(triggerName, "xyz")));

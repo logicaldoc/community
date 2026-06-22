@@ -47,7 +47,7 @@ public class StringUtil {
 		StringBuilder sb = new StringBuilder();
 		String[] tokens = split(src, tokenSize);
 		for (int i = 0; i < tokens.length; i++) {
-			if (sb.length() > 0)
+			if (!sb.isEmpty())
 				sb.append(separator);
 			sb.append(tokens[i]);
 		}

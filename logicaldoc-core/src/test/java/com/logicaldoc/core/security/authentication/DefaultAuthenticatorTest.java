@@ -27,6 +27,7 @@ public class DefaultAuthenticatorTest extends AbstractCoreTestCase {
 	private DefaultAuthenticator testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

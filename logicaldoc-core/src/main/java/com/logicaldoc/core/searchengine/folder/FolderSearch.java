@@ -195,8 +195,10 @@ public class FolderSearch extends Search {
 		int joinsCounter = 0;
 
 		for (FolderCriterion criterion : fOptions.getNotEmptyCriteria()) {
-			if (criteriaQueryPart.length() > 0)
-				criteriaQueryPart.append(" " + criterion.getComposition());
+			if (!criteriaQueryPart.isEmpty()) {
+				criteriaQueryPart.append(" ");
+				criteriaQueryPart.append(criterion.getComposition());
+			}
 			criteriaQueryPart.append("(");
 
 			String columnName = "";
@@ -205,13 +207,13 @@ public class FolderSearch extends Search {
 				// with extended attributes
 				if (!"or".equals(fOptions.getTopOperator()) || joinsCounter == 0)
 					joinsCounter++;
-				criteriaQueryPart.append("(C" + joinsCounter + ".ld_folderid=" + tableAlias + ".ld_id");
-				criteriaQueryPart.append(" and (C" + joinsCounter + ".ld_name='");
+				criteriaQueryPart.append("(C%d.ld_folderid = %s.ld_id".formatted(joinsCounter, tableAlias));
+				criteriaQueryPart.append(" and (C%d.ld_name='".formatted(joinsCounter));
 				criteriaQueryPart.append(criterion.getFieldName());
-				criteriaQueryPart.append("' or C" + joinsCounter + ".ld_name like '");
+				criteriaQueryPart.append("' or C%d.ld_name like '".formatted(joinsCounter));
 				criteriaQueryPart.append(criterion.getFieldName());
 				criteriaQueryPart.append("-%') and ");
-				columnName = "C" + joinsCounter + ".";
+				columnName = "C%d.".formatted(joinsCounter);
 				switch (criterion.getType()) {
 				case Attribute.TYPE_INT, Attribute.TYPE_USER, Attribute.TYPE_FOLDER, Attribute.TYPE_DOCUMENT, Attribute.TYPE_BOOLEAN:
 					columnName += "ld_intvalue";

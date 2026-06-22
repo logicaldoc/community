@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -26,84 +28,79 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory> implements FolderHistoryDAO {
 
-	private static final String AND = " and ";
+    private static final String ORDER_BY_ENTITY_DATE_ASC = "order by _entity.date asc";
 
-	private static final String DATE_ASC = ".date asc";
+    private HibernateFolderHistoryDAO() {
+        super(FolderHistory.class);
+        super.log = LoggerFactory.getLogger(HibernateFolderHistoryDAO.class);
+    }
 
-	private HibernateFolderHistoryDAO() {
-		super(FolderHistory.class);
-		super.log = LoggerFactory.getLogger(HibernateFolderHistoryDAO.class);
-	}
+    @Override
+    public List<FolderHistory> findByUserId(long userId) throws PersistenceException {
+        return findByUserIdAndEvent(userId, null);
+    }
 
-	@Override
-	public List<FolderHistory> findByUserId(long userId) throws PersistenceException {
-		return findByUserIdAndEvent(userId, null);
-	}
+    @Override
+    public List<FolderHistory> findByFolderId(long folderId) throws PersistenceException {
+        return findByWhere("_entity.folderId = %d".formatted(folderId), "_entity.date asc", null);
+    }
 
-	@Override
-	public List<FolderHistory> findByFolderId(long folderId) throws PersistenceException {
-		return findByWhere(ENTITY + ".folderId =" + folderId, ENTITY + DATE_ASC, null);
-	}
+    @Override
+    public List<FolderHistory> findNotNotified(Integer max) throws PersistenceException {
+        return findByWhere("_entity.notified = false", "_entity.date asc", max);
+    }
 
-	@Override
-	public List<FolderHistory> findNotNotified(Integer max) throws PersistenceException {
-		return findByWhere(ENTITY + ".notified = false", ENTITY + DATE_ASC, max);
-	}
+    @Override
+    public void cleanOldHistories(int ttl) throws PersistenceException {
+        log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_folder_history"));
+    }
 
-	@Override
-	public void cleanOldHistories(int ttl) throws PersistenceException {
-		log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_folder_history"));
-	}
+    @Override
+    public List<FolderHistory> findByUserIdAndEvent(long userId, String event) throws PersistenceException {
+        StringBuilder query = new StringBuilder("_entity.userId = %d".formatted(userId));
+        if (StringUtils.isNotEmpty(event))
+            query.append(" and lower(_entity.event) like '%s'".formatted(SqlUtil.doubleQuotes(event.toLowerCase())));
 
-	@Override
-	public List<FolderHistory> findByUserIdAndEvent(long userId, String event) throws PersistenceException {
-		String query = ENTITY + ".userId =" + userId;
-		if (event != null && StringUtils.isNotEmpty(event))
-			query += " and lower(" + ENTITY + ".event) like '" + SqlUtil.doubleQuotes(event.toLowerCase()) + "'";
+        return findByWhere(query.toString(), ORDER_BY_ENTITY_DATE_ASC, null);
+    }
 
-		return findByWhere(query, ORDER_BY + ENTITY + DATE_ASC, null);
-	}
+    @Override
+    public List<FolderHistory> findByPath(
+            String pathExpression,
+            Date oldestDate,
+            Collection<String> events,
+            Integer max) throws PersistenceException {
+        StringBuilder query = new StringBuilder(
+                "(_entity.path like :pathExpression or _entity.pathOld like :pathExpression) ");
 
-	@Override
-	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
-			Integer max) throws PersistenceException {
-		StringBuilder query = new StringBuilder(
-				"(" + ENTITY + ".path like :pathExpression or " + ENTITY + ".pathOld like :pathExpression) ");
-		Map<String, Object> params = new HashMap<>();
-		params.put("pathExpression", pathExpression);
+        Map<String, Object> params = new HashMap<>();
+        params.put("pathExpression", pathExpression);
 
-		if (oldestDate != null) {
-			query.append(AND + ENTITY + ".date >= :oldestDate ");
-			params.put("oldestDate", oldestDate);
-		}
-		if (events != null && !events.isEmpty()) {
-			StringBuilder eventsStr = new StringBuilder("(");
-			for (String event : events) {
-				if (eventsStr.length() > 1)
-					eventsStr.append(",");
-				eventsStr.append("'" + event + "'");
-			}
-			eventsStr.append(")");
-			query.append(AND + ENTITY + ".event in " + eventsStr);
-		}
+        if (oldestDate != null) {
+            query.append(" and _entity.date >= :oldestDate ");
+            params.put("oldestDate", oldestDate);
+        }
 
-		return findByWhere(query.toString(), params, ORDER_BY + ENTITY + DATE_ASC, max);
-	}
+        if (CollectionUtils.isNotEmpty(events))
+            query.append(" and _entity.event in ('%s')".formatted(events.stream().collect(Collectors.joining("','"))));
 
-	@Override
-	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate)
-			throws PersistenceException {
-		String query = ENTITY + ".folderId = :folderId and " + ENTITY + ".event = :event ";
+        return findByWhere(query.toString(), params, ORDER_BY_ENTITY_DATE_ASC, max);
+    }
 
-		Map<String, Object> params = new HashMap<>();
-		params.put("folderId", folderId);
-		params.put("event", event);
+    @Override
+    public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate)
+            throws PersistenceException {
+        StringBuilder query = new StringBuilder("_entity.folderId = :folderId and _entity.event = :event ");
 
-		if (oldestDate != null) {
-			query += AND + ENTITY + ".date >= :oldestDate ";
-			params.put("oldestDate", oldestDate);
-		}
+        Map<String, Object> params = new HashMap<>();
+        params.put("folderId", folderId);
+        params.put("event", event);
 
-		return findByWhere(query, params, ORDER_BY + ENTITY + DATE_ASC, null);
-	}
+        if (oldestDate != null) {
+            query.append(" and _entity.date >= :oldestDate");
+            params.put("oldestDate", oldestDate);
+        }
+
+        return findByWhere(query.toString(), params, ORDER_BY_ENTITY_DATE_ASC, null);
+    }
 }

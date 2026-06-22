@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,156 +25,156 @@ import com.logicaldoc.util.plugin.PluginException;
  * @since 3.0
  */
 public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
-	// Instance under test
-	private SystemMessageDAO testSubject;
+    // Instance under test
+    private SystemMessageDAO testSubject;
 
-	@Before
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Before
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		// Retrieve the instance under test from spring context.
-		// Make sure that it is an HibernateSystemMessageDAO
-		testSubject = SystemMessageDAO.get();
-	}
+        // Retrieve the instance under test from spring context.
+        // Make sure that it is an HibernateSystemMessageDAO
+        testSubject = SystemMessageDAO.get();
+    }
 
-	@Test
-	public void testDelete() throws PersistenceException {
-		testSubject.delete(1);
-		SystemMessage message = testSubject.findById(1);
-		assertNull(message);
-	}
+    @Test
+    public void testDelete() throws PersistenceException {
+        testSubject.delete(1);
+        SystemMessage message = testSubject.findById(1);
+        assertNull(message);
+    }
 
-	@Test
-	public void testFindById() throws PersistenceException {
-		SystemMessage message = testSubject.findById(1);
-		assertNotNull(message);
-		assertEquals(1, message.getId());
-		assertEquals("message text1", message.getMessageText());
+    @Test
+    public void testFindById() throws PersistenceException {
+        SystemMessage message = testSubject.findById(1);
+        assertNotNull(message);
+        assertEquals(1, message.getId());
+        assertEquals("message text1", message.getMessageText());
 
-		// Try with unexisting message
-		message = testSubject.findById(99);
-		assertNull(message);
-	}
+        // Try with unexisting message
+        message = testSubject.findById(99);
+        assertNull(message);
+    }
 
-	@Test
-	public void testFindByRecipient() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findByRecipient("sebastian", Message.Type.SYSTEM, null);
-		assertEquals(1, coll.size());
-		coll = testSubject.findByRecipient("marco", Message.Type.SYSTEM, null);
-		assertEquals(0, coll.size());
-		coll = testSubject.findByRecipient("paperino", Message.Type.NOTIFICATION, null);
-		assertEquals(0, coll.size());
-		coll = testSubject.findByRecipient("xxxx", Message.Type.NOTIFICATION, null);
-		assertEquals(0, coll.size());
-	}
+    @Test
+    public void testFindByRecipient() throws PersistenceException {
+        Collection<SystemMessage> coll = testSubject.findByRecipient("sebastian", Message.Type.SYSTEM, null);
+        assertEquals(1, coll.size());
+        coll = testSubject.findByRecipient("marco", Message.Type.SYSTEM, null);
+        assertEquals(0, coll.size());
+        coll = testSubject.findByRecipient("paperino", Message.Type.NOTIFICATION, null);
+        assertEquals(0, coll.size());
+        coll = testSubject.findByRecipient("xxxx", Message.Type.NOTIFICATION, null);
+        assertEquals(0, coll.size());
+    }
 
-	@Test
-	public void testDeleteExpiredMessages() throws PersistenceException {
-		testSubject.deleteExpiredMessages("sebastian");
-		assertNotNull(testSubject.findById(1));
+    @Test
+    public void testDeleteExpiredMessages() throws PersistenceException {
+        testSubject.deleteExpiredMessages("sebastian");
+        assertNotNull(testSubject.findById(1));
 
-		testSubject.deleteExpiredMessages(Message.Type.SYSTEM);
-		assertNotNull(testSubject.findById(1));
-	}
+        testSubject.deleteExpiredMessages(Message.Type.SYSTEM);
+        assertNotNull(testSubject.findById(1));
+    }
 
-	@Test
-	public void testGetUnreadCount() throws PersistenceException {
-		assertEquals(1, testSubject.getUnreadCount("sebastian", Message.Type.SYSTEM));
-		assertEquals(2, testSubject.getUnreadCount("marco", Message.Type.NOTIFICATION));
-		assertEquals(0, testSubject.getUnreadCount("admin", Message.Type.SYSTEM));
-	}
+    @Test
+    public void testGetUnreadCount() throws PersistenceException {
+        assertEquals(1, testSubject.getUnreadCount("sebastian", Message.Type.SYSTEM));
+        assertEquals(2, testSubject.getUnreadCount("marco", Message.Type.NOTIFICATION));
+        assertEquals(0, testSubject.getUnreadCount("admin", Message.Type.SYSTEM));
+    }
 
-	@Test
-	public void testFindByType() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findByType(Message.Type.SYSTEM);
-		assertEquals(1, coll.size());
-		coll = testSubject.findByType(Message.Type.NOTIFICATION);
-		assertEquals(2, coll.size());
-	}
+    @Test
+    public void testFindByType() throws PersistenceException {
+        Collection<SystemMessage> coll = testSubject.findByType(Message.Type.SYSTEM);
+        assertEquals(1, coll.size());
+        coll = testSubject.findByType(Message.Type.NOTIFICATION);
+        assertEquals(2, coll.size());
+    }
 
-	@Test
-	public void testFindByMode() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findByMode(Mode.CC);
-		assertEquals(1, coll.size());
-		coll = testSubject.findByMode(Mode.MESSAGE);
-		assertEquals(2, coll.size());
+    @Test
+    public void testFindByMode() throws PersistenceException {
+        Collection<SystemMessage> coll = testSubject.findByMode(Mode.CC);
+        assertEquals(1, coll.size());
+        coll = testSubject.findByMode(Mode.MESSAGE);
+        assertEquals(2, coll.size());
 
-	}
+    }
 
-	@Test
-	public void testStore() throws PersistenceException {
-		Set<Recipient> recipients = new HashSet<>();
-		Recipient recipient = new Recipient();
-		recipient.setName("pippo");
-		recipient.setAddress("pippo");
-		recipient.setType(Recipient.Type.SYSTEM);
-		recipient.setMode(Recipient.Mode.TO);
-		recipients.add(recipient);
-		recipient = new Recipient();
-		recipient.setName("paperino");
-		recipient.setAddress("paperino");
-		recipient.setType(Recipient.Type.EMAIL);
-		recipient.setMode(Recipient.Mode.TO);
-		recipients.add(recipient);
+    @Test
+    public void testStore() throws PersistenceException {
+        Set<Recipient> recipients = new HashSet<>();
+        Recipient recipient = new Recipient();
+        recipient.setName("pippo");
+        recipient.setAddress("pippo");
+        recipient.setType(Recipient.Type.SYSTEM);
+        recipient.setMode(Recipient.Mode.TO);
+        recipients.add(recipient);
+        recipient = new Recipient();
+        recipient.setName("paperino");
+        recipient.setAddress("paperino");
+        recipient.setType(Recipient.Type.EMAIL);
+        recipient.setMode(Recipient.Mode.TO);
+        recipients.add(recipient);
 
-		SystemMessage message = new SystemMessage();
-		message.setAuthor("admin");
-		message.setMessageText("text");
-		message.setLastNotified(new Date());
-		message.setType(Message.Type.SYSTEM);
-		message.setStatus(SystemMessage.STATUS_NEW);
-		message.setRecipients(recipients);
-		testSubject.store(message);
-		assertNotNull(message);
-		
-		message = testSubject.findById(message.getId());
-		testSubject.initialize(message);
-		assertNotNull(message);
-		assertEquals(2, message.getRecipients().size());
+        SystemMessage message = new SystemMessage();
+        message.setAuthor("admin");
+        message.setMessageText("text");
+        message.setLastNotified(referenceInstant);
+        message.setType(Message.Type.SYSTEM);
+        message.setStatus(SystemMessage.STATUS_NEW);
+        message.setRecipients(recipients);
+        testSubject.store(message);
+        assertNotNull(message);
 
-		// Update an already existing message
-		message = testSubject.findById(1);
-		assertNotNull(message);
-		assertEquals("message text1", message.getMessageText());
-		message.setMessageText("xxxx");
-		message.setRecipients(recipients);
-		testSubject.store(message);
-		
-		message = testSubject.findById(1);
-		testSubject.initialize(message);
-		
-		assertNotNull(message);
-		assertEquals("xxxx", message.getMessageText());
-		assertEquals(2, message.getRecipients().size());
-	}
+        message = testSubject.findById(message.getId());
+        testSubject.initialize(message);
+        assertNotNull(message);
+        assertEquals(2, message.getRecipients().size());
 
-	@Test
-	public void testFindMessagesToBeSent() throws PersistenceException {
-		Collection<SystemMessage> coll = testSubject.findMessagesToBeSent(Message.Type.SYSTEM, 5);
-		assertEquals(1, coll.size());
-		coll = testSubject.findMessagesToBeSent(Message.Type.NOTIFICATION, 5);
-		assertEquals(2, coll.size());
+        // Update an already existing message
+        message = testSubject.findById(1);
+        assertNotNull(message);
+        assertEquals("message text1", message.getMessageText());
+        message.setMessageText("xxxx");
+        message.setRecipients(recipients);
+        testSubject.store(message);
 
-		// Update an already existing message
-		SystemMessage message = testSubject.findById(1);
-		assertNotNull(message);
-		assertEquals("message text1", message.getMessageText());
-		message.setTrials(5);
-		testSubject.store(message);
-		message = testSubject.findById(1);
-		assertNotNull(message);
-		coll = testSubject.findMessagesToBeSent(Message.Type.NOTIFICATION, 5);
-		assertEquals(1, coll.size());
+        message = testSubject.findById(1);
+        testSubject.initialize(message);
 
-		message = testSubject.findById(2);
-		assertNotNull(message);
-		assertEquals("message text2", message.getMessageText());
-		message.setType(Message.Type.SYSTEM);
-		testSubject.store(message);
-		message = testSubject.findById(2);
-		assertNotNull(message);
-		coll = testSubject.findMessagesToBeSent(Message.Type.SYSTEM, 5);
-		assertEquals(2, coll.size());
-	}
+        assertNotNull(message);
+        assertEquals("xxxx", message.getMessageText());
+        assertEquals(2, message.getRecipients().size());
+    }
+
+    @Test
+    public void testFindMessagesToBeSent() throws PersistenceException {
+        Collection<SystemMessage> coll = testSubject.findMessagesToBeSent(Message.Type.SYSTEM, 5);
+        assertEquals(1, coll.size());
+        coll = testSubject.findMessagesToBeSent(Message.Type.NOTIFICATION, 5);
+        assertEquals(2, coll.size());
+
+        // Update an already existing message
+        SystemMessage message = testSubject.findById(1);
+        assertNotNull(message);
+        assertEquals("message text1", message.getMessageText());
+        message.setTrials(5);
+        testSubject.store(message);
+        message = testSubject.findById(1);
+        assertNotNull(message);
+        coll = testSubject.findMessagesToBeSent(Message.Type.NOTIFICATION, 5);
+        assertEquals(1, coll.size());
+
+        message = testSubject.findById(2);
+        assertNotNull(message);
+        assertEquals("message text2", message.getMessageText());
+        message.setType(Message.Type.SYSTEM);
+        testSubject.store(message);
+        message = testSubject.findById(2);
+        assertNotNull(message);
+        coll = testSubject.findMessagesToBeSent(Message.Type.SYSTEM, 5);
+        assertEquals(2, coll.size());
+    }
 }

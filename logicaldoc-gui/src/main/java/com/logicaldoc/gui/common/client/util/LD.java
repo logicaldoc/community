@@ -429,7 +429,7 @@ public class LD {
             item.setValue(defaultValue);
             if (item instanceof TextItem textItem) {
                 textItem.selectValue();
-                if (defaultValue.length() > 0)
+                if (!defaultValue.isEmpty())
                     textItem.setSelectionRange(0, defaultValue.length());
             }
         }

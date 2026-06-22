@@ -393,7 +393,7 @@ public class LDRepository {
      * @param readOnly if the user must be read-only
      */
     public void addUser(String user, boolean readOnly) {
-        if ((user == null) || (user.length() == 0))
+        if (StringUtils.isEmpty(user))
             return;
 
         userMap.put(user, readOnly);
@@ -429,8 +429,12 @@ public class LDRepository {
      * 
      * @return the list of type definitions
      */
-    public TypeDefinitionList getTypesChildren(CallContext context, String typeId, boolean includePropertyDefinitions,
-            BigInteger maxItems, BigInteger skipCount) {
+    public TypeDefinitionList getTypesChildren(
+            CallContext context,
+            String typeId,
+            boolean includePropertyDefinitions,
+            BigInteger maxItems,
+            BigInteger skipCount) {
         debug("getTypesChildren %s".formatted(typeId));
         validatePermission(context.getRepositoryId(), context, null);
         return types.getTypesChildren(context, typeId, includePropertyDefinitions, maxItems, skipCount);
@@ -466,7 +470,10 @@ public class LDRepository {
      * 
      * @return the list of type definitions
      */
-    public List<TypeDefinitionContainer> getTypesDescendants(CallContext context, String typeId, BigInteger depth,
+    public List<TypeDefinitionContainer> getTypesDescendants(
+            CallContext context,
+            String typeId,
+            BigInteger depth,
             Boolean includePropertyDefinitions) {
         debug("getTypesDescendants");
         validatePermission(context.getRepositoryId(), context, null);
@@ -507,7 +514,11 @@ public class LDRepository {
      * 
      * @return the newly created object
      */
-    public ObjectData create(CallContext context, Properties properties, String folderId, ContentStream contentStream,
+    public ObjectData create(
+            CallContext context,
+            Properties properties,
+            String folderId,
+            ContentStream contentStream,
             ObjectInfoHandler objectInfos) {
         debug("create %s".formatted(folderId));
         validatePermission(folderId, context, Permission.WRITE);
@@ -620,7 +631,10 @@ public class LDRepository {
      * 
      * @return the new document's identifier
      */
-    public String createDocument(CallContext context, Properties properties, String folderId,
+    public String createDocument(
+            CallContext context,
+            Properties properties,
+            String folderId,
             ContentStream contentStream) {
 
         log.debug("createDocument {}", folderId);
@@ -734,7 +748,10 @@ public class LDRepository {
      * 
      * @return the moved object
      */
-    public ObjectData moveObject(CallContext context, Holder<String> objectId, String targetFolderId,
+    public ObjectData moveObject(
+            CallContext context,
+            Holder<String> objectId,
+            String targetFolderId,
             ObjectInfoHandler objectInfos) {
         debug("moveObject %s into %s".formatted(objectId, targetFolderId));
 
@@ -895,7 +912,10 @@ public class LDRepository {
      * 
      * @return the updated object
      */
-    public ObjectData updateProperties(CallContext context, Holder<String> objectId, Properties properties,
+    public ObjectData updateProperties(
+            CallContext context,
+            Holder<String> objectId,
+            Properties properties,
             ObjectInfoHandler objectInfos) {
         debug("updateProperties %s".formatted(objectId));
         validatePermission(objectId.getValue(), context, Permission.WRITE);
@@ -996,7 +1016,11 @@ public class LDRepository {
         }
     }
 
-    public void checkIn(Holder<String> objectId, Boolean major, ContentStream contentStream, Properties properties,
+    public void checkIn(
+            Holder<String> objectId,
+            Boolean major,
+            ContentStream contentStream,
+            Properties properties,
             String checkinComment) {
         debug("checkin %s".formatted(objectId));
         validatePermission(objectId.getValue(), null, Permission.WRITE);
@@ -1045,8 +1069,14 @@ public class LDRepository {
      * 
      * @return the file/folder
      */
-    public ObjectData getObject(CallContext context, String objectId, String versionServicesId, String filter,
-            Boolean includeAllowableActions, Boolean includeAcl, ObjectInfoHandler objectInfos) {
+    public ObjectData getObject(
+            CallContext context,
+            String objectId,
+            String versionServicesId,
+            String filter,
+            Boolean includeAllowableActions,
+            Boolean includeAcl,
+            ObjectInfoHandler objectInfos) {
         debug("getObject %s".formatted(objectId));
         try {
             validatePermission(objectId, context, null);
@@ -1089,9 +1119,16 @@ public class LDRepository {
      * 
      * @return the file/folder at the given path
      */
-    public ObjectData getObjectByPath(CallContext context, String path, String filter, Boolean includeAllowableActions,
-            IncludeRelationships includeRelationships, String renditionFilter, Boolean includePolicyIds,
-            Boolean includeAcl, ExtensionsData extension) {
+    public ObjectData getObjectByPath(
+            CallContext context,
+            String path,
+            String filter,
+            Boolean includeAllowableActions,
+            IncludeRelationships includeRelationships,
+            String renditionFilter,
+            Boolean includePolicyIds,
+            Boolean includeAcl,
+            ExtensionsData extension) {
 
         debug("getObjectByPath %s".formatted(path));
 
@@ -1267,8 +1304,14 @@ public class LDRepository {
      * 
      * @throws PersistenceException error at data layer
      */
-    public ObjectInFolderList getChildren(CallContext context, String folderId, String filter,
-            boolean includeAllowableActions, boolean includePathSegment, int maxItems, int skipCount,
+    public ObjectInFolderList getChildren(
+            CallContext context,
+            String folderId,
+            String filter,
+            boolean includeAllowableActions,
+            boolean includePathSegment,
+            int maxItems,
+            int skipCount,
             ObjectInfoHandler objectInfos) throws PersistenceException {
         debug("getChildren folderId: %s".formatted(folderId));
         validatePermission(folderId, context, null);
@@ -1335,9 +1378,14 @@ public class LDRepository {
 
     }
 
-    private void buildAndAddChildDocument(Document child, ObjectInFolderListImpl result,
-            boolean includeAllowableActions, boolean includePathSegment, ObjectInfoHandler objectInfos,
-            Set<String> filterCollection, CallContext context) {
+    private void buildAndAddChildDocument(
+            Document child,
+            ObjectInFolderListImpl result,
+            boolean includeAllowableActions,
+            boolean includePathSegment,
+            ObjectInfoHandler objectInfos,
+            Set<String> filterCollection,
+            CallContext context) {
         ObjectInFolderDataImpl objectInFolder = new ObjectInFolderDataImpl();
         objectInFolder.setObject(
                 compileObjectType(context, child, filterCollection, includeAllowableActions, false, objectInfos));
@@ -1346,8 +1394,13 @@ public class LDRepository {
         result.getObjects().add(objectInFolder);
     }
 
-    private void buildAndAddChildFolder(Folder child, ObjectInFolderListImpl result, boolean includeAllowableActions,
-            boolean includePathSegment, ObjectInfoHandler objectInfos, Set<String> filterCollection,
+    private void buildAndAddChildFolder(
+            Folder child,
+            ObjectInFolderListImpl result,
+            boolean includeAllowableActions,
+            boolean includePathSegment,
+            ObjectInfoHandler objectInfos,
+            Set<String> filterCollection,
             CallContext context) {
         ObjectInFolderDataImpl objectInFolder = new ObjectInFolderDataImpl();
         objectInFolder.setObject(
@@ -1398,8 +1451,13 @@ public class LDRepository {
      * @return list of parents
      */
     @SuppressWarnings("unchecked")
-    public List<ObjectParentData> getObjectParents(CallContext context, String objectId, String filter,
-            Boolean includeAllowableActions, Boolean includeRelativePathSegment, ObjectInfoHandler objectInfos) {
+    public List<ObjectParentData> getObjectParents(
+            CallContext context,
+            String objectId,
+            String filter,
+            Boolean includeAllowableActions,
+            Boolean includeRelativePathSegment,
+            ObjectInfoHandler objectInfos) {
         debug("getObjectParents %s %s".formatted(objectId, filter));
         validatePermission(objectId, context, null);
 
@@ -1525,8 +1583,13 @@ public class LDRepository {
         }
     }
 
-    private boolean doFulltextSearch(String statement, String whereExpression, Long parentFolderID,
-            List<ObjectData> results, Set<String> filter, int maxItems) {
+    private boolean doFulltextSearch(
+            String statement,
+            String whereExpression,
+            Long parentFolderID,
+            List<ObjectData> results,
+            Set<String> filter,
+            int maxItems) {
         boolean hasMoreItems;
         FulltextSearchOptions opt = buildFulltextSearchOptions(statement, parentFolderID, maxItems);
 
@@ -1637,7 +1700,8 @@ public class LDRepository {
     private void checkReadEnable(User user, long folderId) throws PermissionException, PersistenceException {
         FolderDAO dao = FolderDAO.get();
         if (!dao.isReadAllowed(folderId, user.getId())) {
-            String message = "User %s doesn't have read permission on folder %d".formatted(user.getUsername(), folderId);
+            String message = "User %s doesn't have read permission on folder %d".formatted(user.getUsername(),
+                    folderId);
             log.error(message);
             throw new PermissionException(message);
         }
@@ -1694,7 +1758,7 @@ public class LDRepository {
      *         otherwise
      */
     private static boolean isValidName(String name) {
-        return !(name == null || name.length() == 0 || (name.indexOf('/') != -1));
+        return !(StringUtils.isEmpty(name) || (name.indexOf('/') != -1));
     }
 
     /**
@@ -1709,8 +1773,13 @@ public class LDRepository {
      * 
      * @return the object
      */
-    private ObjectData compileObjectType(CallContext context, PersistentObject object, Set<String> filter,
-            boolean includeAllowableActions, boolean includeAcl, ObjectInfoHandler objectInfos) {
+    private ObjectData compileObjectType(
+            CallContext context,
+            PersistentObject object,
+            Set<String> filter,
+            boolean includeAllowableActions,
+            boolean includeAcl,
+            ObjectInfoHandler objectInfos) {
         debug("compileObjectType");
         ObjectDataImpl result = new ObjectDataImpl();
         ObjectInfoImpl objectInfo = new ObjectInfoImpl();
@@ -1841,8 +1910,12 @@ public class LDRepository {
         }
     }
 
-    private void compileDocumentOrVersionProperties(AbstractDocument doc, ObjectInfoImpl objectInfo, Set<String> filter,
-            String typeId, PropertiesImpl result) throws PersistenceException {
+    private void compileDocumentOrVersionProperties(
+            AbstractDocument doc,
+            ObjectInfoImpl objectInfo,
+            Set<String> filter,
+            String typeId,
+            PropertiesImpl result) throws PersistenceException {
         GregorianCalendar creation = millisToCalendar(doc.getCreation().getTime());
 
         // created and modified by
@@ -1927,7 +2000,10 @@ public class LDRepository {
         compileDocumentOrVersionExtAttrsProperties(doc, typeId, result, filter);
     }
 
-    private void compileDocumentOrVersionExtAttrsProperties(AbstractDocument doc, String typeId, PropertiesImpl result,
+    private void compileDocumentOrVersionExtAttrsProperties(
+            AbstractDocument doc,
+            String typeId,
+            PropertiesImpl result,
             Set<String> filter) throws PersistenceException {
 
         Template template = getTemplate(doc);
@@ -1986,7 +2062,11 @@ public class LDRepository {
         return template;
     }
 
-    private void compileFolderProperties(Folder folder, ObjectInfoImpl objectInfo, Set<String> filter, String typeId,
+    private void compileFolderProperties(
+            Folder folder,
+            ObjectInfoImpl objectInfo,
+            Set<String> filter,
+            String typeId,
             PropertiesImpl result) throws PersistenceException {
         GregorianCalendar creation = millisToCalendar(folder.getCreation().getTime());
 
@@ -2007,7 +2087,7 @@ public class LDRepository {
         }
 
         String path = folderDao.computePathExtended(folder.getId());
-        addPropertyString(result, typeId, filter, PropertyIds.PATH, (path.length() == 0 ? "/" : path));
+        addPropertyString(result, typeId, filter, PropertyIds.PATH, (StringUtils.isEmpty(path) ? "/" : path));
 
         // folder properties
         if (!root.equals(folder)) {
@@ -2076,7 +2156,11 @@ public class LDRepository {
         }
     }
 
-    private void updateDocumentMetadata(AbstractDocument doc, Properties properties, PropertyData<?> p, boolean create,
+    private void updateDocumentMetadata(
+            AbstractDocument doc,
+            Properties properties,
+            PropertyData<?> p,
+            boolean create,
             TypeDefinition type) throws PersistenceException {
         PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
 
@@ -2368,7 +2452,11 @@ public class LDRepository {
         props.addProperty(p);
     }
 
-    private void addPropertyIdList(PropertiesImpl props, String typeId, Set<String> filter, String id,
+    private void addPropertyIdList(
+            PropertiesImpl props,
+            String typeId,
+            Set<String> filter,
+            String id,
             List<String> value) {
         if (!checkAddProperty(props, typeId, filter, id)) {
             return;
@@ -2392,7 +2480,11 @@ public class LDRepository {
         addPropertyBigInteger(props, typeId, filter, id, BigInteger.valueOf(value));
     }
 
-    private void addPropertyBigInteger(PropertiesImpl props, String typeId, Set<String> filter, String id,
+    private void addPropertyBigInteger(
+            PropertiesImpl props,
+            String typeId,
+            Set<String> filter,
+            String id,
             BigInteger value) {
         if (!checkAddProperty(props, typeId, filter, id)) {
             return;
@@ -2413,7 +2505,11 @@ public class LDRepository {
         props.addProperty(p);
     }
 
-    private void addPropertyDateTime(PropertiesImpl props, String typeId, Set<String> filter, String id,
+    private void addPropertyDateTime(
+            PropertiesImpl props,
+            String typeId,
+            Set<String> filter,
+            String id,
             GregorianCalendar value) {
 
         if (!checkAddProperty(props, typeId, filter, id)) {
@@ -2649,11 +2745,7 @@ public class LDRepository {
          * HashSet<String>() instead of a null invalidates completely the
          * working of the cmis module - Alex 2023-01-26
          */
-        if (filter == null) {
-            return null;
-        }
-
-        if (filter.trim().length() == 0) {
+        if (StringUtils.isEmpty(filter)) {
             return null;
         }
 
@@ -2662,7 +2754,7 @@ public class LDRepository {
             s = s.trim();
             if (s.equals("*")) {
                 return null;
-            } else if (s.length() > 0) {
+            } else if (StringUtils.isNotEmpty(s)) {
                 result.add(s);
             }
         }
@@ -3031,7 +3123,8 @@ public class LDRepository {
 
             // properties: id, doc type
             PropertiesImpl properties = new PropertiesImpl();
-            properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, "fld.%d".formatted(logEntry.getFolderId())));
+            properties
+                    .addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, "fld.%d".formatted(logEntry.getFolderId())));
             properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_FOLDER.value()));
             od.setProperties(properties);
             ods.add(od);

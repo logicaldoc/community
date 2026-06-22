@@ -28,6 +28,7 @@ public class EventEndpointTest extends AbstractWPTestCase {
 	private Session websocketSession = new MockWebsocketSession();
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		endpoint.error(websocketSession, new Exception("test exception"));
@@ -37,6 +38,7 @@ public class EventEndpointTest extends AbstractWPTestCase {
 	}
 
 	@After
+	@Override
 	public void tearDown() throws IOException {
 		endpoint.onClose(websocketSession);
 		super.tearDown();

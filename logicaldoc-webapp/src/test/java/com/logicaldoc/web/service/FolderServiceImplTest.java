@@ -46,6 +46,7 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 	private DocumentDAO documentDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

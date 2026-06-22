@@ -53,7 +53,7 @@ public class EpubParser extends AbstractParser {
 				// Excludes html tags
 				String sectionTextContent = bookSection.getSectionTextContent();
 				if (StringUtils.isNotEmpty(sectionTextContent)) {
-					if (content.length() > 0)
+					if (!content.isEmpty())
 						content.append("\n");
 					content.append(sectionTextContent);
 				}

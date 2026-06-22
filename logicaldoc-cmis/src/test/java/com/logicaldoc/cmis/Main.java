@@ -34,7 +34,7 @@ public class Main {
 
     public static final String OC_DOCUMENT_TITLE = OC_DOCUMENT_PREFIX_PREFIX + "title";
 
-    private final static Logger LOG = Logger.getLogger(Main.class.getName());
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         String ldocCmisUrl = "http://localhost:8080/service/cmis";

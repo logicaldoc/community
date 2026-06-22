@@ -46,7 +46,7 @@ public class TemplatesPreparationResults extends Window {
         status.setAutoFitWidth(true);
         status.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
         status.setCellFormatter((value, gridRecord, rowNum, colNum) -> "<span style='color: "
-                + ("success".equals(value.toString().toLowerCase()) ? "green" : "red") + "'>" + I18N.message(value.toString()) + "</span>");
+                + ("success".equalsIgnoreCase(value.toString()) ? "green" : "red") + "'>" + I18N.message(value.toString()) + "</span>");
 
         ListGridField template = new ListGridField(TEMPLATE, I18N.message(TEMPLATE));
         template.setAutoFitWidth(true);

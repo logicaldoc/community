@@ -199,15 +199,18 @@ public class GUIModel implements Serializable {
     }
 
     public void setCategoriesArray(String[] cats) {
-        categories = "";
-        if (cats == null || cats.length == 0)
-            return;
+        StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < cats.length; i++) {
-            if (i > 0)
-                categories += ",";
-            categories += cats[i].trim();
+        if (cats != null && cats.length > 0) {
+
+            for (int i = 0; i < cats.length; i++) {
+                if (i > 0)
+                    sb.append(",");
+                sb.append(cats[i].trim());
+            }
         }
+
+        categories = sb.toString();  
     }
 
     public void setCategories(String categories) {

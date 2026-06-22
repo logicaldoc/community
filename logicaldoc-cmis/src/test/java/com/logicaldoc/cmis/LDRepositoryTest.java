@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -147,8 +146,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // Search by filename
         query = """
                 SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,
-                       cmis:versionSeriesId,cmis:contentStreamMimeType 
-                  FROM cmis:document 
+                       cmis:versionSeriesId,cmis:contentStreamMimeType
+                  FROM cmis:document
                  WHERE cmis:name LIKE '%flexspaces%'
                 """;
         ol = testSubject.query(query, 40);
@@ -177,8 +176,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // Search full text on: fileName, title, tags and content
         query = """
                 SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,
-                       cmis:versionSeriesId,cmis:contentStreamMimeType 
-                  FROM cmis:document 
+                       cmis:versionSeriesId,cmis:contentStreamMimeType
+                  FROM cmis:document
                  WHERE CONTAINS('FLEXSPACE')
                 """;
         ol = testSubject.query(query, 40);
@@ -188,8 +187,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // Search by tag
         query = """
                 SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,
-                       cmis:versionSeriesId,cmis:contentStreamMimeType 
-                  FROM cmis:document 
+                       cmis:versionSeriesId,cmis:contentStreamMimeType
+                  FROM cmis:document
                  WHERE ldoc:tags = 'document'
                 """;
         ol = testSubject.query(query, 40);
@@ -199,8 +198,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // Search by language
         query = """
                 SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,
-                       cmis:versionSeriesId,cmis:contentStreamMimeType 
-                  FROM cmis:document 
+                       cmis:versionSeriesId,cmis:contentStreamMimeType
+                  FROM cmis:document
                  WHERE ldoc:language = 'en'
                 """;
         ol = testSubject.query(query, 40);
@@ -211,8 +210,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // tree filter
         query = """
                 SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,
-                       cmis:versionSeriesId,cmis:contentStreamMimeType 
-                  FROM cmis:document 
+                       cmis:versionSeriesId,cmis:contentStreamMimeType
+                  FROM cmis:document
                  WHERE CONTAINS('FLEXSPACE') in_tree ('fld.6')
                 """;
         ol = testSubject.query(query, 40);
@@ -222,8 +221,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // Search full text on: content with folderId tree filter
         query = """
                 SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,
-                       cmis:versionSeriesId,cmis:contentStreamMimeType 
-                  FROM cmis:document 
+                       cmis:versionSeriesId,cmis:contentStreamMimeType
+                  FROM cmis:document
                  WHERE ldoc:content CONTAINS('document') in_tree ('fld.5')
                 """;
         ol = testSubject.query(query, 40);
@@ -499,11 +498,11 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         File store = new File(storePath);
         File folder1 = new File(store, "1");
         File docFolder = new File(folder1, "doc");
-        File file1_0 = new File(docFolder, "1.0");
+        File filev10 = new File(docFolder, "1.0");
         File fileVer = new File(docFolder, "fileVer01");
         folder1.mkdir();
         docFolder.mkdirs();
-        file1_0.createNewFile();
+        filev10.createNewFile();
         fileVer.createNewFile();
 
         ContentStream contentStreamDocument = testSubject.getContentStream(null, "doc.2", null, null);
@@ -809,12 +808,11 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
     }
 
     private void addHits() throws Exception {
-
         Document document = new Document();
         document.setId(1L);
         document.setFileName("test.doc");
         document.setLanguage("en");
-        document.setDate(new Date());
+        document.setDate(referenceInstant);
         Folder fold = new Folder();
         fold.setId(5);
         fold.setName("root");
@@ -828,7 +826,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         document.setFileName("test.doc");
         document.setTemplateId(0L);
         document.setLanguage("en");
-        document.setDate(new Date());
+        document.setDate(referenceInstant);
         document.setFolder(fold);
         ddao.initialize(document);
         engine.addHit(document,
@@ -838,7 +836,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         document.setId(3L);
         document.setFileName("test.doc");
         document.setLanguage("en");
-        document.setDate(new Date());
+        document.setDate(referenceInstant);
         document.setFolder(fold);
         ddao.initialize(document);
         engine.addHit(document, "Another document");
@@ -847,7 +845,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         document.setId(4L);
         document.setFileName("test.doc");
         document.setLanguage("en");
-        document.setDate(new Date());
+        document.setDate(referenceInstant);
         document.setFolder(fold);
         ddao.initialize(document);
         engine.addHit(document,
@@ -857,7 +855,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         document.setId(5L);
         document.setFileName("flexspaces.xlsx");
         document.setLanguage("en");
-        document.setDate(new Date());
+        document.setDate(referenceInstant);
         Folder fold04 = new Folder();
         fold04.setId(4);
         fold04.setName("Default");

@@ -31,6 +31,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 	private TicketDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

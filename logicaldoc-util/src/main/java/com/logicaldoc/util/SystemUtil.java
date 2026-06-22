@@ -50,7 +50,7 @@ public class SystemUtil {
 		Map<String, String> env = System.getenv();
 
 		for (Map.Entry<String, String> entry : env.entrySet()) {
-			if (sb.length() > 0)
+			if (!sb.isEmpty())
 				sb.append("\n");
 			sb.append(entry.getKey());
 			sb.append("=");

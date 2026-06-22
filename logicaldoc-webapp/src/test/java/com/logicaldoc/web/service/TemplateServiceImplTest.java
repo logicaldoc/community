@@ -42,6 +42,7 @@ public class TemplateServiceImplTest extends AbstractWPTestCase {
 	private TemplateDAO templateDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		templateDao = TemplateDAO.get();

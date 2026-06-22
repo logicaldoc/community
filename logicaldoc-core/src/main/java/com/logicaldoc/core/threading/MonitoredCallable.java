@@ -1,6 +1,7 @@
 package com.logicaldoc.core.threading;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -51,7 +52,7 @@ public abstract class MonitoredCallable<V> implements Callable<V> {
 			stopWatch.stop();
 			running = false;
 			if (log.isInfoEnabled())
-				log.info("Callable {} completed in {}", name, TimeDiff.printDuration(stopWatch.getTime()));
+				log.info("Callable {} completed in {}", name, TimeDiff.printDuration(stopWatch.getTime(TimeUnit.MILLISECONDS)));
 		}
 	}
 

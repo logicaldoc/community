@@ -701,8 +701,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		Document newDoc = new Document(doc5);
 		newDoc.setId(0);
 		newDoc.setCustomId(null);
-		newDoc.setCreation(new Date());
-		newDoc.setDate(new Date());
+		newDoc.setCreation(referenceInstant);
+		newDoc.setDate(referenceInstant);
 		newDoc.setFolder(folderDao.findById(1201));
 		docDao.store(newDoc);
 

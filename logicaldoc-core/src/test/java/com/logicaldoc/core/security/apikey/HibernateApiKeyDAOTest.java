@@ -28,6 +28,7 @@ public class HibernateApiKeyDAOTest extends AbstractCoreTestCase {
 	private ApiKeyDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

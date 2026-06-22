@@ -70,6 +70,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		TextItem name = ItemFactory.newTextItem("name", folder.getName());
 		name.setWidth(200);
 		name.setRequired(true);
+		
 		DoesntContainValidator validator = new DoesntContainValidator();
 		validator.setSubstring("/");
 		validator.setErrorMessage(I18N.message("invalidchar"));
@@ -78,10 +79,8 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		TextItem description = ItemFactory.newTextItem("description", folder.getDescription());
 		description.setWidth(250);
 
-		List<FormItem> items = new ArrayList<>();
-		items.addAll(Arrays.asList(name, description));
 
-		form1.setItems();
+		form1.setItems(name, description);
 
 		rows.addMember(form1);
 

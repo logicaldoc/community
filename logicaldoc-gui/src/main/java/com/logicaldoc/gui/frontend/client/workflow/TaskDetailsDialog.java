@@ -938,7 +938,7 @@ public class TaskDetailsDialog extends Window {
 
 			@Override
 			protected boolean condition(Object value) {
-				if (value == null || value.toString().length() < 1) {
+				if (value == null || value.toString().isEmpty()) {
 					setErrorMessage(I18N.message("fieldrequired"));
 					return false;
 				}

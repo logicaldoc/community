@@ -26,6 +26,7 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 	private SessionDAO dao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

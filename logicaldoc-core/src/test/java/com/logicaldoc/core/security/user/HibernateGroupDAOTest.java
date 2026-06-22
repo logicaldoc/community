@@ -32,6 +32,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 	private GroupDAO dao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

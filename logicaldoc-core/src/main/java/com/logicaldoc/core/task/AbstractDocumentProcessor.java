@@ -62,7 +62,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 			where.append(".transactionId is null or ");
 			where.append(PersistentObjectDAO.ENTITY);
 			where.append(".transactionId not in (");
-			where.append(StringUtils.defaultString(currentTransactionIds, "'unexisting'"));
+			where.append(StringUtils.defaultIfEmpty(currentTransactionIds, "'unexisting'"));
 			where.append(")) and ");
 
 			StringBuilder sort = new StringBuilder();

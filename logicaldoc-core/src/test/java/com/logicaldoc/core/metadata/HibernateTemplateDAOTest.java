@@ -33,6 +33,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

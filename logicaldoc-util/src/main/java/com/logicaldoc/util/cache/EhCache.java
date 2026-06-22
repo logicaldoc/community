@@ -63,10 +63,10 @@ public class EhCache<K extends Serializable, V extends Object> implements com.lo
                 return null;
             }
         } catch (IllegalStateException ie) {
-            throw new CacheException("Failed to get from EhCache as state invalid: \n state: %s \n key: %s"
+            throw new CacheException("Failed to get from EhCache as state invalid: %n state: %s %n key: %s"
                     .formatted(cache.getStatus(), key), ie);
         } catch (CacheException e) {
-            throw new CacheException("Failed to get from EhCache: \n key: %s".formatted(key), e);
+            throw new CacheException("Failed to get from EhCache: %n key: %s".formatted(key), e);
         }
     }
 

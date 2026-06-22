@@ -9,7 +9,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -52,273 +55,277 @@ import jakarta.persistence.PersistenceException;
  */
 public abstract class AbstractTestCase {
 
-	private static final Logger log = LoggerFactory.getLogger(AbstractTestCase.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractTestCase.class);
 
-	protected static final String USER_HOME = "user.home";
+    protected static final String USER_HOME = "user.home";
 
-	protected ApplicationContext context;
+    protected ApplicationContext context;
 
-	protected File tempDir = new File("target/tmp");
+    protected File tempDir = new File("target/tmp");
 
-	protected final String originalUserHome = System.getProperty(USER_HOME);
+    protected final String originalUserHome = System.getProperty(USER_HOME);
 
-	/**
-	 * Utility method to print the time spent executing the current test
-	 * 
-	 * @param description the current execution description as provided by JUnit
-	 * @param status How the test completed(eg succeeded, failed, finished)
-	 * @param nanos The time spent in nanoseconds
-	 */
-	protected static void logDuration(Description description, String status, long nanos) {
-		String testName = description.getClassName() + "#" + description.getMethodName();
-		String message = String.format("Test %s %s, spent %s", testName, status,
-				TimeDiff.printDuration(TimeUnit.NANOSECONDS.toMillis(nanos)));
-		switch (status) {
-			case "failed" -> log.error(message);
-			case "succeeded" -> log.debug(message);
-			case "skipped" -> log.debug(message);
-			default -> log.info(message);
-		}
-	}
+    // A reference data with safe fixed clock
+    protected final Date referenceInstant = Date
+            .from(LocalDateTime.parse("2026-06-22T10:00:00").atZone(ZoneId.systemDefault()).toInstant());
 
-	@Rule
-	public Stopwatch stopwatch = new Stopwatch() {
-		@Override
-		protected void succeeded(long nanos, Description description) {
-			logDuration(description, "succeeded", nanos);
-		}
+    /**
+     * Utility method to print the time spent executing the current test
+     * 
+     * @param description the current execution description as provided by JUnit
+     * @param status How the test completed(eg succeeded, failed, finished)
+     * @param nanos The time spent in nanoseconds
+     */
+    protected static void logDuration(Description description, String status, long nanos) {
+        String testName = description.getClassName() + "#" + description.getMethodName();
+        String message = String.format("Test %s %s, spent %s", testName, status,
+                TimeDiff.printDuration(TimeUnit.NANOSECONDS.toMillis(nanos)));
+        switch (status) {
+            case "failed" -> log.error(message);
+            case "succeeded" -> log.debug(message);
+            case "skipped" -> log.debug(message);
+            default -> log.info(message);
+        }
+    }
 
-		@Override
-		protected void failed(long nanos, Throwable e, Description description) {
-			logDuration(description, "failed", nanos);
-		}
+    @Rule
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void succeeded(long nanos, Description description) {
+            logDuration(description, "succeeded", nanos);
+        }
 
-		@Override
-		protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
-			logDuration(description, "skipped", nanos);
-		}
+        @Override
+        protected void failed(long nanos, Throwable e, Description description) {
+            logDuration(description, "failed", nanos);
+        }
 
-		@Override
-		protected void finished(long nanos, Description description) {
-			logDuration(description, "finished", nanos);
-		}
-	};
+        @Override
+        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
+            logDuration(description, "skipped", nanos);
+        }
 
-	@Before
-	public void setUp() throws IOException, SQLException, PluginException {
-		System.setProperty("LOGICALDOC_REPOSITORY", "target");
-		System.setProperty("java.io.tmpdir", tempDir.getAbsolutePath());
-		System.setProperty("ld.config", getConfigResource());
+        @Override
+        protected void finished(long nanos, Description description) {
+            logDuration(description, "finished", nanos);
+        }
+    };
 
-		try {
-			loadDevelSettingsInEnvironment();
+    @Before
+    public void setUp() throws IOException, SQLException, PluginException {
+        System.setProperty("LOGICALDOC_REPOSITORY", "target");
+        System.setProperty("java.io.tmpdir", tempDir.getAbsolutePath());
+        System.setProperty("ld.config", getConfigResource());
 
-			initializePlugins(getPluginArchives());
+        try {
+            loadDevelSettingsInEnvironment();
 
-			updateUserHome();
+            initializePlugins(getPluginArchives());
 
-			createTestDirs();
+            updateUserHome();
 
-			context = buildApplicationContext();
+            createTestDirs();
 
-			loadDevelSettingsInContext();
+            context = buildApplicationContext();
 
-			createDatabase();
-		} catch (Exception e) {
-			restoreUserHome();
-			log.error(e.getMessage(), e);
+            loadDevelSettingsInContext();
 
-			switch (e) {
-				case IOException ioe -> throw ioe;
-				case SQLException sqe -> throw sqe;
-				case PersistenceException pe -> throw pe;
-				default -> throw new PluginException(e);
-			}
-		}
-	}
+            createDatabase();
+        } catch (Exception e) {
+            restoreUserHome();
+            log.error(e.getMessage(), e);
 
-	@After
-	public void tearDown() throws IOException {
-		try {
-			destroyDatabase();
-			FileUtil.delete(getPluginsDir());
+            switch (e) {
+                case IOException ioe -> throw ioe;
+                case SQLException sqe -> throw sqe;
+                case PersistenceException pe -> throw pe;
+                default -> throw new PluginException(e);
+            }
+        }
+    }
 
-			if (context != null)
-				((AbstractApplicationContext) context).close();
-		} catch (Exception e) {
-			// Ignore
-		} finally {
-			restoreUserHome();
-		}
-	}
+    @After
+    public void tearDown() throws IOException {
+        try {
+            destroyDatabase();
+            FileUtil.delete(getPluginsDir());
 
-	/**
-	 * Retrieves the resource name that stores the context settings, by default
-	 * this method returns context.properties
-	 * 
-	 * @return The settings resource
-	 */
-	protected String getConfigResource() {
-		return "context.properties";
-	}
+            if (context != null)
+                ((AbstractApplicationContext) context).close();
+        } catch (Exception e) {
+            // Ignore
+        } finally {
+            restoreUserHome();
+        }
+    }
 
-	protected void updateUserHome() {
-		System.setProperty(USER_HOME, tempDir.getPath());
-	}
+    /**
+     * Retrieves the resource name that stores the context settings, by default
+     * this method returns context.properties
+     * 
+     * @return The settings resource
+     */
+    protected String getConfigResource() {
+        return "context.properties";
+    }
 
-	/**
-	 * Concrete implementations should prepare and return the Spring
-	 * {@link ApplicationContext} to use. By default it is used the
-	 * {@link AnnotationConfigApplicationContext}.
-	 * 
-	 * @return the ApplicationContext
-	 */
-	protected ApplicationContext buildApplicationContext() {
-		return new AnnotationConfigApplicationContext(MainContext.class);
-	}
+    protected void updateUserHome() {
+        System.setProperty(USER_HOME, tempDir.getPath());
+    }
 
-	/**
-	 * Concrete implementations should return the list of plugin archives to
-	 * initialize
-	 * 
-	 * @return collection of plugin archives
-	 */
-	protected List<String> getPluginArchives() {
-		return new ArrayList<>();
-	}
+    /**
+     * Concrete implementations should prepare and return the Spring
+     * {@link ApplicationContext} to use. By default it is used the
+     * {@link AnnotationConfigApplicationContext}.
+     * 
+     * @return the ApplicationContext
+     */
+    protected ApplicationContext buildApplicationContext() {
+        return new AnnotationConfigApplicationContext(MainContext.class);
+    }
 
-	/**
-	 * Initializes the declared plugins
-	 * 
-	 * @throws IOException I/O error retrieving the plugin archives
-	 * @throws PluginException Error during plugin initialization
-	 */
-	private void initializePlugins(List<String> pluginArchives) throws IOException, PluginException {
-		if (CollectionUtils.isEmpty(pluginArchives))
-			return;
+    /**
+     * Concrete implementations should return the list of plugin archives to
+     * initialize
+     * 
+     * @return collection of plugin archives
+     */
+    protected List<String> getPluginArchives() {
+        return new ArrayList<>();
+    }
 
-		File pluginsDir = getPluginsDir();
-		FileUtil.delete(pluginsDir);
-		pluginsDir.mkdir();
+    /**
+     * Initializes the declared plugins
+     * 
+     * @throws IOException I/O error retrieving the plugin archives
+     * @throws PluginException Error during plugin initialization
+     */
+    private void initializePlugins(List<String> pluginArchives) throws IOException, PluginException {
+        if (CollectionUtils.isEmpty(pluginArchives))
+            return;
 
-		for (String pluginArchive : pluginArchives) {
-			File pluginFile = new File(pluginsDir, FilenameUtils.getName(pluginArchive));
-			FileUtil.copyResource(pluginArchive, pluginFile);
-		}
+        File pluginsDir = getPluginsDir();
+        FileUtil.delete(pluginsDir);
+        pluginsDir.mkdir();
 
-		PluginRegistry registry = PluginRegistry.getInstance();
-		log.info("Initialize plugins inside {}", pluginsDir.getAbsolutePath());
-		registry.init(pluginsDir.getAbsolutePath());
-	}
+        for (String pluginArchive : pluginArchives) {
+            File pluginFile = new File(pluginsDir, FilenameUtils.getName(pluginArchive));
+            FileUtil.copyResource(pluginArchive, pluginFile);
+        }
 
-	protected File getPluginsDir() throws IOException {
-		return new File(new ContextProperties().getProperty("conf.plugindir", "target/tests-plugins"));
-	}
+        PluginRegistry registry = PluginRegistry.getInstance();
+        log.info("Initialize plugins inside {}", pluginsDir.getAbsolutePath());
+        registry.init(pluginsDir.getAbsolutePath());
+    }
 
-	/**
-	 * Concrete implementations should return the array of sql script resources
-	 * to use to setup the database
-	 * 
-	 * @return array of resources(database script files)
-	 */
-	protected List<String> getDatabaseScripts() {
-		return new ArrayList<>();
-	}
+    protected File getPluginsDir() throws IOException {
+        return new File(new ContextProperties().getProperty("conf.plugindir", "target/tests-plugins"));
+    }
 
-	/**
-	 * Creates an in-memory test database
-	 * 
-	 * @throws SQLException Error in one of the SQL scripts
-	 * @throws IOException Error reading one of the SQL scripts
-	 */
-	private void createDatabase() throws SQLException, IOException {
-		final List<String> databaseScripts = getDatabaseScripts();
-		if (CollectionUtils.isEmpty(databaseScripts))
-			return;
+    /**
+     * Concrete implementations should return the array of sql script resources
+     * to use to setup the database
+     * 
+     * @return array of resources(database script files)
+     */
+    protected List<String> getDatabaseScripts() {
+        return new ArrayList<>();
+    }
 
-		for (String sqlScript : databaseScripts) {
-			File sqlFile = File.createTempFile("sql", ".sql");
-			FileUtil.copyResource(sqlScript, sqlFile);
-			try (Connection con = getConnection()) {
-				SqlFile sql = new SqlFile(sqlFile, "Cp1252", false);
-				sql.setConnection(con);
-				try {
-					log.trace("Running script {}", sqlScript);
-					sql.execute();
-				} catch (SqlToolError e) {
-					throw new SQLException(e.getMessage(), e);
-				}
-			} finally {
-				FileUtil.delete(sqlFile);
-			}
-		}
+    /**
+     * Creates an in-memory test database
+     * 
+     * @throws SQLException Error in one of the SQL scripts
+     * @throws IOException Error reading one of the SQL scripts
+     */
+    private void createDatabase() throws SQLException, IOException {
+        final List<String> databaseScripts = getDatabaseScripts();
+        if (CollectionUtils.isEmpty(databaseScripts))
+            return;
 
-		// Test the connection
-		try (Connection con = getConnection(); ResultSet rs = con.createStatement().executeQuery("CALL NOW()")) {
-			rs.next();
-			assertNotNull(rs.getObject(1));
-		}
-	}
+        for (String sqlScript : databaseScripts) {
+            File sqlFile = File.createTempFile("sql", ".sql");
+            FileUtil.copyResource(sqlScript, sqlFile);
+            try (Connection con = getConnection()) {
+                SqlFile sql = new SqlFile(sqlFile, "Cp1252", false);
+                sql.setConnection(con);
+                try {
+                    log.trace("Running script {}", sqlScript);
+                    sql.execute();
+                } catch (SqlToolError e) {
+                    throw new SQLException(e.getMessage(), e);
+                }
+            } finally {
+                FileUtil.delete(sqlFile);
+            }
+        }
 
-	/**
-	 * Loads the settigs in the file user.home/logicaldoc-dev.properties putting
-	 * them as Java variables
-	 * 
-	 * @throws IOException Error reading the development file
-	 */
-	private void loadDevelSettingsInEnvironment() throws IOException {
-		Properties devSettings = new Properties();
-		try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
-			devSettings.load(reader);
-			for (Map.Entry<Object, Object> entry : devSettings.entrySet())
-				System.setProperty(entry.getKey().toString(), entry.getValue().toString());
-		}
-	}
+        // Test the connection
+        try (Connection con = getConnection(); ResultSet rs = con.createStatement().executeQuery("CALL NOW()")) {
+            rs.next();
+            assertNotNull(rs.getObject(1));
+        }
+    }
 
-	/**
-	 * Loads the settigs in the file user.home/logicaldoc-dev.properties putting
-	 * them as context settings
-	 * 
-	 * @throws IOException Error reading the development file
-	 */
-	private void loadDevelSettingsInContext() throws IOException {
-		Properties devSettings = new Properties();
-		try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
-			devSettings.load(reader);
-			for (Map.Entry<Object, Object> entry : devSettings.entrySet())
-				Context.get().getConfig().setProperty(entry.getKey().toString(), entry.getValue().toString());
-		}
-	}
+    /**
+     * Loads the settigs in the file user.home/logicaldoc-dev.properties putting
+     * them as Java variables
+     * 
+     * @throws IOException Error reading the development file
+     */
+    private void loadDevelSettingsInEnvironment() throws IOException {
+        Properties devSettings = new Properties();
+        try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
+            devSettings.load(reader);
+            for (Map.Entry<Object, Object> entry : devSettings.entrySet())
+                System.setProperty(entry.getKey().toString(), entry.getValue().toString());
+        }
+    }
 
-	protected void createTestDirs() {
-		FileUtil.delete(tempDir);
-		tempDir.mkdirs();
-	}
+    /**
+     * Loads the settigs in the file user.home/logicaldoc-dev.properties putting
+     * them as context settings
+     * 
+     * @throws IOException Error reading the development file
+     */
+    private void loadDevelSettingsInContext() throws IOException {
+        Properties devSettings = new Properties();
+        try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
+            devSettings.load(reader);
+            for (Map.Entry<Object, Object> entry : devSettings.entrySet())
+                Context.get().getConfig().setProperty(entry.getKey().toString(), entry.getValue().toString());
+        }
+    }
 
-	private void restoreUserHome() {
-		// Restore user home system property
-		System.setProperty(USER_HOME, originalUserHome);
-	}
+    protected void createTestDirs() {
+        FileUtil.delete(tempDir);
+        tempDir.mkdirs();
+    }
 
-	/**
-	 * Destroys the in-memory database
-	 */
-	private void destroyDatabase() {
-		if (CollectionUtils.isEmpty(getDatabaseScripts()))
-			return;
+    private void restoreUserHome() {
+        // Restore user home system property
+        System.setProperty(USER_HOME, originalUserHome);
+    }
 
-		try (Connection con = getConnection(); Statement statement = con.createStatement()) {
-			statement.execute("shutdown");
-		} catch (SQLException e) {
-			// Ignore
-		}
-	}
+    /**
+     * Destroys the in-memory database
+     */
+    private void destroyDatabase() {
+        if (CollectionUtils.isEmpty(getDatabaseScripts()))
+            return;
 
-	protected Connection getConnection() throws SQLException {
-		return Context.get(DataSource.class).getConnection();
-	}
+        try (Connection con = getConnection(); Statement statement = con.createStatement()) {
+            statement.execute("shutdown");
+        } catch (SQLException e) {
+            // Ignore
+        }
+    }
 
-	protected void waiting() throws InterruptedException {
-		Pause.doPause(5000L);
-	}
+    protected Connection getConnection() throws SQLException {
+        return Context.get(DataSource.class).getConnection();
+    }
+
+    protected void waiting() throws InterruptedException {
+        Pause.doPause(5000L);
+    }
 }

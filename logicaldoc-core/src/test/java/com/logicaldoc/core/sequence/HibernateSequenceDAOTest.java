@@ -28,6 +28,7 @@ public class HibernateSequenceDAOTest extends AbstractCoreTestCase {
 	private SequenceDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

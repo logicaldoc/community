@@ -745,7 +745,6 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		// with excludedId != null
 		documents = testSubject.findByFileNameAndParentFolderId(6L, "pluto", 1L, 1L, null);
 		assertNotNull(documents);
-		;
 	}
 
 	@Test

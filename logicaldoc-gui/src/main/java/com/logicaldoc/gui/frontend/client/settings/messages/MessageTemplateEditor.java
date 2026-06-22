@@ -92,21 +92,21 @@ public class MessageTemplateEditor extends Window {
         footer.setRequired(false);
         footer.setWidth("*");
         footer.setHeight(30);
-        footer.setVisible(rec.getAttributeAsString("type").toLowerCase().equals(WHATSAPP));
+        footer.setVisible(rec.getAttributeAsString("type").equalsIgnoreCase(WHATSAPP));
 
         TextAreaItem buttons = ItemFactory.newTextAreaItemForAutomation(BUTTONS, rec.getAttributeAsString(BUTTONS),
                 null, false);
         buttons.setRequired(false);
         buttons.setWidth("*");
         buttons.setHeight(100);
-        buttons.setVisible(rec.getAttributeAsString("type").toLowerCase().equals(WHATSAPP));
+        buttons.setVisible(rec.getAttributeAsString("type").equalsIgnoreCase(WHATSAPP));
 
         form.setWidth100();
         form.setHeight100();
         form.setTitleOrientation(TitleOrientation.TOP);
         form.setNumCols(1);
 
-        if (rec.getAttributeAsString("type").toLowerCase().equals(WHATSAPP))
+        if (rec.getAttributeAsString("type").equalsIgnoreCase(WHATSAPP))
             form.setItems(subject, bodyTextArea, footer, buttons);
         else
             form.setItems(subject, bodyRichText, footer, buttons);

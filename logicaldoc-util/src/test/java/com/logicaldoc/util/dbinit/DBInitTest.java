@@ -23,6 +23,7 @@ public class DBInitTest extends TestCase {
 	private DBInit testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		List<String> sqlList = new ArrayList<>();
 		sqlList.add("sql1.sql");

@@ -20,6 +20,7 @@ public class StatsCollectorTest extends AbstractCoreTestCase {
 	private StatsCollector testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		testSubject = Context.get(StatsCollector.class);

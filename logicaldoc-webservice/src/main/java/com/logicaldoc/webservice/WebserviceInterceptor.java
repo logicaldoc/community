@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
@@ -363,7 +364,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	}
 
 	protected static String getCurrentMonth() {
-		LocalDate date = LocalDate.now();
+		LocalDate date = LocalDate.now(ZoneId.systemDefault());
 		StringBuilder sb = new StringBuilder(Integer.toString(date.getYear()));
 		int month = date.getMonthValue();
 		if (month < 10)

@@ -122,12 +122,12 @@ public class MainPanel extends VLayout implements SessionObserver {
                         StringBuilder alerts = new StringBuilder();
                         for (GUIMessage warning : info.getAlerts()) {
                             if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()) {
-                                if (!"".equals(alerts.toString()))
+                                if (!alerts.toString().isEmpty())
                                     alerts.append(" -- ");
                                 alerts.append(warning.getMessage());
                             }
                         }
-                        if (!"".equals(alerts.toString()))
+                        if (!alerts.toString().isEmpty())
                             SC.warn(alerts.toString());
                     }
                 });
@@ -162,29 +162,30 @@ public class MainPanel extends VLayout implements SessionObserver {
     }
 
     private void openDefaultTab(long welcomeScreen) {
-		RequestInfo loc = WindowUtils.getRequestInfo();
-		if ((loc.getParameter("folderId") != null || loc.getParameter("docId") != null)
-				&& Menu.enabled(Menu.DOCUMENTS)) {
-			/*
-			 * The user clicked on a permanent link so we have to open the
-			 * Documents tab
-			 */
-			tabSet.selectTab(documentsTab);
-		} else if (loc.getParameter("taskId") != null && Menu.enabled(Menu.DASHBOARD) && Feature.enabled(Feature.WORKFLOW)) {
-	            /*
-	             * The user clicked on a task link so we have to open the
-	             * Workflow tab inside the Dashboard
-	             */
-	            tabSet.selectTab(dashboardTab);			
-		} else {
-			if (welcomeScreen == Menu.DOCUMENTS && Menu.enabled(Menu.DOCUMENTS))
-				tabSet.selectTab(documentsTab);
-			else if (welcomeScreen == Menu.SEARCH && Menu.enabled(Menu.SEARCH))
-				tabSet.selectTab(searchTab);
-			else if (welcomeScreen == Menu.DASHBOARD && Menu.enabled(Menu.DASHBOARD))
-				tabSet.selectTab(dashboardTab);
-		}
-	}
+        RequestInfo loc = WindowUtils.getRequestInfo();
+        if ((loc.getParameter("folderId") != null || loc.getParameter("docId") != null)
+                && Menu.enabled(Menu.DOCUMENTS)) {
+            /*
+             * The user clicked on a permanent link so we have to open the
+             * Documents tab
+             */
+            tabSet.selectTab(documentsTab);
+        } else if (loc.getParameter("taskId") != null && Menu.enabled(Menu.DASHBOARD)
+                && Feature.enabled(Feature.WORKFLOW)) {
+            /*
+             * The user clicked on a task link so we have to open the Workflow
+             * tab inside the Dashboard
+             */
+            tabSet.selectTab(dashboardTab);
+        } else {
+            if (welcomeScreen == Menu.DOCUMENTS && Menu.enabled(Menu.DOCUMENTS))
+                tabSet.selectTab(documentsTab);
+            else if (welcomeScreen == Menu.SEARCH && Menu.enabled(Menu.SEARCH))
+                tabSet.selectTab(searchTab);
+            else if (welcomeScreen == Menu.DASHBOARD && Menu.enabled(Menu.DASHBOARD))
+                tabSet.selectTab(dashboardTab);
+        }
+    }
 
     private void prepareIncomingMessage() {
         incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(),

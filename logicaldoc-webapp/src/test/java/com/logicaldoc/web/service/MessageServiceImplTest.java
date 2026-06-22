@@ -24,6 +24,7 @@ public class MessageServiceImplTest extends AbstractWPTestCase {
 	private MessageTemplateDAO templateDao;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

@@ -6,6 +6,7 @@ import java.io.StringReader;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -51,7 +52,7 @@ public class AbiWordParser extends AbstractParser {
 		 */
 		public String getContent() {
 			String tmp = content.toString();
-			if (tmp != null && tmp.length() > 0) {
+			if (StringUtils.isNotEmpty(tmp)) {
 				// Clean all the unwanted characters
 				tmp = tmp.replaceAll("[<>\"]", "");
 			}

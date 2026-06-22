@@ -3015,7 +3015,7 @@ public class ItemFactory {
                 @Override
                 protected boolean condition(Object value) {
                     if (Boolean.TRUE.equals(getFormItem().getRequired())
-                            && (value == null || value.toString().length() < 1)) {
+                            && (value == null || value.toString().isEmpty())) {
                         setErrorMessage(I18N.message(FIELDREQUIRED));
                         return false;
                     }
@@ -3056,7 +3056,7 @@ public class ItemFactory {
                 @Override
                 protected boolean condition(Object value) {
                     if (Boolean.TRUE.equals(getFormItem().getRequired())
-                            && (value == null || value.toString().length() < 1)) {
+                            && (value == null || value.toString().isEmpty())) {
                         setErrorMessage(I18N.message(FIELDREQUIRED));
                         return false;
                     }

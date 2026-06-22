@@ -30,6 +30,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 	private UserHistoryDAO testSubject;
 
 	@Before
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 

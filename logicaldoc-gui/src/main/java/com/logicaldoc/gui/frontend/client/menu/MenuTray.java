@@ -13,5 +13,6 @@ public abstract class MenuTray extends DynamicForm {
 	protected MenuTray() {
 	}
 	
+	@Override
 	public abstract String getName();
 }

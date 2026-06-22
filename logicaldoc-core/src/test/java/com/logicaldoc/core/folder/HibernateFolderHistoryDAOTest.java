@@ -7,8 +7,9 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -87,15 +88,12 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
         List<FolderHistory> histories = dao.findByFolderIdAndEvent(5, "data test 03", null);
         assertEquals(1, histories.size());
 
-        Date date = histories.get(0).getDate();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.add(Calendar.HOUR_OF_DAY, -48);
-
-        histories = dao.findByFolderIdAndEvent(5, "data test 03", cal.getTime());
+        Instant instant = histories.get(0).getDate().toInstant();
+        
+        histories = dao.findByFolderIdAndEvent(5, "data test 03", Date.from(instant.minus(48L, ChronoUnit.HOURS)));
         assertEquals(1, histories.size());
 
-        histories = dao.findByFolderIdAndEvent(5, "data test 03", new Date());
+        histories = dao.findByFolderIdAndEvent(5, "data test 03", Date.from(instant.plus(1L, ChronoUnit.SECONDS)));
         assertEquals(0, histories.size());
     }
 
@@ -109,7 +107,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
         history.setFilename("pippo");
         history.setVersion("2.0");
         history.setPath("/%s".formatted("paperino"));
-        history.setDate(new Date());
+        history.setDate(referenceInstant);
         history.setUserId(1L);
         history.setUsername("mario");
         history.setEvent(FolderEvent.CREATED);

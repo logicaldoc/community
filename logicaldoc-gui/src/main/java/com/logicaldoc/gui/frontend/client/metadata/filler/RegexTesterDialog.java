@@ -22,79 +22,77 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class RegexTesterDialog extends Window {
 
-	private DynamicForm form = new DynamicForm();
+    private DynamicForm form = new DynamicForm();
 
-	private final TextItem originalRegexItem;
+    private final TextItem originalRegexItem;
 
-	private final boolean inclusive;
+    private final boolean inclusive;
 
-	private final ChangedHandler changedHandler;
+    private final ChangedHandler changedHandler;
 
-	public RegexTesterDialog(TextItem exclusionField, boolean inclusive, ChangedHandler changedHandler) {
-		this.originalRegexItem = exclusionField;
-		this.inclusive = inclusive;
-		this.changedHandler = changedHandler;
+    public RegexTesterDialog(TextItem exclusionField, boolean inclusive, ChangedHandler changedHandler) {
+        this.originalRegexItem = exclusionField;
+        this.inclusive = inclusive;
+        this.changedHandler = changedHandler;
 
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+        setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-		setTitle(I18N.message("regexrester"));
-		setAutoSize(true);
-		setCanDragResize(true);
-		setIsModal(true);
-		setShowModalMask(true);
-		centerInPage();
-	}
+        setTitle(I18N.message("regexrester"));
+        setAutoSize(true);
+        setCanDragResize(true);
+        setIsModal(true);
+        setShowModalMask(true);
+        centerInPage();
+    }
 
-	@Override
-	protected void onDraw() {
-		form.setWidth100();
-		form.setHeight100();
-		form.setNumCols(1);
-		form.setTitleOrientation(TitleOrientation.TOP);
+    @Override
+    protected void onDraw() {
+        form.setWidth100();
+        form.setHeight100();
+        form.setNumCols(1);
+        form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem regexItem = ItemFactory.newTextItem("rregularexpression", originalRegexItem.getValueAsString());
-		regexItem.setWidth(400);
+        TextItem regexItem = ItemFactory.newTextItem("rregularexpression", originalRegexItem.getValueAsString());
+        regexItem.setWidth(400);
 
-		TextAreaItem sample = ItemFactory.newTextAreaItem("sampletoevaluate", "");
-		sample.setWidth(400);
-		sample.setHeight(100);
+        TextAreaItem sample = ItemFactory.newTextAreaItem("sampletoevaluate", "");
+        sample.setWidth(400);
+        sample.setHeight(100);
 
-		StaticTextItem result = ItemFactory.newStaticTextItem("result", "");
+        StaticTextItem result = ItemFactory.newStaticTextItem("result", "");
 
-		ButtonItem evaluate = new ButtonItem(I18N.message("evaluate"));
-		evaluate.setStartRow(true);
-		evaluate.addClickHandler(click -> {
-			AutofillService.Instance.get().testRegex(sample.getValueAsString(), regexItem.getValueAsString(), inclusive,
-					new DefaultAsyncCallback<String>() {
+        ButtonItem evaluate = new ButtonItem(I18N.message("evaluate"));
+        evaluate.setStartRow(true);
+        evaluate.addClickHandler(click -> AutofillService.Instance.get().testRegex(sample.getValueAsString(),
+                regexItem.getValueAsString(), inclusive, new DefaultAsyncCallback<String>() {
 
-						@Override
-						public void handleSuccess(String evaluation) {
-							result.setValue(evaluation);
-						}
-					});
-		});
+                    @Override
+                    public void handleSuccess(String evaluation) {
+                        result.setValue(evaluation);
+                    }
+                }));
 
-		ButtonItem save = new ButtonItem(I18N.message("save"));
-		save.addClickHandler(click -> originalRegexItem.setValue(regexItem.getValueAsString()));
+        ButtonItem save = new ButtonItem(I18N.message("save"));
+        save.addClickHandler(click -> originalRegexItem.setValue(regexItem.getValueAsString()));
 
-		save.addClickHandler(click -> {
+        save.addClickHandler(click -> {
 
-			originalRegexItem.setValue(regexItem.getValueAsString());
+            originalRegexItem.setValue(regexItem.getValueAsString());
 
-			if (changedHandler != null)
-				changedHandler.onChanged(null);
+            if (changedHandler != null)
+                changedHandler.onChanged(null);
 
-			destroy();
-		});
+            destroy();
+        });
 
-		form.setItems(regexItem, sample, evaluate, result, save);
+        form.setItems(regexItem, sample, evaluate, result, save);
 
-		VLayout layout = new VLayout();
-		layout.setWidth100();
-		layout.setHeight100();
-		layout.setMembersMargin(5);
-		layout.addMember(form);
+        VLayout layout = new VLayout();
+        layout.setWidth100();
+        layout.setHeight100();
+        layout.setMembersMargin(5);
+        layout.addMember(form);
 
-		addItem(layout);
-	}
+        addItem(layout);
+    }
 }

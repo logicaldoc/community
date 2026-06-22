@@ -136,7 +136,7 @@ public class FulltextSearch extends Search {
 		StringBuilder foldersFilter = new StringBuilder();
 		if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
 			for (Long id : accessibleFolderIds) {
-				if (foldersFilter.length() > 0)
+				if (!foldersFilter.isEmpty())
 					foldersFilter.append(" or ");
 				foldersFilter.append(HitField.FOLDER_ID + ":" + (id < 0 ? "\\" : "") + id);
 			}

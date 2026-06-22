@@ -35,304 +35,304 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class GUIGridsPanel extends VLayout {
 
-	private static final String LABEL = "label";
+    private static final String LABEL = "label";
 
-	private ListGrid documentsFieldsGrid;
+    private ListGrid documentsFieldsGrid;
 
-	private ListGrid searchGrid;
+    private ListGrid searchGrid;
 
-	private SpinnerItem searchHits;
+    private SpinnerItem searchHits;
 
-	private SpinnerItem pageSize;
+    private SpinnerItem pageSize;
 
-	public GUIGridsPanel() {
-		setMembersMargin(3);
-	}
+    public GUIGridsPanel() {
+        setMembersMargin(3);
+    }
 
-	@Override
-	public void onDraw() {
-		ToolStrip toolbar = new ToolStrip();
-		toolbar.setWidth100();
-		ToolStripButton save = new ToolStripButton(I18N.message("save"));
-		save.addClickHandler(event -> onSave());
-		toolbar.addButton(save);
+    @Override
+    public void onDraw() {
+        ToolStrip toolbar = new ToolStrip();
+        toolbar.setWidth100();
+        ToolStripButton save = new ToolStripButton(I18N.message("save"));
+        save.addClickHandler(event -> onSave());
+        toolbar.addButton(save);
 
-		SectionStack documentsStack = prepareDocumentsGrid();
-		SectionStack searchStack = prepareSearchGrid();
+        SectionStack documentsStack = prepareDocumentsGrid();
+        SectionStack searchStack = prepareSearchGrid();
 
-		HLayout body = new HLayout();
-		body.setMembersMargin(3);
-		body.setWidth100();
-		body.setHeight100();
-		body.setMembers(documentsStack, searchStack);
+        HLayout body = new HLayout();
+        body.setMembersMargin(3);
+        body.setWidth100();
+        body.setHeight100();
+        body.setMembers(documentsStack, searchStack);
 
-		setMembers(toolbar, body);
-	}
+        setMembers(toolbar, body);
+    }
 
-	private SectionStack prepareDocumentsGrid() {
-		ListGridField attribute = new ListGridField(LABEL, I18N.message("attribute"));
-		attribute.setCanEdit(false);
+    private SectionStack prepareDocumentsGrid() {
+        ListGridField attribute = new ListGridField(LABEL, I18N.message("attribute"));
+        attribute.setCanEdit(false);
 
-		documentsFieldsGrid = new ListGrid();
-		documentsFieldsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		documentsFieldsGrid.setCanEdit(false);
-		documentsFieldsGrid.setWidth100();
-		documentsFieldsGrid.setHeight100();
-		documentsFieldsGrid.setSelectionType(SelectionStyle.MULTIPLE);
-		documentsFieldsGrid.setCanReorderRecords(true);
-		documentsFieldsGrid.setShowRowNumbers(true);
-		documentsFieldsGrid.setFields(attribute);
+        documentsFieldsGrid = new ListGrid();
+        documentsFieldsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+        documentsFieldsGrid.setCanEdit(false);
+        documentsFieldsGrid.setWidth100();
+        documentsFieldsGrid.setHeight100();
+        documentsFieldsGrid.setSelectionType(SelectionStyle.MULTIPLE);
+        documentsFieldsGrid.setCanReorderRecords(true);
+        documentsFieldsGrid.setShowRowNumbers(true);
+        documentsFieldsGrid.setFields(attribute);
 
-		documentsFieldsGrid.addCellContextClickHandler(event -> {
-			Menu contextMenu = new Menu();
-			MenuItem delete = new MenuItem();
-			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler(evnt -> documentsFieldsGrid.removeSelectedData());
-			contextMenu.setItems(delete);
-			contextMenu.showContextMenu();
-			event.cancel();
-		});
+        documentsFieldsGrid.addCellContextClickHandler(event -> {
+            Menu contextMenu = new Menu();
+            MenuItem delete = new MenuItem();
+            delete.setTitle(I18N.message("ddelete"));
+            delete.addClickHandler(evnt -> documentsFieldsGrid.removeSelectedData());
+            contextMenu.setItems(delete);
+            contextMenu.showContextMenu();
+            event.cancel();
+        });
 
-		ToolStrip controls = new ToolStrip();
-		controls.setWidth100();
-		controls.setHeight(24);
-		final SelectItem selector = ItemFactory.newAttributesSelector();
-		selector.setWidth(100);
-		selector.addChangedHandler(event -> {
-			ListGridRecord[] seletion = selector.getSelectedRecords();
-			for (ListGridRecord sel : seletion) {
-				// Skip search-specific attributes
-				if (sel.getAttributeAsString("name").equals("folder")
-						|| sel.getAttributeAsString("name").equals("score"))
-					continue;
+        ToolStrip controls = new ToolStrip();
+        controls.setWidth100();
+        controls.setHeight(24);
+        final SelectItem selector = ItemFactory.newAttributesSelector();
+        selector.setWidth(100);
+        selector.addChangedHandler(event -> {
+            ListGridRecord[] seletion = selector.getSelectedRecords();
+            for (ListGridRecord sel : seletion) {
+                // Skip search-specific attributes
+                if (sel.getAttributeAsString("name").equals("folder")
+                        || sel.getAttributeAsString("name").equals("score"))
+                    continue;
 
-				Record rec = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-				if (rec == null) {
-					ListGridRecord newRec = new ListGridRecord();
-					newRec.setAttribute("name", sel.getAttributeAsString("name"));
-					newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
-					documentsFieldsGrid.addData(newRec);
-				}
-			}
-			selector.clearValue();
-		});
-		controls.addFormItem(selector);
+                Record rec = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+                if (rec == null) {
+                    ListGridRecord newRec = new ListGridRecord();
+                    newRec.setAttribute("name", sel.getAttributeAsString("name"));
+                    newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
+                    documentsFieldsGrid.addData(newRec);
+                }
+            }
+            selector.clearValue();
+        });
+        controls.addFormItem(selector);
 
-		documentsFieldsGrid.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, controls);
+        documentsFieldsGrid.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, controls);
 
-		String columns = Session.get().getConfig("gui.document.columns");
+        String columns = Session.get().getConfig("gui.document.columns");
 
-		if (columns != null) {
-			String[] attributes = columns.split("\\,");
-			for (String att : attributes) {
-				ListGridRecord rec = new ListGridRecord();
-				String n = att.trim();
-				rec.setAttribute("name", n);
-				rec.setAttribute(LABEL, Session.get().getInfo().getAttributeLabel(n));
-				documentsFieldsGrid.addData(rec);
-			}
-		}
+        if (columns != null) {
+            String[] attributes = columns.split("\\,");
+            for (String att : attributes) {
+                ListGridRecord rec = new ListGridRecord();
+                String n = att.trim();
+                rec.setAttribute("name", n);
+                rec.setAttribute(LABEL, Session.get().getInfo().getAttributeLabel(n));
+                documentsFieldsGrid.addData(rec);
+            }
+        }
 
-		SectionStack stack = new SectionStack();
-		stack.setWidth(350);
-		stack.setHeight100();
+        SectionStack stack = new SectionStack();
+        stack.setWidth(350);
+        stack.setHeight100();
 
-		SectionStackSection section = new SectionStackSection(I18N.message("columnsindocuments"));
-		section.setCanCollapse(false);
-		section.setExpanded(true);
+        SectionStackSection section = new SectionStackSection(I18N.message("columnsindocuments"));
+        section.setCanCollapse(false);
+        section.setExpanded(true);
 
-		pageSize = ItemFactory.newSpinnerItem("pagesize", Session.get().getConfigAsInt("gui.document.pagesize"));
-		pageSize.setRequired(true);
-		pageSize.setWrapTitle(false);
-		pageSize.setMin(5);
-		pageSize.setStep(10);
-		controls.addFormItem(pageSize);
+        pageSize = ItemFactory.newSpinnerItem("pagesize", Session.get().getConfigAsInt("gui.document.pagesize"));
+        pageSize.setRequired(true);
+        pageSize.setWrapTitle(false);
+        pageSize.setMin(5);
+        pageSize.setStep(10);
+        controls.addFormItem(pageSize);
 
-		section.setItems(documentsFieldsGrid);
-		stack.setSections(section);
+        section.setItems(documentsFieldsGrid);
+        stack.setSections(section);
 
-		return stack;
-	}
+        return stack;
+    }
 
-	private SectionStack prepareSearchGrid() {
-		ListGridField attribute = new ListGridField(LABEL, I18N.message("attribute"));
-		attribute.setCanEdit(false);
+    private SectionStack prepareSearchGrid() {
+        ListGridField attribute = new ListGridField(LABEL, I18N.message("attribute"));
+        attribute.setCanEdit(false);
 
-		searchGrid = new ListGrid();
-		searchGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		searchGrid.setCanEdit(false);
-		searchGrid.setWidth100();
-		searchGrid.setHeight100();
-		searchGrid.setSelectionType(SelectionStyle.MULTIPLE);
-		searchGrid.setCanReorderRecords(true);
-		searchGrid.setShowRowNumbers(true);
-		searchGrid.setFields(attribute);
+        searchGrid = new ListGrid();
+        searchGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+        searchGrid.setCanEdit(false);
+        searchGrid.setWidth100();
+        searchGrid.setHeight100();
+        searchGrid.setSelectionType(SelectionStyle.MULTIPLE);
+        searchGrid.setCanReorderRecords(true);
+        searchGrid.setShowRowNumbers(true);
+        searchGrid.setFields(attribute);
 
-		searchGrid.addCellContextClickHandler(event -> {
-			Menu contextMenu = new Menu();
-			MenuItem delete = new MenuItem();
-			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler(evnt -> searchGrid.removeSelectedData());
-			contextMenu.setItems(delete);
-			contextMenu.showContextMenu();
-			event.cancel();
-		});
+        searchGrid.addCellContextClickHandler(event -> {
+            Menu contextMenu = new Menu();
+            MenuItem delete = new MenuItem();
+            delete.setTitle(I18N.message("ddelete"));
+            delete.addClickHandler(evnt -> searchGrid.removeSelectedData());
+            contextMenu.setItems(delete);
+            contextMenu.showContextMenu();
+            event.cancel();
+        });
 
-		ToolStrip controls = new ToolStrip();
-		controls.setWidth100();
-		controls.setHeight(24);
-		final SelectItem selector = ItemFactory.newAttributesSelector();
-		selector.setWidth(100);
-		selector.addChangedHandler(event -> {
-			ListGridRecord[] seletion = selector.getSelectedRecords();
-			for (ListGridRecord sel : seletion) {
-				Record rec = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-				if (rec == null) {
-					ListGridRecord newRec = new ListGridRecord();
-					newRec.setAttribute("name", sel.getAttributeAsString("name"));
-					newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
-					searchGrid.addData(newRec);
-				}
-			}
-			selector.clearValue();
-		});
-		controls.addFormItem(selector);
+        ToolStrip controls = new ToolStrip();
+        controls.setWidth100();
+        controls.setHeight(24);
+        final SelectItem selector = ItemFactory.newAttributesSelector();
+        selector.setWidth(100);
+        selector.addChangedHandler(event -> {
+            ListGridRecord[] seletion = selector.getSelectedRecords();
+            for (ListGridRecord sel : seletion) {
+                Record rec = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+                if (rec == null) {
+                    ListGridRecord newRec = new ListGridRecord();
+                    newRec.setAttribute("name", sel.getAttributeAsString("name"));
+                    newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
+                    searchGrid.addData(newRec);
+                }
+            }
+            selector.clearValue();
+        });
+        controls.addFormItem(selector);
 
-		searchHits = ItemFactory.newSpinnerItem("searchhits", I18N.message("searchhits"),
-				Session.get().getConfigAsInt("search.hits"));
-		searchHits.setRequired(true);
-		searchHits.setWrapTitle(false);
-		searchHits.setMin(5);
-		searchHits.setStep(5);
-		controls.addFormItem(searchHits);
+        searchHits = ItemFactory.newSpinnerItem("searchhits", I18N.message("searchhits"),
+                Session.get().getConfigAsInt("search.hits"));
+        searchHits.setRequired(true);
+        searchHits.setWrapTitle(false);
+        searchHits.setMin(5);
+        searchHits.setStep(5);
+        controls.addFormItem(searchHits);
 
-		searchGrid.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, controls);
+        searchGrid.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, controls);
 
-		String columns = Session.get().getConfig("gui.search.columns");
+        String columns = Session.get().getConfig("gui.search.columns");
 
-		if (columns != null) {
-			String[] attributes = columns.split("\\,");
-			for (String att : attributes) {
-				ListGridRecord rec = new ListGridRecord();
-				String n = att.trim();
-				rec.setAttribute("name", n);
-				rec.setAttribute(LABEL, I18N.message(Session.get().getInfo().getAttributeLabel(n)));
-				searchGrid.addData(rec);
-			}
-		}
+        if (columns != null) {
+            String[] attributes = columns.split("\\,");
+            for (String att : attributes) {
+                ListGridRecord rec = new ListGridRecord();
+                String n = att.trim();
+                rec.setAttribute("name", n);
+                rec.setAttribute(LABEL, I18N.message(Session.get().getInfo().getAttributeLabel(n)));
+                searchGrid.addData(rec);
+            }
+        }
 
-		SectionStack stack = new SectionStack();
-		stack.setWidth(350);
-		stack.setHeight(500);
+        SectionStack stack = new SectionStack();
+        stack.setWidth(350);
+        stack.setHeight(500);
 
-		SectionStackSection section = new SectionStackSection(I18N.message("columnsinsearch"));
-		section.setCanCollapse(false);
-		section.setExpanded(true);
+        SectionStackSection section = new SectionStackSection(I18N.message("columnsinsearch"));
+        section.setCanCollapse(false);
+        section.setExpanded(true);
 
-		section.setItems(searchGrid);
-		stack.setSections(section);
-		stack.setHeight100();
+        section.setItems(searchGrid);
+        stack.setSections(section);
+        stack.setHeight100();
 
-		return stack;
-	}
+        return stack;
+    }
 
-	private void onSave() {
-		List<String> extendedAttributes = new ArrayList<>();
-		List<GUIParameter> parameters = new ArrayList<>();
+    private void onSave() {
+        List<String> extendedAttributes = new ArrayList<>();
+        List<GUIParameter> parameters = new ArrayList<>();
 
-		/*
-		 * Prepare the list of columns for the documents screen
-		 */
-		collectDocumentsColumns(extendedAttributes, parameters);
+        /*
+         * Prepare the list of columns for the documents screen
+         */
+        collectDocumentsColumns(extendedAttributes, parameters);
 
-		/*
-		 * Prepare the list of columns for the search screen
-		 */
-		collectSearchColumns(extendedAttributes, parameters);
+        /*
+         * Prepare the list of columns for the search screen
+         */
+        collectSearchColumns(extendedAttributes, parameters);
 
-		/*
-		 * Now taking care of defining what extended attributes have to be
-		 * retrieved when searching for the documents
-		 */
-		StringBuilder value = new StringBuilder();
-		for (String att : extendedAttributes) {
-			if (value.length() > 0)
-				value.append(",");
-			value.append(att);
-		}
-		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".search.extattr", value.toString());
-		parameters.add(param);
-		Session.get().setConfig(param.getName(), param.getValue());
+        /*
+         * Now taking care of defining what extended attributes have to be
+         * retrieved when searching for the documents
+         */
+        StringBuilder value = new StringBuilder();
+        for (String att : extendedAttributes) {
+            if (value.length() > 0)
+                value.append(",");
+            value.append(att);
+        }
+        GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".search.extattr", value.toString());
+        parameters.add(param);
+        Session.get().setConfig(param.getName(), param.getValue());
 
-		param = new GUIParameter(Session.get().getTenantName() + ".search.hits", searchHits.getValueAsString());
-		parameters.add(param);
-		Session.get().setConfig(param.getName(), param.getValue());
+        param = new GUIParameter(Session.get().getTenantName() + ".search.hits", searchHits.getValueAsString());
+        parameters.add(param);
+        Session.get().setConfig(param.getName(), param.getValue());
 
-		param = new GUIParameter(Session.get().getTenantName() + ".gui.document.pagesize", pageSize.getValueAsString());
-		parameters.add(param);
-		Session.get().setConfig(param.getName(), param.getValue());
+        param = new GUIParameter(Session.get().getTenantName() + ".gui.document.pagesize", pageSize.getValueAsString());
+        parameters.add(param);
+        Session.get().setConfig(param.getName(), param.getValue());
 
-		// Save all
-		SettingService.Instance.get().saveSettings(parameters, new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(Void arg0) {
-				GuiLog.info(I18N.message("settingssaved"), null);
-			}
-		});
-	}
+        // Save all
+        SettingService.Instance.get().saveSettings(parameters, new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(Void arg0) {
+                GuiLog.info(I18N.message("settingssaved"), null);
+            }
+        });
+    }
 
-	private void collectSearchColumns(List<String> extendedAttributes, List<GUIParameter> parameters) {
-		StringBuilder value = new StringBuilder();
-		ListGridRecord[] attrs = searchGrid.getRecords();
-		for (ListGridRecord att : attrs) {
-			if (value.length() > 0)
-				value.append(",");
-			String name = att.getAttributeAsString("name").trim();
-			value.append(name);
+    private void collectSearchColumns(List<String> extendedAttributes, List<GUIParameter> parameters) {
+        StringBuilder value = new StringBuilder();
+        ListGridRecord[] attrs = searchGrid.getRecords();
+        for (ListGridRecord att : attrs) {
+            if (value.length() > 0)
+                value.append(",");
+            String name = att.getAttributeAsString("name").trim();
+            value.append(name);
 
-			// Meanwhile collect the extended attributes
-			if (name.startsWith("ext_")) {
-				String n = name.substring(4);
-				if (!extendedAttributes.contains(n))
-					extendedAttributes.add(n);
-			}
-		}
-		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.search.columns", value.toString());
-		parameters.add(param);
-		Session.get().setConfig(param.getName(), param.getValue());
-	}
+            // Meanwhile collect the extended attributes
+            if (name.startsWith("ext_")) {
+                String n = name.substring(4);
+                if (!extendedAttributes.contains(n))
+                    extendedAttributes.add(n);
+            }
+        }
+        GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.search.columns", value.toString());
+        parameters.add(param);
+        Session.get().setConfig(param.getName(), param.getValue());
+    }
 
-	private List<GUIParameter> collectDocumentsColumns(List<String> extendedAttributes, List<GUIParameter> parameters) {
-		StringBuilder value = new StringBuilder();
-		ListGridRecord[] attrs = documentsFieldsGrid.getRecords();
-		for (ListGridRecord att : attrs) {
-			if (value.length() > 0)
-				value.append(",");
-			String name = att.getAttributeAsString("name").trim();
-			value.append(name);
+    private List<GUIParameter> collectDocumentsColumns(List<String> extendedAttributes, List<GUIParameter> parameters) {
+        StringBuilder value = new StringBuilder();
+        ListGridRecord[] attrs = documentsFieldsGrid.getRecords();
+        for (ListGridRecord att : attrs) {
+            if (value.length() > 0)
+                value.append(",");
+            String name = att.getAttributeAsString("name").trim();
+            value.append(name);
 
-			// Meanwhile collect the extended attributes
-			if (name.startsWith("ext_")) {
-				String n = name.substring(4);
-				if (!extendedAttributes.contains(n))
-					extendedAttributes.add(n);
-			}
-		}
+            // Meanwhile collect the extended attributes
+            if (name.startsWith("ext_")) {
+                String n = name.substring(4);
+                if (!extendedAttributes.contains(n))
+                    extendedAttributes.add(n);
+            }
+        }
 
-		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.document.columns",
-				value.toString());
-		parameters.add(param);
-		Session.get().setConfig(param.getName(), param.getValue());
-		return parameters;
-	}
+        GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.document.columns",
+                value.toString());
+        parameters.add(param);
+        Session.get().setConfig(param.getName(), param.getValue());
+        return parameters;
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
