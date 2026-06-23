@@ -52,16 +52,16 @@ public class AuthenticationChain extends AbstractAuthenticator {
         if (username.contains(IMPERSONATION_SEPARATOR)) {
             impersonatedUsername = username.split(IMPERSONATION_SEPARATOR)[1].trim();
             username = username.split(IMPERSONATION_SEPARATOR)[0].trim();
-        } else if (StringUtils.defaultString(key).contains(IMPERSONATION_SEPARATOR)) {
+        } else if (StringUtils.isNotEmpty(key) && key.contains(IMPERSONATION_SEPARATOR)) {
             impersonatedUsername = key.split(IMPERSONATION_SEPARATOR)[1].trim();
             key = key.split(IMPERSONATION_SEPARATOR)[0].trim();
         }
 
         init();
 
-        User user = validateAnonymousUser(username, key, client);
-
         List<AuthenticationException> errors = new ArrayList<>();
+
+        User user = validateAnonymousUser(username, key, client);
 
         if (user == null)
             user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
@@ -69,6 +69,36 @@ public class AuthenticationChain extends AbstractAuthenticator {
         /*
          * At the end we need to do in any case some default validations
          */
+        user = applyDefaultValidations(username, user, client, errors);
+
+        log.debug("Collected authentication errors: {}", errors);
+
+        if (user != null) {
+            initializeUser(user);
+
+            user = handleImpersonation(user, impersonatedUsername, errors);
+        } else {
+            handleErrors(errors);
+        }
+
+        return user;
+    }
+
+    private void handleErrors(List<AuthenticationException> errors) throws AuthenticationException {
+        // In case of multiple errors, we consider the first one that is
+        // not a UserNotFound exception because it is normal that some
+        // authenticator does not find this user because not in it's domain
+        for (AuthenticationException err : errors)
+            if (!(err instanceof AccountNotFoundException))
+                throw err;
+        throw errors.get(0);
+    }
+
+    private User applyDefaultValidations(
+            String username,
+            User user,
+            Client client,
+            List<AuthenticationException> errors) {
         try {
             defaultValidations(username, client);
         } catch (AuthenticationException ae) {
@@ -80,23 +110,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
             errors.clear();
             user = null;
         }
-
-        log.debug("Collected authentication errors: {}", errors);
-
-        if (user != null) {
-            initializeUser(user);
-
-            user = handleImpersonation(user, impersonatedUsername, errors);
-        } else {
-            // In case of multiple errors, we consider the first one that is
-            // not a UserNotFound exception because it is normal that some
-            // authenticator does not find this user because not in it's domain
-            for (AuthenticationException err : errors)
-                if (!(err instanceof AccountNotFoundException))
-                    throw err;
-            throw errors.get(0);
-        }
-
         return user;
     }
 
@@ -141,7 +154,12 @@ public class AuthenticationChain extends AbstractAuthenticator {
         return user;
     }
 
-    private User authenticateUsingAuthenticators(String username, String password, String key, Client client, User user,
+    private User authenticateUsingAuthenticators(
+            String username,
+            String password,
+            String key,
+            Client client,
+            User user,
             List<AuthenticationException> errors) {
         for (Authenticator cmp : authenticators) {
             if (cmp.isEnabled()) {
