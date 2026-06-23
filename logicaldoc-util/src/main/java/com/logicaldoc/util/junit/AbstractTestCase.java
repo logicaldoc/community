@@ -77,7 +77,7 @@ public abstract class AbstractTestCase {
      * @param nanos The time spent in nanoseconds
      */
     protected static void logDuration(Description description, String status, long nanos) {
-        String testName = description.getClassName() + "#" + description.getMethodName();
+        String testName = "%s#%s".formatted(description.getClassName(), description.getMethodName());
         String message = String.format("Test %s %s, spent %s", testName, status,
                 TimeDiff.printDuration(TimeUnit.NANOSECONDS.toMillis(nanos)));
         switch (status) {

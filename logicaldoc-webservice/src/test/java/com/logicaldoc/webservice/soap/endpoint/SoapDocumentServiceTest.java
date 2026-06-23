@@ -254,9 +254,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
         DataHandler handler = testSubject.getContent(session.getSid(), wsDoc.getId());
 
         File originalFile = new File("build.xml");
-        File tmp = null;
+        File tmp = FileUtil.createTempFile("test", ".xml");
         try (var fs = new FileOutputStream(tmp)) {
-            tmp = FileUtil.createTempFile("test", ".xml");
             handler.writeTo(fs);
             assertEquals(originalFile.length(), tmp.length());
         } finally {
@@ -285,9 +284,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
         DataHandler handler = testSubject.getContent(session.getSid(), wsDoc.getId());
 
-        File tmp = null;
+        File tmp = FileUtil.createTempFile("test", ".xml");
         try (var fs = new FileOutputStream(tmp)) {
-            tmp = FileUtil.createTempFile("test", ".xml");
             handler.writeTo(fs);
             assertEquals(file.length(), tmp.length());
         } finally {
