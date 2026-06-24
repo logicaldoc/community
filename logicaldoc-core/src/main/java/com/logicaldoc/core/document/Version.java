@@ -82,11 +82,18 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
     public Version() {
     }
-
-    public Version(Version source) {
-        copyAttributes(source);
+  
+    protected void copyAttributes(Version source) {
+        super.copyAttributes(source);
         setId(source.getId());
         setFolderId(source.getFolderId());
+        setDocId(source.getDocId());
+        setVersionDate(source.getVersionDate());
+        setComment(source.getComment());
+    }
+
+    public Version(Version source) {
+        this.copyAttributes(source);
         if (source.getIndexed() != IndexingStatus.INDEXED)
             setIndexingStatus(source.getIndexed());
         setCustomId(null);
@@ -410,11 +417,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (int) (creatorId ^ (creatorId >>> 32));
         result = prime * result + (int) (docId ^ (docId >>> 32));
-        result = prime * result + (int) (folderId ^ (folderId >>> 32));
-        result = prime * result + ((templateId == null) ? 0 : templateId.hashCode());
-        result = prime * result + (int) (userId ^ (userId >>> 32));
         result = prime * result + ((versionDate == null) ? 0 : versionDate.hashCode());
         return result;
     }
@@ -428,32 +431,13 @@ public class Version extends AbstractDocument implements Comparable<Version> {
         if (getClass() != obj.getClass())
             return false;
         Version other = (Version) obj;
-        if (creatorId != other.creatorId)
-            return false;
         if (docId != other.docId)
-            return false;
-        if (folderId != other.folderId)
-            return false;
-        if (templateId == null) {
-            if (other.templateId != null)
-                return false;
-        } else if (!templateId.equals(other.templateId))
-            return false;
-        if (userId != other.userId)
             return false;
         if (versionDate == null) {
             if (other.versionDate != null)
                 return false;
         } else if (!versionDate.equals(other.versionDate))
             return false;
-        
-        return compareComment(other);
-    }
-
-    private boolean compareComment(Version other) {
-        if (getComment() == null)
-            return other.getComment() == null;
-        else
-            return getComment().equals(other.getComment());
+        return true;
     }
 }
