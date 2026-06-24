@@ -328,4 +328,25 @@ public abstract class AbstractTestCase {
     protected void waiting() throws InterruptedException {
         Pause.doPause(5000L);
     }
+
+    /**
+     * Returns the current timestamp in a safe way
+     * 
+     * @return the current timestamp
+     * 
+     * @throws PersistenceException
+     */
+    protected Date currentTimestamp() throws PersistenceException {
+        try (Connection con = getConnection(); Statement statement = con.createStatement()) {
+            if (statement.execute("select CURRENT_TIMESTAMP from ld_user")) {
+                ResultSet rs = statement.getResultSet();
+                if (rs.next())
+                    return Date.from(rs.getTimestamp(1).toInstant());
+            }
+        } catch (SQLException e) {
+            // Ignore
+        }
+
+        return referenceInstant;
+    }
 }

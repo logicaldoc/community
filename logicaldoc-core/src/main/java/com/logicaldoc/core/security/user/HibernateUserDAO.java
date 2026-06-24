@@ -695,17 +695,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         if (maxInactiveDays <= 0)
             return false;
 
-        log.info("Checking if the user {} has interactions in the last {} days", user.getUsername(), maxInactiveDays);
+        log.info("Checking if the user {} had interactions in the last {} days", user.getUsername(), maxInactiveDays);
 
-        StringBuilder sb = new StringBuilder(
-                "select max(ld_date) from ld_history where ld_deleted=0 and ld_userid=" + user.getId());
-        sb.append(
-                " UNION select max(ld_date) from ld_user_history where ld_deleted=0 and not ld_event in ('event.user.updated', 'event.user.disabled', 'event.user.timeout', 'event.user.login.failed', 'event.user.deleted', 'event.user.messagereceived') and ld_userid="
-                        + user.getId());
-        sb.append(" UNION select max(ld_date) from ld_folder_history where ld_deleted=0 and ld_userid=" + user.getId()
-                + " order by 1 desc");
-
-        List<Date> interactions = queryForList(sb.toString(), Date.class);
+        List<Date> interactions = queryForList("select max(ld_lastrenew) from ld_session where ld_username = :username",
+                Map.of("username", user.getUsername()), Date.class, null);
         Date lastInteraction = null;
         if (!interactions.isEmpty())
             lastInteraction = interactions.get(0);

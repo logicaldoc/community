@@ -227,7 +227,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
             log.warn("Created new session {} for user {} impersonated by {}", session.getSid(), user.getUsername(),
                     user.getImpersonator());
         cleanClosedSessions();
-        storeSession(session);
+        saveSession(session);
         for (SessionListener listener : listeners)
             try {
                 listener.onSessionCreated(session);
@@ -238,7 +238,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
         return session;
     }
 
-    private void storeSession(Session session) {
+    private void saveSession(Session session) {
         try {
             if (session.getId() == 0L) {
                 Session dbSession = new Session(session);
@@ -274,7 +274,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
             if (log.isWarnEnabled())
                 log.warn("Killed session {} of user {} started at {}", sid, session.getUsername(),
                         df.format(session.getCreation()));
-            storeSession(session);
+            saveSession(session);
             for (SessionListener listener : listeners)
                 try {
                     listener.onSessionClosed(sid);
@@ -284,9 +284,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
         } else {
             // Perhaps the session was not in memory but just on DB
             try {
-                sessionDao.jdbcUpdate(
-                        "update ld_session set ld_status = " + SessionStatus.CLOSED.ordinal() + " where ld_sid = :sid",
-                        Map.of("sid", sid));
+                sessionDao.jdbcUpdate("update ld_session set ld_status = :status where ld_sid = :sid",
+                        Map.of("status", SessionStatus.CLOSED.ordinal(), "sid", sid));
             } catch (PersistenceException e) {
                 log.warn(e.getMessage(), e);
             }
@@ -328,7 +327,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
             return null;
         if (session.getStatus().equals(SessionStatus.OPEN) && session.isTimedOut()) {
             session.setExpired();
-            storeSession(session);
+            saveSession(session);
         }
         return session.getStatus();
     }
@@ -460,17 +459,12 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
     /**
      * Gets the Session ID specification from the current request following this
-     * lookup strategy:
-     * <ol>
-     * <li>Request parameter <code>PARAM_SID</code></li>
-     * <li>Request header <code>PARAM_SID</code></li>
-     * <li>Request attribute <code>PARAM_SID</code></li>
-     * <li>Session attribute <code>PARAM_SID</code></li>
-     * <li>Cookie <code>COOKIE_SID</code></li>
-     * <li>Header <code>X-API-KEY</code></li>
-     * <li>Client ID</li>
-     * <li>Spring SecurityContextHolder</li>
-     * </ol>
+     * lookup strategy: <ol> <li>Request parameter <code>PARAM_SID</code></li>
+     * <li>Request header <code>PARAM_SID</code></li> <li>Request attribute
+     * <code>PARAM_SID</code></li> <li>Session attribute
+     * <code>PARAM_SID</code></li> <li>Cookie <code>COOKIE_SID</code></li>
+     * <li>Header <code>X-API-KEY</code></li> <li>Client ID</li> <li>Spring
+     * SecurityContextHolder</li> </ol>
      * 
      * @param request The current request to inspect
      * 
@@ -735,7 +729,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
                 for (Session session : SessionManager.this.getSessions()) {
                     if (session.isOpen() && session.isTimedOut()) {
                         session.setExpired();
-                        storeSession(session);
+                        saveSession(session);
                     }
                 }
             }
