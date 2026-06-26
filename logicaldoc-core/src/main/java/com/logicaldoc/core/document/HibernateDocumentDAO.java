@@ -573,7 +573,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         queryForResultSet(
                 "select ld_id, ld_filename from ld_document where ld_tenantid = :tenantId and ld_customid = :customId and not ld_id = :docId",
-                Map.of("tenantId", doc.getTenantId(), "customId", doc.getCustomId(), "docId", doc.getId()), 2,
+                Map.of("tenantId", doc.getTenantId(), "customId", doc.getCustomId(), DOC_ID, doc.getId()), 2,
                 resultSet -> {
                     if (resultSet.next())
                         throw new PersistenceException("Custom ID %s already identifies the document %s (%d)"

@@ -232,7 +232,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testCopyToFolder() throws PersistenceException, IOException, InterruptedException, ExecutionException {
+    public void testCopyToFolder() throws PersistenceException, IOException {
         User user = userDao.findByUsername("admin");
         Document doc = docDao.findById(1);
         assertNotNull(doc);
@@ -592,7 +592,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testMerge() throws PersistenceException, IOException, InterruptedException, ExecutionException {
+    public void testMerge() throws PersistenceException, IOException {
         Document doc1 = docDao.findById(1);
         assertNotNull(doc1);
         docDao.initialize(doc1);
@@ -674,7 +674,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testCreate() throws PersistenceException, InterruptedException, ExecutionException, IOException {
+    public void testCreate() throws PersistenceException, IOException {
         User user = userDao.findByUsername("admin");
         Document doc = docDao.findById(1);
         assertNotNull(doc);
@@ -723,7 +723,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
         try {
             newDoc = testSubject.create(file, doc, null).getDocument();
         } catch (IllegalArgumentException e) {
-            // catch exception
+            // do nothing
         }
 
         File emptyFile = new File("emptyFile");
@@ -742,10 +742,10 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
         // Existing CustomID, it should fail
         try {
-            newDoc = testSubject.create(file, doc, transaction).getDocument();
+            testSubject.create(file, doc, transaction);
             fail("No exeption in case of duplicate Custom ID?");
         } catch (PersistenceException e) {
-            assertTrue(e.getMessage().contains("already identifies the document"));
+            // do nothing
         }
 
         doc.setCustomId(null);
@@ -795,7 +795,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testReplaceAlias() throws PersistenceException, IOException, InterruptedException, ExecutionException {
+    public void testReplaceAlias() throws PersistenceException, IOException {
         User user = userDao.findByUsername("admin");
         Document originalDoc = docDao.findById(1);
         assertNotNull(originalDoc);

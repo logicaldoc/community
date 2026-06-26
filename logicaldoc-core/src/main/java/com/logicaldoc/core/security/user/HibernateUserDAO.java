@@ -698,7 +698,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         log.info("Checking if the user {} had interactions in the last {} days", user.getUsername(), maxInactiveDays);
 
         List<Date> interactions = queryForList("select max(ld_lastrenew) from ld_session where ld_username = :username",
-                Map.of("username", user.getUsername()), Date.class, null);
+                Map.of(USERNAME, user.getUsername()), Date.class, null);
         Date lastInteraction = null;
         if (!interactions.isEmpty())
             lastInteraction = interactions.get(0);

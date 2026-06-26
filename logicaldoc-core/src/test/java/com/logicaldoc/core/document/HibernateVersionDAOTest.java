@@ -1,7 +1,7 @@
 package com.logicaldoc.core.document;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -207,42 +207,42 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-	public void testCreate() throws PersistenceException {
-		UserDAO userDao = UserDAO.get();
+    public void testCreate() throws PersistenceException {
+        UserDAO userDao = UserDAO.get();
 
-		Document doc = docDao.findById(1);
-		docDao.initialize(doc);
-		assertNotNull(doc);
+        Document doc = docDao.findById(1);
+        docDao.initialize(doc);
+        assertNotNull(doc);
 
-		User user = userDao.findById(1);
-		userDao.initialize(user);
-		assertNotNull(user);
+        User user = userDao.findById(1);
+        userDao.initialize(user);
+        assertNotNull(user);
 
-		assertNotNull(Version.create(doc, user, "testVersion", DocumentEvent.COPYED, false));
+        assertNotNull(Version.create(doc, user, "testVersion", DocumentEvent.COPYED, false));
 
-		Version version1 = new Version();
-		version1.setComment("version1Comment");
+        Version version1 = new Version();
+        version1.setComment("version1Comment");
 
-		Version version2 = new Version();
-		version2.setComment("version2Comment");
+        Version version2 = new Version();
+        version2.setComment("version2Comment");
 
-		Version version3 = new Version(testSubject.findById(1));
-		assertNotNull(version3.toString());
+        Version version3 = new Version(testSubject.findById(1));
+        assertNotNull(version3.toString());
 
-		assertNotSame(version1.hashCode(), version2.hashCode());
+        assertNotSame(version1.hashCode(), version2.hashCode());
 
-		assertTrue(version1.equals(version1));
-		assertSame(version1, version1);
-		assertFalse(version1.equals(new Object()));
+        assertEquals(version1, new Version(version1));
+        assertSame(version1, version1);
+        assertNotEquals(version1, new Object());
 
-		version2.setDocId(0);
-		version2.setVersionDate(new Date(2025 - 26 - 02));
-		version1.setVersionDate(null);
+        version2.setDocId(0);
+        version2.setVersionDate(new Date(2025 - 26 - 02));
+        version1.setVersionDate(null);
 
-		assertFalse(version1.equals(version2));
+        assertNotEquals(version1, version2);
 
-		version2.setVersionDate(null);
-		version1.setVersionDate(new Date(2025 - 26 - 02));
-		assertFalse(version1.equals(version2));
-	}
+        version2.setVersionDate(null);
+        version1.setVersionDate(new Date(2025 - 26 - 02));
+        assertNotEquals(version1, version2);
+    }
 }

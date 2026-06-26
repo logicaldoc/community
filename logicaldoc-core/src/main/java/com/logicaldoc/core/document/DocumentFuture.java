@@ -17,7 +17,7 @@ import com.logicaldoc.util.concurrent.FutureElaboration;
  */
 public class DocumentFuture extends FutureElaboration<Document, Document> {
 
-    private final static Logger log = LoggerFactory.getLogger(DocumentFuture.class);
+    private static final Logger log = LoggerFactory.getLogger(DocumentFuture.class);
 
     public DocumentFuture(Document document, Future<Document> future) {
         super(document, future);
@@ -27,14 +27,16 @@ public class DocumentFuture extends FutureElaboration<Document, Document> {
         Document doc = null;
         try {
             doc = super.get();
-        } catch (InterruptedException | ExecutionException e) {
-            // Do nothing
-            log.warn(e.getMessage(), e);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted, current thread gets killed", e);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            throw new PersistenceException("Value cannot be retrieved", e);
         }
-        
+
         if (doc == null)
             throw new PersistenceException("Unknown database error");
-        
+
         return doc;
     }
 }

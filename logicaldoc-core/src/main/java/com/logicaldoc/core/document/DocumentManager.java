@@ -227,7 +227,7 @@ public class DocumentManager {
 
             documentDAO.store(document, transaction);
 
-            log.debug("Replaced fileVersion {} of document {}", fileVersion, docId);
+            debug("Replaced fileVersion {} of document {}", fileVersion, docId);
 
             return new DocumentFuture(document, new SerialFuture<>(futures));
         } else {
@@ -356,7 +356,7 @@ public class DocumentManager {
 
             Map<String, Object> dictionary = new HashMap<>();
 
-            log.debug("Invoke listeners before checkin");
+            debug("Invoke listeners before checkin");
             for (DocumentListener listener : listenerManager.getListeners())
                 listener.beforeCheckin(document, transaction, dictionary);
 
@@ -432,13 +432,13 @@ public class DocumentManager {
 
             DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
 
-            log.debug("Stored version {}", version.getVersion());
-            log.debug("Invoke listeners after checkin");
+            debug("Stored version {}", version.getVersion());
+            debug("Invoke listeners after checkin");
             for (DocumentListener listener : listenerManager.getListeners())
                 listener.afterCheckin(document, transaction, dictionary);
             documentDAO.store(document);
 
-            log.debug("Checked in document {}", docId);
+            debug("Checked in document {}", docId);
 
             if (!document.getFileVersion().equals(oldFileVersion))
                 documentNoteDAO.copyAnnotations(document.getId(), oldFileVersion, document.getFileVersion());
@@ -519,7 +519,7 @@ public class DocumentManager {
         validateTransaction(transaction);
 
         if (document.getStatus() == status && document.getLockUserId().equals(transaction.getUserId())) {
-            log.debug("Document {} is already locked by user {}", document, transaction.getUser().getFullName());
+            debug("Document {} is already locked by user {}", document, transaction.getUser().getFullName());
             return;
         }
 
@@ -539,7 +539,7 @@ public class DocumentManager {
         // Modify document history entry
         documentDAO.store(document, transaction);
 
-        log.debug("locked document {}", document);
+        debug("locked document {}", document);
     }
 
     private void storeFile(Document doc, File file, DocumentHistory transaction, boolean newDocument)
@@ -623,7 +623,7 @@ public class DocumentManager {
 
         // and gets some fields
         if (parser != null) {
-            log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
+            debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
 
             try {
                 content = parser.parse(
@@ -660,7 +660,7 @@ public class DocumentManager {
             throws PersistenceException, ParsingException {
         Document doc = getExistingDocument(docId);
 
-        log.debug("Indexing document {} - {}", doc.getId(), doc.getFileName());
+        debug("Indexing document {} - {}", doc.getId(), doc.getFileName());
         int currentIndexed = doc.getIndexed().ordinal();
 
         long parsingTime;
@@ -681,10 +681,10 @@ public class DocumentManager {
                     if (StringUtils.isEmpty(content))
                         cont = indexer.getHit(realDoc.getId()).getContent();
                 } else {
-                    log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
+                    debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
                             doc.getDocRef());
                     documentDAO.jdbcUpdate("update ld_document set ld_indexed = %d where ld_id = %d"
-                            .formatted(IndexingStatus.SKIP, doc.getId()));
+                            .formatted(IndexingStatus.SKIP.ordinal(), doc.getId()));
                     return 0;
                 }
             }
@@ -736,8 +736,7 @@ public class DocumentManager {
         } catch (ParsingException e) {
             if (config.getBoolean(tenantName(document.getTenantId()) + ".index.ignorecontenterror", false)) {
                 log.warn("Ignore parsing errors for document {}", document);
-                if (log.isDebugEnabled())
-                    log.debug(e.getMessage(), e);
+                debug(e.getMessage(), e);
             } else
                 throw e;
         }
@@ -1155,13 +1154,11 @@ public class DocumentManager {
                 }
 
                 if (count > 0) {
-                    if (log.isDebugEnabled())
-                        log.debug("Record of document {} has been written", version.getDocId());
+                    debug("Record of document {} has been written", version.getDocId());
 
                     versionDAO.store(version);
 
-                    if (log.isDebugEnabled())
-                        log.debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
+                    debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
                 } else {
                     log.error("Document not created in time, probably due to database errors");
                     return null;
@@ -1175,6 +1172,11 @@ public class DocumentManager {
             return document;
         }, "VersionSave", 100L);
 
+    }
+
+    private void debug(String message, Object... args) {
+        if (log.isDebugEnabled())
+            log.debug(message, args);
     }
 
     private void setAtributesForCreation(File file, Document docVO, DocumentHistory transaction) {
@@ -1229,7 +1231,7 @@ public class DocumentManager {
         try {
             Parser parser = ParserFactory.getParser(doc.getFileName());
             if (parser != null) {
-                log.debug("Using parser {} to count pages of document {}", parser.getClass().getName(), doc);
+                debug("Using parser {} to count pages of document {}", parser.getClass().getName(), doc);
                 doc.setPages(parser.countPages(file, doc.getFileName()));
             }
         } catch (Exception e) {
@@ -1387,7 +1389,7 @@ public class DocumentManager {
             if (transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
                 document.setImmutable(false);
             } else if (document.getLockUserId() == null || document.getStatus() == DocumentStatus.UNLOCKED) {
-                log.debug("The document {} is already unlocked", document);
+                debug("The document {} is already unlocked", document);
                 return;
             } else if (!transaction.getUserId().toString().equals(document.getLockUserId().toString())) {
                 /*
@@ -1408,7 +1410,7 @@ public class DocumentManager {
             transaction.setEvent(DocumentEvent.UNLOCKED);
             documentDAO.store(document, transaction);
         }
-        log.debug("Unlocked document {}", docId);
+        debug("Unlocked document {}", docId);
     }
 
     /**
@@ -1431,7 +1433,7 @@ public class DocumentManager {
         transaction.setEvent(DocumentEvent.IMMUTABLE);
         documentDAO.makeImmutable(docId, transaction);
 
-        log.debug("The document {} has been marked as immutable", docId);
+        debug("The document {} has been marked as immutable", docId);
     }
 
     /**
@@ -1475,7 +1477,7 @@ public class DocumentManager {
             documentDAO.store(document, transaction);
 
             markAliasesToIndex(docId);
-            log.debug("Document renamed: {}", document.getId());
+            debug("Document renamed: {}", document.getId());
 
             return elaboration;
         }
@@ -1991,7 +1993,7 @@ public class DocumentManager {
                 checkinTransaction.setDate(new Date());
                 checkin(document.getId(), tmp, ver.getFileName(), false, docVO, checkinTransaction);
 
-                log.debug("Promoted version {} of document {}", version, docId);
+                debug("Promoted version {} of document {}", version, docId);
             } finally {
                 FileUtils.deleteQuietly(tmp);
             }
@@ -2190,14 +2192,15 @@ public class DocumentManager {
 
         MenuDAO menuDAO = MenuDAO.get();
         if (!menuDAO.isReadAllowed(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
-            String message = "User %s cannot access the menu %d".formatted(transaction.getUsername(), Menu.DESTROY_DOCUMENTS);
+            String message = "User %s cannot access the menu %d".formatted(transaction.getUsername(),
+                    Menu.DESTROY_DOCUMENTS);
             throw new PermissionException(message);
         }
 
         transaction.setDocId(docId);
         transaction.setEvent(FolderEvent.DOCUMENT_DESTROYED);
 
-        log.debug("Destroying document {}", docId);
+        debug("Destroying document {}", docId);
 
         // Just retrieve required informations of the document to destroy
         documentDAO.query("select ld_folderid, ld_filename, ld_version, ld_fileversion from ld_document",
@@ -2219,10 +2222,11 @@ public class DocumentManager {
                     }
                 }, 1);
 
-        List<Long> versionIds = documentDAO.queryForList("select ld_id from ld_version where ld_documentid = %d".formatted(docId),
-                Long.class);
+        List<Long> versionIds = documentDAO
+                .queryForList("select ld_id from ld_version where ld_documentid = %d".formatted(docId), Long.class);
         if (!versionIds.isEmpty()) {
-            documentDAO.jdbcUpdate("delete from ld_version_ext where ld_versionid in (%s)".formatted(versionIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
+            documentDAO.jdbcUpdate("delete from ld_version_ext where ld_versionid in (%s)"
+                    .formatted(versionIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
         }
 
         String documentTag = "%d - %s".formatted(docId, transaction.getFilename());
@@ -2238,7 +2242,8 @@ public class DocumentManager {
         count = documentDAO.jdbcUpdate("delete from ld_tag where ld_docid = %d".formatted(docId));
         log.info("Destroyed {} tags of document {}", count, documentTag);
 
-        count = documentDAO.jdbcUpdate("delete from ld_link where ld_docid1 = %d or ld_docid2 = %d".formatted(docId, docId));
+        count = documentDAO
+                .jdbcUpdate("delete from ld_link where ld_docid1 = %d or ld_docid2 = %d".formatted(docId, docId));
         log.info("Destroyed {} links of document {}", count, documentTag);
 
         count = documentDAO.jdbcUpdate("delete from ld_bookmark where ld_type=0 and ld_docid = %d".formatted(docId));

@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -1738,8 +1737,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testMerge()
-            throws PersistenceException, FileNotFoundException, InterruptedException, ExecutionException {
+    public void testMerge() throws PersistenceException, FileNotFoundException {
         Folder root = testSubject.findById(5L);
         testSubject.createPath(root, "/Default/Target/Pippo", false, null);
         testSubject.createPath(root, "/Default/Target/Pluto", false, null);
