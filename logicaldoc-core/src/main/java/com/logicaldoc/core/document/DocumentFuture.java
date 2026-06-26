@@ -28,7 +28,7 @@ public class DocumentFuture extends FutureElaboration<Document, Document> {
         try {
             doc = super.get();
         } catch (InterruptedException e) {
-            log.warn("Interrupted, current thread gets killed", e);
+            log.warn("Interrupted! Current thread gets killed.", e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             throw new PersistenceException("Value cannot be retrieved", e);
