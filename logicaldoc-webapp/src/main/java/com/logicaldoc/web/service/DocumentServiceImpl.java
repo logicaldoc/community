@@ -121,7 +121,6 @@ import com.logicaldoc.util.CollectionUtil;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.StringUtil;
-import com.logicaldoc.util.concurrent.FutureElaboration;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.io.FileUtil;
@@ -260,7 +259,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
     }
 
     @Override
-    public List<GUIDocument> addDocuments(boolean importZip, String charset, boolean immediateIndexing,
+    public List<GUIDocument> addDocuments(
+            boolean importZip,
+            String charset,
+            boolean immediateIndexing,
             final GUIDocument metadata) throws ServerException {
         final Session session = validateSession();
 
@@ -288,9 +290,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         }
     }
 
-    private void addDocuments(boolean importZip, String charset, boolean immediateIndexing, final GUIDocument metadata,
-            final Session session, List<GUIDocument> createdDocs) throws PersistenceException, ServerException,
-            ParsingException, IOException, InterruptedException, ExecutionException {
+    private void addDocuments(
+            boolean importZip,
+            String charset,
+            boolean immediateIndexing,
+            final GUIDocument metadata,
+            final Session session,
+            List<GUIDocument> createdDocs) throws PersistenceException, ServerException, ParsingException, IOException,
+            InterruptedException, ExecutionException {
 
         checkWritePermission(metadata, session);
 
@@ -335,8 +342,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                     doc.setFileName(filename);
 
                     // Create the new document
-                    FutureElaboration<Document, Document> elaboration = documentManager.create(file, doc, transaction);
-                    doc = elaboration.get();
+                    doc = documentManager.create(file, doc, transaction).get();
+                    if (doc == null)
+                        throw new PersistenceException("Generic database error");
 
                     if (immediateIndexing && doc.getIndexed() == IndexingStatus.TO_INDEX)
                         docIdsToIndex.add(doc.getId());
@@ -372,7 +380,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             FileUtil.delete(uploadedEntry);
     }
 
-    private void importZip(String charset, final GUIDocument metadata, final Session session, Folder parent,
+    private void importZip(
+            String charset,
+            final GUIDocument metadata,
+            final Session session,
+            Folder parent,
             final File zipFile) {
         /*
          * Prepare the Master document used to create the new one
@@ -393,7 +405,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         }
     }
 
-    private void notifyUsersInNewThread(List<Document> docs, final GUIDocument metadata, final String templateName,
+    private void notifyUsersInNewThread(
+            List<Document> docs,
+            final GUIDocument metadata,
+            final String templateName,
             final Session session) {
         if (!metadata.getNotifyUsers().isEmpty()) {
             new Thread(() -> notifyDocuments(docs, templateName, metadata.getNotifyMessage(), metadata.getNotifyUsers(),
@@ -447,8 +462,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         return checkedInDocument;
     }
 
-    private void notifyDocuments(List<Document> docs, String messageTemplate, String notificationMessage,
-            List<Long> recipientIds, Session session) {
+    private void notifyDocuments(
+            List<Document> docs,
+            String messageTemplate,
+            String notificationMessage,
+            List<Long> recipientIds,
+            Session session) {
 
         // Prepare the tile of the first uploaded file, by default we use a
         // single transparent pixel
@@ -531,7 +550,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         return dao.findDocument(docId);
     }
 
-    private void prepareRecipients(List<Long> notifyUserids, Map<Locale, Set<Recipient>> emailRecipientsMap,
+    private void prepareRecipients(
+            List<Long> notifyUserids,
+            Map<Locale, Set<Recipient>> emailRecipientsMap,
             Map<Locale, Set<Recipient>> systemRecipientsMap) throws PersistenceException {
         List<User> users = UserDAO.get().findByWhere("_entity.id in (%s)".formatted(CollectionUtil.join(notifyUserids)),
                 null, null);
@@ -572,8 +593,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
     }
 
     @Override
-    public List<GUIDocument> addDocuments(String language, long folderId, boolean importZip, String charset,
-            boolean immediateIndexing, final Long templateId) throws ServerException {
+    public List<GUIDocument> addDocuments(
+            String language,
+            long folderId,
+            boolean importZip,
+            String charset,
+            boolean immediateIndexing,
+            final Long templateId) throws ServerException {
         Session session = validateSession();
         FolderDAO fdao = FolderDAO.get();
         try {
@@ -2261,10 +2287,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             Document document;
             if (StringUtils.isEmpty(content))
                 document = DocumentManager.get()
-                        .create(IOUtils.toInputStream(" ", StandardCharsets.UTF_8), doc, transaction).getObject();
+                        .create(IOUtils.toInputStream(" ", StandardCharsets.UTF_8), doc, transaction).getDocument();
             else
                 document = DocumentManager.get()
-                        .create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc, transaction).getObject();
+                        .create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc, transaction).getDocument();
 
             if (checkout) {
                 // Perform a checkout also
@@ -2377,12 +2403,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         try {
             return dao.queryForLong("""
-                    select count(ld_id) 
-                    from ld_document 
-                   where ld_deleted = 0 
-                     and ld_status = %d
-                     and ld_folderid in (%s)
-                     """.formatted(status, CollectionUtil.join(childrenFolderIds)));
+                                     select count(ld_id)
+                                     from ld_document
+                                    where ld_deleted = 0
+                                      and ld_status = %d
+                                      and ld_folderid in (%s)
+                                      """.formatted(status, CollectionUtil.join(childrenFolderIds)));
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return 0;
@@ -2427,8 +2453,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
     }
 
     @Override
-    public List<String> createTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
-            Integer maxDownloads, Integer maxViews, String password) throws ServerException {
+    public List<String> createTicket(
+            long docId,
+            int type,
+            String suffix,
+            Integer expireHours,
+            Date expireDate,
+            Integer maxDownloads,
+            Integer maxViews,
+            String password) throws ServerException {
         Session session = validateSession();
 
         String urlPrefix = "";
@@ -2621,8 +2654,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
             Document doc = DocumentManager.get()
                     .create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), toDocument(document), transaction)
-                    .getObject();
-
+                    .getDocument();
+            
             return getById(doc.getId());
         } catch (PersistenceException | IOException | ServerException e) {
             return throwServerException(session, log, e);
@@ -2838,7 +2871,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
             DocumentHistory transaction = new DocumentHistory();
             transaction.setSession(session);
-            Document d = DocumentManager.get().create(tmp, docVO, transaction).getObject();
+            Document d = DocumentManager.get().create(tmp, docVO, transaction).getDocument();
             return getById(d.getId());
         } catch (IOException | PersistenceException | MessagingException e) {
             return throwServerException(session, log, e);
@@ -2855,7 +2888,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         DocumentHistory transaction = new DocumentHistory();
         transaction.setSession(session);
         try {
-            Document doc = DocumentManager.get().replaceAlias(aliasId, transaction).getObject();
+            Document doc = DocumentManager.get().replaceAlias(aliasId, transaction).getDocument();
             return getDocument(session, doc.getId());
         } catch (InvalidSessionServerException | PermissionException | PersistenceException e) {
             return throwServerException(session, log, e);
@@ -3111,7 +3144,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
             Document doc = DocumentManager.get().merge(docs, targetFolderId,
                     fileName.toLowerCase().endsWith(".pdf") ? fileName : "%s.pdf".formatted(fileName), transaction)
-                    .getObject();
+                    .getDocument();
             return getDocument(session, doc.getId());
         } catch (InvalidSessionServerException | PermissionException | PersistenceException | IOException e) {
             return throwServerException(session, log, e);

@@ -92,8 +92,6 @@ public class DocumentManager {
         return Context.get(DocumentManager.class);
     }
 
-    private static final String UPDATE_LD_DOCUMENT_SET_LD_INDEXED = "update ld_document set ld_indexed=";
-
     private static final String NO_VALUE_OBJECT_HAS_BEEN_PROVIDED = "No value object has been provided";
 
     private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
@@ -261,7 +259,12 @@ public class DocumentManager {
      * @throws IOException I/O error
      * @throws PersistenceException error at data layer
      */
-    public DocumentFuture checkin(long docId, InputStream content, String filename, boolean release, Document docVO,
+    public DocumentFuture checkin(
+            long docId,
+            InputStream content,
+            String filename,
+            boolean release,
+            Document docVO,
             DocumentHistory transaction) throws IOException, PersistenceException {
         validateTransaction(transaction);
 
@@ -291,7 +294,12 @@ public class DocumentManager {
      * 
      * @throws PersistenceException error at data layer
      */
-    public DocumentFuture checkin(long docId, File file, String filename, boolean release, Document docVO,
+    public DocumentFuture checkin(
+            long docId,
+            File file,
+            String filename,
+            boolean release,
+            Document docVO,
             DocumentHistory transaction) throws PersistenceException {
         validateTransaction(transaction);
 
@@ -675,8 +683,8 @@ public class DocumentManager {
                 } else {
                     log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
                             doc.getDocRef());
-                    documentDAO.jdbcUpdate(
-                            UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.SKIP + " where ld_id=" + doc.getId());
+                    documentDAO.jdbcUpdate("update ld_document set ld_indexed = %d where ld_id = %d"
+                            .formatted(IndexingStatus.SKIP, doc.getId()));
                     return 0;
                 }
             }
@@ -700,8 +708,8 @@ public class DocumentManager {
 
         // For additional safety update the DB directly
         doc.setIndexingStatus(IndexingStatus.INDEXED);
-        documentDAO.jdbcUpdate(
-                UPDATE_LD_DOCUMENT_SET_LD_INDEXED + doc.getIndexed().ordinal() + " where ld_id=" + doc.getId());
+        documentDAO.jdbcUpdate("update ld_document set ld_indexed = %d where ld_id = %d"
+                .formatted(doc.getIndexed().ordinal(), doc.getId()));
 
         // Save the event
         if (transaction != null) {
@@ -782,8 +790,8 @@ public class DocumentManager {
     }
 
     private void markAliasesToIndex(long referencedDocId) throws PersistenceException {
-        documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal()
-                + " where ld_docref=" + referencedDocId + " and not ld_id = " + referencedDocId);
+        documentDAO.jdbcUpdate("update ld_document set ld_indexed = %d where ld_docref = %d and not ld_id = %d"
+                .formatted(IndexingStatus.TO_INDEX.ordinal(), referencedDocId, referencedDocId));
     }
 
     /**
@@ -1002,8 +1010,8 @@ public class DocumentManager {
                 indexer.deleteHit(doc.getId());
 
                 // The same thing should be done on each shortcut
-                documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal()
-                        + " where ld_docref=" + doc.getId());
+                documentDAO.jdbcUpdate("update ld_document set ld_indexed = %d where ld_docref = %d"
+                        .formatted(IndexingStatus.TO_INDEX.ordinal(), doc.getId()));
             }
 
             // Modify document history entry
@@ -1131,12 +1139,13 @@ public class DocumentManager {
     Future<Document> storeVersionAsync(Version version, Document document) {
         /*
          * Probably the document's record has not been written yet, we should
-         * fork a thread to wait for it's write.
+         * fork a thread to wait for its write.
          */
         return ThreadPools.get().schedule(() -> {
             try {
                 // Wait for the document's record write
-                String documentWriteCheckQuery = "select count(*) from ld_document where ld_id=" + version.getDocId();
+                String documentWriteCheckQuery = "select count(*) from ld_document where ld_id = %d"
+                        .formatted(version.getDocId());
                 int count = 0;
                 int tests = 0;
                 while (count == 0 && tests < 100) {
@@ -1153,6 +1162,9 @@ public class DocumentManager {
 
                     if (log.isDebugEnabled())
                         log.debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
+                } else {
+                    log.error("Document not created in time, probably due to database errors");
+                    return null;
                 }
             } catch (PersistenceException ex) {
                 log.error(ex.getMessage(), ex);
@@ -1258,8 +1270,13 @@ public class DocumentManager {
      * @throws PersistenceException error at data layer
      * @throws IOException I/O error
      */
-    public DocumentFuture copyToFolder(Document doc, Folder folder, DocumentHistory transaction, boolean links,
-            boolean notes, boolean security) throws PersistenceException, IOException {
+    public DocumentFuture copyToFolder(
+            Document doc,
+            Folder folder,
+            DocumentHistory transaction,
+            boolean links,
+            boolean notes,
+            boolean security) throws PersistenceException, IOException {
         validateTransaction(transaction);
 
         // initialize the document
@@ -1290,7 +1307,7 @@ public class DocumentManager {
 
             DocumentFuture elaboration = create(is, cloned, transaction);
 
-            Document createdDocument = elaboration.getObject();
+            Document createdDocument = elaboration.getDocument();
 
             // Save the event of the copy
             DocumentHistory copyEvent = new DocumentHistory(transaction);
@@ -1299,7 +1316,7 @@ public class DocumentManager {
             copyEvent.setEvent(DocumentEvent.COPYED);
 
             String newPath = folderDAO.computePathExtended(folder.getId());
-            copyEvent.setComment(newPath + "/" + createdDocument.getFileName());
+            copyEvent.setComment("%s/%s".formatted(newPath, createdDocument.getFileName()));
             documentDAO.saveDocumentHistory(doc, copyEvent);
 
             if (links)
@@ -1542,8 +1559,8 @@ public class DocumentManager {
                 type = FileUtil.getExtension(doc.getFileName());
 
             if (StringUtils.isNotEmpty(aliasType)) {
-                alias.setFileName(
-                        FileUtil.getBaseName(doc.getFileName()) + "." + FileUtil.getExtension(aliasType).toLowerCase());
+                alias.setFileName(FileUtil.getBaseName(
+                        "%s.%s".formatted(doc.getFileName(), FileUtil.getExtension(aliasType).toLowerCase())));
                 type = FileUtil.getExtension(aliasType).toLowerCase();
             }
 
@@ -1671,7 +1688,7 @@ public class DocumentManager {
         if (transaction != null) {
             delHistory = new DocumentHistory(transaction);
             delHistory.setEvent(DocumentEvent.VERSION_DELETED);
-            delHistory.setComment(versionToDeleteSpec + " - " + versionToDelete.getFileVersion());
+            delHistory.setComment("%s - %s".formatted(versionToDeleteSpec, versionToDelete.getFileVersion()));
         }
         documentDAO.saveDocumentHistory(document, delHistory);
 
@@ -1691,14 +1708,14 @@ public class DocumentManager {
     protected Document enforceExistingDocument(long docId) throws PersistenceException {
         Document document = documentDAO.findById(docId);
         if (document == null)
-            throw new IllegalArgumentException("Unexisting referenced document " + docId);
+            throw new IllegalArgumentException("Unexisting referenced document %d".formatted(docId));
         return document;
     }
 
     protected Version enforceExistingVersion(long versionId) throws PersistenceException {
         Version versionToDelete = versionDAO.findById(versionId);
         if (versionToDelete == null)
-            throw new IllegalArgumentException("Unexisting version " + versionId);
+            throw new IllegalArgumentException("Unexisting version %d".formatted(versionId));
         return versionToDelete;
     }
 
@@ -1713,7 +1730,10 @@ public class DocumentManager {
         return lastVersion;
     }
 
-    private void downgradeDocumentVersion(Document document, String versionToDeleteSpec, DocumentHistory transaction,
+    private void downgradeDocumentVersion(
+            Document document,
+            String versionToDeleteSpec,
+            DocumentHistory transaction,
             Version lastVersion) throws PersistenceException {
         String currentVersion = document.getVersion();
         if (currentVersion.equals(versionToDeleteSpec) && lastVersion != null) {
@@ -1724,7 +1744,7 @@ public class DocumentManager {
             if (transaction != null) {
                 transaction.setEvent(DocumentEvent.CHANGED);
                 transaction.setComment(
-                        "Version changed to " + document.getVersion() + " (" + document.getFileVersion() + ")");
+                        "Version changed to %s (%s)".formatted(document.getVersion(), document.getFileVersion()));
             }
 
             documentDAO.store(document, transaction);
@@ -1750,10 +1770,15 @@ public class DocumentManager {
         Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
                 Permission.ARCHIVE, root.getId(), true);
         for (Long fid : folderIds) {
-            String where = " where ld_deleted=0 and not ld_status=" + DocumentStatus.ARCHIVED.ordinal()
-                    + " and ld_folderid=" + fid;
-            archivedDocIds.addAll(documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
-                    .stream().collect(Collectors.toSet()));
+            archivedDocIds
+                    .addAll(documentDAO.queryForList("""
+                                                     select ld_id
+                                                       from ld_document
+                                                      where ld_deleted = 0
+                                                        and not ld_status = %d
+                                                        and ld_folderid = %d
+                                                     """.formatted(DocumentStatus.ARCHIVED.ordinal(), fid), Long.class)
+                            .stream().collect(Collectors.toSet()));
             if (archivedDocIds.isEmpty())
                 continue;
             archiveDocuments(archivedDocIds, transaction);
@@ -1820,11 +1845,11 @@ public class DocumentManager {
 
         Document document = documentDAO.findById(ticket.getDocId());
         if (document == null)
-            throw new PersistenceException("Unexisting document " + ticket.getDocId());
+            throw new PersistenceException("Unexisting document %d".formatted(ticket.getDocId()));
 
         if (!folderDAO.isDownloadllowed(document.getFolder().getId(), transaction.getUserId()))
-            throw new PermissionException(transaction.getUsername(), "Folder " + document.getFolder().getId(),
-                    Permission.DOWNLOAD);
+            throw new PermissionException(transaction.getUsername(),
+                    "Folder %d".formatted(document.getFolder().getId()), Permission.DOWNLOAD);
 
         ticket.setUserId(transaction.getUserId());
 
@@ -1877,9 +1902,9 @@ public class DocumentManager {
         if (!urlPrefix.endsWith("/"))
             urlPrefix += "/";
         if (ticket.getType() == Ticket.VIEW)
-            return urlPrefix + "view/" + ticket.getTicketId();
+            return "%sview/%s".formatted(urlPrefix, ticket.getTicketId());
         else
-            return urlPrefix + "download-ticket?ticketId=" + ticket.getTicketId();
+            return "%sdownload-ticket?ticketId=%s".formatted(urlPrefix, ticket.getTicketId());
     }
 
     /**
@@ -1989,7 +2014,7 @@ public class DocumentManager {
             throws PersistenceException, IOException {
         Folder rootFolder = folderDAO.findFolder(rootFolderId);
         if (rootFolder == null)
-            throw new PersistenceException("Unexisting folder ID  " + rootFolderId);
+            throw new PersistenceException("Unexisting folder ID %d".formatted(rootFolderId));
 
         if (transaction != null)
             transaction.setEvent(DocumentEvent.CHANGED);
@@ -2071,7 +2096,10 @@ public class DocumentManager {
      * @throws IOException I/O error
      * @throws PersistenceException error at data layer
      */
-    public DocumentFuture merge(Collection<Document> documents, long targetFolderId, String fileName,
+    public DocumentFuture merge(
+            Collection<Document> documents,
+            long targetFolderId,
+            String fileName,
             DocumentHistory transaction) throws IOException, PersistenceException {
         List<Long> docIds = documents.stream().map(d -> d.getId()).toList();
         File tempDir = null;
@@ -2097,7 +2125,7 @@ public class DocumentManager {
                 }
 
             Document docVO = new Document();
-            docVO.setFileName(fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf");
+            docVO.setFileName(fileName.toLowerCase().endsWith(".pdf") ? fileName : "%s.pdf".formatted(fileName));
             FolderDAO folderDao = FolderDAO.get();
             docVO.setFolder(folderDao.findById(targetFolderId));
 
@@ -2136,7 +2164,7 @@ public class DocumentManager {
 
                 FormatConversionManager.get().convertToPdf(document, null);
 
-                File pdf = new File(tempDir, nf.format(i) + ".pdf");
+                File pdf = new File(tempDir, "%s.pdf".formatted(nf.format(i)));
 
                 FormatConversionManager.get().writePdfToFile(document, null, pdf, null);
             } catch (Exception t) {
@@ -2162,7 +2190,7 @@ public class DocumentManager {
 
         MenuDAO menuDAO = MenuDAO.get();
         if (!menuDAO.isReadAllowed(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
-            String message = "User " + transaction.getUsername() + " cannot access the menu " + Menu.DESTROY_DOCUMENTS;
+            String message = "User %s cannot access the menu %d".formatted(transaction.getUsername(), Menu.DESTROY_DOCUMENTS);
             throw new PermissionException(message);
         }
 
@@ -2191,49 +2219,48 @@ public class DocumentManager {
                     }
                 }, 1);
 
-        List<Long> versionIds = documentDAO.queryForList("select ld_id from ld_version where ld_documentid=" + docId,
+        List<Long> versionIds = documentDAO.queryForList("select ld_id from ld_version where ld_documentid = %d".formatted(docId),
                 Long.class);
         if (!versionIds.isEmpty()) {
-            documentDAO.jdbcUpdate("delete from ld_version_ext where ld_versionid in ("
-                    + versionIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")");
+            documentDAO.jdbcUpdate("delete from ld_version_ext where ld_versionid in (%s)".formatted(versionIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
         }
 
-        String documentTag = docId + " - " + transaction.getFilename();
+        String documentTag = "%d - %s".formatted(docId, transaction.getFilename());
 
-        int count = documentDAO.jdbcUpdate("delete from ld_version where ld_documentid = " + docId);
+        int count = documentDAO.jdbcUpdate("delete from ld_version where ld_documentid = %d".formatted(docId));
         log.info("Destroyed {} versions of document {}", count, documentTag);
 
-        documentDAO.jdbcUpdate("delete from ld_document_ext where ld_docid = " + docId);
+        documentDAO.jdbcUpdate("delete from ld_document_ext where ld_docid = %d".formatted(docId));
 
-        count = documentDAO.jdbcUpdate("delete from ld_document where ld_docref = " + docId);
+        count = documentDAO.jdbcUpdate("delete from ld_document where ld_docref = %d".formatted(docId));
         log.info("Destroyed {} aliases of document {}", count, documentTag);
 
-        count = documentDAO.jdbcUpdate("delete from ld_tag where ld_docid = " + docId);
+        count = documentDAO.jdbcUpdate("delete from ld_tag where ld_docid = %d".formatted(docId));
         log.info("Destroyed {} tags of document {}", count, documentTag);
 
-        count = documentDAO.jdbcUpdate("delete from ld_link where ld_docid1 = " + docId + " or ld_docid2 = " + docId);
+        count = documentDAO.jdbcUpdate("delete from ld_link where ld_docid1 = %d or ld_docid2 = %d".formatted(docId, docId));
         log.info("Destroyed {} links of document {}", count, documentTag);
 
-        count = documentDAO.jdbcUpdate("delete from ld_bookmark where ld_type=0 and ld_docid = " + docId);
+        count = documentDAO.jdbcUpdate("delete from ld_bookmark where ld_type=0 and ld_docid = %d".formatted(docId));
         log.info("Destroyed {} bookmarks of document {}", count, documentTag);
 
-        count = documentDAO.jdbcUpdate("delete from ld_ticket where ld_docid = " + docId);
+        count = documentDAO.jdbcUpdate("delete from ld_ticket where ld_docid = %d".formatted(docId));
         log.info("Destroyed {} tickets of document {}", count, documentTag);
 
-        count = documentDAO.jdbcUpdate("delete from ld_note where ld_docid = " + docId);
+        count = documentDAO.jdbcUpdate("delete from ld_note where ld_docid = %d".formatted(docId));
         log.info("Destroyed {} notes of document {}", count, documentTag);
 
-        count = documentDAO.jdbcUpdate("delete from ld_history where ld_docid = " + docId);
+        count = documentDAO.jdbcUpdate("delete from ld_history where ld_docid = %d".formatted(docId));
         log.info("Destroyed {} histories of document {}", count, documentTag);
 
         try {
-            count = documentDAO.jdbcUpdate("delete from ld_readingrequest where ld_docid = " + docId);
+            count = documentDAO.jdbcUpdate("delete from ld_readingrequest where ld_docid = %d".formatted(docId));
             log.info("Destroyed {} reading requests of document {}", count, documentTag);
         } catch (Exception e) {
             // Ignore because the table may not exist
         }
 
-        documentDAO.jdbcUpdate("delete from ld_document where ld_id = " + docId);
+        documentDAO.jdbcUpdate("delete from ld_document where ld_id = %d".formatted(docId));
         log.info("Destroyed the record of document {}", documentTag);
 
         indexer.deleteHit(docId);

@@ -2391,7 +2391,7 @@ SELECT COUNT(*) from ld_document D, ld_folder F
 
     private void moveDocumentsOnMerge(Folder source, Folder target, FolderHistory transaction, Session session)
             throws PersistenceException {
-        log.debug("move documents fom folder {} to folder {}", source, target);
+        log.debug("move documents from folder {} to folder {}", source, target);
         DocumentManager manager = DocumentManager.get();
         DocumentDAO docDao = DocumentDAO.get();
         List<Document> docs = docDao.findByFolder(source.getId(), null);

@@ -156,8 +156,13 @@ public class DocTool {
      * 
      * @return the complete download ticket's URL
      */
-    public String downloadTicket(final long docId, boolean pdfConversion, Integer expireHours, Date expireDate,
-            Integer maxDownloads, String username) {
+    public String downloadTicket(
+            final long docId,
+            boolean pdfConversion,
+            Integer expireHours,
+            Date expireDate,
+            Integer maxDownloads,
+            String username) {
 
         User user = new SecurityTool().getUser(username);
 
@@ -196,8 +201,14 @@ public class DocTool {
      * 
      * @return the complete download ticket's URL
      */
-    public String viewTicket(final long docId, boolean pdfConversion, Integer expireHours, Date expireDate,
-            Integer maxDownloads, Integer maxViews, String username) {
+    public String viewTicket(
+            final long docId,
+            boolean pdfConversion,
+            Integer expireHours,
+            Date expireDate,
+            Integer maxDownloads,
+            Integer maxViews,
+            String username) {
 
         User user = new SecurityTool().getUser(username);
 
@@ -363,7 +374,12 @@ public class DocTool {
      * 
      * @return the new document created
      */
-    public Document copy(Document doc, String targetPath, boolean links, boolean notes, boolean security,
+    public Document copy(
+            Document doc,
+            String targetPath,
+            boolean links,
+            boolean notes,
+            boolean security,
             String username) {
         User user = new SecurityTool().getUser(username);
 

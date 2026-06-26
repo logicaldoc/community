@@ -244,14 +244,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     @Override
     public List<Long> findDocIdByTag(String tag) throws PersistenceException {
-        return queryForList("""
-                            select distinct(A.ld_docid) 
-                              from ld_tag A, ld_document B 
-                             where A.ld_docid=B.ld_id 
-                               and not B.ld_status = %d
-                               and lower(ld_tag) = '%s'
-                            """.formatted(DocumentStatus.ARCHIVED.ordinal(),
-                SqlUtil.doubleQuotesAndBackslashes(tag).toLowerCase()), Long.class);
+        return queryForList(
+                """
+                select distinct(A.ld_docid)
+                  from ld_tag A, ld_document B
+                 where A.ld_docid=B.ld_id
+                   and not B.ld_status = %d
+                   and lower(ld_tag) = '%s'
+                """.formatted(DocumentStatus.ARCHIVED.ordinal(), SqlUtil.doubleQuotesAndBackslashes(tag).toLowerCase()),
+                Long.class);
     }
 
     @Override
@@ -292,7 +293,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
             // Remove any initialization and validation in attributes
             cleanValidationAndInitialization(doc);
-            
+
             /*
              * Avoid documents inside folder alias
              */
@@ -329,6 +330,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
             // Use unique filename in the same folder
             setUniqueFilename(doc);
+
+            // Make sure the Custom ID has not been taken by another document
+            checkUniqueCustomId(doc);
 
             // Save the document
             saveOrUpdate(doc);
@@ -447,7 +451,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             doc.setFillMode(doc.getFolder().getFillMode());
         if (doc.getFillMode() == null)
             doc.setFillMode(FillMode.ALL);
-        
+
         /*
          * Check for OCR template at folder level
          */
@@ -563,6 +567,20 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         }
     }
 
+    private void checkUniqueCustomId(Document doc) throws PersistenceException {
+        if (!RunLevel.current().aspectEnabled(Aspect.UNIQUENESSCUSTOMID))
+            return;
+
+        queryForResultSet(
+                "select ld_id, ld_filename from ld_document where ld_tenantid = :tenantId and ld_customid = :customId and not ld_id = :docId",
+                Map.of("tenantId", doc.getTenantId(), "customId", doc.getCustomId(), "docId", doc.getId()), 2,
+                resultSet -> {
+                    if (resultSet.next())
+                        throw new PersistenceException("Custom ID %s already identifies the document %s (%d)"
+                                .formatted(doc.getCustomId(), resultSet.getString(2), resultSet.getLong(1)));
+                });
+    }
+
     /**
      * Avoid file name duplications in the same folder
      * 
@@ -586,11 +604,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         // Execute the query to populate the sets
         queryForResultSet("""
-                          select ld_filename 
-                            from ld_document 
-                           where ld_deleted = 0 
+                          select ld_filename
+                            from ld_document
+                           where ld_deleted = 0
                              and ld_folderid = %d
-                             and ld_filename like '%s%%' 
+                             and ld_filename like '%s%%'
                              and not ld_id = %d
                           """.formatted(doc.getFolder().getId(), SqlUtil.doubleQuotes(baseName), doc.getId()), null,
                 null, rs -> {
@@ -637,7 +655,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         List<Long> results = new ArrayList<>();
         try {
             results = findByQuery("""
-                                  select _history.docId 
+                                  select _history.docId
                                     from DocumentHistory _history
                                    where _history.userId = %d
                                    order by _history.date desc
@@ -737,10 +755,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
              * Search in all accessible folders
              */
             String query = """
-                            select distinct(C.ld_id) 
+                            select distinct(C.ld_id)
                             from ld_document C, ld_tag D
-                           where C.ld_id = D.ld_docid 
-                             and C.ld_deleted = 0 
+                           where C.ld_id = D.ld_docid
+                             and C.ld_deleted = 0
                              and not C.ld_status = %d
                              and C.ld_folderid in (%s)
                              and lower(D.ld_tag) = '%s'
@@ -758,11 +776,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public List<Document> findLastDownloadsByUserId(long userId, int maxResults) throws PersistenceException {
         ArrayList<Long> tmpal = new ArrayList<>(findByQuery("""
-                        select docId from DocumentHistory 
-                        where userId = %d
-                          and event = '%s'
-                        order by date desc
-                       """.formatted(userId, DocumentEvent.DOWNLOADED), (Map<String, Object>) null, Long.class, null));
+                                                             select docId from DocumentHistory
+                                                             where userId = %d
+                                                               and event = '%s'
+                                                             order by date desc
+                                                            """.formatted(userId, DocumentEvent.DOWNLOADED),
+                (Map<String, Object>) null, Long.class, null));
         List<Long> docIds = tmpal;
 
         List<Document> coll = new ArrayList<>();
@@ -773,12 +792,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             tmpal.subList(0, maxResults - 1);
 
         // execute the query
-        List<Document> unorderdColl = findByQuery("""
-                                                   from Document _entity
-                                                  where not _entity.status = %d
-                                                    and _entity.id in (%s)
-                                                  """.formatted(DocumentStatus.ARCHIVED.ordinal(),
-                CollectionUtil.join(docIds)), (Map<String, Object>) null, Document.class, null);
+        List<Document> unorderdColl = findByQuery(
+                """
+                 from Document _entity
+                where not _entity.status = %d
+                  and _entity.id in (%s)
+                """.formatted(DocumentStatus.ARCHIVED.ordinal(), CollectionUtil.join(docIds)),
+                (Map<String, Object>) null, Document.class, null);
 
         // put all elements in a map
         HashMap<Long, Document> hm = new HashMap<>();
@@ -822,28 +842,28 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         String query = switch (direction) {
             case null -> """
-                select distinct(ld_docid2) 
-                from ld_link 
-               where ld_deleted = 0 
-                 and ld_docid1 = :docId 
-               UNION 
-              select distinct(ld_docid1) 
-                from ld_link 
-               where ld_deleted = 0 
-                 and ld_docid2 = :docId
-              """;
+                           select distinct(ld_docid2)
+                           from ld_link
+                          where ld_deleted = 0
+                            and ld_docid1 = :docId
+                          UNION
+                         select distinct(ld_docid1)
+                           from ld_link
+                          where ld_deleted = 0
+                            and ld_docid2 = :docId
+                         """;
             case 1 -> """
-              select distinct(ld_docid2) 
-                from ld_link 
-               where ld_deleted = 0 
-                 and ld_docid1 = :docId
-              """;
+                      select distinct(ld_docid2)
+                        from ld_link
+                       where ld_deleted = 0
+                         and ld_docid1 = :docId
+                      """;
             case 2 -> """
-              select distinct(ld_docid1) 
-                from ld_link 
-               where ld_deleted = 0 
-                 and ld_docid2 = :docId
-              """;
+                      select distinct(ld_docid1)
+                        from ld_link
+                       where ld_deleted = 0
+                         and ld_docid2 = :docId
+                      """;
             default -> "";
         };
 
@@ -857,7 +877,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     }
 
     @Override
-    public List<Document> findByFileNameAndParentFolderId(Long folderId, String fileName, Long excludeId, Long tenantId,
+    public List<Document> findByFileNameAndParentFolderId(
+            Long folderId,
+            String fileName,
+            Long excludeId,
+            Long tenantId,
             Integer max) throws PersistenceException {
         StringBuilder query = new StringBuilder(
                 "lower(_entity.fileName) like '%%%s%%'".formatted(SqlUtil.doubleQuotes(fileName.toLowerCase())));
@@ -1101,10 +1125,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         };
 
         return query("""
-                        select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid, ld_color 
-                          from ld_document 
-                         where ld_deleted = 1 
-                           and ld_deleteuserid = %d 
+                        select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid, ld_color
+                          from ld_document
+                         where ld_deleted = 1
+                           and ld_deleteuserid = %d
                          order by ld_lastmodified desc
                      """.formatted(userId), docMapper, maxHits);
     }
@@ -1135,9 +1159,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             concat = "CAST(ld_id AS varchar) + '.' + ld_customid";
 
         jdbcUpdate("""
-                   update ld_document 
-                      set ld_deleted = 1, ld_customid = %s, ld_deleteuserid = %d 
-                    where ld_deleted = 0 
+                   update ld_document
+                      set ld_deleted = 1, ld_customid = %s, ld_deleteuserid = %d
+                    where ld_deleted = 0
                       and ld_folderid in (select ld_id from ld_folder where ld_deleted  > 0)
                    """.formatted(concat, deleteUserId));
     }
@@ -1150,9 +1174,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         if (CollectionUtils.isNotEmpty(folderIds))
             query.append(" and ld_folderid in (%s) ".formatted(CollectionUtil.join(folderIds)));
 
-        query.append(""" 
-                     and ld_published = 1 
-                     and ld_startpublishing <= :now 
+        query.append("""
+                     and ld_published = 1
+                     and ld_startpublishing <= :now
                      and ( ld_stoppublishing is null or ld_stoppublishing > :now )
                      """);
 
@@ -1183,25 +1207,25 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
             // tags no more existing in the ld_tag table or that belong to
             // deleted documents
-            deleteStatement.append(""" 
-                        ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT t.ld_tag 
-                                                       FROM ld_tag t 
-                                                       JOIN ld_document d ON d.ld_id = t.ld_docid 
-                                                      WHERE ld_uniquetag.ld_tenantid = t.ld_tenantid 
-                                                      AND ld_uniquetag.ld_tag = t.ld_tag 
-                                                      AND d.ld_deleted = 0 )
-                                   """);
+            deleteStatement.append("""
+                                   ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT t.ld_tag
+                                                                  FROM ld_tag t
+                                                                  JOIN ld_document d ON d.ld_id = t.ld_docid
+                                                                 WHERE ld_uniquetag.ld_tenantid = t.ld_tenantid
+                                                                 AND ld_uniquetag.ld_tag = t.ld_tag
+                                                                 AND d.ld_deleted = 0 )
+                                              """);
 
             // tags no more existing in the ld_foldertag table or that belong to
             // deleted folders
-            deleteStatement.append(""" 
-                        AND ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT ft.ld_tag 
-                                                           FROM ld_foldertag ft 
-                                                           JOIN ld_folder f ON f.ld_id = ft.ld_folderid 
-                                                          WHERE ld_uniquetag.ld_tenantid = ft.ld_tenantid 
-                                                            AND ld_uniquetag.ld_tag = ft.ld_tag 
-                                                            AND f.ld_deleted = 0 );                                                            
-                                   """);
+            deleteStatement.append("""
+                                   AND ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT ft.ld_tag
+                                                                      FROM ld_foldertag ft
+                                                                      JOIN ld_folder f ON f.ld_id = ft.ld_folderid
+                                                                     WHERE ld_uniquetag.ld_tenantid = ft.ld_tenantid
+                                                                       AND ld_uniquetag.ld_tag = ft.ld_tag
+                                                                       AND f.ld_deleted = 0 );
+                                              """);
 
             jdbcUpdate(deleteStatement.toString());
         } catch (PersistenceException e) {
@@ -1221,16 +1245,16 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
             // Collect the currently unique used tags
             Set<String> currentlyUsedTags = (queryForList("""
-                                                          select distinct(B.ld_tag) 
-                                                            from ld_tag B, ld_document C 
-                                                           where B.ld_tenantid = %d 
-                                                             and C.ld_id = B.ld_docid 
-                                                             and C.ld_deleted = 0 
-                                                           UNION 
-                                                          select distinct(D.ld_tag) 
-                                                            from ld_foldertag D, ld_folder E 
+                                                          select distinct(B.ld_tag)
+                                                            from ld_tag B, ld_document C
+                                                           where B.ld_tenantid = %d
+                                                             and C.ld_id = B.ld_docid
+                                                             and C.ld_deleted = 0
+                                                           UNION
+                                                          select distinct(D.ld_tag)
+                                                            from ld_foldertag D, ld_folder E
                                                            where D.ld_tenantid = %d
-                                                             and E.ld_id = D.ld_folderid 
+                                                             and E.ld_id = D.ld_folderid
                                                              and E.ld_deleted = 0
                                                           """.formatted(tenantId, tenantId), String.class).stream()
                     .collect(Collectors.groupingBy(Function.identity()))).keySet();
@@ -1259,24 +1283,24 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public void insertNewUniqueTags() throws PersistenceException {
         jdbcUpdate("""
-                    insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) 
-                    select distinct(B.ld_tag), B.ld_tenantid, 0 
+                    insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count)
+                    select distinct(B.ld_tag), B.ld_tenantid, 0
                       from ld_tag B, ld_document D
-                     where B.ld_docid = D.ld_id 
-                       and D.ld_deleted = 0 
-                       and B.ld_tag not in (select A.ld_tag 
-                                              from ld_uniquetag A 
+                     where B.ld_docid = D.ld_id
+                       and D.ld_deleted = 0
+                       and B.ld_tag not in (select A.ld_tag
+                                              from ld_uniquetag A
                                              where A.ld_tenantid = B.ld_tenantid)
                    """);
 
         jdbcUpdate("""
                     insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count)
-                    select distinct(B.ld_tag), B.ld_tenantid, 0 
-                      from ld_foldertag B, ld_folder F 
-                     where B.ld_folderid = F.ld_id 
-                       and F.ld_deleted = 0 
-                       and B.ld_tag not in (select A.ld_tag 
-                                              from ld_uniquetag A 
+                    select distinct(B.ld_tag), B.ld_tenantid, 0
+                      from ld_foldertag B, ld_folder F
+                     where B.ld_folderid = F.ld_id
+                       and F.ld_deleted = 0
+                       and B.ld_tag not in (select A.ld_tag
+                                              from ld_uniquetag A
                                              where A.ld_tenantid = B.ld_tenantid)
                    """);
     }
@@ -1293,14 +1317,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             for (String tag : uniqueTags) {
                 try {
                     jdbcUpdate("""
-                               update ld_uniquetag 
-                                  set ld_count = (select count(T.ld_tag) 
-                                                    from ld_tag T, ld_document D 
-                                                   where T.ld_tag = :tag 
-                                                     and T.ld_tenantid = :tenantId 
-                                                     and T.ld_docid = D.ld_id 
-                                                     and D.ld_deleted = 0 ) 
-                                where ld_tag = :tag 
+                               update ld_uniquetag
+                                  set ld_count = (select count(T.ld_tag)
+                                                    from ld_tag T, ld_document D
+                                                   where T.ld_tag = :tag
+                                                     and T.ld_tenantid = :tenantId
+                                                     and T.ld_docid = D.ld_id
+                                                     and D.ld_deleted = 0 )
+                                where ld_tag = :tag
                                   and ld_tenantid = :tenantId
                                """, Map.of("tag", tag, "tenantId", tenantId));
                 } catch (PersistenceException e) {
@@ -1544,28 +1568,31 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
         permissionColumn.put("LDREVISION", Permission.REVISION);
 
-        queryForResultSet("""
-                            select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, 
-                                   ld_delete as LDDELETE, ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, 
-                                   ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, 
-                                   ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
-                                   ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation as LDAUTOMATION, ld_readingreq as LDREADINGREQ, 
-                                   ld_preview as LDPREVIEW, ld_customid as LDCUSTOMID, ld_revision as LDREVISION 
-                              from ld_document_acl 
-                             where ld_docid = %d
-                               and ld_groupid in (select ld_groupid 
-                                                    from ld_usergroup 
-                                                   where ld_userid = %d )
-                          """.formatted(docId, userId), null, null, rows -> {
-            while (rows.next()) {
-                for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
-                    String column = entry.getKey();
-                    Permission permission = entry.getValue();
-                    if (rows.getInt(column) == 1)
-                        permissions.add(permission);
-                }
-            }
-        });
+        queryForResultSet(
+                """
+                  select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE,
+                         ld_delete as LDDELETE, ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE,
+                         ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR,
+                         ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
+                         ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation as LDAUTOMATION, ld_readingreq as LDREADINGREQ,
+                         ld_preview as LDPREVIEW, ld_customid as LDCUSTOMID, ld_revision as LDREVISION
+                    from ld_document_acl
+                   where ld_docid = %d
+                     and ld_groupid in (select ld_groupid
+                                          from ld_usergroup
+                                         where ld_userid = %d )
+                """.formatted(
+                        docId, userId),
+                null, null, rows -> {
+                    while (rows.next()) {
+                        for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
+                            String column = entry.getKey();
+                            Permission permission = entry.getValue();
+                            if (rows.getInt(column) == 1)
+                                permissions.add(permission);
+                        }
+                    }
+                });
 
         if (permissions.isEmpty()) {
             // The document does not specify its own permissions so use the
@@ -1589,20 +1616,21 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         int count = jdbcUpdate("delete from ld_document_acl where ld_docid = %d".formatted(docId));
         log.debug("Removed {} security policies of document {}", count, docId);
 
-        count = jdbcUpdate("""
-                                insert into ld_document_acl(ld_docId, ld_groupid, ld_read, ld_preview, ld_write, ld_security,
-                                ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive,
-                                ld_workflow, ld_download, ld_calendar, ld_subscription,
-                                ld_print, ld_password, ld_move, ld_email, ld_automation,
-                                ld_readingreq, ld_customid, ld_revision)
-                         select %d,ld_groupid, ld_read, ld_preview, ld_write, ld_security,
-                                ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive,
-                                ld_workflow, ld_download, ld_calendar, ld_subscription,
-                                ld_print, ld_password, ld_move, ld_email, ld_automation,
-                                ld_readingreq, ld_customid, ld_revision 
-                           from ld_folder_acl 
-                          where ld_folderid = %d                      
-                           """.formatted(docId, folder.getId()));
+        count = jdbcUpdate(
+                """
+                       insert into ld_document_acl(ld_docId, ld_groupid, ld_read, ld_preview, ld_write, ld_security,
+                       ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive,
+                       ld_workflow, ld_download, ld_calendar, ld_subscription,
+                       ld_print, ld_password, ld_move, ld_email, ld_automation,
+                       ld_readingreq, ld_customid, ld_revision)
+                select %d,ld_groupid, ld_read, ld_preview, ld_write, ld_security,
+                       ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive,
+                       ld_workflow, ld_download, ld_calendar, ld_subscription,
+                       ld_print, ld_password, ld_move, ld_email, ld_automation,
+                       ld_readingreq, ld_customid, ld_revision
+                  from ld_folder_acl
+                 where ld_folderid = %d
+                  """.formatted(docId, folder.getId()));
         log.debug("Copied {} security policies of folder {} into document {}", count, folder.getId(), docId);
 
         if (transaction != null) {

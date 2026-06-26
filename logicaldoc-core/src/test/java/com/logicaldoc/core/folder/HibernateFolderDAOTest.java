@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -813,7 +814,24 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         testSubject.initialize(folder);
         assertEquals("test1", folder.getTemplate().getName());
         assertEquals("test_val_1", folder.getValue("val1"));
-        assertEquals("xxxx(" + folder.getId() + ")", folder.toString());
+        assertEquals("xxxx(%d)".formatted(folder.getId()), folder.toString());
+
+        User user = UserDAO.get().findById(2L);
+        UserDAO.get().initialize(user);
+        FolderHistory transaction = new FolderHistory();
+        transaction.setUser(user);
+
+        folderVO = new Folder();
+        folderVO.setName("yyyy");
+        folderVO.setCreator(user.getUsername());
+        folderVO.setCreatorId(user.getId());
+        folderVO.setTemplate(TemplateDAO.get().findByName("email", Tenant.DEFAULT_ID));
+        folderVO.setValue("to", "test@acme.com");
+
+        folder = testSubject.create(parent, folderVO, false, transaction);
+        testSubject.initialize(folder);
+        assertEquals("yyyy(%d)".formatted(folder.getId()), folder.toString());
+        assertNotNull(folder.getAccessControlEntry(user.getUserGroup().getId()));
     }
 
     @Test
@@ -1720,7 +1738,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testMerge() throws PersistenceException, FileNotFoundException {
+    public void testMerge()
+            throws PersistenceException, FileNotFoundException, InterruptedException, ExecutionException {
         Folder root = testSubject.findById(5L);
         testSubject.createPath(root, "/Default/Target/Pippo", false, null);
         testSubject.createPath(root, "/Default/Target/Pluto", false, null);
@@ -1750,34 +1769,46 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
         docDao.initialize(doc);
         doc = new Document(doc);
+        doc.setCustomId(null);
         doc.setId(0);
         doc.setFolder(testSubject.findByPathExtended("/Default/Target/Pippo", 1L));
         doc.setFileName("doc1.txt");
-        docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+        docManager.create(new FileInputStream("pom.xml"), doc, transaction).getDocument();
 
         doc = new Document(doc);
         doc.setId(0);
+        doc.setCustomId(null);
+        doc.setFolder(testSubject.findByPathExtended("/Default/Source", 1L));
+        doc.setFileName("doc0.txt");
+        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction)).getDocument();
+
+        doc = new Document(doc);
+        doc.setId(0);
+        doc.setCustomId(null);
         doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pippo", 1L));
         doc.setFileName("doc1.txt");
-        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
+        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction)).getDocument();
 
         doc = new Document(doc);
         doc.setId(0);
+        doc.setCustomId(null);
         doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pippo", 1L));
         doc.setFileName("doc2.txt");
-        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
+        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction)).getDocument();
 
         doc = new Document(doc);
         doc.setId(0);
+        doc.setCustomId(null);
         doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pluto/Paperina", 1L));
         doc.setFileName("doc3.txt");
-        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
+        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction)).getDocument();
 
         doc = new Document(doc);
         doc.setId(0);
+        doc.setCustomId(null);
         doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pollo/DEF", 1L));
         doc.setFileName("doc4.txt");
-        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
+        docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction)).getDocument();
 
         Folder target = testSubject.findByPathExtended("/Default/Target", 1L);
         Folder source = testSubject.findByPathExtended("/Default/Source", 1L);
@@ -1798,6 +1829,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
         try {
             testSubject.merge(null, target, fTransaction);
+            fail("No exception in case of null source?");
         } catch (PersistenceException e) {
             // catch exception
         }
@@ -1806,6 +1838,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         assertNotNull(source);
         try {
             testSubject.merge(source, null, fTransaction);
+            fail("No exception in case of null target?");
         } catch (PersistenceException e) {
             // catch exception
         }

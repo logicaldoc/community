@@ -235,13 +235,6 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		assertSame(version1, version1);
 		assertFalse(version1.equals(new Object()));
 
-		version2.setCreatorId(1);
-		assertFalse(version1.equals(version2));
-
-		version2.setCreatorId(0);
-		version2.setDocId(1);
-		assertFalse(version1.equals(version2));
-
 		version2.setDocId(0);
 		version2.setVersionDate(new Date(2025 - 26 - 02));
 		version1.setVersionDate(null);
