@@ -1485,9 +1485,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                 extAttr.setDateValue(null);
             }
         } else if (templateType == GUIAttribute.TYPE_DOUBLE) {
-            extAttr.setValue(Double.parseDouble(attr.getValue().toString()));
+            extAttr.setValue(attr.getValue() != null ? Double.parseDouble(attr.getValue().toString()) : null);
         } else if (templateType == GUIAttribute.TYPE_INT) {
-            extAttr.setValue(Long.parseLong(attr.getValue().toString()));
+            extAttr.setValue(attr.getValue() != null ? Long.parseLong(attr.getValue().toString()) : null);
         } else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
             extAttr.setValue(attr.getBooleanValue());
             extAttr.setType(Attribute.TYPE_BOOLEAN);
@@ -2655,7 +2655,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             Document doc = DocumentManager.get()
                     .create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), toDocument(document), transaction)
                     .getDocument();
-            
+
             return getById(doc.getId());
         } catch (PersistenceException | IOException | ServerException e) {
             return throwServerException(session, log, e);
