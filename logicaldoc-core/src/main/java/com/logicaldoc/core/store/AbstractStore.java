@@ -252,7 +252,7 @@ public abstract class AbstractStore implements Store {
 		File tmpFile = null;
 		StoreResource resource = StoreResource.builder().docId(0L).fileVersion("test").build();
 		try {
-			tmpFile = FileUtil.createTempFile("st-test", ".txt");
+			tmpFile = FileUtil.createTempFile("test", ".txt");
 			FileUtil.writeFile("test", tmpFile.getAbsolutePath());
 			store(tmpFile, resource);
 			return exists(resource);

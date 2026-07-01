@@ -18,95 +18,99 @@ import com.logicaldoc.util.spring.Context;
  */
 public class MockStore extends FSStore {
 
-	private File dummyFile = new File("pom.xml");
+    private File dummyFile = new File("pom.xml");
 
-	private boolean errorOnStore = false;
+    private boolean errorOnStore = false;
 
-	private boolean useDummyFile = false;
+    private boolean useDummyFile = false;
 
-	public boolean isRaiseError() {
-		return errorOnStore;
-	}
+    public MockStore() {
+        storeDefinitions.put("fs", this);
+    }
 
-	public void setErrorOnStore(boolean errorOnStore) {
-		this.errorOnStore = errorOnStore;
-	}
+    public boolean isRaiseError() {
+        return errorOnStore;
+    }
 
-	@Override
-	public void store(File file, StoreResource resource) throws IOException {
-		if (errorOnStore)
-			throw new IOException("error");
-		if (useDummyFile)
-			super.store(dummyFile, resource);
-		else
-			super.store(file, resource);
-	}
+    public void setErrorOnStore(boolean errorOnStore) {
+        this.errorOnStore = errorOnStore;
+    }
 
-	@Override
-	public void store(InputStream stream, StoreResource resource) throws IOException {
-		if (errorOnStore) {
-			stream.close();
-			throw new IOException("error");
-		}
+    @Override
+    public void store(File file, StoreResource resource) throws IOException {
+        if (errorOnStore)
+            throw new IOException("error");
+        if (useDummyFile)
+            super.store(dummyFile, resource);
+        else
+            super.store(file, resource);
+    }
 
-		if (useDummyFile) {
-			stream.close();
-			super.store(new FileInputStream(dummyFile), resource);
-		} else {
-			super.store(stream, resource);
-		}
-	}
+    @Override
+    public void store(InputStream stream, StoreResource resource) throws IOException {
+        if (errorOnStore) {
+            stream.close();
+            throw new IOException("error");
+        }
 
-	@Override
-	public InputStream getStream(StoreResource resource) throws IOException {
-		if (useDummyFile)
-			return new FileInputStream(dummyFile);
-		else
-			return super.getStream(resource);
-	}
+        if (useDummyFile) {
+            stream.close();
+            super.store(new FileInputStream(dummyFile), resource);
+        } else {
+            super.store(stream, resource);
+        }
+    }
 
-	public boolean isUseDummyFile() {
-		return useDummyFile;
-	}
+    @Override
+    public InputStream getStream(StoreResource resource) throws IOException {
+        if (useDummyFile)
+            return new FileInputStream(dummyFile);
+        else
+            return super.getStream(resource);
+    }
 
-	public void setUseDummyFile(boolean useDummyFile) {
-		this.useDummyFile = useDummyFile;
-	}
+    public boolean isUseDummyFile() {
+        return useDummyFile;
+    }
 
-	@Override
-	public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
+    public void setUseDummyFile(boolean useDummyFile) {
+        this.useDummyFile = useDummyFile;
+    }
 
-		String targetRoot = Context.get().getConfig().getProperty("store." + targetStoreId + ".dir");
+    @Override
+    public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
 
-		int moved = 0;
+        String targetRoot = Context.get().getConfig().getProperty("store." + targetStoreId + ".dir");
 
-		// List the resources
-		List<StoreResource> resources = listResources(docId, null);
+        int moved = 0;
 
-		for (StoreResource resource : resources) {
-			File sourceFile = new File(getContainer(resource.getDocId()), resource.name());
+        // List the resources
+        List<StoreResource> resources = listResources(docId, null);
 
-			File targetFile = new File(targetRoot);
-			targetFile = new File(targetFile, computeRelativePath(docId));
-			targetFile = new File(targetFile, resource.name());
-			targetFile.getParentFile().mkdirs();
+        for (StoreResource resource : resources) {
+            File sourceFile = new File(getContainer(resource.getDocId()), resource.name());
 
-			// Extract the original file into a temporary location
-			writeToFile(resource, targetFile);
-			moved++;
+            File targetFile = new File(targetRoot);
+            targetFile = new File(targetFile, computeRelativePath(docId));
+            targetFile = new File(targetFile, resource.name());
+            targetFile.getParentFile().mkdirs();
 
-			// Delete the original resource
-			FileUtil.delete(sourceFile);
-		}
+            // Extract the original file into a temporary location
+            writeToFile(resource, targetFile);
+            moved++;
 
-		return moved;
-	}
+            // Delete the original resource
+            FileUtil.delete(sourceFile);
+        }
 
-	public File getDummyFile() {
-		return dummyFile;
-	}
+        return moved;
+    }
 
-	public void setDummyFile(File dummyFile) {
-		this.dummyFile = dummyFile;
-	}
+    public File getDummyFile() {
+        return dummyFile;
+    }
+
+    public void setDummyFile(File dummyFile) {
+        this.dummyFile = dummyFile;
+    }
 }

@@ -1491,12 +1491,16 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         } else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
             extAttr.setValue(attr.getBooleanValue());
             extAttr.setType(Attribute.TYPE_BOOLEAN);
-        } else if (templateType == GUIAttribute.TYPE_USER || templateType == GUIAttribute.TYPE_FOLDER
-                || templateType == GUIAttribute.TYPE_DOCUMENT) {
+        } else if (isComplexType(templateType)) {
             extAttr.setIntValue(attr.getIntValue());
             extAttr.setStringValue(attr.getStringValue());
             extAttr.setType(templateType);
         }
+    }
+
+    private static boolean isComplexType(int attributeType) {
+        return attributeType == GUIAttribute.TYPE_USER || attributeType == GUIAttribute.TYPE_FOLDER
+                || attributeType == GUIAttribute.TYPE_DOCUMENT;
     }
 
     @Override

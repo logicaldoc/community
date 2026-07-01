@@ -96,4 +96,7 @@
 		destroy-method="destroy">
 		<property name="waitForJobsToCompleteOnShutdown" value="true" />
 	</bean>
+	
+	<bean id="httpFirewall"
+		  class="org.springframework.security.web.firewall.StrictHttpFirewall" />
 </beans>

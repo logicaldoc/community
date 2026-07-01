@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.2
- * 
  */
 public class HttpFirewall extends StrictHttpFirewall {
 

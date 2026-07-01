@@ -34,439 +34,446 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class ContextProperties extends OrderedProperties {
 
-	public static final String LD_CONFIG = "ld.config";
+    public static final String LD_CONFIG = "ld.config";
 
-	private static final String UTF_8 = "UTF-8";
+    private static final String UTF_8 = "UTF-8";
 
-	private static final String BASE64_PREFIX = "_b64_";
+    private static final String BASE64_PREFIX = "_b64_";
 
-	private static final String UNABLE_TO_READ_FROM = "Unable to read from %s";
+    private static final String UNABLE_TO_READ_FROM = "Unable to read from %s";
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/** this points to an ordinary file */
-	private File file;
+    /** this points to an ordinary file */
+    private File file;
 
-	private File overrideFile;
+    private File overrideFile;
 
-	private static final Logger log = LoggerFactory.getLogger(ContextProperties.class);
+    private static final Logger log = LoggerFactory.getLogger(ContextProperties.class);
 
-	protected int maxBackups = 10;
+    protected int maxBackups = 10;
 
-	public ContextProperties(int maxBackups) throws IOException {
-		this();
-		this.maxBackups = maxBackups;
-	}
+    public ContextProperties(int maxBackups) throws IOException {
+        this();
+        this.maxBackups = maxBackups;
+    }
 
-	public ContextProperties() throws IOException {
-		String config = StringUtils.defaultString(System.getProperty(LD_CONFIG), "context.properties");
-		if (log.isDebugEnabled())
-			log.debug("Take configuration from resource {}", config);
-		load(ContextProperties.class.getClassLoader().getResource(config));
-	}
+    public ContextProperties() throws IOException {
+        String config = StringUtils.defaultString(System.getProperty(LD_CONFIG), "context.properties");
+        if (log.isDebugEnabled())
+            log.debug("Take configuration from resource {}", config);
+        load(ContextProperties.class.getClassLoader().getResource(config));
+    }
 
-	public ContextProperties(String filePath) throws IOException {
-		this.file = new File(filePath);
+    public ContextProperties(String filePath) throws IOException {
+        this.file = new File(filePath);
 
-		// If the file does not exist, interpet it as a classpath reference
-		if (!this.file.exists()) {
-			try {
-				if (filePath.startsWith("/"))
-					filePath = filePath.substring(1);
-				URL url = ContextProperties.class.getClassLoader().getResource(filePath);
-				if ("file".equals(url.getProtocol()))
-					this.file = new File(url.getPath());
-			} catch (Exception e) {
-				log.error("Unable to find classpath resource {}", filePath);
-				log.error(e.getMessage(), e);
-			}
-		}
+        // If the file does not exist, interpet it as a classpath reference
+        if (!this.file.exists()) {
+            try {
+                if (filePath.startsWith("/"))
+                    filePath = filePath.substring(1);
+                URL url = ContextProperties.class.getClassLoader().getResource(filePath);
+                if ("file".equals(url.getProtocol()))
+                    this.file = new File(url.getPath());
+            } catch (Exception e) {
+                log.error("Unable to find classpath resource {}", filePath);
+                log.error(e.getMessage(), e);
+            }
+        }
 
-		try (FileInputStream fis = new FileInputStream(this.file)) {
-			load(fis);
-		} catch (IOException e) {
-			throw new IOException(String.format(UNABLE_TO_READ_FROM, filePath), e);
-		}
+        try (FileInputStream fis = new FileInputStream(this.file)) {
+            load(fis);
+        } catch (IOException e) {
+            throw new IOException(String.format(UNABLE_TO_READ_FROM, filePath), e);
+        }
 
-		overrideFile = detectOverrideFile();
-		if (overrideFile != null) {
-			try (FileInputStream fis = new FileInputStream(this.overrideFile)) {
-				load(fis);
-				log.info("Override settings defined in {}", overrideFile.getPath());
-			} catch (IOException e) {
-				throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
-			}
-		}
-	}
+        overrideFile = detectOverrideFile();
+        if (overrideFile != null) {
+            try (FileInputStream fis = new FileInputStream(this.overrideFile)) {
+                load(fis);
+                log.info("Override settings defined in {}", overrideFile.getPath());
+            } catch (IOException e) {
+                throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
+            }
+        }
+    }
 
-	private File detectOverrideFile() {
-		if (file == null || !file.exists())
-			return null;
-		File override = new File(file.getParentFile(),
-				FileUtil.getBaseName(file.getName()) + "-override." + FileUtil.getExtension(file.getName()));
-		return override.exists() ? override : null;
-	}
+    private File detectOverrideFile() {
+        if (file == null || !file.exists())
+            return null;
+        File override = new File(file.getParentFile(),
+                FileUtil.getBaseName(file.getName()) + "-override." + FileUtil.getExtension(file.getName()));
+        return override.exists() ? override : null;
+    }
 
-	public ContextProperties(URL fileUrl) throws IOException {
-		load(fileUrl);
-	}
+    public ContextProperties(URL fileUrl) throws IOException {
+        load(fileUrl);
+    }
 
-	/**
-	 * Loads the file from the given URL
-	 */
-	private void load(URL fileUrl) throws IOException {
-		try {
-			file = new File(URLDecoder.decode(fileUrl.getPath(), UTF_8));
-		} catch (Exception e) {
-			throw new IOException(String.format(UNABLE_TO_READ_FROM, file.getPath()), e);
-		}
-		try (FileInputStream fis = new FileInputStream(file)) {
-			load(fis);
-		} catch (IOException e) {
-			throw new IOException(String.format(UNABLE_TO_READ_FROM, file.getPath()), e);
-		}
+    /**
+     * Loads the file from the given URL
+     */
+    private void load(URL fileUrl) throws IOException {
+        try {
+            file = new File(URLDecoder.decode(fileUrl.getPath(), UTF_8));
+        } catch (Exception e) {
+            throw new IOException(String.format(UNABLE_TO_READ_FROM, file.getPath()), e);
+        }
+        try (FileInputStream fis = new FileInputStream(file)) {
+            load(fis);
+        } catch (IOException e) {
+            throw new IOException(String.format(UNABLE_TO_READ_FROM, file.getPath()), e);
+        }
 
-		overrideFile = detectOverrideFile();
-		if (overrideFile != null) {
-			try (FileInputStream fis = new FileInputStream(overrideFile)) {
-				load(fis);
-				log.debug("Override settings defined in {}", overrideFile.getPath());
-			} catch (IOException e) {
-				throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
-			}
-		}
-	}
+        overrideFile = detectOverrideFile();
+        if (overrideFile != null) {
+            try (FileInputStream fis = new FileInputStream(overrideFile)) {
+                load(fis);
+                log.debug("Override settings defined in {}", overrideFile.getPath());
+            } catch (IOException e) {
+                throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
+            }
+        }
+    }
 
-	public ContextProperties(File file) throws IOException {
-		try {
-			this.file = file;
-			FileUtils.touch(file);
-			try (FileInputStream fis = new FileInputStream(file)) {
-				load(fis);
-			}
-		} catch (IOException e) {
-			throw new IOException("Unable to read from " + file.getPath(), e);
-		}
+    public ContextProperties(File file) throws IOException {
+        try {
+            this.file = file;
+            FileUtils.touch(file);
+            try (FileInputStream fis = new FileInputStream(file)) {
+                load(fis);
+            }
+        } catch (IOException e) {
+            throw new IOException("Unable to read from " + file.getPath(), e);
+        }
 
-		overrideFile = detectOverrideFile();
-		if (overrideFile != null) {
-			try (FileInputStream fis = new FileInputStream(overrideFile)) {
-				load(fis);
-			} catch (IOException e) {
-				throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
-			}
-		}
-	}
+        overrideFile = detectOverrideFile();
+        if (overrideFile != null) {
+            try (FileInputStream fis = new FileInputStream(overrideFile)) {
+                load(fis);
+            } catch (IOException e) {
+                throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
+            }
+        }
+    }
 
-	/**
-	 * Creates new XMLBean from an input stream; XMLBean is read-only!!!
-	 *
-	 * @param is the stream that represents the XML to parse
-	 * 
-	 * @throws IOException raised when the stream cannot be read
-	 */
-	public ContextProperties(InputStream is) throws IOException {
-		file = null;
-		overrideFile = null;
-		try {
-			load(is);
-		} catch (IOException e) {
-			throw new IOException("Unable to read from stream", e);
-		}
-	}
+    /**
+     * Creates new XMLBean from an input stream; XMLBean is read-only!!!
+     *
+     * @param is the stream that represents the XML to parse
+     * 
+     * @throws IOException raised when the stream cannot be read
+     */
+    public ContextProperties(InputStream is) throws IOException {
+        file = null;
+        overrideFile = null;
+        try {
+            load(is);
+        } catch (IOException e) {
+            throw new IOException("Unable to read from stream", e);
+        }
+    }
 
-	/**
-	 * This method saves the properties-file connected by ContextProperties.<br>
-	 * <b>NOTE:</b> only call this on an ContextProperties _NOT_ created from an
-	 * InputStream!
-	 * 
-	 * @throws IOException raised when the file cannot be written
-	 */
-	public synchronized void write() throws IOException {
-		checkFile();
-		backup();
+    /**
+     * This method saves the properties-file connected by ContextProperties.<br>
+     * <b>NOTE:</b> only call this on an ContextProperties _NOT_ created from an
+     * InputStream!
+     * 
+     * @throws IOException raised when the file cannot be written
+     */
+    public synchronized void write() throws IOException {
+        checkFile();
+        backup();
 
-		File tmpFile = new File(file.getParentFile(), file.getName() + ".tmp");
+        File tmpFile = new File(file.getParentFile(), file.getName() + ".tmp");
 
-		try {
-			Files.deleteIfExists(tmpFile.toPath());
-			Files.createFile(tmpFile.toPath());
+        try {
+            Files.deleteIfExists(tmpFile.toPath());
+            Files.createFile(tmpFile.toPath());
 
-			try (FileOutputStream fos = new FileOutputStream(tmpFile);) {
-				store(fos, "");
-				log.info("Saved settings into temp file {}", tmpFile.getAbsolutePath());
-			}
+            try (FileOutputStream fos = new FileOutputStream(tmpFile);) {
+                store(fos, "");
+                log.info("Saved settings into temp file {}", tmpFile.getAbsolutePath());
+            }
 
-			FileUtil.moveQuitely(tmpFile, file);
-		} finally {
-			FileUtil.delete(tmpFile);
-		}
-	}
+            FileUtil.moveQuitely(tmpFile, file);
+        } finally {
+            FileUtil.delete(tmpFile);
+        }
+    }
 
-	private void checkFile() throws IOException {
-		// it might be that we do not have an ordinary file,
-		// so we can't write to it
-		if (file == null)
-			throw new IOException("File not given");
-	}
+    private void checkFile() throws IOException {
+        // it might be that we do not have an ordinary file,
+        // so we can't write to it
+        if (file == null)
+            throw new IOException("File not given");
+    }
 
-	/**
-	 * Makes a daily backup of the actual file. Up to <code>maxBackups</code>
-	 * are maintained.
-	 */
-	protected void backup() throws IOException {
-		if (maxBackups < 1)
-			return;
+    /**
+     * Makes a daily backup of the actual file. Up to <code>maxBackups</code>
+     * are maintained.
+     */
+    protected void backup() throws IOException {
+        if (maxBackups < 1)
+            return;
 
-		checkFile();
+        checkFile();
 
-		// Backup the file first
-		final File parent = file.getParentFile();
+        // Backup the file first
+        final File parent = file.getParentFile();
 
-		/*
-		 * Save the daily backup
-		 */
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String today = df.format(new Date());
-		File backup = new File(parent, file.getName() + "." + today);
-		if (!backup.exists()) {
-			FileUtils.copyFile(file, backup);
-			log.debug("Backup saved in {}", backup.getPath());
-		}
+        /*
+         * Save the daily backup
+         */
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+        String today = df.format(new Date());
+        File backup = new File(parent, file.getName() + "." + today);
+        if (!backup.exists()) {
+            FileUtils.copyFile(file, backup);
+            log.debug("Backup saved in {}", backup.getPath());
+        }
 
-		/*
-		 * Delete the oldest backups
-		 */
-		deleteOldestBackups();
-	}
+        /*
+         * Delete the oldest backups
+         */
+        deleteOldestBackups();
+    }
 
-	private void deleteOldestBackups() throws IOException {
-		List<File> oldBackups = getBackups();
-		if (oldBackups.size() > maxBackups) {
-			List<File> backupsToRetain = oldBackups.stream().limit(maxBackups).toList();
-			for (File backupFile : oldBackups)
-				if (!backupsToRetain.contains(backupFile))
-					FileUtil.delete(backupFile);
-		}
-	}
+    private void deleteOldestBackups() throws IOException {
+        List<File> oldBackups = getBackups();
+        if (oldBackups.size() > maxBackups) {
+            List<File> backupsToRetain = oldBackups.stream().limit(maxBackups).toList();
+            for (File backupFile : oldBackups)
+                if (!backupsToRetain.contains(backupFile))
+                    FileUtil.delete(backupFile);
+        }
+    }
 
-	public List<File> getBackups() throws IOException {
-		checkFile();
+    public List<File> getBackups() throws IOException {
+        checkFile();
 
-		File[] oldBackups = file.getParentFile().listFiles((dir, name) -> name.startsWith(file.getName() + ".")
-				&& name.substring(name.lastIndexOf('.') + 1).length() == 8);
+        File[] oldBackups = file.getParentFile().listFiles((dir, name) -> name.startsWith(file.getName() + ".")
+                && name.substring(name.lastIndexOf('.') + 1).length() == 8);
 
-		// Sort old backup by descending date
-		Arrays.sort(oldBackups, (f1, f2) -> {
-			String date1 = f1.getName().substring(f1.getName().lastIndexOf('.') + 1);
-			String date2 = f2.getName().substring(f2.getName().lastIndexOf('.') + 1);
-			return date2.compareTo(date1);
-		});
+        // Sort old backup by descending date
+        Arrays.sort(oldBackups, (f1, f2) -> {
+            String date1 = f1.getName().substring(f1.getName().lastIndexOf('.') + 1);
+            String date2 = f2.getName().substring(f2.getName().lastIndexOf('.') + 1);
+            return date2.compareTo(date1);
+        });
 
-		return Arrays.asList(oldBackups);
-	}
+        return Arrays.asList(oldBackups);
+    }
 
-	public String getString(String property) {
-		return getString(property, null);
-	}
+    public String getString(String property) {
+        return getString(property, null);
+    }
 
-	public String getString(String property, String defaultValue) {
-		String value = getProperty(property, defaultValue);
-		if (value.startsWith(BASE64_PREFIX))
-			value = new String(Base64.getDecoder().decode(value.substring(BASE64_PREFIX.length())),
-					StandardCharsets.UTF_8);
-		return StrSubstitutor.replaceSystemProperties(value);
-	}
+    public String getString(String property, String defaultValue) {
+        String value = getProperty(property, defaultValue);
+        if (value == null)
+            return null;
 
-	public int getInt(String property) {
-		return getInt(property, 0);
-	}
+        if (value.startsWith(BASE64_PREFIX))
+            value = new String(Base64.getDecoder().decode(value.substring(BASE64_PREFIX.length())),
+                    StandardCharsets.UTF_8);
+        return StrSubstitutor.replaceSystemProperties(value);
+    }
 
-	public int getInt(String property, int defaultValue) {
-		String v = getProperty(property);
-		if (v == null || v.trim().isEmpty())
-			return defaultValue;
-		else
-			return Integer.parseInt(v.trim());
-	}
+    public int getInt(String property) {
+        return getInt(property, 0);
+    }
 
-	public long getLong(String property) {
-		return getLong(property, 0);
-	}
+    public int getInt(String property, int defaultValue) {
+        String v = getProperty(property);
+        if (v == null || v.trim().isEmpty())
+            return defaultValue;
+        else
+            return Integer.parseInt(v.trim());
+    }
 
-	public long getLong(String property, long defaultValue) {
-		String v = getProperty(property);
-		if (v == null || v.trim().isEmpty())
-			return defaultValue;
-		else
-			return Long.parseLong(v.trim());
-	}
+    public long getLong(String property) {
+        return getLong(property, 0);
+    }
 
-	public boolean getBoolean(String property) {
-		return getBoolean(property, false);
-	}
+    public long getLong(String property, long defaultValue) {
+        String v = getProperty(property);
+        if (v == null || v.trim().isEmpty())
+            return defaultValue;
+        else
+            return Long.parseLong(v.trim());
+    }
 
-	public boolean getBoolean(String property, boolean defaultValue) {
-		String v = getProperty(property, Boolean.toString(defaultValue)).trim();
-		return "true".equals(v) || "yes".equals(v) || "1".equals(v);
-	}
+    public boolean getBoolean(String property) {
+        return getBoolean(property, false);
+    }
 
-	public double getDouble(String property) {
-		return getDouble(property, 0D);
-	}
+    public boolean getBoolean(String property, boolean defaultValue) {
+        String v = getProperty(property, Boolean.toString(defaultValue)).trim();
+        return "true".equals(v) || "yes".equals(v) || "1".equals(v);
+    }
 
-	public double getDouble(String property, double defaultValue) {
-		String v = getProperty(property);
-		if (v == null || v.trim().isEmpty())
-			return defaultValue;
-		else
-			return Double.parseDouble(v.trim());
-	}
+    public double getDouble(String property) {
+        return getDouble(property, 0D);
+    }
 
-	public float getFloat(String property) {
-		return getFloat(property, 0F);
-	}
+    public double getDouble(String property, double defaultValue) {
+        String v = getProperty(property);
+        if (v == null || v.trim().isEmpty())
+            return defaultValue;
+        else
+            return Double.parseDouble(v.trim());
+    }
 
-	public float getFloat(String property, float defaultValue) {
-		String v = getProperty(property);
-		if (v == null || v.trim().isEmpty())
-			return defaultValue;
-		else
-			return Float.parseFloat(v.trim());
-	}
+    public float getFloat(String property) {
+        return getFloat(property, 0F);
+    }
 
-	@Override
-	public synchronized Object setProperty(String key, String value) {
-		if (value.contains("\n"))
-			value = BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
-		return super.setProperty(key, value);
-	}
+    public float getFloat(String property, float defaultValue) {
+        String v = getProperty(property);
+        if (v == null || v.trim().isEmpty())
+            return defaultValue;
+        else
+            return Float.parseFloat(v.trim());
+    }
 
-	/**
-	 * Same as setProperty but the value gets encoded Base64 first
-	 * 
-	 * @param key name of the setting
-	 * @param value value of the setting
-	 * 
-	 * @return created value
-	 */
-	public synchronized Object setPropertyEncoded(String key, String value) {
-		return super.setProperty(key,
-				BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8)));
-	}
+    @Override
+    public synchronized Object setProperty(String key, String value) {
+        if (value.contains("\n"))
+            value = BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+        return super.setProperty(key, value);
+    }
 
-	/**
-	 * Gets the property value replacing all variable references
-	 * 
-	 * @param property name of the setting to process
-	 * 
-	 * @return the porperty's value with expanded variables
-	 */
-	@Override
-	public String getProperty(String property) {
-		String value = super.getProperty(property);
-		return StrSubstitutor.replaceSystemProperties(value);
-	}
+    /**
+     * Same as setProperty but the value gets encoded Base64 first
+     * 
+     * @param key name of the setting
+     * @param value value of the setting
+     * 
+     * @return created value
+     */
+    public synchronized Object setPropertyEncoded(String key, String value) {
+        return super.setProperty(key,
+                BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8)));
+    }
 
-	/**
-	 * Gets the property value replacing all variable references
-	 * 
-	 * @param property name of the setting to process
-	 * @param defaultValue default value returned in case of absence of property
-	 * 
-	 * @return the porperty's value with expanded variables
-	 */
-	@Override
-	public String getProperty(String property, String defaultValue) {
-		String value = super.getProperty(property, defaultValue);
-		return StrSubstitutor.replaceSystemProperties(value);
-	}
+    /**
+     * Gets the property value replacing all variable references
+     * 
+     * @param property name of the setting to process
+     * 
+     * @return the porperty's value with expanded variables
+     */
+    @Override
+    public String getProperty(String property) {
+        String value = super.getProperty(property);
+        return StrSubstitutor.replaceSystemProperties(value);
+    }
 
-	public int getMaxBackups() {
-		return maxBackups;
-	}
+    /**
+     * Gets the property value replacing all variable references
+     * 
+     * @param property name of the setting to process
+     * @param defaultValue default value returned in case of absence of property
+     * 
+     * @return the porperty's value with expanded variables
+     */
+    @Override
+    public String getProperty(String property, String defaultValue) {
+        String value = super.getProperty(property, defaultValue);
+        return StrSubstitutor.replaceSystemProperties(value);
+    }
 
-	public void setMaxBackups(int maxBackups) {
-		this.maxBackups = maxBackups;
-	}
+    public int getMaxBackups() {
+        return maxBackups;
+    }
 
-	public String getTenantProperty(String tenant, String property) {
-		String key = tenant + "." + property;
-		if (containsKey(key))
-			return getProperty(key);
-		else
-			return getProperty(property);
-	}
+    public void setMaxBackups(int maxBackups) {
+        this.maxBackups = maxBackups;
+    }
 
-	public Map<String, String> getTenantProperties(String tenant) {
-		return getProperties(tenant + ".");
-	}
+    public String getTenantProperty(String tenant, String property, String defaultValue) {
+        String key = "%s.%s".formatted(tenant, property);
+        if (containsKey(key))
+            return StringUtils.defaultIfEmpty(getProperty(key), defaultValue);
+        else
+            return getProperty(property, defaultValue);
+    }
 
-	/**
-	 * Gets all the properties whose name starts with the given prefix.
-	 * 
-	 * @param prefix property's prefix
-	 * 
-	 * @return the map property_name = property_value
-	 */
-	public Map<String, String> getProperties(String prefix) {
-		Map<String, String> props = new HashMap<>();
-		for (Object key : keySet()) {
-			String prop = key.toString();
-			if (prop.startsWith(prefix))
-				props.put(prop.substring(prefix.length()), getProperty(prop));
-		}
-		return props;
-	}
+    public String getTenantProperty(String tenant, String property) {
+        return getTenantProperty(tenant, property, null);
+    }
 
-	/**
-	 * Gets all the keys whose name starts with the given prefix.
-	 * 
-	 * @param prefix property's prefix
-	 */
-	public List<String> getKeys(String prefix) {
-		return getKeys().stream().filter(k -> k.startsWith(prefix)).toList();
-	}
-	
-	/**
-	 * Removes all the properties of a specific tenant
-	 * 
-	 * @param tenant name of the tenant
-	 */
-	public void removeTenantProperties(String tenant) {
-		if ("default".equals(tenant))
-			return;
-		List<String> toBeDeleted = new ArrayList<>();
-		for (Object key : keySet()) {
-			String prop = key.toString();
-			if (prop.startsWith(tenant + "."))
-				toBeDeleted.add(prop);
-		}
-		for (String prop : toBeDeleted)
-			remove(prop);
-	}
+    public Map<String, String> getTenantProperties(String tenant) {
+        return getProperties("%s.".formatted(tenant));
+    }
 
-	/**
-	 * Replicates the settings of the default tenant to a new tenant
-	 * 
-	 * @param tenant name of the tenant
-	 */
-	public void replicateTenantSettings(String tenant) {
-		Map<String, String> defaultProps = getTenantProperties("default");
-		for (String prop : defaultProps.keySet()) {
-			String tenantProp = tenant + "." + prop;
-			if (!containsKey(tenantProp))
-				setProperty(tenantProp, getProperty("default." + prop));
-		}
-	}
+    /**
+     * Gets all the properties whose name starts with the given prefix.
+     * 
+     * @param prefix property's prefix
+     * 
+     * @return the map property_name = property_value
+     */
+    public Map<String, String> getProperties(String prefix) {
+        Map<String, String> props = new HashMap<>();
+        for (Object key : keySet()) {
+            String prop = key.toString();
+            if (prop.startsWith(prefix))
+                props.put(prop.substring(prefix.length()), getProperty(prop));
+        }
+        return props;
+    }
 
-	@Override
-	public synchronized boolean equals(Object other) {
-		return super.equals(other);
-	}
+    /**
+     * Gets all the keys whose name starts with the given prefix.
+     * 
+     * @param prefix property's prefix
+     */
+    public List<String> getKeys(String prefix) {
+        return getKeys().stream().filter(k -> k.startsWith(prefix)).toList();
+    }
 
-	@Override
-	public synchronized int hashCode() {
-		return super.hashCode();
-	}
+    /**
+     * Removes all the properties of a specific tenant
+     * 
+     * @param tenant name of the tenant
+     */
+    public void removeTenantProperties(String tenant) {
+        if ("default".equals(tenant))
+            return;
+        List<String> toBeDeleted = new ArrayList<>();
+        for (Object key : keySet()) {
+            String prop = key.toString();
+            if (prop.startsWith(tenant + "."))
+                toBeDeleted.add(prop);
+        }
+        for (String prop : toBeDeleted)
+            remove(prop);
+    }
+
+    /**
+     * Replicates the settings of the default tenant to a new tenant
+     * 
+     * @param tenant name of the tenant
+     */
+    public void replicateTenantSettings(String tenant) {
+        Map<String, String> defaultProps = getTenantProperties("default");
+        for (String prop : defaultProps.keySet()) {
+            String tenantProp = tenant + "." + prop;
+            if (!containsKey(tenantProp))
+                setProperty(tenantProp, getProperty("default." + prop));
+        }
+    }
+
+    @Override
+    public synchronized boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public synchronized int hashCode() {
+        return super.hashCode();
+    }
 }

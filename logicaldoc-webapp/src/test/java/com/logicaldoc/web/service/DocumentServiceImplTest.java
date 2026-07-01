@@ -258,6 +258,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         List<String> errors = testSubject.setTicketPassword(t.getId(), "abc");
         assertFalse(errors.isEmpty());
         errors = testSubject.setTicketPassword(t.getId(), PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 1));
+        assertTrue(errors.isEmpty());
     }
 
     @Test

@@ -11,7 +11,7 @@ import com.logicaldoc.util.junit.AbstractTestCase;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
-public abstract class AbstractDropBoxTestCase extends AbstractTestCase {
+public abstract class AbstractDropboxTestCase extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
