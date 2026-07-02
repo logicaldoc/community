@@ -61,7 +61,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 
 		// Load an existing menu and modify it
 		menu = testSubject.findById(9);
-		assertEquals("security", menu.getName());
+		assertEquals("accesscontrol", menu.getName());
 
 		testSubject.store(menu);
 
@@ -172,7 +172,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	public void testFindByParentId() {
 		List<Menu> menus = testSubject.findByParentId(2, false);
 		assertNotNull(menus);
-		assertEquals(37, menus.size());
+		assertEquals(40, menus.size());
 
 		// Try with non-existent parent
 		menus = testSubject.findByParentId(999, false);

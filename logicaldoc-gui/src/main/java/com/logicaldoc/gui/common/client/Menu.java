@@ -75,7 +75,7 @@ public class Menu {
 
 	public static final long FORMS = 1550;
 
-	public static final long SECURITY = 9;
+	public static final long ACCESS_CONTROL = 9;
 
 	public static final long CLIENTS = 3;
 
@@ -234,7 +234,15 @@ public class Menu {
 	public static final long FILLERS = 3030;
 
     public static final long WHATSAPP = -2150;
-	
+    
+    public static final long ANTIVIRUS = 1895;
+    
+    public static final long SECURITY = 1896;
+    
+    public static final long USERS = 1897;
+    
+    public static final long GROUPS = 1898;
+    
 	private static Set<Long> menus = new HashSet<>();
 
 	private Menu() {

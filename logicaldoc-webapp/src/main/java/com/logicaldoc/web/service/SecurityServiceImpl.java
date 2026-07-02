@@ -337,7 +337,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
              */
             MenuDAO mDao = MenuDAO.get();
             if (currentUser != null && currentUser.getId() != userId
-                    && !mDao.isReadAllowed(Menu.SECURITY, currentUser.getId()))
+                    && !mDao.isReadAllowed(Menu.ACCESS_CONTROL, currentUser.getId()))
                 throw new PermissionException(String.format("User %s not allowed to change the password of user %s",
                         currentUser.getUsername(), user.getUsername()));
 
@@ -395,8 +395,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public void addUserToGroup(long groupId, long userId) throws ServerException {
-        checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         UserDAO userDao = UserDAO.get();
         try {
@@ -411,7 +411,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public void deleteGroup(long groupId) throws ServerException {
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         UserDAO userDao = UserDAO.get();
         GroupDAO groupDao = GroupDAO.get();
@@ -431,7 +431,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public void deleteUser(long userId) throws ServerException {
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
         UserDAO userDao = UserDAO.get();
 
         // Create the user history event
@@ -449,7 +449,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public GUIGroup getGroup(long groupId) throws ServerException {
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         validateSession();
 
@@ -789,7 +789,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     private void disallowEditingOfOtherUsers(GUIUser guiUser, Session session)
             throws InvalidSessionServerException, AccessDeniedException {
         if (guiUser.getId() != session.getUserId() && getThreadLocalRequest() != null)
-            checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+            checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
     }
 
     private void setGroups(User user, GUIUser guiUser, UserHistory transaction) throws PersistenceException {
@@ -947,7 +947,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         // Disallow the editing of other users if you do not have access to
         // the Security
         if (guiUser.getId() != session.getUserId())
-            checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+            checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         try {
             User user = userDao.findById(guiUser.getId());
@@ -1004,7 +1004,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         // Disallow the editing of other users if you do not have access to
         // the Security
         if (user.getId() != session.getUserId())
-            checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+            checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         try {
             User usr = userDao.findById(user.getId());
@@ -1043,7 +1043,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public GUISecuritySettings loadSettings() throws ServerException {
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         GUISecuritySettings securitySettings = new GUISecuritySettings();
 
@@ -1106,7 +1106,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public boolean saveSettings(GUISecuritySettings settings) throws ServerException {
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         boolean restartRequired = false;
 
@@ -1186,7 +1186,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     private void saveACL(Session session, Menu menu, List<GUIAccessControlEntry> aces)
             throws PermissionException, PersistenceException {
         MenuDAO mdao = MenuDAO.get();
-        if (!mdao.isReadAllowed(Menu.SECURITY, session.getUserId()))
+        if (!mdao.isReadAllowed(Menu.ACCESS_CONTROL, session.getUserId()))
             throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
 
         GroupDAO gdao = GroupDAO.get();
@@ -1219,7 +1219,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public void saveACL(GUIMenu menu) throws ServerException {
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
         MenuDAO mdao = MenuDAO.get();
         try {
             saveACL(session, mdao.findById(menu.getId()), menu.getAccessControlList());
@@ -1684,8 +1684,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     @Override
     public void changeStatus(long userId, boolean enabled) throws ServerException {
-        checkMenu(getThreadLocalRequest(), Menu.SECURITY);
-        Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+        checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
+        Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         UserDAO userDao = UserDAO.get();
         try {

@@ -407,7 +407,17 @@ values     (2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'administration',1,'menu.png
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (9,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'security',2,'menu.png',1,1,1,20,1);
+values     (9,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'accesscontrol',2,'menu.png',1,1,1,20,1);
+
+insert into ld_menu 
+            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values      (1896,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'security',9,'security.png',1,1,1,9,1);
+
+insert into ld_menu (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values (1897,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'users',9,'users.png',1,1,1,8,1);
+
+insert into ld_menu (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values (1898,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'groups',9,'groups.png',1,1,1,7,1);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
@@ -495,7 +505,7 @@ values     (80,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'system',2,'system.png',1,1
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (90,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'reports',2,'reports.png',1,1,1,50,1);
+values     (90,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'reports',2,'reports.png',1,1,1,48,1);
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)

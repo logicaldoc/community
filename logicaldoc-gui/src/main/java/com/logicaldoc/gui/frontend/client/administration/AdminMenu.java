@@ -7,7 +7,7 @@ import com.logicaldoc.gui.frontend.client.ai.AIMenu;
 import com.logicaldoc.gui.frontend.client.impex.ImpexMenu;
 import com.logicaldoc.gui.frontend.client.metadata.MetadataMenu;
 import com.logicaldoc.gui.frontend.client.reports.ReportsMenu;
-import com.logicaldoc.gui.frontend.client.security.SecurityMenu;
+import com.logicaldoc.gui.frontend.client.security.AccessControlMenu;
 import com.logicaldoc.gui.frontend.client.settings.SettingsMenu;
 import com.logicaldoc.gui.frontend.client.system.SystemMenu;
 import com.smartgwt.client.types.VisibilityMode;
@@ -41,11 +41,11 @@ public class AdminMenu extends SectionStack {
 		if (Menu.enabled(Menu.SYSTEM))
 			addSection(systemSection);
 
-		SectionStackSection securitySection = new SectionStackSection(I18N.message("security"));
-		securitySection.setExpanded(false);
-		securitySection.addItem(new SecurityMenu());
-		if (Menu.enabled(Menu.SECURITY))
-			addSection(securitySection);
+		SectionStackSection accessControlSection = new SectionStackSection(I18N.message("accesscontrol"));
+		accessControlSection.setExpanded(false);
+		accessControlSection.addItem(new AccessControlMenu());
+		if (Menu.enabled(Menu.ACCESS_CONTROL))
+			addSection(accessControlSection);
 
 		if ((Feature.visible(Feature.TEMPLATE) || Feature.visible(Feature.WORKFLOW)
 				|| Feature.visible(Feature.TAGS_ADMIN)) && Menu.enabled(Menu.METADATA)) {
