@@ -22,7 +22,6 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
-import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -35,7 +34,6 @@ import jakarta.transaction.Transactional;
 @Repository("systemMessageDAO")
 @Transactional
 public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<SystemMessage> implements SystemMessageDAO {
-    private static final String SELECT = "select ld_lastmodified, ld_author, ld_messagetext, ld_subject, ld_sentdate, ld_datescope, ld_prio, ld_confirmation, ld_lastnotified, ld_status, ld_trials, ld_type, ld_id, ld_html, ld_author, ld_tenantid ";
 
     public class SystemMessageMapper implements RowMapper<SystemMessage> {
 
@@ -70,24 +68,43 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
     @Override
     public List<SystemMessage> findByRecipient(String recipient, Message.Type type, Integer read)
             throws PersistenceException {
-        String sql = SELECT
-                + " from ld_systemmessage where ld_deleted = 0 and ld_type = :type and exists (select Q.ld_messageid from ld_recipient Q where Q.ld_name = '"
-                + SqlUtil.doubleQuotes(recipient) + "' and Q.ld_messageid=ld_id)";
-        if (read != null)
-            sql = sql + " and " + (read == 1 ? "exists" : "not exists")
-                    + "  (select R.ld_messageid from ld_recipient R where R.ld_name = '"
-                    + SqlUtil.doubleQuotes(recipient) + "' and R.ld_read=1 and R.ld_messageid=ld_id)";
-        sql = sql + " order by ld_sentdate desc";
+        StringBuilder sql = new StringBuilder(
+                """
+                select ld_lastmodified, ld_author, ld_messagetext, ld_subject, ld_sentdate,
+                       ld_datescope, ld_prio, ld_confirmation, ld_lastnotified,
+                       ld_status, ld_trials, ld_type, ld_id, ld_html, ld_author, ld_tenantid
+                  from ld_systemmessage
+                  where ld_deleted = 0
+                    and ld_type = :type
+                    and exists (select Q.ld_messageid
+                                  from ld_recipient Q
+                                 where Q.ld_name = :recipient
+                                   and Q.ld_messageid=ld_id)
+                """);
 
-        return query(sql, Map.of("type", type.ordinal()), new SystemMessageMapper(), null);
+        if (read != null) {
+            sql.append(" and %s".formatted(read == 1 ? "exists" : "not exists"));
+            sql.append(
+                    " (select R.ld_messageid from ld_recipient R where R.ld_name = :recipient and R.ld_read = 1 and R.ld_messageid = ld_id)");
+        }
+
+        sql.append(" order by ld_sentdate desc");
+
+        return query(sql.toString(), Map.of("type", type.ordinal(), "recipient", recipient), new SystemMessageMapper(),
+                null);
     }
 
     @Override
     public int getUnreadCount(String recipient, Message.Type type) throws PersistenceException {
-        String sql = "select count(distinct(R.ld_messageid)) from ld_recipient R, ld_systemmessage M "
-                + " where R.ld_name = '" + SqlUtil.doubleQuotes(recipient)
-                + "' and R.ld_messageid=M.ld_id and M.ld_deleted=0 and M.ld_type = :type and R.ld_read=0";
-        return queryForInt(sql, Map.of("type", type.ordinal()));
+        String sql = """
+                     select count(distinct(R.ld_messageid))
+                       from ld_recipient R, ld_systemmessage M
+                      where R.ld_messageid = M.ld_id
+                        and R.ld_name = :recipient
+                        and M.ld_deleted = 0
+                        and M.ld_type = :type and R.ld_read = 0
+                     """;
+        return queryForInt(sql, Map.of("type", type.ordinal(), "recipient", recipient));
     }
 
     @Override
@@ -137,15 +154,31 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 
     @Override
     public List<SystemMessage> findByMode(Recipient.Mode mode) throws PersistenceException {
-        String sql = SELECT
-                + " from ld_systemmessage where ld_deleted = 0 and ld_id IN (select ld_messageid from ld_recipient where ld_mode = :mode) order by ld_sentdate desc";
+        String sql = """
+                       select ld_lastmodified, ld_author, ld_messagetext, ld_subject, ld_sentdate,
+                              ld_datescope, ld_prio, ld_confirmation, ld_lastnotified,
+                              ld_status, ld_trials, ld_type, ld_id, ld_html, ld_author, ld_tenantid
+                         from ld_systemmessage
+                        where ld_deleted = 0
+                          and ld_id IN (select ld_messageid
+                                          from ld_recipient
+                                         where ld_mode = :mode)
+                     order by ld_sentdate desc
+                     """;
         return query(sql, Map.of("mode", mode.name()), new SystemMessageMapper(), null);
     }
 
     @Override
     public List<SystemMessage> findByType(Message.Type type) throws PersistenceException {
-        String sql = SELECT
-                + " from ld_systemmessage where ld_deleted = 0 and ld_type = :type order by ld_sentdate desc";
+        String sql = """
+                       select ld_lastmodified, ld_author, ld_messagetext, ld_subject, ld_sentdate,
+                              ld_datescope, ld_prio, ld_confirmation, ld_lastnotified,
+                              ld_status, ld_trials, ld_type, ld_id, ld_html, ld_author, ld_tenantid
+                         from ld_systemmessage
+                        where ld_deleted = 0
+                          and ld_type = :type
+                     order by ld_sentdate desc
+                     """;
         return query(sql, Map.of("type", type.ordinal()), new SystemMessageMapper(), null);
     }
 
@@ -160,13 +193,22 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 
     @Override
     public List<SystemMessage> findMessagesToBeSent(Message.Type type, int maxTrial) throws PersistenceException {
-        String sql = SELECT + " from ld_systemmessage where ld_deleted = 0 and not ld_status = "
-                + SystemMessage.STATUS_DELIVERED + " and ld_type = :type";
+        StringBuilder sql = new StringBuilder(
+                """
+                 select ld_lastmodified, ld_author, ld_messagetext, ld_subject, ld_sentdate,
+                        ld_datescope, ld_prio, ld_confirmation, ld_lastnotified,
+                        ld_status, ld_trials, ld_type, ld_id, ld_html, ld_author, ld_tenantid
+                   from ld_systemmessage
+                  where ld_deleted = 0
+                and not ld_status = :status
+                    and ld_type = :type
+                """);
         if (maxTrial > 0)
-            sql = sql + " and ld_trials < " + maxTrial;
-        sql = sql + " order by ld_sentdate desc";
+            sql.append(" and ld_trials < %d".formatted(maxTrial));
+        sql.append(" order by ld_sentdate desc");
 
-        return query(sql, Map.of("type", type.ordinal()) ,new SystemMessageMapper(), null);
+        return query(sql.toString(), Map.of("type", type.ordinal(), "status", SystemMessage.STATUS_DELIVERED),
+                new SystemMessageMapper(), null);
     }
 
     @Override

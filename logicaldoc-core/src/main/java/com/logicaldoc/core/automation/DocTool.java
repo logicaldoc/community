@@ -246,7 +246,8 @@ public class DocTool {
             return "0 Bytes";
         final String[] units = new String[] { "Bytes", "KB", "MB", "GB", "TB" };
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+        return "%s %s".formatted(new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)),
+                units[digitGroups]);
     }
 
     /**
@@ -257,9 +258,8 @@ public class DocTool {
      * 
      */
     public void store(Document doc, DocumentHistory transaction) {
-        DocumentDAO docDao = DocumentDAO.get();
         try {
-            docDao.store(doc, transaction);
+            DocumentDAO.get().store(doc, transaction);
         } catch (Exception t) {
             log.error(t.getMessage(), t);
         }

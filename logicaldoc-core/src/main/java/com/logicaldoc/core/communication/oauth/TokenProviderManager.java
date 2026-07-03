@@ -25,58 +25,58 @@ import jakarta.annotation.PostConstruct;
 @Component("tokenProviderManager")
 public class TokenProviderManager {
 
-	private static final Logger log = LoggerFactory.getLogger(TokenProviderManager.class);
+    private static final Logger log = LoggerFactory.getLogger(TokenProviderManager.class);
 
-	/**
-	 * Map of providers, key is the protocol of the provider (microsoft, google
-	 * ...)
-	 */
-	private Map<String, TokenProvider> providers = new HashMap<>();
+    /**
+     * Map of providers, key is the protocol of the provider (microsoft, google
+     * ...)
+     */
+    private Map<String, TokenProvider> providers = new HashMap<>();
 
-	@PostConstruct
-	public synchronized void init() {
-		providers.clear();
+    @PostConstruct
+    public synchronized void init() {
+        providers.clear();
 
-		// Acquire the 'TokenProvider' extensions of the core plugin
-		PluginRegistry registry = PluginRegistry.getInstance();
-		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "TokenProvider");
-		for (Extension ext : exts) {
-			String className = ext.getParameter("class").valueAsString();
-			String protocols = ext.getParameter("protocols").valueAsString().replace(" ", "");
+        // Acquire the 'TokenProvider' extensions of the core plugin
+        PluginRegistry registry = PluginRegistry.getInstance();
+        Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "TokenProvider");
+        for (Extension ext : exts) {
+            String className = ext.getParameter("class").valueAsString();
+            String protocols = ext.getParameter("protocols").valueAsString().replace(" ", "");
 
-			try {
-				Class<?> clazz = Class.forName(className);
-				// Try to instantiate the listener
-				Object provider = clazz.getDeclaredConstructor().newInstance();
-				if (provider instanceof TokenProvider tp) {
-					for (String protocol : List.of(protocols.split(","))) {
-						providers.put(protocol, tp);
-						if (log.isInfoEnabled())
-							log.info("Registered token provider {} for protocol {}", className, protocol);
-					}
-				} else {
-					throw new ClassNotFoundException(
-							"The specified provider " + className + " doesn't implement TokenProvider interface");
-				}
+            try {
+                Class<?> clazz = Class.forName(className);
+                // Try to instantiate the listener
+                Object provider = clazz.getDeclaredConstructor().newInstance();
+                if (provider instanceof TokenProvider tp) {
+                    for (String protocol : List.of(protocols.split(","))) {
+                        providers.put(protocol, tp);
+                        if (log.isInfoEnabled())
+                            log.info("Registered token provider {} for protocol {}", className, protocol);
+                    }
+                } else {
+                    throw new ClassNotFoundException(
+                            "The specified provider %s doesn't implement TokenProvider interface".formatted(className));
+                }
 
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException e) {
-				log.error(e.getMessage());
-			}
-		}
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException e) {
+                log.error(e.getMessage());
+            }
+        }
 
-		initDefault();
-	}
+        initDefault();
+    }
 
-	private void initDefault() {
-		if (!providers.containsKey("smtpmicrosoft365"))
-			providers.put("smtpmicrosoft365", new Microsoft365TokenProvider());
-		if (!providers.containsKey("imapmicrosoft365"))
-			providers.put("imapmicrosoft365", new Microsoft365TokenProvider());
-	}
+    private void initDefault() {
+        if (!providers.containsKey("smtpmicrosoft365"))
+            providers.put("smtpmicrosoft365", new Microsoft365TokenProvider());
+        if (!providers.containsKey("imapmicrosoft365"))
+            providers.put("imapmicrosoft365", new Microsoft365TokenProvider());
+    }
 
-	public TokenProvider getProvider(String key) {
-		initDefault();
-		return providers.get(key);
-	}
+    public TokenProvider getProvider(String key) {
+        initDefault();
+        return providers.get(key);
+    }
 }

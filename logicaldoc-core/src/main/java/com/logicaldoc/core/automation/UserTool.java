@@ -20,108 +20,106 @@ import com.logicaldoc.core.util.UserUtil;
 @AutomationDictionary
 public class UserTool {
 
-	private static final Logger log = LoggerFactory.getLogger(UserTool.class);
+    private static final Logger log = LoggerFactory.getLogger(UserTool.class);
 
-	/**
-	 * Retrieves a user object
-	 * 
-	 * @param username the username
-	 * 
-	 * @return the user object
-	 */
-	public User getUser(String username) {
-		UserDAO userDao = UserDAO.get();
-		try {
-			return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
-					: userDao.findByUsername("_system");
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
+    /**
+     * Retrieves a user object
+     * 
+     * @param username the username
+     * 
+     * @return the user object
+     */
+    public User getUser(String username) {
+        UserDAO userDao = UserDAO.get();
+        try {
+            return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
+                    : userDao.findByUsername("_system");
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
 
-	/**
-	 * Retrieves a user object
-	 * 
-	 * @param userId the user ID
-	 * 
-	 * @return the user object
-	 */
-	public User getUser(long userId) {
-		UserDAO userDao = UserDAO.get();
-		try {
-			return userDao.findById(userId);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
+    /**
+     * Retrieves a user object
+     * 
+     * @param userId the user ID
+     * 
+     * @return the user object
+     */
+    public User getUser(long userId) {
+        UserDAO userDao = UserDAO.get();
+        try {
+            return userDao.findById(userId);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
 
-	/**
-	 * Initializes lazy loaded collections
-	 * 
-	 * @param user the user to initialize
-	 */
-	public void initialize(User user) {
-		UserDAO uDao = UserDAO.get();
-		try {
-			uDao.initialize(user);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+    /**
+     * Initializes lazy loaded collections
+     * 
+     * @param user the user to initialize
+     */
+    public void initialize(User user) {
+        UserDAO uDao = UserDAO.get();
+        try {
+            uDao.initialize(user);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
-	/**
-	 * Generates and retrieves the avatar image for a given user
-	 * 
-	 * @param username username of the user
-	 * 
-	 * @return the avatar in Base64
-	 */
-	public String getAvatar(String username) {
-		try {
-			return UserUtil.getAvatarImage(username);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return "";
-		}
-	}
+    /**
+     * Generates and retrieves the avatar image for a given user
+     * 
+     * @param username username of the user
+     * 
+     * @return the avatar in Base64
+     */
+    public String getAvatar(String username) {
+        try {
+            return UserUtil.getAvatarImage(username);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return "";
+        }
+    }
 
-	/**
-	 * Generates the HTML img tag for displaying an avatar
-	 * 
-	 * @param username username of the user
-	 * @param size image size
-	 * 
-	 * @return the avatar in Base64
-	 */
-	public String getAvatarImg(String username, int size) {
-		try {
-			String content = UserUtil.getAvatarImage(username);
-			return "<img src='" + content + "' style='border: 0px height: " + size + "px; width: "
-					+ size + "px; vertical-align:middle;' />";
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return "";
-		}
-	}
+    /**
+     * Generates the HTML img tag for displaying an avatar
+     * 
+     * @param username username of the user
+     * @param size image size
+     * 
+     * @return the avatar in Base64
+     */
+    public String getAvatarImg(String username, int size) {
+        try {
+            return "<img src='%s' style='border: 0px height: %dpx; width: %dpx; vertical-align:middle;' />"
+                    .formatted(UserUtil.getAvatarImage(username), size, size);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return "";
+        }
+    }
 
-	/**
-	 * Generates the HTML img tag for displaying an avatar
-	 * 
-	 * @param userId identifier of the user
-	 * @param size image size
-	 * 
-	 * @return the avatar in Base64
-	 */
-	public String getAvatarImg(long userId, int size) {
-		try {
-			String content = UserUtil.getAvatarImage("" + userId);
-			return "<img src='" + content + "' style='border: 0px height: " + size + "px; width: "
-					+ size + "px; vertical-align:middle;' />";
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return "";
-		}
-	}
+    /**
+     * Generates the HTML img tag for displaying an avatar
+     * 
+     * @param userId identifier of the user
+     * @param size image size
+     * 
+     * @return the avatar in Base64
+     */
+    public String getAvatarImg(long userId, int size) {
+        try {
+            return "<img src='%s' style='border: 0px height: %dpx; width: %dpx; vertical-align:middle;' />"
+                    .formatted(UserUtil.getAvatarImage(Long.toString(userId)), size, size);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return "";
+        }
+    }
 }
