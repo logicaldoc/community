@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -96,12 +95,9 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.PermissionMappingD
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyBooleanImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyDateTimeImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyDecimalImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyHtmlImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIntegerImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyUriImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.RepositoryCapabilitiesImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.RepositoryInfoImpl;
 import org.apache.chemistry.opencmis.commons.impl.server.ObjectInfoImpl;
@@ -2395,12 +2391,7 @@ public class LDRepository {
             if ((propType.getUpdatability() == Updatability.ONCREATE))
                 throw new CmisConstraintException(String.format(PROPERTY, prop.getId(), "can only be set on create!"));
 
-            // default or value
-            if (isEmptyProperty(prop)) {
-                addPropertyDefault(result, propType);
-            } else {
-                result.addProperty(prop);
-            }
+            result.addProperty(prop);
         }
     }
 
@@ -2432,14 +2423,6 @@ public class LDRepository {
                 folder.setDescription((String) p.getFirstValue());
             }
         }
-    }
-
-    private static boolean isEmptyProperty(PropertyData<?> prop) {
-        if ((prop == null) || (prop.getValues() == null)) {
-            return true;
-        }
-
-        return prop.getValues().isEmpty();
     }
 
     private void addPropertyId(PropertiesImpl props, String typeId, Set<String> filter, String id, String value) {
@@ -2549,71 +2532,6 @@ public class LDRepository {
             return true;
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
-        }
-
-        return false;
-    }
-
-    /**
-     * Adds the default value of property if defined.
-     */
-    @SuppressWarnings("unchecked")
-    private static boolean addPropertyDefault(PropertiesImpl props, PropertyDefinition<?> propDef) {
-        if ((props == null) || (props.getProperties() == null))
-            throw new IllegalArgumentException("Props must not be null!");
-
-        if (propDef == null)
-            return false;
-
-        List<?> defaultValue = propDef.getDefaultValue();
-        if ((defaultValue != null) && (!defaultValue.isEmpty())) {
-            switch (propDef.getPropertyType()) {
-                case BOOLEAN:
-                    PropertyBooleanImpl p = new PropertyBooleanImpl(propDef.getId(), (List<Boolean>) defaultValue);
-                    p.setQueryName(propDef.getId());
-                    props.addProperty(p);
-                    break;
-                case DATETIME:
-                    PropertyDateTimeImpl p1 = new PropertyDateTimeImpl(propDef.getId(),
-                            (List<GregorianCalendar>) defaultValue);
-                    p1.setQueryName(propDef.getId());
-                    props.addProperty(p1);
-                    break;
-                case DECIMAL:
-                    PropertyDecimalImpl p3 = new PropertyDecimalImpl(propDef.getId(), (List<BigDecimal>) defaultValue);
-                    p3.setQueryName(propDef.getId());
-                    props.addProperty(p3);
-                    break;
-                case HTML:
-                    PropertyHtmlImpl p4 = new PropertyHtmlImpl(propDef.getId(), (List<String>) defaultValue);
-                    p4.setQueryName(propDef.getId());
-                    props.addProperty(p4);
-                    break;
-                case ID:
-                    PropertyIdImpl p5 = new PropertyIdImpl(propDef.getId(), (List<String>) defaultValue);
-                    p5.setQueryName(propDef.getId());
-                    props.addProperty(p5);
-                    break;
-                case INTEGER:
-                    PropertyIntegerImpl p6 = new PropertyIntegerImpl(propDef.getId(), (List<BigInteger>) defaultValue);
-                    p6.setQueryName(propDef.getId());
-                    props.addProperty(p6);
-                    break;
-                case STRING:
-                    PropertyStringImpl p7 = new PropertyStringImpl(propDef.getId(), (List<String>) defaultValue);
-                    p7.setQueryName(propDef.getId());
-                    props.addProperty(p7);
-                    break;
-                case URI:
-                    PropertyUriImpl p8 = new PropertyUriImpl(propDef.getId(), (List<String>) defaultValue);
-                    p8.setQueryName(propDef.getId());
-                    props.addProperty(p8);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown datatype! Spec change?");
-            }
-
-            return true;
         }
 
         return false;

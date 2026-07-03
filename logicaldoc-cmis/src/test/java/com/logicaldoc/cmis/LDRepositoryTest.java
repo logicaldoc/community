@@ -32,12 +32,17 @@ import org.apache.chemistry.opencmis.commons.data.ObjectList;
 import org.apache.chemistry.opencmis.commons.data.ObjectParentData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionContainer;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionList;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl;
 import org.apache.chemistry.opencmis.commons.impl.server.ObjectInfoImpl;
+import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
 import org.junit.Before;
@@ -231,6 +236,13 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
     }
 
     @Test
+    public void testRepositoryInfo() {
+        RepositoryInfo info = testSubject.getRepositoryInfo(new MockCallContext(session.getSid(), "4"), "12345");
+        assertNotNull(info);
+        assertEquals("Default", info.getName());
+    }
+
+    @Test
     public void testGetObjectInfo() {
         ObjectInfo oi = testSubject.getObjectInfo("doc.5", null);
         assertNotNull(oi);
@@ -258,9 +270,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // Update the name of the file
         PropertiesImpl pimp = new PropertiesImpl();
 
-        String pid = "cmis:name";
-        PropertyStringImpl p = new PropertyStringImpl(pid, "snow angels.txt");
-        p.setQueryName(pid);
+        PropertyStringImpl p = new PropertyStringImpl(PropertyIds.NAME, "snow angels.txt");
+        p.setQueryName(PropertyIds.NAME);
         pimp.addProperty(p);
 
         testSubject.updateProperties(null, objectId, pimp, null);
@@ -282,9 +293,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         log.debug((String) props2.getProperties().get("cmis:name").getFirstValue());
 
         pimp = new PropertiesImpl();
-        pid = "cmis:name";
-        p = new PropertyStringImpl(pid, "donald.txt");
-        p.setQueryName(pid);
+        p = new PropertyStringImpl(PropertyIds.NAME, "donald.txt");
+        p.setQueryName(PropertyIds.NAME);
         pimp.addProperty(p);
 
         testSubject.updateProperties(null, objectId2, pimp, null);
@@ -312,7 +322,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         try {
             buf = content.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         ByteArrayInputStream input = new ByteArrayInputStream(buf);
         ContentStream contentStream = new ContentStreamImpl("pippo.txt", new BigInteger(Integer.toString(buf.length)),
@@ -327,6 +337,9 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         String id = ldrep.createDocument(null, props, "fld.4", contentStream);
         assertNotNull(id);
 
+        // create another document by copying from the current one
+        id = ldrep.createDocumentFromSource(null, id, "fld.4");
+        assertNotNull(id);
     }
 
     @Test
@@ -443,6 +456,43 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
                 "fld.5", "x", true, true, null);
         assertTrue(docList.stream().filter(dL -> "fld.5".equals(dL.getObject().getId())).count() >= 1);
         assertTrue(fldList.stream().filter(fL -> "fld.5".equals(fL.getObject().getId())).count() >= 1);
+    }
+
+    @Test
+    public void testGetTypesChildren() {
+        TypeDefinitionList types = testSubject.getTypesChildren(new MockCallContext(session.getSid(), "fld.5"), "xxx",
+                true, null, null);
+        assertTrue(types.getList().isEmpty());
+
+        types = testSubject.getTypesChildren(new MockCallContext(session.getSid(), "4"), null, true, null, null);
+        assertTrue(types.getList().stream().anyMatch(type -> TypeManager.FOLDER_TYPE_ID.equals(type.getId())));
+
+        types = testSubject.getTypesChildren(new MockCallContext(session.getSid(), "4"), TypeManager.DOCUMENT_TYPE_ID,
+                true, null, null);
+        assertTrue(types.getList().isEmpty());
+    }
+
+    @Test
+    public void getTypeDefinition() {
+        CallContext call = new MockCallContext(session.getSid(), "fld.5");
+        try {
+            testSubject.getTypeDefinition(call, "xxx");
+            fail("No exception raised when giving an unexisting ID");
+        } catch (CmisObjectNotFoundException e) {
+            // All ok
+        }
+
+        TypeDefinition definition = testSubject.getTypeDefinition(new MockCallContext(session.getSid(), "fld.5"),
+                TypeManager.DOCUMENT_TYPE_ID);
+        assertNotNull(definition);
+        assertEquals(TypeManager.DOCUMENT_TYPE_ID, definition.getId());
+    }
+
+    @Test
+    public void getTypesDescendants() {
+        List<TypeDefinitionContainer> containers = testSubject.getTypesDescendants(
+                new MockCallContext(session.getSid(), "fld.5"), TypeManager.DOCUMENT_TYPE_ID, null, true);
+        assertEquals(1, containers.size());
     }
 
     @Test

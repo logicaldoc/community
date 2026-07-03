@@ -54,6 +54,13 @@ public class MailUtilTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+    public void testCountAttachments() {
+        assertEquals(1, MailUtil.countMsgAttachments(new File("src/test/resources/signed.msg")));
+        assertEquals(1, MailUtil.countEmlAttachments(new File("src/test/resources/fattura.eml")));
+    }
+	
+	
+	@Test
 	public void testReadMime() throws MessagingException, IOException {
 		EMail mail = MailUtil.messageToMail(new File("src/test/resources/fattura.eml"), false);
 		assertNotNull(mail);
