@@ -63,25 +63,21 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		return template;
 	}
 
-	@Override
-	public void delete(long id, int code) throws PersistenceException {
-		if (!checkStoringAspect())
-			return;
+    @Override
+    public void delete(long id, int code) throws PersistenceException {
+        if (!checkStoringAspect())
+            return;
 
-		AttributeSet set = findById(id);
-		if (set == null)
-			return;
+        AttributeSet set = findById(id);
+        if (set == null)
+            return;
 
-		set.setDeleted(code);
-		set.setName(set.getName() + "." + set.getId());
-		saveOrUpdate(set);
+        set.setDeleted(code);
+        set.setName("%s.%d".formatted(set.getName(), set.getId()));
+        saveOrUpdate(set);
 
-		optionsDao.deleteBySetIdAndAttribute(id, null);
-
-		List<Template> templates = templateDao.findAll(set.getTenantId());
-		for (Template template : templates)
-			templateDao.store(template);
-	}
+        optionsDao.deleteBySetIdAndAttribute(id, null);
+    }
 
 	@Override
 	public List<AttributeSet> findByType(int type, long tenantId) throws PersistenceException {
