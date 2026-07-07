@@ -23,158 +23,161 @@ import com.logicaldoc.core.security.TenantDAO;
  */
 public class FulltextSearch extends Search {
 
-	private static final String COLON_STAR_TO = ":[* TO ";
+    protected FulltextSearch() {
+    }
 
-	protected FulltextSearch() {
-	}
+    @Override
+    public void internalSearch() throws SearchException {
+        FulltextSearchOptions opt = (FulltextSearchOptions) options;
 
-	@Override
-	public void internalSearch() throws SearchException {
-		FulltextSearchOptions opt = (FulltextSearchOptions) options;
+        setDefaultFields(opt);
 
-		setDefaultFields(opt);
+        /*
+         * Prepare the query: the expression must be applied to all requested
+         * fields.
+         */
+        StringBuilder query = prepareQuery(opt);
 
-		/*
-		 * Prepare the query: the expression must be applied to all requested
-		 * fields.
-		 */
-		StringBuilder query = prepareQuery(opt);
+        Collection<Long> accessibleFolderIds = getAccessibleFolderIds();
 
-		Collection<Long> accessibleFolderIds = getAccessibleFolderIds();
+        long tenantId = getTenant(opt);
 
-		long tenantId = getTenant(opt);
+        /*
+         * Prepare the filters
+         */
+        Set<String> filters = new HashSet<>();
+        try {
+            setQueryFilters(opt, filters, tenantId, accessibleFolderIds);
+        } catch (PersistenceException e) {
+            throw new SearchException(e);
+        }
 
-		/*
-		 * Prepare the filters
-		 */
-		Set<String> filters = new HashSet<>();
-		try {
-			setQueryFilters(opt, filters, tenantId, accessibleFolderIds);
-		} catch (PersistenceException e) {
-			throw new SearchException(e);
-		}
+        /*
+         * Launch the search
+         */
+        log.debug("Full-text seach: {}   filters: {}", query, filters);
+        Hits results = SearchEngine.get().search(query.toString(), filters, opt.getExpressionLanguage(), null);
+        log.debug("End of Full-text search");
+        log.debug("Fulltext hits count: {}", (results != null ? results.getCount() : 0));
 
-		/*
-		 * Launch the search
-		 */
-		log.debug("Full-text seach: {}   filters: {}", query, filters);
-		Hits results = SearchEngine.get().search(query.toString(), filters, opt.getExpressionLanguage(), null);
-		log.debug("End of Full-text search");
-		log.debug("Fulltext hits count: {}", (results != null ? results.getCount() : 0));
+        // Save here the binding between ID and Hit
+        Map<Long, Hit> hitsMap = buildHitsMap(opt, results);
 
-		// Save here the binding between ID and Hit
-		Map<Long, Hit> hitsMap = buildHitsMap(opt, results);
+        if (hitsMap.isEmpty())
+            return;
 
-		if (hitsMap.isEmpty())
-			return;
+        estimatedHitsNumber = results != null ? results.getEstimatedCount() : 0;
 
-		estimatedHitsNumber = results != null ? results.getEstimatedCount() : 0;
+        log.debug("DB search");
 
-		log.debug("DB search");
+        enrichAndPopulateHits(opt, hitsMap, tenantId, accessibleFolderIds);
+    }
 
-		enrichAndPopulateHits(opt, hitsMap, tenantId, accessibleFolderIds);
-	}
+    private Map<Long, Hit> buildHitsMap(FulltextSearchOptions opt, Hits results) {
+        Map<Long, Hit> hitsMap = new HashMap<>();
+        while (results != null && results.hasNext()) {
+            Hit hit = results.next();
+            // Skip a document if not in the filter set
+            if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()
+                    && !opt.getFilterIds().contains(hit.getId()))
+                continue;
+            hitsMap.put(hit.getId(), hit);
+        }
+        return hitsMap;
+    }
 
-	private Map<Long, Hit> buildHitsMap(FulltextSearchOptions opt, Hits results) {
-		Map<Long, Hit> hitsMap = new HashMap<>();
-		while (results != null && results.hasNext()) {
-			Hit hit = results.next();
-			// Skip a document if not in the filter set
-			if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()
-					&& !opt.getFilterIds().contains(hit.getId()))
-				continue;
-			hitsMap.put(hit.getId(), hit);
-		}
-		return hitsMap;
-	}
+    private void setQueryFilters(
+            FulltextSearchOptions fulltextOptions,
+            Set<String> filters,
+            long tenantId,
+            Collection<Long> accessibleFolderIds) throws SearchException, PersistenceException {
+        if (searchUser != null && TenantDAO.get().count() > 1)
+            filters.add("%s:%s%d".formatted(HitField.TENANT_ID, tenantId < 0 ? "\\" : "", tenantId));
 
-	private void setQueryFilters(FulltextSearchOptions fulltextOptions, Set<String> filters, long tenantId,
-			Collection<Long> accessibleFolderIds) throws SearchException, PersistenceException {
-		if (searchUser != null && TenantDAO.get().count() > 1)
-			filters.add(HitField.TENANT_ID + ":" + (tenantId < 0 ? "\\" : "") + tenantId);
+        if (fulltextOptions.getTemplate() != null)
+            filters.add("%s:%s%d".formatted(HitField.TEMPLATE_ID, fulltextOptions.getTemplate() < 0 ? "\\" : "",
+                    fulltextOptions.getTemplate()));
 
-		if (fulltextOptions.getTemplate() != null)
-			filters.add(HitField.TEMPLATE_ID + ":" + (fulltextOptions.getTemplate() < 0 ? "\\" : "")
-					+ fulltextOptions.getTemplate());
+        if (StringUtils.isNotEmpty(fulltextOptions.getLanguage()))
+            filters.add("%s:%s".formatted(HitField.LANGUAGE, fulltextOptions.getLanguage()));
 
-		if (StringUtils.isNotEmpty(fulltextOptions.getLanguage()))
-			filters.add(HitField.LANGUAGE + ":" + fulltextOptions.getLanguage());
+        if (fulltextOptions.getSizeMin() != null)
+            filters.add("%s:[%d TO *]".formatted(HitField.SIZE, fulltextOptions.getSizeMin()));
 
-		if (fulltextOptions.getSizeMin() != null)
-			filters.add(HitField.SIZE + ":[" + fulltextOptions.getSizeMin() + " TO *]");
+        if (fulltextOptions.getSizeMax() != null)
+            filters.add("%s:[* TO %d]".formatted(HitField.SIZE, fulltextOptions.getSizeMax()));
 
-		if (fulltextOptions.getSizeMax() != null)
-			filters.add(HitField.SIZE + COLON_STAR_TO + fulltextOptions.getSizeMax() + "]");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        if (fulltextOptions.getDateFrom() != null)
+            filters.add("%s:[%sT00:00:00Z TO *]".formatted(HitField.DATE, df.format(fulltextOptions.getDateFrom())));
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		if (fulltextOptions.getDateFrom() != null)
-			filters.add(HitField.DATE + ":[" + df.format(fulltextOptions.getDateFrom()) + "T00:00:00Z TO *]");
+        if (fulltextOptions.getDateTo() != null)
+            filters.add("%s:[* TO %sT00:00:00Z]".formatted(HitField.DATE, df.format(fulltextOptions.getDateTo())));
 
-		if (fulltextOptions.getDateTo() != null)
-			filters.add(HitField.DATE + COLON_STAR_TO + df.format(fulltextOptions.getDateTo()) + "T00:00:00Z]");
+        if (fulltextOptions.getCreationFrom() != null)
+            filters.add("%s:[%sT00:00:00Z TO *]".formatted(HitField.CREATION, df.format(fulltextOptions.getCreationFrom())));
 
-		if (fulltextOptions.getCreationFrom() != null)
-			filters.add(HitField.CREATION + ":[" + df.format(fulltextOptions.getCreationFrom()) + "T00:00:00Z TO *]");
+        if (fulltextOptions.getCreationTo() != null)
+            filters.add("%s:[* TO %sT00:00:00Z]".formatted(HitField.CREATION, df.format(fulltextOptions.getCreationTo())));
 
-		if (fulltextOptions.getCreationTo() != null)
-			filters.add(HitField.CREATION + COLON_STAR_TO + df.format(fulltextOptions.getCreationTo()) + "T00:00:00Z]");
+        appendFolderQueryFilter(fulltextOptions, filters, accessibleFolderIds);
+    }
 
-		appendFolderQueryFilter(fulltextOptions, filters, accessibleFolderIds);
-	}
+    private void appendFolderQueryFilter(
+            FulltextSearchOptions opt,
+            Set<String> filters,
+            Collection<Long> accessibleFolderIds) throws SearchException {
+        FolderDAO fdao = FolderDAO.get();
+        try {
+            if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
+                    && fdao.isReadAllowed(opt.getFolderId().longValue(), opt.getUserId()))
+                accessibleFolderIds.add(opt.getFolderId());
+        } catch (PersistenceException e1) {
+            throw new SearchException(e1.getMessage(), e1);
+        }
 
-	private void appendFolderQueryFilter(FulltextSearchOptions opt, Set<String> filters,
-			Collection<Long> accessibleFolderIds) throws SearchException {
-		FolderDAO fdao = FolderDAO.get();
-		try {
-			if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
-					&& fdao.isReadAllowed(opt.getFolderId().longValue(), opt.getUserId()))
-				accessibleFolderIds.add(opt.getFolderId());
-		} catch (PersistenceException e1) {
-			throw new SearchException(e1.getMessage(), e1);
-		}
+        StringBuilder foldersFilter = new StringBuilder();
+        if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
+            for (Long id : accessibleFolderIds) {
+                if (!foldersFilter.isEmpty())
+                    foldersFilter.append(" or ");
+                foldersFilter.append(HitField.FOLDER_ID);
+                foldersFilter.append(":");
+                foldersFilter.append(id < 0 ? "\\" : "");
+                foldersFilter.append(Long.toString(id));
+            }
 
-		StringBuilder foldersFilter = new StringBuilder();
-		if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
-			for (Long id : accessibleFolderIds) {
-				if (!foldersFilter.isEmpty())
-					foldersFilter.append(" or ");
-				foldersFilter.append(HitField.FOLDER_ID);
-				foldersFilter.append(":");
-				foldersFilter.append(id < 0 ? "\\" : "");
-				foldersFilter.append(Long.toString(id));
-			}
+            filters.add(" (%s) ".formatted(foldersFilter.toString()));
+        }
+    }
 
-			filters.add(" (%s) ".formatted(foldersFilter.toString()));
-		}
-	}
+    private long getTenant(FulltextSearchOptions opt) {
+        long tenantId = Tenant.DEFAULT_ID;
+        if (opt.getTenantId() != null)
+            tenantId = opt.getTenantId().longValue();
+        else if (searchUser != null)
+            tenantId = searchUser.getTenantId();
+        return tenantId;
+    }
 
-	private long getTenant(FulltextSearchOptions opt) {
-		long tenantId = Tenant.DEFAULT_ID;
-		if (opt.getTenantId() != null)
-			tenantId = opt.getTenantId().longValue();
-		else if (searchUser != null)
-			tenantId = searchUser.getTenantId();
-		return tenantId;
-	}
+    private StringBuilder prepareQuery(FulltextSearchOptions opt) {
+        StringBuilder query = new StringBuilder();
+        for (String field : opt.getFields()) {
+            if (!query.isEmpty())
+                query.append(" OR ");
 
-	private StringBuilder prepareQuery(FulltextSearchOptions opt) {
-		StringBuilder query = new StringBuilder();
-		for (String field : opt.getFields()) {
-			if (!query.isEmpty())
-				query.append(" OR ");
+            query.append(field);
+            query.append(":(");
+            query.append(opt.getExpression());
+            query.append(")");
+        }
+        return query;
+    }
 
-			query.append(field);
-			query.append(":(");
-			query.append(opt.getExpression());
-			query.append(")");
-		}
-		return query;
-	}
-
-	private void setDefaultFields(FulltextSearchOptions opt) {
-		if (opt.getFields().isEmpty()) {
-			opt.setFields(new HashSet<>(Arrays.asList(HitField.FILENAME.toString(), HitField.TITLE.toString(),
-					HitField.TAGS.toString(), HitField.CONTENT.toString())));
-		}
-	}
+    private void setDefaultFields(FulltextSearchOptions opt) {
+        if (opt.getFields().isEmpty()) {
+            opt.setFields(new HashSet<>(Arrays.asList(HitField.FILENAME.toString(), HitField.TITLE.toString(),
+                    HitField.TAGS.toString(), HitField.CONTENT.toString())));
+        }
+    }
 }

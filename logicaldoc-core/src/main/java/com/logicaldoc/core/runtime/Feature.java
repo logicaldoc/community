@@ -28,7 +28,7 @@ public enum Feature {
 	 * @return The key
 	 */
 	public String key() {
-		return "Feature_" + (ordinal() + 1);
+		return "Feature_%s".formatted(ordinal() + 1);
 	}
 
 	@Override

@@ -156,7 +156,7 @@ public class Validator {
 
 		ValidationError error = new ValidationError(attributeName, attribute.getLabel(), null);
 		fieldValidationDictionary.put("error", error);
-		Automation script = new Automation("validator-" + attributeName,
+		Automation script = new Automation("validator-%s".formatted(attributeName),
 				transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
 						: Locale.getDefault(),
 				object.getTenantId());

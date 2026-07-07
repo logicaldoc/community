@@ -30,117 +30,121 @@ import com.logicaldoc.core.security.user.UserDAO;
  */
 public class Initializer {
 
-	private static final Logger log = LoggerFactory.getLogger(Initializer.class);
+    private static final Logger log = LoggerFactory.getLogger(Initializer.class);
 
-	/**
-	 * Initializes an object instance taking the initialization logic from a
-	 * given template
-	 * 
-	 * @param object the instance to initialize.
-	 * @param template the template that contains the initialization logic
-	 * @param transaction the current transaction
-	 * 
-	 */
-	public void initialize(ExtensibleObject object, Template template, History transaction) {
-		if (!RunLevel.current().aspectEnabled(Aspect.INITIALIZATION))
-			return;
+    /**
+     * Initializes an object instance taking the initialization logic from a
+     * given template
+     * 
+     * @param object the instance to initialize.
+     * @param template the template that contains the initialization logic
+     * @param transaction the current transaction
+     * 
+     */
+    public void initialize(ExtensibleObject object, Template template, History transaction) {
+        if (!RunLevel.current().aspectEnabled(Aspect.INITIALIZATION))
+            return;
 
-		// Skip initialization if the object has already been saved
-		if (object.getId() != 0L)
-			return;
+        // Skip initialization if the object has already been saved
+        if (object.getId() != 0L)
+            return;
 
-		// Initialize only if the object has a template
-		if (object.getDeleted() != 0 || template == null)
-			return;
+        // Initialize only if the object has a template
+        if (object.getDeleted() != 0 || template == null)
+            return;
 
-		setUser(transaction);
+        setUser(transaction);
 
-		template = initializeAttributesCollection(template);
+        template = initializeAttributesCollection(template);
 
-		// Initialize the object with general initalization defined at template
-		// level(if any)
-		try {
-			executeInitialization(object, transaction, template);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+        // Initialize the object with general initalization defined at template
+        // level(if any)
+        try {
+            executeInitialization(object, transaction, template);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
-		// We access the collection as is without initializing the bean
-		// because that would lead to hibernate errors
-		for (String attributeName : template.getAttributeNames()) {
-			try {
-				Attribute attribute = object.getAttribute(attributeName);
-				Attribute templateAttribute = template.getAttribute(attributeName);
-				if (attribute != null && templateAttribute != null && attribute.getValue() == null
-						&& StringUtils.isNotEmpty(templateAttribute.getInitialization()))
-					executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-	}
+        // We access the collection as is without initializing the bean
+        // because that would lead to hibernate errors
+        for (String attributeName : template.getAttributeNames()) {
+            try {
+                Attribute attribute = object.getAttribute(attributeName);
+                Attribute templateAttribute = template.getAttribute(attributeName);
+                if (attribute != null && templateAttribute != null && attribute.getValue() == null
+                        && StringUtils.isNotEmpty(templateAttribute.getInitialization()))
+                    executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
 
-	private Template initializeAttributesCollection(Template template) {
-		try {
-			int attributesCount = template.getAttributeNames().size();
-			if (log.isDebugEnabled())
-				log.debug("Initialized {} attributes", attributesCount);
-		} catch (LazyInitializationException e) {
-			// If an error happens here it means that the collection could not
-			// be loaded, so load the bean again and initialize it.
-			log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-			TemplateDAO tDao = TemplateDAO.get();
-			try {
-				template = tDao.findById(template.getId());
-				tDao.initialize(template);
-			} catch (PersistenceException pe) {
-				log.warn(pe.getMessage(), pe);
-			}
-		}
-		return template;
-	}
+    private Template initializeAttributesCollection(Template template) {
+        try {
+            int attributesCount = template.getAttributeNames().size();
+            if (log.isDebugEnabled())
+                log.debug("Initialized {} attributes", attributesCount);
+        } catch (LazyInitializationException e) {
+            // If an error happens here it means that the collection could not
+            // be loaded, so load the bean again and initialize it.
+            log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
+            TemplateDAO tDao = TemplateDAO.get();
+            try {
+                template = tDao.findById(template.getId());
+                tDao.initialize(template);
+            } catch (PersistenceException pe) {
+                log.warn(pe.getMessage(), pe);
+            }
+        }
+        return template;
+    }
 
-	private void executeInitialization(ExtensibleObject object, History transaction, Template template)
-			throws AutomationException {
-		if (StringUtils.isEmpty(template.getInitialization()))
-			return;
+    private void executeInitialization(ExtensibleObject object, History transaction, Template template)
+            throws AutomationException {
+        if (StringUtils.isEmpty(template.getInitialization()))
+            return;
 
-		Map<String, Object> fieldValidationDictionary = new HashMap<>();
-		fieldValidationDictionary.put("object", object);
-		fieldValidationDictionary.put("event", transaction);
+        Map<String, Object> fieldValidationDictionary = new HashMap<>();
+        fieldValidationDictionary.put("object", object);
+        fieldValidationDictionary.put("event", transaction);
 
-		Automation script = new Automation("initializer-" + template.getName(),
-				transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
-						: Locale.getDefault(),
-				object.getTenantId());
-		script.evaluate(template.getInitialization(), fieldValidationDictionary);
-	}
+        Automation script = new Automation("initializer-%s".formatted(template.getName()),
+                transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
+                        : Locale.getDefault(),
+                object.getTenantId());
+        script.evaluate(template.getInitialization(), fieldValidationDictionary);
+    }
 
-	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,
-			Attribute attribute, Attribute templateAttribute) throws AutomationException {
-		Map<String, Object> fieldValidationDictionary = new HashMap<>();
-		fieldValidationDictionary.put("object", object);
-		fieldValidationDictionary.put("event", transaction);
-		fieldValidationDictionary.put("attributeName", attributeName);
-		fieldValidationDictionary.put("attribute", attribute);
+    private void executeInitialization(
+            ExtensibleObject object,
+            History transaction,
+            String attributeName,
+            Attribute attribute,
+            Attribute templateAttribute) throws AutomationException {
+        Map<String, Object> fieldValidationDictionary = new HashMap<>();
+        fieldValidationDictionary.put("object", object);
+        fieldValidationDictionary.put("event", transaction);
+        fieldValidationDictionary.put("attributeName", attributeName);
+        fieldValidationDictionary.put("attribute", attribute);
 
-		Automation script = new Automation("initializer-" + attributeName,
-				transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
-						: Locale.getDefault(),
-				object.getTenantId());
-		script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
-	}
+        Automation script = new Automation("initializer-%s".formatted(attributeName),
+                transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
+                        : Locale.getDefault(),
+                object.getTenantId());
+        script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
+    }
 
-	private void setUser(History transaction) {
-		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
-		if (user == null && transaction != null && transaction.getUserId() != null) {
-			UserDAO uDao = UserDAO.get();
-			try {
-				user = uDao.findById(transaction.getUserId());
-				transaction.setUser(user);
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage());
-			}
-		}
-	}
+    private void setUser(History transaction) {
+        User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
+        if (user == null && transaction != null && transaction.getUserId() != null) {
+            UserDAO uDao = UserDAO.get();
+            try {
+                user = uDao.findById(transaction.getUserId());
+                transaction.setUser(user);
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage());
+            }
+        }
+    }
 }

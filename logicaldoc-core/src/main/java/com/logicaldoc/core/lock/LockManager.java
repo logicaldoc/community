@@ -26,129 +26,129 @@ import jakarta.annotation.Resource;
  */
 @Component("lockManager")
 public class LockManager {
-	private static final String LOCK = "lock";
+    private static final String LOCK = "lock";
 
-	protected Logger log = LoggerFactory.getLogger(LockManager.class);
+    protected Logger log = LoggerFactory.getLogger(LockManager.class);
 
-	@Resource(name = "genericDAO")
-	protected GenericDAO genericDao;
+    @Resource(name = "genericDAO")
+    protected GenericDAO genericDao;
 
-	@Resource(name = "config")
-	protected ContextProperties config;
+    @Resource(name = "config")
+    protected ContextProperties config;
 
-	/**
-	 * Gets all the transaction ids associated to the locks
-	 * 
-	 * @return the lists of transactions
-	 */
-	public List<String> getAllTransactions() {
-		try {
-			return genericDao.queryForList(
-					"select ld_string1 from ld_generic where ld_type='lock' and ld_string1 is not null", String.class);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+    /**
+     * Gets all the transaction ids associated to the locks
+     * 
+     * @return the lists of transactions
+     */
+    public List<String> getAllTransactions() {
+        try {
+            return genericDao.queryForList(
+                    "select ld_string1 from ld_generic where ld_type='lock' and ld_string1 is not null", String.class);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Acquire a lock of a given name and for a given transaction.
+     * 
+     * @param lockName Name of the lock
+     * @param transactionId Id of the transaction
+     * 
+     * @return true only if the lock was acquired
+     */
+    public boolean get(String lockName, String transactionId) {
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.add(Calendar.SECOND, config.getInt("lock.wait", 10));
+        Date ldDate = cal.getTime();
+        while (new Date().before(ldDate)) {
+            try {
+                if (getInternal(lockName, transactionId)) {
+                    log.debug("Acquired lock {}", lockName);
+                    return true;
+                } else {
+                    synchronized (this) {
+                        wait(1000);
+                    }
+                }
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage(), e);
+            } catch (InterruptedException ie) {
+                log.warn("Interrupted", ie);
+
+                // Restore interrupted state
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        log.warn("Unable to get lock  {}", lockName);
+        return false;
+    }
+
+    private String getSubType(String lockName) {
+		return  "%s-%s".formatted(lockName, config.getProperty("id"));
 	}
 
-	/**
-	 * Acquire a lock of a given name and for a given transaction.
-	 * 
-	 * @param lockName Name of the lock
-	 * @param transactionId Id of the transaction
-	 * 
-	 * @return true only if the lock was acquired
-	 */
-	public boolean get(String lockName, String transactionId) {
-		GregorianCalendar cal = new GregorianCalendar();
-		cal.add(Calendar.SECOND, config.getInt("lock.wait", 10));
-		Date ldDate = cal.getTime();
-		while (new Date().before(ldDate)) {
-			try {
-				if (getInternal(lockName, transactionId)) {
-					log.debug("Acquired lock {}", lockName);
-					return true;
-				} else {
-					synchronized (this) {
-						wait(1000);
-					}
-				}
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage(), e);
-			} catch (InterruptedException ie) {
-				log.warn("Interrupted", ie);
+    /**
+     * Releases a previously acquired lock.
+     * 
+     * @param lockName The lock name
+     * @param transactionId The transaction ID
+     * @throws PersistenceException
+     */
+    public void release(String lockName, String transactionId) throws PersistenceException {
+        if (lockName == null || transactionId == null)
+            return;
 
-				// Restore interrupted state
-				Thread.currentThread().interrupt();
-			}
-		}
+        Generic lock = genericDao.findByAlternateKey(LOCK, getSubType(lockName), null, Tenant.DEFAULT_ID);
+        if (lock != null && transactionId.equals(lock.getString1())) {
+            lock.setDate1(null);
+            lock.setString1(null);
 
-		log.warn("Unable to get lock  {}", lockName);
-		return false;
-	}
+            try {
+                genericDao.store(lock);
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage(), e);
+            }
+        }
+    }
 
-	private String getSubType(String lockName) {
-		return lockName + "-" + config.getProperty("id");
-	}
+    protected boolean getInternal(String lockName, String transactionId) throws PersistenceException {
+        Date today = new Date();
+        Generic lock = genericDao.findByAlternateKey(LOCK, getSubType(lockName), null, Tenant.DEFAULT_ID);
+        try {
+            if (lock == null) {
+                log.debug("Lock {} not found", lockName);
+                lock = new Generic(LOCK, getSubType(lockName));
+                lock.setString1(transactionId);
+                lock.setDate1(today);
+            }
 
-	/**
-	 * Releases a previously acquired lock.
-	 * 
-	 * @param lockName The lock name
-	 * @param transactionId The transaction ID
-	 * @throws PersistenceException
-	 */
-	public void release(String lockName, String transactionId) throws PersistenceException {
-		if (lockName == null || transactionId == null)
-			return;
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.add(Calendar.SECOND, -config.getInt("lock.ttl"));
+            Date ldDate = cal.getTime();
 
-		Generic lock = genericDao.findByAlternateKey(LOCK, getSubType(lockName), null, Tenant.DEFAULT_ID);
-		if (lock != null && transactionId.equals(lock.getString1())) {
-			lock.setDate1(null);
-			lock.setString1(null);
+            if (lock.getDate1() == null || lock.getDate1().before(ldDate)) {
+                log.debug("Lock {} expired", lockName);
+                lock.setDate1(today);
+                lock.setString1(transactionId);
+            }
 
-			try {
-				genericDao.store(lock);
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage(), e);
-			}
-		}
-	}
-
-	protected boolean getInternal(String lockName, String transactionId) throws PersistenceException {
-		Date today = new Date();
-		Generic lock = genericDao.findByAlternateKey(LOCK, getSubType(lockName), null, Tenant.DEFAULT_ID);
-		try {
-			if (lock == null) {
-				log.debug("Lock {} not found", lockName);
-				lock = new Generic(LOCK, getSubType(lockName));
-				lock.setString1(transactionId);
-				lock.setDate1(today);
-			}
-
-			GregorianCalendar cal = new GregorianCalendar();
-			cal.add(Calendar.SECOND, -config.getInt("lock.ttl"));
-			Date ldDate = cal.getTime();
-
-			if (lock.getDate1() == null || lock.getDate1().before(ldDate)) {
-				log.debug("Lock {} expired", lockName);
-				lock.setDate1(today);
-				lock.setString1(transactionId);
-			}
-
-			if (lock.getString1() == null || transactionId.equals(lock.getString1())) {
-				lock.setDate1(today);
-				lock.setString1(transactionId);
-				return true;
-			} else
-				return false;
-		} finally {
-			try {
-				genericDao.store(lock);
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage(), e);
-			}
-		}
-	}
+            if (lock.getString1() == null || transactionId.equals(lock.getString1())) {
+                lock.setDate1(today);
+                lock.setString1(transactionId);
+                return true;
+            } else
+                return false;
+        } finally {
+            try {
+                genericDao.store(lock);
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage(), e);
+            }
+        }
+    }
 
 }

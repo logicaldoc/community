@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -27,8 +26,6 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<AttributeSet> implements AttributeSetDAO {
 
-    private static final String TENANT_ID_EQUAL = ".tenantId=";
-
     @Resource(name = "attributeOptionDAO")
     protected AttributeOptionDAO optionsDao;
 
@@ -42,19 +39,18 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
     @Override
     public List<AttributeSet> findAll() throws PersistenceException {
-        return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
+        return findByWhere(" 1=1", "order by _entity.name", null);
     }
 
     @Override
     public List<AttributeSet> findAll(long tenantId) throws PersistenceException {
-        return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ENTITY + ".name", null);
+        return findByWhere("_entity.tenantId = %d".formatted(tenantId), "_entity.name", null);
     }
 
     @Override
     public AttributeSet findByName(String name, long tenantId) throws PersistenceException {
-        List<AttributeSet> coll = findByWhere(
-                ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-                null, null);
+        List<AttributeSet> coll = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
+                Map.of("name", name, "tenantId", tenantId), null, null);
         AttributeSet template = null;
         if (CollectionUtils.isNotEmpty(coll))
             template = coll.iterator().next();
@@ -81,8 +77,8 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
     @Override
     public List<AttributeSet> findByType(int type, long tenantId) throws PersistenceException {
-        return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-                ENTITY + ".name asc", null);
+        return findByWhere("_entity.type = %d and _entity.tenantId = %d".formatted(type, tenantId), "_entiry.name asc",
+                null);
     }
 
     @Override

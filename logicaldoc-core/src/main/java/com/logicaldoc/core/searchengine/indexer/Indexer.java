@@ -30,73 +30,73 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  */
 class Indexer extends DocumentProcessorCallable<IndexerStats> {
 
-	private ContextProperties config;
+    private ContextProperties config;
 
-	private DocumentDAO documentDao;
+    private DocumentDAO documentDao;
 
-	private TenantDAO tenantDao;
+    private TenantDAO tenantDao;
 
-	private DocumentManager documentManager;
+    private DocumentManager documentManager;
 
-	Indexer(List<Long> docIds, IndexerTask task, Logger log) {
-		super(docIds, task, log);
-		this.config = Context.get().getConfig();
-		this.documentDao = DocumentDAO.get();
-		this.tenantDao = TenantDAO.get();
-		this.documentManager = DocumentManager.get();
-	}
+    Indexer(List<Long> docIds, IndexerTask task, Logger log) {
+        super(docIds, task, log);
+        this.config = Context.get().getConfig();
+        this.documentDao = DocumentDAO.get();
+        this.tenantDao = TenantDAO.get();
+        this.documentManager = DocumentManager.get();
+    }
 
-	private void increaseParsingTime(long increase) {
-		stats.setParsingTime(stats.getParsingTime() + increase);
-	}
+    private void increaseParsingTime(long increase) {
+        stats.setParsingTime(stats.getParsingTime() + increase);
+    }
 
-	private void increaseIndexingTime(long increase) {
-		stats.setIndexingTime(stats.getIndexingTime() + increase);
-	}
+    private void increaseIndexingTime(long increase) {
+        stats.setIndexingTime(stats.getIndexingTime() + increase);
+    }
 
-	@Override
-	public boolean isCompleted() {
-		return completed;
-	}
+    @Override
+    public boolean isCompleted() {
+        return completed;
+    }
 
-	public IndexerStats getStats() {
-		return stats;
-	}
+    public IndexerStats getStats() {
+        return stats;
+    }
 
-	@Override
-	protected void processDocument(Document document, User user) throws PersistenceException, IOException {
-		try {
-			Tenant tenant = tenantDao.findById(document.getTenantId());
+    @Override
+    protected void processDocument(Document document, User user) throws PersistenceException, IOException {
+        try {
+            Tenant tenant = tenantDao.findById(document.getTenantId());
 
-			// Check if this document must be marked for skipping
-			if (!FileUtil.matches(document.getFileName(),
-					config.getProperty(tenant.getName() + ".index.includes") == null ? ""
-							: config.getProperty(tenant.getName() + ".index.includes"),
-					config.getProperty(tenant.getName() + ".index.excludes") == null ? ""
-							: config.getProperty(tenant.getName() + ".index.excludes"))) {
-				documentDao.initialize(document);
-				document.setIndexingStatus(IndexingStatus.SKIP);
-				documentDao.store(document);
-				log.warn("Document {} with filename '{}' marked as unindexable", document.getId(),
-						document.getFileName());
-			} else {
-				Date beforeIndexing = new Date();
-				DocumentHistory transaction = new DocumentHistory();
-				transaction.setUser(user);
+            // Check if this document must be marked for skipping
+            if (!FileUtil.matches(document.getFileName(),
+                    config.getProperty(tenant.getName() + ".index.includes") == null ? ""
+                            : config.getProperty(tenant.getName() + ".index.includes"),
+                    config.getProperty(tenant.getName() + ".index.excludes") == null ? ""
+                            : config.getProperty(tenant.getName() + ".index.excludes"))) {
+                documentDao.initialize(document);
+                document.setIndexingStatus(IndexingStatus.SKIP);
+                documentDao.store(document);
+                log.warn("Document {} with filename '{}' marked as unindexable", document.getId(),
+                        document.getFileName());
+            } else {
+                Date beforeIndexing = new Date();
+                DocumentHistory transaction = new DocumentHistory();
+                transaction.setUser(user);
 
-				increaseParsingTime(documentManager.index(document.getId(), null, transaction));
-				long indexingDiff = TimeDiff.getTimeDifference(beforeIndexing, new Date(), TimeField.MILLISECOND);
-				increaseIndexingTime(indexingDiff);
-				if (log.isDebugEnabled())
-					log.debug("Indexed document {} in {}ms", document, indexingDiff);
-			}
-		} catch (Exception e) {
-			throw new IOException("Problem indexing document " + document, e);
-		}
-	}
+                increaseParsingTime(documentManager.index(document.getId(), null, transaction));
+                long indexingDiff = TimeDiff.getTimeDifference(beforeIndexing, new Date(), TimeField.MILLISECOND);
+                increaseIndexingTime(indexingDiff);
+                if (log.isDebugEnabled())
+                    log.debug("Indexed document {} in {}ms", document, indexingDiff);
+            }
+        } catch (Exception e) {
+            throw new IOException("Problem indexing document %s".formatted(document), e);
+        }
+    }
 
-	@Override
-	protected IndexerStats prepareStats() {
-		return new IndexerStats();
-	}
+    @Override
+    protected IndexerStats prepareStats() {
+        return new IndexerStats();
+    }
 }
