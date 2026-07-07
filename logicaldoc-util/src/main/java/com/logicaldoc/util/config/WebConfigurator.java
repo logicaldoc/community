@@ -16,6 +16,8 @@ import org.jdom2.Namespace;
  */
 public class WebConfigurator extends XMLBean {
 
+    private static final String S_S = "%s,%s";
+
     private static final String INIT_PARAM_STR = "init-param";
 
     private static final String URL_PATTERN = "url-pattern";
@@ -122,7 +124,7 @@ public class WebConfigurator extends XMLBean {
 
         if (appendMode.equals(ParamInsertMode.APPEND)) {
             Element paramValue = contextParam.getChildren().get(1);
-            paramValue.setText("%s,%s".formatted(paramValue.getText(), value));
+            paramValue.setText(S_S.formatted(paramValue.getText(), value));
             writeXMLDoc();
             return;
         }
@@ -179,7 +181,7 @@ public class WebConfigurator extends XMLBean {
             if (insertMode.equals(ParamInsertMode.OVERWRITE))
                 paramValue.setText(value);
             else
-                paramValue.setText("%s,%s".formatted(paramValue.getText(), value));
+                paramValue.setText(S_S.formatted(paramValue.getText(), value));
 
             writeXMLDoc();
             return;
@@ -246,7 +248,7 @@ public class WebConfigurator extends XMLBean {
             if (insertMode.equals(ParamInsertMode.OVERWRITE))
                 paramValue.setText(value);
             else
-                paramValue.setText("%s,%s".formatted(paramValue.getText(), value));
+                paramValue.setText(S_S.formatted(paramValue.getText(), value));
 
             writeXMLDoc();
             return;
@@ -467,7 +469,7 @@ public class WebConfigurator extends XMLBean {
 
         if (initParam != null && append.equals(ParamInsertMode.APPEND)) {
             Element paramValue = initParam.getChild(PARAM_VALUE, rootNamespace());
-            paramValue.setText("%s,%s".formatted(paramValue.getText(), value));
+            paramValue.setText(S_S.formatted(paramValue.getText(), value));
             writeXMLDoc();
             return;
         }

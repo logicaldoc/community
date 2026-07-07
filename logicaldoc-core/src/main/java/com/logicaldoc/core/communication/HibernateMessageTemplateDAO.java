@@ -25,6 +25,10 @@ import jakarta.transaction.Transactional;
 public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<MessageTemplate>
         implements MessageTemplateDAO {
 
+    private static final String LANGUAGE = "language";
+    
+    private static final String TENANT_ID = "tenantId";
+
     public HibernateMessageTemplateDAO() {
         super(MessageTemplate.class);
         super.log = LoggerFactory.getLogger(HibernateMessageTemplateDAO.class);
@@ -33,20 +37,20 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
     @Override
     public List<MessageTemplate> findByLanguage(String language, long tenantId) throws PersistenceException {
         return findByWhere("_entity.language = :language and _entity.tenantId = :tenantId",
-                Map.of("language", language, "tenantId", tenantId), "_entity.name", null);
+                Map.of(LANGUAGE, language, TENANT_ID, tenantId), "_entity.name", null);
     }
 
     @Override
     public List<MessageTemplate> findByTypeAndLanguage(MessageTemplate.Type type, String language, long tenantId)
             throws PersistenceException {
         Map<String, Object> params = new HashMap<>();
-        params.put("tenantId", tenantId);
+        params.put(TENANT_ID, tenantId);
 
         StringBuilder query = new StringBuilder("_entity.tenantId = :tenantId");
 
         if (StringUtils.isNotEmpty(language)) {
             query.append(" and _entity.language = :language");
-            params.put("language", language);
+            params.put(LANGUAGE, language);
         }
 
         if (type != null) {
@@ -63,12 +67,12 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
         String lang = StringUtils.defaultIfEmpty(language, "en");
 
         String query = "_entity.language = :language and _entity.name = :name and _entity.tenantId = :tenantId";
-        List<MessageTemplate> buf = findByWhere(query, Map.of("language", lang, "name", name, "tenantId", tenantId),
+        List<MessageTemplate> buf = findByWhere(query, Map.of(LANGUAGE, lang, "name", name, TENANT_ID, tenantId),
                 null, null);
         if (CollectionUtils.isNotEmpty(buf))
             return buf.get(0);
 
-        buf = findByWhere(query, Map.of("language", "en", "name", name, "tenantId", tenantId), null, null);
+        buf = findByWhere(query, Map.of(LANGUAGE, "en", "name", name, TENANT_ID, tenantId), null, null);
         if (CollectionUtils.isNotEmpty(buf))
             return buf.get(0);
 
@@ -94,6 +98,6 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
     @Override
     public List<MessageTemplate> findByName(String name, long tenantId) throws PersistenceException {
         return findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
-                Map.of("name", name, "tenantId", tenantId), null, null);
+                Map.of("name", name, TENANT_ID, tenantId), null, null);
     }
 }

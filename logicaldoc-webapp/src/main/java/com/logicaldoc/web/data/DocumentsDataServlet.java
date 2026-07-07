@@ -711,7 +711,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
         if (formId != null)
             query.append(" and D.ld_formid = %d".formatted(formId));
         query.append(") and ld_name in (%s)"
-                .formatted(extendedAttributes.stream().map(n -> "'%s'".formatted(n)).collect(Collectors.joining(","))));
+                .formatted(extendedAttributes.stream().map("'%s'"::formatted).collect(Collectors.joining(","))));
 
         dao.query(query.toString(), new ExtendedAttributeRowMapper(extAttributesValues, locale), null);
     }

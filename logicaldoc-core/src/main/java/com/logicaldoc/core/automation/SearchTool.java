@@ -117,14 +117,13 @@ public class SearchTool {
                      * ((1,0), (2,0), (3,0), ...):
                      */
                     hitsIdsCondition.append(" (A.ld_id,0) in ( ");
-                    hitsIdsCondition.append(
-                            hitsIds.stream().map(id -> "(%d,0)".formatted(id)).collect(Collectors.joining(",")));
+                    hitsIdsCondition.append(hitsIds.stream().map("(%d,0)"::formatted).collect(Collectors.joining(",")));
                 } else {
-                    hitsIdsCondition.append(" A.ld_id in ("
-                            .formatted(hitsIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))));
+                    hitsIdsCondition.append(" A.ld_id in ( ");
+                    hitsIdsCondition
+                            .append(hitsIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
                 }
-                hitsIdsCondition.append(" )");
-                hitsIdsCondition.append(")");
+                hitsIdsCondition.append(" ) )");
             }
 
             // Find real documents

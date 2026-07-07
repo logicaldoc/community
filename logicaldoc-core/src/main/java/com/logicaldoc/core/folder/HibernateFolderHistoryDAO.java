@@ -83,7 +83,7 @@ public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory
 
         if (CollectionUtils.isNotEmpty(events))
             query.append(" and _entity.event in (%s)"
-                    .formatted(events.stream().map(e -> "'%s'".formatted(e)).collect(Collectors.joining(","))));
+                    .formatted(events.stream().map("'%s'"::formatted).collect(Collectors.joining(","))));
 
         return findByWhere(query.toString(), params, ORDER_BY_ENTITY_DATE_ASC, max);
     }

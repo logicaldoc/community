@@ -219,7 +219,7 @@ public class XMLConverter extends AbstractFormatConverter {
                 } else {
                     FileUtil.replaceInFile(xml.getAbsolutePath(),
                             "<%s".formatted(domDocument.getRootElement().getQualifiedName()),
-                            "\n%s\n<%s".formatted(newStyleSpec, domDocument.getRootElement().getQualifiedName()));
+                            "%n%s\n<%s".formatted(newStyleSpec, domDocument.getRootElement().getQualifiedName()));
                 }
             } catch (Exception e) {
                 log.warn("Cannot elaborate the style sheet {}", style, e);

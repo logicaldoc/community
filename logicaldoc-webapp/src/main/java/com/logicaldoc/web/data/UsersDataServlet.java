@@ -132,10 +132,8 @@ public class UsersDataServlet extends AbstractDataServlet {
         if (CollectionUtils.isEmpty(usernames)) {
             return List.of();
         } else {
-            List<User> users = UserDAO.get().findByWhere(
-                    "_entity.username in (%s)".formatted(
-                            usernames.stream().map(u -> "'%s'".formatted(u)).collect(Collectors.joining(","))),
-                    null, null);
+            List<User> users = UserDAO.get().findByWhere("_entity.username in (%s)"
+                    .formatted(usernames.stream().map("'%s'"::formatted).collect(Collectors.joining(","))), null, null);
             for (User user : users)
                 UserDAO.get().initialize(user);
             return users;

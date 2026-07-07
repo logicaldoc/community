@@ -40,10 +40,6 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<DocumentNote> implements DocumentNoteDAO {
 
-    private static final String DELETED_0 = ".deleted=0";
-
-    private static final String DOC_ID_DOC_ID_AND = ".docId = :docId and ";
-
     private static final String DOC_ID = "docId";
 
     public HibernateDocumentNoteDAO() {

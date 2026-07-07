@@ -737,7 +737,7 @@ public class MailUtil {
      */
     private static void extractPartText(Object content, StringBuilder textBody) throws MessagingException, IOException {
         if (content instanceof String string) {
-            textBody.append("\n%s".formatted(string));
+            textBody.append("%n%s".formatted(string));
             return;
         }
 

@@ -296,7 +296,7 @@ public class DashletContent extends HttpServlet {
                 """);
         qry.append(records.stream().map(d -> Long.toString(d.getDocId())).collect(Collectors.joining(",")));
         qry.append(") and ld_name in (");
-        qry.append(attrs.stream().map(a -> "'%s'".formatted(a)).collect(Collectors.joining(",")));
+        qry.append(attrs.stream().map("'%s'"::formatted).collect(Collectors.joining(",")));
         qry.append(")");
 
         DocumentDAO dao = DocumentDAO.get();
@@ -410,7 +410,7 @@ public class DashletContent extends HttpServlet {
                         """);
                 qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getId())).collect(Collectors.joining(",")));
                 qry.append(") and ld_name in (");
-                qry.append(attrs.stream().map(a -> "'%s'".formatted(a)).collect(Collectors.joining(",")));
+                qry.append(attrs.stream().map("'%s'"::formatted).collect(Collectors.joining(",")));
                 qry.append(")");
 
                 dao.query(qry.toString(), new EntendedAttributesRowMapper(locale, extValues), null);
@@ -565,7 +565,8 @@ public class DashletContent extends HttpServlet {
             for (DocumentNote note : records) {
                 writer.write("<post>");
                 printField("id", note.getId(), writer);
-                writer.write(String.format("<title><![CDATA[%s]]></title>".formatted(StringUtils.abbreviate(note.getMessage(), 100))));
+                writer.write(String.format(
+                        "<title><![CDATA[%s]]></title>".formatted(StringUtils.abbreviate(note.getMessage(), 100))));
                 writer.write(String.format("<page>%d</page>", note.getPage()));
                 writer.write(String.format("<user><![CDATA[%s]]></user>", note.getUsername()));
                 writer.write(String.format("<date>%s</date>", note.getDate() != null ? df.format(note.getDate()) : ""));
