@@ -105,7 +105,7 @@ public class SystemInfo {
                 Object tmp = clazz.getDeclaredConstructor().newInstance();
                 if (!(tmp instanceof SystemInfo))
                     throw new ClassNotFoundException(
-                            "The specified info %s doesn't implement %d interface".formatted(className, SystemInfo.class.getSimpleName()));
+                            "The specified info %s doesn't implement %s interface".formatted(className, SystemInfo.class.getSimpleName()));
 
                 info = (SystemInfo) tmp;
                 info.setTenantId(tenantId);
