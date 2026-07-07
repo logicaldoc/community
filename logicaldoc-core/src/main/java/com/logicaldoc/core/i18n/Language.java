@@ -153,7 +153,7 @@ public class Language implements Comparable<Language> {
 
 	public SnowballProgram getStemmer() {
 		if (stemmer == null) {
-			String stemmerClass = "org.tartarus.snowball.ext." + getLocale().getDisplayName(Locale.ENGLISH) + "Stemmer";
+			String stemmerClass = "org.tartarus.snowball.ext.%sStemmer".formatted(getLocale().getDisplayName(Locale.ENGLISH));
 
 			try {
 				Class<?> clazz = Class.forName(stemmerClass);

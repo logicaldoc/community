@@ -36,7 +36,11 @@ public class UsersDataServlet extends AbstractDataServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+    protected void service(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Session session,
+            Integer max,
             Locale locale) throws PersistenceException, IOException {
 
         String groupIdOrName = request.getParameter("groupId");
@@ -90,7 +94,8 @@ public class UsersDataServlet extends AbstractDataServlet {
         writer.print(String.format("<email><![CDATA[%s]]></email>", StringUtils.defaultString(user.getEmail())));
         writer.print(String.format("<phone><![CDATA[%s]]></phone>", StringUtils.defaultString(user.getTelephone())));
         writer.print(String.format("<cell><![CDATA[%s]]></cell>", StringUtils.defaultString(user.getTelephone2())));
-        writer.print(String.format("<whatsapp><![CDATA[%s]]></whatsapp>", StringUtils.defaultString(user.getWhatsapp())));
+        writer.print(
+                String.format("<whatsapp><![CDATA[%s]]></whatsapp>", StringUtils.defaultString(user.getWhatsapp())));
         writer.print(String.format("<city><![CDATA[%s]]></city>", StringUtils.defaultString(user.getCity())));
         writer.print(String.format("<department><![CDATA[%s]]></department>",
                 StringUtils.defaultString(user.getDepartment())));
@@ -128,8 +133,9 @@ public class UsersDataServlet extends AbstractDataServlet {
             return List.of();
         } else {
             List<User> users = UserDAO.get().findByWhere(
-                    "_entity.username in ('%s')".formatted(usernames.stream().collect(Collectors.joining("','"))), null,
-                    null);
+                    "_entity.username in (%s)".formatted(
+                            usernames.stream().map(u -> "'%s'".formatted(u)).collect(Collectors.joining(","))),
+                    null, null);
             for (User user : users)
                 UserDAO.get().initialize(user);
             return users;

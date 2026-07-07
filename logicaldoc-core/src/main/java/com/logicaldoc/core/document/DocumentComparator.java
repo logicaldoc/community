@@ -339,7 +339,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			if (field.startsWith("ext_"))
 				comp = newComparatorForExtendedAttribute(field.substring(field.indexOf('_') + 1), caseSensitive);
 			else
-				comp = legacyComparators.get(field + "-" + (caseSensitive ? "CS" : "CI"));
+				comp = legacyComparators.get("%s-%s".formatted(field, caseSensitive ? "CS" : "CI"));
 
 			if (comp != null && asc)
 				comparators.add(comp);

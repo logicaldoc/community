@@ -27,100 +27,100 @@ import com.logicaldoc.util.spring.Context;
  */
 public class LanguageManager {
 
-	private static final Logger log = LoggerFactory.getLogger(LanguageManager.class);
+    private static final Logger log = LoggerFactory.getLogger(LanguageManager.class);
 
-	private static LanguageManager languageManager;
+    private static LanguageManager languageManager;
 
-	private Map<Locale, Language> languages = new HashMap<>();
+    private Map<Locale, Language> languages = new HashMap<>();
 
-	private LanguageManager() {
-		init();
-	}
+    private LanguageManager() {
+        init();
+    }
 
-	public void init() {
-		languages.clear();
+    public void init() {
+        languages.clear();
 
-		// Acquire the 'Language' extensions of the core plug-in and add defined
-		// languages
-		PluginRegistry registry = PluginRegistry.getInstance();
-		if (registry == null)
-			return;
+        // Acquire the 'Language' extensions of the core plug-in and add defined
+        // languages
+        PluginRegistry registry = PluginRegistry.getInstance();
+        if (registry == null)
+            return;
 
-		Collection<Extension> extensions = new ArrayList<>();
-		try {
-			extensions = registry.getExtensions("logicaldoc-core", "Language");
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
+        Collection<Extension> extensions = new ArrayList<>();
+        try {
+            extensions = registry.getExtensions("logicaldoc-core", "Language");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
 
-		for (Extension ext : extensions) {
-			String language = ext.getParameter("locale").valueAsString();
-			String analyzer = ext.getParameter("analyzer").valueAsString();
-			log.debug("analyzer = {}", analyzer);
-			try {
-				Locale locale = LocaleUtil.toLocale(language);
-				Language lang = new Language(locale);
-				if (StringUtils.isNotEmpty(analyzer) && !"-".equals(analyzer))
-					lang.setAnalyzerClass(analyzer);
-				else {
-					// Try one of the standard analyzers
-					lang.setAnalyzerClass("org.apache.lucene.analysis." + lang.getLanguage() + "."
-							+ lang.getLocale().getDisplayName(Locale.ENGLISH) + "Analyzer");
-				}
-				languages.put(locale, lang);
-				log.info("Added new Language: {}", language);
-			} catch (Exception e) {
-				log.error(e.getMessage());
-			}
-		}
-	}
+        for (Extension ext : extensions) {
+            String language = ext.getParameter("locale").valueAsString();
+            String analyzer = ext.getParameter("analyzer").valueAsString();
+            log.debug("analyzer = {}", analyzer);
+            try {
+                Locale locale = LocaleUtil.toLocale(language);
+                Language lang = new Language(locale);
+                if (StringUtils.isNotEmpty(analyzer) && !"-".equals(analyzer))
+                    lang.setAnalyzerClass(analyzer);
+                else {
+                    // Try one of the standard analyzers
+                    lang.setAnalyzerClass("org.apache.lucene.analysis.%s.%sAnalyzer".formatted(lang.getLanguage(),
+                            lang.getLocale().getDisplayName(Locale.ENGLISH)));
+                }
+                languages.put(locale, lang);
+                log.info("Added new Language: {}", language);
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
 
-	public static LanguageManager getInstance() {
-		if (languageManager == null)
-			languageManager = new LanguageManager();
-		return languageManager;
-	}
+    public static LanguageManager getInstance() {
+        if (languageManager == null)
+            languageManager = new LanguageManager();
+        return languageManager;
+    }
 
-	public List<Language> getLanguages() {
-		List<Language> langs = new ArrayList<>();
-		langs.addAll(languages.values());
-		Collections.sort(langs);
-		return langs;
-	}
+    public List<Language> getLanguages() {
+        List<Language> langs = new ArrayList<>();
+        langs.addAll(languages.values());
+        Collections.sort(langs);
+        return langs;
+    }
 
-	public List<Language> getActiveLanguages(String tenantName) {
-		ContextProperties config = Context.get().getConfig();
-		if (config == null)
-			return getLanguages();
+    public List<Language> getActiveLanguages(String tenantName) {
+        ContextProperties config = Context.get().getConfig();
+        if (config == null)
+            return getLanguages();
 
-		List<Language> actives = new ArrayList<>();
-		for (Language l : getLanguages()) {
-			if ("enabled".equals(config.getProperty(tenantName + ".lang." + l)))
-				actives.add(l);
-		}
-		return actives;
-	}
+        List<Language> actives = new ArrayList<>();
+        for (Language l : getLanguages()) {
+            if ("enabled".equals(config.getProperty("%s.lang.%s".formatted(tenantName, l))))
+                actives.add(l);
+        }
+        return actives;
+    }
 
-	/**
-	 * Retrieves the Language for the given language Null is returned if the
-	 * corresponding Language could not be found
-	 * 
-	 * @param locale The language to retrieve the language for
-	 * @return A Language object
-	 */
-	public Language getLanguage(Locale locale) {
-		return languages.get(locale);
-	}
+    /**
+     * Retrieves the Language for the given language Null is returned if the
+     * corresponding Language could not be found
+     * 
+     * @param locale The language to retrieve the language for
+     * @return A Language object
+     */
+    public Language getLanguage(Locale locale) {
+        return languages.get(locale);
+    }
 
-	public void addLanguage(Locale locale, Language lang) {
-		languages.put(locale, lang);
-	}
+    public void addLanguage(Locale locale, Language lang) {
+        languages.put(locale, lang);
+    }
 
-	public List<String> getLanguagesAsString(String tenantName) {
-		List<String> languages2 = new ArrayList<>();
-		for (Language lang : getActiveLanguages(tenantName)) {
-			languages2.add(lang.getLocale().toString());
-		}
-		return languages2;
-	}
+    public List<String> getLanguagesAsString(String tenantName) {
+        List<String> languages2 = new ArrayList<>();
+        for (Language lang : getActiveLanguages(tenantName)) {
+            languages2.add(lang.getLocale().toString());
+        }
+        return languages2;
+    }
 }

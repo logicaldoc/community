@@ -42,96 +42,95 @@ import jakarta.annotation.Resource;
 @Component("jobManager")
 public class JobManager {
 
-	public static final String JOB = "job";
+    public static final String JOB = "job";
 
-	public static final String TENANT_ID = "tenantId";
+    public static final String TENANT_ID = "tenantId";
 
-	public static final String MISSFIRE_RUNNOW = "runnow";
+    public static final String MISSFIRE_RUNNOW = "runnow";
 
-	public static final String MISSFIRE_IGNORE = "ignore";
+    public static final String MISSFIRE_IGNORE = "ignore";
 
-	private static final Logger log = LoggerFactory.getLogger(JobManager.class);
+    private static final Logger log = LoggerFactory.getLogger(JobManager.class);
 
-	@Resource(name = "Scheduler")
-	protected Scheduler scheduler;
+    @Resource(name = "Scheduler")
+    protected Scheduler scheduler;
 
-	@Resource(name = "config")
-	protected ContextProperties config;
+    @Resource(name = "config")
+    protected ContextProperties config;
 
-	/**
-	 * Schedules a new Job
-	 * 
-	 * @param job the Job to schedule
-	 * @param dictionary map of data to assign at fire-time to the Job
-	 * @param triggers they can be a Date(instant to fire the job) or a
-	 *        String(cron expression)
-	 * 
-	 * @throws SchedulerException error in the scheduler
-	 */
-	public void schedule(AbstractJob job, Map<String, Object> dictionary, Object... triggers)
-			throws SchedulerException {
-		Map<Object, Map<String, Object>> trgs = new HashMap<>();
-		for (Object trigger : triggers) {
-			trgs.put(trigger, new HashMap<>());
-		}
-		schedule(job, dictionary, trgs);
-	}
+    /**
+     * Schedules a new Job
+     * 
+     * @param job the Job to schedule
+     * @param dictionary map of data to assign at fire-time to the Job
+     * @param triggers they can be a Date(instant to fire the job) or a
+     *        String(cron expression)
+     * 
+     * @throws SchedulerException error in the scheduler
+     */
+    public void schedule(AbstractJob job, Map<String, Object> dictionary, Object... triggers)
+            throws SchedulerException {
+        Map<Object, Map<String, Object>> trgs = new HashMap<>();
+        for (Object trigger : triggers) {
+            trgs.put(trigger, new HashMap<>());
+        }
+        schedule(job, dictionary, trgs);
+    }
 
-	/**
-	 * Schedules a new Job
-	 * 
-	 * @param job the Job to schedule
-	 * @param dictionary map of data to assign at fire-time to the Job
-	 * @param triggers map of triggers, the key is a Date(instant to fire the
-	 *        job) or a String(cron expression) and the value is the map of data
-	 *        to pass at fire-time to the trigger
-	 * 
-	 * @throws SchedulerException error in the scheduler
-	 */
-	public void schedule(AbstractJob job, Map<String, Object> dictionary, Map<Object, Map<String, Object>> triggers)
-			throws SchedulerException {
-		if(dictionary==null)
-			dictionary=new HashMap<>();
-		else
-			dictionary=new HashMap<>(dictionary);
+    /**
+     * Schedules a new Job
+     * 
+     * @param job the Job to schedule
+     * @param dictionary map of data to assign at fire-time to the Job
+     * @param triggers map of triggers, the key is a Date(instant to fire the
+     *        job) or a String(cron expression) and the value is the map of data
+     *        to pass at fire-time to the trigger
+     * 
+     * @throws SchedulerException error in the scheduler
+     */
+    public void schedule(AbstractJob job, Map<String, Object> dictionary, Map<Object, Map<String, Object>> triggers)
+            throws SchedulerException {
+        if (dictionary == null)
+            dictionary = new HashMap<>();
+        else
+            dictionary = new HashMap<>(dictionary);
 
-		dictionary.computeIfAbsent(TENANT_ID, k -> job.getTenantId());
-		dictionary.computeIfAbsent(JOB, k -> job);
-		
-		JobKey jobKey = JobKey.jobKey(job.getName(), job.getGroup());
-		JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-		if (jobDetail != null) {
-			// Delete the job and all it's triggers that may already exist
-			scheduler.deleteJob(jobKey);
-		}
+        dictionary.computeIfAbsent(TENANT_ID, k -> job.getTenantId());
+        dictionary.computeIfAbsent(JOB, k -> job);
 
-		jobDetail = JobBuilder.newJob(job.getClass()).withIdentity(job.getName(), job.getGroup())
-				.withDescription(job.getDescription() != null ? job.getDescription() : "")
-				.usingJobData(new JobDataMap(dictionary)).build();
+        JobKey jobKey = JobKey.jobKey(job.getName(), job.getGroup());
+        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+        if (jobDetail != null) {
+            // Delete the job and all it's triggers that may already exist
+            scheduler.deleteJob(jobKey);
+        }
 
-		Set<Trigger> trgs = new HashSet<>();
-		for (Object triggerSpec : triggers.keySet()) {
-			Trigger trig = prepareTrigger(job, triggerSpec, triggers);
-			trgs.add(trig);
-		}
+        jobDetail = JobBuilder.newJob(job.getClass()).withIdentity(job.getName(), job.getGroup())
+                .withDescription(job.getDescription() != null ? job.getDescription() : "")
+                .usingJobData(new JobDataMap(dictionary)).build();
 
-		scheduler.scheduleJob(jobDetail, trgs, true);
-	}
+        Set<Trigger> trgs = new HashSet<>();
+        for (Object triggerSpec : triggers.keySet()) {
+            Trigger trig = prepareTrigger(job, triggerSpec, triggers);
+            trgs.add(trig);
+        }
 
-	/**
-	 * Immediately runs a Job
-	 * 
-	 * @param job the Job to schedule
-	 * @param dictionary map of data to assign at fire-time to the Job
-	 * 
-	 * @throws SchedulerException error in the scheduler
-	 */
-	public void scheduleNow(AbstractJob job, Map<String, Object> dictionary)
-			throws SchedulerException {
-		schedule(job, dictionary, DateUtils.addMilliseconds(new Date(), 500));
-	}
-	
-	private Trigger prepareTrigger(AbstractJob job, Object triggerSpec, Map<Object, Map<String, Object>> triggersMap) {
+        scheduler.scheduleJob(jobDetail, trgs, true);
+    }
+
+    /**
+     * Immediately runs a Job
+     * 
+     * @param job the Job to schedule
+     * @param dictionary map of data to assign at fire-time to the Job
+     * 
+     * @throws SchedulerException error in the scheduler
+     */
+    public void scheduleNow(AbstractJob job, Map<String, Object> dictionary) throws SchedulerException {
+        schedule(job, dictionary, DateUtils.addMilliseconds(new Date(), 500));
+    }
+
+    private Trigger prepareTrigger(AbstractJob job, Object triggerSpec, Map<Object, Map<String, Object>> triggersMap) {
 		if (!triggersMap.get(triggerSpec).containsKey(TENANT_ID))
 			triggersMap.get(triggerSpec).put(TENANT_ID, job.getTenantId());
 
@@ -145,7 +144,7 @@ public class JobManager {
 				schedule = schedule.withMisfireHandlingInstructionIgnoreMisfires();
 
 			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
-			yield TriggerBuilder.newTrigger().withIdentity(job.getName() + "-" + df.format(triggerSpec), job.getGroup())
+			yield TriggerBuilder.newTrigger().withIdentity("%s-%s".formatted(job.getName(), df.format(triggerSpec)), job.getGroup())
 					.usingJobData(new JobDataMap(triggersMap.get(triggerSpec))).startAt(dateSpec).withSchedule(schedule)
 					.build();
 		}
@@ -157,7 +156,7 @@ public class JobManager {
 			else
 				schedule = schedule.withMisfireHandlingInstructionDoNothing();
 
-			yield TriggerBuilder.newTrigger().withIdentity(job.getName() + "-" + triggerSpec, job.getGroup())
+			yield TriggerBuilder.newTrigger().withIdentity("%s-%s".formatted(job.getName(), triggerSpec), job.getGroup())
 					.usingJobData(new JobDataMap(triggersMap.get(triggerSpec))).withSchedule(schedule).build();
 		}
 		default -> {
@@ -167,125 +166,125 @@ public class JobManager {
 		};
 	}
 
-	/**
-	 * What policy to use in case of missfire
-	 * 
-	 * @param group the group name
-	 * 
-	 * @return JobManager.MISSFIRE_RUNNOW or JobManager.MISSFIRE_IGNORE
-	 */
-	public String getMissfireInstruction(String group) {
-		return config.getProperty("job." + group + ".missfire", MISSFIRE_RUNNOW);
-	}
+    /**
+     * What policy to use in case of missfire
+     * 
+     * @param group the group name
+     * 
+     * @return JobManager.MISSFIRE_RUNNOW or JobManager.MISSFIRE_IGNORE
+     */
+    public String getMissfireInstruction(String group) {
+        return config.getProperty("job.%s.missfire".formatted(group), MISSFIRE_RUNNOW);
+    }
 
-	/**
-	 * Max number of days to look in the past for missfired triggers
-	 * 
-	 * @param group the group name
-	 * 
-	 * @return max number of days
-	 */
-	public int getMissfireMax(String group) {
-		return config.getInt("job." + group + ".missfire.max", 2);
-	}
+    /**
+     * Max number of days to look in the past for missfired triggers
+     * 
+     * @param group the group name
+     * 
+     * @return max number of days
+     */
+    public int getMissfireMax(String group) {
+        return config.getInt("job.%s.missfire.max".formatted(group), 2);
+    }
 
-	/**
-	 * Retrieves all the job groups
-	 * 
-	 * @return list of groups
-	 * 
-	 * @throws SchedulerException error in the scheduler
-	 */
-	public List<String> getGroups() throws SchedulerException {
-		return scheduler.getJobGroupNames();
-	}
+    /**
+     * Retrieves all the job groups
+     * 
+     * @return list of groups
+     * 
+     * @throws SchedulerException error in the scheduler
+     */
+    public List<String> getGroups() throws SchedulerException {
+        return scheduler.getJobGroupNames();
+    }
 
-	/**
-	 * Retrieves the jobs
-	 * 
-	 * @param group name of the group or null to retrieve all the jobs
-	 * @param tenantId filter on the tenant
-	 * 
-	 * @return list of job details ordered by group and name
-	 * 
-	 * @throws SchedulerException error in the scheduler
-	 */
-	public List<JobDetail> getJobs(String group, Long tenantId) throws SchedulerException {
-		Set<JobKey> jobKeys = scheduler.getJobKeys(
-				StringUtils.isNotEmpty(group) ? GroupMatcher.groupEquals(group) : GroupMatcher.anyJobGroup());
+    /**
+     * Retrieves the jobs
+     * 
+     * @param group name of the group or null to retrieve all the jobs
+     * @param tenantId filter on the tenant
+     * 
+     * @return list of job details ordered by group and name
+     * 
+     * @throws SchedulerException error in the scheduler
+     */
+    public List<JobDetail> getJobs(String group, Long tenantId) throws SchedulerException {
+        Set<JobKey> jobKeys = scheduler.getJobKeys(
+                StringUtils.isNotEmpty(group) ? GroupMatcher.groupEquals(group) : GroupMatcher.anyJobGroup());
 
-		List<JobDetail> jobs = new ArrayList<>();
-		for (JobKey key : jobKeys) {
-			JobDetail job = getJob(key.getName(), key.getGroup());
-			if (tenantId == null || tenantId.equals(job.getJobDataMap().get(TENANT_ID)))
-				jobs.add(job);
-		}
+        List<JobDetail> jobs = new ArrayList<>();
+        for (JobKey key : jobKeys) {
+            JobDetail job = getJob(key.getName(), key.getGroup());
+            if (tenantId == null || tenantId.equals(job.getJobDataMap().get(TENANT_ID)))
+                jobs.add(job);
+        }
 
-		jobs.sort((jobDetails1, jobDetails2) -> {
-			int cmp = jobDetails1.getKey().getGroup().compareTo(jobDetails2.getKey().getGroup());
-			if (cmp == 0)
-				cmp = jobDetails1.getKey().getName().compareTo(jobDetails2.getKey().getName());
-			return cmp;
-		});
-		return jobs;
-	}
+        jobs.sort((jobDetails1, jobDetails2) -> {
+            int cmp = jobDetails1.getKey().getGroup().compareTo(jobDetails2.getKey().getGroup());
+            if (cmp == 0)
+                cmp = jobDetails1.getKey().getName().compareTo(jobDetails2.getKey().getName());
+            return cmp;
+        });
+        return jobs;
+    }
 
-	public JobDetail getJob(String name, String group) throws SchedulerException {
-		return scheduler.getJobDetail(JobKey.jobKey(name, group));
-	}
+    public JobDetail getJob(String name, String group) throws SchedulerException {
+        return scheduler.getJobDetail(JobKey.jobKey(name, group));
+    }
 
-	public List<Trigger> getTriggersOfJob(String name, String group) throws SchedulerException {
-		return scheduler.getTriggersOfJob(JobKey.jobKey(name, group)).stream().collect(Collectors.toList());
-	}
+    public List<Trigger> getTriggersOfJob(String name, String group) throws SchedulerException {
+        return scheduler.getTriggersOfJob(JobKey.jobKey(name, group)).stream().collect(Collectors.toList());
+    }
 
-	public void unscheduleJob(String name, String group) throws SchedulerException {
-		if (scheduler != null) {
-			JobDetail job = scheduler.getJobDetail(JobKey.jobKey(name, group));
-			if (job != null)
-				scheduler.deleteJob(JobKey.jobKey(name, group));
-		}
-	}
+    public void unscheduleJob(String name, String group) throws SchedulerException {
+        if (scheduler != null) {
+            JobDetail job = scheduler.getJobDetail(JobKey.jobKey(name, group));
+            if (job != null)
+                scheduler.deleteJob(JobKey.jobKey(name, group));
+        }
+    }
 
-	public void unscheduleTrigger(String name, String group) throws SchedulerException {
-		if (scheduler != null) {
-			Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(name, group));
-			if (trigger != null)
-				scheduler.unscheduleJob(TriggerKey.triggerKey(name, group));
-		}
-	}
+    public void unscheduleTrigger(String name, String group) throws SchedulerException {
+        if (scheduler != null) {
+            Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(name, group));
+            if (trigger != null)
+                scheduler.unscheduleJob(TriggerKey.triggerKey(name, group));
+        }
+    }
 
-	/**
-	 * Retrieves the triggers
-	 * 
-	 * @param group name of the group or null to retrieve all the triggers
-	 * @param tenantId filter on the tenant
-	 * 
-	 * @return list of triggers ordered by group and name
-	 * 
-	 * @throws SchedulerException error in the scheduler
-	 */
-	public List<Trigger> getTriggers(String group, Long tenantId) throws SchedulerException {
-		Set<TriggerKey> triggerKeys = scheduler
-				.getTriggerKeys(StringUtils.isNotEmpty(group) ? GroupMatcher.triggerGroupEquals(group)
-						: GroupMatcher.anyTriggerGroup());
+    /**
+     * Retrieves the triggers
+     * 
+     * @param group name of the group or null to retrieve all the triggers
+     * @param tenantId filter on the tenant
+     * 
+     * @return list of triggers ordered by group and name
+     * 
+     * @throws SchedulerException error in the scheduler
+     */
+    public List<Trigger> getTriggers(String group, Long tenantId) throws SchedulerException {
+        Set<TriggerKey> triggerKeys = scheduler
+                .getTriggerKeys(StringUtils.isNotEmpty(group) ? GroupMatcher.triggerGroupEquals(group)
+                        : GroupMatcher.anyTriggerGroup());
 
-		List<Trigger> triggers = new ArrayList<>();
-		for (TriggerKey key : triggerKeys) {
-			Trigger trigger = getTrigger(key.getName(), key.getGroup());
-			if (tenantId == null || tenantId.equals(trigger.getJobDataMap().get(TENANT_ID)))
-				triggers.add(trigger);
-		}
+        List<Trigger> triggers = new ArrayList<>();
+        for (TriggerKey key : triggerKeys) {
+            Trigger trigger = getTrigger(key.getName(), key.getGroup());
+            if (tenantId == null || tenantId.equals(trigger.getJobDataMap().get(TENANT_ID)))
+                triggers.add(trigger);
+        }
 
-		triggers.sort((Trigger o1, Trigger o2) -> {
-			int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
-			if (cmp == 0)
-				cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
-			return cmp;
-		});
-		return triggers;
-	}
+        triggers.sort((Trigger o1, Trigger o2) -> {
+            int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
+            if (cmp == 0)
+                cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
+            return cmp;
+        });
+        return triggers;
+    }
 
-	public Trigger getTrigger(String name, String group) throws SchedulerException {
-		return scheduler.getTrigger(TriggerKey.triggerKey(name, group));
-	}
+    public Trigger getTrigger(String name, String group) throws SchedulerException {
+        return scheduler.getTrigger(TriggerKey.triggerKey(name, group));
+    }
 }

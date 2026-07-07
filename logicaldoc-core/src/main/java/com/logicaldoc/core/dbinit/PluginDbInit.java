@@ -23,71 +23,72 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public class PluginDbInit extends DBInit {
 
-	private static final Logger log = LoggerFactory.getLogger(PluginDbInit.class);
+    private static final Logger log = LoggerFactory.getLogger(PluginDbInit.class);
 
-	/**
-	 * Intitializes the database using 'DbInit' extension point.
-	 * 
-	 * @throws SQLException Error in the database
-	 */
-	public void init() throws SQLException {
-		init(new HashSet<>());
-	}
+    /**
+     * Intitializes the database using 'DbInit' extension point.
+     * 
+     * @throws SQLException Error in the database
+     */
+    public void init() throws SQLException {
+        init(new HashSet<>());
+    }
 
-	public void init(Set<String> ids) throws SQLException {
-		log.info("Start database initialization");
-		log.info("Database engine is {}", getDbms());
+    public void init(Set<String> ids) throws SQLException {
+        log.info("Start database initialization");
+        log.info("Database engine is {}", getDbms());
 
-		try {
-			// Acquire the 'DbInit' extensions of the core plugin
-			PluginRegistry registry = PluginRegistry.getInstance();
-			Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "DbInit");
+        try {
+            // Acquire the 'DbInit' extensions of the core plugin
+            PluginRegistry registry = PluginRegistry.getInstance();
+            Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "DbInit");
 
-			// Sort the extensions according to ascending position
-			List<Extension> sortedExts = new ArrayList<>();
-			for (Extension extension : exts) {
-				sortedExts.add(extension);
-			}
-			Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
-				int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
-				if (position1 < position2)
-					return -1;
-				else if (position1 > position2)
-					return 1;
-				else
-					return 0;
-			});
+            // Sort the extensions according to ascending position
+            List<Extension> sortedExts = new ArrayList<>();
+            for (Extension extension : exts) {
+                sortedExts.add(extension);
+            }
+            Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
+                int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
+                int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
+                if (position1 < position2)
+                    return -1;
+                else if (position1 > position2)
+                    return 1;
+                else
+                    return 0;
+            });
 
-			getSqlList().clear();
+            getSqlList().clear();
 
-			// Acquire the ordered list of sql files
-			for (Extension ext : sortedExts) {
-				String id = ext.getDeclaringPluginDescriptor().getId();
-				if (!ids.isEmpty() && !ids.contains(id))
-					continue;
+            // Acquire the ordered list of sql files
+            for (Extension ext : sortedExts) {
+                String id = ext.getDeclaringPluginDescriptor().getId();
+                if (!ids.isEmpty() && !ids.contains(id))
+                    continue;
 
-				String sqlFile = ext.getParameter("sqlFile").valueAsString();
-				if (exists(sqlFile + "." + getDbms().toLowerCase()))
-					getSqlList().add(sqlFile + "." + getDbms().toLowerCase());
-				else
-					getSqlList().add(sqlFile);
-			}
-			execute();
-		} catch (Exception e) {
-			throw new SQLException(e.getMessage());
-		}
-	}
+                String sqlFile = ext.getParameter("sqlFile").valueAsString();
+                String dbmsSqlFile = "%s.%s".formatted(sqlFile, getDbms().toLowerCase());
+                if (exists(dbmsSqlFile))
+                    getSqlList().add(dbmsSqlFile);
+                else
+                    getSqlList().add(sqlFile);
+            }
+            execute();
+        } catch (Exception e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
 
-	/**
-	 * Checks resource existence into the classpath
-	 */
-	private boolean exists(String name) {
-		ClassLoader cl = this.getClass().getClassLoader();
-		try {
-			return cl.getResourceAsStream(name) != null;
-		} catch (Exception t) {
-			return false;
-		}
-	}
+    /**
+     * Checks resource existence into the classpath
+     */
+    private boolean exists(String name) {
+        ClassLoader cl = this.getClass().getClassLoader();
+        try {
+            return cl.getResourceAsStream(name) != null;
+        } catch (Exception t) {
+            return false;
+        }
+    }
 }

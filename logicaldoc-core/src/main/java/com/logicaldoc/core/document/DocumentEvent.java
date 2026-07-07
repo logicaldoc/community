@@ -10,42 +10,42 @@ import java.util.List;
  * @since 6.6
  */
 public enum DocumentEvent {
-	STORED, CHANGED, CHECKEDIN, CHECKEDOUT, IMMUTABLE, RENAMED, DOWNLOADED, INDEXED, INDEXED_ERROR, MOVED, LOCKED, UNLOCKED, ARCHIVED, DELETED, RESOURCE_DELETED, SENT, BARCODED, ZONALOCRD, WORKFLOWSTATUS, WORKFLOWAPPENDED, SHORTCUT_STORED, SHORTCUT_MOVED, SHORTCUT_DELETED, VIEWED, RESTORED, NEW_NOTE, SIGNED, EXPORTPDF, EXPORTED, ADDED_TO_CALEVENT, REMOVED_FROM_CALEVENT, SUBSCRIBED, STAMPED, TICKET_CREATED, PASSWORD_PROTECTED, PASSWORD_UNPROTECTED, RATING_NEW, CONVERTED, VERSION_DELETED, VERSION_REPLACED, COMPARED, COPYED, ESIGNED, FORM_SUBMITTED, FORM_EDITED, READING_CONFIRMED, READING_REQUESTED, PERMISSION, EMBEDDED, FILLED;
+    STORED, CHANGED, CHECKEDIN, CHECKEDOUT, IMMUTABLE, RENAMED, DOWNLOADED, INDEXED, INDEXED_ERROR, MOVED, LOCKED, UNLOCKED, ARCHIVED, DELETED, RESOURCE_DELETED, SENT, BARCODED, ZONALOCRD, WORKFLOWSTATUS, WORKFLOWAPPENDED, SHORTCUT_STORED, SHORTCUT_MOVED, SHORTCUT_DELETED, VIEWED, RESTORED, NEW_NOTE, SIGNED, EXPORTPDF, EXPORTED, ADDED_TO_CALEVENT, REMOVED_FROM_CALEVENT, SUBSCRIBED, STAMPED, TICKET_CREATED, PASSWORD_PROTECTED, PASSWORD_UNPROTECTED, RATING_NEW, CONVERTED, VERSION_DELETED, VERSION_REPLACED, COMPARED, COPYED, ESIGNED, FORM_SUBMITTED, FORM_EDITED, READING_CONFIRMED, READING_REQUESTED, PERMISSION, EMBEDDED, FILLED;
 
-	/**
-	 * Gets the right enumeration entry from the corresponding resource bundle
-	 * key
-	 * 
-	 * @param key the resource bundle key
-	 * 
-	 * @return The corresponding entry
-	 */
-	public static DocumentEvent fromKey(String key) {
-		return DocumentEvent
-				.valueOf(key.contains(".") ? key.replace("event.", "").toUpperCase().replace(".", "_") : key);
-	}
+    /**
+     * Gets the right enumeration entry from the corresponding resource bundle
+     * key
+     * 
+     * @param key the resource bundle key
+     * 
+     * @return The corresponding entry
+     */
+    public static DocumentEvent fromKey(String key) {
+        return DocumentEvent
+                .valueOf(key.contains(".") ? key.replace("event.", "").toUpperCase().replace(".", "_") : key);
+    }
 
-	/**
-	 * Converts the enumeration entry to the corresponding key in the resource
-	 * bundle
-	 * 
-	 * @return The key
-	 */
-	public String toKey() {
-		return "event." + name().toLowerCase().replace("_", ".");
-	}
+    /**
+     * Converts the enumeration entry to the corresponding key in the resource
+     * bundle
+     * 
+     * @return The key
+     */
+    public String toKey() {
+        return "event.%s".formatted(name().toLowerCase().replace("_", "."));
+    }
 
-	/**
-	 * Retrieves the all resource bundle keys
-	 * 
-	 * @return A list of keys
-	 */
-	public List<String> allKeys() {
-		return Arrays.asList(DocumentEvent.values()).stream().map(e -> e.toKey()).toList();
-	}
+    /**
+     * Retrieves the all resource bundle keys
+     * 
+     * @return A list of keys
+     */
+    public List<String> allKeys() {
+        return Arrays.asList(DocumentEvent.values()).stream().map(e -> e.toKey()).toList();
+    }
 
-	@Override
-	public String toString() {
-		return toKey();
-	}
+    @Override
+    public String toString() {
+        return toKey();
+    }
 }

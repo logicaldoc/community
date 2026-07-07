@@ -66,7 +66,7 @@ public class FolderListenerManager {
 				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof FolderListener))
 					throw new ClassNotFoundException(
-							"The specified listener " + className + " doesn't implement FolderListener interface");
+							"The specified listener %s doesn't implement FolderListener interface".formatted(className));
 				listeners.add((FolderListener) listener);
 				if (log.isInfoEnabled())
 					log.info("Added new folder listener {} position {}", className,

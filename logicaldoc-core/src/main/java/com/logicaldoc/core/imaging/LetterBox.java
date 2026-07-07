@@ -81,6 +81,6 @@ public class LetterBox extends BufferedImage {
 
     @Override
     public String toString() {
-        return "Letterbox [scale = " + scale + ", offsetX = " + offsetX + ", offsetY = " + offsetY + "]";
+        return "Letterbox [scale = %f, offsetX = %d, offsetY = %d]".formatted(scale, offsetX, offsetY);
     }
 }

@@ -710,8 +710,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             query.append(" and D.ld_folderid = %d".formatted(folderId));
         if (formId != null)
             query.append(" and D.ld_formid = %d".formatted(formId));
-        query.append(
-                ") and ld_name in ('%s')".formatted(extendedAttributes.stream().collect(Collectors.joining("','"))));
+        query.append(") and ld_name in (%s)"
+                .formatted(extendedAttributes.stream().map(n -> "'%s'".formatted(n)).collect(Collectors.joining(","))));
 
         dao.query(query.toString(), new ExtendedAttributeRowMapper(extAttributesValues, locale), null);
     }

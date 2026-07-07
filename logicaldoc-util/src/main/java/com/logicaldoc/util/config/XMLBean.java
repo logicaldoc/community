@@ -125,6 +125,10 @@ public class XMLBean {
 		root = doc.getRootElement();
 	}
 
+	protected Namespace rootNamespace() {
+        return getRootElement().getNamespace();
+    }
+	
 	private void buildFromFileUrl(SAXBuilder builder) {
 		try {
 			doc = builder.build("file://" + docPath);

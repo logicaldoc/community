@@ -132,6 +132,6 @@ public class ImageZone implements Serializable {
 
     @Override
     public String toString() {
-        return "ImageZone [left=" + left + ", top=" + top + ", width=" + width + ", height=" + height + "]";
+        return "ImageZone [left=%f, top=%f, width=%f, height=%f]".formatted(left, top, width, height);
     }
 }

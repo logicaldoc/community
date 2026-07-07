@@ -278,7 +278,7 @@ public class FormatConversionManager {
             converter.convert(transaction != null ? transaction.getSessionId() : null, document, src, out);
             if (out.length() <= 0)
                 throw new IOException(String.format("The converter %s was unable to convert document: %s",
-                        converter.getClass().getSimpleName(), document.getId() + " - " + fileName));
+                        converter.getClass().getSimpleName(), "%d - %s".formatted(document.getId(), fileName)));
 
             if (transaction != null) {
                 transaction.setEvent(DocumentEvent.CONVERTED);
@@ -478,9 +478,8 @@ public class FormatConversionManager {
      * @return the key
      */
     private String composeKey(String inFileName, String outFileName) {
-        String inExt = AbstractFormatConverter.getExtension(inFileName).toLowerCase();
-        String outExt = AbstractFormatConverter.getExtension(outFileName).toLowerCase();
-        return inExt + "-" + outExt;
+        return "%s-%s".formatted(AbstractFormatConverter.getExtension(inFileName).toLowerCase(),
+                AbstractFormatConverter.getExtension(outFileName).toLowerCase());
     }
 
     /**
@@ -496,7 +495,7 @@ public class FormatConversionManager {
      */
     private File writeToFile(Document document, String fileVersion) throws IOException, PersistenceException {
         File target = FileUtil.createTempFile("scr",
-                "." + AbstractFormatConverter.getExtension(document.getFileName()));
+                ".%s".formatted(AbstractFormatConverter.getExtension(document.getFileName())));
         store.writeToFile(StoreResource.builder().document(document)
                 .fileVersion(getSuitableFileVersion(document, fileVersion)).build(), target);
         return target;

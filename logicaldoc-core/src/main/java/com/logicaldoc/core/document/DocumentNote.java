@@ -380,7 +380,7 @@ public class DocumentNote extends PersistentObject implements Secure<NoteAccessC
 	
 	@Override
 	public String toString() {
-		return StringUtils.abbreviate(message, 40) + "(" + getId() + ")";
+		return "%s(%d)".formatted(StringUtils.abbreviate(message, 40), getId());
 	}
 
 	@Override

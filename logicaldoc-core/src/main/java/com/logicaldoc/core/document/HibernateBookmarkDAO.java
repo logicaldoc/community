@@ -20,47 +20,42 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark> implements BookmarkDAO {
 
-	private static final String AND = " and ";
+    public HibernateBookmarkDAO() {
+        super(Bookmark.class);
+        super.log = LoggerFactory.getLogger(HibernateBookmarkDAO.class);
+    }
 
-	private static final String USER_ID = ".userId =";
+    @Override
+    public List<Bookmark> findByUserId(long userId) throws PersistenceException {
+        return findByWhere("_entity.userId = %d".formatted(userId), "_entity.position asc", null);
+    }
 
-	public HibernateBookmarkDAO() {
-		super(Bookmark.class);
-		super.log = LoggerFactory.getLogger(HibernateBookmarkDAO.class);
-	}
+    @Override
+    public Bookmark findByUserIdAndDocId(long userId, long docId) throws PersistenceException {
+        return findByWhere("_entity.userId = %d and _entity.targetId = %d and _entity.type = %d".formatted(userId, docId,
+                Bookmark.TYPE_DOCUMENT), null, null).stream().findFirst().orElse(null);
+    }
 
-	@Override
-	public List<Bookmark> findByUserId(long userId) throws PersistenceException {
-		return findByWhere(ENTITY + USER_ID + userId, ENTITY + ".position asc", null);
-	}
+    @Override
+    public Bookmark findByUserIdAndFolderId(long userId, long folderId) throws PersistenceException {
+        return findByWhere("_entity.userId = %d and _entity.targetId = %d and _entity.type = %d".formatted(userId,
+                folderId, Bookmark.TYPE_FOLDER), null, null).stream().findFirst().orElse(null);
+    }
 
-	@Override
-	public Bookmark findByUserIdAndDocId(long userId, long docId) throws PersistenceException {
-		return findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + docId + AND
-				+ ENTITY + ".type=" + Bookmark.TYPE_DOCUMENT, null, null).stream().findFirst().orElse(null);
-	}
+    @Override
+    public List<Long> findBookmarkedDocs(long userId) throws PersistenceException {
+        return queryForList("select ld_docid from ld_bookmark where ld_type = %d and ld_deleted = 0 and ld_userid = %d"
+                .formatted(Bookmark.TYPE_DOCUMENT, userId), Long.class);
+    }
 
-	@Override
-	public Bookmark findByUserIdAndFolderId(long userId, long folderId) throws PersistenceException {
-		return findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + folderId + AND
-				+ ENTITY + ".type=" + Bookmark.TYPE_FOLDER, null, null).stream().findFirst().orElse(null);
-	}
-
-	@Override
-	public List<Long> findBookmarkedDocs(long userId) throws PersistenceException {
-		String sql = "select ld_docid from ld_bookmark where ld_type=" + Bookmark.TYPE_DOCUMENT
-				+ " and ld_deleted = 0 and ld_userid = " + userId;
-		return queryForList(sql, Long.class);
-	}
-
-	@Override
-	public boolean isDocBookmarkedByUser(long docId, long userId) throws PersistenceException {
-		String sql = "select count(ld_docid) from ld_bookmark where ld_type=" + Bookmark.TYPE_DOCUMENT
-				+ " and ld_deleted = 0 and ld_userid = " + userId + " and ld_docid = " + docId;
-		try {
-			return queryForInt(sql) > 0;
-		} catch (Exception t) {
-			return queryForLong(sql) > 0;
-		}
-	}
+    @Override
+    public boolean isDocBookmarkedByUser(long docId, long userId) throws PersistenceException {
+        String sql = "select count(ld_docid) from ld_bookmark where ld_type = %d and ld_deleted = 0 and ld_userid = %d and ld_docid = %d"
+                .formatted(Bookmark.TYPE_DOCUMENT, userId, docId);
+        try {
+            return queryForInt(sql) > 0;
+        } catch (Exception t) {
+            return queryForLong(sql) > 0;
+        }
+    }
 }

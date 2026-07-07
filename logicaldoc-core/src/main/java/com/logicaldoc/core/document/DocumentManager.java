@@ -269,7 +269,7 @@ public class DocumentManager {
         validateTransaction(transaction);
 
         // Write content to temporary file, then delete it
-        File tmp = FileUtil.createTempFile("checkin", "." + FileUtil.getExtension(filename));
+        File tmp = FileUtil.createTempFile("checkin", ".%s".formatted(FileUtil.getExtension(filename)));
         try {
             FileUtil.writeFile(content, tmp.getPath());
             return checkin(docId, tmp, filename, release, docVO, transaction);
@@ -776,7 +776,7 @@ public class DocumentManager {
     private Document getExistingDocument(long docId) throws PersistenceException {
         Document doc = documentDAO.findById(docId);
         if (doc == null)
-            throw new IllegalArgumentException("Unexisting document with ID: " + docId);
+            throw new IllegalArgumentException("Unexisting document with ID: %d".formatted(docId));
         return doc;
     }
 

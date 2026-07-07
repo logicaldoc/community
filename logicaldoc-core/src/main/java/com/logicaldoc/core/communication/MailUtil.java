@@ -529,7 +529,7 @@ public class MailUtil {
             }
         }
 
-        return "T" + NO_BODY;
+        return "T%s".formatted(NO_BODY);
     }
 
     /**
@@ -554,10 +554,10 @@ public class MailUtil {
         }
 
         if (p.isMimeType("text/html")) {
-            return "H" + str;
+            return "H%s".formatted(str);
         } else {
             // Let's set as text/plain
-            return "T" + str;
+            return "T%s".formatted(str);
         }
     }
 
@@ -573,7 +573,7 @@ public class MailUtil {
     private static String extractTextFromMultipartAlernative(Part p) throws IOException, MessagingException {
         // prefer html over plain text
         Multipart mp = (Multipart) p.getContent();
-        String text = "T" + NO_BODY;
+        String text = "T%s".formatted(NO_BODY);
 
         for (int i = 0; i < mp.getCount(); i++) {
             Part bp = mp.getBodyPart(i);
@@ -737,7 +737,7 @@ public class MailUtil {
      */
     private static void extractPartText(Object content, StringBuilder textBody) throws MessagingException, IOException {
         if (content instanceof String string) {
-            textBody.append("\n" + string);
+            textBody.append("\n%s".formatted(string));
             return;
         }
 

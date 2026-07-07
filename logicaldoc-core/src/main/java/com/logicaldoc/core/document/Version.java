@@ -82,7 +82,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
     public Version() {
     }
-  
+
     protected void copyAttributes(Version source) {
         super.copyAttributes(source);
         setId(source.getId());
@@ -154,10 +154,12 @@ public class Version extends AbstractDocument implements Comparable<Version> {
     /**
      * Calculate the new version name in the format <b>X</b>.<b>Y</b>.
      * 
-     * <ul> <li>if the new version is a release, then X will be raised by 1 and
-     * Y will be 0 (e.g.: 12.3 will become 13.0)</li> <li>if the new version is
-     * not a release, then Y will be raised by 1 (e.g.: 12.3 will become
-     * 12.4)</li> </ul>
+     * <ul>
+     * <li>if the new version is a release, then X will be raised by 1 and Y
+     * will be 0 (e.g.: 12.3 will become 13.0)</li>
+     * <li>if the new version is not a release, then Y will be raised by 1
+     * (e.g.: 12.3 will become 12.4)</li>
+     * </ul>
      * 
      * @param oldVersionName the old version in the format <b>X</b>.<b>Y</b>
      * @param major if the new version is a major release or not
@@ -195,7 +197,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
             version = String.valueOf(number + 1);
         }
 
-        return rel + "." + version;
+        return "%s.%s".formatted(rel, version);
     }
 
     public int compareTo(Version other) {
@@ -223,7 +225,8 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
     @Override
     public String toString() {
-        return getVersion() + (getComment() != null ? "-" + getComment() : "");
+        return "%s%s".formatted(getVersion(),
+                StringUtils.isNotEmpty(getComment()) ? "-%s".formatted(getComment()) : "");
     }
 
     public Date getVersionDate() {
@@ -262,9 +265,11 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
     /**
      * Factory method that creates a Version and replicate all given document's
-     * properties.<br> The new version and fileVersion will be set in both
-     * Document and Version<br> <br> <b>Important:</b> The created Version is
-     * not persistent
+     * properties.<br>
+     * The new version and fileVersion will be set in both Document and
+     * Version<br>
+     * <br>
+     * <b>Important:</b> The created Version is not persistent
      * 
      * @param document The document to be versioned
      * @param user The user who made the changes

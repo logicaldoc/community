@@ -18,76 +18,75 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 
-	private HLayout formsContainer = new HLayout();
+    private HLayout formsContainer = new HLayout();
 
-	private ValuesManager vm = new ValuesManager();
+    private ValuesManager vm = new ValuesManager();
 
-	public AutomationRoutineProperties(GUIAutomationRoutine routine, final ChangedHandler changedHandler) {
-		super(routine, changedHandler);
-		setWidth100();
-		setHeight100();
+    public AutomationRoutineProperties(GUIAutomationRoutine routine, final ChangedHandler changedHandler) {
+        super(routine, changedHandler);
+        setWidth100();
+        setHeight100();
 
-		setMembers(formsContainer);
-		refresh();
-	}
+        setMembers(formsContainer);
+        refresh();
+    }
 
-	private void refresh() {
-		vm.clearValues();
-		vm.clearErrors(false);
+    private void refresh() {
+        vm.clearValues();
+        vm.clearErrors(false);
 
-		if (formsContainer.getMembers() != null)
-			formsContainer.removeMembers(formsContainer.getMembers());
+        if (formsContainer.getMembers() != null)
+            formsContainer.removeMembers(formsContainer.getMembers());
 
-		DynamicForm form2 = new DynamicForm();
-		form2.setWidth100();
-		form2.setTitleOrientation(TitleOrientation.TOP);
-		form2.setValuesManager(vm);
-		form2.setNumCols(1);
+        DynamicForm form2 = new DynamicForm();
+        form2.setWidth100();
+        form2.setTitleOrientation(TitleOrientation.TOP);
+        form2.setValuesManager(vm);
+        form2.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", routine.getAutomation(),
-				changedHandler, false);
-		automation.setStartRow(false);
-		automation.setRequired(true);
-		automation.setWidth("*");
+        final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", routine.getAutomation(),
+                changedHandler, false);
+        automation.setStartRow(false);
+        automation.setRequired(true);
+        automation.setWidth("*");
 
-		form2.setItems(automation);
+        form2.setItems(automation);
 
-		DynamicForm form1 = new DynamicForm();
-		form1.setNumCols(1);
-		form1.setTitleOrientation(TitleOrientation.TOP);
-		form1.setValuesManager(vm);
+        DynamicForm form1 = new DynamicForm();
+        form1.setNumCols(1);
+        form1.setTitleOrientation(TitleOrientation.TOP);
+        form1.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", routine.getName());
-		name.addChangedHandler(changedHandler);
-		name.setDisabled(routine.getId() != 0L);
+        TextItem name = ItemFactory.newSimpleTextItem("name", routine.getName());
+        name.addChangedHandler(changedHandler);
 
-		TextItem description = ItemFactory.newTextItem("description", routine.getDescription());
-		description.addChangedHandler(changedHandler);
-		description.setWidth(200);
+        TextItem description = ItemFactory.newTextItem("description", routine.getDescription());
+        description.addChangedHandler(changedHandler);
+        description.setWidth(200);
 
-		form1.setItems(name, description);
+        form1.setItems(name, description);
 
-		formsContainer.setMembers(form1, form2);
-	}
+        formsContainer.setMembers(form1, form2);
+    }
 
-	@Override
-	public boolean validate() {
-		vm.validate();
-		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			routine.setName(vm.getValueAsString("name"));
-			routine.setDescription(vm.getValueAsString("description"));
-			routine.setAutomation(vm.getValueAsString("automation"));
-		}
-		return !vm.hasErrors();
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    @Override
+    public boolean validate() {
+        vm.validate();
+        if (Boolean.FALSE.equals(vm.hasErrors())) {
+            routine.setName(vm.getValueAsString("name"));
+            routine.setDescription(vm.getValueAsString("description"));
+            routine.setAutomation(vm.getValueAsString("automation"));
+        }
+        return !vm.hasErrors();
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

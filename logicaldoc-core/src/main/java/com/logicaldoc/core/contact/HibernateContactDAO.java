@@ -32,19 +32,19 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 	@Override
 	public List<Contact> findByUser(Long userId, String email) throws PersistenceException {
 		Map<String, Object> params = new HashMap<>();
-		StringBuilder sb = new StringBuilder("");
+		StringBuilder query = new StringBuilder("");
 		if (userId == null) {
-			sb.append(" " + ENTITY + ".userId is null ");
+			query.append("_entity.userId is null ");
 		} else {
-			sb.append(" " + ENTITY + ".userId = :userId ");
+			query.append("_entity.userId = :userId ");
 			params.put("userId", userId);
 		}
 		if (email != null) {
-			sb.append(" and " + ENTITY + ".email = :email ");
+			query.append(" and _entity.email = :email ");
 			params.put("email", email);
 		}
 
-		return findByWhere(sb.toString(), params, ENTITY + ".firstName, " + ENTITY + ".lastName", null);
+		return findByWhere(query.toString(), params, "_entity.firstName, _entity.lastName", null);
 	}
 
 	@Override
@@ -55,7 +55,6 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 		contact.setLastName(HTMLSanitizer.sanitizeSimpleText(contact.getLastName()));
 		contact.setMobile(HTMLSanitizer.sanitizeSimpleText(contact.getMobile()));
 		contact.setPhone(HTMLSanitizer.sanitizeSimpleText(contact.getPhone()));
-	
 		super.store(contact);
 	}
 }

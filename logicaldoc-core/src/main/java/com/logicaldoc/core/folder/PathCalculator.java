@@ -1,6 +1,7 @@
 package com.logicaldoc.core.folder;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,77 +22,78 @@ import jakarta.annotation.Resource;
 @Component("pathCalculator")
 public class PathCalculator extends Task {
 
-	public static final String NAME = "PathCalculator";
-	
-	@Resource(name = "folderDAO")
-	protected FolderDAO folderDao;
+    public static final String NAME = "PathCalculator";
 
-	private long processed = 0;
+    @Resource(name = "folderDAO")
+    protected FolderDAO folderDao;
 
-	private long errors = 0;
+    private long processed = 0;
 
-	public PathCalculator() {
-		super(NAME);
-		log = LoggerFactory.getLogger(PathCalculator.class);
-	}
+    private long errors = 0;
 
-	@Override
-	public boolean isIndeterminate() {
-		return false;
-	}
+    public PathCalculator() {
+        super(NAME);
+        log = LoggerFactory.getLogger(PathCalculator.class);
+    }
 
-	@Override
-	public boolean isConcurrent() {
-		return false;
-	}
+    @Override
+    public boolean isIndeterminate() {
+        return false;
+    }
 
-	@Override
-	protected void runTask() throws TaskException {
-		log.info("Start indexing of all documents");
+    @Override
+    public boolean isConcurrent() {
+        return false;
+    }
 
-		errors = 0;
-		processed = 0;
+    @Override
+    protected void runTask() throws TaskException {
+        log.info("Start indexing of all documents");
 
-		try {
-			// First of all find folders to be processed and not already
-			// involved into a transaction
-			List<Long> ids = folderDao
-					.queryForList("select ld_id from ld_folder where ld_deleted=0 and ld_path is null", Long.class);
-			log.info("Found a total of {} folders to be processed", ids.size());
-			setSize(ids.size());
+        errors = 0;
+        processed = 0;
 
-			if (!ids.isEmpty()) {
-				for (Long id : ids) {
-					processFolder(id);
-					if (interruptRequested)
-						break;
-				}
-			}
-		} catch (PersistenceException e) {
-			throw new TaskException(e.getMessage(), e);
-		} finally {
-			log.info("Path calculation finished");
-			log.info("Processed folders: {}", processed);
-			log.info("Errors: {}", errors);
-		}
-	}
+        try {
+            // First of all find folders to be processed and not already
+            // involved into a transaction
+            List<Long> ids = folderDao
+                    .queryForList("select ld_id from ld_folder where ld_deleted=0 and ld_path is null", Long.class);
+            log.info("Found a total of {} folders to be processed", ids.size());
+            setSize(ids.size());
 
-	private void processFolder(Long id) {
-		try {
-			String path = folderDao.computePath(id);
-			folderDao.jdbcUpdate("update ld_folder set ld_path='" + path + "' where ld_id=" + id);
-			processed++;
-		} catch (Exception e) {
-			log.error("Error processing folder {}: {}", id, e.getMessage());
-			log.error(e.getMessage(), e);
-			errors++;
-		} finally {
-			next();
-		}
-	}
+            if (!ids.isEmpty()) {
+                for (Long id : ids) {
+                    processFolder(id);
+                    if (interruptRequested)
+                        break;
+                }
+            }
+        } catch (PersistenceException e) {
+            throw new TaskException(e.getMessage(), e);
+        } finally {
+            log.info("Path calculation finished");
+            log.info("Processed folders: {}", processed);
+            log.info("Errors: {}", errors);
+        }
+    }
 
-	public FolderDAO getFolderDao() {
-		return folderDao;
-	}
+    private void processFolder(Long id) {
+        try {
+            String path = folderDao.computePath(id);
+            folderDao.jdbcUpdate("update ld_folder set ld_path = :path where ld_id = :id",
+                    Map.of("id", id, "path", path));
+            processed++;
+        } catch (Exception e) {
+            log.error("Error processing folder {}: {}", id, e.getMessage());
+            log.error(e.getMessage(), e);
+            errors++;
+        } finally {
+            next();
+        }
+    }
+
+    public FolderDAO getFolderDao() {
+        return folderDao;
+    }
 
 }

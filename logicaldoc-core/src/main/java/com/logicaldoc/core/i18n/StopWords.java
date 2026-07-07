@@ -41,9 +41,9 @@ public abstract class StopWords {
 	}
 
 	private static Set<String> loadStopWords(Locale locale) {
-		String resource = "/stopwords/stopwords_" + locale + ".txt";
+		String resource = "/stopwords/stopwords_%s.txt".formatted(locale);
 		if (!ResourceUtil.existsResource(resource))
-			resource = "/stopwords/stopwords_" + locale.getLanguage() + ".txt";
+			resource = "/stopwords/stopwords_%s.txt".formatted(locale.getLanguage());
 		if (!ResourceUtil.existsResource(resource))
 			resource = "/stopwords/stopwords_en.txt";
 		log.debug("Loading stopwords from: {}", resource);

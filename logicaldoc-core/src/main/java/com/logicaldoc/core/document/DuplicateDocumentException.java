@@ -8,20 +8,20 @@ package com.logicaldoc.core.document;
  */
 public class DuplicateDocumentException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final String customId;
+    private final String customId;
 
-	public String getCustomId() {
-		return customId;
-	}
-	
-	public DuplicateDocumentException(String customId, Throwable cause) {
-		super("Duplicate Document. customid: " + customId, cause);
-		this.customId = customId;
-	}
+    public String getCustomId() {
+        return customId;
+    }
 
-	public DuplicateDocumentException(String customId) {
-		this(customId, null);
-	}
+    public DuplicateDocumentException(String customId, Throwable cause) {
+        super("Duplicate Document. customid: %s".formatted(customId), cause);
+        this.customId = customId;
+    }
+
+    public DuplicateDocumentException(String customId) {
+        this(customId, null);
+    }
 }

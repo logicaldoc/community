@@ -15,29 +15,29 @@ import com.logicaldoc.util.io.P7M;
  */
 public class P7MConverter extends AbstractFormatConverter {
 
-	@Override
-	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
-		File tmp = null;
-		try {
-			String baseName = FileUtil.getBaseName(document.getFileName());
-			String enclosedExtension = FileUtil.getExtension(baseName).toLowerCase();
-			String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
+    @Override
+    public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+        File tmp = null;
+        try {
+            String baseName = FileUtil.getBaseName(document.getFileName());
+            String enclosedExtension = FileUtil.getExtension(baseName).toLowerCase();
+            String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 
-			tmp = FileUtil.createTempFile("p7m", "." + enclosedExtension);
+            tmp = FileUtil.createTempFile("p7m", ".%s".formatted(enclosedExtension));
 
-			P7M p7m = new P7M(src);
-			p7m.read();
-			p7m.extractOriginalFile(tmp);
+            P7M p7m = new P7M(src);
+            p7m.read();
+            p7m.extractOriginalFile(tmp);
 
-			FormatConverter converter = FormatConversionManager.get().getConverter(enclosedExtension, targetExtension);
-			if (converter == null)
-				throw new IOException(
-						String.format("Unable to find a converter from %s to %s", enclosedExtension, targetExtension));
-			converter.convert(sid, document, tmp, dest);
-		} catch (Exception e) {
-			throw new IOException(e.getMessage(), e);
-		} finally {
-			FileUtil.delete(tmp);
-		}
-	}
+            FormatConverter converter = FormatConversionManager.get().getConverter(enclosedExtension, targetExtension);
+            if (converter == null)
+                throw new IOException(
+                        String.format("Unable to find a converter from %s to %s", enclosedExtension, targetExtension));
+            converter.convert(sid, document, tmp, dest);
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        } finally {
+            FileUtil.delete(tmp);
+        }
+    }
 }

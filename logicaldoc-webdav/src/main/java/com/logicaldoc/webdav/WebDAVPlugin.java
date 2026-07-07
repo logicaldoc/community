@@ -29,8 +29,8 @@ public class WebDAVPlugin extends LogicalDOCPlugin {
 
 		config.addServlet(SERVLET_NAME, WebdavServlet.class.getName(), 4);
 		config.writeXMLDoc();
-		config.addInitParam(SERVLET_NAME, "resource-path-prefix", "/webdav", null);
-		config.addInitParam(SERVLET_NAME, "resource-config", "/WEB-INF/config.xml", null);
+		config.addServletInitParam(SERVLET_NAME, "resource-path-prefix", "/webdav", null);
+		config.addServletInitParam(SERVLET_NAME, "resource-config", "/WEB-INF/config.xml", null);
 		config.addServletMapping(SERVLET_NAME, "/webdav/*");
 		config.writeXMLDoc();
 

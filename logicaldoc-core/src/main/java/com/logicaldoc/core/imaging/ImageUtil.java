@@ -77,7 +77,7 @@ public class ImageUtil {
     public static void cropToFile(String content, ImageZone zone, File file) throws IOException {
         File tmpFile = null;
         try {
-            tmpFile = FileUtil.createTempFile("zonalocr", "." + FileUtil.getExtension(file.getName()));
+            tmpFile = FileUtil.createTempFile("zonalocr", ".%s".formatted(FileUtil.getExtension(file.getName())));
             save(content, tmpFile);
             cropToFile(tmpFile, zone, file);
         } finally {

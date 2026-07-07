@@ -35,150 +35,149 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> implements VersionDAO {
 
-	private static final String DOC_ID = ".docId=";
+    @Resource(name = "store")
+    protected Store store;
 
-	@Resource(name = "store")
-	protected Store store;
+    @Resource(name = "folderDAO")
+    protected FolderDAO folderDAO;
 
-	@Resource(name = "folderDAO")
-	protected FolderDAO folderDAO;
+    public HibernateVersionDAO() {
+        super(Version.class);
+        super.log = LoggerFactory.getLogger(HibernateVersionDAO.class);
+    }
 
-	public HibernateVersionDAO() {
-		super(Version.class);
-		super.log = LoggerFactory.getLogger(HibernateVersionDAO.class);
-	}
+    @Override
+    public List<Version> findByDocId(long docId) throws PersistenceException {
+        return findByWhere("_entity.docId = %d".formatted(docId), "_entity.versionDate desc", null);
+    }
 
-	@Override
-	public List<Version> findByDocId(long docId) throws PersistenceException {
-		return findByWhere(" " + ENTITY + DOC_ID + docId, ENTITY + ".versionDate desc", null);
-	}
+    @Override
+    public Version findByVersion(long docId, String version) throws PersistenceException {
+        List<Version> versions = findByWhere("_entity.docId = :docId and _entity.version = :version",
+                Map.of("docId", docId, "version", StringUtils.defaultString(version)), null, null);
 
-	@Override
-	public Version findByVersion(long docId, String version) throws PersistenceException {
-		List<Version> versions = findByWhere(" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version = :version",
-				Map.of("version", StringUtils.defaultString(version)), null, null);
+        if (!versions.isEmpty())
+            return versions.get(0);
+        else
+            return null;
+    }
 
-		if (!versions.isEmpty())
-			return versions.get(0);
-		else
-			return null;
-	}
+    @Override
+    public Version findByFileVersion(long docId, String fileVersion) throws PersistenceException {
+        List<Version> versions = findByWhere("_entity.docId = :docId and _entity.fileVersion = :fileVersion",
+                Map.of("docId", docId, "fileVersion", StringUtils.defaultString(fileVersion)), "_entity.date asc",
+                null);
 
-	@Override
-	public Version findByFileVersion(long docId, String fileVersion) throws PersistenceException {
-		List<Version> versions = findByWhere(
-				" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion = :fileVersion",
-				Map.of("fileVersion", StringUtils.defaultString(fileVersion)), ENTITY + ".date asc", null);
+        if (!versions.isEmpty())
+            return versions.get(0);
+        else
+            return null;
+    }
 
-		if (!versions.isEmpty())
-			return versions.get(0);
-		else
-			return null;
-	}
+    @Override
+    public void initialize(Version version) {
+        refresh(version);
 
-	@Override
-	public void initialize(Version version) {
-		refresh(version);
+        if (version.getAttributes() != null)
+            log.trace("Initialized {} attributes", version.getAttributes().keySet().size());
+    }
 
-		if (version.getAttributes() != null)
-			log.trace("Initialized {} attributes", version.getAttributes().keySet().size());
-	}
+    /**
+     * This method persists the given version. Checks if is necessary to delete
+     * some document versions reading the context property
+     * 'document.maxversions' and the maxVersions property of the owning
+     * workspace.
+     * 
+     * @param version version to be stored.
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    @Override
+    public void store(Version version) throws PersistenceException {
+        super.store(version);
 
-	/**
-	 * This method persists the given version. Checks if is necessary to delete
-	 * some document versions reading the context property
-	 * 'document.maxversions' and the maxVersions property of the owning
-	 * workspace.
-	 * 
-	 * @param version version to be stored.
-	 * 
-	 * @throws PersistenceException error at data layer
-	 */
-	@Override
-	public void store(Version version) throws PersistenceException {
-		super.store(version);
+        try {
+            // Checks the context property 'document.maxversions'
+            ContextProperties bean = new ContextProperties();
+            int maxVersions = bean.getInt("document.maxversions", -1);
+            Folder workspace = folderDAO.findWorkspace(version.getFolderId());
+            if (workspace != null && workspace.getMaxVersions() != null && workspace.getMaxVersions() > 0)
+                maxVersions = workspace.getMaxVersions();
 
-		try {
-			// Checks the context property 'document.maxversions'
-			ContextProperties bean = new ContextProperties();
-			int maxVersions = bean.getInt("document.maxversions", -1);
-			Folder workspace = folderDAO.findWorkspace(version.getFolderId());
-			if (workspace != null && workspace.getMaxVersions() != null && workspace.getMaxVersions() > 0)
-				maxVersions = workspace.getMaxVersions();
+            if (maxVersions > 0) {
+                List<Version> versions = findByDocId(version.getDocId());
 
-			if (maxVersions > 0) {
-				List<Version> versions = findByDocId(version.getDocId());
+                if (versions.size() > maxVersions) {
+                    // Delete the oldest versions
+                    deleteOldestVersions(versions, maxVersions);
+                }
+            }
+        } catch (IOException e) {
+            throw new PersistenceException(e.getMessage(), e);
+        }
+    }
 
-				if (versions.size() > maxVersions) {
-					// Delete the oldest versions
-					deleteOldestVersions(versions, maxVersions);
-				}
-			}
-		} catch (IOException e) {
-			throw new PersistenceException(e.getMessage(), e);
-		}
-	}
+    private void deleteOldestVersions(List<Version> versions, int maxVersions) {
+        if (versions.size() <= maxVersions)
+            return;
 
-	private void deleteOldestVersions(List<Version> versions, int maxVersions) {
-		if (versions.size() <= maxVersions)
-			return;
+        // Make sure to sort the versions by descending version spec
+        Collections.sort(versions, Collections.reverseOrder());
 
-		// Make sure to sort the versions by descending version spec
-		Collections.sort(versions, Collections.reverseOrder());
+        List<Version> oldestVersionsToDelete = versions.stream().skip(maxVersions).toList();
+        for (Version versionToDelete : oldestVersionsToDelete)
+            deleteVersion(versionToDelete, PersistentObject.DELETED_CODE_DEFAULT);
+    }
 
-		List<Version> oldestVersionsToDelete = versions.stream().skip(maxVersions).toList();
-		for (Version versionToDelete : oldestVersionsToDelete)
-			deleteVersion(versionToDelete, PersistentObject.DELETED_CODE_DEFAULT);
-	}
+    @Override
+    public void updateDigest(Version version) throws PersistenceException {
+        initialize(version);
+        StoreResource resource = StoreResource.builder().document(version).build();
+        if (store.exists(resource)) {
+            try (InputStream in = store.getStream(resource);) {
+                version.setDigest(FileUtil.computeDigest(in));
+            } catch (IOException e) {
+                log.error("Cannot retrieve the content of version {}", version);
+                log.error(e.getMessage(), e);
+            }
+            saveOrUpdate(version);
+        }
+    }
 
-	@Override
-	public void updateDigest(Version version) throws PersistenceException {
-		initialize(version);
-		StoreResource resource = StoreResource.builder().document(version).build();
-		if (store.exists(resource)) {
-			try (InputStream in = store.getStream(resource);) {
-				version.setDigest(FileUtil.computeDigest(in));
-			} catch (IOException e) {
-				log.error("Cannot retrieve the content of version {}", version);
-				log.error(e.getMessage(), e);
-			}
-			saveOrUpdate(version);
-		}
-	}
+    @Override
+    public void delete(long versionId, int delCode) throws PersistenceException {
+        if (!checkStoringAspect())
+            return;
 
-	@Override
-	public void delete(long versionId, int delCode) throws PersistenceException {
-		if (!checkStoringAspect())
-			return;
+        Version ver = findById(versionId);
+        if (ver != null)
+            deleteVersion(ver, delCode);
+    }
 
-		Version ver = findById(versionId);
-		if (ver != null)
-			deleteVersion(ver, delCode);
-	}
+    protected void deleteVersion(Version versionToDelete, int delCode) {
+        if (delCode == 0)
+            throw new IllegalArgumentException("delCode cannot be 0");
+        versionToDelete.setDeleted(delCode);
+        versionToDelete.setLastModified(new Date());
+        versionToDelete.setVersion(
+                StringUtils.right("%d.%s".formatted(versionToDelete.getId(), versionToDelete.getVersion()), 10));
+        saveOrUpdate(versionToDelete);
 
-	protected void deleteVersion(Version versionToDelete, int delCode) {
-		if (delCode == 0)
-			throw new IllegalArgumentException("delCode cannot be 0");
-		versionToDelete.setDeleted(delCode);
-		versionToDelete.setLastModified(new Date());
-		versionToDelete.setVersion(StringUtils.right(versionToDelete.getId() + "." + versionToDelete.getVersion(), 10));
-		saveOrUpdate(versionToDelete);
+        try {
+            long referencesToFileversion = queryForLong(
+                    "select count(*) from ld_version where ld_deleted=0 and ld_documentid = :documentid and ld_fileversion = :fileversion and not ld_id = :currentid",
+                    Map.of("documentid", versionToDelete.getDocId(), "fileversion", versionToDelete.getFileVersion(),
+                            "currentid", versionToDelete.getId()));
+            if (referencesToFileversion == 0L)
+                store.delete(StoreResource.builder().document(versionToDelete).build());
+        } catch (PersistenceException e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
 
-		try {
-			long referencesToFileversion = queryForLong(
-					"select count(*) from ld_version where ld_deleted=0 and ld_documentid = :documentid and ld_fileversion = :fileversion and not ld_id = :currentid",
-					Map.of("documentid", versionToDelete.getDocId(), "fileversion", versionToDelete.getFileVersion(),
-							"currentid", versionToDelete.getId()));
-			if (referencesToFileversion == 0L)
-				store.delete(StoreResource.builder().document(versionToDelete).build());
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void deleteAll(Collection<Version> entities, int code) throws PersistenceException {
-		for (Version version : entities)
-			deleteVersion(version, code);
-	}
+    @Override
+    public void deleteAll(Collection<Version> entities, int code) throws PersistenceException {
+        for (Version version : entities)
+            deleteVersion(version, code);
+    }
 }

@@ -22,50 +22,56 @@ import com.logicaldoc.util.spring.Context;
  * @since 4.5
  */
 public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
-	private static final Logger log = LoggerFactory.getLogger(ImageThumbnailBuilder.class);
+    private static final Logger log = LoggerFactory.getLogger(ImageThumbnailBuilder.class);
 
-	@Override
-	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,
-			int size, int quality) throws IOException {
+    @Override
+    public synchronized void buildThumbnail(
+            String sid,
+            Document document,
+            String fileVersion,
+            File src,
+            File dest,
+            int size,
+            int quality) throws IOException {
 
-		String outExt = FileUtil.getExtension(dest.getName().toLowerCase());
-		ContextProperties conf = Context.get().getConfig();
-		List<String> commandLine = new ArrayList<>();
-		commandLine.add(conf.getProperty("converter.ImageConverter.path"));
-		if ("png".equals(outExt)) {
-			commandLine.add("-alpha");
-			commandLine.add("on");
-		}
-		commandLine.addAll(List.of("-compress", "JPEG", "-quality", Integer.toString(quality), "-resize",
-				"x" + Integer.toString(size), src.getPath(), dest.getPath()));
+        String outExt = FileUtil.getExtension(dest.getName().toLowerCase());
+        ContextProperties conf = Context.get().getConfig();
+        List<String> commandLine = new ArrayList<>();
+        commandLine.add(conf.getProperty("converter.ImageConverter.path"));
+        if ("png".equals(outExt)) {
+            commandLine.add("-alpha");
+            commandLine.add("on");
+        }
+        commandLine.addAll(List.of("-compress", "JPEG", "-quality", Integer.toString(quality), "-resize",
+                "x%d".formatted(size), src.getPath(), dest.getPath()));
 
-		log.debug("Executing: {}", commandLine);
+        log.debug("Executing: {}", commandLine);
 
-		new Exec().exec(commandLine, null, null, conf.getInt("converter.ImageConverter.timeout", 10));
+        new Exec().exec(commandLine, null, null, conf.getInt("converter.ImageConverter.timeout", 10));
 
-		if (!dest.exists() || dest.length() == 0) {
-			/*
-			 * In case of multiple TIF pages, the output should be name-0.jpg,
-			 * name-1.jpg ...
-			 */
-			final String basename = FileUtil.getBaseName(dest.getName());
-			String testname = basename + "-0." + outExt;
-			File test = new File(dest.getParentFile(), testname);
-			if (test.exists()) {
-				// In this case rename the first page with the wanted
-				// destination file
-				FileUtils.copyFile(test, dest);
+        if (!dest.exists() || dest.length() == 0) {
+            /*
+             * In case of multiple TIF pages, the output should be name-0.jpg,
+             * name-1.jpg ...
+             */
+            final String basename = FileUtil.getBaseName(dest.getName());
+            String testname = "%s-0.%s".formatted(basename, outExt);
+            File test = new File(dest.getParentFile(), testname);
+            if (test.exists()) {
+                // In this case rename the first page with the wanted
+                // destination file
+                FileUtils.copyFile(test, dest);
 
-				// And delete all other pages
-				String[] pages = dest.getParentFile()
-						.list((dir, name) -> name.startsWith(basename + "-") && name.endsWith("." + outExt));
-				for (String page : pages) {
-					FileUtils.deleteQuietly(new File(page));
-				}
-			}
-		}
+                // And delete all other pages
+                String[] pages = dest.getParentFile().list((dir, name) -> name.startsWith("%s-".formatted(basename))
+                        && name.endsWith(".%s".formatted(outExt)));
+                for (String page : pages) {
+                    FileUtils.deleteQuietly(new File(page));
+                }
+            }
+        }
 
-		if (dest.length() < 1)
-			throw new IOException("Empty thumbnail image");
-	}
+        if (dest.length() < 1)
+            throw new IOException("Empty thumbnail image");
+    }
 }
