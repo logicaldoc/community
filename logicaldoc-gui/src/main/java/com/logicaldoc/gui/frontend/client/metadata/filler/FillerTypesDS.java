@@ -11,25 +11,21 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class FillerTypesDS extends DataSource {
 
-	public FillerTypesDS() {
-		this(null);
-	}
+    public FillerTypesDS() {
+        setRecordXPath("/list/type");
 
-	public FillerTypesDS(String type) {
-		setRecordXPath("/list/type");
+        DataSourceTextField id = new DataSourceTextField("id");
+        id.setPrimaryKey(true);
+        id.setHidden(true);
+        id.setRequired(true);
 
-		DataSourceTextField id = new DataSourceTextField("id");
-		id.setPrimaryKey(true);
-		id.setHidden(true);
-		id.setRequired(true);
+        DataSourceTextField label = new DataSourceTextField("label");
 
-		DataSourceTextField label = new DataSourceTextField("label");
-		
-		setFields(id, label);
-		setClientOnly(true);
+        setFields(id, label);
+        setClientOnly(true);
 
-		String url = "data/fillers.xml?type=all";
+        String url = "data/fillers.xml?type=all";
 
-		setDataURL(url);
-	}
+        setDataURL(url);
+    }
 }
