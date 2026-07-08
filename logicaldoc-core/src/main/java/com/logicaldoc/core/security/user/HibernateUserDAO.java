@@ -58,8 +58,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     private static final String ADMIN = "admin";
 
-    private static final String LOWER = "lower(";
-
     private static final String USERNAME = "username";
 
     private static final String POSITION = "position";

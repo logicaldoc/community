@@ -30,6 +30,8 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> implements DeviceDAO {
 
+    private static final String AND = " and ";
+
     private static final String USER_ID = "userId";
 
     @Resource(name = "userDAO")
@@ -133,28 +135,28 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
         query.append("_entity.userId = :userId");
         params.put(USER_ID, device.getUserId());
 
-        query.append(" and ");
+        query.append(AND);
         if (device.getBrowser() != null) {
             query.append("_entity.browser = :browser");
             params.put("browser", device.getBrowser());
         } else
             query.append("_entity.browser is null");
 
-        query.append(" and ");
+        query.append(AND);
         if (device.getBrowserVersion() != null) {
             query.append("_entity.browserVersion = :browserVersion");
             params.put("browserVersion", device.getBrowserVersion());
         } else
             query.append("_entity.browserVersion is null");
 
-        query.append(" and ");
+        query.append(AND);
         if (device.getOperativeSystem() != null) {
             query.append("_entity.operativeSystem = :operativeSystem");
             params.put("operativeSystem", device.getOperativeSystem());
         } else
             query.append("_entity.operativeSystem is null");
 
-        query.append(" and ");
+        query.append(AND);
         if (device.getType() != null) {
             query.append("_entity.type = :type");
             params.put("type", device.getType());

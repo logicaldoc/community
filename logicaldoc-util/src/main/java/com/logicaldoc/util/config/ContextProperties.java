@@ -394,8 +394,7 @@ public class ContextProperties extends OrderedProperties {
     }
     
     private String fullKey(String tenant, String property) {
-        String key = "%s.%s".formatted(tenant, property);
-        return key;
+        return "%s.%s".formatted(tenant, property);
     }
     
     public int getTenantInt(String tenant, String property) {

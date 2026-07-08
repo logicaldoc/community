@@ -490,7 +490,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
         store(menu);
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public List<Long> findIdByUserId(long userId, long parentId) {
         List<Long> ids = new ArrayList<>();
@@ -502,7 +501,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
                 return findIdsByWhere("_entity.parentId = %d".formatted(parentId), null, null);
 
             Set<Group> precoll = user.getGroups();
-            Iterator iter = precoll.iterator();
             if (!precoll.isEmpty()) {
                 StringBuilder query = new StringBuilder("""
                                                         select distinct(A.ld_menuid)

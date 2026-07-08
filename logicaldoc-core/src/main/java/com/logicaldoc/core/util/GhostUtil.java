@@ -65,12 +65,12 @@ public class GhostUtil {
         } else {
             if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
                 cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE, "-r%d".formatted(dpi),
-                        "-sOutputFile=%s/%s-%04d.%s".formatted(dst.getParent(), FileUtil.getBaseName(dst.getName()),
+                        "-sOutputFile=%s/%s-%%04d.%s".formatted(dst.getParent(), FileUtil.getBaseName(dst.getName()),
                                 FileUtil.getExtension(dst.getName())),
                         srcPdf.getPath() };
             else
                 cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
-                        D_NOPAUSE, "-r%d".formatted(dpi), "-sOutputFile=%s/%s-%04d.%s".formatted(dst.getParent(),
+                        D_NOPAUSE, "-r%d".formatted(dpi), "-sOutputFile=%s/%s-%%04d.%s".formatted(dst.getParent(),
                                 FileUtil.getBaseName(dst.getName()), FileUtil.getExtension(dst.getName())),
                         srcPdf.getPath() };
         }

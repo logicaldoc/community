@@ -36,7 +36,6 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
 
@@ -46,6 +45,8 @@ import com.logicaldoc.util.spring.Context;
  * @author Michael Scholz
  */
 public abstract class Search {
+    private static final String D_S = "%d-%s";
+
     protected static final Logger log = LoggerFactory.getLogger(Search.class);
 
     protected boolean moreHitsPresent = false;
@@ -151,7 +152,8 @@ public abstract class Search {
 
         String extattrs;
         try {
-            extattrs = Context.get().getConfig().getTenantProperty(TenantDAO.get().getTenantName(searchUser.getTenantId()), "search.extattr");
+            extattrs = Context.get().getConfig()
+                    .getTenantProperty(TenantDAO.get().getTenantName(searchUser.getTenantId()), "search.extattr");
         } catch (PersistenceException e) {
             throw new SearchException(e);
         }
@@ -184,7 +186,7 @@ public abstract class Search {
 
             query.append(idsString);
             query.append(" and ld_name in (");
-            query.append(attrs.stream().map(at -> "'%s'".formatted(at)).collect(Collectors.joining(",")));
+            query.append(attrs.stream().map("'%s'"::formatted).collect(Collectors.joining(",")));
             query.append(")");
 
             try {
@@ -202,7 +204,7 @@ public abstract class Search {
                         ext.setDateValue(rs.getDate(7));
                         ext.setStringValues(rs.getString(8));
                         ext.setType(rs.getInt(3));
-                        extAtt.put("%d-%s".formatted(docId, name), ext);
+                        extAtt.put(D_S.formatted(docId, name), ext);
                         return null;
                     }
                 }, null);
@@ -308,9 +310,9 @@ public abstract class Search {
     private void copyExtendedAttributesToHits(List<String> atributeNames, final Map<String, Attribute> extAttribute) {
         for (Hit h : hits) {
             for (String name : atributeNames) {
-                Attribute att = extAttribute.get("%d-%s".formatted(h.getId(), name));
+                Attribute att = extAttribute.get(D_S.formatted(h.getId(), name));
                 if (h.getDocRef() != null && h.getDocRef().longValue() != 0L)
-                    att = extAttribute.get("%d-%s".formatted(h.getDocRef(), name));
+                    att = extAttribute.get(D_S.formatted(h.getDocRef(), name));
                 if (att != null)
                     h.getAttributes().put(name, att);
             }

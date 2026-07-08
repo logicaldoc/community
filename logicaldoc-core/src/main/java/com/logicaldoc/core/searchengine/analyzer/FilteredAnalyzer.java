@@ -40,8 +40,6 @@ import com.logicaldoc.util.spring.Context;
  */
 public class FilteredAnalyzer extends AnalyzerWrapper {
 
-    private static final String INDEX_TOKENFILTER = "index.tokenfilter.";
-
     private static final Logger log = LoggerFactory.getLogger(FilteredAnalyzer.class);
 
     public static final ThreadLocal<String> lang = ThreadLocal.withInitial(() -> "en");

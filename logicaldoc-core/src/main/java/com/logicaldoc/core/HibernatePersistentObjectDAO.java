@@ -51,11 +51,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> implements PersistentObjectDAO<T> {
 
-    private static final String UPDATE = "update ";
-
     private static final String DATA_SOURCE = "dataSource";
-
-    private static final String AND = " and (";
 
     protected Logger log = LoggerFactory.getLogger(HibernatePersistentObjectDAO.class);
 
@@ -553,13 +549,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
             return;
 
         try {
-            StringBuilder ids = new StringBuilder();
-            for (T t : entities) {
-                if (!ids.isEmpty())
-                    ids.append(",");
-                ids.append(Long.toString(t.getId()));
-            }
-
             StringBuilder query = new StringBuilder("update ");
             query.append(entityClass.getCanonicalName());
             query.append(" set deleted = ");

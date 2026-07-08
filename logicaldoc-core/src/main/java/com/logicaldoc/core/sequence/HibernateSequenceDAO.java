@@ -29,8 +29,6 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 
     private static final String TENANTID = "tenantId";
 
-    private static final String AND = " and ";
-
     private HibernateSequenceDAO() {
         super(Sequence.class);
         super.log = LoggerFactory.getLogger(HibernateSequenceDAO.class);

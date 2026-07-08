@@ -22,8 +22,6 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 
     private static final String ONE_EQ_ONE = " 1 = 1 ";
 
-    private static final String AND = " and ";
-
     protected HibernateSessionDAO() {
         super(Session.class);
     }
