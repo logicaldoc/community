@@ -38,88 +38,89 @@ import com.logicaldoc.util.spring.Context;
  */
 public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
-	protected File rootStoreOne;
+    protected File rootStoreOne;
 
-	protected File rootStoreTwo;
+    protected File rootStoreTwo;
 
-	protected ApiKey apiKey;
+    protected ApiKey apiKey;
 
-	protected MockServletSession servletSession = new MockServletSession();
+    protected MockServletSession servletSession = new MockServletSession();
 
-	protected Session session;
+    protected Session session;
 
-	@Before
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
-		prepareStore();
+    @Before
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
+        prepareStore();
 
-		// Prepare an API Key
-		ApiKeyDAO dao = ApiKeyDAO.get();
-		apiKey = new ApiKey(1L, "MyKey");
-		dao.store(apiKey);
-	}
+        // Prepare an API Key
+        ApiKeyDAO dao = ApiKeyDAO.get();
+        apiKey = new ApiKey(1L, "MyKey");
+        dao.store(apiKey);
+    }
 
-	@Override
-	protected List<String> getDatabaseScripts() {
-		return List.of("sql/logicaldoc-core.sql", "data.sql");
-	}
+    @Override
+    protected List<String> getDatabaseScripts() {
+        return List.of("sql/logicaldoc-core.sql", "data.sql");
+    }
 
-	private void prepareStore() throws IOException {
-		/**
-		 * For each test we must prepare different stores folders because
-		 * re-using the same paths cause locks
-		 */
-		rootStoreOne = new File(Context.get().getConfig().getProperty("store.1.dir"));
-		rootStoreTwo = new File(Context.get().getConfig().getProperty("store.2.dir"));
+    private void prepareStore() throws IOException {
+        /**
+         * For each test we must prepare different stores folders because
+         * re-using the same paths cause locks
+         */
+        rootStoreOne = new File(Context.get().getConfig().getProperty("store.1.dir"));
+        rootStoreTwo = new File(Context.get().getConfig().getProperty("store.2.dir"));
 
-		Store.get().init();
+        Store.get().init();
 
-		/*
-		 * In order to minimize the locks, we write the file only if really
-		 * needed
-		 */
+        /*
+         * In order to minimize the locks, we write the file only if really
+         * needed
+         */
 
-		// Store the file of document 1
-		FileUtil.copyResource("loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0"));
-		FileUtil.copyResource("loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0-conversion.pdf"));
+        // Store the file of document 1
+        FileUtil.copyResource("loremipsum.pdf", new File("%s/1/doc/1.0".formatted(rootStoreOne.getPath())));
+        FileUtil.copyResource("loremipsum.pdf",
+                new File("%s/1/doc/1.0-conversion.pdf".formatted(rootStoreOne.getPath())));
 
-		// Store the file of document 3
-		FileUtil.copyResource("small.pdf", new File(rootStoreOne.getPath() + "/3/doc/1.3"));
+        // Store the file of document 3
+        FileUtil.copyResource("small.pdf", new File("%s/3/doc/1.3".formatted(rootStoreOne.getPath())));
 
-		// Store the file of document 8
-		FileUtil.copyResource("small.pdf", new File(rootStoreOne.getPath() + "/8/doc/1.0"));
-	}
+        // Store the file of document 8
+        FileUtil.copyResource("small.pdf", new File("%s/8/doc/1.0".formatted(rootStoreOne.getPath())));
+    }
 
-	@Override
-	public void tearDown() throws IOException {
-		if (session != null)
-			Context.get(SessionManager.class).kill(session.getSid());
-		SessionDAO.get().cleanOldSessions(-1);
+    @Override
+    public void tearDown() throws IOException {
+        if (session != null)
+            Context.get(SessionManager.class).kill(session.getSid());
+        SessionDAO.get().cleanOldSessions(-1);
 
-		super.tearDown();
+        super.tearDown();
 
-		FileUtil.delete(rootStoreOne);
-		FileUtil.delete(rootStoreTwo);
-	}
+        FileUtil.delete(rootStoreOne);
+        FileUtil.delete(rootStoreTwo);
+    }
 
-	protected void prepareSession(String username, String password) throws PersistenceException {
-		UserDAO userDao = UserDAO.get();
+    protected void prepareSession(String username, String password) throws PersistenceException {
+        UserDAO userDao = UserDAO.get();
 
-		Client client = new Client("xyz", "192.168.2.231", "ghost");
-		Device device = new Device();
-		device.setBrowser("Firefox");
-		device.setBrowserVersion("18");
-		device.setOperativeSystem("Windows");
-		client.setDevice(device);
-		session = SessionManager.get().newSession(username, password, null, client);
-		if (session != null) {
-			User user = userDao.findByUsernameIgnoreCase(username);
-			userDao.initialize(user);
-			LDAuthenticationToken token = new LDAuthenticationToken(username);
-			token.setSid(session.getSid());
-			SecurityContextHolder.getContext().setAuthentication(token);
-			LDDeferredSecurityContext.bindServletSession(session.getSid(), servletSession);
-		}
-	}
+        Client client = new Client("xyz", "192.168.2.231", "ghost");
+        Device device = new Device();
+        device.setBrowser("Firefox");
+        device.setBrowserVersion("18");
+        device.setOperativeSystem("Windows");
+        client.setDevice(device);
+        session = SessionManager.get().newSession(username, password, null, client);
+        if (session != null) {
+            User user = userDao.findByUsernameIgnoreCase(username);
+            userDao.initialize(user);
+            LDAuthenticationToken token = new LDAuthenticationToken(username);
+            token.setSid(session.getSid());
+            SecurityContextHolder.getContext().setAuthentication(token);
+            LDDeferredSecurityContext.bindServletSession(session.getSid(), servletSession);
+        }
+    }
 }

@@ -14,6 +14,12 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 
+/**
+ * Test case for {@link StatsCollector}
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 7.0
+ */
 public class StatsCollectorTest extends AbstractCoreTestCase {
 
 	// Instance under test

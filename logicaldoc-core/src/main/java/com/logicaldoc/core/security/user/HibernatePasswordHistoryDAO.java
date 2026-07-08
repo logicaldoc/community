@@ -1,6 +1,5 @@
 package com.logicaldoc.core.security.user;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,50 +20,48 @@ import jakarta.transaction.Transactional;
 @Repository("passwordHistoryDAO")
 @Transactional
 public class HibernatePasswordHistoryDAO extends HibernatePersistentObjectDAO<PasswordHistory>
-		implements PasswordHistoryDAO {
+        implements PasswordHistoryDAO {
 
-	private HibernatePasswordHistoryDAO() {
-		super(PasswordHistory.class);
-		super.log = LoggerFactory.getLogger(PasswordHistoryDAO.class);
-	}
+    private HibernatePasswordHistoryDAO() {
+        super(PasswordHistory.class);
+        super.log = LoggerFactory.getLogger(PasswordHistoryDAO.class);
+    }
 
-	@Override
-	public List<PasswordHistory> findByUserId(long userId, Integer max) throws PersistenceException {
-		Map<String, Object> params = new HashMap<>();
-		params.put("userId", userId);
-		return findByWhere(ENTITY + ".userId = :userId", params, ENTITY + ".date desc", max);
-	}
+    @Override
+    public List<PasswordHistory> findByUserId(long userId, Integer max) throws PersistenceException {
+        return findByWhere("_entity.userId = :userId", Map.of("userId", userId), "_entity.date desc", max);
+    }
 
-	@Override
-	public void cleanOldHistories(long userId, int retain) {
-		if (retain <= 0)
-			return;
-		try {
-			List<PasswordHistory> histories = findByUserId(userId, null);
-			if (histories.size() <= retain)
-				return;
-			for (int i = 0; i < histories.size(); i++) {
-				if (i >= retain)
-					delete(histories.get(i).getId());
-			}
-		} catch (Exception t) {
-			log.error(t.getMessage(), t);
-		}
+    @Override
+    public void cleanOldHistories(long userId, int retain) {
+        if (retain <= 0)
+            return;
+        try {
+            List<PasswordHistory> histories = findByUserId(userId, null);
+            if (histories.size() <= retain)
+                return;
+            for (int i = 0; i < histories.size(); i++) {
+                if (i >= retain)
+                    delete(histories.get(i).getId());
+            }
+        } catch (Exception t) {
+            log.error(t.getMessage(), t);
+        }
 
-	}
+    }
 
-	@Override
-	public PasswordHistory findByUserIdAndPassword(long userId, String password, int max) throws PersistenceException {
-		if (password != null) {
-			List<PasswordHistory> histories = findByUserId(userId, max);
-			for (int i = 0; i < histories.size(); i++) {
-				if (i >= max)
-					return null;
-				PasswordHistory history = histories.get(i);
-				if (history.getPassword() != null && history.getPassword().equals(password))
-					return history;
-			}
-		}
-		return null;
-	}
+    @Override
+    public PasswordHistory findByUserIdAndPassword(long userId, String password, int max) throws PersistenceException {
+        if (password != null) {
+            List<PasswordHistory> histories = findByUserId(userId, max);
+            for (int i = 0; i < histories.size(); i++) {
+                if (i >= max)
+                    return null;
+                PasswordHistory history = histories.get(i);
+                if (history.getPassword() != null && history.getPassword().equals(password))
+                    return history;
+            }
+        }
+        return null;
+    }
 }

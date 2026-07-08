@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -35,241 +34,237 @@ import com.timgroup.jgravatar.GravatarRating;
  */
 public class UserUtil {
 
-	private static final String AVATAR = "avatar";
+    private static final String AVATAR = "avatar";
 
-	private static final String ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER = "Error generating default the avatar for user {}";
+    private static final String ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER = "Error generating default the avatar for user {}";
 
-	/**
-	 * A transparent 1x1 PNG
-	 */
-	private static final String TRANSPARENT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+    /**
+     * A transparent 1x1 PNG
+     */
+    private static final String TRANSPARENT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-	
-	private static final String DEFAULT_AVATAR_IMAGE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tISBGb250IEF3ZXNvbWUgUHJvIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlIChDb21tZXJjaWFsIExpY2Vuc2UpIENvcHlyaWdodCAyMDI0IEZvbnRpY29ucywgSW5jLiAtLT48cGF0aCBkPSJNMzM2IDEyOGExMTIgMTEyIDAgMSAwIC0yMjQgMCAxMTIgMTEyIDAgMSAwIDIyNCAwek05NiAxMjhhMTI4IDEyOCAwIDEgMSAyNTYgMEExMjggMTI4IDAgMSAxIDk2IDEyOHpNMjEuNyA0OTZsNDA0LjcgMEwzNzIuMiAzMjAgNzUuOCAzMjAgMjEuNyA0OTZ6TTY0IDMwNGwzMjAgMCA1OS4xIDE5MiA0LjkgMTYtMTYuNyAwTDE2LjcgNTEyIDAgNTEybDQuOS0xNkw2NCAzMDR6Ii8+PC9zdmc+";
-	
-	private static final Logger log = LoggerFactory.getLogger(UserUtil.class);
+    private static final String DEFAULT_AVATAR_IMAGE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tISBGb250IEF3ZXNvbWUgUHJvIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlIChDb21tZXJjaWFsIExpY2Vuc2UpIENvcHlyaWdodCAyMDI0IEZvbnRpY29ucywgSW5jLiAtLT48cGF0aCBkPSJNMzM2IDEyOGExMTIgMTEyIDAgMSAwIC0yMjQgMCAxMTIgMTEyIDAgMSAwIDIyNCAwek05NiAxMjhhMTI4IDEyOCAwIDEgMSAyNTYgMEExMjggMTI4IDAgMSAxIDk2IDEyOHpNMjEuNyA0OTZsNDA0LjcgMEwzNzIuMiAzMjAgNzUuOCAzMjAgMjEuNyA0OTZ6TTY0IDMwNGwzMjAgMCA1OS4xIDE5MiA0LjkgMTYtMTYuNyAwTDE2LjcgNTEyIDAgNTEybDQuOS0xNkw2NCAzMDR6Ii8+PC9zdmc+";
 
-	private UserUtil() {
-	}
+    private static final Logger log = LoggerFactory.getLogger(UserUtil.class);
 
-	/**
-	 * This method retrieves the user folder. If not exists, it creates the
-	 * folder. The folder is: <b>conf.userdir</b>/<b>id</b>
-	 * 
-	 * @param id The user identifier
-	 * 
-	 * @return the user's data folder
-	 */
-	public static File getUserHome(long id) {
-		File root = getUsersDir();
-		File userDir = new File(root, Long.toString(id));
-		if (!userDir.exists()) {
-			try {
-				FileUtils.forceMkdir(userDir);
-			} catch (IOException e) {
-				return null;
-			}
-		}
-		return userDir;
-	}
+    private UserUtil() {
+    }
 
-	/**
-	 * This method retrieves a user resource (file or folder). If the resource
-	 * is a folder and not exists, it creates the folder. The folder will be:
-	 * <b>conf.userdir</b>/<b>id</b>/<b>path</b>
-	 * 
-	 * @param id The user identifier
-	 * @param path The resource path
-	 * 
-	 * @return the user's resource
-	 */
-	public static File getUserResource(long id, String path) {
-		File root = getUserHome(id);
-		File resource = new File((root != null ? root.getPath() : "") + "/" + path);
+    /**
+     * This method retrieves the user folder. If not exists, it creates the
+     * folder. The folder is: <b>conf.userdir</b>/<b>id</b>
+     * 
+     * @param id The user identifier
+     * 
+     * @return the user's data folder
+     */
+    public static File getUserHome(long id) {
+        File root = getUsersDir();
+        File userDir = new File(root, Long.toString(id));
+        if (!userDir.exists()) {
+            try {
+                FileUtils.forceMkdir(userDir);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+        return userDir;
+    }
 
-		if (!resource.exists() && !path.contains("."))
-			try {
-				FileUtils.forceMkdir(resource);
-			} catch (IOException e) {
-				return null;
-			}
+    /**
+     * This method retrieves a user resource (file or folder). If the resource
+     * is a folder and not exists, it creates the folder. The folder will be:
+     * <b>conf.userdir</b>/<b>id</b>/<b>path</b>
+     * 
+     * @param id The user identifier
+     * @param path The resource path
+     * 
+     * @return the user's resource
+     */
+    public static File getUserResource(long id, String path) {
+        File root = getUserHome(id);
+        File resource = new File("%s/%s".formatted(root != null ? root.getPath() : "", path));
 
-		return resource;
-	}
+        if (!resource.exists() && !path.contains("."))
+            try {
+                FileUtils.forceMkdir(resource);
+            } catch (IOException e) {
+                return null;
+            }
 
-	/**
-	 * This method retrieves the users root folder. If not exists, it creates
-	 * the folder. The folder is: <b>conf.userdir</b>
-	 * 
-	 * @return the root folder that contains the users data folders
-	 */
-	public static File getUsersDir() {
-		File userpath = new File("");
-		try {
-			ContextProperties conf = Context.get().getConfig();
-			userpath = new File(conf.getProperty("conf.userdir"));
-			FileUtils.forceMkdir(userpath);
-		} catch (Exception t) {
-			// Nothing to do
-		}
-		return userpath;
-	}
+        return resource;
+    }
 
-	/**
-	 * Updates the avatar of a user with a given .png image
-	 * 
-	 * @param user The user to elaborate
-	 * @param avatarImageFile The file containing the avatar image
-	 * @param avatarImageFile The image type(eg png, svg)
-	 */
-	public static void saveAvatar(User user, File avatarImageFile, String imageType) {
-		UserDAO userDao = UserDAO.get();
-		File tmpAvatarImage = null;
-		try {
-			userDao.initialize(user);
-			if ("svg".equalsIgnoreCase(imageType)) {
-				// In case of SVG we save the image as is
-				user.setAvatar("data:image/svg+xml;base64," + ImageUtil.encode(avatarImageFile));
-			} else {
-				// In case of raster image we crop and resize
-				String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
-				int size = Context.get().getConfig().getInt(tenantName + ".gui.avatar.size", 128);
-				tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
-				BufferedImage avatar = ImageIO.read(avatarImageFile);
-				avatar = ImageUtil.cropCenterSquare(avatar, size);
-				ImageIO.write(avatar, "png", tmpAvatarImage);
-				user.setAvatar("data:image/png;base64," + ImageUtil.encode(tmpAvatarImage));
-			}
+    /**
+     * This method retrieves the users root folder. If not exists, it creates
+     * the folder. The folder is: <b>conf.userdir</b>
+     * 
+     * @return the root folder that contains the users data folders
+     */
+    public static File getUsersDir() {
+        File userpath = new File("");
+        try {
+            ContextProperties conf = Context.get().getConfig();
+            userpath = new File(conf.getProperty("conf.userdir"));
+            FileUtils.forceMkdir(userpath);
+        } catch (Exception t) {
+            // Nothing to do
+        }
+        return userpath;
+    }
 
-			userDao.store(user);
-		} catch (Exception t) {
-			log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
-		} finally {
-			FileUtil.delete(tmpAvatarImage);
-		}
-	}
+    /**
+     * Updates the avatar of a user with a given .png image
+     * 
+     * @param user The user to elaborate
+     * @param avatarImageFile The file containing the avatar image
+     * @param avatarImageFile The image type(eg png, svg)
+     */
+    public static void saveAvatar(User user, File avatarImageFile, String imageType) {
+        UserDAO userDao = UserDAO.get();
+        File tmpAvatarImage = null;
+        try {
+            userDao.initialize(user);
+            if ("svg".equalsIgnoreCase(imageType)) {
+                // In case of SVG we save the image as is
+                user.setAvatar("data:image/svg+xml;base64,%s".formatted(ImageUtil.encode(avatarImageFile)));
+            } else {
+                // In case of raster image we crop and resize
+                int size = Context.get().getConfig().getTenantInt(TenantDAO.get().getTenantName(user.getTenantId()),
+                        "gui.avatar.size", 128);
+                tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
+                BufferedImage avatar = ImageIO.read(avatarImageFile);
+                avatar = ImageUtil.cropCenterSquare(avatar, size);
+                ImageIO.write(avatar, "png", tmpAvatarImage);
+                user.setAvatar("data:image/png;base64,%s".formatted(ImageUtil.encode(tmpAvatarImage)));
+            }
 
-	/**
-	 * Updates the avatar of a user with the default avatar that is the Gravatar
-	 * or the auto-generated image(in case Gravatar is not available)
-	 * 
-	 * @param user The user to elaborate
-	 */
-	public static void generateDefaultAvatar(User user) {
-		UserDAO userDao = UserDAO.get();
+            userDao.store(user);
+        } catch (Exception t) {
+            log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
+        } finally {
+            FileUtil.delete(tmpAvatarImage);
+        }
+    }
 
-		File tmpAvatarImage = null;
-		try {
-			userDao.initialize(user);
-			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
+    /**
+     * Updates the avatar of a user with the default avatar that is the Gravatar
+     * or the auto-generated image(in case Gravatar is not available)
+     * 
+     * @param user The user to elaborate
+     */
+    public static void generateDefaultAvatar(User user) {
+        UserDAO userDao = UserDAO.get();
 
-			String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
-			int size = Context.get().getConfig().getInt(tenantName + ".gui.avatar.size", 128);
+        File tmpAvatarImage = null;
+        try {
+            userDao.initialize(user);
+            tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
+            int size = Context.get().getConfig().getTenantInt(TenantDAO.get().getTenantName(user.getTenantId()),
+                    "gui.avatar.size", 128);
 
-			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
-			if (avatar != null) {
-				ImageIO.write(avatar, "png", tmpAvatarImage);
-				user.setAvatar("data:image/png;base64," + ImageUtil.encode(tmpAvatarImage));
-			} else {
-				log.debug("No avatar could be obtained for user {} so switch to default one", user);
-				user.setAvatar(DEFAULT_AVATAR_IMAGE);
-			}
+            BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
+            if (avatar != null) {
+                ImageIO.write(avatar, "png", tmpAvatarImage);
+                user.setAvatar("data:image/png;base64,%s".formatted(ImageUtil.encode(tmpAvatarImage)));
+            } else {
+                log.debug("No avatar could be obtained for user {} so switch to default one", user);
+                user.setAvatar(DEFAULT_AVATAR_IMAGE);
+            }
 
-			if (user.getType() != UserType.SYSTEM) {
-				userDao.store(user);
-			} else {
-				Map<String, Object> params = new HashMap<>();
-				params.put(AVATAR, user.getAvatar());
-				params.put("username", user.getUsername());
-				userDao.jdbcUpdate("update ld_user set ld_avatar = :avatar where ld_username = :username", params);
-			}
-		} catch (Exception t) {
-			if (log.isDebugEnabled())
-				log.debug(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
-		} finally {
-			FileUtil.delete(tmpAvatarImage);
-		}
-	}
+            if (user.getType() != UserType.SYSTEM) {
+                userDao.store(user);
+            } else {
+                userDao.jdbcUpdate("update ld_user set ld_avatar = :avatar where ld_username = :username",
+                        Map.of(AVATAR, user.getAvatar(), "username", user.getUsername()));
+            }
+        } catch (Exception t) {
+            if (log.isDebugEnabled())
+                log.debug(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
+        } finally {
+            FileUtil.delete(tmpAvatarImage);
+        }
+    }
 
-	private static BufferedImage generateDefaultAvatarImage(User user, int size) {
-		/*
-		 * Check Gravatar with main email
-		 */
-		BufferedImage avatarImage = getImageFromGravatar(user, size);
-		if (avatarImage != null)
-			avatarImage = getImageCentralSquare(size, avatarImage);
+    private static BufferedImage generateDefaultAvatarImage(User user, int size) {
+        /*
+         * Check Gravatar with main email
+         */
+        BufferedImage avatarImage = getImageFromGravatar(user, size);
+        if (avatarImage != null)
+            avatarImage = getImageCentralSquare(size, avatarImage);
 
-		return avatarImage;
-	}
+        return avatarImage;
+    }
 
-	protected static BufferedImage getImageFromGravatar(User user, int size) {
-		if (!Context.get().getConfig().getBoolean("gravatar.enabled", false))
-			return null;
+    protected static BufferedImage getImageFromGravatar(User user, int size) {
+        if (!Context.get().getConfig().getBoolean("gravatar.enabled", false))
+            return null;
 
-		BufferedImage avatarImage = null;
-		Gravatar gravatar = new Gravatar();
-		gravatar.setRating(GravatarRating.GENERAL_AUDIENCES);
-		gravatar.setDefaultImage(GravatarDefaultImage.GRAVATAR_ICON);
-		gravatar.setSize(size);
+        BufferedImage avatarImage = null;
+        Gravatar gravatar = new Gravatar();
+        gravatar.setRating(GravatarRating.GENERAL_AUDIENCES);
+        gravatar.setDefaultImage(GravatarDefaultImage.GRAVATAR_ICON);
+        gravatar.setSize(size);
 
-		byte[] bytes;
-		try {
-			bytes = gravatar.download(user.getEmail());
-			if (bytes != null && bytes.length > 0)
-				avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
-		} catch (Exception t) {
-			log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
-		}
+        byte[] bytes;
+        try {
+            bytes = gravatar.download(user.getEmail());
+            if (bytes != null && bytes.length > 0)
+                avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+        } catch (Exception t) {
+            log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
+        }
 
-		/*
-		 * Check Gravatar with secondary email
-		 */
-		if (avatarImage == null && StringUtils.isNotEmpty(user.getEmail2())) {
-			try {
-				bytes = gravatar.download(user.getEmail2());
-				if (bytes != null && bytes.length > 0)
-					avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
-			} catch (Exception t) {
-				log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
-			}
-		}
-		return avatarImage;
-	}
+        /*
+         * Check Gravatar with secondary email
+         */
+        if (avatarImage == null && StringUtils.isNotEmpty(user.getEmail2())) {
+            try {
+                bytes = gravatar.download(user.getEmail2());
+                if (bytes != null && bytes.length > 0)
+                    avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+            } catch (Exception t) {
+                log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
+            }
+        }
+        return avatarImage;
+    }
 
-	/**
-	 * If the image is bigger, then gets the central square
-	 * 
-	 * @param size Wanted size of the output image
-	 * @param avatarImage the avatar image
-	 * 
-	 * @return the central square
-	 */
-	private static BufferedImage getImageCentralSquare(int size, BufferedImage avatarImage) {
-		if (avatarImage != null && (avatarImage.getWidth() > size || avatarImage.getHeight() > size)) {
-			avatarImage = ImageUtil.cropCenterSquare(avatarImage, size);
-		}
-		return avatarImage;
-	}
+    /**
+     * If the image is bigger, then gets the central square
+     * 
+     * @param size Wanted size of the output image
+     * @param avatarImage the avatar image
+     * 
+     * @return the central square
+     */
+    private static BufferedImage getImageCentralSquare(int size, BufferedImage avatarImage) {
+        if (avatarImage != null && (avatarImage.getWidth() > size || avatarImage.getHeight() > size)) {
+            avatarImage = ImageUtil.cropCenterSquare(avatarImage, size);
+        }
+        return avatarImage;
+    }
 
-	public static String getAvatarImage(String userIdOrName) throws PersistenceException {
-		String content = TRANSPARENT_IMAGE;
+    public static String getAvatarImage(String userIdOrName) throws PersistenceException {
+        String content = TRANSPARENT_IMAGE;
 
-		UserDAO userDao = UserDAO.get();
-		User user = null;
-		if (userIdOrName != null)
-			try {
-				user = userDao.findById(Long.parseLong(userIdOrName));
-			} catch (Exception t) {
-				// perhaps the id is the username
-				user = userDao.findByUsername(userIdOrName);
-			}
+        UserDAO userDao = UserDAO.get();
+        User user = null;
+        if (userIdOrName != null)
+            try {
+                user = userDao.findById(Long.parseLong(userIdOrName));
+            } catch (Exception t) {
+                // perhaps the id is the username
+                user = userDao.findByUsername(userIdOrName);
+            }
 
-		if (user != null) {
-			if (StringUtils.isEmpty(user.getAvatar()))
-				UserUtil.generateDefaultAvatar(user);
-			content = user.getAvatar();
-		}
+        if (user != null) {
+            if (StringUtils.isEmpty(user.getAvatar()))
+                UserUtil.generateDefaultAvatar(user);
+            content = user.getAvatar();
+        }
 
-		return content;
-	}
+        return content;
+    }
 }

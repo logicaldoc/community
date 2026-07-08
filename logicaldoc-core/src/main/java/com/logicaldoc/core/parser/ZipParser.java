@@ -60,7 +60,8 @@ public class ZipParser extends AbstractParser {
     }
 
     private File gunzip(InputStream input, String fileName) throws IOException {
-        String unpackedFileName = fileName.toLowerCase().endsWith(".tgz") ? FileUtil.getBaseName(fileName) + ".tar.gz"
+        String unpackedFileName = fileName.toLowerCase().endsWith(".tgz")
+                ? "%s.tar.gz".formatted(FileUtil.getBaseName(fileName))
                 : fileName;
         unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
         File ungzippedFile = FileUtil.createTempFile("parsegzip",

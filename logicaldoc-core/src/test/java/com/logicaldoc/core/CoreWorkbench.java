@@ -75,8 +75,6 @@ public class CoreWorkbench {
 //			percent = ((cpuAfter - cpuBefore) * 100L) / (nanoAfter - nanoBefore);
 //		else
 //			percent = 0;
-//
-//		System.out.println("Cpu usage: " + percent + "%");
 
 //		statsStuff();
     }
@@ -173,11 +171,9 @@ public class CoreWorkbench {
         @Override
         public Long call() throws Exception {
             FileUtil.writeFile("ciccio", file.getPath());
-            System.out.println("Created file " + file.getPath());
+            System.out.println("Created file %s".formatted(file.getPath()));
             FileUtil.copyFile(file, copy);
 
-            // copyFileUsingJava7Files(file, copy);
-            // System.out.println("Copied file " + copy.getPath());
             FileUtil.delete(file);
             FileUtil.delete(copy);
             return 0L;

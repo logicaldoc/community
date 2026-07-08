@@ -28,46 +28,46 @@ import com.logicaldoc.util.http.HttpUtil;
  */
 public class Microsoft365TokenProvider implements TokenProvider {
 
-	private static final Logger log = LoggerFactory.getLogger(Microsoft365TokenProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(Microsoft365TokenProvider.class);
 
-	@Override
-	public String getAccessToken(String clientSecret, String clientId, String clientTenant) throws IOException {
-		try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60);) {
+    @Override
+    public String getAccessToken(String clientSecret, String clientId, String clientTenant) throws IOException {
+        try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60);) {
 
-			// Prepare the post parameters
-			HttpPost post = new HttpPost(
-					String.format("https://login.microsoftonline.com/%s/oauth2/v2.0/token", clientTenant));
-			UrlEncodedFormEntity entity = (new UrlEncodedFormEntity(
-					List.of(new BasicNameValuePair("client_id", clientId),
-							new BasicNameValuePair("client_secret", clientSecret),
-							new BasicNameValuePair("grant_type", "client_credentials"),
-							new BasicNameValuePair("scope", "https://outlook.office365.com/.default"))));
-			post.setEntity(entity);
+            // Prepare the post parameters
+            HttpPost post = new HttpPost(
+                    String.format("https://login.microsoftonline.com/%s/oauth2/v2.0/token", clientTenant));
+            UrlEncodedFormEntity entity = (new UrlEncodedFormEntity(
+                    List.of(new BasicNameValuePair("client_id", clientId),
+                            new BasicNameValuePair("client_secret", clientSecret),
+                            new BasicNameValuePair("grant_type", "client_credentials"),
+                            new BasicNameValuePair("scope", "https://outlook.office365.com/.default"))));
+            post.setEntity(entity);
 
-			return httpClient.execute(post, new BasicHttpClientResponseHandler() {
+            return httpClient.execute(post, new BasicHttpClientResponseHandler() {
 
-				@Override
-				public String handleResponse(ClassicHttpResponse response) throws IOException {
-					String content;
-					try {
-						content = EntityUtils.toString(response.getEntity(), "UTF-8");
-					} catch (ParseException e) {
-						throw new IOException(e);
-					}
+                @Override
+                public String handleResponse(ClassicHttpResponse response) throws IOException {
+                    String content;
+                    try {
+                        content = EntityUtils.toString(response.getEntity(), "UTF-8");
+                    } catch (ParseException e) {
+                        throw new IOException(e);
+                    }
 
-					log.debug("got 365 response: {}", StringUtils.substring(content, 150));
+                    log.debug("got 365 response: {}", StringUtils.substring(content, 150));
 
-					ObjectMapper mapper = new ObjectMapper();
-					JsonNode responseObj = mapper.readTree(content);
-					if (content.contains("error"))
-						throw new IOException(responseObj.get("error").asText() + " - "
-								+ responseObj.get("error_description").asText());
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode responseObj = mapper.readTree(content);
+                    if (content.contains("error"))
+                        throw new IOException("%s - %s".formatted(responseObj.get("error").asText(),
+                                responseObj.get("error_description").asText()));
 
-					String token = new String(new Base64().decode(responseObj.get("access_token").asText().getBytes()));
-					log.debug("got access_token: {}", token);
-					return responseObj.get("access_token").asText();
-				}
-			});
-		}
-	}
+                    String token = new String(new Base64().decode(responseObj.get("access_token").asText().getBytes()));
+                    log.debug("got access_token: {}", token);
+                    return responseObj.get("access_token").asText();
+                }
+            });
+        }
+    }
 }

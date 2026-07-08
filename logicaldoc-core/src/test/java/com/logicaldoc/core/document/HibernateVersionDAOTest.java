@@ -111,11 +111,11 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
         for (int i = 0; i < versionsCap * 2; i++) {
             Version version = null;
             if (i % 2 == 0) {
-                version = Version.create(doc, user, "checkin " + i, DocumentEvent.CHECKEDIN, true);
+                version = Version.create(doc, user, "checkin %d".formatted(i), DocumentEvent.CHECKEDIN, true);
                 store.store(ResourceUtil.getInputStream("data.sql"),
                         StoreResource.builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
             } else {
-                version = Version.create(doc, user, "edit " + i, DocumentEvent.CHANGED, true);
+                version = Version.create(doc, user, "edit %d".formatted(i), DocumentEvent.CHANGED, true);
             }
             testSubject.store(version);
         }

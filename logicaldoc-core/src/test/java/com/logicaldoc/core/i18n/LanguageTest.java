@@ -77,8 +77,7 @@ public class LanguageTest {
 	@Test
 	public void testSetAnalyzerClass() {
 		Language lang = new Language(Locale.GERMAN);
-		String analyzer = "org.apache.lucene.analysis." + lang.getLanguage() + "."
-				+ lang.getLocale().getDisplayName(Locale.ENGLISH) + "Analyzer";
+		String analyzer = "org.apache.lucene.analysis.%s.%sAnalyzer".formatted(lang.getLanguage(), lang.getLocale().getDisplayName(Locale.ENGLISH));
 		lang.setAnalyzerClass(analyzer);
 		assertNotNull(lang.getAnalyzer());
 		assertEquals(analyzer, lang.getAnalyzerClass());
@@ -105,8 +104,7 @@ public class LanguageTest {
 		lang.setAnalyzer(null);
 
 		lang = new Language(Locale.ITALIAN);
-		String analyzerClass = "org.apache.lucene.analysis." + lang.getLanguage() + "."
-				+ lang.getLocale().getDisplayName(Locale.ENGLISH) + "Analyzer";
+		String analyzerClass = "org.apache.lucene.analysis.%s.%sAnalyzer".formatted(lang.getLanguage(), lang.getLocale().getDisplayName(Locale.ENGLISH));
 		lang.setAnalyzerClass(analyzerClass);
 
 		Set<String> customStopWords = new HashSet<>();

@@ -63,7 +63,7 @@ public class EMailSenderWorkbench {
 
 		sender.send(mail);
 		
-		System.out.println("Sent " + mail.getSubject());
+		System.out.println("Sent %s".formatted(mail.getSubject()));
 	}
 
 }

@@ -85,12 +85,14 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
     @Override
     public Trigger getObject() {
-        if (MODE_SIMPLE.equals(config.getProperty("schedule.mode." + getName()))) {
+        if (MODE_SIMPLE.equals(config.getProperty("schedule.mode.%s".formatted(getName())))) {
             if (simpleTrigger == null) {
                 simpleTrigger = new SimpleTriggerFactoryBean();
                 simpleTrigger.setName(getName());
-                simpleTrigger.setRepeatInterval(Long.parseLong(config.getProperty("schedule.interval." + getName())));
-                simpleTrigger.setStartDelay(Long.parseLong(config.getProperty("schedule.delay." + getName())));
+                simpleTrigger.setRepeatInterval(
+                        Long.parseLong(config.getProperty("schedule.interval.%s".formatted(getName()))));
+                simpleTrigger
+                        .setStartDelay(Long.parseLong(config.getProperty("schedule.delay.%s".formatted(getName()))));
                 simpleTrigger.setJobDetail(jobDetail);
                 simpleTrigger.afterPropertiesSet();
             }
@@ -100,7 +102,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
             if (cronTrigger == null) {
                 cronTrigger = new CronTriggerFactoryBean();
                 cronTrigger.setName(getName());
-                cronTrigger.setCronExpression(config.getProperty("schedule.cron." + getName()));
+                cronTrigger.setCronExpression(config.getProperty("schedule.cron.%s".formatted(getName())));
                 cronTrigger.setJobDetail(jobDetail);
                 try {
                     cronTrigger.afterPropertiesSet();

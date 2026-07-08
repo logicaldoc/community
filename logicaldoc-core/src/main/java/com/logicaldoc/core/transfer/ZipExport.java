@@ -260,8 +260,7 @@ public class ZipExport {
 		if (newName.length() > 250) {
 			String ext = FileUtil.getExtension(newName);
 			int maxSize = 250 - ext.length() - 1;
-			String name = FileUtil.getBaseName(newName).substring(0, maxSize);
-			newName = name + "." + ext;
+			newName = "%s.%s".formatted(FileUtil.getBaseName(newName).substring(0, maxSize), ext);
 		}
 		return newName;
 	}
@@ -292,7 +291,7 @@ public class ZipExport {
 		try (BufferedInputStream bis = new BufferedInputStream(Store.get().getStream(resource))) {
 			String fileName = document.getFileName();
 			if (pdfConversion)
-				fileName = FileUtil.getBaseName(fileName) + ".pdf";
+				fileName = "%s.pdf".formatted(FileUtil.getBaseName(fileName));
 
 			ZipEntry entry = new ZipEntry(path + adjustFileNameForWindows(fileName));
 			entry.setMethod(ZipEntry.DEFLATED);

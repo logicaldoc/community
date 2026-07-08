@@ -12,20 +12,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 7.5
  */
 public class NamedThreadFactory implements ThreadFactory {
-	private final String baseName;
+    private final String baseName;
 
-	private final AtomicInteger threadNum = new AtomicInteger(0);
+    private final AtomicInteger threadNum = new AtomicInteger(0);
 
-	public NamedThreadFactory(String baseName) {
-		this.baseName = baseName;
-	}
+    public NamedThreadFactory(String baseName) {
+        this.baseName = baseName;
+    }
 
-	@Override
-	public synchronized Thread newThread(Runnable r) {
-		Thread t = Executors.defaultThreadFactory().newThread(r);
-
-		t.setName(baseName + "-" + threadNum.getAndIncrement());
-
-		return t;
-	}
+    @Override
+    public synchronized Thread newThread(Runnable r) {
+        Thread t = Executors.defaultThreadFactory().newThread(r);
+        t.setName("%s-%d".formatted(baseName, threadNum.getAndIncrement()));
+        return t;
+    }
 }

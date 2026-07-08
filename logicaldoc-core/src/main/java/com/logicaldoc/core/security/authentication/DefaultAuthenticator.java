@@ -139,7 +139,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
         if (user.getSource().equals(UserSource.DEFAULT))
             try {
                 String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
-                if (Context.get().getConfig().getBoolean(tenantName + ".password.checklogin", false))
+                if (Context.get().getConfig().getTenantBoolean(tenantName, "password.checklogin", false))
                     UserDAO.get().checkPasswordCompliance(user);
             } catch (PasswordWeakException pwe) {
                 // In case of password too week, mark it as expired in the DB
@@ -162,7 +162,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
         if (user.isLegals()) {
             try {
                 List<String> unconfirmedLegals = userDAO.queryForList(
-                        "select ld_name from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name)",
+                        "select ld_name from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal = ld_name)",
                         Map.of("username", user.getUsername()), String.class, null);
                 if (!unconfirmedLegals.isEmpty()) {
                     if (log.isErrorEnabled())

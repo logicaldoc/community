@@ -647,7 +647,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
             testSubject.store(folder, transaction);
             fail("No error here, but should be");
         } catch (PersistenceException e) {
-            assertEquals("Unexisting parent folder " + folder.getParentId(), e.getMessage());
+            assertEquals("Unexisting parent folder %d".formatted(folder.getParentId()), e.getMessage());
         }
 
         // Load an existing folder and modify it
@@ -1443,13 +1443,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testRestore() throws PersistenceException {
-        assertEquals(1204L,
-                testSubject.queryForLong("select ld_id from ld_folder where ld_id=" + 1204L + " and ld_deleted=1"));
+        assertEquals(1204L, testSubject
+                .queryForLong("select ld_id from ld_folder where ld_id = %d and ld_deleted = 1".formatted(1204L)));
 
         testSubject.restore(1204L, 5L, null);
 
-        assertEquals(1204L,
-                testSubject.queryForLong("select ld_id from ld_folder where ld_id=" + 1204L + " and ld_deleted=0"));
+        assertEquals(1204L, testSubject
+                .queryForLong("select ld_id from ld_folder where ld_id = %d and ld_deleted = 0".formatted(1204L)));
 
         Folder folder = testSubject.findById(1204L);
         assertNotNull(folder);

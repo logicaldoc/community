@@ -407,6 +407,24 @@ public class ContextProperties extends OrderedProperties {
         return getInt(key, defaultValue);
     }
     
+    public long getTenantLong(String tenant, String property) {
+        return getTenantLong(tenant, property, 0L);
+    }
+    
+    public long getTenantLong(String tenant, String property, long defaultValue) {
+        String key = fullKey(tenant, property);
+        return getLong(key, defaultValue);
+    }
+    
+    public boolean getTenantBoolean(String tenant, String property) {
+        return getTenantBoolean(tenant, property, false);
+    }
+    
+    public boolean getTenantBoolean(String tenant, String property, boolean defaultValue) {
+        String key = fullKey(tenant, property);
+        return getBoolean(key, defaultValue);
+    }
+    
     public String getTenantString(String tenant, String property) {
         return getTenantString(tenant, property, null);
     }

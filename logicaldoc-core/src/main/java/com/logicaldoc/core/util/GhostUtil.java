@@ -25,135 +25,135 @@ import com.logicaldoc.util.spring.Context;
  * @since 8.3.1
  */
 public class GhostUtil {
-	private static final String S_OUTPUT_FILE = "-sOutputFile=";
 
-	private static final String D_NOPAUSE = "-dNOPAUSE";
+    private static final String D_NOPAUSE = "-dNOPAUSE";
 
-	private static final String D_BATCH = "-dBATCH";
+    private static final String D_BATCH = "-dBATCH";
 
-	private static final Logger log = LoggerFactory.getLogger(GhostUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(GhostUtil.class);
 
-	private GhostUtil() {
-	}
+    private GhostUtil() {
+    }
 
-	/**
-	 * Prints a PDF file into a Jpeg image using 150dpi resolution
-	 * 
-	 * @param srcPdf The original file
-	 * @param dst The output image(in case of multiple page more files are
-	 *        created named dstName-xxx.dstExtension)
-	 * @param page The page to print or null to print all the pages
-	 * @param dpi the resolution(e.g. 75, 150, 300)
-	 * 
-	 * @return list of page files
-	 */
-	public static List<File> print(File srcPdf, File dst, Integer page, Integer dpi) {
-		ContextProperties config = Context.get().getConfig();
-		String ghostCommand = config.getProperty("converter.GhostscriptConverter.path");
+    /**
+     * Prints a PDF file into a Jpeg image using 150dpi resolution
+     * 
+     * @param srcPdf The original file
+     * @param dst The output image(in case of multiple page more files are
+     *        created named dstName-xxx.dstExtension)
+     * @param page The page to print or null to print all the pages
+     * @param dpi the resolution(e.g. 75, 150, 300)
+     * 
+     * @return list of page files
+     */
+    public static List<File> print(File srcPdf, File dst, Integer page, Integer dpi) {
+        ContextProperties config = Context.get().getConfig();
+        String ghostCommand = config.getProperty("converter.GhostscriptConverter.path");
 
-		List<File> pages = new ArrayList<>();
-		String[] cmd = null;
-		if (page != null) {
-			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE, "-dFirstPage=" + page,
-						"-dLastPage=" + page, "-r" + dpi, S_OUTPUT_FILE + dst.getPath(), srcPdf.getPath() };
-			else
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
-						D_NOPAUSE, "-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi,
-						S_OUTPUT_FILE + dst.getPath(), srcPdf.getPath() };
-			pages.add(dst);
-		} else {
-			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE, "-r" + dpi,
-						S_OUTPUT_FILE + dst.getParent() + "/" + FileUtil.getBaseName(dst.getName()) + "-%04d."
-								+ FileUtil.getExtension(dst.getName()),
-						srcPdf.getPath() };
-			else
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
-						D_NOPAUSE, "-r" + dpi, S_OUTPUT_FILE + dst.getParent() + "/"
-								+ FileUtil.getBaseName(dst.getName()) + "-%04d." + FileUtil.getExtension(dst.getName()),
-						srcPdf.getPath() };
-		}
+        List<File> pages = new ArrayList<>();
+        String[] cmd = null;
+        if (page != null) {
+            if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
+                cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE,
+                        "-dFirstPage=%d".formatted(page), "-dLastPage=%d".formatted(page), "-r%d".formatted(dpi),
+                        "-sOutputFile=%s".formatted(dst.getPath()), srcPdf.getPath() };
+            else
+                cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
+                        D_NOPAUSE, "-dFirstPage=%d".formatted(page), "-dLastPage=%d".formatted(page),
+                        "-r%d".formatted(dpi), "-sOutputFile=%s".formatted(dst.getPath()), srcPdf.getPath() };
+            pages.add(dst);
+        } else {
+            if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
+                cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE, "-r%d".formatted(dpi),
+                        "-sOutputFile=%s/%s-%04d.%s".formatted(dst.getParent(), FileUtil.getBaseName(dst.getName()),
+                                FileUtil.getExtension(dst.getName())),
+                        srcPdf.getPath() };
+            else
+                cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
+                        D_NOPAUSE, "-r%d".formatted(dpi), "-sOutputFile=%s/%s-%04d.%s".formatted(dst.getParent(),
+                                FileUtil.getBaseName(dst.getName()), FileUtil.getExtension(dst.getName())),
+                        srcPdf.getPath() };
+        }
 
-		log.debug("Executing: {}", Arrays.asList(cmd));
+        log.debug("Executing: {}", Arrays.asList(cmd));
 
-		ProcessBuilder pb = new ProcessBuilder();
-		pb.redirectErrorStream(true);
-		pb.command(cmd);
-		Worker worker = null;
-		Process process = null;
-		try {
-			process = pb.start();
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.redirectErrorStream(true);
+        pb.command(cmd);
+        Worker worker = null;
+        Process process = null;
+        try {
+            process = pb.start();
 
-			StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
-			outputGobbler.start();
+            StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
+            outputGobbler.start();
 
-			worker = new Worker(process);
-			worker.start();
+            worker = new Worker(process);
+            worker.start();
 
-			worker.join(config.getInt("converter.GhostscriptConverter.timeout", 30) * 1000L);
-			if (worker.getExit() == null)
-				throw new TimeoutException();
+            worker.join(config.getInt("converter.GhostscriptConverter.timeout", 30) * 1000L);
+            if (worker.getExit() == null)
+                throw new TimeoutException();
 
-			process.waitFor();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		} catch (TimeoutException e) {
-			log.error("Rendering timed out");
-		} catch (InterruptedException ex) {
-			worker.interrupt();
-			Thread.currentThread().interrupt();
-		} finally {
-			if (process != null)
-				process.destroy();
-		}
+            process.waitFor();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        } catch (TimeoutException e) {
+            log.error("Rendering timed out");
+        } catch (InterruptedException ex) {
+            worker.interrupt();
+            Thread.currentThread().interrupt();
+        } finally {
+            if (process != null)
+                process.destroy();
+        }
 
-		if (page == null) {
-			File root = dst.getParentFile();
-			File[] children = root.listFiles((dir, name) -> name.startsWith(FileUtil.getBaseName(dst.getName())));
-			pages.addAll(Arrays.asList(children));
-		}
+        if (page == null) {
+            File root = dst.getParentFile();
+            File[] children = root.listFiles((dir, name) -> name.startsWith(FileUtil.getBaseName(dst.getName())));
+            pages.addAll(Arrays.asList(children));
+        }
 
-		return pages.stream().sorted().toList();
-	}
+        return pages.stream().sorted().toList();
+    }
 
-	/**
-	 * Prints a PDF file into a Jpeg image using 150dpi resolution
-	 * 
-	 * @param srcPdf The original file
-	 * @param dst The output image(in case of multiple page more files are
-	 *        created named dstName-xxx.dstExtension)
-	 * @param page The page to print or null to print all the pages.
-	 * 
-	 * @return list of page files
-	 */
-	public static List<File> print(File srcPdf, File dst, Integer page) {
-		return print(srcPdf, dst, page, 150);
-	}
+    /**
+     * Prints a PDF file into a Jpeg image using 150dpi resolution
+     * 
+     * @param srcPdf The original file
+     * @param dst The output image(in case of multiple page more files are
+     *        created named dstName-xxx.dstExtension)
+     * @param page The page to print or null to print all the pages.
+     * 
+     * @return list of page files
+     */
+    public static List<File> print(File srcPdf, File dst, Integer page) {
+        return print(srcPdf, dst, page, 150);
+    }
 
-	/**
-	 * When Runtime.exec() won't.
-	 * http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html
-	 */
-	protected static class StreamGobbler extends Thread {
-		InputStream is;
+    /**
+     * When Runtime.exec() won't.
+     * http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html
+     */
+    protected static class StreamGobbler extends Thread {
+        InputStream is;
 
-		StreamGobbler(InputStream is) {
-			this.is = is;
-		}
+        StreamGobbler(InputStream is) {
+            this.is = is;
+        }
 
-		@Override
-		public void run() {
-			try {
-				InputStreamReader isr = new InputStreamReader(is);
-				BufferedReader br = new BufferedReader(isr);
-				String line = null;
-				while ((line = br.readLine()) != null) {
-					LoggerFactory.getLogger("console").info(line);
-				}
-			} catch (IOException ioe) {
-				log.error(ioe.getMessage());
-			}
-		}
-	}
+        @Override
+        public void run() {
+            try {
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    LoggerFactory.getLogger("console").info(line);
+                }
+            } catch (IOException ioe) {
+                log.error(ioe.getMessage());
+            }
+        }
+    }
 }

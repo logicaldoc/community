@@ -167,7 +167,7 @@ public abstract class AbstractStore implements Store {
      * 123/45/doc.
      */
     protected String computeRelativePath(long docId) {
-        return StringUtil.split(Long.toString(docId), '/', 3) + "/doc";
+        return "%s/doc".formatted(StringUtil.split(Long.toString(docId), '/', 3));
     }
 
     /**
@@ -234,7 +234,7 @@ public abstract class AbstractStore implements Store {
     }
 
     /**
-     * Retrieves the setting "store." + id + ".dir"
+     * Retrieves the setting store.<id>.dir
      */
     protected String getDir() {
         return getConfig().getProperty("store.%d.dir".formatted(id));

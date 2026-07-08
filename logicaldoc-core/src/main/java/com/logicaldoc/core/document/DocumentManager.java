@@ -734,7 +734,7 @@ public class DocumentManager {
         try {
             cont = parseDocument(document, null);
         } catch (ParsingException e) {
-            if (config.getBoolean(tenantName(document.getTenantId()) + ".index.ignorecontenterror", false)) {
+            if (config.getTenantBoolean(tenantName(document.getTenantId()), "index.ignorecontenterror", false)) {
                 log.warn("Ignore parsing errors for document {}", document);
                 debug(e.getMessage(), e);
             } else
@@ -756,7 +756,7 @@ public class DocumentManager {
         hDao.store(transaction);
 
         if (exception instanceof ParsingException && Context.get().getConfig()
-                .getBoolean(tenantName(document.getTenantId()) + ".index.skiponerror", false)) {
+                .getTenantBoolean(tenantName(document.getTenantId()), "index.skiponerror", false)) {
             DocumentDAO dDao = DocumentDAO.get();
             dDao.initialize(document);
             document.setIndexingStatus(IndexingStatus.SKIP);

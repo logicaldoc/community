@@ -14,45 +14,45 @@ import org.junit.Test;
 
 public class PDFImageExtractorTest {
 
-	File destFolder = null;
+    File destFolder = null;
 
-	@Before
-	public void setUp() {
-		destFolder = new File("target", "destFolder");
-		if (!destFolder.exists())
-			destFolder.mkdir();
-	}
+    @Before
+    public void setUp() {
+        destFolder = new File("target", "destFolder");
+        if (!destFolder.exists())
+            destFolder.mkdir();
+    }
 
-	@Test
-	public void testGetNumberOfPages() throws IOException {
-		String filePath = URLDecoder.decode(getClass().getResource("/exportPDF_OFwImage.pdf").getPath(), "UTF-8");
-		File pdffile = new File(filePath);
-		PDFImageExtractor pdfReader = new PDFImageExtractor(pdffile);
-		int pagesNumb = pdfReader.getNumberOfPages();
-		pdfReader.close();
-		Assert.assertEquals(1, pagesNumb);
-	}
+    @Test
+    public void testGetNumberOfPages() throws IOException {
+        String filePath = URLDecoder.decode(getClass().getResource("/exportPDF_OFwImage.pdf").getPath(), "UTF-8");
+        File pdffile = new File(filePath);
+        PDFImageExtractor pdfReader = new PDFImageExtractor(pdffile);
+        int pagesNumb = pdfReader.getNumberOfPages();
+        pdfReader.close();
+        Assert.assertEquals(1, pagesNumb);
+    }
 
-	@Test
-	public void testExtactImageOO2_4() throws IOException {
-		extractImages("exportPDF_OFwImage");
-	}
+    @Test
+    public void testExtactImageOO2_4() throws IOException {
+        extractImages("exportPDF_OFwImage");
+    }
 
-	public void extractImages(String prefix) throws IOException {
-		String filePath = URLDecoder.decode(getClass().getResource("/" + prefix + ".pdf").getPath(), "UTF-8");
+    public void extractImages(String prefix) throws IOException {
+        String filePath = URLDecoder.decode(getClass().getResource("/%s.pdf".formatted(prefix)).getPath(), "UTF-8");
 
-		File pdffile = new File(filePath);
+        File pdffile = new File(filePath);
 
-		try (PDFImageExtractor pdfReader = new PDFImageExtractor(pdffile);) {
-			List<BufferedImage> imgs = pdfReader.extractImages();
+        try (PDFImageExtractor pdfReader = new PDFImageExtractor(pdffile);) {
+            List<BufferedImage> imgs = pdfReader.extractImages();
 
-			Assert.assertNotNull(imgs);
-			Assert.assertTrue(imgs.size() > 0);
+            Assert.assertNotNull(imgs);
+            Assert.assertTrue(imgs.size() > 0);
 
-			for (int i = 0; i < imgs.size(); i++) {
-				File destFile = new File(destFolder, prefix + "_" + i + ".bmp");
-				ImageIO.write(imgs.get(i), "bmp", destFile);
-			}
-		}
-	}
+            for (int i = 0; i < imgs.size(); i++) {
+                File destFile = new File(destFolder, "%s_%d.bmp".formatted(prefix, i));
+                ImageIO.write(imgs.get(i), "bmp", destFile);
+            }
+        }
+    }
 }

@@ -143,7 +143,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
      * Retrieves the timeout in minutes
      */
     protected int getTimeout() {
-        return Context.get().getConfig().getInt(getTenantName() + ".session.timeout", -1);
+        return Context.get().getConfig().getTenantInt(getTenantName(), "session.timeout", -1);
     }
 
     public boolean isOpen() {

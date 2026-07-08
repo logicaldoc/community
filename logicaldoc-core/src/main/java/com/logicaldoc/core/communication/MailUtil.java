@@ -477,7 +477,7 @@ public class MailUtil {
             // The part is another email (may happen in case of forwards).
             try (InputStream is = part.getInputStream()) {
                 EMail embeddedEmail = messageToMail(part.getInputStream(), false);
-                fileName = embeddedEmail.getSubject() + ".eml";
+                fileName =  "%s.eml".formatted(embeddedEmail.getSubject());
             } catch (Exception t) {
                 log.warn(t.getMessage(), t);
             }

@@ -77,8 +77,7 @@ public class TaskScheduling {
 
 	public Date getNextFireTime() {
 		Date nextFire = null;
-
-		Object trigger = Context.get(taskName + "Trigger");
+		Object trigger = Context.get("%sTrigger".formatted(taskName));
 		if (trigger instanceof Trigger trgr)
 			nextFire = previousFireTime != null ? trgr.getFireTimeAfter(previousFireTime) : trgr.getNextFireTime();
 
@@ -102,13 +101,13 @@ public class TaskScheduling {
 	 */
 	public void load() throws IOException, ParseException {
 		ContextProperties config = Context.get().getConfig();
-		this.enabled = config.getBoolean("schedule.enabled." + taskName, false);
-		setCronExpression(config.getProperty("schedule.cron." + taskName));
-		setMode(config.getProperty("schedule.mode." + taskName));
+		this.enabled = config.getBoolean("schedule.enabled.%s".formatted(taskName), false);
+		setCronExpression(config.getProperty("schedule.cron.%s".formatted(taskName)));
+		setMode(config.getProperty("schedule.mode.%s".formatted(taskName)));
 		try {
-			maxLength = Long.parseLong(config.getProperty("schedule.length." + taskName));
-			interval = Long.parseLong(config.getProperty("schedule.interval." + taskName));
-			delay = Long.parseLong(config.getProperty("schedule.delay." + taskName));
+			maxLength = Long.parseLong(config.getProperty("schedule.length.%s".formatted(taskName)));
+			interval = Long.parseLong(config.getProperty("schedule.interval.%s".formatted(taskName)));
+			delay = Long.parseLong(config.getProperty("schedule.delay.%s".formatted(taskName)));
 		} catch (Exception e) {
 			// Nothing to do
 		}
@@ -123,16 +122,16 @@ public class TaskScheduling {
 	public void save() throws IOException, ParseException {
 		Scheduler scheduler = Context.get(Scheduler.class);
 		// Use the & prefix to get the factory and not the bean it produces
-		TaskTrigger trigger = (TaskTrigger) Context.get("&" + taskName + "Trigger");
+		TaskTrigger trigger = (TaskTrigger) Context.get("&%sTrigger".formatted(taskName));
 		String expression = getCronExpression();
 
 		ContextProperties config = Context.get().getConfig();
-		config.setProperty("schedule.cron." + taskName, expression);
-		config.setProperty("schedule.enabled." + taskName, enabled ? "true" : "false");
-		config.setProperty("schedule.length." + taskName, Long.toString(maxLength));
-		config.setProperty("schedule.mode." + taskName, getMode());
-		config.setProperty("schedule.delay." + taskName, Long.toString(delay));
-		config.setProperty("schedule.interval." + taskName, Long.toString(interval));
+		config.setProperty("schedule.cron.%s".formatted(taskName), expression);
+		config.setProperty("schedule.enabled.%s".formatted(taskName), Boolean.toString(enabled));
+		config.setProperty("schedule.length.%s".formatted(taskName), Long.toString(maxLength));
+		config.setProperty("schedule.mode.%s".formatted(taskName), getMode());
+		config.setProperty("schedule.delay.%s".formatted(taskName), Long.toString(delay));
+		config.setProperty("schedule.interval.%s".formatted(taskName), Long.toString(interval));
 		config.write();
 
 		trigger.reload();

@@ -70,10 +70,10 @@ class Indexer extends DocumentProcessorCallable<IndexerStats> {
 
             // Check if this document must be marked for skipping
             if (!FileUtil.matches(document.getFileName(),
-                    config.getProperty(tenant.getName() + ".index.includes") == null ? ""
-                            : config.getProperty(tenant.getName() + ".index.includes"),
-                    config.getProperty(tenant.getName() + ".index.excludes") == null ? ""
-                            : config.getProperty(tenant.getName() + ".index.excludes"))) {
+                    config.getTenantProperty(tenant.getName(), "index.includes") == null ? ""
+                            : config.getTenantProperty(tenant.getName(), "index.includes"),
+                    config.getTenantProperty(tenant.getName(), "index.excludes") == null ? ""
+                            : config.getTenantProperty(tenant.getName(), "index.excludes"))) {
                 documentDao.initialize(document);
                 document.setIndexingStatus(IndexingStatus.SKIP);
                 documentDao.store(document);

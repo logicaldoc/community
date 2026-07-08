@@ -85,7 +85,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
     public List<Sequence> findByName(String name, long tenantId) {
         try {
             return findByWhere("_entity.tenantId = :tenantId and _entity.name like :name ",
-                    Map.of(TENANTID, tenantId, "name", name + "%"), null, null);
+                    Map.of(TENANTID, tenantId, "name", "%s%%".formatted(name)), null, null);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return new ArrayList<>();

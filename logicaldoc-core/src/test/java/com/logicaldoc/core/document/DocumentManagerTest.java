@@ -122,8 +122,9 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
         assertEquals("pluto(1)", doc.getFileName());
         assertEquals("1.1", doc.getVersion());
 
-        assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid=" + doc.getId()
-                + " and ld_version='" + doc.getVersion() + "'"));
+        assertEquals("1.1",
+                verDao.queryForString("select ld_version from ld_version where ld_documentid = %d and ld_version='%s'"
+                        .formatted(doc.getId(), doc.getVersion())));
 
         // Document is null
         Document doc1 = docDao.findById(99999);
@@ -215,8 +216,8 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
             User userWithourPermission = userDao.findByUsername("sebastian");
             transaction.setUser(userWithourPermission);
 
-            userDao.jdbcUpdate("delete from ld_folder_acl where ld_folderid=" + doc.getFolder().getId());
-            userDao.jdbcUpdate("delete from ld_usergroup where ld_groupid=" + Group.GROUPID_ADMIN);
+            userDao.jdbcUpdate("delete from ld_folder_acl where ld_folderid = %d".formatted(doc.getFolder().getId()));
+            userDao.jdbcUpdate("delete from ld_usergroup where ld_groupid = %d".formatted(Group.GROUPID_ADMIN));
 
             assertFalse(folderDao.isDownloadllowed(doc.getFolder().getId(), userWithourPermission.getId()));
 
@@ -395,14 +396,14 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
         String storeRoot = Context.get().getConfig().getProperty("store.1.dir");
         String store2Root = Context.get().getConfig().getProperty("store.2.dir");
 
-        assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
-        FileUtil.delete(new File(store2Root + "/1/doc/"));
+        assertTrue(new File("%s/1/doc/%s".formatted(storeRoot, doc.getFileVersion())).exists());
+        FileUtil.delete(new File("%s/1/doc/".formatted(store2Root)));
 
         transaction = new DocumentHistory();
         transaction.setUser(user);
         testSubject.enforceFilesIntoFolderStore(folder.getId(), transaction);
 
-        assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
+        assertTrue(new File("%s/1/doc/%s".formatted(store2Root, doc.getFileVersion())).exists());
 
         // rootId is null
         try {

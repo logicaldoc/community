@@ -46,7 +46,8 @@ public class ZipConverter extends CompressedArchiveConverter {
     }
 
     private File gunzip(File input, String fileName) throws IOException {
-        String unpackedFileName = fileName.toLowerCase().endsWith(".tgz") ? FileUtil.getBaseName(fileName) + ".tar.gz"
+        String unpackedFileName = fileName.toLowerCase().endsWith(".tgz")
+                ? "%s.tar.gz".formatted(FileUtil.getBaseName(fileName))
                 : fileName;
         unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
         File ungzippedFile = FileUtil.createTempFile("parsegzip",

@@ -28,42 +28,43 @@ import com.logicaldoc.util.spring.Context;
  */
 public class LockManagerTest extends AbstractCoreTestCase {
 
-	private LockManager testSubject;
+    private LockManager testSubject;
 
-	private GenericDAO dao;
+    private GenericDAO dao;
 
-	private ContextProperties config;
+    private ContextProperties config;
 
-	@Before
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Before
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		testSubject = Context.get(LockManager.class);
-		dao = GenericDAO.get();
-		config = Context.get().getConfig();
-	}
+        testSubject = Context.get(LockManager.class);
+        dao = GenericDAO.get();
+        config = Context.get().getConfig();
+    }
 
-	@Test
-	public void testGet() throws PersistenceException {
-		assertTrue(testSubject.get("test", "t1"));
-		assertTrue(testSubject.get("test", "t1"));
-		assertFalse(testSubject.get("test", "t2"));
+    @Test
+    public void testGet() throws PersistenceException {
+        assertTrue(testSubject.get("test", "t1"));
+        assertTrue(testSubject.get("test", "t1"));
+        assertFalse(testSubject.get("test", "t2"));
 
-		synchronized (this) {
-			try {
-				wait(3000);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
+        synchronized (this) {
+            try {
+                wait(3000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
-		assertTrue(testSubject.get("test", "t2"));
-		testSubject.release("test", "t2");
+        assertTrue(testSubject.get("test", "t2"));
+        testSubject.release("test", "t2");
 
-		Generic lock = dao.findByAlternateKey("lock", "test-" + config.getProperty("id"), null, Tenant.DEFAULT_ID);
-		assertNotNull(lock);
-		assertNull(lock.getString1());
-		assertNull(lock.getDate1());
-	}
+        Generic lock = dao.findByAlternateKey("lock", "test-%s".formatted(config.getProperty("id")), null,
+                Tenant.DEFAULT_ID);
+        assertNotNull(lock);
+        assertNull(lock.getString1());
+        assertNull(lock.getDate1());
+    }
 }

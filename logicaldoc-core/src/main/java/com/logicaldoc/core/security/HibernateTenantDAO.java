@@ -1,7 +1,6 @@
 package com.logicaldoc.core.security;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +63,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
     public Tenant findByName(String name) {
         Tenant tenant = null;
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("name", name);
-            Collection<Tenant> coll = findByWhere(ENTITY + ".name = :name", params, null, null);
+            Collection<Tenant> coll = findByWhere("_entity.name = :name", Map.of("name", name), null, null);
             if (CollectionUtils.isNotEmpty(coll)) {
                 tenant = coll.iterator().next();
                 if (tenant.getDeleted() == 1)

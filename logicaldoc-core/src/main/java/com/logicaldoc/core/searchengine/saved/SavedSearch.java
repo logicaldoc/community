@@ -27,130 +27,130 @@ import jakarta.persistence.Table;
 @Cacheable
 public class SavedSearch extends PersistentObject implements Serializable, Comparable<SavedSearch> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Column(name = "ld_userid", nullable = false)
-	private long userId;
+    @Column(name = "ld_userid", nullable = false)
+    private long userId;
 
-	@Column(name = "ld_date", columnDefinition = "DATETIME(3)")
-	private Date date = new Date();
+    @Column(name = "ld_date", columnDefinition = "DATETIME(3)")
+    private Date date = new Date();
 
-	@Column(name = "ld_options")
-	private String options = "";
+    @Column(name = "ld_options")
+    private String options = "";
 
-	@Column(name = "ld_name")
-	private String name = "";
+    @Column(name = "ld_name")
+    private String name = "";
 
-	@Column(name = "ld_type", nullable = false)
-	private int type = SearchOptions.TYPE_FULLTEXT;
+    @Column(name = "ld_type", nullable = false)
+    private int type = SearchOptions.TYPE_FULLTEXT;
 
-	@Column(name = "ld_description")
-	private String description = "";
+    @Column(name = "ld_description")
+    private String description = "";
 
-	public SavedSearch() {
-	}
+    public SavedSearch() {
+    }
 
-	public SavedSearch(SavedSearch source) {
-		this.userId = source.userId;
-		this.name = source.name;
-		this.description = source.description;
-		this.type = source.type;
-		this.date = source.date;
-		this.options = source.options;
-	}
+    public SavedSearch(SavedSearch source) {
+        this.userId = source.userId;
+        this.name = source.name;
+        this.description = source.description;
+        this.type = source.type;
+        this.date = source.date;
+        this.options = source.options;
+    }
 
-	public void saveOptions(SearchOptions opt) throws PersistenceException {
-		this.setType(opt.getType());
+    public void saveOptions(SearchOptions opt) throws PersistenceException {
+        this.setType(opt.getType());
 
-		String tenantName = TenantDAO.get().getTenantName(getTenantId());
-		String charset = Context.get().getConfig().getProperty(tenantName + ".charset", "UTF-8");
+        String tenantName = TenantDAO.get().getTenantName(getTenantId());
+        String charset = Context.get().getConfig().getTenantProperty(tenantName, "charset", "UTF-8");
 
-		setOptions(IOUtil.serialize(opt, charset));
-	}
+        setOptions(IOUtil.serialize(opt, charset));
+    }
 
-	public SearchOptions readOptions() {
-		SearchOptions searchOptions = (SearchOptions) IOUtil.deserialize(getOptions());
-		searchOptions.setName(getName());
-		searchOptions.setDescription(getDescription());
-		return searchOptions;
-	}
+    public SearchOptions readOptions() {
+        SearchOptions searchOptions = (SearchOptions) IOUtil.deserialize(getOptions());
+        searchOptions.setName(getName());
+        searchOptions.setDescription(getDescription());
+        return searchOptions;
+    }
 
-	@Override
-	public int compareTo(SavedSearch other) {
-		return this.getOptions().compareTo(other.getOptions());
-	}
+    @Override
+    public int compareTo(SavedSearch other) {
+        return this.getOptions().compareTo(other.getOptions());
+    }
 
-	public long getUserId() {
-		return userId;
-	}
+    public long getUserId() {
+        return userId;
+    }
 
-	public void setUserId(long userId) {
-		this.userId = userId;
-	}
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public Date getDate() {
-		return date;
-	}
+    public Date getDate() {
+        return date;
+    }
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
-	public String getOptions() {
-		return options;
-	}
+    public String getOptions() {
+        return options;
+    }
 
-	public void setOptions(String options) {
-		this.options = options;
-	}
+    public void setOptions(String options) {
+        this.options = options;
+    }
 
-	public int getType() {
-		return type;
-	}
+    public int getType() {
+        return type;
+    }
 
-	public void setType(int type) {
-		this.type = type;
-	}
+    public void setType(int type) {
+        this.type = type;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + (int) (userId ^ (userId >>> 32));
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + (int) (userId ^ (userId >>> 32));
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SavedSearch other = (SavedSearch) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return userId == other.userId;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SavedSearch other = (SavedSearch) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return userId == other.userId;
+    }
 }

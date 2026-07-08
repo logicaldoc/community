@@ -44,7 +44,7 @@ public class CorePlugin extends LogicalDOCPlugin {
 		// Initialize the IconSelector
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile().getParentFile();
-		dest = new File(dest.getAbsolutePath() + "/frontend/sc/skins/Tahoe/images/FileIcons");
+		dest = new File("%s/frontend/sc/skins/Tahoe/images/FileIcons".formatted(dest.getAbsolutePath()));
 		File[] icons = dest.listFiles((File dir, String name) -> name.endsWith(".svg"));
 		if (icons != null)
 			for (File icon : icons)
@@ -58,14 +58,14 @@ public class CorePlugin extends LogicalDOCPlugin {
 			ContextProperties pbean = new ContextProperties();
 			for (String aspect : RunLevel.getAspects()) {
 				for (RunLevel level : RunLevel.values())
-					pbean.setProperty("aspect." + aspect + "." + level.toString(), "true");
+					pbean.setProperty("aspect.%s.%s".formatted(aspect, level), "true");
 			}
 
 			pbean.setProperty("threadpool.Email.type", DEFAULT);
 			pbean.setProperty("threadpool.EventCollector.max", "20");
 			pbean.setProperty("threadpool.EventCollector.type", DEFAULT);
-			pbean.setProperty("threadpool."+IndexerTask.NAME+".max", "2");
-			pbean.setProperty("threadpool."+IndexerTask.NAME+".type", DEFAULT);
+			pbean.setProperty("threadpool.%s.max".formatted(IndexerTask.NAME), "2");
+			pbean.setProperty("threadpool.%s.type".formatted(IndexerTask.NAME), DEFAULT);
 
 			pbean.write();
 		} catch (IOException e) {

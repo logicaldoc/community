@@ -149,10 +149,9 @@ public abstract class Search {
 
         internalSearch();
 
-        ContextProperties config = Context.get().getConfig();
         String extattrs;
         try {
-            extattrs = config.getProperty(TenantDAO.get().getTenantName(searchUser.getTenantId()) + ".search.extattr");
+            extattrs = Context.get().getConfig().getTenantProperty(TenantDAO.get().getTenantName(searchUser.getTenantId()), "search.extattr");
         } catch (PersistenceException e) {
             throw new SearchException(e);
         }
@@ -184,8 +183,9 @@ public abstract class Search {
             }
 
             query.append(idsString);
-            query.append(" and ld_name in ");
-            query.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','").replace(" ", ""));
+            query.append(" and ld_name in (");
+            query.append(attrs.stream().map(at -> "'%s'".formatted(at)).collect(Collectors.joining(",")));
+            query.append(")");
 
             try {
                 ddao.query(query.toString(), new RowMapper<Long>() {

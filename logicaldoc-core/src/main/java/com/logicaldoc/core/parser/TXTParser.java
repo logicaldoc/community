@@ -29,51 +29,58 @@ import com.logicaldoc.util.spring.Context;
  */
 public class TXTParser extends AbstractParser {
 
-	private static final Logger log = LoggerFactory.getLogger(TXTParser.class);
+    private static final Logger log = LoggerFactory.getLogger(TXTParser.class);
 
-	@Override
-	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
-			String fileVersion) {
-		try (FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis);) {
-			return parse(bis, new ParseParameters(document, filename, fileVersion, determineEncoding(bis, encoding),
-					locale, tenant));
-		} catch (Exception ex) {
-			log.warn("Failed to extract TXT text content", ex);
-		}
-		return "";
-	}
+    @Override
+    public String parse(
+            File file,
+            String filename,
+            String encoding,
+            Locale locale,
+            String tenant,
+            Document document,
+            String fileVersion) {
+        try (FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis);) {
+            return parse(bis, new ParseParameters(document, filename, fileVersion, determineEncoding(bis, encoding),
+                    locale, tenant));
+        } catch (Exception ex) {
+            log.warn("Failed to extract TXT text content", ex);
+        }
+        return "";
+    }
 
-	private String determineEncoding(BufferedInputStream bis, String probableEncoding) {
-		if (StringUtils.isEmpty(probableEncoding)) {
-			// Determine the most probable encoding
-			try {
-				CharsetDetector cd = new CharsetDetector();
-				cd.setText(bis);
-				CharsetMatch cm = cd.detect();
-				if (cm != null && Charset.isSupported(cm.getName()))
-					probableEncoding = cm.getName();
-			} catch (Exception th) {
-				log.warn("Error during TXT fileNameCharset detection", th);
-			}
-		}
-		return probableEncoding;
-	}
+    private String determineEncoding(BufferedInputStream bis, String probableEncoding) {
+        if (StringUtils.isEmpty(probableEncoding)) {
+            // Determine the most probable encoding
+            try {
+                CharsetDetector cd = new CharsetDetector();
+                cd.setText(bis);
+                CharsetMatch cm = cd.detect();
+                if (cm != null && Charset.isSupported(cm.getName()))
+                    probableEncoding = cm.getName();
+            } catch (Exception th) {
+                log.warn("Error during TXT fileNameCharset detection", th);
+            }
+        }
+        return probableEncoding;
+    }
 
-	@Override
-	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
-		try {
-			if (input != null)
-				content.append(StringUtil.writeToString(getLimitedStream(input, parameters.getTenant()), parameters.getEncoding()));
-		} catch (UnsupportedEncodingException e) {
-			log.warn("Unsupported encoding '{}', using default ({}) instead.", parameters.getEncoding(),
-					System.getProperty("file.encoding"));
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-	}
+    @Override
+    public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
+        try {
+            if (input != null)
+                content.append(StringUtil.writeToString(getLimitedStream(input, parameters.getTenant()),
+                        parameters.getEncoding()));
+        } catch (UnsupportedEncodingException e) {
+            log.warn("Unsupported encoding '{}', using default ({}) instead.", parameters.getEncoding(),
+                    System.getProperty("file.encoding"));
+        } catch (IOException e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
 
-	private InputStream getLimitedStream(InputStream input, String tenant) {
-		long maxBytes = Context.get().getConfig().getInt(tenant + ".parser.txt.maxsize", 1024) * 1024L;
-		return IOUtil.getLimitedStream(input, maxBytes);
-	}
+    private InputStream getLimitedStream(InputStream input, String tenant) {
+        long maxBytes = Context.get().getConfig().getTenantInt(tenant, "parser.txt.maxsize", 1024) * 1024L;
+        return IOUtil.getLimitedStream(input, maxBytes);
+    }
 }

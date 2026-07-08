@@ -54,7 +54,7 @@ public enum HitField {
 	public static String searchList() {
 		Set<HitField> fields = all();
 		String buf = fields.toString();
-		buf = buf.substring(buf.indexOf(',') + 1, buf.length() - 1) + ",ext_*";
+		buf = "%s,ext_*".formatted(buf.substring(buf.indexOf(',') + 1, buf.length() - 1));
 		return buf;
 	}
 

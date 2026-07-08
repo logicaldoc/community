@@ -21,56 +21,55 @@ import jakarta.annotation.Resource;
 /**
  * Parent of all DAOs that handle histories
  * 
- * @param <T> Class of the implementation of a {@link History} this DAO
- *        handles
+ * @param <T> Class of the implementation of a {@link History} this DAO handles
  * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 9.0.1
  */
 public abstract class HibernateHistoryDAO<T extends History> extends HibernatePersistentObjectDAO<T>
-		implements PersistentObjectDAO<T> {
+        implements PersistentObjectDAO<T> {
 
-	@Resource(name = "config")
-	protected ContextProperties config;
+    @Resource(name = "config")
+    protected ContextProperties config;
 
-	// A cache of tenant names to minimize the DB accesses
-	private static final Map<Long, String> tenantNames = new HashMap<>();
+    // A cache of tenant names to minimize the DB accesses
+    private static final Map<Long, String> tenantNames = new HashMap<>();
 
-	protected HibernateHistoryDAO(Class<T> historyClass) {
-		super(historyClass);
-		super.log = LoggerFactory.getLogger(HibernateHistoryDAO.class);
-	}
+    protected HibernateHistoryDAO(Class<T> historyClass) {
+        super(historyClass);
+        super.log = LoggerFactory.getLogger(HibernateHistoryDAO.class);
+    }
 
-	@Override
-	public void store(T history) throws PersistenceException {
-		// Write only if the history is enabled
-		if (!RunLevel.current().aspectEnabled(Aspect.SAVEHISTORY))
-			return;
+    @Override
+    public void store(T history) throws PersistenceException {
+        // Write only if the history is enabled
+        if (!RunLevel.current().aspectEnabled(Aspect.SAVEHISTORY))
+            return;
 
-		if (history.getDate() == null)
-			history.setDate(new Date());
-		if (history.getComment() != null) {
-			// trim to 4000 chars
-			history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
+        if (history.getDate() == null)
+            history.setDate(new Date());
+        if (history.getComment() != null) {
+            // trim to 4000 chars
+            history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 
-			// remove non printable chars, but maintain the carriage
-			// returns and the tabs
-			history.setComment(history.getComment().trim().replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
-		}
+            // remove non printable chars, but maintain the carriage
+            // returns and the tabs
+            history.setComment(history.getComment().trim().replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
+        }
 
-		String allowedEvents = config.getString(getTenantName(history) + ".history.events", "all");
-		if ("all".equals(allowedEvents) || allowedEvents.contains(history.getEvent()))
-			super.store(history);
+        String allowedEvents = config.getTenantString(getTenantName(history), "history.events", "all");
+        if ("all".equals(allowedEvents) || allowedEvents.contains(history.getEvent()))
+            super.store(history);
 
-		EventCollector.get().newEvent(history);
-	}
+        EventCollector.get().newEvent(history);
+    }
 
-	protected String getTenantName(History history) throws PersistenceException {
-		if (HibernateHistoryDAO.tenantNames.containsKey(history.getTenantId()))
-			return HibernateHistoryDAO.tenantNames.get(history.getTenantId());
+    protected String getTenantName(History history) throws PersistenceException {
+        if (HibernateHistoryDAO.tenantNames.containsKey(history.getTenantId()))
+            return HibernateHistoryDAO.tenantNames.get(history.getTenantId());
 
-		String name = TenantDAO.get().getTenantName(history.getTenantId());
-		HibernateHistoryDAO.tenantNames.put(history.getTenantId(), name);
-		return name;
-	}
+        String name = TenantDAO.get().getTenantName(history.getTenantId());
+        HibernateHistoryDAO.tenantNames.put(history.getTenantId(), name);
+        return name;
+    }
 }

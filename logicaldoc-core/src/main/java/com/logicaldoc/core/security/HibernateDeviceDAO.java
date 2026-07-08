@@ -43,10 +43,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
     @Override
     public Device findByDeviceId(String deviceId) {
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("deviceId", deviceId);
-
-            List<Device> devices = findByWhere(ENTITY + ".deviceId = :deviceId", params, null, null);
+            List<Device> devices = findByWhere("_entity.deviceId = :deviceId", Map.of("deviceId", deviceId), null, null);
             return devices.isEmpty() ? null : devices.get(0);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);

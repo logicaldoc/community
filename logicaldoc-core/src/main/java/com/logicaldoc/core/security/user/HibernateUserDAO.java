@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.LoggerFactory;
@@ -90,10 +89,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     @Override
     public List<User> findByName(String name) throws PersistenceException {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name.toLowerCase());
-
-        return findByWhere(LOWER + ENTITY + ".name) like :name", params, null, null);
+        return findByWhere("lower(_entity.name) like :name", Map.of("name", name.toLowerCase()), null, null);
     }
 
     @Override
@@ -101,13 +97,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         if (StringUtils.isEmpty(username))
             return null;
 
-        User user = null;
-        Map<String, Object> params = new HashMap<>();
-        params.put(USERNAME, username);
-
-        List<User> coll = findByWhere(ENTITY + ".username = :username", params, null, null);
-        if (CollectionUtils.isNotEmpty(coll))
-            user = coll.iterator().next();
+        User user = findByWhere("_entity.username = :username", Map.of(USERNAME, username), null, null).stream()
+                .findFirst().orElse(null);
         initialize(user);
         return user;
     }
@@ -117,13 +108,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         if (StringUtils.isEmpty(username))
             return null;
 
-        User user = null;
-        Map<String, Object> params = new HashMap<>();
-        params.put(USERNAME, username.toLowerCase());
-
-        List<User> coll = findByWhere(LOWER + ENTITY + ".username) = :username", params, null, null);
-        if (CollectionUtils.isNotEmpty(coll))
-            user = coll.iterator().next();
+        User user = findByWhere("lower(_entity.username) = :username", Map.of(USERNAME, username.toLowerCase()), null,
+                null).stream().findFirst().orElse(null);
         initialize(user);
         return user;
     }
@@ -326,10 +312,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
                 params.put("label", wt.getLabel());
                 params.put("description", wt.getDescription());
 
-                jdbcUpdate("""
-                           insert into ld_workingtime (ld_userid,ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description) 
-                                               values (:userId, :dayOfWeek, :hourStart, :minuteStart, :hourEnd, :minuteEnd, :label, :description)
-                           """, params);
+                jdbcUpdate(
+                        """
+                        insert into ld_workingtime (ld_userid,ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description)
+                                            values (:userId, :dayOfWeek, :hourStart, :minuteStart, :hourEnd, :minuteEnd, :label, :description)
+                        """,
+                        params);
             }
     }
 
@@ -592,8 +580,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     private void saveDefaultDashlets(User user) throws PersistenceException {
         String type = "usersetting";
         String dashletSubtype = "dashlet-";
-        String[] dashletSubtypes = new String[] { dashletSubtype + "checkout", dashletSubtype + "locked",
-                dashletSubtype + "notes" };
+        String[] dashletSubtypes = new String[] { "%scheckout".formatted(dashletSubtype),
+                "%slocked".formatted(dashletSubtype), "%snotes".formatted(dashletSubtype) };
         for (int i = 0; i < dashletSubtypes.length; i++) {
             Generic dash = new Generic(type, dashletSubtypes[i], user.getId());
             dash.setString1("0");
@@ -865,7 +853,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     @Override
     public Map<String, Generic> findUserSettings(long userId, String namePrefix) throws PersistenceException {
-        List<Generic> generics = genericDAO.findByTypeAndSubtype("usersetting", namePrefix + "%", userId, null);
+        List<Generic> generics = genericDAO.findByTypeAndSubtype("usersetting", "%s%%".formatted(namePrefix), userId,
+                null);
         Map<String, Generic> map = new HashMap<>();
         for (Generic generic : generics) {
             map.put(generic.getSubtype(), generic);

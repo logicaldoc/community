@@ -169,19 +169,19 @@ public class EMailSender {
         try {
             ContextProperties config = Context.get().getConfig();
 
-            protocol = config.getProperty(tenant + ".smtp.protocol");
-            host = config.getProperty(tenant + ".smtp.host");
-            port = config.getInt(tenant + ".smtp.port");
-            username = config.getProperty(tenant + ".smtp.username");
-            password = config.getProperty(tenant + ".smtp.password");
-            sender = config.getProperty(tenant + ".smtp.sender");
-            authEncrypted = "true".equals(config.getProperty(tenant + ".smtp.authEncrypted"));
-            connectionSecurity = config.getInt(tenant + ".smtp.connectionSecurity");
-            folderId = config.getLong(tenant + ".smtp.save.folderId", 0);
-            foldering = config.getInt(tenant + ".smtp.save.foldering", FOLDERING_DAY);
-            clientSecret = config.getProperty(tenant + ".smtp.clientSecret");
-            clientId = config.getProperty(tenant + ".smtp.clientId");
-            clientTenant = config.getProperty(tenant + ".smtp.clientTenant");
+            protocol = config.getTenantProperty(tenant, "smtp.protocol");
+            host = config.getTenantProperty(tenant, "smtp.host");
+            port = config.getTenantInt(tenant, "smtp.port");
+            username = config.getTenantProperty(tenant, "smtp.username");
+            password = config.getTenantProperty(tenant, "smtp.password");
+            sender = config.getTenantProperty(tenant, "smtp.sender");
+            authEncrypted = "true".equals(config.getTenantProperty(tenant, "smtp.authEncrypted"));
+            connectionSecurity = config.getTenantInt(tenant, "smtp.connectionSecurity");
+            folderId = config.getTenantLong(tenant, "smtp.save.folderId", 0L);
+            foldering = config.getTenantInt(tenant, "smtp.save.foldering", FOLDERING_DAY);
+            clientSecret = config.getTenantProperty(tenant, "smtp.clientSecret");
+            clientId = config.getTenantProperty(tenant, "smtp.clientId");
+            clientTenant = config.getProperty(tenant, "smtp.clientTenant");
         } catch (Exception t) {
             log.warn(t.getMessage(), t);
         }
@@ -463,7 +463,7 @@ public class EMailSender {
     private void cleanAuthorAddress(EMail email) {
         try {
             String tenantName = TenantDAO.get().getTenantName(email.getTenantId());
-            if (!Context.get().getConfig().getBoolean(tenantName + ".smtp.userasfrom", false))
+            if (!Context.get().getConfig().getTenantBoolean(tenantName, "smtp.userasfrom", false))
                 email.setAuthorAddress(null);
         } catch (Exception e) {
             // Nothing to do, when using outside a Spring context this code
@@ -649,7 +649,7 @@ public class EMailSender {
             }
 
             Document emailDocument = new Document();
-            emailDocument.setFileName(email.getSubject() + ".eml");
+            emailDocument.setFileName("%s.eml".formatted(email.getSubject()));
             emailDocument.setType("eml");
             emailDocument.setLocale(email.getLocale() != null ? email.getLocale() : Locale.ENGLISH);
             emailDocument.setFolder(folder);

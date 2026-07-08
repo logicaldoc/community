@@ -14,6 +14,6 @@ public class ThreadPoolNotAvailableException extends Exception {
 	}
 
 	public ThreadPoolNotAvailableException(String pool, Throwable cause) {
-		super(pool + " pool was shutdown or not is not available", cause);
+		super("%s pool was shutdown or not is not available".formatted(pool), cause);
 	}
 }

@@ -260,9 +260,9 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testRestore() throws PersistenceException {
 		assertEquals(1000L,
-				testSubject.queryForLong("select ld_id from ld_menu where ld_id=" + 1000L + " and ld_deleted=1"));
+				testSubject.queryForLong("select ld_id from ld_menu where ld_id = %d and ld_deleted = 1".formatted(1000L)));
 		assertEquals(1100L,
-				testSubject.queryForLong("select ld_id from ld_menu where ld_id=" + 1100L + " and ld_deleted=1"));
+				testSubject.queryForLong("select ld_id from ld_menu where ld_id = %d and ld_deleted = 1".formatted(1100L)));
 
 		testSubject.restore(1100, true);
 		Menu menu = testSubject.findById(1000);

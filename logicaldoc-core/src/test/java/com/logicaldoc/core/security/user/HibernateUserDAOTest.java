@@ -268,7 +268,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         testSubject.initialize(user);
         assertFalse(user.isPasswordExpired());
         assertFalse(user.isPasswordExpires());
-        user.setDecodedPassword(pswd + "-*/!?");
+        user.setDecodedPassword("%s-*/!?".formatted(pswd));
         testSubject.store(user);
 
         // Give an already used password
@@ -288,7 +288,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         user = testSubject.findById(1L);
         testSubject.initialize(user);
         assertFalse(user.isPasswordExpired());
-        user.setDecodedPassword(pswd + "-#é+^");
+        user.setDecodedPassword("%s-#é+^".formatted(pswd));
         user.setPasswordExpired(true);
         testSubject.store(user);
 

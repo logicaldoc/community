@@ -174,8 +174,8 @@ public class ThumbnailManager {
 
             builder.buildThumbnail(sid, document, fileVersion, src, dest, size,
                     quality != null ? quality
-                            : Context.get().getConfig().getInt(
-                                    TenantDAO.get().getTenantName(document.getTenantId()) + ".gui.thumbnail.quality",
+                            : Context.get().getConfig().getTenantInt(
+                                    TenantDAO.get().getTenantName(document.getTenantId()), "gui.thumbnail.quality",
                                     93));
 
             // Put the resource

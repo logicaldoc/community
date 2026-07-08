@@ -112,7 +112,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 		testSubject.merge(source, target, "admin");
 		target = testSubject.findById(6L);
 		assertNull(target);
-		assertNotNull(testSubject.findByPath(targetPath + "/test"));
+		assertNotNull(testSubject.findByPath("%s/test".formatted(targetPath)));
 	}
 
 	@Test
