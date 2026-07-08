@@ -30,7 +30,7 @@ public class CmisPlugin extends LogicalDOCPlugin {
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();
 
-		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
+		WebConfigurator config = new WebConfigurator( "%s/web.xml".formatted(dest.getPath()));
 		config.addServletInitParam(SERVLET_NAME, "callContextHandler", BasicAuthCallContextHandler.class.getName(), null);
 		config.addServletInitParam(SERVLET_NAME, "cmisVersion", "1.0", null);
 		config.addListener(CmisRepositoryContextListener.class.getName());

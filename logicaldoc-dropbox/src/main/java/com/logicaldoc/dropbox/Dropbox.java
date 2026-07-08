@@ -124,7 +124,7 @@ public class Dropbox {
 		if (normalizedPath.endsWith("/"))
 			normalizedPath = normalizedPath.substring(0, path.length() - 1);
 		if (!normalizedPath.startsWith("/"))
-			normalizedPath = "/" + normalizedPath;
+			normalizedPath = "/%s".formatted(normalizedPath);
 		if (normalizedPath.equals("/"))
 			normalizedPath = "";
 

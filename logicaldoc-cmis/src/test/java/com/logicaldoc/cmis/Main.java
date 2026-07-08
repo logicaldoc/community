@@ -30,9 +30,9 @@ public class Main {
 
     public static final String OC_DOCUMENT_TEMPLATE_ID = "CampusDocument";
 
-    public static final String OC_DOCUMENT_PREFIX_PREFIX = METADATA_PREFIX + OC_DOCUMENT_TEMPLATE_ID + "-";
+    public static final String OC_DOCUMENT_PREFIX_PREFIX = "%s%s-".formatted(METADATA_PREFIX, OC_DOCUMENT_TEMPLATE_ID);
 
-    public static final String OC_DOCUMENT_TITLE = OC_DOCUMENT_PREFIX_PREFIX + "title";
+    public static final String OC_DOCUMENT_TITLE = "%stitle".formatted(OC_DOCUMENT_PREFIX_PREFIX);
 
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
