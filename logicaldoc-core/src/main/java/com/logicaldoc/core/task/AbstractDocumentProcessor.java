@@ -57,7 +57,7 @@ public abstract class AbstractDocumentProcessor extends Task {
             // Select the IDs of those documents not involved in any transaction
             StringBuilder sort = new StringBuilder();
             StringBuilder where = new StringBuilder(
-                    "entity.deleted = 0 and (_entity.transactionId is null or _entity.transactionId not in (");
+                    "_entity.deleted = 0 and (_entity.transactionId is null or _entity.transactionId not in (");
             where.append(StringUtils.defaultIfEmpty(currentTransactionIds, "'unexisting'")).append(")) and ");
             prepareQueueQuery(where, sort);
 
