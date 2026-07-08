@@ -249,7 +249,7 @@ public class StandardSearchEngine implements SearchEngine {
     public String check() {
         log.warn("Checking index");
 
-        String statMsg = "";
+        StringBuilder statMsg = new StringBuilder();
 
         try (CheckIndex ci = new CheckIndex(getIndexDataDirectory());
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
@@ -261,32 +261,29 @@ public class StandardSearchEngine implements SearchEngine {
             // Elaborate the status showing needed informations
             if (status != null) {
                 if (status.clean) {
-                    statMsg = "OK\n";
+                    statMsg.append("OK\n");
                 } else if (status.toolOutOfDate) {
-                    statMsg = "ERROR: Can't check - tool out-of-date\n";
+                    statMsg.append("ERROR: Can't check - tool out-of-date\n");
                 } else {
-                    statMsg = "BAD: ";
-                    if (status.missingSegments) {
-                        statMsg += "missingSegments ";
-                    }
-                    if (status.numBadSegments > 0) {
-                        statMsg += "numBadSegments=" + status.numBadSegments + " ";
-                    }
-                    if (status.totLoseDocCount > 0) {
-                        statMsg += "lostDocCount=" + status.totLoseDocCount + " ";
-                    }
+                    statMsg.append("BAD: ");
+                    if (status.missingSegments)
+                        statMsg.append("missingSegments ");
+
+                    if (status.numBadSegments > 0)
+                        statMsg.append("numBadSegments=%d ".formatted(status.numBadSegments));
+
+                    if (status.totLoseDocCount > 0)
+                        statMsg.append("lostDocCount=%d".formatted(status.totLoseDocCount));
                 }
 
-                String content = getContent(baos);
-
-                statMsg += "\n" + content;
+                statMsg.append("\n").append(getContent(baos));
             }
         } catch (Exception t) {
             log.error(t.getMessage());
         }
 
         log.warn("Finished checking index");
-        return statMsg;
+        return statMsg.toString();
     }
 
     private Status retrieveStatus(CheckIndex ci, PrintStream ps) {
@@ -616,7 +613,7 @@ public class StandardSearchEngine implements SearchEngine {
             }
 
             // Delete the lock file if it exists
-            FileUtil.delete(new File(indexHome, "logicaldoc/data/index/" + IndexWriter.WRITE_LOCK_NAME));
+            FileUtil.delete(new File(indexHome, "logicaldoc/data/index/%s".formatted(IndexWriter.WRITE_LOCK_NAME)));
 
             CoreContainer container = new CoreContainer(indexHome.toPath(), null);
             server = new EmbeddedSolrServer(container, LOGICALDOC);

@@ -25,7 +25,7 @@
 
     <context:annotation-config />
 
-    <tx:annotation-driven transaction-manager="TransactionManager" />
+    <tx:annotation-driven transaction-manager="transactionManager" />
 
 	<import resource="classpath*:context-security.xml" />
 
@@ -39,7 +39,7 @@
 	</bean>
 	
 	<!-- Connection Pool implementations -->
-	<bean id="DbcpConfig" class="com.logicaldoc.core.util.DbcpConfiguration">
+	<bean id="dbcpConfig" class="com.logicaldoc.core.util.DbcpConfiguration">
 		<property name="driverClassName" value="${jdbc.driver}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
@@ -55,7 +55,7 @@
 			value="${jdbc.dbcp.timeBetweenEvictionRuns}" />
 		<property name="numTestsPerEvictionRun" value="${jdbc.dbcp.testsPerEvictionRun}" />
 	</bean>
-	<bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="poolName" value="Connection Pool" />
 		<property name="connectionTestQuery" value="${jdbc.validationQuery}" />
 		<property name="driverClassName" value="${jdbc.driver}" />
@@ -71,16 +71,16 @@
 	</bean>
 
 	<!-- Data Source -->
-	<bean id="DataSource" class="com.logicaldoc.core.util.ConnectionPool" destroy-method="close" init-method="init">
+	<bean id="dataSource" class="com.logicaldoc.core.util.ConnectionPool" destroy-method="close" init-method="init">
 		<property name="implementation" value="${jdbc.cp}" />
-		<property name="hikariConfig" ref="HikariConfig" />
-		<property name="dbcpConfig" ref="DbcpConfig" />
+		<property name="hikariConfig" ref="hikariConfig" />
+		<property name="dbcpConfig" ref="dbcpConfig" />
 	</bean>
 
     <!-- Hibernate SessionFactory -->
-    <bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
+    <bean id="sessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
 		abstract="false" lazy-init="default" autowire="default">
-		<property name="dataSource" ref="DataSource" />
+		<property name="dataSource" ref="dataSource" />
 		<property name="entityInterceptor">
 			<bean class="com.logicaldoc.core.LastModifiedInterceptor" />
 		</property>
@@ -98,17 +98,17 @@
 		</property>
 	</bean>
 	<!--Transaction management -->
-	<bean id="TransactionManager"
+	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate5.HibernateTransactionManager" abstract="false"
 		lazy-init="default" autowire="default">
-		<property name="sessionFactory" ref="SessionFactory" />
+		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	<!--Transactional proxy -->
-	<bean id="ApplicationBaseTransactionProxy"
+	<bean id="applicationBaseTransactionProxy"
 		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" lazy-init="true"
 		abstract="false" autowire="default">
 		<property name="transactionManager">
-			<ref bean="TransactionManager" />
+			<ref bean="transactionManager" />
 		</property>
 		<property name="transactionAttributes">
 			<props>
@@ -118,7 +118,7 @@
 	</bean>
 
 	<!-- Scheduler -->
-	<bean id="Scheduler" class="com.logicaldoc.core.task.DefaultSchedulerFactory"
+	<bean id="scheduler" class="com.logicaldoc.core.task.DefaultSchedulerFactory"
 		destroy-method="destroy">
 		<property name="waitForJobsToCompleteOnShutdown" value="true" />
 	</bean>

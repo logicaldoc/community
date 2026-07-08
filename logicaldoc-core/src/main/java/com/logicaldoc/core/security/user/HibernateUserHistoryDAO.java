@@ -1,7 +1,6 @@
 package com.logicaldoc.core.security.user;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,73 +20,74 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> implements UserHistoryDAO {
 
-	private HibernateUserHistoryDAO() {
-		super(UserHistory.class);
-		super.log = LoggerFactory.getLogger(HibernateUserHistoryDAO.class);
-	}
+    private HibernateUserHistoryDAO() {
+        super(UserHistory.class);
+        super.log = LoggerFactory.getLogger(HibernateUserHistoryDAO.class);
+    }
 
-	@Override
-	public List<UserHistory> findByUserId(long userId) {
-		return findByUserIdAndEvent(userId, null);
-	}
+    @Override
+    public List<UserHistory> findByUserId(long userId) {
+        return findByUserIdAndEvent(userId, null);
+    }
 
-	@Override
-	public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
-		try {
-			if (StringUtils.isEmpty(event))
-				return findByWhere(ENTITY + ".userId =" + userId, ENTITY + ".date desc", null);
-			else {
-				Map<String, Object> params = new HashMap<>();
-				params.put("userId", userId);
-				params.put("event", event);
+    @Override
+    public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
+        try {
+            if (StringUtils.isEmpty(event))
+                return findByWhere("_entity.userId = %d".formatted(userId), "_entity.date desc", null);
+            else {
+                return findByWhere("_entity.userId = :userId and _entity.event = :event",
+                        Map.of("userId", userId, "event", event), "_entity.date desc", null);
+            }
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
 
-				return findByWhere(ENTITY + ".userId = :userId and " + ENTITY + ".event = :event", params,
-						ENTITY + ".date desc", null);
-			}
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
-	}
+    @Override
+    public UserHistory createUserHistory(
+            User user,
+            UserEvent eventType,
+            String comment,
+            String sessionId,
+            Client client) {
+        UserHistory history = new UserHistory();
+        history.setComment(comment);
+        history.setEvent(eventType);
 
-	@Override
-	public UserHistory createUserHistory(User user, UserEvent eventType, String comment, String sessionId, Client client) {
-		UserHistory history = new UserHistory();
-		history.setComment(comment);
-		history.setEvent(eventType);
+        Session session = SessionManager.get().get(sessionId);
+        if (session != null)
+            history.setSession(session);
+        else
+            history.setSessionId(sessionId);
 
-		Session session = SessionManager.get().get(sessionId);
-		if (session != null)
-			history.setSession(session);
-		else
-			history.setSessionId(sessionId);
+        if (user != null)
+            history.setUser(user);
 
-		if (user != null)
-			history.setUser(user);
+        if (client != null) {
+            history.setIp(client.getAddress());
+            if (client.getDevice() != null)
+                history.setDevice(client.getDevice().toString());
+            if (client.getGeolocation() != null)
+                history.setGeolocation(client.getGeolocation().toString());
+        }
 
-		if (client != null) {
-			history.setIp(client.getAddress());
-			if (client.getDevice() != null)
-				history.setDevice(client.getDevice().toString());
-			if (client.getGeolocation() != null)
-				history.setGeolocation(client.getGeolocation().toString());
-		}
+        try {
+            store(history);
+            return history;
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
 
-		try {
-			store(history);
-			return history;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
-
-	@Override
-	public void cleanOldHistories(int ttl) {
-		try {
-			log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_user_history"));
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+    @Override
+    public void cleanOldHistories(int ttl) {
+        try {
+            log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_user_history"));
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }

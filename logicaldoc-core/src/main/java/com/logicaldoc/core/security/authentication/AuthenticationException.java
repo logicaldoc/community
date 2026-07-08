@@ -8,51 +8,51 @@ package com.logicaldoc.core.security.authentication;
  */
 public class AuthenticationException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final transient Authenticator authenticator;
+    private final transient Authenticator authenticator;
 
-	public AuthenticationException() {
-		super();
-		authenticator = null;
-	}
+    public AuthenticationException() {
+        super();
+        authenticator = null;
+    }
 
-	public AuthenticationException(Authenticator authenticator) {
-		this.authenticator = authenticator;
-	}
+    public AuthenticationException(Authenticator authenticator) {
+        this.authenticator = authenticator;
+    }
 
-	public AuthenticationException(Authenticator authenticator, String code) {
-		super(code);
-		this.authenticator = authenticator;
-	}
-	
-	public AuthenticationException(Authenticator authenticator, String code, Throwable cause) {
-		super(code, cause);
-		this.authenticator = authenticator;
-	}
+    public AuthenticationException(Authenticator authenticator, String code) {
+        super(code);
+        this.authenticator = authenticator;
+    }
 
-	public AuthenticationException(String message) {
-		this(null, message);
-	}
-	
-	public AuthenticationException(String message, Throwable cause) {
-		this(null, message, cause);
-	}
+    public AuthenticationException(Authenticator authenticator, String code, Throwable cause) {
+        super(code, cause);
+        this.authenticator = authenticator;
+    }
 
-	public Authenticator getAuthenticator() {
-		return authenticator;
-	}
+    public AuthenticationException(String message) {
+        this(null, message);
+    }
 
-	public boolean mustRecordFailure() {
-		return true;
-	}
+    public AuthenticationException(String message, Throwable cause) {
+        this(null, message, cause);
+    }
 
-	@Override
-	public String toString() {
-		String baseString = super.toString().replace("com.logicaldoc.", "");
-		if (authenticator == null)
-			return baseString;
-		else
-			return authenticator.getClass().getSimpleName() + " > " + baseString;
-	}
+    public Authenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    public boolean mustRecordFailure() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        String baseString = super.toString().replace("com.logicaldoc.", "");
+        if (authenticator == null)
+            return baseString;
+        else
+            return "%s > %s".formatted(authenticator.getClass().getSimpleName(), baseString);
+    }
 }

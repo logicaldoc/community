@@ -24,40 +24,40 @@ import jakarta.annotation.Resource;
 @Component("apiKeyAuthenticator")
 public class ApiKeyAuthenticator extends DefaultAuthenticator {
 
-	@Resource(name = "apiKeyDAO")
-	protected ApiKeyDAO apiKeyDAO;
+    @Resource(name = "apiKeyDAO")
+    protected ApiKeyDAO apiKeyDAO;
 
-	@Override
-	public User authenticate(String username, String password) throws AuthenticationException {
-		// Cannot authenticate without an API Key
-		return null;
-	}
+    @Override
+    public User authenticate(String username, String password) throws AuthenticationException {
+        // Cannot authenticate without an API Key
+        return null;
+    }
 
-	@Override
-	public User authenticate(String username, String password, String apikey, Client client)
-			throws AuthenticationException {
-		// Skip whatever key that is not an API Key
-		if (StringUtils.isEmpty(apikey) || !apikey.startsWith("ld-"))
-			return null;
+    @Override
+    public User authenticate(String username, String password, String apikey, Client client)
+            throws AuthenticationException {
+        // Skip whatever key that is not an API Key
+        if (StringUtils.isEmpty(apikey) || !apikey.startsWith("ld-"))
+            return null;
 
-		User user;
-		try {
-			ApiKey apiKey = apiKeyDAO.findByKey(apikey);
-			if (apiKey == null)
-				throw new AuthenticationException("Unexisting ApiKey " + StringUtils.abbreviate(apikey, 10));
-			user = userDAO.findById(apiKey.getUserId());
-			if (user == null)
-				throw new AuthenticationException("Unexisting User " + apiKey.getUserId());
+        User user;
+        try {
+            ApiKey apiKey = apiKeyDAO.findByKey(apikey);
+            if (apiKey == null)
+                throw new AuthenticationException("Unexisting ApiKey %s".formatted(StringUtils.abbreviate(apikey, 10)));
+            user = userDAO.findById(apiKey.getUserId());
+            if (user == null)
+                throw new AuthenticationException("Unexisting User %s".formatted(apiKey.getUserId()));
 
-			// Update the last used
-			apiKeyDAO.jdbcUpdate("update ld_apikey set ld_lastused = :now where ld_id = :id",
-					Map.of("now", new Date(), "id", apiKey.getId()));
-		} catch (PersistenceException | NoSuchAlgorithmException e) {
-			throw new AuthenticationException(this, "dataerror", e);
-		}
+            // Update the last used
+            apiKeyDAO.jdbcUpdate("update ld_apikey set ld_lastused = :now where ld_id = :id",
+                    Map.of("now", new Date(), "id", apiKey.getId()));
+        } catch (PersistenceException | NoSuchAlgorithmException e) {
+            throw new AuthenticationException(this, "dataerror", e);
+        }
 
-		validateUser(user);
+        validateUser(user);
 
-		return user;
-	}
+        return user;
+    }
 }

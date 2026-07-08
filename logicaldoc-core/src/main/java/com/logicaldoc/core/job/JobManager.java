@@ -52,7 +52,7 @@ public class JobManager {
 
     private static final Logger log = LoggerFactory.getLogger(JobManager.class);
 
-    @Resource(name = "Scheduler")
+    @Resource(name = "scheduler")
     protected Scheduler scheduler;
 
     @Resource(name = "config")

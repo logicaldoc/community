@@ -30,176 +30,166 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> implements DeviceDAO {
 
-	private static final String USER_ID_EQUAL_USER_ID = ".userId = :userId";
+    private static final String USER_ID = "userId";
 
-	private static final String AND = " and ";
+    @Resource(name = "userDAO")
+    private UserDAO userDAO;
 
-	private static final String USER_ID = "userId";
+    private HibernateDeviceDAO() {
+        super(Device.class);
+        super.log = LoggerFactory.getLogger(HibernateDeviceDAO.class);
+    }
 
-	@Resource(name = "userDAO")
-	private UserDAO userDAO;
+    @Override
+    public Device findByDeviceId(String deviceId) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("deviceId", deviceId);
 
-	private HibernateDeviceDAO() {
-		super(Device.class);
-		super.log = LoggerFactory.getLogger(HibernateDeviceDAO.class);
-	}
+            List<Device> devices = findByWhere(ENTITY + ".deviceId = :deviceId", params, null, null);
+            return devices.isEmpty() ? null : devices.get(0);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
 
-	@Override
-	public Device findByDeviceId(String deviceId) {
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("deviceId", deviceId);
+    @Override
+    public List<Device> findTrustedDevices(long userId) {
+        try {
+            return findByWhere("_entity.trusted = true and _entity.userId = :userId", Map.of(USER_ID, userId),
+                    "_entity.lastLogin desc", null);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
 
-			List<Device> devices = findByWhere(ENTITY + ".deviceId = :deviceId", params, null, null);
-			return devices.isEmpty() ? null : devices.get(0);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
+    @Override
+    public List<Device> findByUserId(long userId) {
+        try {
+            return findByWhere("_entity.userId = :userId", Map.of(USER_ID, userId), "_entity.lastLogin desc", null);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
 
-	@Override
-	public List<Device> findTrustedDevices(long userId) {
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put(USER_ID, userId);
+    @Override
+    public Device trustDevice(User user, Device requestDevice) throws PersistenceException {
+        Device device = findByDevice(requestDevice);
+        if (device == null)
+            device = requestDevice;
+        else
+            BeanUtils.copyProperties(requestDevice, device, "id", "recordVersion", "tenantId");
 
-			return findByWhere(ENTITY + ".trusted = true and " + ENTITY + USER_ID_EQUAL_USER_ID, params,
-					ENTITY + ".lastLogin desc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
-	}
+        if (StringUtils.isNotEmpty(requestDevice.getLabel()))
+            device.setLabel(requestDevice.getLabel());
+        device.setTenantId(user.getTenantId());
+        device.setTrusted(true);
+        device.setUserId(user.getId());
+        device.setUsername(user.getFullName());
+        store(device);
 
-	@Override
-	public List<Device> findByUserId(long userId) {
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put(USER_ID, userId);
+        return device;
+    }
 
-			return findByWhere(ENTITY + USER_ID_EQUAL_USER_ID, params, ENTITY + ".lastLogin desc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
-	}
+    @Override
+    public void cleanOldDevices(int ttl) {
+        try {
+            log.info("cleanOldDevices rows updated: {}", cleanOldRecords(ttl, "ld_device", "ld_creation"));
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
-	@Override
-	public Device trustDevice(User user, Device requestDevice) throws PersistenceException {
-		Device device = findByDevice(requestDevice);
-		if (device == null)
-			device = requestDevice;
-		else
-			BeanUtils.copyProperties(requestDevice, device, "id", "recordVersion", "tenantId");
+    @Override
+    public void store(Device entity) throws PersistenceException {
+        if (StringUtils.isEmpty(entity.getDeviceId()))
+            entity.setDeviceId(UUID.randomUUID().toString());
+        super.store(entity);
+    }
 
-		if (StringUtils.isNotEmpty(requestDevice.getLabel()))
-			device.setLabel(requestDevice.getLabel());
-		device.setTenantId(user.getTenantId());
-		device.setTrusted(true);
-		device.setUserId(user.getId());
-		device.setUsername(user.getFullName());
-		store(device);
+    @Override
+    public boolean isTrustedDevice(String username, HttpServletRequest request) throws PersistenceException {
+        User user = userDAO.findByUsername(username);
+        if (user == null)
+            return false;
 
-		return device;
-	}
+        Device requestDevice = new Device(request);
+        if (requestDevice.getDeviceId() == null)
+            return false;
 
-	@Override
-	public void cleanOldDevices(int ttl) {
-		try {
-			log.info("cleanOldDevices rows updated: {}", cleanOldRecords(ttl, "ld_device", "ld_creation"));
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+        List<Device> trustedDevices = findTrustedDevices(user.getId());
+        return trustedDevices.stream().anyMatch(d -> d.getDeviceId().equals(requestDevice.getDeviceId()));
+    }
 
-	@Override
-	public void store(Device entity) throws PersistenceException {
-		if (StringUtils.isEmpty(entity.getDeviceId()))
-			entity.setDeviceId(UUID.randomUUID().toString());
-		super.store(entity);
-	}
+    @Override
+    public Device findByDevice(Device device) {
+        if (device.getDeviceId() != null)
+            return findByDeviceId(device.getDeviceId());
 
-	@Override
-	public boolean isTrustedDevice(String username, HttpServletRequest request) throws PersistenceException {
-		User user = userDAO.findByUsername(username);
-		if (user == null)
-			return false;
+        Map<String, Object> params = new HashMap<>();
 
-		Device requestDevice = new Device(request);
-		if (requestDevice.getDeviceId() == null)
-			return false;
+        StringBuilder query = new StringBuilder();
 
-		List<Device> trustedDevices = findTrustedDevices(user.getId());
-		return trustedDevices.stream().anyMatch(d -> d.getDeviceId().equals(requestDevice.getDeviceId()));
-	}
+        query.append("_entity.userId = :userId");
+        params.put(USER_ID, device.getUserId());
 
-	@Override
-	public Device findByDevice(Device device) {
-		if (device.getDeviceId() != null)
-			return findByDeviceId(device.getDeviceId());
+        query.append(" and ");
+        if (device.getBrowser() != null) {
+            query.append("_entity.browser = :browser");
+            params.put("browser", device.getBrowser());
+        } else
+            query.append("_entity.browser is null");
 
-		Map<String, Object> params = new HashMap<>();
+        query.append(" and ");
+        if (device.getBrowserVersion() != null) {
+            query.append("_entity.browserVersion = :browserVersion");
+            params.put("browserVersion", device.getBrowserVersion());
+        } else
+            query.append("_entity.browserVersion is null");
 
-		StringBuilder query = new StringBuilder();
+        query.append(" and ");
+        if (device.getOperativeSystem() != null) {
+            query.append("_entity.operativeSystem = :operativeSystem");
+            params.put("operativeSystem", device.getOperativeSystem());
+        } else
+            query.append("_entity.operativeSystem is null");
 
-		query.append(ENTITY + USER_ID_EQUAL_USER_ID);
-		params.put(USER_ID, device.getUserId());
+        query.append(" and ");
+        if (device.getType() != null) {
+            query.append("_entity.type = :type");
+            params.put("type", device.getType());
+        } else
+            query.append("_entity.type is null");
 
-		query.append(AND);
-		if (device.getBrowser() != null) {
-			query.append(ENTITY + ".browser = :browser");
-			params.put("browser", device.getBrowser());
-		} else
-			query.append(ENTITY + ".browser is null");
+        try {
+            List<Device> devices = findByWhere(query.toString(), params, null, null);
+            if (devices.isEmpty())
+                return null;
+            else
+                return devices.get(0);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
 
-		query.append(AND);
-		if (device.getBrowserVersion() != null) {
-			query.append(ENTITY + ".browserVersion = :browserVersion");
-			params.put("browserVersion", device.getBrowserVersion());
-		} else
-			query.append(ENTITY + ".browserVersion is null");
+    @Override
+    public void delete(long deviceId, int code) throws PersistenceException {
+        if (!checkStoringAspect())
+            return;
 
-		query.append(AND);
-		if (device.getOperativeSystem() != null) {
-			query.append(ENTITY + ".operativeSystem = :operativeSystem");
-			params.put("operativeSystem", device.getOperativeSystem());
-		} else
-			query.append(ENTITY + ".operativeSystem is null");
+        Device device = findById(deviceId);
+        if (device != null) {
+            device.setDeleted(code);
+            device.setDeviceId("%d.%s".formatted(device.getId(), device.getDeviceId()));
+            saveOrUpdate(device);
+        }
+    }
 
-		query.append(AND);
-		if (device.getType() != null) {
-			query.append(ENTITY + ".type = :type");
-			params.put("type", device.getType());
-		} else
-			query.append(ENTITY + ".type is null");
-
-		try {
-			List<Device> devices = findByWhere(query.toString(), params, null, null);
-			if (devices.isEmpty())
-				return null;
-			else
-				return devices.get(0);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
-
-	@Override
-	public void delete(long deviceId, int code) throws PersistenceException {
-		if (!checkStoringAspect())
-			return;
-
-		Device device = findById(deviceId);
-		if (device != null) {
-			device.setDeleted(code);
-			device.setDeviceId(device.getId() + "." + device.getDeviceId());
-			saveOrUpdate(device);
-		}
-	}
-
-	public void setUserDAO(UserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
+    public void setUserDAO(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
 }

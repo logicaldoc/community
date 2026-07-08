@@ -13,42 +13,42 @@ import com.logicaldoc.core.folder.FolderEvent;
  */
 public enum UserEvent {
 
-	LOGIN, LOGIN_FAILED, LOGOUT, TIMEOUT, PASSWORDCHANGED, TWOFACHANGED, DELETED, FILE_CONVERSION, MESSAGE_RECEIVED, CREATED, UPDATED, DISABLED, ENABLED, NEWAPIKEY, SEARCH, AI_QUERY, LEGAL_CONFIRMED, IMPERSONATORS_CHANGED, IMPERSONATION;
+    LOGIN, LOGIN_FAILED, LOGOUT, TIMEOUT, PASSWORDCHANGED, TWOFACHANGED, DELETED, FILE_CONVERSION, MESSAGE_RECEIVED, CREATED, UPDATED, DISABLED, ENABLED, NEWAPIKEY, SEARCH, AI_QUERY, LEGAL_CONFIRMED, IMPERSONATORS_CHANGED, IMPERSONATION;
 
-	/**
-	 * Gets the right enumeration entry from the corresponding resource bundle
-	 * key
-	 * 
-	 * @param key the resource bundle key
-	 * 
-	 * @return The corresponding entry
-	 */
-	public static UserEvent fromKey(String key) {
-		return UserEvent
-				.valueOf(key.contains(".") ? key.replace("event.user.", "").toUpperCase().replace(".", "_") : key);
-	}
+    /**
+     * Gets the right enumeration entry from the corresponding resource bundle
+     * key
+     * 
+     * @param key the resource bundle key
+     * 
+     * @return The corresponding entry
+     */
+    public static UserEvent fromKey(String key) {
+        return UserEvent
+                .valueOf(key.contains(".") ? key.replace("event.user.", "").toUpperCase().replace(".", "_") : key);
+    }
 
-	/**
-	 * Converts the enumeration entry to the corresponding key in the resource
-	 * bundle
-	 * 
-	 * @return The key
-	 */
-	public String toKey() {
-		return "event.user." + name().toLowerCase().replace("_", ".");
-	}
+    /**
+     * Converts the enumeration entry to the corresponding key in the resource
+     * bundle
+     * 
+     * @return The key
+     */
+    public String toKey() {
+        return "event.user.%s".formatted(name().toLowerCase().replace("_", "."));
+    }
 
-	/**
-	 * Retrieves the all resource bundle keys
-	 * 
-	 * @return A list of keys
-	 */
-	public List<String> allKeys() {
-		return Arrays.asList(FolderEvent.values()).stream().map(e -> e.toKey()).toList();
-	}
+    /**
+     * Retrieves the all resource bundle keys
+     * 
+     * @return A list of keys
+     */
+    public List<String> allKeys() {
+        return Arrays.asList(FolderEvent.values()).stream().map(e -> e.toKey()).toList();
+    }
 
-	@Override
-	public String toString() {
-		return toKey();
-	}
+    @Override
+    public String toString() {
+        return toKey();
+    }
 }

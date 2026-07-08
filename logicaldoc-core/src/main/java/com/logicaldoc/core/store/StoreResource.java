@@ -17,273 +17,273 @@ import com.logicaldoc.core.document.Version;
  */
 public class StoreResource {
 
-	/**
-	 * The suffix for the document's resource that represents the PDF conversion
-	 */
-	public static final String SUFFIX_PDF_CONVERSION = "conversion.pdf";
+    /**
+     * The suffix for the document's resource that represents the PDF conversion
+     */
+    public static final String SUFFIX_PDF_CONVERSION = "conversion.pdf";
 
-	/**
-	 * The suffix for the document's resource that represents the tile image
-	 */
-	public static final String SUFFIX_TILE = "tile.png";
+    /**
+     * The suffix for the document's resource that represents the tile image
+     */
+    public static final String SUFFIX_TILE = "tile.png";
 
-	/**
-	 * The suffix for the document's resource that represents the thumbnail
-	 * image
-	 */
-	public static final String SUFFIX_THUMBNAIL = "thumb.png";
+    /**
+     * The suffix for the document's resource that represents the thumbnail
+     * image
+     */
+    public static final String SUFFIX_THUMBNAIL = "thumb.png";
 
-	/**
-	 * The suffix for the document's resource that represents the mobile
-	 * thumbnail image
-	 */
-	public static final String SUFFIX_MOBILE_THUMBNAIL = "mobile.png";
+    /**
+     * The suffix for the document's resource that represents the mobile
+     * thumbnail image
+     */
+    public static final String SUFFIX_MOBILE_THUMBNAIL = "mobile.png";
 
-	private long docId;
+    private long docId;
 
-	private String fileVersion;
+    private String fileVersion;
 
-	private String suffix;
-	
-	/**
-	 * Indicates this is a resource added for the very first time
-	 */
-	private boolean newEntry = false;
+    private String suffix;
 
-	StoreResource(Builder builder) {
-		this.fileVersion = builder.fileVersion;
-		this.suffix = builder.suffix;
-		this.docId = builder.docId;
-		this.newEntry = builder.newEntry;
-	}
+    /**
+     * Indicates this is a resource added for the very first time
+     */
+    private boolean newEntry = false;
 
-	public long getDocId() {
-		return docId;
-	}
+    StoreResource(Builder builder) {
+        this.fileVersion = builder.fileVersion;
+        this.suffix = builder.suffix;
+        this.docId = builder.docId;
+        this.newEntry = builder.newEntry;
+    }
 
-	public String getFileVersion() {
-		return fileVersion;
-	}
+    public long getDocId() {
+        return docId;
+    }
 
-	public String getSuffix() {
-		return suffix;
-	}
+    public String getFileVersion() {
+        return fileVersion;
+    }
 
-	public boolean isNewEntry() {
-		return newEntry;
-	}
+    public String getSuffix() {
+        return suffix;
+    }
 
-	/**
-	 * Name of the resource as <code><b>fileVersion</b>-<b>suffix</b></code>
-	 * 
-	 * @return The resource's name
-	 */
-	public String name() {
-		return sanitizeResourceName(fileVersion + (StringUtils.isEmpty(suffix) ? "" : "-" + suffix));
-	}
+    public boolean isNewEntry() {
+        return newEntry;
+    }
 
-	@Override
-	public String toString() {
-		return name();
-	}
+    /**
+     * Name of the resource as <code><b>fileVersion</b>-<b>suffix</b></code>
+     * 
+     * @return The resource's name
+     */
+    public String name() {
+        return sanitizeResourceName(fileVersion + (StringUtils.isEmpty(suffix) ? "" : "-%s".formatted(suffix)));
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (docId ^ (docId >>> 32));
-		result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
-		result = prime * result + ((suffix == null) ? 0 : suffix.hashCode());
-		return result;
-	}
+    @Override
+    public String toString() {
+        return name();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		StoreResource other = (StoreResource) obj;
-		if (docId != other.docId)
-			return false;
-		if (fileVersion == null) {
-			if (other.fileVersion != null)
-				return false;
-		} else if (!fileVersion.equals(other.fileVersion))
-			return false;
-		if (suffix == null) {
-			if (other.suffix != null)
-				return false;
-		} else if (!suffix.equals(other.suffix))
-			return false;
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (docId ^ (docId >>> 32));
+        result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
+        result = prime * result + ((suffix == null) ? 0 : suffix.hashCode());
+        return result;
+    }
 
-	private String sanitizeResourceName(String resourceName) {
-		return resourceName.replace("..", "").replaceAll("[^a-zA-Z0-9\\-\\\\.]", "");
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        StoreResource other = (StoreResource) obj;
+        if (docId != other.docId)
+            return false;
+        if (fileVersion == null) {
+            if (other.fileVersion != null)
+                return false;
+        } else if (!fileVersion.equals(other.fileVersion))
+            return false;
+        if (suffix == null) {
+            if (other.suffix != null)
+                return false;
+        } else if (!suffix.equals(other.suffix))
+            return false;
+        return true;
+    }
 
-	/**
-	 * Creates a new builder
-	 * 
-	 * @return The new builder
-	 */
-	public static Builder builder() {
-		return new Builder();
-	}
+    private String sanitizeResourceName(String resourceName) {
+        return resourceName.replace("..", "").replaceAll("[^a-zA-Z0-9\\-\\\\.]", "");
+    }
 
-	/**
-	 * A builder for {@link StoreResource}s
-	 * 
-	 * @author Marco Meschieri - LogicalDOC
-	 * @since 9.2.2
-	 */
-	public static class Builder {
+    /**
+     * Creates a new builder
+     * 
+     * @return The new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
 
-		private Long docId;
+    /**
+     * A builder for {@link StoreResource}s
+     * 
+     * @author Marco Meschieri - LogicalDOC
+     * @since 9.2.2
+     */
+    public static class Builder {
 
-		private String fileVersion;
+        private Long docId;
 
-		private String suffix;
+        private String fileVersion;
 
-		private boolean newEntry;
+        private String suffix;
 
-		private Builder() {
-			// Empty
-		}
+        private boolean newEntry;
 
-		public Builder fileVersion(String fileVersion) {
-			this.fileVersion = StringUtils.defaultString(fileVersion, this.fileVersion);
-			return this;
-		}
+        private Builder() {
+            // Empty
+        }
 
-		public Builder suffix(String suffix) {
-			this.suffix = StringUtils.defaultString(suffix, null);
-			return this;
-		}
+        public Builder fileVersion(String fileVersion) {
+            this.fileVersion = StringUtils.defaultString(fileVersion, this.fileVersion);
+            return this;
+        }
 
-		/**
-		 * Assigns the suffix of the PDF conversion
-		 * 
-		 * @return The configured builder
-		 */
-		public Builder suffixPdfConversion() {
-			return suffix(SUFFIX_PDF_CONVERSION);
-		}
+        public Builder suffix(String suffix) {
+            this.suffix = StringUtils.defaultString(suffix, null);
+            return this;
+        }
 
-		/**
-		 * Assigns the suffix of the tile image
-		 * 
-		 * @return The configured builder
-		 */
-		public Builder suffixTile() {
-			return suffix(SUFFIX_TILE);
-		}
+        /**
+         * Assigns the suffix of the PDF conversion
+         * 
+         * @return The configured builder
+         */
+        public Builder suffixPdfConversion() {
+            return suffix(SUFFIX_PDF_CONVERSION);
+        }
 
-		/**
-		 * Assigns the suffix of the thumbnail image
-		 * 
-		 * @return The configured builder
-		 */
-		public Builder suffixThumbnail() {
-			return suffix(SUFFIX_THUMBNAIL);
-		}
+        /**
+         * Assigns the suffix of the tile image
+         * 
+         * @return The configured builder
+         */
+        public Builder suffixTile() {
+            return suffix(SUFFIX_TILE);
+        }
 
-		/**
-		 * Assigns the suffix of the mobile thumbnail
-		 * 
-		 * @return The configured builder
-		 */
-		public Builder suffixMobile() {
-			return suffix(SUFFIX_MOBILE_THUMBNAIL);
-		}
+        /**
+         * Assigns the suffix of the thumbnail image
+         * 
+         * @return The configured builder
+         */
+        public Builder suffixThumbnail() {
+            return suffix(SUFFIX_THUMBNAIL);
+        }
 
-		public Builder docId(long docId) {
-			this.docId = docId;
-			return this;
-		}
+        /**
+         * Assigns the suffix of the mobile thumbnail
+         * 
+         * @return The configured builder
+         */
+        public Builder suffixMobile() {
+            return suffix(SUFFIX_MOBILE_THUMBNAIL);
+        }
 
-		public Builder newEntry(boolean newEntry) {
-			this.newEntry = newEntry;
-			return this;
-		}
+        public Builder docId(long docId) {
+            this.docId = docId;
+            return this;
+        }
 
-		public Builder resource(StoreResource res) {
-			this.docId = res.docId;
-			this.fileVersion = res.fileVersion;
-			this.suffix = res.suffix;
-			this.newEntry = res.newEntry;
-			return this;
-		}
+        public Builder newEntry(boolean newEntry) {
+            this.newEntry = newEntry;
+            return this;
+        }
 
-		public Builder name(String name) {
-			if (name.contains("-")) {
-				fileVersion = name.substring(0, name.indexOf('-')).trim();
-				suffix = name.substring(name.indexOf('-') + 1, name.length()).trim();
-			} else {
-				fileVersion = name.trim();
-			}
-			return this;
-		}
+        public Builder resource(StoreResource res) {
+            this.docId = res.docId;
+            this.fileVersion = res.fileVersion;
+            this.suffix = res.suffix;
+            this.newEntry = res.newEntry;
+            return this;
+        }
 
-		/**
-		 * Takes the docId and fileVersion from the given
-		 * {@link DocumentFormatException} or {@link Version}
-		 * 
-		 * @param document The document or version
-		 * 
-		 * @return The configured builder
-		 * 
-		 * @throws PersistenceException Error in the data layer
-		 */
-		public Builder document(AbstractDocument document) throws PersistenceException {
-			if (document instanceof Version ver)
-				return version(ver);
-			else if (document instanceof Document doc)
-				return document(doc);
-			return this;
-		}
+        public Builder name(String name) {
+            if (name.contains("-")) {
+                fileVersion = name.substring(0, name.indexOf('-')).trim();
+                suffix = name.substring(name.indexOf('-') + 1, name.length()).trim();
+            } else {
+                fileVersion = name.trim();
+            }
+            return this;
+        }
 
-		private Builder version(Version version) {
-			this.docId = version.getDocId();
-			this.fileVersion = version.getFileVersion();
-			if (StringUtils.isEmpty(this.fileVersion))
-				this.fileVersion = version.getVersion();
-			return this;
-		}
+        /**
+         * Takes the docId and fileVersion from the given
+         * {@link DocumentFormatException} or {@link Version}
+         * 
+         * @param document The document or version
+         * 
+         * @return The configured builder
+         * 
+         * @throws PersistenceException Error in the data layer
+         */
+        public Builder document(AbstractDocument document) throws PersistenceException {
+            if (document instanceof Version ver)
+                return version(ver);
+            else if (document instanceof Document doc)
+                return document(doc);
+            return this;
+        }
 
-		private Builder document(Document document) throws PersistenceException {
-			Document realDocument = document;
+        private Builder version(Version version) {
+            this.docId = version.getDocId();
+            this.fileVersion = version.getFileVersion();
+            if (StringUtils.isEmpty(this.fileVersion))
+                this.fileVersion = version.getVersion();
+            return this;
+        }
 
-			/*
-			 * All versions of a document are stored in the same directory as
-			 * the current version, but the filename is the version number
-			 * without extension, e.g. "doc/2.1"
-			 */
-			if (document.getDocRef() != null) {
-				// The shortcut document doesn't have the 'fileVersion' and the
-				// 'version'
-				realDocument = DocumentDAO.get().findById(document.getDocRef());
-			}
+        private Builder document(Document document) throws PersistenceException {
+            Document realDocument = document;
 
-			docId = realDocument.getId();
+            /*
+             * All versions of a document are stored in the same directory as
+             * the current version, but the filename is the version number
+             * without extension, e.g. "doc/2.1"
+             */
+            if (document.getDocRef() != null) {
+                // The shortcut document doesn't have the 'fileVersion' and the
+                // 'version'
+                realDocument = DocumentDAO.get().findById(document.getDocRef());
+            }
 
-			if (StringUtils.isEmpty(fileVersion))
-				fileVersion = realDocument.getFileVersion();
-			if (StringUtils.isEmpty(fileVersion))
-				this.fileVersion = realDocument.getVersion();
+            docId = realDocument.getId();
 
-			return this;
-		}
+            if (StringUtils.isEmpty(fileVersion))
+                fileVersion = realDocument.getFileVersion();
+            if (StringUtils.isEmpty(fileVersion))
+                this.fileVersion = realDocument.getVersion();
 
-		public StoreResource build() {
-			if (docId == null)
-				throw new IllegalArgumentException("Document identifier cannot be null");
-			if (StringUtils.isEmpty(fileVersion))
-				throw new IllegalArgumentException("File version cannot be empty");
-			return new StoreResource(this);
-		}
-	}
+            return this;
+        }
+
+        public StoreResource build() {
+            if (docId == null)
+                throw new IllegalArgumentException("Document identifier cannot be null");
+            if (StringUtils.isEmpty(fileVersion))
+                throw new IllegalArgumentException("File version cannot be empty");
+            return new StoreResource(this);
+        }
+    }
 }

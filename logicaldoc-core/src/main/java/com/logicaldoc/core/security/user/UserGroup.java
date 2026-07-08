@@ -10,49 +10,49 @@ import java.io.Serializable;
  */
 public class UserGroup implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private long groupId;
+    private long groupId;
 
-	public UserGroup() {
-	}
+    public UserGroup() {
+    }
 
-	public UserGroup(long groupId) {
-		super();
-		this.groupId = groupId;
-	}
+    public UserGroup(long groupId) {
+        super();
+        this.groupId = groupId;
+    }
 
-	public long getGroupId() {
-		return groupId;
-	}
+    public long getGroupId() {
+        return groupId;
+    }
 
-	public void setGroupId(long groupId) {
-		this.groupId = groupId;
-	}
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (groupId ^ (groupId >>> 32));
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (groupId ^ (groupId >>> 32));
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		
-		UserGroup other = (UserGroup) obj;
-		return groupId == other.groupId;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
 
-	@Override
-	public String toString() {
-		return "" + groupId;
-	}
+        UserGroup other = (UserGroup) obj;
+        return groupId == other.groupId;
+    }
+
+    @Override
+    public String toString() {
+        return Long.toString(groupId);
+    }
 }

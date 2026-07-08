@@ -130,19 +130,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     @Override
     public List<User> findByLikeUsername(String username) throws PersistenceException {
-        Map<String, Object> params = new HashMap<>();
-        params.put(USERNAME, username);
-        return findByWhere(ENTITY + ".username like :username", params, null, null);
+        return findByWhere("_entity.username like :username", Map.of(USERNAME, username), null, null);
     }
 
     @Override
     public List<User> findByUsernameAndName(String username, String name) throws PersistenceException {
-        Map<String, Object> params = new HashMap<>();
-        params.put(USERNAME, username);
-        params.put("name", name.toLowerCase());
-
-        return findByWhere(LOWER + ENTITY + ".name) like :name and " + ENTITY + ".username like :username", params,
-                null, null);
+        return findByWhere("lower(_entity.name) like :name and _entity.username like :username",
+                Map.of(USERNAME, username, "name", name.toLowerCase()), null, null);
     }
 
     @Override
@@ -172,18 +166,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         // at least X lower-case characters
         // at least X digit characters
         // at least X digit characters
-        PasswordCriteria criteria = new PasswordCriteria(config.getInt(tenant + ".password.size", 8),
-                config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
-                config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1));
+        PasswordCriteria criteria = new PasswordCriteria(config.getTenantInt(tenant, "password.size", 8),
+                config.getTenantInt(tenant, "password.uppercase", 2),
+                config.getTenantInt(tenant, "password.lowercase", 2), config.getTenantInt(tenant, "password.digit", 1),
+                config.getTenantInt(tenant, "password.special", 1));
 
         // at least X times a character can be used
-        criteria.setMaxOccurrences(config.getInt(tenant + ".password.occurrence", 3));
+        criteria.setMaxOccurrences(config.getTenantInt(tenant, "password.occurrence", 3));
 
         // define some illegal sequences that will fail when >= 4 chars
         // long alphabetical is of the form 'abcd', numerical is '3456',
         // qwer is 'asdf' the false parameter indicates that wrapped
         // sequences are allowed; e.g. 'xyzab'
-        criteria.setMaxSequenceSize(config.getInt(tenant + ".password.sequence", 3));
+        criteria.setMaxSequenceSize(config.getTenantInt(tenant, "password.sequence", 3));
 
         PasswordValidator validator = new PasswordValidator(criteria, props);
 
@@ -318,7 +313,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     }
 
     private void saveWorkingTimes(User user) throws PersistenceException {
-        jdbcUpdate("delete from ld_workingtime where ld_userid=" + user.getId());
+        jdbcUpdate("delete from ld_workingtime where ld_userid = %s".formatted(user.getId()));
         if (user.getWorkingTimes() != null)
             for (WorkingTime wt : user.getWorkingTimes()) {
                 Map<String, Object> params = new HashMap<>();
@@ -331,9 +326,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
                 params.put("label", wt.getLabel());
                 params.put("description", wt.getDescription());
 
-                jdbcUpdate(
-                        "insert into ld_workingtime(ld_userid,ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description) values (:userId, :dayOfWeek, :hourStart, :minuteStart, :hourEnd, :minuteEnd, :label, :description)",
-                        params);
+                jdbcUpdate("""
+                           insert into ld_workingtime (ld_userid,ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description) 
+                                               values (:userId, :dayOfWeek, :hourStart, :minuteStart, :hourEnd, :minuteEnd, :label, :description)
+                           """, params);
             }
     }
 
@@ -582,7 +578,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             return false;
 
         boolean passwordChanged;
-        String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
+        String currentPassword = queryForString(
+                "select ld_password from ld_user where ld_id = %d".formatted(user.getId()));
         passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
 
         if (passwordChanged) {
@@ -636,7 +633,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         }
 
         String tenantName = (Context.get(TenantDAO.class)).getTenantName(user.getTenantId());
-        int passwordTtl = config.getInt(tenantName + ".password.ttl", 90);
+        int passwordTtl = config.getTenantInt(tenantName, "password.ttl", 90);
         if (passwordTtl <= 0)
             return false;
 
@@ -825,8 +822,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             GroupDAO gDao = Context.get(GroupDAO.class);
             try {
                 List<Group> groups = gDao.findByWhere(
-                        ENTITY + ".id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")", null,
-                        null);
+                        "_entity.id in (%s)".formatted(StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",")),
+                        null, null);
                 for (Group group : groups) {
                     user.getGroups().add(group);
                     user.getUserGroups().add(new UserGroup(group.getId()));
@@ -899,8 +896,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         }
         Set<User> set = new HashSet<>();
         if (!docIds.isEmpty()) {
-            String query = ENTITY + ".id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
-            List<User> users = findByWhere(query, (Map<String, Object>) null, null, null);
+            List<User> users = findByWhere(
+                    "_entity.id in (%s)".formatted(StringUtil.arrayToString(docIds.toArray(new Long[0]), ",")),
+                    (Map<String, Object>) null, null, null);
             for (User user : users) {
                 if (user.getDeleted() == 0 && !set.contains(user))
                     set.add(user);

@@ -11,37 +11,37 @@ import java.util.stream.Collectors;
  * @since 8.8.2
  */
 public class PasswordWeakException extends AuthenticationException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * The reasons to explain the weakness
-	 */
-	private final List<String> messages = new ArrayList<>();
+    /**
+     * The reasons to explain the weakness
+     */
+    private final List<String> messages = new ArrayList<>();
 
-	public PasswordWeakException(List<String> messages) {
-		super("passwordweak");
-		this.messages.addAll(messages);
-	}
+    public PasswordWeakException(List<String> messages) {
+        super("passwordweak");
+        this.messages.addAll(messages);
+    }
 
-	public PasswordWeakException() {
-		super("passwordweak");
-	}
+    public PasswordWeakException() {
+        super("passwordweak");
+    }
 
-	@Override
-	public String getMessage() {
-		if (messages.isEmpty())
-			return super.getMessage();
-		else {
-			return super.getMessage() + " - " + messages.stream().collect(Collectors.joining(" "));
-		}
-	}
+    @Override
+    public String getMessage() {
+        if (messages.isEmpty())
+            return super.getMessage();
+        else {
+            return "%s - %s".formatted(super.getMessage(), messages.stream().collect(Collectors.joining(" ")));
+        }
+    }
 
-	@Override
-	public boolean mustRecordFailure() {
-		return false;
-	}
+    @Override
+    public boolean mustRecordFailure() {
+        return false;
+    }
 
-	public List<String> getMessages() {
-		return messages;
-	}
+    public List<String> getMessages() {
+        return messages;
+    }
 }

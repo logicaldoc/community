@@ -17,7 +17,7 @@
 
 	<context:annotation-config />
 
-	<tx:annotation-driven transaction-manager="TransactionManager" />
+	<tx:annotation-driven transaction-manager="transactionManager" />
 
 	<!-- This post processor ensures placeholders substitutions -->
 	<bean id="placeholder" class="com.logicaldoc.util.spring.PropertiesPlaceHolder" />
@@ -27,23 +27,23 @@
 	<bean id="context" class="com.logicaldoc.util.spring.Context" />
 
 	<!-- DataSource -->
-	<bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
 		<property name="jdbcUrl" value="jdbc:hsqldb:mem:logicaldoc" />
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
-	<bean id="DataSource" class="com.zaxxer.hikari.HikariDataSource"
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
 		destroy-method="close">
-		<constructor-arg ref="HikariConfig" />
+		<constructor-arg ref="hikariConfig" />
 	</bean>
 
 	<!-- Hibernate SessionFactory -->
-	<bean id="SessionFactory"
+	<bean id="sessionFactory"
 		class="com.logicaldoc.util.spring.LocalSessionFactory"
 		abstract="false" lazy-init="default" autowire="default">
 		<property name="dataSource">
-			<ref bean="DataSource" />
+			<ref bean="dataSource" />
 		</property>
 		<property name="entityInterceptor">
 			<bean class="com.logicaldoc.core.LastModifiedInterceptor" />
@@ -71,18 +71,18 @@
 
 
 	<!--Transaction management -->
-	<bean id="TransactionManager"
+	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate5.HibernateTransactionManager"
 		abstract="false" lazy-init="default" autowire="default">
-		<property name="sessionFactory" ref="SessionFactory" />
+		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
 	<!--Transactional proxy -->
-	<bean id="ApplicationBaseTransactionProxy"
+	<bean id="applicationBaseTransactionProxy"
 		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
 		lazy-init="true" abstract="false" autowire="default">
 		<property name="transactionManager">
-			<ref bean="TransactionManager" />
+			<ref bean="transactionManager" />
 		</property>
 		<property name="transactionAttributes">
 			<props>
@@ -91,7 +91,7 @@
 		</property>
 	</bean>
 
-	<bean id="Scheduler"
+	<bean id="scheduler"
 		class="com.logicaldoc.core.task.DefaultSchedulerFactory"
 		destroy-method="destroy">
 		<property name="waitForJobsToCompleteOnShutdown" value="true" />

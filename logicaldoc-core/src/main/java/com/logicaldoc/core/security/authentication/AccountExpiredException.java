@@ -10,33 +10,33 @@ import java.util.Date;
  * @since 8.7.2
  */
 public class AccountExpiredException extends AuthenticationException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final Date date;
+    private final Date date;
 
-	public AccountExpiredException(Date date) {
-		super("accountexpired");
-		this.date = date;
-	}
-	
-	public Date getDate() {
-		return date;
-	}
+    public AccountExpiredException(Date date) {
+        super("accountexpired");
+        this.date = date;
+    }
 
-	public String getFormattedDate() {
-		if (date == null)
-			return "";
-		else {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			return df.format(date);
-		}
-	}
+    public Date getDate() {
+        return date;
+    }
 
-	@Override
-	public String getMessage() {
-		if (date == null)
-			return super.getMessage();
-		else
-			return super.getMessage() + " - " + getFormattedDate();
-	}
+    public String getFormattedDate() {
+        if (date == null)
+            return "";
+        else {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return df.format(date);
+        }
+    }
+
+    @Override
+    public String getMessage() {
+        if (date == null)
+            return super.getMessage();
+        else
+            return "%s - %s".formatted(super.getMessage(), getFormattedDate());
+    }
 }

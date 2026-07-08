@@ -34,6 +34,6 @@ public class AccountInactiveException extends AuthenticationException {
 		if (days <= 0)
 			return super.getMessage();
 		else
-			return super.getMessage() + " - more than " + days + " days since last interaction";
+			return "%s - more than %d days since last interaction".formatted(super.getMessage(), days);
 	}
 }

@@ -392,9 +392,32 @@ public class ContextProperties extends OrderedProperties {
     public void setMaxBackups(int maxBackups) {
         this.maxBackups = maxBackups;
     }
+    
+    private String fullKey(String tenant, String property) {
+        String key = "%s.%s".formatted(tenant, property);
+        return key;
+    }
+    
+    public int getTenantInt(String tenant, String property) {
+        return getTenantInt(tenant, property, 0);
+    }
+    
+    public int getTenantInt(String tenant, String property, int defaultValue) {
+        String key = fullKey(tenant, property);
+        return getInt(key, defaultValue);
+    }
+    
+    public String getTenantString(String tenant, String property) {
+        return getTenantString(tenant, property, null);
+    }
+    
+    public String getTenantString(String tenant, String property, String defaultValue) {
+        String key = fullKey(tenant, property);
+        return getString(key, defaultValue);
+    }
 
     public String getTenantProperty(String tenant, String property, String defaultValue) {
-        String key = "%s.%s".formatted(tenant, property);
+        String key = fullKey(tenant, property);
         if (containsKey(key))
             return StringUtils.defaultIfEmpty(getProperty(key), defaultValue);
         else

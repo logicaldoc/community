@@ -347,7 +347,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
             String addr = client.getAddress();
             String host = client.getHost();
             if (StringUtils.isNotEmpty(host) && !host.equals(addr))
-                historyComment = host + " (" + addr + ") ";
+                historyComment = "%s (%s)".formatted(host, addr);
             else
                 historyComment = addr;
         }

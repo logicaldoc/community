@@ -53,7 +53,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	private static final String UPDATE = "update ";
 
-	private static final String DATA_SOURCE = "DataSource";
+	private static final String DATA_SOURCE = "dataSource";
 
 	private static final String AND = " and (";
 
@@ -61,7 +61,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected Class<T> entityClass;
 
-	@Resource(name = "SessionFactory")
+	@Resource(name = "sessionFactory")
 	protected SessionFactory sessionFactory;
 
 	protected static final String ORDER_BY = " order by ";

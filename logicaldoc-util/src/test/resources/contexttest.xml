@@ -35,18 +35,18 @@
     <bean id="config" class="com.logicaldoc.util.config.ContextProperties" />
 
     <!-- DataSource -->
-    <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
         <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
         <property name="jdbcUrl" value="jdbc:hsqldb:mem:logicaldoc" />
         <property name="username" value="sa" />
         <property name="password" value="" />
     </bean>    
-    <bean id="DataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
-    	<constructor-arg ref="HikariConfig" />
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+    	<constructor-arg ref="hikariConfig" />
   	</bean>
   	
 	<!-- Scheduler -->
-    <bean id="Scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="waitForJobsToCompleteOnShutdown" value="true" />
         <property name="triggers">
             <list>

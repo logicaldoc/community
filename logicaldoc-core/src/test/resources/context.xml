@@ -20,7 +20,7 @@
    
     <context:annotation-config />
 
-    <tx:annotation-driven transaction-manager="TransactionManager" />
+    <tx:annotation-driven transaction-manager="transactionManager" />
 
     <bean id="context" class="com.logicaldoc.util.spring.Context" />
     
@@ -30,20 +30,20 @@
     <bean id="config" class="com.logicaldoc.util.config.ContextProperties" />
     
     <!-- DataSource -->
-    <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
         <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
         <property name="jdbcUrl" value="${jdbc.url}" />
         <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.password}" />
     </bean>    
-    <bean id="DataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
-    	<constructor-arg ref="HikariConfig" />
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+    	<constructor-arg ref="hikariConfig" />
   	</bean>
     
     <!-- Hibernate SessionFactory -->
-    <bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
+    <bean id="sessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
         abstract="false" lazy-init="default" autowire="default">
-        <property name="dataSource" ref="DataSource" />
+        <property name="dataSource" ref="dataSource" />
         <property name="entityInterceptor">
             <bean class="com.logicaldoc.core.LastModifiedInterceptor" />
         </property>
@@ -63,17 +63,17 @@
     </bean>
     
     <!--Transaction management -->
-    <bean id="TransactionManager"
+    <bean id="transactionManager"
         class="org.springframework.orm.hibernate5.HibernateTransactionManager"
         abstract="false" lazy-init="default" autowire="default">
-        <property name="sessionFactory" ref="SessionFactory" />
+        <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     <!--Transactional proxy -->
-    <bean id="ApplicationBaseTransactionProxy"
+    <bean id="applicationBaseTransactionProxy"
         class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
         lazy-init="true" abstract="false" autowire="default">
         <property name="transactionManager">
-            <ref bean="TransactionManager" />
+            <ref bean="transactionManager" />
         </property>
         <property name="transactionAttributes">
             <props>
@@ -81,7 +81,7 @@
             </props>
         </property>
     </bean>
-    <bean id="Scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="triggers">
             <list>
                 <ref bean="IndexOptimizerTrigger" />

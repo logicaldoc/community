@@ -29,165 +29,163 @@ import com.logicaldoc.util.io.IOUtil;
  */
 public class FSStore extends AbstractStore {
 
-	private static final Logger log = LoggerFactory.getLogger(FSStore.class);
+    private static final Logger log = LoggerFactory.getLogger(FSStore.class);
 
-	public FSStore() {
-		super();
-	}
+    public FSStore() {
+        super();
+    }
 
-	@Override
-	public void delete(long docId) {
-		File docDir = getContainer(docId);
-		if (docDir == null || !docDir.exists())
-			return;
+    @Override
+    public void delete(long docId) {
+        File docDir = getContainer(docId);
+        if (docDir == null || !docDir.exists())
+            return;
 
-		for (File file : docDir.listFiles()) {
-			log.info("Deleting stored file {}", file.getAbsolutePath());
-			if (FileUtil.delete(file))
-				logDeletion(docId, file.getAbsolutePath());
-		}
+        for (File file : docDir.listFiles()) {
+            log.info("Deleting stored file {}", file.getAbsolutePath());
+            if (FileUtil.delete(file))
+                logDeletion(docId, file.getAbsolutePath());
+        }
 
-		log.info("Deleting stored folder {}", docDir.getAbsolutePath());
-		FileUtil.delete(docDir);
-		logDeletion(docId, docDir.getAbsolutePath());
-	}
+        log.info("Deleting stored folder {}", docDir.getAbsolutePath());
+        FileUtil.delete(docDir);
+        logDeletion(docId, docDir.getAbsolutePath());
+    }
 
-	@Override
-	public void delete(StoreResource resource) {
-		File file = new File(getContainer(resource.getDocId()), resource.name());
-		log.info("Deleting stored file {}", file.getAbsolutePath());
-		if (FileUtil.delete(file))
-			logDeletion(resource.getDocId(), file.getAbsolutePath());
-	}
+    @Override
+    public void delete(StoreResource resource) {
+        File file = new File(getContainer(resource.getDocId()), resource.name());
+        log.info("Deleting stored file {}", file.getAbsolutePath());
+        if (FileUtil.delete(file))
+            logDeletion(resource.getDocId(), file.getAbsolutePath());
+    }
 
-	/**
-	 * Finds the container where all document's files are stored
-	 * 
-	 * @param docId The document identifier
-	 * @return The document's container
-	 */
-	public File getContainer(long docId) {
-		String relativePath = computeRelativePath(docId);
-		String path = getRoot().getPath() + "/" + relativePath;
-		return new File(path);
-	}
+    /**
+     * Finds the container where all document's files are stored
+     * 
+     * @param docId The document identifier
+     * @return The document's container
+     */
+    public File getContainer(long docId) {
+        return new File("%s/%s".formatted(getRoot().getPath(), computeRelativePath(docId)));
+    }
 
-	public File getRoot() {
-		return new File(getDir());
-	}
+    public File getRoot() {
+        return new File(getDir());
+    }
 
-	@Override
-	public void store(File file, StoreResource resource) throws IOException {
-		checkEnabled();
+    @Override
+    public void store(File file, StoreResource resource) throws IOException {
+        checkEnabled();
 
-		checkNotEmpty(file);
+        checkNotEmpty(file);
 
-		File dir = getContainer(resource.getDocId());
-		FileUtils.forceMkdir(dir);
-		File dest = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
-		FileUtil.copyFile(file, dest);
+        File dir = getContainer(resource.getDocId());
+        FileUtils.forceMkdir(dir);
+        File dest = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
+        FileUtil.copyFile(file, dest);
 
-		checkWriteAfterStore(resource, file.length());
-	}
+        checkWriteAfterStore(resource, file.length());
+    }
 
-	@Override
-	public void store(InputStream stream, StoreResource resource) throws IOException {
-		File file = null;
-		try {
-			if (!isEnabled())
-				throw new IOException("Store not enabled");
+    @Override
+    public void store(InputStream stream, StoreResource resource) throws IOException {
+        File file = null;
+        try {
+            if (!isEnabled())
+                throw new IOException("Store not enabled");
 
-			File dir = getContainer(resource.getDocId());
-			FileUtils.forceMkdir(dir);
-			file = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
-			FileUtil.writeFile(stream, file.getPath());
+            File dir = getContainer(resource.getDocId());
+            FileUtils.forceMkdir(dir);
+            file = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
+            FileUtil.writeFile(stream, file.getPath());
 
-			checkWriteAfterStore(resource, file.length());
-		} catch (IOException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new IOException(e.getMessage(), e);
-		} finally {
-			IOUtil.close(stream);
-		}
-	}
+            checkWriteAfterStore(resource, file.length());
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        } finally {
+            IOUtil.close(stream);
+        }
+    }
 
-	@Override
-	public void writeToFile(StoreResource resource, File out) throws IOException {
-		File container = getContainer(resource.getDocId());
-		File file = new File(container, resource.name());
-		FileUtil.copyFile(file, out);
-	}
+    @Override
+    public void writeToFile(StoreResource resource, File out) throws IOException {
+        File container = getContainer(resource.getDocId());
+        File file = new File(container, resource.name());
+        FileUtil.copyFile(file, out);
+    }
 
-	@Override
-	public InputStream getStream(StoreResource resource) throws IOException {
-		File container = getContainer(resource.getDocId());
-		File file = new File(container, resource.name());
+    @Override
+    public InputStream getStream(StoreResource resource) throws IOException {
+        File container = getContainer(resource.getDocId());
+        File file = new File(container, resource.name());
 
-		try {
-			return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
-		} catch (IOException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new IOException(e.getMessage(), e);
-		}
-	}
+        try {
+            return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
 
-	@Override
-	public long getTotalSize() {
-		long size = 0;
-		File docDir = getRoot();
-		if (docDir.exists())
-			size = FileUtils.sizeOfDirectory(docDir);
-		return size;
-	}
+    @Override
+    public long getTotalSize() {
+        long size = 0;
+        File docDir = getRoot();
+        if (docDir.exists())
+            size = FileUtils.sizeOfDirectory(docDir);
+        return size;
+    }
 
-	@Override
-	public byte[] getBytes(StoreResource resource, long start, long length) throws IOException {
-		File container = getContainer(resource.getDocId());
-		File file = new File(container, resource.name());
-		return FileUtil.toByteArray(file, start, length);
-	}
+    @Override
+    public byte[] getBytes(StoreResource resource, long start, long length) throws IOException {
+        File container = getContainer(resource.getDocId());
+        File file = new File(container, resource.name());
+        return FileUtil.toByteArray(file, start, length);
+    }
 
-	@Override
-	public List<StoreResource> listResources(long docId, String fileVersion) {
-		List<StoreResource> resources = new ArrayList<>();
-		File container = getContainer(docId);
-		File[] buf = container.listFiles((dir, name) -> {
-			if (name.startsWith("."))
-				return false;
-			else if (StringUtils.isNotEmpty(fileVersion)) {
-				return name.startsWith(fileVersion);
-			}
-			return true;
-		});
-		if (buf != null)
-			for (File file : buf)
-				resources.add(StoreResource.builder().docId(docId).name(file.getName()).build());
-		return resources;
-	}
+    @Override
+    public List<StoreResource> listResources(long docId, String fileVersion) {
+        List<StoreResource> resources = new ArrayList<>();
+        File container = getContainer(docId);
+        File[] buf = container.listFiles((dir, name) -> {
+            if (name.startsWith("."))
+                return false;
+            else if (StringUtils.isNotEmpty(fileVersion)) {
+                return name.startsWith(fileVersion);
+            }
+            return true;
+        });
+        if (buf != null)
+            for (File file : buf)
+                resources.add(StoreResource.builder().docId(docId).name(file.getName()).build());
+        return resources;
+    }
 
-	@Override
-	public long size(StoreResource resource) {
-		File file = getContainer(resource.getDocId());
-		file = new File(file, resource.name());
-		return file.length();
-	}
+    @Override
+    public long size(StoreResource resource) {
+        File file = getContainer(resource.getDocId());
+        file = new File(file, resource.name());
+        return file.length();
+    }
 
-	@Override
-	public boolean exists(StoreResource resource) {
-		File file = getContainer(resource.getDocId());
-		file = new File(file, resource.name());
-		return file.exists();
-	}
+    @Override
+    public boolean exists(StoreResource resource) {
+        File file = getContainer(resource.getDocId());
+        file = new File(file, resource.name());
+        return file.exists();
+    }
 
-	@Override
-	public List<String> getParameterNames() {
-		return new ArrayList<>();
-	}
+    @Override
+    public List<String> getParameterNames() {
+        return new ArrayList<>();
+    }
 
-	@Override
-	public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
+        throw new UnsupportedOperationException();
+    }
 }

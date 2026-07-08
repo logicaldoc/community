@@ -174,7 +174,7 @@ public class ContextConfigurator {
 	}
 
 	public String getDialect() {
-		return getPropertyProp("SessionFactory", "hibernateProperties", "hibernate.dialect");
+		return getPropertyProp("sessionFactory", "hibernateProperties", "hibernate.dialect");
 	}
 
 	public boolean write() {
@@ -187,7 +187,7 @@ public class ContextConfigurator {
 	 * @param triggerId name of the trigger's bean
 	 */
 	public void addTrigger(String triggerId) {
-		Element element = getPropertyElement("Scheduler", "triggers");
+		Element element = getPropertyElement("scheduler", "triggers");
 		Element list = element.getChild("list", element.getNamespace());
 		List<Element> refs = list.getChildren("ref", element.getNamespace());
 		for (Element ref : refs) {

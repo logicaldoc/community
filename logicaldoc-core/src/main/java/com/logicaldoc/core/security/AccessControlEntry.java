@@ -16,85 +16,85 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class AccessControlEntry implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Column(name = "ld_read", nullable = false)
-	protected boolean read = true;
+    @Column(name = "ld_read", nullable = false)
+    protected boolean read = true;
 
-	@Column(name = "ld_write", nullable = false)
-	protected boolean write = false;
+    @Column(name = "ld_write", nullable = false)
+    protected boolean write = false;
 
-	@Column(name = "ld_groupid", nullable = false)
-	protected long groupId;
+    @Column(name = "ld_groupid", nullable = false)
+    protected long groupId;
 
-	public AccessControlEntry() {
-	}
+    public AccessControlEntry() {
+    }
 
-	public AccessControlEntry(AccessControlEntry source) {
-		setGroupId(source.getGroupId());
-		setRead(source.isRead());
-		setWrite(source.isWrite());
-	}
+    public AccessControlEntry(AccessControlEntry source) {
+        setGroupId(source.getGroupId());
+        setRead(source.isRead());
+        setWrite(source.isWrite());
+    }
 
-	public AccessControlEntry(long groupId) {
-		this.groupId = groupId;
-	}
+    public AccessControlEntry(long groupId) {
+        this.groupId = groupId;
+    }
 
-	public void setGroupId(long groupId) {
-		this.groupId = groupId;
-	}
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
 
-	public long getGroupId() {
-		return groupId;
-	}
-	
-	public boolean isRead() {
-		return read;
-	}
+    public long getGroupId() {
+        return groupId;
+    }
 
-	public void setRead(boolean read) {
-		this.read = read;
-	}
+    public boolean isRead() {
+        return read;
+    }
 
-	public boolean isWrite() {
-		return write;
-	}
+    public void setRead(boolean read) {
+        this.read = read;
+    }
 
-	public void setWrite(boolean write) {
-		this.write = write;
-	}
+    public boolean isWrite() {
+        return write;
+    }
 
-	public Set<Permission> grantedPermissions() {
-		HashSet<Permission> granted = new HashSet<>();
-		if (read)
-			granted.add(Permission.READ);
+    public void setWrite(boolean write) {
+        this.write = write;
+    }
 
-		if (write)
-			granted.add(Permission.WRITE);
+    public Set<Permission> grantedPermissions() {
+        HashSet<Permission> granted = new HashSet<>();
+        if (read)
+            granted.add(Permission.READ);
 
-		return granted;
-	}
+        if (write)
+            granted.add(Permission.WRITE);
 
-	public void grantPermissions(Set<Permission> permissions) {
-		read = permissions.contains(Permission.READ);
-		write = permissions.contains(Permission.WRITE);
-	}
+        return granted;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof AccessControlEntry ace)
-			return this.getGroupId() == ace.getGroupId();
-		else
-			return false;
-	}
+    public void grantPermissions(Set<Permission> permissions) {
+        read = permissions.contains(Permission.READ);
+        write = permissions.contains(Permission.WRITE);
+    }
 
-	@Override
-	public int hashCode() {
-		return Long.valueOf(groupId).hashCode();
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AccessControlEntry ace)
+            return this.getGroupId() == ace.getGroupId();
+        else
+            return false;
+    }
 
-	@Override
-	public String toString() {
-		return "AccessControlEntry [read=" + read + ", write=" + write + ", groupId=" + groupId + "]";
-	}
+    @Override
+    public int hashCode() {
+        return Long.valueOf(groupId).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "AccessControlEntry [read=%b, write=%b, groupId=%d]".formatted(read, write, groupId);
+    }
 }

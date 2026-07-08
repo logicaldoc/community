@@ -275,7 +275,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
                                where ld_templateid = %d
                                  and ld_groupid in (select ld_groupid
                                                       from ld_usergroup
-                                                     where ld_userid = %d
+                                                     where ld_userid = %d)
                                       """.formatted(templateId, userId), null, null, rows -> {
                 while (rows.next()) {
                     permissions.add(Permission.READ);

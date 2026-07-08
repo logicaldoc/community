@@ -48,12 +48,10 @@ public class User extends PersistentObject implements Serializable {
 
     private static final long serialVersionUID = 8093874904302301982L;
 
-    @Column(name = "ld_type", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_type", nullable = false) @Enumerated(EnumType.ORDINAL)
     private UserType type = UserType.DEFAULT;
 
-    @Column(name = "ld_source", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_source", nullable = false) @Enumerated(EnumType.ORDINAL)
     private UserSource source = UserSource.DEFAULT;
 
     @Column(name = "ld_username", length = 255, nullable = false)
@@ -110,7 +108,7 @@ public class User extends PersistentObject implements Serializable {
 
     @Column(name = "ld_whatsapp", length = 255)
     private String whatsapp = "";
-    
+
     /**
      * Groups this user belongs to
      */
@@ -344,7 +342,7 @@ public class User extends PersistentObject implements Serializable {
     public String getFullName() {
         String fullName = getFirstName();
         if (fullName != null && getName() != null)
-            fullName += " " + getName();
+            fullName = "%s %s".formatted(fullName, getName());
         if (fullName == null && getName() != null)
             fullName = getName();
         if (fullName == null)
@@ -394,7 +392,7 @@ public class User extends PersistentObject implements Serializable {
     public String getTelephone() {
         return telephone;
     }
-    
+
     public String getWhatsapp() {
         return whatsapp;
     }
@@ -563,7 +561,7 @@ public class User extends PersistentObject implements Serializable {
      * @return name of the group that represents this user
      */
     public String getUserGroupName() {
-        return "_user_" + getId();
+        return "_user_%d".formatted(getId());
     }
 
     /**
