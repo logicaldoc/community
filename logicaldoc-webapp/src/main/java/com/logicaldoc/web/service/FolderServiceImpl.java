@@ -305,7 +305,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             Folder folder = null;
             Folder test = dao.findById(folderId);
             if (test == null)
-                throw new ServerException("Unexisting folder " + folderId);
+                throw new ServerException("Unexisting folder %d".formatted(folderId));
 
             dao.initialize(test);
 
