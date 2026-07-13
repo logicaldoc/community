@@ -77,7 +77,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
     @Override
     public List<AttributeSet> findByType(int type, long tenantId) throws PersistenceException {
-        return findByWhere("_entity.type = %d and _entity.tenantId = %d".formatted(type, tenantId), "_entiry.name asc",
+        return findByWhere("_entity.type = %d and _entity.tenantId = %d".formatted(type, tenantId), "_entity.name asc",
                 null);
     }
 
