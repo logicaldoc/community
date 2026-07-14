@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,11 +164,13 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
             List<GUIMessageTemplate> buf = new ArrayList<>();
 
             List<MessageTemplate> standardTemplates = dao.findByTypeAndLanguage(
-                    type != null ? MessageTemplate.Type.valueOf(type) : null, "en", session.getTenantId());
+                    StringUtils.isNoneEmpty(type) ? MessageTemplate.Type.valueOf(type) : null, "en",
+                    session.getTenantId());
             Map<String, MessageTemplate> templates = new HashMap<>();
 
             List<MessageTemplate> tmp = dao.findByTypeAndLanguage(
-                    type != null ? MessageTemplate.Type.valueOf(type) : null, language, session.getTenantId());
+                    StringUtils.isNoneEmpty(type) ? MessageTemplate.Type.valueOf(type) : null, language,
+                    session.getTenantId());
             for (MessageTemplate m : tmp) {
                 templates.put(m.getName(), m);
             }

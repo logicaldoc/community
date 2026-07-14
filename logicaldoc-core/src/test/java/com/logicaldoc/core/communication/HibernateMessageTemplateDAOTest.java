@@ -65,6 +65,8 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 		assertEquals(6, coll.size());
 		coll = dao.findByTypeAndLanguage(MessageTemplate.Type.WHATSAPP, "en", 1L);
 		assertTrue(coll.isEmpty());
+		coll = dao.findByTypeAndLanguage(null, "en", 1L);
+		assertEquals(9, coll.size());
 	}
 
 	@Test
