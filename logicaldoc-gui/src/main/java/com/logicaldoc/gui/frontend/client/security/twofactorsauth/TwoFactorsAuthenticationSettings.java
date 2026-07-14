@@ -37,8 +37,6 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
     private static final String ENABLED = ".enabled";
 
-    private static final String ALLOWTRUSTED = ".allowtrusted";
-
     private ValuesManager vm = new ValuesManager();
 
     public TwoFactorsAuthenticationSettings() {
@@ -66,8 +64,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
         enable2fa.setRequired(true);
         enable2fa.setDisabled(Session.get().isDemo());
 
-        ToggleItem allowTrustedDevices = ItemFactory.newToggleItem("allowtrusted2fa", I18N.message("alwaysallowtrusteddev"),
-                Boolean.valueOf(settings.get("allowtrusted")));
+        ToggleItem allowTrustedDevices = ItemFactory.newToggleItem("allowtrusted2fa",
+                I18N.message("alwaysallowtrusteddev"), Boolean.valueOf(settings.get("allowtrusted")));
         allowTrustedDevices.setWrapTitle(false);
         allowTrustedDevices.setRequired(true);
 
@@ -100,7 +98,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
         whatsappForm.setGroupTitle("Wahtsapp Authenticator");
         whatsappForm.setNumCols(1);
 
-        ToggleItem enableWhatsapp = ItemFactory.newToggleItem("enableWhatsapp", I18N.message("enablewhatsappauthenticator"),
+        ToggleItem enableWhatsapp = ItemFactory.newToggleItem("enableWhatsapp",
+                I18N.message("enablewhatsappauthenticator"),
                 Boolean.valueOf(settings.get(Constants.TWOFA_WHATSAPP_AUTHENTICATOR + ENABLED)));
         enableWhatsapp.setWrapTitle(false);
         enableWhatsapp.setRequired(true);
@@ -189,8 +188,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
             String tenant = Session.get().getTenantName();
             final List<GUIParameter> params = new ArrayList<>();
-            params.add(new GUIParameter(tenant + TWOFA + ENABLED, vm.getValueAsString("enable2fa")));
-            params.add(new GUIParameter(tenant + TWOFA + ALLOWTRUSTED, vm.getValueAsString("allowtrusted2fa")));
+            params.add(new GUIParameter(tenant + TWOFA + "enabled", vm.getValueAsString("enable2fa")));
+            params.add(new GUIParameter(tenant + TWOFA + "allowtrusted", vm.getValueAsString("allowtrusted2fa")));
             params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED,
                     vm.getValueAsString("enableGoolge")));
             params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_YUBIKEY + ENABLED,
