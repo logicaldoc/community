@@ -413,14 +413,14 @@ public abstract class Filler extends PersistentObject {
 
         String result = fill(document, extractedContent, transaction, dictionary, explication);
 
-        Value<String> extractedValue = new Value<>();
+        Value<String> filledValue = new Value<>();
         if (StringUtils.isNotEmpty(automation)) {
             Automation script = new Automation("Filler-%s".formatted(name), null, getTenantId());
             script.evaluate(automation, Map.of("filler", this, "document", document, "transaction", transaction,
-                    "fillerDictionary", dictionary, "value", extractedValue));
+                    "fillerDictionary", dictionary, "value", filledValue));
         }
 
-        return StringUtils.defaultIfEmpty(extractedValue.getValue(), result);
+        return StringUtils.defaultIfEmpty(filledValue.getValue(), result);
     }
 
     protected boolean mustOverwrite(History transaction) {

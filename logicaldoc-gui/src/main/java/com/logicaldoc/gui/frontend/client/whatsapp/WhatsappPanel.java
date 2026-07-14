@@ -128,25 +128,24 @@ public class WhatsappPanel extends AdminPanel {
     private void onActivate(ValuesManager vm) {
         if (Boolean.TRUE.equals(vm.validate())) {
             List<String> settings = collectFormValues(vm);
-
             WhatsappService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<Void>() {
 
                 @Override
                 protected void handleSuccess(Void result) {
-                    GuiLog.info(I18N.message(SETTINGSSAVED), null);
-                    LD.contactingServer();
-                    LD.askForStringMandatory("activatenumber", "whatsapppin", null,
-                            pin -> WhatsappService.Instance.get().activateNumber(pin, new DefaultAsyncCallback<>() {
+                    LD.askForStringMandatory("activatenumber", "whatsapppin", null, pin -> {
+                        LD.contactingServer();
+                        WhatsappService.Instance.get().activateNumber(pin, new DefaultAsyncCallback<>() {
 
-                                @Override
-                                protected void handleSuccess(Boolean activated) {
-                                    LD.clearPrompt();
-                                    if (Boolean.TRUE.equals(activated))
-                                        SC.say("numberactivated");
-                                    else
-                                        SC.warn("numbernotactivated");
-                                }
-                            }));
+                            @Override
+                            protected void handleSuccess(Boolean activated) {
+                                LD.clearPrompt();
+                                if (Boolean.TRUE.equals(activated))
+                                    SC.say("numberactivated");
+                                else
+                                    SC.warn("numbernotactivated");
+                            }
+                        });
+                    });
                 }
             });
         }
@@ -160,7 +159,6 @@ public class WhatsappPanel extends AdminPanel {
 
                 @Override
                 protected void handleSuccess(Void result) {
-                    GuiLog.info(I18N.message(SETTINGSSAVED), null);
                     LD.contactingServer();
                     WhatsappService.Instance.get().prepareTemplates(new DefaultAsyncCallback<List<TemplateResult>>() {
 

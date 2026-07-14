@@ -105,11 +105,11 @@ public abstract class HistoryPanel extends VLayout {
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		buttons.addButton(export);
-		export.addClickHandler(evnt -> GridUtil.exportCSV(list, true));
+		export.addClickHandler(click -> GridUtil.exportCSV(list, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		buttons.addButton(print);
-		print.addClickHandler(evnt -> GridUtil.print(list));
+		print.addClickHandler(click -> GridUtil.print(list));
 
 		addMember(list);
 		addMember(buttons);

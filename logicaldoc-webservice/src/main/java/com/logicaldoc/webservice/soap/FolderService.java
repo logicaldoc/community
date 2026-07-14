@@ -339,7 +339,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action = "listChildren")
+	@WebMethod(action = "list")
 	@WebResult(name = "folder")
 	@WSDoc(description = "lists all direct children of a parent folder: readable sub-folders only are returned")
 	public List<WSFolder> list(@WSDoc(description = "identifier of the session", required = true)
