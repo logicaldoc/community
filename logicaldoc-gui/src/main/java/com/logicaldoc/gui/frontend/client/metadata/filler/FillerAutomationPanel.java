@@ -50,7 +50,7 @@ public class FillerAutomationPanel extends FillerDetailsTab {
 		automationBefore.setHeight("*");
 		automationBefore.addChangedHandler(changedHandler);
 
-		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation(AUTOMATION, AUTOMATION,
+		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation(AUTOMATION, "automationafter",
 				filler.getAutomation(), changedHandler, false);
 		automation.setRequired(false);
 		automation.setWidth("*");
