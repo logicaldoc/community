@@ -28,8 +28,6 @@ public class FolderCapturePanel extends FolderDetailTab {
 
     private static final String BARCODETEMPLATE = "barcodetemplate";
 
-    private static final String OCRTEMPLATE = "ocrtemplate";
-
     private DynamicForm form = new DynamicForm();
 
     private ValuesManager vm = new ValuesManager();
@@ -67,13 +65,6 @@ public class FolderCapturePanel extends FolderDetailTab {
             FolderService.Instance.get().applyCapture(folder.getId(), new EmptyAsyncCallback<>());
         });
 
-        SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
-                folder.getOcrTemplateId());
-        ocrTemplate.setWrapTitle(false);
-        ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) && folder.getTemplateId() == null);
-        ocrTemplate.addChangedHandler(changedHandler);
-        ocrTemplate.setDisabled(documentTemplateId == null);
-
         SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
                 folder.getBarcodeTemplateId());
         barcodeTemplate.setWrapTitle(false);
@@ -92,7 +83,7 @@ public class FolderCapturePanel extends FolderDetailTab {
         fillMode.setValue(folder.getFillMode());
         fillMode.addChangedHandler(changedHandler);
 
-        form.setItems(ocrTemplate, barcodeTemplate, filler, fillMode, applySubFolders);
+        form.setItems(barcodeTemplate, filler, fillMode, applySubFolders);
         addMember(form);
     }
 
@@ -102,12 +93,6 @@ public class FolderCapturePanel extends FolderDetailTab {
         Map<String, Object> values = vm.getValues();
         vm.validate();
         if (Boolean.FALSE.equals(vm.hasErrors())) {
-            if (values.get(OCRTEMPLATE) == null || values.get(OCRTEMPLATE).toString().isEmpty())
-                folder.setOcrTemplateId(null);
-            else {
-                folder.setOcrTemplateId(Long.parseLong(values.get(OCRTEMPLATE).toString()));
-            }
-
             if (values.get(BARCODETEMPLATE) == null || values.get(BARCODETEMPLATE).toString().isEmpty())
                 folder.setBarcodeTemplateId(null);
             else {

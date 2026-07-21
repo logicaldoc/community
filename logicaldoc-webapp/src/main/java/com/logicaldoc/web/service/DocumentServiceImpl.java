@@ -901,8 +901,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         guiDocument.setPasswordProtected(realDoc.isPasswordProtected());
         guiDocument.setLinks(realDoc.getLinks());
         guiDocument.setDocAttrs(realDoc.getDocAttrs());
-        guiDocument.setOcrd(realDoc.isOcrd());
-        guiDocument.setOcrTemplateId(realDoc.getOcrTemplateId());
         guiDocument.setBarcoded(realDoc.isBarcoded());
         guiDocument.setBarcodeTemplateId(realDoc.getBarcodeTemplateId());
         guiDocument.setFillerId(realDoc.getFillerId());
@@ -993,8 +991,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             version1.setStopPublishing(docVersion.getStopPublishing());
             version1.setPublished(docVersion.isPublished());
             version1.setPages(docVersion.getPages());
-            version1.setOcrd(docVersion.isOcrd());
-            version1.setOcrTemplateId(docVersion.getOcrTemplateId());
 
             setGUIExtendedAttributes(docVersion, version1);
 
@@ -1038,8 +1034,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             version2.setStopPublishing(docVersion.getStopPublishing());
             version2.setPublished(docVersion.isPublished());
             version2.setPages(docVersion.getPages());
-            version2.setOcrd(docVersion.isOcrd());
-            version2.setOcrTemplateId(docVersion.getOcrTemplateId());
             version2.setBarcodeTemplateId(docVersion.getBarcodeTemplateId());
 
             setGUIExtendedAttributes(docVersion, version2);
@@ -1279,7 +1273,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             docVO.setTenantId(session.getTenantId());
 
             // Make sure to maintain relevant flags from real document
-            docVO.setOcrd(document.isOcrd());
             docVO.setBarcoded(document.isBarcoded());
 
             // Create the document history event
@@ -1344,7 +1337,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         docVO.setPreviewPages(guiDocument.getPreviewPages());
         docVO.setNature(guiDocument.getNature());
         docVO.setFormId(guiDocument.getFormId());
-        docVO.setOcrTemplateId(guiDocument.getOcrTemplateId());
         docVO.setBarcodeTemplateId(guiDocument.getBarcodeTemplateId());
         docVO.setFillerId(guiDocument.getFillerId());
         docVO.setFillMode(FillMode.values()[guiDocument.getFillMode()]);
@@ -2203,8 +2195,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         if (model.getTemplateId() != null)
             document.setTemplateId(model.getTemplateId());
 
-        setOcrTemplate(model, ignoreEmptyFields, document);
-
         setBarcodeTemplate(model, ignoreEmptyFields, document);
 
         setExtendedAttributes(model, ignoreEmptyFields, document);
@@ -2236,13 +2226,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             document.setBarcodeTemplateId(model.getBarcodeTemplateId());
         else if (!ignoreEmptyFields)
             document.setBarcodeTemplateId(null);
-    }
-
-    private void setOcrTemplate(GUIDocument model, boolean ignoreEmptyFields, GUIDocument document) {
-        if (model.getOcrTemplateId() != null)
-            document.setOcrTemplateId(model.getOcrTemplateId());
-        else if (!ignoreEmptyFields)
-            document.setOcrTemplateId(null);
     }
 
     protected static void checkPublished(User user, Document doc) throws PermissionException {

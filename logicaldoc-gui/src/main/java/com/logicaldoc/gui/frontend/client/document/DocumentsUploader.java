@@ -146,7 +146,6 @@ public class DocumentsUploader extends Window {
         metadata.setTemplate(folder.getTemplate());
         metadata.setAttributes(folder.getAttributes());
         metadata.setTags(folder.getTags());
-        metadata.setOcrTemplateId(folder.getOcrTemplateId());
         metadata.setBarcodeTemplateId(folder.getBarcodeTemplateId());
         metadata.setFillerId(folder.getFillerId());
         metadata.setFillMode(folder.getFillMode());

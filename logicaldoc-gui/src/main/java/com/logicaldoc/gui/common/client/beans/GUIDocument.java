@@ -129,16 +129,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
     private int docAttrs = 0;
 
     /**
-     * Identifier of the Zonal OCR template to use to process this document
-     */
-    private Long ocrTemplateId = null;
-
-    /**
-     * Indicates if the document has been processed by the zonal OCR
-     */
-    private boolean ocrd = false;
-
-    /**
      * Identifier of the barcode template to use to process this document
      */
     private Long barcodeTemplateId = null;
@@ -410,14 +400,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
         this.stamped = stamped;
     }
 
-    public boolean isOcrd() {
-        return ocrd;
-    }
-
-    public void setOcrd(boolean ocrd) {
-        this.ocrd = ocrd;
-    }
-
     public boolean isBarcoded() {
         return barcoded;
     }
@@ -580,14 +562,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
     public void setLinks(int links) {
         this.links = links;
-    }
-
-    public Long getOcrTemplateId() {
-        return ocrTemplateId;
-    }
-
-    public void setOcrTemplateId(Long ocrTemplateId) {
-        this.ocrTemplateId = ocrTemplateId;
     }
 
     public Long getBarcodeTemplateId() {

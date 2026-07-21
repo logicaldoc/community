@@ -453,19 +453,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             doc.setFillMode(FillMode.ALL);
 
         /*
-         * Check for OCR template at folder level
-         */
-        if (doc.getOcrTemplateId() == null && doc.getFolder().getOcrTemplateId() != null)
-            doc.setOcrTemplateId(doc.getFolder().getOcrTemplateId());
-
-        /*
          * Check for Barcode template at folder level
          */
         if (doc.getBarcodeTemplateId() == null && doc.getFolder().getBarcodeTemplateId() != null)
             doc.setBarcodeTemplateId(doc.getFolder().getBarcodeTemplateId());
-
-        if (doc.getTemplate() == null)
-            doc.setOcrTemplateId(null);
     }
 
     private void copyFolderExtendedAttributes(Document doc) {

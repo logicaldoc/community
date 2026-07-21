@@ -57,8 +57,6 @@ public class GUIImportFolder implements Serializable {
 
     private Long templateId;
 
-    private Long ocrTemplateId;
-
     private Long barcodeTemplateId;
 
     private int depth = 5;
@@ -334,15 +332,7 @@ public class GUIImportFolder implements Serializable {
         }
         return url;
     }
-
-    public Long getOcrTemplateId() {
-        return ocrTemplateId;
-    }
-
-    public void setOcrTemplateId(Long ocrTemplateId) {
-        this.ocrTemplateId = ocrTemplateId;
-    }
-
+    
     public Long getBarcodeTemplateId() {
         return barcodeTemplateId;
     }

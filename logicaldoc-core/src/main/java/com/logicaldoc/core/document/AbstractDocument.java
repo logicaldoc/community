@@ -233,18 +233,6 @@ public abstract class AbstractDocument extends Fillable implements Transactional
     private String password;
 
     /**
-     * Identifier of the Zonal OCR template to use to process this document
-     */
-    @Column(name = "ld_ocrtemplateid")
-    private Long ocrTemplateId = null;
-
-    /**
-     * Indicates if the document has been processed by the Zonal OCR
-     */
-    @Column(name = "ld_ocrd", nullable = false)
-    private boolean ocrd = false;
-
-    /**
      * Indicates if the document has been processed by the Filler
      */
     @Column(name = "ld_filled", nullable = true)
@@ -798,14 +786,6 @@ public abstract class AbstractDocument extends Fillable implements Transactional
         this.links = links;
     }
 
-    public Long getOcrTemplateId() {
-        return ocrTemplateId;
-    }
-
-    public void setOcrTemplateId(Long ocrTemplateId) {
-        this.ocrTemplateId = ocrTemplateId;
-    }
-
     public Long getBarcodeTemplateId() {
         return barcodeTemplateId;
     }
@@ -896,14 +876,6 @@ public abstract class AbstractDocument extends Fillable implements Transactional
 
     public void setPublished(boolean published) {
         this.published = published;
-    }
-
-    public boolean isOcrd() {
-        return ocrd;
-    }
-
-    public void setOcrd(boolean ocrd) {
-        this.ocrd = ocrd;
     }
 
     /**

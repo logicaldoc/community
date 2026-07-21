@@ -91,12 +91,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
     private String grid;
 
     /**
-     * Identifier of the Zonal OCR template to use to process the documents
-     * inside this folder
-     */
-    private Long ocrTemplateId = null;
-
-    /**
      * Identifier of the barcode template to use to process this document
      */
     private Long barcodeTemplateId = null;
@@ -447,7 +441,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
             document.setTemplate(getTemplate());
             document.setAttributes(getAttributes());
         }
-        document.setOcrTemplateId(getOcrTemplateId());
         document.setBarcodeTemplateId(getBarcodeTemplateId());
 
         return document;
@@ -464,14 +457,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
     public void setGrid(String grid) {
         this.grid = grid;
-    }
-
-    public Long getOcrTemplateId() {
-        return ocrTemplateId;
-    }
-
-    public void setOcrTemplateId(Long ocrTemplateId) {
-        this.ocrTemplateId = ocrTemplateId;
     }
 
     public Long getBarcodeTemplateId() {

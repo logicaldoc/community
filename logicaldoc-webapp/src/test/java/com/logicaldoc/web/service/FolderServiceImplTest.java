@@ -161,33 +161,6 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 	}
 
 	@Test
-	public void testApplyOCR() throws ServerException {
-		GUIFolder folder = testSubject.getFolder(1201L, true, true, true);
-		assertNotNull(folder);
-		assertNull(folder.getGrid());
-
-		folder = testSubject.getFolder(1200L, true, true, true);
-		assertNotNull(folder);
-		folder.setOcrTemplateId(1L);
-		folder.setTemplateId(-1L);
-		folder.setTemplate("test");
-		testSubject.save(folder);
-		folder = testSubject.getFolder(1200L, true, true, true);
-		assertEquals(Long.valueOf(1L), folder.getOcrTemplateId());
-
-		folder = testSubject.getFolder(1201L, true, true, true);
-		assertNotNull(folder);
-		folder.setTemplateId(-1L);
-		folder.setTemplate("test");
-		testSubject.save(folder);
-
-		testSubject.applyCapture(1200L);
-
-		folder = testSubject.getFolder(1201L, true, true, true);
-		assertEquals(Long.valueOf(1L), folder.getOcrTemplateId());
-	}
-
-	@Test
 	public void testApplyStore() throws ServerException {
 		GUIFolder folder = testSubject.getFolder(1201L, true, true, true);
 		assertNotNull(folder);

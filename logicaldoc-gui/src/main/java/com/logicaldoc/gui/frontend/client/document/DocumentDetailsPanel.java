@@ -591,7 +591,6 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
                 extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
         }
         ChangedHandler templateChangedHandler = (ChangedEvent event) -> {
-            document.setOcrTemplateId(null);
             document.setBarcodeTemplateId(null);
             if (capturePanel != null)
                 capturePanel.refresh(document.getTemplateId());

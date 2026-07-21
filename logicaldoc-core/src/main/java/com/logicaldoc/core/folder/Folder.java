@@ -138,13 +138,6 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     private String grid;
 
     /**
-     * Identifier of the Zonal OCR template to use to process the documents
-     * inside this folder
-     */
-    @Column(name = "ld_ocrtemplateid")
-    private Long ocrTemplateId = null;
-
-    /**
      * Identifier of the barcode template to use to process the documents inside
      * this folder
      */
@@ -217,7 +210,6 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
         this.path = source.path;
         this.pathExtended = source.pathExtended;
         this.grid = source.grid;
-        this.ocrTemplateId = source.ocrTemplateId;
         this.barcodeTemplateId = source.barcodeTemplateId;
         this.tile = source.tile;
         this.fillerId = source.fillerId;
@@ -598,14 +590,6 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
 
     public void setPathExtended(String pathExtended) {
         this.pathExtended = pathExtended;
-    }
-
-    public Long getOcrTemplateId() {
-        return ocrTemplateId;
-    }
-
-    public void setOcrTemplateId(Long ocrTemplateId) {
-        this.ocrTemplateId = ocrTemplateId;
     }
 
     public Long getBarcodeTemplateId() {

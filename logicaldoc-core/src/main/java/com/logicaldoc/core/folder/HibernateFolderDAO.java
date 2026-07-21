@@ -143,7 +143,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             }
 
             if (folder.getTemplate() == null) {
-                folder.setOcrTemplateId(null);
                 folder.setBarcodeTemplateId(null);
             }
 
@@ -358,23 +357,24 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
                 .collect(Collectors.joining(","));
 
         accessibleFolders = findByObjectQuery("""
-select distinct(_entity) 
-  from Folder _entity left join _entity.accessControlList as _acl 
- where _acl.ace.ace.groupId in (%s) 
-   and _entity.parentId = :parentId 
-   and _entity.id != _entity.parentId
-""".formatted(allUserGroupIds), Map.of(PARENT_ID, parentId), null);
+                                              select distinct(_entity)
+                                                from Folder _entity left join _entity.accessControlList as _acl
+                                               where _acl.ace.ace.groupId in (%s)
+                                                 and _entity.parentId = :parentId
+                                                 and _entity.id != _entity.parentId
+                                              """.formatted(allUserGroupIds), Map.of(PARENT_ID, parentId), null);
 
         /*
          * Now search for all other folders that references accessible folders
          */
-        List<Folder> coll2 = findByObjectQuery("""
-select _entity from Folder _entity 
- where _entity.deleted = 0 
-   and _entity.parentId = :parentId 
-   and _entity.securityRef in (select distinct(B.id) from Folder B left join B.accessControlList as _acl
-                                where _acl.ace.ace.groupId in (%s))
-""".formatted(allUserGroupIds), Map.of(PARENT_ID, parentId), null);
+        List<Folder> coll2 = findByObjectQuery(
+                """
+                select _entity from Folder _entity
+                 where _entity.deleted = 0
+                   and _entity.parentId = :parentId
+                   and _entity.securityRef in (select distinct(B.id) from Folder B left join B.accessControlList as _acl
+                                                where _acl.ace.ace.groupId in (%s))
+                """.formatted(allUserGroupIds), Map.of(PARENT_ID, parentId), null);
         for (Folder folder : coll2) {
             if (!accessibleFolders.contains(folder))
                 accessibleFolders.add(folder);
@@ -410,28 +410,33 @@ select _entity from Folder _entity
         /*
          * Search for the folders that define its own policies
          */
-        coll = findByObjectQuery("""
-                select distinct(_entity) 
-                from Folder _entity left join _entity.accessControlList as _acl
-               where _acl.ace.ace.groupId in (%s)
-                 and _entity.parentId = %d
-                 and not (_entity.id = %d)
-              """.formatted(groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")),
-                parent.getId(), parent.getId()), null, null);
+        coll = findByObjectQuery(
+                """
+                  select distinct(_entity)
+                  from Folder _entity left join _entity.accessControlList as _acl
+                 where _acl.ace.ace.groupId in (%s)
+                   and _entity.parentId = %d
+                   and not (_entity.id = %d)
+                """.formatted(groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")),
+                        parent.getId(), parent.getId()),
+                null, null);
 
         /*
          * Now search for all other folders that references accessible folders
          */
-        List<Folder> coll2 = findByQuery("""
-                select _entity 
-                from Folder _entity 
-               where _entity.deleted = 0 
-                 and _entity.parentId = :parentId
-                 and _entity.securityRef in (select distinct(B.id) from Folder B left join B.accessControlList as _acl
-                                                                  where _acl.ace.ace.groupId in (%s))
-                 and not(_entity.id = %d )
-           """.formatted(groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")),
-                parent.getId()), Map.of(PARENT_ID, parent.getId()), Folder.class, null);
+        List<Folder> coll2 = findByQuery(
+                """
+                     select _entity
+                     from Folder _entity
+                    where _entity.deleted = 0
+                      and _entity.parentId = :parentId
+                      and _entity.securityRef in (select distinct(B.id) from Folder B left join B.accessControlList as _acl
+                                                                       where _acl.ace.ace.groupId in (%s))
+                      and not(_entity.id = %d )
+                """.formatted(
+                        groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")),
+                        parent.getId()),
+                Map.of(PARENT_ID, parent.getId()), Folder.class, null);
         for (Folder folder : coll2) {
             if (!coll.contains(folder))
                 coll.add(folder);
@@ -552,11 +557,11 @@ select _entity from Folder _entity
          * Search for folders that define its own security policies
          */
         List<Folder> coll = findByObjectQuery("""
-                select distinct(_entity) 
-                  from Folder _entity left join _entity.accessControlList as _acl
-                 where _entity.deleted = 0 
-                   and _acl.ace.ace.groupId = %d
-              """.formatted(groupId), (Map<String, Object>) null, null);
+                                                select distinct(_entity)
+                                                  from Folder _entity left join _entity.accessControlList as _acl
+                                                 where _entity.deleted = 0
+                                                   and _acl.ace.ace.groupId = %d
+                                              """.formatted(groupId), (Map<String, Object>) null, null);
 
         /*
          * Now search for all other folders that references the previous ones
@@ -588,14 +593,15 @@ select _entity from Folder _entity
         Set<Group> precoll = user.getGroups();
         if (!precoll.isEmpty()) {
             String query1 = """
-select distinct(A.ld_folderid) 
-  from ld_folder_acl A, ld_folder B 
- where B.ld_deleted = 0 
-   and A.ld_folderid = B.ld_id 
-   and A.ld_read = 1
-   and (B.ld_parentid = %d or B.ld_id = %d )
-   and A.ld_groupid in (%s)
-""".formatted(parentId, parentId, precoll.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
+                            select distinct(A.ld_folderid)
+                              from ld_folder_acl A, ld_folder B
+                             where B.ld_deleted = 0
+                               and A.ld_folderid = B.ld_id
+                               and A.ld_read = 1
+                               and (B.ld_parentid = %d or B.ld_id = %d )
+                               and A.ld_groupid in (%s)
+                            """.formatted(parentId, parentId,
+                    precoll.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 
             ids = queryForList(query1, Long.class);
 
@@ -761,7 +767,10 @@ select distinct(A.ld_folderid)
         }
     }
 
-    private void saveHistoryInParentFolder(Folder parent, Folder folder, FolderHistory transaction,
+    private void saveHistoryInParentFolder(
+            Folder parent,
+            Folder folder,
+            FolderHistory transaction,
             String pathExtended) {
         FolderHistory parentHistory = new FolderHistory(transaction);
         parentHistory.setFolderId(parent.getId());
@@ -907,19 +916,21 @@ select distinct(A.ld_folderid)
             log.debug("Use the security reference {}", id);
         }
 
-        StringBuilder query = new StringBuilder("""
-                 select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, 
-                        ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, 
-                        ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, 
-                        ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, 
-                        ld_automation LDAUTOMATION, ld_store LDSTORE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID,
-                        ld_revision as LDREVISION 
-                   from ld_folder_acl 
-                   where ld_folderid = %d
-                     and ld_groupid in (select ld_groupid 
-                                          from ld_usergroup 
-                                         where ld_userid = %d)
-""".formatted(id, userId));
+        StringBuilder query = new StringBuilder(
+                """
+                                 select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE,
+                                        ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN,
+                                        ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR,
+                                        ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL,
+                                        ld_automation LDAUTOMATION, ld_store LDSTORE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID,
+                                        ld_revision as LDREVISION
+                                   from ld_folder_acl
+                                   where ld_folderid = %d
+                                     and ld_groupid in (select ld_groupid
+                                                          from ld_usergroup
+                                                         where ld_userid = %d)
+                """.formatted(
+                        id, userId));
 
         Map<String, Permission> permissionColumn = new HashMap<>();
         permissionColumn.put("LDADD", Permission.ADD);
@@ -1043,7 +1054,10 @@ select distinct(A.ld_folderid)
     }
 
     @Override
-    public Collection<Long> findFolderIdByUserIdAndPermission(long userId, Permission permission, Long parentId,
+    public Collection<Long> findFolderIdByUserIdAndPermission(
+            long userId,
+            Permission permission,
+            Long parentId,
             boolean tree) throws PersistenceException {
         User user = getExistingtUser(userId);
 
@@ -1383,11 +1397,6 @@ select distinct(A.ld_folderid)
          */
         replicateParentMetadata(folder, folderVO, parent);
 
-        if (folderVO.getOcrTemplateId() != null)
-            folder.setOcrTemplateId(folderVO.getOcrTemplateId());
-        else
-            folder.setOcrTemplateId(parent.getOcrTemplateId());
-
         if (folderVO.getBarcodeTemplateId() != null)
             folder.setBarcodeTemplateId(folderVO.getBarcodeTemplateId());
         else
@@ -1488,7 +1497,12 @@ select distinct(A.ld_folderid)
     }
 
     @Override
-    public Folder copy(Folder source, Folder target, String newName, boolean foldersOnly, String securityOption,
+    public Folder copy(
+            Folder source,
+            Folder target,
+            String newName,
+            boolean foldersOnly,
+            String securityOption,
             FolderHistory transaction) throws PersistenceException {
         Folder newFolder = internalCopy(source, target, newName, foldersOnly, securityOption, transaction);
 
@@ -1527,8 +1541,13 @@ select distinct(A.ld_folderid)
         return newFolder;
     }
 
-    private Folder internalCopy(Folder source, Folder target, String newName, boolean foldersOnly,
-            String securityOption, FolderHistory transaction) throws PersistenceException {
+    private Folder internalCopy(
+            Folder source,
+            Folder target,
+            String newName,
+            boolean foldersOnly,
+            String securityOption,
+            FolderHistory transaction) throws PersistenceException {
         target = internalCopyValidation(source, target, securityOption, transaction);
 
         // Create the same folder in the target
@@ -1568,7 +1587,6 @@ select distinct(A.ld_folderid)
                 newDoc.setImmutable(false);
                 newDoc.setBarcoded(false);
                 newDoc.setRating(0);
-                newDoc.setOcrd(false);
 
                 DocumentHistory documentTransaction = new DocumentHistory();
                 documentTransaction.setSessionId(transaction.getSessionId());
@@ -1594,7 +1612,10 @@ select distinct(A.ld_folderid)
         return newFolder;
     }
 
-    private Folder internalCopyValidation(Folder source, Folder target, String securityOption,
+    private Folder internalCopyValidation(
+            Folder source,
+            Folder target,
+            String securityOption,
             FolderHistory transaction) throws PersistenceException {
         if (!(securityOption == null || "none".equals(securityOption) || "inherit".equals(securityOption)
                 || REPLICATE.equals(securityOption)))
@@ -1881,14 +1902,14 @@ select distinct(A.ld_folderid)
         // We do this way because if using the HQL we will have all the
         // collections initialized
         List<Long> wsIds = queryForList("""
-select ld_id from ld_folder 
- where (not ld_id = %d) 
-   and ld_deleted = 0 
-   and ld_parentid = %d 
-   and ld_type = %d 
-   and ld_tenantid = %d 
- order by lower(ld_name)
-""".formatted(rootId, rootId, Folder.TYPE_WORKSPACE, tenantId), Long.class);
+                                        select ld_id from ld_folder
+                                         where (not ld_id = %d)
+                                           and ld_deleted = 0
+                                           and ld_parentid = %d
+                                           and ld_type = %d
+                                           and ld_tenantid = %d
+                                         order by lower(ld_name)
+                                        """.formatted(rootId, rootId, Folder.TYPE_WORKSPACE, tenantId), Long.class);
 
         ArrayList<Folder> workspaces = new ArrayList<>();
         for (Long wsId : wsIds)
@@ -1998,13 +2019,13 @@ select ld_id from ld_folder
                 rootPath = "";
 
             String query = """
-SELECT COUNT(*) from ld_document D, ld_folder F 
- WHERE D.ld_folderid=F.ld_id 
-   and F.ld_deleted=0 
-   and D.ld_deleted=0 
-   and D.ld_tenantid = %d 
-   and (D.ld_folderid = %d or F.ld_path like '%s/%%')   
-""".formatted(root.getTenantId(), rootId, SqlUtil.doubleQuotes(rootPath));
+                           SELECT COUNT(*) from ld_document D, ld_folder F
+                            WHERE D.ld_folderid=F.ld_id
+                              and F.ld_deleted=0
+                              and D.ld_deleted=0
+                              and D.ld_tenantid = %d
+                              and (D.ld_folderid = %d or F.ld_path like '%s/%%')
+                           """.formatted(root.getTenantId(), rootId, SqlUtil.doubleQuotes(rootPath));
             return queryForLong(query);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
@@ -2033,33 +2054,34 @@ SELECT COUNT(*) from ld_document D, ld_folder F
                 rootPath = "";
 
             long sizeDocs = queryForLong("""
-                    select sum(ld_filesize) 
-                      from ld_document 
-                     where ld_deleted = 0 
-                       and ld_tenantid = %d
-                       and ld_folderid in (select ld_id 
-                                             from ld_folder 
-                                            where ld_deleted = 0 
-                                              and (ld_path LIKE '%s/%%' or ld_id = %d )
-                                          ) 
-                 """.formatted(root.getTenantId(), SqlUtil.doubleQuotes(rootPath), rootId));
+                                            select sum(ld_filesize)
+                                              from ld_document
+                                             where ld_deleted = 0
+                                               and ld_tenantid = %d
+                                               and ld_folderid in (select ld_id
+                                                                     from ld_folder
+                                                                    where ld_deleted = 0
+                                                                      and (ld_path LIKE '%s/%%' or ld_id = %d )
+                                                                  )
+                                         """.formatted(root.getTenantId(), SqlUtil.doubleQuotes(rootPath), rootId));
 
-            long sizeVersions = queryForLong("""
-                    select sum(V.ld_filesize) as total 
-                      from ld_version V 
-                     where V.ld_version = V.ld_fileversion 
-                       and V.ld_tenantid = %d
-                       and V.ld_folderid in (select ld_id 
-                                               from ld_folder 
-                                              where ld_deleted = 0 
-                                                and ld_tenantid = %d
-                                                and (ld_path like '%s/%%' or ld_id = %d)
-                                            ) and not exists (select D.ld_id 
-                                                                from ld_document D
-                                                               where D.ld_id = V.ld_documentid 
-                                                                 and D.ld_fileversion = V.ld_fileversion
-                                                              )
-                 """.formatted(root.getTenantId(), root.getTenantId(), SqlUtil.doubleQuotes(rootPath), rootId));
+            long sizeVersions = queryForLong(
+                    """
+                       select sum(V.ld_filesize) as total
+                         from ld_version V
+                        where V.ld_version = V.ld_fileversion
+                          and V.ld_tenantid = %d
+                          and V.ld_folderid in (select ld_id
+                                                  from ld_folder
+                                                 where ld_deleted = 0
+                                                   and ld_tenantid = %d
+                                                   and (ld_path like '%s/%%' or ld_id = %d)
+                                               ) and not exists (select D.ld_id
+                                                                   from ld_document D
+                                                                  where D.ld_id = V.ld_documentid
+                                                                    and D.ld_fileversion = V.ld_fileversion
+                                                                 )
+                    """.formatted(root.getTenantId(), root.getTenantId(), SqlUtil.doubleQuotes(rootPath), rootId));
 
             return sizeDocs + sizeVersions;
         } catch (PersistenceException e) {
@@ -2228,7 +2250,6 @@ SELECT COUNT(*) from ld_document D, ld_folder F
         List<Folder> children = findByParentId(id);
         for (Folder folder : children) {
             initialize(folder);
-            folder.setOcrTemplateId(parent.getOcrTemplateId());
             folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
             folder.setFillerId(parent.getFillerId());
             folder.setFillMode(parent.getFillMode());

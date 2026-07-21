@@ -30,251 +30,249 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 6.0
  */
 public class UpdatePanel extends VLayout {
-	protected GUIDocument document = new GUIDocument();
+    protected GUIDocument document = new GUIDocument();
 
-	protected Layout propertiesTabPanel;
+    protected Layout propertiesTabPanel;
 
-	protected Layout extendedPropertiesTabPanel;
+    protected Layout extendedPropertiesTabPanel;
 
-	protected Layout captureTabPanel;
+    protected Layout captureTabPanel;
 
-	protected Layout retentionPoliciesTabPanel;
+    protected Layout retentionPoliciesTabPanel;
 
-	protected Layout notificationTabPanel;
+    protected Layout notificationTabPanel;
 
-	protected Layout securityTabPanel;
+    protected Layout securityTabPanel;
 
-	protected UpdateStandardPropertiesPanel propertiesPanel;
+    protected UpdateStandardPropertiesPanel propertiesPanel;
 
-	protected DocumentExtendedPropertiesPanel extendedPropertiesPanel;
+    protected DocumentExtendedPropertiesPanel extendedPropertiesPanel;
 
-	protected PublishingPanel retentionPoliciesPanel;
+    protected PublishingPanel retentionPoliciesPanel;
 
-	protected UpdateNotificationPanel notificationPanel;
+    protected UpdateNotificationPanel notificationPanel;
 
-	protected DocumentCapturePanel capturePanel;
+    protected DocumentCapturePanel capturePanel;
 
-	protected DocumentSecurityPanel securityPanel;
+    protected DocumentSecurityPanel securityPanel;
 
-	protected TabSet tabSet = new TabSet();
+    protected TabSet tabSet = new TabSet();
 
-	protected Tab propertiesTab;
+    protected Tab propertiesTab;
 
-	protected Tab extendedPropertiesTab;
+    protected Tab extendedPropertiesTab;
 
-	protected Tab retentionPoliciesTab;
+    protected Tab retentionPoliciesTab;
 
-	protected Tab notificationTab;
+    protected Tab notificationTab;
 
-	protected Tab captureTab;
+    protected Tab captureTab;
 
-	protected Tab securityTab;
+    protected Tab securityTab;
 
-	public UpdatePanel(GUIDocument metadata, boolean showNotificationPanel, boolean showSecurityTab) {
-		super();
+    public UpdatePanel(GUIDocument metadata, boolean showNotificationPanel, boolean showSecurityTab) {
+        super();
 
-		if (metadata != null)
-			document = metadata;
-		else {
-			GUIFolder currentFolder = FolderController.get().getCurrentFolder();
-			document = currentFolder.newDocument();
-		}
+        if (metadata != null)
+            document = metadata;
+        else {
+            GUIFolder currentFolder = FolderController.get().getCurrentFolder();
+            document = currentFolder.newDocument();
+        }
 
-		setHeight100();
-		setWidth100();
-		setMembersMargin(10);
+        setHeight100();
+        setWidth100();
+        setMembersMargin(10);
 
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("60%");
-		spacer.setOverflow(Overflow.HIDDEN);
+        HTMLPane spacer = new HTMLPane();
+        spacer.setContents("<div>&nbsp;</div>");
+        spacer.setWidth("60%");
+        spacer.setOverflow(Overflow.HIDDEN);
 
-		prepareTabs();
-		prepareTabset(showNotificationPanel, showSecurityTab);
-		refresh();
-	}
+        prepareTabs();
+        prepareTabset(showNotificationPanel, showSecurityTab);
+        refresh();
+    }
 
-	protected void prepareTabs() {
-		propertiesTab = new Tab(I18N.message("properties"));
-		propertiesTabPanel = new HLayout();
-		propertiesTabPanel.setWidth100();
-		propertiesTabPanel.setHeight100();
-		propertiesTab.setPane(propertiesTabPanel);
+    protected void prepareTabs() {
+        propertiesTab = new Tab(I18N.message("properties"));
+        propertiesTabPanel = new HLayout();
+        propertiesTabPanel.setWidth100();
+        propertiesTabPanel.setHeight100();
+        propertiesTab.setPane(propertiesTabPanel);
 
-		extendedPropertiesTab = new Tab(I18N.message("propertiesext"));
-		extendedPropertiesTabPanel = new HLayout();
-		extendedPropertiesTabPanel.setWidth100();
-		extendedPropertiesTabPanel.setHeight100();
-		extendedPropertiesTab.setPane(extendedPropertiesTabPanel);
+        extendedPropertiesTab = new Tab(I18N.message("propertiesext"));
+        extendedPropertiesTabPanel = new HLayout();
+        extendedPropertiesTabPanel.setWidth100();
+        extendedPropertiesTabPanel.setHeight100();
+        extendedPropertiesTab.setPane(extendedPropertiesTabPanel);
 
-		captureTab = new Tab(I18N.message("capture"));
-		captureTabPanel = new HLayout();
-		captureTabPanel.setWidth100();
-		captureTabPanel.setHeight100();
-		captureTab.setPane(captureTabPanel);
+        captureTab = new Tab(I18N.message("capture"));
+        captureTabPanel = new HLayout();
+        captureTabPanel.setWidth100();
+        captureTabPanel.setHeight100();
+        captureTab.setPane(captureTabPanel);
 
-		retentionPoliciesTab = new Tab(I18N.message("publishing"));
-		retentionPoliciesTabPanel = new HLayout();
-		retentionPoliciesTabPanel.setWidth100();
-		retentionPoliciesTabPanel.setHeight100();
-		retentionPoliciesTab.setPane(retentionPoliciesTabPanel);
+        retentionPoliciesTab = new Tab(I18N.message("publishing"));
+        retentionPoliciesTabPanel = new HLayout();
+        retentionPoliciesTabPanel.setWidth100();
+        retentionPoliciesTabPanel.setHeight100();
+        retentionPoliciesTab.setPane(retentionPoliciesTabPanel);
 
-		notificationTab = new Tab(I18N.message("notifyusers"));
-		notificationTabPanel = new HLayout();
-		notificationTabPanel.setWidth100();
-		notificationTabPanel.setHeight100();
-		notificationTab.setPane(notificationTabPanel);
+        notificationTab = new Tab(I18N.message("notifyusers"));
+        notificationTabPanel = new HLayout();
+        notificationTabPanel.setWidth100();
+        notificationTabPanel.setHeight100();
+        notificationTab.setPane(notificationTabPanel);
 
-		securityTab = new Tab(I18N.message("security"));
-		securityTabPanel = new HLayout();
-		securityTabPanel.setWidth100();
-		securityTabPanel.setHeight100();
-		securityTab.setPane(securityTabPanel);
-	}
+        securityTab = new Tab(I18N.message("security"));
+        securityTabPanel = new HLayout();
+        securityTabPanel.setWidth100();
+        securityTabPanel.setHeight100();
+        securityTab.setPane(securityTabPanel);
+    }
 
-	protected void prepareTabset(boolean showNotificationPanel, boolean showSecurityTab) {
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
+    protected void prepareTabset(boolean showNotificationPanel, boolean showSecurityTab) {
+        tabSet = new TabSet();
+        tabSet.setTabBarPosition(Side.TOP);
+        tabSet.setTabBarAlign(Side.LEFT);
+        tabSet.setWidth100();
+        tabSet.setHeight100();
 
-		tabSet.addTab(propertiesTab);
-		tabSet.addTab(extendedPropertiesTab);
-		if (Feature.enabled(Feature.RETENTION_POLICIES) && (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
-				|| Session.get().getUser().isMemberOf(Constants.GROUP_PUBLISHER)))
-			tabSet.addTab(retentionPoliciesTab);
+        tabSet.addTab(propertiesTab);
+        tabSet.addTab(extendedPropertiesTab);
+        if (Feature.enabled(Feature.RETENTION_POLICIES) && (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
+                || Session.get().getUser().isMemberOf(Constants.GROUP_PUBLISHER)))
+            tabSet.addTab(retentionPoliciesTab);
 
-		if (Menu.enabled(Menu.CAPTURE))
-			tabSet.addTab(captureTab);
+        if (Menu.enabled(Menu.CAPTURE))
+            tabSet.addTab(captureTab);
 
-		if (showNotificationPanel)
-			tabSet.addTab(notificationTab);
+        if (showNotificationPanel)
+            tabSet.addTab(notificationTab);
 
-		if (showSecurityTab)
-			tabSet.addTab(securityTab);
+        if (showSecurityTab)
+            tabSet.addTab(securityTab);
 
-		addMember(tabSet);
-	}
+        addMember(tabSet);
+    }
 
-	protected void refresh() {
-		/*
-		 * Prepare the standard properties tab
-		 */
-		if (propertiesPanel != null) {
-			propertiesPanel.destroy();
-			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
-				propertiesTabPanel.removeMember(propertiesPanel);
-		}
+    protected void refresh() {
+        /*
+         * Prepare the standard properties tab
+         */
+        if (propertiesPanel != null) {
+            propertiesPanel.destroy();
+            if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
+                propertiesTabPanel.removeMember(propertiesPanel);
+        }
 
-		propertiesPanel = new UpdateStandardPropertiesPanel(document);
-		propertiesTabPanel.addMember(propertiesPanel);
+        propertiesPanel = new UpdateStandardPropertiesPanel(document);
+        propertiesTabPanel.addMember(propertiesPanel);
 
+        ChangedHandler templateChangedHandler = event -> {
+            document.setBarcodeTemplateId(null);
+            capturePanel.refresh(document.getTemplateId());
+        };
 
-		ChangedHandler templateChangedHandler = event -> {
-			document.setOcrTemplateId(null);
-			document.setBarcodeTemplateId(null);
-			capturePanel.refresh(document.getTemplateId());
-		};
+        ChangedHandler nothingToDo = event -> {
+            // Nothing to do
+        };
 
-		ChangedHandler nothingToDo = event -> {
-			// Nothing to do
-		};
-		
-		/*
-		 * Prepare the extended properties tab
-		 */
-		if (extendedPropertiesPanel != null) {
-			extendedPropertiesPanel.destroy();
-			if (Boolean.TRUE.equals(extendedPropertiesTabPanel.contains(extendedPropertiesPanel)))
-				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
-		}
-		extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, nothingToDo, templateChangedHandler);
-		extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
+        /*
+         * Prepare the extended properties tab
+         */
+        if (extendedPropertiesPanel != null) {
+            extendedPropertiesPanel.destroy();
+            if (Boolean.TRUE.equals(extendedPropertiesTabPanel.contains(extendedPropertiesPanel)))
+                extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
+        }
+        extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, nothingToDo, templateChangedHandler);
+        extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
 
-		/*
-		 * Prepare the OCR settings tab
-		 */
-		if (capturePanel != null) {
-			capturePanel.destroy();
-			if (Boolean.TRUE.equals(captureTabPanel.contains(capturePanel)))
-				captureTabPanel.removeMember(capturePanel);
-		}
-		capturePanel = new DocumentCapturePanel(document, nothingToDo, false);
-		captureTabPanel.addMember(capturePanel);
+        /*
+         * Prepare the OCR settings tab
+         */
+        if (capturePanel != null) {
+            capturePanel.destroy();
+            if (Boolean.TRUE.equals(captureTabPanel.contains(capturePanel)))
+                captureTabPanel.removeMember(capturePanel);
+        }
+        capturePanel = new DocumentCapturePanel(document, nothingToDo, false);
+        captureTabPanel.addMember(capturePanel);
 
-		/*
-		 * Prepare the retention policies tab
-		 */
-		if (retentionPoliciesPanel != null) {
-			retentionPoliciesPanel.destroy();
-			if (Boolean.TRUE.equals(retentionPoliciesTabPanel.contains(retentionPoliciesPanel)))
-				retentionPoliciesTabPanel.removeMember(retentionPoliciesPanel);
-		}
-		retentionPoliciesPanel = new PublishingPanel(document, nothingToDo);
-		retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
+        /*
+         * Prepare the retention policies tab
+         */
+        if (retentionPoliciesPanel != null) {
+            retentionPoliciesPanel.destroy();
+            if (Boolean.TRUE.equals(retentionPoliciesTabPanel.contains(retentionPoliciesPanel)))
+                retentionPoliciesTabPanel.removeMember(retentionPoliciesPanel);
+        }
+        retentionPoliciesPanel = new PublishingPanel(document, nothingToDo);
+        retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
 
-		/*
-		 * Prepare the notifications tab
-		 */
-		refreshNotificationsTab();
+        /*
+         * Prepare the notifications tab
+         */
+        refreshNotificationsTab();
 
-		/*
-		 * Prepare the security tab
-		 */
-		refreshSecurityTab();
-	}
+        /*
+         * Prepare the security tab
+         */
+        refreshSecurityTab();
+    }
 
-	private void refreshNotificationsTab() {
-		if (notificationPanel != null) {
-			notificationPanel.destroy();
-			if (Boolean.TRUE.equals(notificationTabPanel.contains(notificationPanel)))
-				notificationTabPanel.removeMember(notificationPanel);
-		}
-		notificationPanel = new UpdateNotificationPanel(document);
-		notificationTabPanel.addMember(notificationPanel);
-	}
+    private void refreshNotificationsTab() {
+        if (notificationPanel != null) {
+            notificationPanel.destroy();
+            if (Boolean.TRUE.equals(notificationTabPanel.contains(notificationPanel)))
+                notificationTabPanel.removeMember(notificationPanel);
+        }
+        notificationPanel = new UpdateNotificationPanel(document);
+        notificationTabPanel.addMember(notificationPanel);
+    }
 
-	private void refreshSecurityTab() {
-		if (securityPanel != null) {
-			securityPanel.destroy();
-			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
-				securityTabPanel.removeMember(securityPanel);
-		}
-		securityPanel = new DocumentSecurityPanel(document);
-		securityTabPanel.addMember(securityPanel);
-	}
+    private void refreshSecurityTab() {
+        if (securityPanel != null) {
+            securityPanel.destroy();
+            if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
+                securityTabPanel.removeMember(securityPanel);
+        }
+        securityPanel = new DocumentSecurityPanel(document);
+        securityTabPanel.addMember(securityPanel);
+    }
 
-	public GUIDocument getDocument() {
-		return document;
-	}
+    public GUIDocument getDocument() {
+        return document;
+    }
 
-	public boolean validate() {
-		boolean stdValid = propertiesPanel.validate();
-		boolean extValid = extendedPropertiesPanel.validate();
-		boolean publishingValid = retentionPoliciesPanel.validate();
-		boolean captureValid = capturePanel.validate();
-		notificationPanel.validate();
-		securityPanel.validate();
+    public boolean validate() {
+        boolean stdValid = propertiesPanel.validate();
+        boolean extValid = extendedPropertiesPanel.validate();
+        boolean publishingValid = retentionPoliciesPanel.validate();
+        boolean captureValid = capturePanel.validate();
+        notificationPanel.validate();
+        securityPanel.validate();
 
-		if (!stdValid)
-			tabSet.selectTab(propertiesTab);
-		else if (!extValid)
-			tabSet.selectTab(extendedPropertiesTab);
-		else if (!publishingValid)
-			tabSet.selectTab(retentionPoliciesTab);
-		else if (!captureValid)
-			tabSet.selectTab(captureTab);
-		return stdValid && extValid && publishingValid && captureValid;
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+        if (!stdValid)
+            tabSet.selectTab(propertiesTab);
+        else if (!extValid)
+            tabSet.selectTab(extendedPropertiesTab);
+        else if (!publishingValid)
+            tabSet.selectTab(retentionPoliciesTab);
+        else if (!captureValid)
+            tabSet.selectTab(captureTab);
+        return stdValid && extValid && publishingValid && captureValid;
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

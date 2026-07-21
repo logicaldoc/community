@@ -2,9 +2,7 @@ package com.logicaldoc.gui.frontend.client.metadata.zonalocr;
 
 import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
-import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
-import com.smartgwt.client.widgets.tab.Tab;
 
 /**
  * Panel showing the Zonal OCR administration panel.
@@ -14,32 +12,29 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class ZonalOCRPanel extends AdminPanel {
 
-	private GUIOCRTemplate selectedOcrTemplate;
+    private GUIOCRTemplate selectedOcrTemplate;
 
-	private GUITemplate selectedDocumentTemplate;
+    private GUITemplate selectedDocumentTemplate;
 
-	public ZonalOCRPanel(GUITemplate selectedDocumentTemplate, GUIOCRTemplate selectedOcrTemplate) {
-		super("zonalocr");
+    public ZonalOCRPanel(GUITemplate selectedDocumentTemplate, GUIOCRTemplate selectedOcrTemplate) {
+        super("zonalocr");
 
-		this.selectedDocumentTemplate = selectedDocumentTemplate;
-		this.selectedOcrTemplate = selectedOcrTemplate;
-	}
+        this.selectedDocumentTemplate = selectedDocumentTemplate;
+        this.selectedOcrTemplate = selectedOcrTemplate;
+    }
 
-	@Override
-	public void onDraw() {
-		tab.setPane(new ZonalOCRTemplatesPanel(selectedDocumentTemplate, selectedOcrTemplate));
-		Tab processingQueueTab = new Tab(I18N.message("processingqueue"));
-		processingQueueTab.setPane(new ZonalOCRQueuePanel(100));
-		tabs.addTab(processingQueueTab);
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    @Override
+    public void onDraw() {
+        tab.setPane(new ZonalOCRTemplatesPanel(selectedDocumentTemplate, selectedOcrTemplate));
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

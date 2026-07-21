@@ -91,8 +91,6 @@ public class WSUtil {
             wsDoc.setNature(document.getNature());
             wsDoc.setFormId(document.getFormId());
             wsDoc.setPasswordProtected(document.isPasswordProtected() ? 1 : 0);
-            wsDoc.setOcrTemplateId(document.getOcrTemplateId());
-            wsDoc.setOcrd(document.isOcrd() ? 1 : 0);
             wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
             wsDoc.setBarcoded(document.isBarcoded() ? 1 : 0);
             wsDoc.setFillerId(document.getFillerId());
@@ -243,7 +241,6 @@ public class WSUtil {
 
         doc.setPublished(wsDoc.getPublished() == 1);
 
-        doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
         doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
         doc.setFillerId(wsDoc.getFillerId());
         doc.setFillMode(FillMode.values()[wsDoc.getFillMode()]);

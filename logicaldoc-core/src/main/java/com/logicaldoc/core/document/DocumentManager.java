@@ -208,7 +208,6 @@ public class DocumentManager {
             document.setFileSize(fileSize);
             if (document.getIndexed() != IndexingStatus.SKIP)
                 document.setIndexingStatus(IndexingStatus.TO_INDEX);
-            document.setOcrd(false);
             document.setBarcoded(false);
             document.setFilled(false);
             document.setSigned(false);
@@ -363,7 +362,6 @@ public class DocumentManager {
             document.setStamped(false);
             document.setSigned(false);
             document.setFilled(false);
-            document.setOcrd(false);
             document.setBarcoded(false);
 
             if (document.getIndexed() != IndexingStatus.SKIP)
@@ -409,8 +407,6 @@ public class DocumentManager {
 
                 document.copyAttributes(oldDocument);
                 document.setFilled(oldDocument.isFilled());
-                document.setOcrd(oldDocument.isOcrd());
-                document.setOcrTemplateId(oldDocument.getOcrTemplateId());
                 document.setBarcoded(oldDocument.isBarcoded());
                 document.setBarcodeTemplateId(oldDocument.getBarcodeTemplateId());
                 document.setIndexingStatus(oldDocument.getIndexed());
@@ -860,13 +856,6 @@ public class DocumentManager {
 
             setTemplate(document, docVO);
 
-            if (document.getTemplate() == null) {
-                document.setOcrTemplateId(null);
-                document.setOcrd(false);
-            }
-
-            setOcrTemplate(document, docVO);
-
             setBarcodeTemplate(document, docVO);
 
             setFiller(document, docVO);
@@ -948,17 +937,6 @@ public class DocumentManager {
         else
             document.setBarcoded(docVO.isBarcoded());
         document.setBarcodeTemplateId(docVO.getBarcodeTemplateId());
-    }
-
-    private void setOcrTemplate(Document document, Document docVO) {
-        if ((document.getOcrTemplateId() == null && docVO.getOcrTemplateId() != null)
-                || (document.getOcrTemplateId() != null && docVO.getOcrTemplateId() == null)
-                || (document.getOcrTemplateId() == null && docVO.getOcrTemplateId() == null)
-                || !document.getOcrTemplateId().equals(docVO.getOcrTemplateId()))
-            document.setOcrd(false);
-        else
-            document.setOcrd(docVO.isOcrd());
-        document.setOcrTemplateId(docVO.getOcrTemplateId());
     }
 
     private void checkCustomIdUniquenesOnUpdate(Document document, Document docVO) throws PersistenceException {
@@ -1300,7 +1278,6 @@ public class DocumentManager {
             cloned.setStamped(false);
             cloned.setSigned(false);
             cloned.setLinks(0);
-            cloned.setOcrd(false);
             cloned.setBarcoded(false);
             cloned.setFilled(false);
 

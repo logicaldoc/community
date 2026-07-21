@@ -1893,25 +1893,20 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     public void testApplyCaptureToTree() throws PersistenceException {
         Folder folder = testSubject.findById(1200);
         testSubject.initialize(folder);
-        assertNull(folder.getOcrTemplateId());
-        folder.setOcrTemplateId(1L);
+        assertNull(folder.getFillerId());
         testSubject.store(folder);
         folder = testSubject.findById(1200);
-
-        // Without a template the OCR template also must be forced to null
-        assertNull(folder.getOcrTemplateId());
 
         TemplateDAO tDao = TemplateDAO.get();
         folder = testSubject.findById(1200);
         testSubject.initialize(folder);
         folder.setTemplate(tDao.findById(1));
-        assertNull(folder.getOcrTemplateId());
-        folder.setOcrTemplateId(1L);
+        folder.setFillerId(1L);
         testSubject.store(folder);
-        assertEquals(Long.valueOf(1), folder.getOcrTemplateId());
+        assertEquals(Long.valueOf(1), folder.getFillerId());
 
         folder = testSubject.findById(1201);
-        assertNull(folder.getOcrTemplateId());
+        assertNull(folder.getFillerId());
 
         FolderHistory transaction = new FolderHistory();
         transaction.setUser(userDao.findById(User.USERID_ADMIN));
@@ -1919,7 +1914,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         testSubject.applyCaptureToTree(1200, transaction);
 
         folder = testSubject.findById(1201);
-        assertEquals(Long.valueOf(1), folder.getOcrTemplateId());
+        assertEquals(Long.valueOf(1), folder.getFillerId());
     }
 
     @Test

@@ -213,12 +213,6 @@ public class WSDocument implements Serializable {
 	@WSDoc(required = false, description = "indicates whether the document is protected by a password")
 	private Integer passwordProtected = 0;
 
-	@WSDoc(required = false, description = "identifier of the Zonal OCR template to use to process this document")
-	private Long ocrTemplateId = null;
-
-	@WSDoc(required = false, description = "indicates if the document has been processed by the zonal OCR: <b>0</b> = to process, <b>1</b> = processed")
-	private int ocrd = 0;
-
 	@WSDoc(required = false, description = "identifier of the barcode template to use to process this document")
 	private Long barcodeTemplateId = null;
 
@@ -641,22 +635,6 @@ public class WSDocument implements Serializable {
 
 	public void setPasswordProtected(Integer passwordProtected) {
 		this.passwordProtected = passwordProtected;
-	}
-
-	public Long getOcrTemplateId() {
-		return ocrTemplateId;
-	}
-
-	public void setOcrTemplateId(Long ocrTemplateId) {
-		this.ocrTemplateId = ocrTemplateId;
-	}
-
-	public int getOcrd() {
-		return ocrd;
-	}
-
-	public void setOcrd(int ocrd) {
-		this.ocrd = ocrd;
 	}
 
 	public Long getBarcodeTemplateId() {
