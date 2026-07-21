@@ -171,7 +171,6 @@ public class UpdatePanel extends VLayout {
         propertiesTabPanel.addMember(propertiesPanel);
 
         ChangedHandler templateChangedHandler = event -> {
-            document.setBarcodeTemplateId(null);
             capturePanel.refresh(document.getTemplateId());
         };
 

@@ -90,11 +90,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
     private String grid;
 
-    /**
-     * Identifier of the barcode template to use to process this document
-     */
-    private Long barcodeTemplateId = null;
-
     private String tile;
 
     /**
@@ -107,6 +102,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
     public GUIFolder() {
 
     }
+
     public int getFillMode() {
         return fillMode;
     }
@@ -441,7 +437,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
             document.setTemplate(getTemplate());
             document.setAttributes(getAttributes());
         }
-        document.setBarcodeTemplateId(getBarcodeTemplateId());
 
         return document;
     }
@@ -457,14 +452,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
     public void setGrid(String grid) {
         this.grid = grid;
-    }
-
-    public Long getBarcodeTemplateId() {
-        return barcodeTemplateId;
-    }
-
-    public void setBarcodeTemplateId(Long barcodeTemplateId) {
-        this.barcodeTemplateId = barcodeTemplateId;
     }
 
     public String getTile() {

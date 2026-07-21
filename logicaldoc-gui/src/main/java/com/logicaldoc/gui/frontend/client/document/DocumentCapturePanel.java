@@ -12,13 +12,11 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.metadata.filler.AutofillService;
 import com.logicaldoc.gui.frontend.client.metadata.filler.FillerSelector;
-import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
@@ -31,8 +29,6 @@ public class DocumentCapturePanel extends DocumentDetailTab {
     private static final String PROCESS = "process";
 
     private static final String FILLER = "filler";
-
-    private static final String BARCODETEMPLATE = "barcodetemplate";
 
     private DynamicForm form = new DynamicForm();
 
@@ -64,31 +60,6 @@ public class DocumentCapturePanel extends DocumentDetailTab {
         form.setTitleOrientation(TitleOrientation.TOP);
         form.setWrapItemTitles(false);
         form.setNumCols(4);
-
-        ButtonItem processBarcode = new ButtonItem("processBarcode", I18N.message(PROCESS));
-        processBarcode.setAutoFit(true);
-        processBarcode.setEndRow(true);
-        processBarcode.setDisabled(!updateEnabled || document.getBarcodeTemplateId() == null);
-        processBarcode.addClickHandler(event -> {
-            LD.contactingServer();
-            BarcodeService.Instance.get().process(document.getId(), new DefaultAsyncCallback<>() {
-
-                @Override
-                public void handleSuccess(GUIDocument result) {
-                    DocumentController.get().modified(result);
-                }
-            });
-        });
-
-        SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
-                document.getBarcodeTemplateId());
-        barcodeTemplate.setWrapTitle(false);
-        barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
-        barcodeTemplate.addChangedHandler(changedHandler);
-
-        StaticTextItem barcodeProcessed = ItemFactory.newStaticTextItem("barcodeprocessed", "processedbybarcode",
-                document.isBarcoded() ? I18N.message("yes") : I18N.message("no"));
-        barcodeProcessed.setWrapTitle(false);
 
         ButtonItem fill = new ButtonItem("fill", I18N.message(PROCESS));
         fill.setAutoFit(true);
@@ -149,9 +120,9 @@ public class DocumentCapturePanel extends DocumentDetailTab {
         });
 
         if (processButton)
-            form.setItems(barcodeTemplate, barcodeProcessed, processBarcode, filler, fillMode, fill, explainFill);
+            form.setItems(filler, fillMode, fill, explainFill);
         else
-            form.setItems(barcodeTemplate, filler, fillMode);
+            form.setItems(filler, fillMode);
 
         addMember(form);
     }
@@ -162,12 +133,6 @@ public class DocumentCapturePanel extends DocumentDetailTab {
         Map<String, Object> values = vm.getValues();
         vm.validate();
         if (Boolean.FALSE.equals(vm.hasErrors())) {
-            if (values.get(BARCODETEMPLATE) == null || values.get(BARCODETEMPLATE).toString().isEmpty())
-                document.setBarcodeTemplateId(null);
-            else {
-                document.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
-            }
-
             if (values.get(FILLER) == null || values.get(FILLER).toString().isEmpty())
                 document.setFillerId(null);
             else {

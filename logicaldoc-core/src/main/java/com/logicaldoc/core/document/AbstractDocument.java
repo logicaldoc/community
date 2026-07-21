@@ -115,16 +115,13 @@ public abstract class AbstractDocument extends Fillable implements Transactional
     @Column(name = "ld_creatorid", nullable = false)
     private long creatorId;
 
-    @Column(name = "ld_status")
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_status") @Enumerated(EnumType.ORDINAL)
     private DocumentStatus status = DocumentStatus.UNLOCKED;
 
-    @Column(name = "ld_indexed", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_indexed", nullable = false) @Enumerated(EnumType.ORDINAL)
     private IndexingStatus indexingStatus = IndexingStatus.TO_INDEX;
 
-    @Column(name = "ld_embedded", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_embedded", nullable = false) @Enumerated(EnumType.ORDINAL)
     private EmbeddingStatus embeddingStatus = EmbeddingStatus.TO_EMBED;
 
     @Column(name = "ld_type", length = 255)
@@ -144,15 +141,6 @@ public abstract class AbstractDocument extends Fillable implements Transactional
 
     @Column(name = "ld_filesize")
     private long fileSize = 0;
-
-    /**
-     * Identifier of the barcode template to use to process this document
-     */
-    @Column(name = "ld_barcodetemplateid")
-    private Long barcodeTemplateId = null;
-
-    @Column(name = "ld_barcoded", nullable = false)
-    private boolean barcoded = false;
 
     @Column(name = "ld_signed", nullable = false)
     private boolean signed = false;
@@ -786,14 +774,6 @@ public abstract class AbstractDocument extends Fillable implements Transactional
         this.links = links;
     }
 
-    public Long getBarcodeTemplateId() {
-        return barcodeTemplateId;
-    }
-
-    public void setBarcodeTemplateId(Long barcodeTemplateId) {
-        this.barcodeTemplateId = barcodeTemplateId;
-    }
-
     public int getPreviewPages() {
         return previewPages;
     }
@@ -846,14 +826,6 @@ public abstract class AbstractDocument extends Fillable implements Transactional
         this.immutable = immutable;
     }
 
-    public boolean isBarcoded() {
-        return barcoded;
-    }
-
-    public void setBarcoded(boolean barcoded) {
-        this.barcoded = barcoded;
-    }
-
     public boolean isSigned() {
         return signed;
     }
@@ -903,7 +875,6 @@ public abstract class AbstractDocument extends Fillable implements Transactional
         setFileName(docVO.getFileName());
         setFileSize(docVO.getFileSize());
         setIndexingStatus(docVO.getIndexed());
-        setBarcoded(docVO.isBarcoded());
         setSigned(docVO.isSigned());
         setStamped(docVO.isStamped());
         setDigest(docVO.getDigest());

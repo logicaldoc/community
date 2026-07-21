@@ -142,10 +142,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
                 attribute.setValidation(null);
             }
 
-            if (folder.getTemplate() == null) {
-                folder.setBarcodeTemplateId(null);
-            }
-
             // Remove the sections
             folder.getAttributes().values().removeIf(Attribute::isSection);
 
@@ -1397,11 +1393,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
          */
         replicateParentMetadata(folder, folderVO, parent);
 
-        if (folderVO.getBarcodeTemplateId() != null)
-            folder.setBarcodeTemplateId(folderVO.getBarcodeTemplateId());
-        else
-            folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
-
         store(folder, transaction);
         return folder;
     }
@@ -1585,7 +1576,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
                 newDoc.setIndexingStatus(IndexingStatus.TO_INDEX);
                 newDoc.setStatus(DocumentStatus.UNLOCKED);
                 newDoc.setImmutable(false);
-                newDoc.setBarcoded(false);
                 newDoc.setRating(0);
 
                 DocumentHistory documentTransaction = new DocumentHistory();
@@ -2250,7 +2240,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         List<Folder> children = findByParentId(id);
         for (Folder folder : children) {
             initialize(folder);
-            folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
             folder.setFillerId(parent.getFillerId());
             folder.setFillMode(parent.getFillMode());
 

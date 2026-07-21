@@ -901,8 +901,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         guiDocument.setPasswordProtected(realDoc.isPasswordProtected());
         guiDocument.setLinks(realDoc.getLinks());
         guiDocument.setDocAttrs(realDoc.getDocAttrs());
-        guiDocument.setBarcoded(realDoc.isBarcoded());
-        guiDocument.setBarcodeTemplateId(realDoc.getBarcodeTemplateId());
         guiDocument.setFillerId(realDoc.getFillerId());
         guiDocument.setFillMode(realDoc.getFillMode().ordinal());
 
@@ -1034,7 +1032,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             version2.setStopPublishing(docVersion.getStopPublishing());
             version2.setPublished(docVersion.isPublished());
             version2.setPages(docVersion.getPages());
-            version2.setBarcodeTemplateId(docVersion.getBarcodeTemplateId());
 
             setGUIExtendedAttributes(docVersion, version2);
 
@@ -1272,9 +1269,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             }
             docVO.setTenantId(session.getTenantId());
 
-            // Make sure to maintain relevant flags from real document
-            docVO.setBarcoded(document.isBarcoded());
-
             // Create the document history event
             DocumentHistory transaction = new DocumentHistory();
             transaction.setSession(session);
@@ -1331,13 +1325,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         docVO.setStartPublishing(guiDocument.getStartPublishing());
         docVO.setStopPublishing(guiDocument.getStopPublishing());
         docVO.setPublished(guiDocument.isPublished());
-        docVO.setBarcoded(guiDocument.isBarcoded());
         docVO.setExtResId(guiDocument.getExtResId());
         docVO.setPages(guiDocument.getPages());
         docVO.setPreviewPages(guiDocument.getPreviewPages());
         docVO.setNature(guiDocument.getNature());
         docVO.setFormId(guiDocument.getFormId());
-        docVO.setBarcodeTemplateId(guiDocument.getBarcodeTemplateId());
         docVO.setFillerId(guiDocument.getFillerId());
         docVO.setFillMode(FillMode.values()[guiDocument.getFillMode()]);
 
@@ -2195,8 +2187,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         if (model.getTemplateId() != null)
             document.setTemplateId(model.getTemplateId());
 
-        setBarcodeTemplate(model, ignoreEmptyFields, document);
-
         setExtendedAttributes(model, ignoreEmptyFields, document);
 
         return document;
@@ -2219,13 +2209,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         } else {
             document.setAttributes(model.getAttributes());
         }
-    }
-
-    private void setBarcodeTemplate(GUIDocument model, boolean ignoreEmptyFields, GUIDocument document) {
-        if (model.getBarcodeTemplateId() != null)
-            document.setBarcodeTemplateId(model.getBarcodeTemplateId());
-        else if (!ignoreEmptyFields)
-            document.setBarcodeTemplateId(null);
     }
 
     protected static void checkPublished(User user, Document doc) throws PermissionException {

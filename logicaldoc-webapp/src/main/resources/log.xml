@@ -287,22 +287,6 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="BarcodeProcessor_WEB" fileName="${root}/barcodeprocessor_web.log.html" filePattern="${root}/barcodeprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" />
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
-    <RollingFile name="BarcodeProcessor" fileName="${root}/barcodeprocessor.log" filePattern="${root}/barcodeprocessor.log.%i">
-      <PatternLayout>
-        <Pattern>${pattern}</Pattern>
-      </PatternLayout>
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
     <RollingFile name="NetworkBrowser_WEB" fileName="${root}/networkbrowser_web.log.html" filePattern="${root}/networkbrowser_web.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
@@ -682,10 +666,6 @@
     <Logger name="com.logicaldoc.core.stats.StatsCollector" level="info" additivity="false">
       <AppenderRef ref="StatsCollector" />
       <AppenderRef ref="StatsCollector_WEB" />
-    </Logger>
-    <Logger name="com.logicaldoc.barcode.BarcodeProcessor" level="info" additivity="false">
-      <AppenderRef ref="BarcodeProcessor" />
-      <AppenderRef ref="BarcodeProcessor_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.notifier.Notifier" level="info" additivity="false">
       <AppenderRef ref="Notifier" />

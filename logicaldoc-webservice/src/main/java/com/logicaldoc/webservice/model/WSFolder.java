@@ -85,9 +85,6 @@ public class WSFolder implements Serializable {
     @WSDoc(required = false, description = "tags applied to the document")
     private List<String> tags = new ArrayList<>();
 
-    @WSDoc(required = false, description = "identifier of the barcode template to use to process the documents inside this folder")
-    private Long barcodeTemplateId = null;
-
     @WSDoc(required = false, description = "maximum number of versions maintaned in the workspace")
     private Integer maxVersions;
 
@@ -99,6 +96,10 @@ public class WSFolder implements Serializable {
 
     @WSDoc(required = false, description = "identifier of the filler to use when autofilling the documents inside this folder")
     private Long fillerId;
+
+    @WSDoc(required = false, description = "filling policy: 0 = ALL, 1 = IMMEDIATE, 2 = DEFERRED")
+    private Integer fillMode = 0;
+   
 
     public void addAttribute(WSAttribute att) {
         if (attributes == null)
@@ -150,8 +151,9 @@ public class WSFolder implements Serializable {
         wsFolder.setStore(folder.getStore());
         wsFolder.setMaxVersions(folder.getMaxVersions());
         wsFolder.setSecurityRef(folder.getSecurityRef());
-        wsFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
         wsFolder.setFillerId(folder.getFillerId());
+        wsFolder.setFillMode(folder.getFillMode().ordinal());
+        
         wsFolder.setColor(folder.getColor());
         wsFolder.setTile(folder.getTile());
 
@@ -229,6 +231,14 @@ public class WSFolder implements Serializable {
         folder.setTemplate(template);
     }
 
+    public Integer getFillMode() {
+        return fillMode;
+    }
+
+    public void setFillMode(Integer fillMode) {
+        this.fillMode = fillMode;
+    }
+    
     public long getId() {
         return id;
     }
@@ -368,14 +378,6 @@ public class WSFolder implements Serializable {
         if (tags == null)
             tags = new ArrayList<>();
         this.tags = tags;
-    }
-
-    public Long getBarcodeTemplateId() {
-        return barcodeTemplateId;
-    }
-
-    public void setBarcodeTemplateId(Long barcodeTemplateId) {
-        this.barcodeTemplateId = barcodeTemplateId;
     }
 
     public Integer getMaxVersions() {

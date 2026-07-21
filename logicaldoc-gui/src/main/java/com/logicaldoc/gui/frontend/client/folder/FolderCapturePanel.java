@@ -26,8 +26,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 public class FolderCapturePanel extends FolderDetailTab {
     private static final String FILLER = "filler";
 
-    private static final String BARCODETEMPLATE = "barcodetemplate";
-
     private DynamicForm form = new DynamicForm();
 
     private ValuesManager vm = new ValuesManager();
@@ -65,13 +63,6 @@ public class FolderCapturePanel extends FolderDetailTab {
             FolderService.Instance.get().applyCapture(folder.getId(), new EmptyAsyncCallback<>());
         });
 
-        SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
-                folder.getBarcodeTemplateId());
-        barcodeTemplate.setWrapTitle(false);
-        barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
-        barcodeTemplate.addChangedHandler(changedHandler);
-        barcodeTemplate.setEndRow(true);
-
         FillerSelector filler = new FillerSelector(true, folder.getFillerId());
         filler.setWrapTitle(false);
         filler.setDisabled(!Feature.enabled(Feature.AUTOFILL));
@@ -83,7 +74,7 @@ public class FolderCapturePanel extends FolderDetailTab {
         fillMode.setValue(folder.getFillMode());
         fillMode.addChangedHandler(changedHandler);
 
-        form.setItems(barcodeTemplate, filler, fillMode, applySubFolders);
+        form.setItems(filler, fillMode, applySubFolders);
         addMember(form);
     }
 
@@ -93,12 +84,6 @@ public class FolderCapturePanel extends FolderDetailTab {
         Map<String, Object> values = vm.getValues();
         vm.validate();
         if (Boolean.FALSE.equals(vm.hasErrors())) {
-            if (values.get(BARCODETEMPLATE) == null || values.get(BARCODETEMPLATE).toString().isEmpty())
-                folder.setBarcodeTemplateId(null);
-            else {
-                folder.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
-            }
-
             if (values.get(FILLER) == null || values.get(FILLER).toString().isEmpty())
                 folder.setFillerId(null);
             else {

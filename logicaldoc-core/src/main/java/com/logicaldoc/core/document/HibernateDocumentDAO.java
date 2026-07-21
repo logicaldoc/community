@@ -451,12 +451,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             doc.setFillMode(doc.getFolder().getFillMode());
         if (doc.getFillMode() == null)
             doc.setFillMode(FillMode.ALL);
-
-        /*
-         * Check for Barcode template at folder level
-         */
-        if (doc.getBarcodeTemplateId() == null && doc.getFolder().getBarcodeTemplateId() != null)
-            doc.setBarcodeTemplateId(doc.getFolder().getBarcodeTemplateId());
     }
 
     private void copyFolderExtendedAttributes(Document doc) {

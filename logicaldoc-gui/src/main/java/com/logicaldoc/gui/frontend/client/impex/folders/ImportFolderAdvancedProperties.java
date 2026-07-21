@@ -33,8 +33,6 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 
     private static final String PREVENTDUPLICATIONS = "preventduplications";
 
-    private static final String BARCODETEMPLATE = "barcodetemplate";
-
     private static final String TEMPLATE = "template";
 
     private static final String SIZEMAX = "sizemax";
@@ -84,16 +82,9 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
                 importFolder.setTemplateId(null);
             else
                 importFolder.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
-            importFolder.setBarcodeTemplateId(null);
             refresh();
         };
         template.addChangedHandler(changeTemplateHandler);
-
-        SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, importFolder.getTemplateId(),
-                importFolder.getBarcodeTemplateId());
-        barcodeTemplate.addChangedHandler(changedHandler);
-        barcodeTemplate.setMultiple(false);
-        barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
 
         CheckboxItem delImport = new CheckboxItem();
         delImport.setName("delImport");
@@ -164,8 +155,8 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
         fillMode.setValue(importFolder.getFillMode());
         fillMode.addChangedHandler(changedHandler);
 
-        form.setItems(depth, size, startDate, template, barcodeTemplate, filler, fillMode, tags, updatePolicy,
-                importEmpty, preventDuplications, inheritRights, delImport);
+        form.setItems(depth, size, startDate, template, filler, fillMode, tags, updatePolicy, importEmpty,
+                preventDuplications, inheritRights, delImport);
 
         formsContainer.addMember(form);
 
@@ -206,12 +197,6 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
             importFolder.setTemplateId(null);
         else
             importFolder.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
-
-        if (form.getValue(BARCODETEMPLATE) == null || "".equals(form.getValueAsString(BARCODETEMPLATE)))
-            importFolder.setBarcodeTemplateId(null);
-        else
-            importFolder.setBarcodeTemplateId(Long.parseLong(form.getValueAsString(BARCODETEMPLATE)));
-
         if (form.getValue(FILLER) == null || "".equals(form.getValueAsString(FILLER)))
             importFolder.setFillerId(null);
         else

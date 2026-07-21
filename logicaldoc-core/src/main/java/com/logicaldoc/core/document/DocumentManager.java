@@ -208,7 +208,6 @@ public class DocumentManager {
             document.setFileSize(fileSize);
             if (document.getIndexed() != IndexingStatus.SKIP)
                 document.setIndexingStatus(IndexingStatus.TO_INDEX);
-            document.setBarcoded(false);
             document.setFilled(false);
             document.setSigned(false);
             document.setStamped(false);
@@ -362,7 +361,6 @@ public class DocumentManager {
             document.setStamped(false);
             document.setSigned(false);
             document.setFilled(false);
-            document.setBarcoded(false);
 
             if (document.getIndexed() != IndexingStatus.SKIP)
                 document.setIndexingStatus(IndexingStatus.TO_INDEX);
@@ -407,8 +405,6 @@ public class DocumentManager {
 
                 document.copyAttributes(oldDocument);
                 document.setFilled(oldDocument.isFilled());
-                document.setBarcoded(oldDocument.isBarcoded());
-                document.setBarcodeTemplateId(oldDocument.getBarcodeTemplateId());
                 document.setIndexingStatus(oldDocument.getIndexed());
                 document.setCustomId(oldDocument.getCustomId());
                 document.setStatus(oldDocument.getStatus());
@@ -856,8 +852,6 @@ public class DocumentManager {
 
             setTemplate(document, docVO);
 
-            setBarcodeTemplate(document, docVO);
-
             setFiller(document, docVO);
 
             // create a new version
@@ -926,17 +920,6 @@ public class DocumentManager {
         } else {
             document.setTemplate(null);
         }
-    }
-
-    private void setBarcodeTemplate(Document document, Document docVO) {
-        if ((document.getBarcodeTemplateId() == null && docVO.getBarcodeTemplateId() != null)
-                || (document.getBarcodeTemplateId() != null && docVO.getBarcodeTemplateId() == null)
-                || (document.getBarcodeTemplateId() == null && docVO.getBarcodeTemplateId() == null)
-                || !document.getBarcodeTemplateId().equals(docVO.getBarcodeTemplateId()))
-            document.setBarcoded(false);
-        else
-            document.setBarcoded(docVO.isBarcoded());
-        document.setBarcodeTemplateId(docVO.getBarcodeTemplateId());
     }
 
     private void checkCustomIdUniquenesOnUpdate(Document document, Document docVO) throws PersistenceException {
@@ -1278,7 +1261,6 @@ public class DocumentManager {
             cloned.setStamped(false);
             cloned.setSigned(false);
             cloned.setLinks(0);
-            cloned.setBarcoded(false);
             cloned.setFilled(false);
 
             if (!security)

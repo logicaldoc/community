@@ -405,8 +405,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
             document.setPasswordProtected(hit.isPasswordProtected());
             document.setLinks(hit.getLinks());
             document.setDocAttrs(hit.getDocAttrs());
-            document.setBarcoded(hit.isBarcoded());
-            document.setBarcodeTemplateId(hit.getBarcodeTemplateId());
+            document.setFillerId(hit.getFillerId());
+            document.setFillMode(hit.getFillMode().ordinal());
 
             if (hit.getRating() != null)
                 document.setRating(hit.getRating());

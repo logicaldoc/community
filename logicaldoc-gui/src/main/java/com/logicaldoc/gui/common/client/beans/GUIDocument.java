@@ -129,11 +129,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
     private int docAttrs = 0;
 
     /**
-     * Identifier of the barcode template to use to process this document
-     */
-    private Long barcodeTemplateId = null;
-
-    /**
      * Identifier of the Filler to be used by the autofill
      */
     private Long fillerId = null;
@@ -141,11 +136,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
     private int fillMode = 0;
 
     private boolean filled = false;
-
-    /**
-     * Indicates if the document has been processed by the barcodes processorsS
-     */
-    private boolean barcoded = false;
 
     /**
      * Just to indicate if this document is being used for collecting the
@@ -400,14 +390,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
         this.stamped = stamped;
     }
 
-    public boolean isBarcoded() {
-        return barcoded;
-    }
-
-    public void setBarcoded(boolean barcoded) {
-        this.barcoded = barcoded;
-    }
-
     public int getRating() {
         return rating;
     }
@@ -563,15 +545,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
     public void setLinks(int links) {
         this.links = links;
     }
-
-    public Long getBarcodeTemplateId() {
-        return barcodeTemplateId;
-    }
-
-    public void setBarcodeTemplateId(Long barcodeTemplateId) {
-        this.barcodeTemplateId = barcodeTemplateId;
-    }
-
+    
     public Long getCreatorId() {
         return creatorId;
     }

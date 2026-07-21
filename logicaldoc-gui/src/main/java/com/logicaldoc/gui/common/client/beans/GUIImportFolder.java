@@ -57,8 +57,6 @@ public class GUIImportFolder implements Serializable {
 
     private Long templateId;
 
-    private Long barcodeTemplateId;
-
     private int depth = 5;
 
     private boolean delImport = false;
@@ -331,14 +329,6 @@ public class GUIImportFolder implements Serializable {
             url += getPath();
         }
         return url;
-    }
-    
-    public Long getBarcodeTemplateId() {
-        return barcodeTemplateId;
-    }
-
-    public void setBarcodeTemplateId(Long barcodeTemplateId) {
-        this.barcodeTemplateId = barcodeTemplateId;
     }
 
     public boolean isPreventDuplications() {

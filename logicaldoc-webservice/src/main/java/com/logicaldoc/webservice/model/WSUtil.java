@@ -91,8 +91,6 @@ public class WSUtil {
             wsDoc.setNature(document.getNature());
             wsDoc.setFormId(document.getFormId());
             wsDoc.setPasswordProtected(document.isPasswordProtected() ? 1 : 0);
-            wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
-            wsDoc.setBarcoded(document.isBarcoded() ? 1 : 0);
             wsDoc.setFillerId(document.getFillerId());
             wsDoc.setFillMode(document.getFillMode().ordinal());
 
@@ -241,12 +239,10 @@ public class WSUtil {
 
         doc.setPublished(wsDoc.getPublished() == 1);
 
-        doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
         doc.setFillerId(wsDoc.getFillerId());
         doc.setFillMode(FillMode.values()[wsDoc.getFillMode()]);
 
         doc.setSigned(wsDoc.getSigned() == 1);
-        doc.setBarcoded(wsDoc.getBarcoded() == 1);
 
         return doc;
     }

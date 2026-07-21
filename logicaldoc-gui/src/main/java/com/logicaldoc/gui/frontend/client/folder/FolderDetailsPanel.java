@@ -73,7 +73,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
     private FolderInterfacePanel interfacePanel;
 
-    private FolderCapturePanel ocrPanel;
+    private FolderCapturePanel capturePanel;
 
     private EditingTabSet tabSet;
 
@@ -289,12 +289,12 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
             /*
              * Prepare the OCR tab
              */
-            if (ocrPanel != null) {
-                ocrPanel.destroy();
-                captureTabPanel.removeMember(ocrPanel);
+            if (capturePanel != null) {
+                capturePanel.destroy();
+                captureTabPanel.removeMember(capturePanel);
             }
-            ocrPanel = new FolderCapturePanel(folder, changeHandler);
-            captureTabPanel.addMember(ocrPanel);
+            capturePanel = new FolderCapturePanel(folder, changeHandler);
+            captureTabPanel.addMember(capturePanel);
         }
     }
 
@@ -407,8 +407,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
         }
 
         ChangedHandler templateChangedHandler = (ChangedEvent templateChangeEvent) -> {
-            folder.setBarcodeTemplateId(null);
-            ocrPanel.refresh(folder.getTemplateId());
+            capturePanel.refresh(folder.getTemplateId());
         };
         extendedPropertiesPanel = new FolderExtendedPropertiesPanel(folder, changeHandler, templateChangedHandler);
         if (Feature.enabled(Feature.TEMPLATE))
@@ -452,8 +451,8 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
                 tabSet.selectTab(interfaceTab);
         }
 
-        if (valid && ocrPanel != null && Feature.enabled(Feature.OCR)) {
-            valid = ocrPanel.validate();
+        if (valid && capturePanel != null && Feature.enabled(Feature.OCR)) {
+            valid = capturePanel.validate();
             if (!valid)
                 tabSet.selectTab(captureTab);
         }

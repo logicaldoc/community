@@ -25,673 +25,651 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "WSDocument")
 public class WSDocument implements Serializable {
 
-	@WSDoc(documented = false)
-	private static final long serialVersionUID = 1L;
+    @WSDoc(documented = false)
+    private static final long serialVersionUID = 1L;
 
-	@WSDoc(documented = false)
-	private static final Logger log = LoggerFactory.getLogger(WSDocument.class);
+    @WSDoc(documented = false)
+    private static final Logger log = LoggerFactory.getLogger(WSDocument.class);
 
-	@WSDoc(documented = false)
-	public static final int DOC_UNLOCKED = 0;
+    @WSDoc(documented = false)
+    public static final int DOC_UNLOCKED = 0;
 
-	@WSDoc(documented = false)
-	public static final int DOC_CHECKED_OUT = 1;
+    @WSDoc(documented = false)
+    public static final int DOC_CHECKED_OUT = 1;
 
-	@WSDoc(documented = false)
-	public static final int DOC_LOCKED = 2;
+    @WSDoc(documented = false)
+    public static final int DOC_LOCKED = 2;
 
-	@WSDoc(documented = false)
-	public static final int EXPORT_UNLOCKED = 0;
+    @WSDoc(documented = false)
+    public static final int EXPORT_UNLOCKED = 0;
 
-	@WSDoc(documented = false)
-	public static final int EXPORT_LOCKED = 1;
+    @WSDoc(documented = false)
+    public static final int EXPORT_LOCKED = 1;
 
-	@WSDoc(documented = false)
-	public static final int INDEX_TO_INDEX = 0;
+    @WSDoc(documented = false)
+    public static final int INDEX_TO_INDEX = 0;
 
-	@WSDoc(documented = false)
-	public static final int INDEX_INDEXED = 1;
+    @WSDoc(documented = false)
+    public static final int INDEX_INDEXED = 1;
 
-	@WSDoc(documented = false)
-	public static final int INDEX_SKIP = 2;
-	
-	@WSDoc(documented = false)
-	public static final int EMBED_TO_EMBED = 0;
+    @WSDoc(documented = false)
+    public static final int INDEX_SKIP = 2;
 
-	@WSDoc(documented = false)
-	public static final int EMBED_SKIP = 0;
-	
-	@WSDoc(description = "unique identifier ")
-	private long id;
+    @WSDoc(documented = false)
+    public static final int EMBED_TO_EMBED = 0;
 
-	private long fileSize = 0;
+    @WSDoc(documented = false)
+    public static final int EMBED_SKIP = 0;
 
-	/**
-	 * Whether document is checked out,locked or unlocked
-	 * 
-	 * @see DocumentStatus
-	 */
-	@WSDoc(required = false, description = "<b>0</b> = unlocked, <b>1</b> = checked out, <b>2</b> = locked")
-	private int status = DOC_UNLOCKED;
+    @WSDoc(description = "unique identifier ")
+    private long id;
 
-	@WSDoc(required = false)
-	private int exportStatus = EXPORT_UNLOCKED;
+    private long fileSize = 0;
 
-	@WSDoc(required = false)
-	private String version;
-	
-	@WSDoc(required = false)
-	private String fileVersion;
+    /**
+     * Whether document is checked out,locked or unlocked
+     * 
+     * @see DocumentStatus
+     */
+    @WSDoc(required = false, description = "<b>0</b> = unlocked, <b>1</b> = checked out, <b>2</b> = locked")
+    private int status = DOC_UNLOCKED;
 
-	@WSDoc(required = false, description = "custom revision")
-	private String revision;
-	
-	@WSDoc(description = "last publication date; format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'")
-	private String date;
+    @WSDoc(required = false)
+    private int exportStatus = EXPORT_UNLOCKED;
 
-	@WSDoc(required = false)
-	private String publisher;
+    @WSDoc(required = false)
+    private String version;
 
-	@WSDoc(required = false)
-	private long publisherId;
+    @WSDoc(required = false)
+    private String fileVersion;
 
-	@WSDoc(required = false)
-	private String creator;
+    @WSDoc(required = false, description = "custom revision")
+    private String revision;
 
-	@WSDoc(required = false)
-	private long creatorId;
+    @WSDoc(description = "last publication date; format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'")
+    private String date;
 
-	private String type;
+    @WSDoc(required = false)
+    private String publisher;
 
-	@WSDoc(required = false)
-	private Long lockUserId;
+    @WSDoc(required = false)
+    private long publisherId;
 
-	@WSDoc(required = false, description = "the date when the document was created; format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'")
-	private String creation;
+    @WSDoc(required = false)
+    private String creator;
 
-	private String fileName;
+    @WSDoc(required = false)
+    private long creatorId;
 
-	@WSDoc(required = false, description = "<b>0</b> = to index, <b>1</b> = indexed, <b>2</b> = skip indexing")
-	private int indexed = INDEX_TO_INDEX;
+    private String type;
 
-	@WSDoc(required = false, description = "<b>0</b> = to embed, <b>1</b> = skip embedding")
-	private int embedded = EMBED_TO_EMBED;
-	
-	@WSDoc(required = false)
-	private int signed = 0;
+    @WSDoc(required = false)
+    private Long lockUserId;
 
-	@WSDoc(required = false, description = "<b>1</b> if the document contains at least one stamp")
-	private int stamped = 0;
+    @WSDoc(required = false, description = "the date when the document was created; format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'")
+    private String creation;
 
-	@WSDoc(required = false, description = "tags applied to the document")
-	private List<String> tags = new ArrayList<>();
+    private String fileName;
 
-	@WSDoc(description = "parent folder")
-	private Long folderId;
+    @WSDoc(required = false, description = "<b>0</b> = to index, <b>1</b> = indexed, <b>2</b> = skip indexing")
+    private int indexed = INDEX_TO_INDEX;
 
-	@WSDoc(required = false, description = "id of the template assigned to the document")
-	private Long templateId;
+    @WSDoc(required = false, description = "<b>0</b> = to embed, <b>1</b> = skip embedding")
+    private int embedded = EMBED_TO_EMBED;
 
-	@WSDoc(required = false, description = "unique custom identifier")
-	private String customId;
+    @WSDoc(required = false)
+    private int signed = 0;
 
-	@WSDoc(required = false, description = "<b>0</b> = not immutable, <b>1</b> = immutable")
-	private int immutable = 0;
+    @WSDoc(required = false, description = "<b>1</b> if the document contains at least one stamp")
+    private int stamped = 0;
 
-	@WSDoc(required = false)
-	private String digest;
+    @WSDoc(required = false, description = "tags applied to the document")
+    private List<String> tags = new ArrayList<>();
 
-	@WSDoc(required = false)
-	private String exportName;
+    @WSDoc(description = "parent folder")
+    private Long folderId;
 
-	@WSDoc(required = false)
-	private Long exportId = null;
+    @WSDoc(required = false, description = "id of the template assigned to the document")
+    private Long templateId;
 
-	@WSDoc(required = false, description = "used for aliases, refers to another document")
-	private Long docRef;
+    @WSDoc(required = false, description = "unique custom identifier")
+    private String customId;
 
-	@WSDoc(required = false, description = "if used, defines the reference type (use pdf for the PDF Conversion)")
-	private String docRefType;
+    @WSDoc(required = false, description = "<b>0</b> = not immutable, <b>1</b> = immutable")
+    private int immutable = 0;
 
-	@WSDoc(required = false, description = "user that has deleted the document")
-	private Long deleteUserId;
+    @WSDoc(required = false)
+    private String digest;
 
-	@WSDoc(required = false, description = "array of attributes")
-	private List<WSAttribute> attributes = new ArrayList<>();
+    @WSDoc(required = false)
+    private String exportName;
 
-	@WSDoc(required = false, description = "language of the document; <a href='/wiki/LanguageSpecification'>See specification</a>")
-	private String language;
+    @WSDoc(required = false)
+    private Long exportId = null;
 
-	@WSDoc(required = false, description = "contains the snippet search text")
-	private String summary;
+    @WSDoc(required = false, description = "used for aliases, refers to another document")
+    private Long docRef;
 
-	@WSDoc(required = false, description = "full text search score")
-	private Integer score;
+    @WSDoc(required = false, description = "if used, defines the reference type (use pdf for the PDF Conversion)")
+    private String docRefType;
 
-	@WSDoc(required = false)
-	private String icon;
+    @WSDoc(required = false, description = "user that has deleted the document")
+    private Long deleteUserId;
 
-	@WSDoc(required = false)
-	private String comment;
+    @WSDoc(required = false, description = "array of attributes")
+    private List<WSAttribute> attributes = new ArrayList<>();
 
-	@WSDoc(required = false)
-	private String lastNote;
+    @WSDoc(required = false, description = "language of the document; <a href='/wiki/LanguageSpecification'>See specification</a>")
+    private String language;
 
-	@WSDoc(required = false)
-	private String lastModified;
+    @WSDoc(required = false, description = "contains the snippet search text")
+    private String summary;
 
-	@WSDoc(required = false)
-	private Integer rating;
+    @WSDoc(required = false, description = "full text search score")
+    private Integer score;
 
-	@WSDoc(required = false, description = "current workflow's status where the document is in")
-	private String workflowStatus;
+    @WSDoc(required = false)
+    private String icon;
 
-	@WSDoc(required = false, description = "current workflow's status display informations")
-	private String workflowStatusDisplay;
+    @WSDoc(required = false)
+    private String comment;
 
-	@WSDoc(required = false, description = "optional color assigned to the document")
-	private String color;
+    @WSDoc(required = false)
+    private String lastNote;
 
-	@WSDoc(required = false, description = "if it is not set to <b>1</b>, the document is marked as not published")
-	private int published = 1;
+    @WSDoc(required = false)
+    private String lastModified;
 
-	@WSDoc(required = false)
-	private String startPublishing;
+    @WSDoc(required = false)
+    private Integer rating;
 
-	@WSDoc(required = false)
-	private String stopPublishing;
+    @WSDoc(required = false, description = "current workflow's status where the document is in")
+    private String workflowStatus;
 
-	@WSDoc(required = false, description = "number of pages (default <b>1</b>)")
-	private int pages = -1;
+    @WSDoc(required = false, description = "current workflow's status display informations")
+    private String workflowStatusDisplay;
 
-	@WSDoc(required = false, description = "<b>0</b> = document, <b>1</b> = form")
-	private int nature = AbstractDocument.NATURE_DOC;
+    @WSDoc(required = false, description = "optional color assigned to the document")
+    private String color;
 
-	@WSDoc(required = false, description = "the last modified date; format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'")
-	private Long formId = null;
+    @WSDoc(required = false, description = "if it is not set to <b>1</b>, the document is marked as not published")
+    private int published = 1;
 
-	@WSDoc(required = false, description = "indicates whether the document is protected by a password")
-	private Integer passwordProtected = 0;
+    @WSDoc(required = false)
+    private String startPublishing;
 
-	@WSDoc(required = false, description = "identifier of the barcode template to use to process this document")
-	private Long barcodeTemplateId = null;
+    @WSDoc(required = false)
+    private String stopPublishing;
 
-	@WSDoc(required = false, description = "indicates if the document has been processed by the barcode processor: <b>0</b> = to process, <b>1</b> = processed")
-	private int barcoded = 0;
-	
-	@WSDoc(required = false, description = "identifier of the filler to use when autofilling")
-	private Long fillerId;
+    @WSDoc(required = false, description = "number of pages (default <b>1</b>)")
+    private int pages = -1;
 
-	@WSDoc(required = false, description = "how the fill should be done: 0=all, 1=immediate, 2=deferred")
+    @WSDoc(required = false, description = "<b>0</b> = document, <b>1</b> = form")
+    private int nature = AbstractDocument.NATURE_DOC;
+
+    @WSDoc(required = false, description = "the last modified date; format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'")
+    private Long formId = null;
+
+    @WSDoc(required = false, description = "indicates whether the document is protected by a password")
+    private Integer passwordProtected = 0;
+
+    @WSDoc(required = false, description = "identifier of the filler to use when autofilling")
+    private Long fillerId;
+
+    @WSDoc(required = false, description = "how the fill should be done: 0=all, 1=immediate, 2=deferred")
     private int fillMode;
-	
-	public Collection<String> listAttributeNames() {
-		List<String> names = new ArrayList<>();
-		for (WSAttribute att : getAttributes()) {
-			names.add(att.getName());
-		}
-		return names;
-	}
 
-	public WSAttribute attribute(String name) {
-		for (WSAttribute att : getAttributes()) {
-			if (att.getName().equals(name))
-				return att;
-		}
-		return null;
-	}
-	
+    public Collection<String> listAttributeNames() {
+        List<String> names = new ArrayList<>();
+        for (WSAttribute att : getAttributes()) {
+            names.add(att.getName());
+        }
+        return names;
+    }
+
+    public WSAttribute attribute(String name) {
+        for (WSAttribute att : getAttributes()) {
+            if (att.getName().equals(name))
+                return att;
+        }
+        return null;
+    }
+
     public long getFileSize() {
-		return fileSize;
-	}
-
-	public void setFileSize(long fileSize) {
-		this.fileSize = fileSize;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	public int getExportStatus() {
-		return exportStatus;
-	}
-
-	public void setExportStatus(int exportStatus) {
-		this.exportStatus = exportStatus;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public String getFileVersion() {
-		return fileVersion;
-	}
-
-	public void setFileVersion(String fileVersion) {
-		this.fileVersion = fileVersion;
-	}
-
-	public String getPublisher() {
-		return publisher;
-	}
-
-	public void setPublisher(String publisher) {
-		this.publisher = publisher;
-	}
-
-	public long getPublisherId() {
-		return publisherId;
-	}
-
-	public void setPublisherId(long publisherId) {
-		this.publisherId = publisherId;
-	}
-
-	public String getCreator() {
-		return creator;
-	}
-
-	public void setCreator(String creator) {
-		this.creator = creator;
-	}
-
-	public long getCreatorId() {
-		return creatorId;
-	}
-
-	public void setCreatorId(long creatorId) {
-		this.creatorId = creatorId;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public Long getLockUserId() {
-		return lockUserId;
-	}
-
-	public void setLockUserId(Long lockUserId) {
-		this.lockUserId = lockUserId;
-	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	public int getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(int indexed) {
-		this.indexed = indexed;
-	}
-
-	public int getSigned() {
-		return signed;
-	}
-
-	public void setSigned(int signed) {
-		this.signed = signed;
-	}
-
-	public List<String> getTags() {
-		return tags;
-	}
-
-	public void setTags(List<String> tags) {
-		if (tags == null)
-			tags = new ArrayList<>();
-		this.tags = tags;
-	}
-
-	public Long getFolderId() {
-		return folderId;
-	}
-
-	public void setFolderId(Long folderId) {
-		this.folderId = folderId;
-	}
-
-	public Long getTemplateId() {
-		return templateId;
-	}
-
-	public void setTemplateId(Long templateId) {
-		this.templateId = templateId;
-	}
-
-	public String getCustomId() {
-		return customId;
-	}
-
-	public void setCustomId(String customId) {
-		this.customId = customId;
-	}
-
-	public int getImmutable() {
-		return immutable;
-	}
-
-	public void setImmutable(int immutable) {
-		this.immutable = immutable;
-	}
-
-	public String getDigest() {
-		return digest;
-	}
-
-	public void setDigest(String digest) {
-		this.digest = digest;
-	}
-
-	public String getExportName() {
-		return exportName;
-	}
-
-	public void setExportName(String exportName) {
-		this.exportName = exportName;
-	}
-
-	public Long getExportId() {
-		return exportId;
-	}
-
-	public void setExportId(Long exportId) {
-		this.exportId = exportId;
-	}
-
-	public Long getDocRef() {
-		return docRef;
-	}
-
-	public void setDocRef(Long docRef) {
-		this.docRef = docRef;
-	}
-
-	public Long getDeleteUserId() {
-		return deleteUserId;
-	}
-
-	public void setDeleteUserId(Long deleteUserId) {
-		this.deleteUserId = deleteUserId;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getDate() {
-		return date;
-	}
-
-	public void setDate(String date) {
-		this.date = date;
-	}
-
-	public String getCreation() {
-		return creation;
-	}
-
-	public void setCreation(String creation) {
-		this.creation = creation;
-	}
-
-	public List<WSAttribute> getAttributes() {
-		return attributes;
-	}
-
-	public WSAttribute getAttribute(String name) {
-		if (attributes == null)
-			return null;
-		for (WSAttribute att : attributes) {
-			if (att.getName().equals(name))
-				return att;
-		}
-		return null;
-	}
-
-	public void setAttributes(List<WSAttribute> attributes) {
-		if (attributes == null)
-			this.attributes = new ArrayList<>();
-		else
-			this.attributes = attributes;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
-	public String getSummary() {
-		return summary;
-	}
-
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
-
-	public Integer getScore() {
-		return score;
-	}
-
-	public void setScore(Integer score) {
-		this.score = score;
-	}
-
-	public String getIcon() {
-		return icon;
-	}
-
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-	public String getLastModified() {
-		return lastModified;
-	}
-
-	public void setLastModified(String lastModified) {
-		this.lastModified = lastModified;
-	}
-
-	public Integer getRating() {
-		return rating;
-	}
-
-	public void setRating(Integer rating) {
-		this.rating = rating;
-	}
-
-	public void addAttribute(WSAttribute att) {
-		if (attributes == null)
-			attributes = new ArrayList<>();
-		attributes.add(att);
-	}
-
-	public void addTag(String tag) {
-		if (tags == null)
-			tags = new ArrayList<>();
-		if (!tags.contains(tag))
-			tags.add(tag);
-	}
-
-	public String getWorkflowStatus() {
-		return workflowStatus;
-	}
-
-	public void setWorkflowStatus(String workflowStatus) {
-		this.workflowStatus = workflowStatus;
-	}
-
-	public String getWorkflowStatusDisplay() {
-		return workflowStatusDisplay;
-	}
-
-	public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
-		this.workflowStatusDisplay = workflowStatusDisplay;
-	}
-
-	public int getPublished() {
-		return published;
-	}
-
-	public void setPublished(int published) {
-		this.published = published;
-	}
-
-	public String getStartPublishing() {
-		return startPublishing;
-	}
-
-	public void setStartPublishing(String startPublishing) {
-		this.startPublishing = startPublishing;
-	}
-
-	public String getStopPublishing() {
-		return stopPublishing;
-	}
-
-	public void setStopPublishing(String stopPublishing) {
-		this.stopPublishing = stopPublishing;
-	}
-
-	public String getDocRefType() {
-		return docRefType;
-	}
-
-	public void setDocRefType(String docRefType) {
-		this.docRefType = docRefType;
-	}
-
-	public int getPages() {
-		return pages;
-	}
-
-	public void setPages(int pages) {
-		this.pages = pages;
-	}
-
-	public int getStamped() {
-		return stamped;
-	}
-
-	public void setStamped(int stamped) {
-		this.stamped = stamped;
-	}
-
-	public int getNature() {
-		return nature;
-	}
-
-	public void setNature(int nature) {
-		this.nature = nature;
-	}
-
-	public Long getFormId() {
-		return formId;
-	}
-
-	public void setFormId(Long formId) {
-		this.formId = formId;
-	}
-
-	public Integer getPasswordProtected() {
-		return passwordProtected;
-	}
-
-	public void setPasswordProtected(Integer passwordProtected) {
-		this.passwordProtected = passwordProtected;
-	}
-
-	public Long getBarcodeTemplateId() {
-		return barcodeTemplateId;
-	}
-
-	public void setBarcodeTemplateId(Long barcodeTemplateId) {
-		this.barcodeTemplateId = barcodeTemplateId;
-	}
-
-	public int getBarcoded() {
-		return barcoded;
-	}
-
-	public void setBarcoded(int barcoded) {
-		this.barcoded = barcoded;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
-	public String getLastNote() {
-		return lastNote;
-	}
-
-	public void setLastNote(String lastNote) {
-		this.lastNote = lastNote;
-	}
-
-	public String getRevision() {
-		return revision;
-	}
-
-	public void setRevision(String revision) {
-		this.revision = revision;
-	}
-
-	public int getEmbedded() {
-		return embedded;
-	}
-
-	public void setEmbedded(int embedded) {
-		this.embedded = embedded;
-	}
-
-	public Long getFillerId() {
-		return fillerId;
-	}
-
-	public void setFillerId(Long fillerId) {
-		this.fillerId = fillerId;
-	}
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getExportStatus() {
+        return exportStatus;
+    }
+
+    public void setExportStatus(int exportStatus) {
+        this.exportStatus = exportStatus;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getFileVersion() {
+        return fileVersion;
+    }
+
+    public void setFileVersion(String fileVersion) {
+        this.fileVersion = fileVersion;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public long getPublisherId() {
+        return publisherId;
+    }
+
+    public void setPublisherId(long publisherId) {
+        this.publisherId = publisherId;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(long creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Long getLockUserId() {
+        return lockUserId;
+    }
+
+    public void setLockUserId(Long lockUserId) {
+        this.lockUserId = lockUserId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public int getIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(int indexed) {
+        this.indexed = indexed;
+    }
+
+    public int getSigned() {
+        return signed;
+    }
+
+    public void setSigned(int signed) {
+        this.signed = signed;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        if (tags == null)
+            tags = new ArrayList<>();
+        this.tags = tags;
+    }
+
+    public Long getFolderId() {
+        return folderId;
+    }
+
+    public void setFolderId(Long folderId) {
+        this.folderId = folderId;
+    }
+
+    public Long getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(Long templateId) {
+        this.templateId = templateId;
+    }
+
+    public String getCustomId() {
+        return customId;
+    }
+
+    public void setCustomId(String customId) {
+        this.customId = customId;
+    }
+
+    public int getImmutable() {
+        return immutable;
+    }
+
+    public void setImmutable(int immutable) {
+        this.immutable = immutable;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
+    public String getExportName() {
+        return exportName;
+    }
+
+    public void setExportName(String exportName) {
+        this.exportName = exportName;
+    }
+
+    public Long getExportId() {
+        return exportId;
+    }
+
+    public void setExportId(Long exportId) {
+        this.exportId = exportId;
+    }
+
+    public Long getDocRef() {
+        return docRef;
+    }
+
+    public void setDocRef(Long docRef) {
+        this.docRef = docRef;
+    }
+
+    public Long getDeleteUserId() {
+        return deleteUserId;
+    }
+
+    public void setDeleteUserId(Long deleteUserId) {
+        this.deleteUserId = deleteUserId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getCreation() {
+        return creation;
+    }
+
+    public void setCreation(String creation) {
+        this.creation = creation;
+    }
+
+    public List<WSAttribute> getAttributes() {
+        return attributes;
+    }
+
+    public WSAttribute getAttribute(String name) {
+        if (attributes == null)
+            return null;
+        for (WSAttribute att : attributes) {
+            if (att.getName().equals(name))
+                return att;
+        }
+        return null;
+    }
+
+    public void setAttributes(List<WSAttribute> attributes) {
+        if (attributes == null)
+            this.attributes = new ArrayList<>();
+        else
+            this.attributes = attributes;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public void addAttribute(WSAttribute att) {
+        if (attributes == null)
+            attributes = new ArrayList<>();
+        attributes.add(att);
+    }
+
+    public void addTag(String tag) {
+        if (tags == null)
+            tags = new ArrayList<>();
+        if (!tags.contains(tag))
+            tags.add(tag);
+    }
+
+    public String getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(String workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    public String getWorkflowStatusDisplay() {
+        return workflowStatusDisplay;
+    }
+
+    public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
+        this.workflowStatusDisplay = workflowStatusDisplay;
+    }
+
+    public int getPublished() {
+        return published;
+    }
+
+    public void setPublished(int published) {
+        this.published = published;
+    }
+
+    public String getStartPublishing() {
+        return startPublishing;
+    }
+
+    public void setStartPublishing(String startPublishing) {
+        this.startPublishing = startPublishing;
+    }
+
+    public String getStopPublishing() {
+        return stopPublishing;
+    }
+
+    public void setStopPublishing(String stopPublishing) {
+        this.stopPublishing = stopPublishing;
+    }
+
+    public String getDocRefType() {
+        return docRefType;
+    }
+
+    public void setDocRefType(String docRefType) {
+        this.docRefType = docRefType;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
+    public int getStamped() {
+        return stamped;
+    }
+
+    public void setStamped(int stamped) {
+        this.stamped = stamped;
+    }
+
+    public int getNature() {
+        return nature;
+    }
+
+    public void setNature(int nature) {
+        this.nature = nature;
+    }
+
+    public Long getFormId() {
+        return formId;
+    }
+
+    public void setFormId(Long formId) {
+        this.formId = formId;
+    }
+
+    public Integer getPasswordProtected() {
+        return passwordProtected;
+    }
+
+    public void setPasswordProtected(Integer passwordProtected) {
+        this.passwordProtected = passwordProtected;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getLastNote() {
+        return lastNote;
+    }
+
+    public void setLastNote(String lastNote) {
+        this.lastNote = lastNote;
+    }
+
+    public String getRevision() {
+        return revision;
+    }
+
+    public void setRevision(String revision) {
+        this.revision = revision;
+    }
+
+    public int getEmbedded() {
+        return embedded;
+    }
+
+    public void setEmbedded(int embedded) {
+        this.embedded = embedded;
+    }
+
+    public Long getFillerId() {
+        return fillerId;
+    }
+
+    public void setFillerId(Long fillerId) {
+        this.fillerId = fillerId;
+    }
 
     public int getFillMode() {
         return fillMode;

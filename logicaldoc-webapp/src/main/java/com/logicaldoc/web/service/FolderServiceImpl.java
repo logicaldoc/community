@@ -186,7 +186,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         guiFolder.setGrid(folder.getGrid());
         guiFolder.setQuotaThreshold(folder.getQuotaThreshold());
         guiFolder.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList());
-        guiFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
         guiFolder.setFillerId(folder.getFillerId());
         guiFolder.setFillMode(folder.getFillMode().ordinal());
 
@@ -655,7 +654,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             folder.setQuotaThreshold(guiFolder.getQuotaThreshold());
             folder.setQuotaAlertRecipients(guiFolder.getQuotaAlertRecipientsAsString());
             folder.setGrid(guiFolder.getGrid());
-            folder.setBarcodeTemplateId(guiFolder.getBarcodeTemplateId());
             folder.setFillerId(guiFolder.getFillerId());
             folder.setFillMode(FillMode.values()[guiFolder.getFillMode()]);
 

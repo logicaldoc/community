@@ -549,12 +549,10 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
         // Ocr template at folder level should be present
         doc.setFileName("test123");
-        doc.getFolder().setBarcodeTemplateId(1L);
         testSubject.store(doc);
 
         // The document template should be null
         doc.setFileName("test123");
-        doc.getFolder().setBarcodeTemplateId(null);
         doc.setTemplate(null);
         testSubject.store(doc);
 

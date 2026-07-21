@@ -137,13 +137,6 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     @Column(name = "ld_grid")
     private String grid;
 
-    /**
-     * Identifier of the barcode template to use to process the documents inside
-     * this folder
-     */
-    @Column(name = "ld_barcodetemplateid")
-    private Long barcodeTemplateId = null;
-
     @Column(name = "ld_tile")
     private String tile;
 
@@ -210,9 +203,9 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
         this.path = source.path;
         this.pathExtended = source.pathExtended;
         this.grid = source.grid;
-        this.barcodeTemplateId = source.barcodeTemplateId;
         this.tile = source.tile;
         this.fillerId = source.fillerId;
+        this.fillMode = source.fillMode;
 
         setTemplate(source.getTemplate());
         setTemplateId(source.getTemplateId());
@@ -590,14 +583,6 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
 
     public void setPathExtended(String pathExtended) {
         this.pathExtended = pathExtended;
-    }
-
-    public Long getBarcodeTemplateId() {
-        return barcodeTemplateId;
-    }
-
-    public void setBarcodeTemplateId(Long barcodeTemplateId) {
-        this.barcodeTemplateId = barcodeTemplateId;
     }
 
     @Override
