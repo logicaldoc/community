@@ -241,7 +241,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
 
     @Transient
     private Long documentTemplateId;
-
+    
     protected AbstractDocument() {
         super();
         setFilled(false);

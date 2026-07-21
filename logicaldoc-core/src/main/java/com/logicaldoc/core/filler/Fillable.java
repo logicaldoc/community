@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 /**
  * An abstract extension of {@link ExtensibleObject} that adds the necessary to
@@ -20,15 +21,18 @@ public abstract class Fillable extends ExtensibleObject {
 
     private static final long serialVersionUID = 1L;
 
+    public enum FillMode {
+        ALL, IMMEDIATE, DEFERRED;
+    }
+    
     /**
      * ID of the filler to use for autofill operations
      */
     @Column(name = "ld_fillerid", nullable = true)
     protected Long fillerId;
 
-    public enum FillMode {
-        ALL, IMMEDIATE, DEFERRED;
-    }
+    @Transient
+    private String fillerName;
     
     /**
      * Indicates id the object should be filled by listener, by task or both
@@ -51,6 +55,14 @@ public abstract class Fillable extends ExtensibleObject {
 
     public void setFillMode(FillMode fillMode) {
         this.fillMode = fillMode;
+    }
+    
+    public String getFillerName() {
+        return fillerName;
+    }
+
+    public void setFillerName(String fillerName) {
+        this.fillerName = fillerName;
     }
 
     @Override
