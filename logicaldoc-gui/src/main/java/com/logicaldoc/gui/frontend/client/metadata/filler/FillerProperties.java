@@ -50,7 +50,7 @@ public class FillerProperties extends FillerDetailsTab {
 
 	private static final String OPERATOR = "operator";
 
-	private static final String ATTRIBUTE = "attribute";
+	private static final String OBJECT_DETECTION = "detection";
 
 	private static final String CANDIDATE = "candidate";
 
@@ -228,7 +228,7 @@ public class FillerProperties extends FillerDetailsTab {
 		AdvancedCriteria thresholdCriteria = new AdvancedCriteria(OperatorId.OR,
 				new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, TAG),
 						new Criterion(TYPE, OperatorId.EQUALS, TEMPLATE),
-						new Criterion(TYPE, OperatorId.EQUALS, ATTRIBUTE) });
+						new Criterion(TYPE, OperatorId.EQUALS, OBJECT_DETECTION) });
 		threshold.setVisibleWhen(thresholdCriteria);
 		threshold.setRequiredWhen(thresholdCriteria);
 
@@ -247,7 +247,7 @@ public class FillerProperties extends FillerDetailsTab {
 
 		AdvancedCriteria modelVisible = new AdvancedCriteria(OperatorId.OR,
 				new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, LANGUAGE),
-						new Criterion(TYPE, OperatorId.EQUALS, ATTRIBUTE),
+						new Criterion(TYPE, OperatorId.EQUALS, OBJECT_DETECTION),
 						new AdvancedCriteria(OperatorId.AND,
 								new Criterion[] { new Criterion(TYPE, OperatorId.EQUALS, TAG),
 										new Criterion(STRATEGY, OperatorId.EQUALS, MODEL) }) });
@@ -270,16 +270,16 @@ public class FillerProperties extends FillerDetailsTab {
 		embeddingSelector.setVisibleWhen(embeddingVisible);
 		embeddingSelector.setRequiredWhen(embeddingVisible);
 
-		AdvancedCriteria attributeSelected = new AdvancedCriteria(TYPE, OperatorId.EQUALS, ATTRIBUTE);
-		candidate.setVisibleWhen(attributeSelected);
-		candidate.setRequiredWhen(attributeSelected);
-		attribute.setVisibleWhen(attributeSelected);
-		attribute.setRequiredWhen(attributeSelected);
-		format.setVisibleWhen(attributeSelected);
-		decimalSep.setVisibleWhen(attributeSelected);
-		groupingSep.setVisibleWhen(attributeSelected);
-		exclusionRegex.setVisibleWhen(attributeSelected);
-		inclusionRegex.setVisibleWhen(attributeSelected);
+		AdvancedCriteria objectDetectionSelected = new AdvancedCriteria(TYPE, OperatorId.EQUALS, OBJECT_DETECTION);
+		candidate.setVisibleWhen(objectDetectionSelected);
+		candidate.setRequiredWhen(objectDetectionSelected);
+		attribute.setVisibleWhen(objectDetectionSelected);
+		attribute.setRequiredWhen(objectDetectionSelected);
+		format.setVisibleWhen(objectDetectionSelected);
+		decimalSep.setVisibleWhen(objectDetectionSelected);
+		groupingSep.setVisibleWhen(objectDetectionSelected);
+		exclusionRegex.setVisibleWhen(objectDetectionSelected);
+		inclusionRegex.setVisibleWhen(objectDetectionSelected);
 
 		form.setItems(id, type, strategy, name, label, overwrite, onCheckin, modelSelector, embeddingSelector,
 				threshold, candidate, attribute, format, decimalSep, groupingSep, exclusionRegex, inclusionRegex,
@@ -325,7 +325,7 @@ public class FillerProperties extends FillerDetailsTab {
 			modelSelector.fetchData();
 
 			chainStack.setVisible(CHAIN.equals(selectedType));
-			criteriaStack.setVisible(ATTRIBUTE.equals(selectedType));
+			criteriaStack.setVisible(OBJECT_DETECTION.equals(selectedType));
 		});
 		return type;
 	}
@@ -355,7 +355,7 @@ public class FillerProperties extends FillerDetailsTab {
 		return switch (fillerType) {
 			case TAG -> "zeroshot,classifier";
 			case LANGUAGE -> LANGUAGE;
-			case ATTRIBUTE -> YOLO;
+			case OBJECT_DETECTION -> YOLO;
 			default -> null;
 		};
 	}
@@ -369,7 +369,7 @@ public class FillerProperties extends FillerDetailsTab {
 		filler.setDescription(form.getValueAsString(DESCRIPTION));
 		filler.setType(form.getValueAsString(TYPE));
 		filler.setCandidate(form.getValueAsString(CANDIDATE));
-		filler.setAttribute(form.getValueAsString(ATTRIBUTE));
+		filler.setAttribute(form.getValueAsString("attribute"));
 		filler.setFormat(form.getValueAsString("format"));
 		filler.setDecimalSeparator(form.getValueAsString("decimalseparator"));
 		filler.setGroupingSeparator(form.getValueAsString("groupingseparator"));
@@ -410,7 +410,7 @@ public class FillerProperties extends FillerDetailsTab {
 		}
 
 		// Criteria handling
-		if (ATTRIBUTE.equals(filler.getType())) {
+		if (OBJECT_DETECTION.equals(filler.getType())) {
 			filler.getCriteria().clear();
 
 			com.smartgwt.client.data.Record[] criteriaRecords = criteriaGrid.getRecordList().toArray();
@@ -519,7 +519,7 @@ public class FillerProperties extends FillerDetailsTab {
 
 		// Configure the chain stack
 		criteriaStack.setHeight100();
-		criteriaStack.setVisible(ATTRIBUTE.equals(filler.getType()));
+		criteriaStack.setVisible(OBJECT_DETECTION.equals(filler.getType()));
 
 		// Section that holds the grid + selector
 		SectionStackSection section = new SectionStackSection("<b>" + I18N.message("criteria") + "</b>");
