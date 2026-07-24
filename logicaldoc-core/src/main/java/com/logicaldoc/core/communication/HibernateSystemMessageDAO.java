@@ -183,15 +183,6 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
     }
 
     @Override
-    public void initialize(SystemMessage message) {
-        refresh(message);
-
-        for (Recipient recipient : message.getRecipients()) {
-            recipient.getName();
-        }
-    }
-
-    @Override
     public List<SystemMessage> findMessagesToBeSent(Message.Type type, int maxTrial) throws PersistenceException {
         StringBuilder sql = new StringBuilder(
                 """

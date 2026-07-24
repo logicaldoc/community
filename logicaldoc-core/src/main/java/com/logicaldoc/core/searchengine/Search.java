@@ -323,7 +323,7 @@ public abstract class Search {
         UserDAO uDao = UserDAO.get();
         try {
             searchUser = uDao.findById(options.getUserId());
-            uDao.initialize(searchUser);
+            searchUser = uDao.initialize(searchUser);
         } catch (PersistenceException e1) {
             throw new SearchException(e1);
         }

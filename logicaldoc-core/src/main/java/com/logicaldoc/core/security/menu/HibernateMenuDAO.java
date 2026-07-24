@@ -70,7 +70,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
         List<Menu> coll = new ArrayList<>();
 
         try {
-            User user = userDAO.findById(userId);
+            User user = userDAO.findById(userId, true);
             if (user == null)
                 return coll;
 
@@ -120,6 +120,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
              */
             if (user.getGroups().isEmpty())
                 return coll;
+            
+            
             StringBuilder query1 = new StringBuilder("""
                                                         select distinct(_entity)
                                                           from Menu _entity
@@ -131,11 +133,12 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
             query1.append("""
                           ) and _entity.parentId = :parentId
                             and _entity.id != _entity.parentId
-                            and _entity.enabled = true
                           """);
+            if(enabledOnly)
+                query1.append(" and _entity.enabled = true");
             if (type != null)
                 query1.append(" and _entity.type = %s".formatted(type.toString()));
-
+            
             coll = findByObjectQuery(query1.toString(), Map.of(PARENT_ID, parentId), null);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -500,8 +503,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
             if (user.isMemberOf(Group.GROUP_ADMIN))
                 return findIdsByWhere("_entity.parentId = %d".formatted(parentId), null, null);
 
-            Set<Group> precoll = user.getGroups();
-            if (!precoll.isEmpty()) {
+            Set<Group> userGroups = user.getGroups();
+            if (!userGroups.isEmpty()) {
                 StringBuilder query = new StringBuilder("""
                                                         select distinct(A.ld_menuid)
                                                           from ld_menu_acl A, ld_menu B
@@ -511,7 +514,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
                                                            and A.ld_read = 1
                                                            and A.ld_groupid in (
                                                         """.formatted(parentId));
-                query.append(precoll.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")))
+                query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")))
                         .append(")");
 
                 ids = queryForList(query.toString(), Long.class);
@@ -532,7 +535,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
         Menu menu = findById(parentId);
         while (st.hasMoreTokens()) {
-            initialize(menu);
+            menu = initialize(menu);
             String name = st.nextToken();
 
             List<Menu> childs = findByName(menu, name, false);
@@ -540,7 +543,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
                 menu = createNewMenu(name, tenantId, type, menu);
             } else {
                 menu = childs.iterator().next();
-                initialize(menu);
+                menu = initialize(menu);
             }
         }
 

@@ -321,14 +321,17 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     }
 
     @Override
-    public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
+    public GUIValue changePassword(
+            Long requestorUserId,
+            long userId,
+            String oldPassword,
+            String newPassword,
             boolean notify) {
         try {
             UserDAO userDao = UserDAO.get();
-            User user = userDao.findById(userId);
+            User user = userDao.findById(userId, true);
             if (user == null)
                 throw new ServerException(String.format("User %s not found", userId));
-            userDao.initialize(user);
 
             User currentUser = getSessionUser();
 
@@ -401,9 +404,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         UserDAO userDao = UserDAO.get();
         try {
             User user = userDao.findById(userId, true);
-            user.addGroup(GroupDAO.get().findById(groupId));
+            user.addGroup(GroupDAO.get().findById(groupId, true));
             userDao.store(user);
-            userDao.initialize(user);
         } catch (PersistenceException e) {
             throwServerException(session, log, e);
         }
@@ -416,10 +418,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         UserDAO userDao = UserDAO.get();
         GroupDAO groupDao = GroupDAO.get();
         try {
-            Group grp = groupDao.findById(groupId);
-            groupDao.initialize(grp);
-            for (User user : grp.getUsers()) {
-                userDao.initialize(user);
+            Group grp = groupDao.findById(groupId, true);
+            for (User user : userDao.initialize(grp.getUsers())) {
                 user.removeGroup(groupId);
                 userDao.store(user);
             }
@@ -478,10 +478,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         UserDAO userDao = UserDAO.get();
 
         try {
-            User user = userDao.findById(userId);
+            User user = userDao.findById(userId, true);
             if (user != null) {
-                userDao.initialize(user);
-
                 GUIUser guiUser = new GUIUser();
                 guiUser.setId(userId);
                 guiUser.setTenant(getTenant(user.getTenantId()));
@@ -632,9 +630,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             GroupDAO groupDao = GroupDAO.get();
             Group grp;
             if (group.getId() != 0) {
-                grp = groupDao.findById(group.getId());
-                groupDao.initialize(grp);
-
+                grp = groupDao.findById(group.getId(), true);
                 grp.setName(group.getName());
                 grp.setDescription(group.getDescription());
 
@@ -759,8 +755,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
             guiUser.setId(user.getId());
 
-            user = userDao.findById(user.getId());
-            userDao.initialize(user);
+            user = userDao.findById(user.getId(), true);
 
             user.getImpersonators().clear();
             user.getImpersonators().addAll(guiUser.getImpersonators());
@@ -801,7 +796,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             user.addGroup(groupDao.findById(groupId));
 
         Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
-        groupDao.initialize(adminGroup);
+        adminGroup = groupDao.initialize(adminGroup);
 
         // The admin user must be always member of admin group
         if (ADMIN.equals(guiUser.getUsername()) && !guiUser.isMemberOf(Group.GROUP_ADMIN))
@@ -830,8 +825,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         UserDAO userDao = UserDAO.get();
         User usr;
         if (guiUser.getId() != 0) {
-            usr = userDao.findById(guiUser.getId());
-            userDao.initialize(usr);
+            usr = userDao.findById(guiUser.getId(), true);
         } else {
             usr = new User();
         }
@@ -861,11 +855,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     private void loadWorkingTimes(GUIUser guiUser) throws PersistenceException {
         UserDAO userDao = UserDAO.get();
-        User user = userDao.findById(guiUser.getId());
+        User user = userDao.findById(guiUser.getId(), true);
         if (user == null)
             return;
-        else
-            userDao.initialize(user);
 
         List<GUIWorkingTime> guiWts = new ArrayList<>();
         if (user.getWorkingTimes() != null)
@@ -950,8 +942,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         try {
-            User user = userDao.findById(guiUser.getId());
-            userDao.initialize(user);
+            User user = userDao.findById(guiUser.getId(), true);
 
             user.setFirstName(guiUser.getFirstName());
             user.setName(guiUser.getName());
@@ -1007,8 +998,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
 
         try {
-            User usr = userDao.findById(user.getId());
-            userDao.initialize(usr);
+            User usr = userDao.findById(user.getId(), true);
 
             usr.setWelcomeScreen(user.getWelcomeScreen());
             usr.setDefaultWorkspace(user.getDefaultWorkspace());
@@ -1190,7 +1180,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
 
         GroupDAO gdao = GroupDAO.get();
-        mdao.initialize(menu);
+        menu = mdao.initialize(menu);
 
         // Remove all current tenant rights
         Set<AccessControlEntry> grps = new HashSet<>();
@@ -1261,8 +1251,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         try {
             Menu menu = new Menu();
             if (guiMenu.getId() != 0L) {
-                menu = dao.findById(guiMenu.getId());
-                dao.initialize(menu);
+                menu = dao.findById(guiMenu.getId(), true);
             } else {
                 menu.setTenantId(session.getTenantId());
             }
@@ -1354,7 +1343,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         f.setType(menu.getType());
 
         MenuDAO dao = MenuDAO.get();
-        dao.initialize(menu);
+        menu = dao.initialize(menu);
 
         List<GUIAccessControlEntry> acl = new ArrayList<>();
 
@@ -1500,13 +1489,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
         UserDAO userDao = UserDAO.get();
         try {
-            User masterUser = userDao.findById(masterUserId);
-            userDao.initialize(masterUser);
+            User masterUser = userDao.findById(masterUserId, true);
             Set<Group> masterGroups = masterUser.getGroups();
 
             for (Long userId : userIds) {
-                User user = userDao.findById(userId);
-                userDao.initialize(user);
+                User user = userDao.findById(userId, true);
 
                 if (gui) {
                     user.setDefaultWorkspace(masterUser.getDefaultWorkspace());
@@ -1662,12 +1649,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
         UserDAO userDao = UserDAO.get();
         try {
-            User srcUser = userDao.findById(srcUserId);
-            userDao.initialize(srcUser);
+            User srcUser = userDao.findById(srcUserId, true);
 
             for (Long userId : uniqueUserIds) {
-                User user = userDao.findById(userId);
-                userDao.initialize(user);
+                User user = userDao.findById(userId, true);
                 if (srcUser.getWorkingTimes() != null)
                     for (WorkingTime wt : srcUser.getWorkingTimes())
                         user.getWorkingTimes().add(new WorkingTime(wt));
@@ -1724,15 +1709,28 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     }
 
     @Override
-    public String generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
-            int maxSequenceSize, int maxOccurrences) {
+    public String generatePassword2(
+            int length,
+            int uppercaseChars,
+            int lowercaseChars,
+            int digits,
+            int specialChars,
+            int maxSequenceSize,
+            int maxOccurrences) {
         return PasswordGenerator.generate(length, uppercaseChars, lowercaseChars, digits, specialChars, maxSequenceSize,
                 maxOccurrences);
     }
 
     @Override
-    public List<String> validatePassword(String password, int minLength, int uppercaseChars, int lowercaseChars,
-            int digits, int specialChars, int maxSequenceSize, int maxOccurrences) {
+    public List<String> validatePassword(
+            String password,
+            int minLength,
+            int uppercaseChars,
+            int lowercaseChars,
+            int digits,
+            int specialChars,
+            int maxSequenceSize,
+            int maxOccurrences) {
         PasswordCriteria criteria = new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
                 specialChars);
         criteria.setMaxSequenceSize(maxSequenceSize);
@@ -1757,7 +1755,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
             UserHistory transaction = new UserHistory();
             transaction.setSession(session);
-            transaction.setComment(name + " (" + apiKey.getLabel() + ")");
+            transaction.setComment("%s (%s)".formatted(name, apiKey.getLabel()));
             transaction.setEvent(UserEvent.NEWAPIKEY);
 
             UserHistoryDAO.get().store(transaction);
@@ -1800,8 +1798,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
         try {
             UserDAO dao = UserDAO.get();
-            User user = dao.findById(session.getUserId());
-            dao.initialize(user);
+            User user = dao.findById(session.getUserId(), true);
             user.getImpersonators().removeAll(usernames);
 
             UserHistory transaction = new UserHistory(session);
@@ -1818,8 +1815,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
         try {
             UserDAO dao = UserDAO.get();
-            User user = dao.findById(session.getUserId());
-            dao.initialize(user);
+            User user = dao.findById(session.getUserId(), true);
             user.getImpersonators().add(username);
 
             UserHistory transaction = new UserHistory(session);

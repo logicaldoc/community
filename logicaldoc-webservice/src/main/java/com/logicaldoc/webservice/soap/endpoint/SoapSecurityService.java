@@ -66,7 +66,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			return users;
 		} catch (Exception t) {
-			throw new PersistenceException(t.getMessage());
+			throw new PersistenceException(t.getMessage(), t);
 		}
 	}
 
@@ -75,16 +75,14 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		UserDAO dao = UserDAO.get();
 		if (StringUtils.isEmpty(group)) {
 			for (User usr : dao.findAll(user.getTenantId())) {
-				dao.initialize(user);
 				if (usr.getType() != UserType.SYSTEM)
 					users.add(WSUser.fromUser(usr));
 			}
 		} else {
 			GroupDAO gDao = GroupDAO.get();
 			Group grp = gDao.findByName(group, user.getTenantId());
-			gDao.initialize(grp);
+			grp = gDao.initialize(grp);
 			for (User usr : grp.getUsers()) {
-				dao.initialize(user);
 				if (usr.getType() != UserType.SYSTEM)
 					users.add(WSUser.fromUser(usr));
 			}
@@ -102,7 +100,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			GroupDAO dao = GroupDAO.get();
 			for (Group grp : dao.findAll(user.getTenantId())) {
 				if (grp.getType() == GroupType.DEFAULT) {
-					dao.initialize(grp);
+					grp = dao.initialize(grp);
 					groups.add(WSGroup.fromGroup(grp));
 				}
 			}
@@ -123,11 +121,10 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			usr.setTenantId(sessionUser.getTenantId());
 
 			if (wsUser.getId() != 0) {
-				usr = dao.findById(wsUser.getId());
+				usr = dao.findById(wsUser.getId(), true);
 				if (usr.getType() == UserType.SYSTEM)
 					throw new PermissionException(
-							"You cannot edit user with id " + usr.getId() + " because it is a system user");
-				dao.initialize(usr);
+							"You cannot edit user with id %d because it is a system user".formatted(usr.getId()));
 
 				usr.setCity(wsUser.getCity());
 				usr.setCountry(wsUser.getCountry());
@@ -181,8 +178,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			transaction.setEvent(wsUser.getId() == 0 ? UserEvent.CREATED : UserEvent.UPDATED);
 
 			dao.store(usr, transaction);
-			usr = dao.findById(usr.getId());
-			dao.initialize(usr);
+			usr = dao.findById(usr.getId(), true);
 
 			GroupDAO gDao = GroupDAO.get();
 			if (CollectionUtils.isNotEmpty(wsUser.getGroupIds())) {
@@ -217,8 +213,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			GroupDAO dao = GroupDAO.get();
 			Group grp = group.toGroup();
 			if (group.getId() != 0) {
-				grp = dao.findById(group.getId());
-				dao.initialize(grp);
+				grp = dao.findById(group.getId(), true);
 				if (grp.getType() != GroupType.DEFAULT) {
 					throw new PermissionException(String
 							.format("You cannot edit group with id %s because it is a system group", grp.getId()));
@@ -340,11 +335,10 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		checkAdministrator(sid);
 		try {
 			UserDAO userDao = UserDAO.get();
-			User user = userDao.findById(userId);
+			User user = userDao.findById(userId, true);
 			if (user == null)
 				return null;
-
-			userDao.initialize(user);
+			
 			return WSUser.fromUser(user);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -375,11 +369,10 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		checkAdministrator(sid);
 
 		GroupDAO groupDao = GroupDAO.get();
-		Group group = groupDao.findById(groupId);
+		Group group = groupDao.findById(groupId, true);
 		if (group == null)
 			return null;
 
-		groupDao.initialize(group);
 		return WSGroup.fromGroup(group);
 	}
 }

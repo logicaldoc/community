@@ -68,7 +68,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 		// No give read access to just user 3
 		note = notes.getFirst();
-		testSubject.initialize(note);
+		note = testSubject.initialize(note);
 		note.addAccessControlEntry(new NoteAccessControlEntry(-3L));
 		testSubject.store(note);
 
@@ -196,9 +196,8 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		note.setDocId(1L);
 		testSubject.store(note);
 		assertNotEquals(0L, note.getId());
-		note = testSubject.findById(note.getId());
+		note = testSubject.findById(note.getId(), true);
 		assertNotNull(note);
-		testSubject.initialize(note);
 
 		assertEquals(3, note.getAccessControlList().size());
 		
@@ -207,8 +206,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		note.addAccessControlEntry(ace);
 		testSubject.store(note);
 
-		note = testSubject.findById(note.getId());
-		testSubject.initialize(note);
+		note = testSubject.findById(note.getId(), true);
 		assertEquals(4, note.getAccessControlList().size());
 
 		// fileVersion() == null
@@ -229,7 +227,6 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		// test overridden store method with DocumentNote and DocumentHistory
 		// parameters
 		DocumentHistory history = historyDao.findById(1L);
-		historyDao.initialize(history);
 		assertNotNull(history);
 
 		testSubject.store(note, history);

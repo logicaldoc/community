@@ -432,8 +432,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 
     @Test
     public void testResetAvatar() throws ServerException, PersistenceException {
-        User user = userDAO.findById(1L);
-        userDAO.initialize(user);
+        User user = userDAO.findById(1L, true);
         user.setAvatar("xyz");
         userDAO.store(user);
 
@@ -531,8 +530,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
     @Test
     public void testChangeImpersonifiers() throws ServerException, PersistenceException {
         UserDAO dao = UserDAO.get();
-        User sessionUser = dao.findById(session.getUser().getId());
-        dao.initialize(sessionUser);
+        User sessionUser = dao.findById(session.getUser().getId(), true);
         assertTrue(sessionUser.getImpersonators().isEmpty());
 
         testSubject.addImpersonifier("author");
@@ -540,13 +538,11 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
         testSubject.addImpersonifier("sebastian");
         testSubject.addImpersonifier("unexisting");
 
-        sessionUser = dao.findById(session.getUser().getId());
-        dao.initialize(sessionUser);
+        sessionUser = dao.findById(session.getUser().getId(), true);
         assertEquals(3, sessionUser.getImpersonators().size());
 
         testSubject.deleteImpersonifiers(List.of("author", "boss"));
-        sessionUser = dao.findById(session.getUser().getId());
-        dao.initialize(sessionUser);
+        sessionUser = dao.findById(session.getUser().getId(), true);
         assertEquals(1, sessionUser.getImpersonators().size());
     }
 }

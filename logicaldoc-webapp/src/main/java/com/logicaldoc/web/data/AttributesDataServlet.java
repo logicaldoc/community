@@ -108,12 +108,9 @@ public class AttributesDataServlet extends AbstractDataServlet {
             PrintWriter writer) throws PersistenceException {
         Map<String, Attribute> attributes = new HashMap<>();
         if (templateId == null) {
-            AttributeSetDAO dao = AttributeSetDAO.get();
-            attributes = dao.findAttributes(session.getTenantId(), null);
+            attributes = AttributeSetDAO.get().findAttributes(session.getTenantId(), null);
         } else {
-            TemplateDAO dao = TemplateDAO.get();
-            Template template = dao.findById(templateId);
-            dao.initialize(template);
+            Template template = TemplateDAO.get().findById(templateId, true);
             List<String> names = template.getAttributeNames();
             for (String name : names)
                 attributes.put(name, template.getAttribute(name));

@@ -168,7 +168,6 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
         assertEquals(2, histories.size());
 
         FolderHistory history = dao.findById(3);
-        dao.initialize(history);
         history.setNotified(true);
         dao.store(history);
 

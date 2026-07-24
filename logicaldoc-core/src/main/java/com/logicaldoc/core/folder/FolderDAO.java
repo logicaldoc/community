@@ -28,7 +28,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 
     /**
      * Gets a folder by a given ID if it is an alias, the referenced folder is
-     * returned.
+     * returned. Lazy-loaded collections are not initialized.
      * 
      * @param folderId The ID
      * 
@@ -37,6 +37,96 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
      * @throws PersistenceException error at data layer
      */
     public Folder findFolder(long folderId) throws PersistenceException;
+
+    /**
+     * Gets a folder by a given ID if it is an alias, the referenced folder is
+     * returned. Lazy-loaded collections are not initialized.
+     * 
+     * @param folderId The ID
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return A real folder that is referenced by the given ID
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public Folder findFolder(long folderId, boolean initialize) throws PersistenceException;
+
+    /**
+     * Retrieves the root folder of the given tenant. Lazy-loaded collections
+     * are not initialized.
+     * 
+     * @param tenantId identifier of the tenant
+     * 
+     * @return the root folder
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public Folder findRoot(long tenantId) throws PersistenceException;
+
+    /**
+     * Retrieves the root folder of the given tenant. Lazy-loaded collections
+     * are not initialized.
+     * 
+     * @param tenantId identifier of the tenant
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return the root folder
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public Folder findRoot(long tenantId, boolean initialize) throws PersistenceException;
+
+    /**
+     * Retrieves the Default workspace of the given tenant. Lazy-loaded
+     * collections are not initialized.
+     * 
+     * @param tenantId identifier of the tenant
+     * 
+     * @return The default workspace
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public Folder findDefaultWorkspace(long tenantId) throws PersistenceException;
+
+    /**
+     * Returns the workspace that contains the given folder. Lazy-loaded
+     * collections are not initialized.
+     * 
+     * @param folderId ID of the folder
+     * 
+     * @return the workspace containing the given folder
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public Folder findWorkspace(long folderId) throws PersistenceException;
+
+    /**
+     * Returns the workspace that contains the given folder.
+     * 
+     * @param folderId ID of the folder
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     *
+     * @return the workspace containing the given folder
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public Folder findWorkspace(long folderId, boolean initialize) throws PersistenceException;
+
+    /**
+     * Retrieves the Default workspace of the given tenant
+     * 
+     * @param tenantId identifier of the tenant
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return The default workspace
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public Folder findDefaultWorkspace(long tenantId, boolean initialize) throws PersistenceException;
 
     /**
      * Finds all folders by folder name
@@ -65,28 +155,6 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
      */
     public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive)
             throws PersistenceException;
-
-    /**
-     * Retrieves the root folder of the given tenant
-     * 
-     * @param tenantId identifier of the tenant
-     * 
-     * @return the root folder
-     * 
-     * @throws PersistenceException error at data layer
-     */
-    public Folder findRoot(long tenantId) throws PersistenceException;
-
-    /**
-     * Retrieves the Default workspace of the given tenant
-     * 
-     * @param tenantId identifier of the tenant
-     * 
-     * @return The default workspace
-     * 
-     * @throws PersistenceException error at data layer
-     */
-    public Folder findDefaultWorkspace(long tenantId) throws PersistenceException;
 
     /**
      * Finds authorized folders for a user
@@ -336,17 +404,6 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
     public List<Folder> findParents(long id) throws PersistenceException;
 
     /**
-     * Returns the workspace that contains the given folder
-     * 
-     * @param folderId ID of the folder
-     * 
-     * @return the workspace containing the given folder
-     * 
-     * @throws PersistenceException error at data layer
-     */
-    public Folder findWorkspace(long folderId) throws PersistenceException;
-
-    /**
      * Restores a previously deleted folder
      * 
      * @param folderId The folder identifier
@@ -551,9 +608,11 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
      * @param target The target folder
      * @param transaction entry to log the event (set the user)
      * 
+     * @return the moved folder
+     * 
      * @throws PersistenceException error at data layer
      */
-    public void move(Folder source, Folder target, FolderHistory transaction) throws PersistenceException;
+    public Folder move(Folder source, Folder target, FolderHistory transaction) throws PersistenceException;
 
     /**
      * Copies a folder into another folder
@@ -574,6 +633,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
      *        </ul>
      * 
      * @param transaction entry to log the event (set the user)
+     * 
      * @return The new folder created
      * 
      * @throws PersistenceException error at data layer
@@ -759,13 +819,6 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
      * @throws PersistenceException error at data layer
      */
     public List<Folder> findWorkspaces(long tanantId) throws PersistenceException;
-
-    /**
-     * Initializes lazy loaded collections
-     * 
-     * @param folder The folder to be initialized
-     */
-    public void initialize(Folder folder);
 
     /**
      * Utility method that logs into the DB the transaction that involved the

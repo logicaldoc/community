@@ -948,7 +948,7 @@ public class StatsCollector extends Task {
             gen.setTenantId(tenantId);
             gen.setSubtype(parameter);
         } else
-            genericDAO.initialize(gen);
+            gen = genericDAO.initialize(gen);
 
         switch (val) {
             case Date dateVal -> gen.setDate1(dateVal);

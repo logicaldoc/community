@@ -5,7 +5,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.LazyInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,11 @@ public class Initializer {
 
         setUser(transaction);
 
-        template = initializeAttributesCollection(template);
+        try {
+            template = TemplateDAO.get().initialize(template);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
         // Initialize the object with general initalization defined at template
         // level(if any)
@@ -78,26 +81,6 @@ public class Initializer {
                 log.error(e.getMessage(), e);
             }
         }
-    }
-
-    private Template initializeAttributesCollection(Template template) {
-        try {
-            int attributesCount = template.getAttributeNames().size();
-            if (log.isDebugEnabled())
-                log.debug("Initialized {} attributes", attributesCount);
-        } catch (LazyInitializationException e) {
-            // If an error happens here it means that the collection could not
-            // be loaded, so load the bean again and initialize it.
-            log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-            TemplateDAO tDao = TemplateDAO.get();
-            try {
-                template = tDao.findById(template.getId());
-                tDao.initialize(template);
-            } catch (PersistenceException pe) {
-                log.warn(pe.getMessage(), pe);
-            }
-        }
-        return template;
     }
 
     private void executeInitialization(ExtensibleObject object, History transaction, Template template)

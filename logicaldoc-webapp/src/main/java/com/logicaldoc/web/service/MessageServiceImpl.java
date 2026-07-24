@@ -61,8 +61,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
         try {
             SystemMessageDAO dao = SystemMessageDAO.get();
-            SystemMessage message = dao.findById(messageId);
-            dao.initialize(message);
+            SystemMessage message = dao.findById(messageId, true);
 
             GUIMessage m = new GUIMessage();
             m.setId(message.getId());

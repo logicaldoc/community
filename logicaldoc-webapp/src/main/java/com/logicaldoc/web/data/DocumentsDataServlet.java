@@ -368,9 +368,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             String extendedAttributesSpec,
             final Map<String, Object> extendedAttributesValues) throws PersistenceException, IOException {
 
-        UserDAO udao = UserDAO.get();
-        User sessionUser = udao.findById(session.getUserId());
-        udao.initialize(sessionUser);
+        User sessionUser = UserDAO.get().findById(session.getUserId(), true);
 
         String sort = request.getParameter("sort");
 
@@ -527,10 +525,9 @@ public class DocumentsDataServlet extends AbstractDataServlet {
                 String aliasType = doc.getType();
                 IndexingStatus aliasIndexed = doc.getIndexed();
                 EmbeddingStatus aliasEmbedded = doc.getEmbeddingStatus();
-                doc = dao.findById(aliasDocRef);
+                doc = dao.findById(aliasDocRef, true);
 
                 if (doc != null) {
-                    dao.initialize(doc);
                     doc.setId(aliasId);
                     doc.setDocRef(aliasDocRef);
                     doc.setDocRefType(aliasDocRefType);
@@ -643,7 +640,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             hiliteDoc = dao.findById(hiliteDocId);
             if (hiliteDoc != null && folderId != null && hiliteDoc.getFolder() != null
                     && hiliteDoc.getFolder().getId() == folderId) {
-                dao.initialize(hiliteDoc);
+                hiliteDoc = dao.initialize(hiliteDoc);
             } else
                 hiliteDoc = null;
         }

@@ -70,10 +70,8 @@ public class TemplateServiceImplTest extends AbstractWPTestCase {
 		GUITemplate cloned = testSubject.clone(-1L, "cloned");
 		assertNotNull(cloned);
 
-		Template t1 = templateDao.findById(-1L);
-		templateDao.initialize(t1);
-		Template t2 = templateDao.findById(cloned.getId());
-		templateDao.initialize(t2);
+		Template t1 = templateDao.findById(-1L, true);
+		Template t2 = templateDao.findById(cloned.getId(), true);
 		assertEquals("cloned", t2.getName());
 		assertEquals(t1.getAttributes(), t2.getAttributes());
 	}
@@ -131,8 +129,7 @@ public class TemplateServiceImplTest extends AbstractWPTestCase {
 
 		Template template = templateDao.findById(-1L);
 
-		Folder folder = folderDao.findById(Folder.DEFAULTWORKSPACEID);
-		folderDao.initialize(folder);
+		Folder folder = folderDao.findById(Folder.DEFAULTWORKSPACEID, true);
 		folder.setTemplate(template);
 		folderDao.store(folder);
 

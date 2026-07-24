@@ -96,7 +96,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
         }
         super.store(set);
         set = findById(set.getId());
-        initialize(set);
+        set = initialize(set);
         for (Attribute att : set.getAttributes().values())
             att.setSetId(set.getId());
         super.store(set);
@@ -122,7 +122,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
         Map<String, Attribute> attributes = new TreeMap<>();
         for (AttributeSet set : sets) {
-            initialize(set);
+            set = initialize(set);
             Map<String, Attribute> localAttributes = set.getTemplateAttributes();
             for (Map.Entry<String, Attribute> entry : localAttributes.entrySet())
                 if (!attributes.containsKey(entry.getKey()))
@@ -130,17 +130,5 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
         }
 
         return attributes;
-    }
-
-    @Override
-    public void initialize(AttributeSet attributeSet) throws PersistenceException {
-        try {
-            refresh(attributeSet);
-
-            log.trace("Initialized {} attributes", attributeSet.getTemplateAttributes().size());
-        } catch (Exception e) {
-            if (log.isErrorEnabled())
-                log.error(e.getMessage(), e);
-        }
     }
 }

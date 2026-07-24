@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.Hibernate;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
@@ -199,30 +200,24 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
     }
 
     @Override
-    public void initialize(Template template) {
-        try {
-            refresh(template);
+    protected void initializeCollections(Template template) throws PersistenceException {
+        Hibernate.initialize(template.getTemplateAttributes());
+        log.trace("Initialized {} attributes", template.getTemplateAttributes().size());
 
-            log.trace("Initialized {} attributes", template.getTemplateAttributes().size());
+        // Manually initialize the collection of ACEs
+        final Set<AccessControlEntry> aces = template.getAccessControlList();
+        aces.clear();
+        queryForResultSet("select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid = %d"
+                .formatted(template.getId()), null, null, rows -> {
+                    while (rows.next()) {
+                        AccessControlEntry ace = new AccessControlEntry(rows.getLong(1));
+                        ace.setWrite(rows.getInt(2) == 1);
+                        ace.setRead(rows.getInt(3) == 1);
+                        aces.add(ace);
+                    }
+                });
 
-            // Manually initialize the collection of ACEs
-            template.getAccessControlList().clear();
-
-            queryForResultSet("select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid = %d"
-                    .formatted(template.getId()), null, null, rows -> {
-                        while (rows.next()) {
-                            AccessControlEntry ace = new AccessControlEntry(rows.getLong(1));
-                            ace.setWrite(rows.getInt(2) == 1);
-                            ace.setRead(rows.getInt(3) == 1);
-                            template.addAccessControlEntry(ace);
-                        }
-                    });
-
-            log.trace("Initialized {} aces", template.getAccessControlList().size());
-        } catch (Exception e) {
-            if (log.isErrorEnabled())
-                log.error(e.getMessage(), e);
-        }
+        log.trace("Initialized {} aces", template.getAccessControlList().size());
     }
 
     private boolean isWriteOrReadEnable(long templateId, long userId, boolean write) {
@@ -293,7 +288,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
     @Override
     public Template clone(long id, String cloneName) throws PersistenceException {
         Template originalTemplate = findById(id, true);
-        initialize(originalTemplate);
+        originalTemplate = initialize(originalTemplate);
         Template clonedTemplate = new Template();
 
         String finalName = cloneName;
@@ -317,7 +312,6 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
                                           from ld_template_acl
                                          where ld_templateid = %d
                    """.formatted(clonedTemplate.getId(), id));
-        initialize(clonedTemplate);
-        return clonedTemplate;
+        return initialize(clonedTemplate);
     }
 }

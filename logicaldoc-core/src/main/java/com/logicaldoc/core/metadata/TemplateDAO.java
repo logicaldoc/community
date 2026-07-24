@@ -110,6 +110,4 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * @return if the user can access the template
 	 */
 	public boolean isReadEnable(long templateId, long userId);
-
-	public void initialize(Template template);
 }

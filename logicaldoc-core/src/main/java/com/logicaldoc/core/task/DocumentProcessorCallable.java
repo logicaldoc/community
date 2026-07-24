@@ -70,7 +70,7 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
 
             try {
                 Document doc = documentDao.findById(id);
-                documentDao.initialize(doc);
+                doc = documentDao.initialize(doc);
 
                 processDocument(doc, user);
 

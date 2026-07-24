@@ -81,1281 +81,1308 @@ import jakarta.mail.MessagingException;
  */
 public class SoapDocumentService extends AbstractService implements DocumentService {
 
-	private static final Logger log = LoggerFactory.getLogger(SoapDocumentService.class);
-
-	@Override
-	public WSDocument create(String sid, WSDocument document, DataHandler content) throws IOException,
-			AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		return create(sid, document, content.getInputStream());
-	}
-
-	public WSDocument create(String sid, WSDocument document, InputStream content)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-
-		checkFolderPermission(Permission.WRITE, user, document.getFolderId());
-
-		FolderDAO fdao = FolderDAO.get();
-		Folder folder = fdao.findById(document.getFolderId());
-
-		long rootId = fdao.findRoot(user.getTenantId()).getId();
-
-		if (folder == null) {
-			throw new WebserviceException(String.format("Folder %d not found", document.getFolderId()));
-		} else if (folder.getId() == rootId) {
-			throw new WebserviceException("Cannot add documents in the root");
-		}
-
-		Document doc = WSUtil.toDocument(document);
-		doc.setTenantId(user.getTenantId());
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.STORED);
-		transaction.setComment(document.getComment());
-		transaction.setUser(user);
-
-		doc = DocumentManager.get().create(content, doc, transaction).getDocument();
-		return WSUtil.toWSDocument(doc);
-	}
-
-	public void checkinDocument(String sid, long docId, String comment, String filename, boolean release,
-			WSDocument docVO, InputStream content) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, IOException {
-		checkin(sid, docId, comment, filename, release, docVO, content);
-	}
-
-	@Override
-	public void checkinDocument(String sid, long docId, String comment, String filename, boolean release,
-			WSDocument docVO, DataHandler content) throws IOException, AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException {
-		checkin(sid, docId, comment, filename, release, docVO, content.getInputStream());
-	}
-
-	@Override
-	public void checkin(String sid, long docId, String comment, String filename, boolean release, DataHandler content)
-			throws IOException, AuthenticationException, PermissionException, WebserviceException,
-			PersistenceException {
-		checkin(sid, docId, comment, filename, release, null, content.getInputStream());
-	}
-
-	public void checkin(String sid, long docId, String comment, String filename, boolean release, WSDocument docVO,
-			InputStream content) throws AuthenticationException, WebserviceException, PersistenceException,
-			PermissionException, IOException {
-		User user = validateSession(sid);
-		DocumentDAO ddao = DocumentDAO.get();
-
-		Document document = ddao.findById(docId);
-		checkUnlocked(user, document);
-		checkDocumentPermission(Permission.WRITE, user, docId);
-
-		document = ddao.findDocument(docId);
-
-		if (document.getStatus() == DocumentStatus.CHECKEDOUT
-				&& (user.getId() == document.getLockUserId() || user.isMemberOf(Group.GROUP_ADMIN))) {
-			ddao.initialize(document);
-
-			// Create the document history event
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.CHECKEDIN);
-			transaction.setUser(user);
-			transaction.setComment(comment);
-
-			Document doc = null;
-			if (docVO != null) {
-				doc = WSUtil.toDocument(docVO);
-				doc.setTenantId(user.getTenantId());
-			}
-
-			/*
-			 * checkin the document; throws an exception if something goes wrong
-			 */
-			DocumentManager.get().checkin(document.getId(), content, filename, release, doc, transaction);
-
-			/* create positive log message */
-			log.info("Document {} checked in", document.getId());
-		} else {
-			throw new WebserviceException("document not checked in");
-		}
-
-	}
-
-	@Override
-	public void checkout(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findById(docId);
-		docDao.initialize(doc);
-		checkUnlocked(user, doc);
-		checkDocumentPermission(Permission.WRITE, user, docId);
-		checkDocumentPermission(Permission.DOWNLOAD, user, docId);
-
-		doc = docDao.findDocument(docId);
-		docDao.initialize(doc);
-
-		checkPublished(user, doc);
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.CHECKEDOUT);
-		transaction.setComment("");
-		transaction.setUser(user);
-
-		DocumentManager.get().checkout(doc, transaction);
-	}
-
-	@Override
-	public void delete(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findById(docId);
-		checkUnlocked(user, doc);
-		checkFolderPermission(Permission.DELETE, user, doc.getFolder().getId());
-		checkPublished(user, doc);
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.DELETED);
-		transaction.setComment("");
-		transaction.setUser(user);
-
-		docDao.delete(docId, transaction);
-	}
-
-	private void checkUnlocked(User user, Document doc) throws PermissionException {
-		if (user.isMemberOf(Group.GROUP_ADMIN))
-			return;
-
-		if (doc.isImmutable())
-			throw new PermissionException("The document %s is immutable".formatted(doc));
-
-		if (doc.getStatus() != DocumentStatus.UNLOCKED && user.getId() != doc.getLockUserId())
-			throw new PermissionException("The document %s is locked".formatted(doc));
-	}
-
-	@Override
-	public DataHandler getContent(String sid, long docId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, IOException {
-		return getVersionContent(sid, docId, null);
-	}
-
-	@Override
-	public DataHandler getVersionContent(String sid, long docId, String version) throws AuthenticationException,
-			WebserviceException, PersistenceException, PermissionException, IOException {
-		String fileVersion = null;
-		if (version != null) {
-			VersionDAO vDao = VersionDAO.get();
-			Version v = vDao.findByVersion(docId, version);
-			fileVersion = v.getFileVersion();
-		}
-
-		return getResource(sid, docId, fileVersion, null);
-	}
-
-	@Override
-	public DataHandler getResource(String sid, long docId, String fileVersion, String suffix)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
-			IOException {
-		User user = validateSession(sid);
-
-		checkDocumentPermission(Permission.READ, user, docId);
-		checkDocumentPermission(Permission.DOWNLOAD, user, docId);
-
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findDocument(docId);
-		checkPublished(user, doc);
-
-		if (doc.isPasswordProtected()) {
-			Session session = SessionManager.get().get(sid);
-			if (!session.getUnprotectedDocs().containsKey(doc.getId()))
-				throw new PermissionException(String.format("The document %s is protected by a password", doc));
-		}
-
-		Store store = Store.get();
-		StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build();
-		if (!store.exists(resource))
-			throw new WebserviceException("Resource %s not found".formatted(resource));
-
-		log.debug("Attach file {}", resource);
-
-		String fileName = doc.getFileName();
-		if (StringUtils.isNotEmpty(suffix))
-			fileName = suffix;
-		String mime = MimeType.getByFilename(fileName);
-		return new DataHandler(new InputStreamDataSource(store.getStream(resource), mime));
-	}
-
-	@Override
-	public void createPdf(String sid, long docId, String fileVersion) throws AuthenticationException,
-			WebserviceException, PersistenceException, PermissionException, IOException {
-		User user = validateSession(sid);
-
-		checkDocumentPermission(Permission.READ, user, docId);
-
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findDocument(docId);
-
-		FormatConversionManager.get().convertToPdf(doc, fileVersion, sid);
-	}
-
-	@Override
-	public void createThumbnail(String sid, long docId, String fileVersion, String type)
-			throws AuthenticationException, WebserviceException, PersistenceException, IOException {
-		validateSession(sid);
-
-		ThumbnailManager manager = ThumbnailManager.get();
-		Store store = Store.get();
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findDocument(docId);
-
-		if (!type.toLowerCase().endsWith(".png"))
-			type += ".png";
-		StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(type).build();
-		if (!store.exists(resource)) {
-			if (type.equals(StoreResource.SUFFIX_THUMBNAIL))
-				manager.createTumbnail(doc, fileVersion, sid);
-			else if (type.equals(StoreResource.SUFFIX_TILE))
-				manager.createTile(doc, fileVersion, sid);
-			else if (type.equals(StoreResource.SUFFIX_MOBILE_THUMBNAIL))
-				manager.createMobile(doc, fileVersion, sid);
-			else if (type.startsWith(ThumbnailManager.THUMB)) {
-				/*
-				 * In this case the resource is like thumb450.png so we extract
-				 * the size from the name
-				 */
-				String sizeStr = resource.name().substring(resource.name().indexOf('-') + 6,
-						resource.name().lastIndexOf('.'));
-				manager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
-			}
-		}
-	}
-
-	@Override
-	public void uploadResource(String sid, long docId, String fileVersion, String suffix, DataHandler content)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
-			IOException {
-		User user = validateSession(sid);
-
-		if (StringUtils.isEmpty(suffix))
-			throw new WebserviceException("Please provide a suffix");
-
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findById(docId);
-
-		checkUnlocked(user, doc);
-		checkDocumentPermission(Permission.READ, user, doc.getId());
-		checkDocumentPermission(Permission.WRITE, user, doc.getId());
-
-		doc = docDao.findDocument(docId);
-
-		if ("sign.p7m".equalsIgnoreCase(suffix))
-			throw new PermissionException("You cannot upload a signature");
-
-		StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build();
-		log.debug("Attach file {}", resource);
-
-		Store.get().store(content.getInputStream(), resource);
-	}
-
-	@Override
-	public WSDocument getDocument(String sid, long docId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		Document doc = retrieveReadableDocument(docId, user);
-		checkPublished(user, doc);
-		return getDoc(docId);
-	}
-
-	@Override
-	public WSDocument getDocumentByCustomId(String sid, String customId)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findByCustomId(customId, user.getTenantId());
-		if (doc == null)
-			return null;
-
-		checkDocumentPermission(Permission.READ, user, doc.getId());
-		checkPublished(user, doc);
-
-		return getDoc(doc.getId());
-	}
-
-	@Override
-	public void lock(String sid, long docId) throws AuthenticationException, WebserviceException, PersistenceException,
-			PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = retrieveReadableDocument(docId, user);
-		checkUnlocked(user, doc);
-		checkDocumentPermission(Permission.WRITE, user, docId);
-
-		doc = docDao.findDocument(docId);
-		checkPublished(user, doc);
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.LOCKED);
-		transaction.setComment("");
-		transaction.setUser(user);
-
-		DocumentManager.get().lock(doc.getId(), DocumentStatus.LOCKED, transaction);
-	}
-
-	@Override
-	public void move(String sid, long docId, long folderId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		FolderDAO fdao = FolderDAO.get();
-		long rootId = fdao.findRoot(user.getTenantId()).getId();
-
-		if (folderId == rootId)
-			throw new PermissionException("Cannot move documents in the root");
-
-		Document doc = retrieveReadableDocument(docId, user);
-		checkFolderPermission(Permission.MOVE, user, doc.getFolder().getId());
-
-		DocumentDAO docDao = DocumentDAO.get();
-		doc = docDao.findDocument(docId);
-		checkPublished(user, doc);
-
-		FolderDAO dao = FolderDAO.get();
-		Folder folder = dao.findById(folderId);
-		checkUnlocked(user, doc);
-		checkFolderPermission(Permission.WRITE, user, folder.getId());
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.MOVED);
-		transaction.setComment("");
-		transaction.setUser(user);
-
-		DocumentManager.get().moveToFolder(doc, folder, transaction);
-	}
-
-	@Override
-	public WSDocument copy(String sid, long docId, long folderId, boolean links, boolean notes, boolean security)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
-			IOException {
-		User user = validateSession(sid);
-		FolderDAO fdao = FolderDAO.get();
-		long rootId = fdao.findRoot(user.getTenantId()).getId();
-
-		if (folderId == rootId)
-			throw new PermissionException("Cannot create documents in the root");
-
-		checkFolderPermission(Permission.WRITE, user, folderId);
-
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findDocument(docId);
-		checkPublished(user, doc);
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.COPYED);
-		transaction.setComment("");
-		transaction.setUser(user);
-
-		Folder folder = fdao.findFolder(folderId);
-
-		Document createdDoc = DocumentManager.get().copyToFolder(doc, folder, transaction, links, notes, security)
-				.getDocument();
-		return getDoc(createdDoc.getId());
-	}
-
-	@Override
-	public void rename(String sid, long docId, String name) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-
-		Document doc = retrieveReadableDocument(docId, user);
-		checkDocumentPermission(Permission.RENAME, user, docId);
-		checkPublished(user, doc);
-		checkUnlocked(user, doc);
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setUser(user);
-		DocumentManager.get().rename(docId, name, transaction);
-	}
-
-	@Override
-	public void restore(String sid, long docId, long folderId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		DocumentDAO docDao = DocumentDAO.get();
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setUser(user);
-		transaction.setSessionId(sid);
-		docDao.restore(docId, folderId, transaction);
-	}
-
-	@Override
-	public void unlock(String sid, long docId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-
-		Document doc = retrieveReadableDocument(docId, user);
-		checkUnlocked(user, doc);
-
-		// Document is already unlocked, no need to do anything else
-		if (doc.getStatus() == DocumentStatus.UNLOCKED)
-			return;
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.UNLOCKED);
-		transaction.setComment("");
-		transaction.setUser(user);
-
-		DocumentManager.get().unlock(docId, transaction);
-	}
-
-	@Override
-	public void update(String sid, WSDocument document) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, UnexistingResourceException {
-		updateDocument(sid, document);
-	}
-
-	private void updateDocument(String sid, WSDocument document) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-
-		Document doc = retrieveReadableDocument(document.getId(), user);
-		checkUnlocked(user, doc);
-		checkDocumentPermission(Permission.WRITE, user, doc.getId());
-		checkPublished(user, doc);
-
-		// Initialize the lazy loaded collections
-		DocumentDAO docDao = DocumentDAO.get();
-		docDao.initialize(doc);
-
-		long originalFolderId = doc.getFolder().getId();
-
-		doc.setCustomId(document.getCustomId());
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.CHANGED);
-		transaction.setComment(document.getComment());
-		transaction.setUser(user);
-
-		DocumentManager.get().update(doc, WSUtil.toDocument(document), transaction);
-
-		// If the folder is different, handle the move
-		if (!document.getFolderId().equals(originalFolderId))
-			move(sid, document.getId(), document.getFolderId());
-	}
-
-	@Override
-	public List<WSDocument> listDocuments(String sid, long folderId, String fileName)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		return list(sid, folderId, fileName, "fileName asc", null, null);
-	}
-
-	@Override
-	public List<WSDocument> list(String sid, long folderId, String fileName, String sort, Integer page, Integer max)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-		checkFolderPermission(Permission.READ, user, folderId);
-
-		DocumentDAO docDao = DocumentDAO.get();
-
-		// Get the documents in folder sorted by file name
-		List<Document> docs = docDao.findByFolder(folderId, null);
-
-		// Sort based on the given criteria
-		if (StringUtils.isNotEmpty(sort))
-			Collections.sort(docs, DocumentComparator.getComparator(sort));
-
-		// Retain just those files accessible by the user that also matches the
-		// file name
-		docs = docs.stream().filter(doc -> mustList(doc, user, fileName)).collect(Collectors.toList());
-
-		// In case of pagination, extract just the wanted page
-		if (max != null && page != null && max < docs.size())
-			docs = docs.stream().skip((page - 1) * (long) max).limit(max).collect(Collectors.toList());
-
-		List<WSDocument> wsDocs = new ArrayList<>();
-		for (Document doc : docs) {
-			docDao.initialize(doc);
-			wsDocs.add(WSUtil.toWSDocument(doc));
-		}
-
-		return wsDocs;
-	}
-
-	private boolean mustList(Document document, User user, String fileName) {
-		try {
-			checkPublished(user, document);
-			checkNotArchived(document);
-
-			if (fileName != null && !FileUtil.matches(document.getFileName(), List.of(fileName), null))
-				throw new ParsingException("no match");
-			return true;
-		} catch (Exception t) {
-			return false;
-		}
-	}
-
-	@Override
-	public List<WSDocument> getDocuments(String sid, List<Long> docIds)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		FolderDAO fdao = FolderDAO.get();
-		Collection<Long> folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
-
-		DocumentDAO docDao = DocumentDAO.get();
-		List<Document> docs = docDao.findByIds(Set.copyOf(docIds), null);
-		List<WSDocument> wsDocs = new ArrayList<>();
-		for (int i = 0; i < docs.size(); i++) {
-			try {
-				checkPublished(user, docs.get(i));
-				checkNotArchived(docs.get(i));
-			} catch (Exception t) {
-				continue;
-			}
-			if (user.isMemberOf(Group.GROUP_ADMIN) || folderIds.contains(docs.get(i).getFolder().getId()))
-				wsDocs.add(getDoc(docs.get(i).getId()));
-		}
-
-		return wsDocs;
-	}
-
-	@Override
-	public List<WSDocument> getRecentDocuments(String sid, Integer max)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-
-		StringBuilder query = new StringBuilder(
-				"select docId from DocumentHistory where deleted=0 and (docId is not NULL) and userId=" + user.getId());
-		query.append(" order by date desc");
-		List<Long> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null,
-				Long.class, max);
-
-		List<Long> docIds = new ArrayList<>();
-
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		for (Long id : records) {
-			// Discard a gridRecord if already visited
-			if (!docIds.contains(id))
-				docIds.add(id);
-		}
-
-		return getDocuments(sid, docIds);
-	}
-
-	@Override
-	public void sendEmail(String sid, List<Long> docIds, String recipients, String subject, String message)
-			throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException {
-		User user = validateSession(sid);
-
-		DocumentDAO docDao = DocumentDAO.get();
-		FolderDAO folderDao = FolderDAO.get();
-		ContextProperties config = Context.get().getConfig();
-		Session session = SessionManager.get().get(sid);
-
-		EMail mail = new EMail();
-		mail.setTenantId(user.getTenantId());
-		mail.setAccountId(-1);
-		mail.setAuthor(user.getUsername());
-		if (config.getBoolean(session.getTenantName() + ".smtp.userasfrom", true))
-			mail.setAuthorAddress(user.getEmail());
-		mail.parseRecipients(recipients);
-		for (Recipient recipient : mail.getRecipients()) {
-			recipient.setRead(1);
-		}
-		mail.setFolder("outbox");
-		mail.setMessageText(message);
-		mail.setSentDate(new Date());
-		mail.setSubject(subject);
-		mail.setUsername(user.getUsername());
-
-		/*
-		 * Only readable documents can be sent
-		 */
-		List<Document> docs = new ArrayList<>();
-		for (long id : docIds) {
-			Document doc = docDao.findById(id);
-			if (doc != null && folderDao.isReadAllowed(doc.getFolder().getId(), user.getId())) {
-				doc = docDao.findDocument(id);
-				createAttachment(mail, doc);
-				docs.add(doc);
-			}
-		}
-
-		// Send the message
-		EMailSender sender = new EMailSender(user.getTenantId());
-		sender.send(mail);
-
-		for (Document doc : docs) {
-			try {
-				checkPublished(user, doc);
-			} catch (Exception t) {
-				continue;
-			}
-
-			// Create the document history event
-			DocumentHistory history = new DocumentHistory();
-			history.setSessionId(sid);
-			history.setDocument(doc);
-			history.setDocId(doc.getId());
-			history.setEvent(DocumentEvent.SENT);
-			history.setUser(user);
-			history.setComment(StringUtils.abbreviate(recipients, 4000));
-			history.setFilename(doc.getFileName());
-			history.setVersion(doc.getVersion());
-			history.setFileVersion(doc.getFileVersion());
-			history.setPath(folderDao.computePathExtended(doc.getFolder().getId()));
-			docDao.saveDocumentHistory(doc, history);
-		}
-	}
-
-	private WSDocument getDoc(long docId) throws PersistenceException {
-		DocumentDAO docDao = DocumentDAO.get();
-
-		Document doc = docDao.findById(docId);
-		Long aliasId = null;
-		String aliasFileName = null;
-
-		// Check if it is an alias
-		if (doc.getDocRef() != null) {
-			aliasFileName = doc.getFileName();
-			long id = doc.getDocRef();
-			doc = docDao.findById(id);
-			aliasId = docId;
-		}
-
-		docDao.initialize(doc);
-		WSDocument document = WSUtil.toWSDocument(doc);
-
-		if (aliasId != null)
-			document.setDocRef(aliasId);
-		if (StringUtils.isNotEmpty(aliasFileName))
-			document.setFileName(aliasFileName);
-
-		return document;
-	}
-
-	private void createAttachment(EMail email, Document doc) throws IOException, PersistenceException {
-		EMailAttachment att = new EMailAttachment();
-		att.setIcon(doc.getIcon());
-		att.setData(Store.get().getBytes(StoreResource.builder().document(doc).build()));
-		att.setFileName(doc.getFileName());
-		att.setMimeType(MimeType.get(doc.getFileExtension()));
-
-		email.addAttachment(2 + email.getAttachments().size(), att);
-	}
-
-	@Override
-	public WSDocument createAlias(String sid, long docId, long folderId, String type)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-
-		FolderDAO fdao = FolderDAO.get();
-		long rootId = fdao.findRoot(user.getTenantId()).getId();
-
-		if (folderId == rootId)
-			throw new PermissionException("Cannot create alias in the root");
-
-		DocumentDAO docDao = DocumentDAO.get();
-		Document originalDoc = docDao.findById(docId);
-		checkDocumentPermission(Permission.DOWNLOAD, user, docId);
-		checkFolderPermission(Permission.WRITE, user, folderId);
-
-		FolderDAO mdao = FolderDAO.get();
-		Folder folder = mdao.findById(folderId);
-		if (folder == null)
-			throw new WebserviceException("error - folder not found");
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.SHORTCUT_STORED);
-		transaction.setComment("");
-		transaction.setUser(user);
-
-		Document doc = DocumentManager.get().createAlias(originalDoc, folder, type, transaction);
-
-		checkPublished(user, doc);
-
-		return WSUtil.toWSDocument(doc);
-	}
-
-	@Override
-	public void reindex(String sid, long docId, String content)
-			throws ParsingException, AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setUser(user);
-		DocumentManager.get().index(docId, content, transaction);
-	}
-
-	@Override
-	public List<WSDocument> getAliases(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		Collection<Long> folderIds = null;
-		if (!user.isMemberOf(Group.GROUP_ADMIN)) {
-			FolderDAO fdao = FolderDAO.get();
-			folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
-		}
-
-		DocumentDAO docDao = DocumentDAO.get();
-		List<Document> docs = new ArrayList<>();
-		if (user.isMemberOf(Group.GROUP_ADMIN))
-			docs = docDao.findByWhere("_entity.docRef=" + docId, null, null);
-		else if (folderIds != null) {
-			String idsStr = folderIds.toString().replace('[', '(').replace(']', ')');
-			docs = docDao.findByWhere("_entity.docRef=" + docId + " and _entity.id in " + idsStr, null, null);
-		}
-
-		List<WSDocument> wsDocs = new ArrayList<>();
-		for (int i = 0; i < docs.size(); i++) {
-			docDao.initialize(docs.get(i));
-			if (user.isMemberOf(Group.GROUP_ADMIN)
-					|| (folderIds != null && folderIds.contains(docs.get(i).getFolder().getId())))
-				wsDocs.add(WSUtil.toWSDocument(docs.get(i)));
-		}
-
-		return wsDocs;
-	}
-
-	@Override
-	public long upload(String sid, Long docId, Long folderId, boolean release, String filename, String language,
-			DataHandler content) throws AuthenticationException, WebserviceException, PersistenceException,
-			PermissionException, IOException {
-		validateSession(sid);
-
-		if (docId != null) {
-			checkout(sid, docId);
-			checkin(sid, docId, "", filename, release, content);
-			return docId;
-		} else {
-			WSDocument doc = new WSDocument();
-			doc.setFileName(filename);
-			doc.setFolderId(folderId);
-			if (StringUtils.isEmpty(language))
-				doc.setLanguage("en");
-			else
-				doc.setLanguage(language);
-
-			return create(sid, doc, content).getId();
-		}
-
-	}
-
-	@Override
-	public WSLink link(String sid, long doc1, long doc2, String type) throws AuthenticationException,
-			WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-
-		DocumentLink link = DocumentLinkDAO.get().findByDocIdsAndType(doc1, doc2, type);
-
-		Document document1 = retrieveReadableDocument(doc1, user);
-		Document document2 = retrieveReadableDocument(doc2, user);
-
-		checkDocumentPermission(Permission.WRITE, user, document2.getId());
-
-		if (link == null) {
-			// The link doesn't exist and must be created
-			link = new DocumentLink();
-			link.setTenantId(document1.getTenantId());
-			link.setDocument1(document1);
-			link.setDocument2(document2);
-			link.setType(type);
-			DocumentLinkDAO.get().store(link);
-
-			WSLink lnk = new WSLink();
-			lnk.setId(link.getId());
-			lnk.setDoc1(doc1);
-			lnk.setDoc2(doc2);
-			lnk.setType(type);
-			return lnk;
-		} else {
-			throw new WebserviceException("Documents already linked");
-		}
-	}
-
-	@Override
-	public List<WSLink> getLinks(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-
-		checkDocumentPermission(Permission.READ, user, docId);
-
-		List<DocumentLink> links = DocumentLinkDAO.get().findByDocId(docId);
-		List<WSLink> lnks = new ArrayList<>();
-		for (DocumentLink link : links) {
-			WSLink lnk = new WSLink();
-			lnk.setId(link.getId());
-			lnk.setDoc1(link.getDocument1().getId());
-			lnk.setDoc2(link.getDocument2().getId());
-			lnk.setType(link.getType());
-			lnks.add(lnk);
-		}
-
-		return lnks;
-	}
-
-	@Override
-	public void deleteLink(String sid, long id)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		validateSession(sid);
-		DocumentLinkDAO.get().delete(id);
-	}
-
-	@Override
-	public String getExtractedText(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		validateSession(sid);
-		return SearchEngine.get().getHit(docId).getContent();
-	}
-
-	@Override
-	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads, String password)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		validateSession(sid);
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSession(SessionManager.get().get(sid));
-
-		Ticket ticket = new Ticket();
-		ticket.setType(Ticket.DOWNLOAD);
-		ticket.setTenantId(transaction.getTenantId());
-		ticket.setDocId(docId);
-		ticket.setSuffix(suffix);
-		ticket.setExpireHours(expireHours);
-		ticket.setExpired(convertStringToDate(expireDate));
-		ticket.setMaxCount(maxDownloads);
-		try {
-			ticket.setDecodedPassword(password);
-		} catch (NoSuchAlgorithmException e) {
-			throw new PersistenceException(e);
-		}
-
-		ticket = DocumentManager.get().createTicket(ticket, transaction);
-
-		return ticket.getUrl();
-	}
-
-	@Override
-	public String createViewTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads, Integer maxViews, String password)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		validateSession(sid);
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSession(SessionManager.get().get(sid));
-
-		Ticket ticket = new Ticket();
-		ticket.setType(Ticket.VIEW);
-		ticket.setTenantId(transaction.getTenantId());
-		ticket.setDocId(docId);
-		ticket.setSuffix(suffix);
-		ticket.setExpireHours(expireHours);
-		ticket.setExpired(convertStringToDate(expireDate));
-		ticket.setMaxCount(maxDownloads);
-		ticket.setMaxViews(maxViews);
-		try {
-			ticket.setDecodedPassword(password);
-		} catch (NoSuchAlgorithmException e) {
-			throw new PersistenceException(e);
-		}
-
-		ticket = DocumentManager.get().createTicket(ticket, transaction);
-
-		return ticket.getUrl();
-	}
-
-	@Override
-	public void setPassword(String sid, long docId, String password) throws AuthenticationException,
-			WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-
-		Document doc = retrieveReadableDocument(docId, user);
-		checkUnlocked(user, doc);
-		checkDocumentPermission(Permission.PASSWORD, user, docId);
-
-		DocumentDAO dao = DocumentDAO.get();
-		doc = dao.findDocument(docId);
-
-		Session session = SessionManager.get().get(sid);
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSession(session);
-		transaction.setComment("");
-
-		dao.setPassword(doc.getId(), password, transaction);
-	}
-
-	@Override
-	public void unsetPassword(String sid, long docId, String currentPassword) throws AuthenticationException,
-			WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		Document doc = retrieveReadableDocument(docId, user);
-		checkUnlocked(user, doc);
-		checkDocumentPermission(Permission.PASSWORD, user, docId);
-
-		DocumentDAO dao = DocumentDAO.get();
-		doc = dao.findDocument(docId);
-
-		Session session = SessionManager.get().get(sid);
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSession(session);
-		transaction.setComment("");
-
-		if (doc.isGranted(currentPassword))
-			dao.unsetPassword(doc.getId(), transaction);
-		else
-			throw new PermissionException("You cannot access the document");
-	}
-
-	@Override
-	public boolean unprotect(String sid, long docId, String password)
-			throws PersistenceException, AuthenticationException, WebserviceException {
-		validateSession(sid);
-		Document doc = DocumentDAO.get().findDocument(docId);
-		return DocumentManager.get().unprotect(sid, doc.getId(), password);
-	}
-
-	@Override
-	public WSNote addNote(String sid, long docId, String note) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-
-		WSDocument document = retrieveExistingWSDocument(docId, sid);
-
-		DocumentNote newNote = new DocumentNote();
-		newNote.setDocId(document.getId());
-		newNote.setMessage(note);
-		newNote.setUserId(user.getId());
-		newNote.setUsername(user.getFullName());
-
-		DocumentDAO ddao = DocumentDAO.get();
-		Document doc = ddao.findDocument(docId);
-		newNote.setFileName(doc.getFileName());
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setUser(user);
-
-		DocumentNoteDAO.get().store(newNote, transaction);
-
-		return WSNote.fromDocumentNote(newNote);
-	}
-
-	@Override
-	public WSNote saveNote(String sid, long docId, WSNote wsNote) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		retrieveExistingWSDocument(docId, sid);
-
-		DocumentNoteDAO dao = DocumentNoteDAO.get();
-		DocumentNote note = dao.findById(wsNote.getId());
-		if (note == null) {
-			note = new DocumentNote();
-			note.setTenantId(user.getTenantId());
-			note.setDocId(docId);
-			note.setUserId(user.getId());
-			note.setUsername(user.getUsername());
-			note.setDate(new Date());
-		} else {
-			dao.initialize(note);
-		}
-
-		note.setPage(wsNote.getPage());
-		note.setMessage(wsNote.getMessage());
-		note.setColor(wsNote.getColor());
-		note.setTop(wsNote.getTop());
-		note.setLeft(wsNote.getLeft());
-		note.setWidth(wsNote.getWidth());
-		note.setHeight(wsNote.getHeight());
-
-		Document doc = DocumentDAO.get().findDocument(docId);
-		note.setFileName(doc.getFileName());
-
-		if (note.getId() == 0L) {
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setSessionId(sid);
-			transaction.setUser(user);
-			dao.store(note, transaction);
-		} else
-			dao.store(note);
-
-		return WSNote.fromDocumentNote(note);
-	}
-
-	private WSDocument retrieveExistingWSDocument(long docId, String sid)
-			throws WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
-		WSDocument document = getDocument(sid, docId);
-		if (document == null)
-			throw new PermissionException("Document %d not found or not accessible".formatted(docId));
-		else
-			return document;
-	}
-
-	@Override
-	public void deleteNote(String sid, long noteId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		DocumentNoteDAO dao = DocumentNoteDAO.get();
-		DocumentNote note = dao.findById(noteId);
-		if (note == null)
-			return;
-
-		if (user.isMemberOf(Group.GROUP_ADMIN) || user.getId() == note.getUserId())
-			dao.delete(note.getId());
-	}
-
-	@Override
-	public String deleteVersion(String sid, long docId, String version)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		validateSession(sid);
-
-		Version ver = VersionDAO.get().findByVersion(docId, version);
-
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-
-		return DocumentManager.get().deleteVersion(ver.getId(), transaction).getVersion();
-	}
-
-	@Override
-	public List<WSNote> getNotes(String sid, long docId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		WSDocument document = retrieveExistingWSDocument(docId, sid);
-
-		List<DocumentNote> notes = DocumentNoteDAO.get().findByDocId(docId, user.getId(), document.getFileVersion());
-		List<WSNote> wsNotes = new ArrayList<>();
-		if (notes != null)
-			for (DocumentNote note : notes)
-				wsNotes.add(WSNote.fromDocumentNote(note));
-		return wsNotes;
-	}
-
-	@Override
-	public WSRating rateDocument(String sid, long docId, int vote) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		retrieveExistingWSDocument(docId, sid);
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSessionId(sid);
-		transaction.setUser(user);
-
-		RatingDAO ratingDao = RatingDAO.get();
-		Rating rating = ratingDao.findByDocIdAndUserId(docId, user.getId());
-		if (rating == null) {
-			rating = new Rating();
-			rating.setDocId(docId);
-			rating.setUserId(user.getId());
-			rating.setUsername(user.getFullName());
-		}
-		rating.setVote(vote);
-
-		ratingDao.store(rating, transaction);
-		return WSRating.fromRating(rating);
-	}
-
-	@Override
-	public List<WSRating> getRatings(String sid, long docId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		validateSession(sid);
-		retrieveExistingWSDocument(docId, sid);
-
-		List<Rating> ratings = RatingDAO.get().findByDocId(docId);
-		List<WSRating> wsRatings = new ArrayList<>();
-		if (ratings != null)
-			for (Rating rating : ratings)
-				wsRatings.add(WSRating.fromRating(rating));
-
-		return wsRatings;
-	}
-
-	@Override
-	public void replaceFile(String sid, long docId, String fileVersion, String comment, DataHandler content)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException,
-			UnexistingResourceException {
-		User user = validateSession(sid);
-
-		Document doc = retrieveReadableDocument(docId, user);
-		checkUnlocked(user, doc);
-		checkDocumentPermission(Permission.WRITE, user, docId);
-
-		DocumentDAO ddao = DocumentDAO.get();
-		doc = ddao.findDocument(docId);
-		checkUnlocked(user, doc);
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setComment(comment);
-		transaction.setUser(user);
-		transaction.setSession(SessionManager.get().get(sid));
-
-		DocumentManager.get().replaceFile(doc.getId(), fileVersion, content.getInputStream(), transaction);
-		log.info("Replaced fileVersion {} of document {}", fileVersion, doc);
-	}
-
-	@Override
-	public void promoteVersion(String sid, long docId, String version) throws AuthenticationException,
-			WebserviceException, PersistenceException, PermissionException, IOException, UnexistingResourceException {
-		User user = validateSession(sid);
-		Document doc = retrieveReadableDocument(docId, user);
-
-		checkDocumentPermission(Permission.WRITE, user, docId);
-
-		checkUnlocked(user, doc);
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setUser(user);
-		transaction.setSession(SessionManager.get().get(sid));
-
-		DocumentManager.get().promoteVersion(doc.getId(), version, transaction);
-
-		log.info("Promoted version {} of document {}", version, doc);
-	}
-
-	@Override
-	public WSDocument getVersion(String sid, long docId, String version) throws AuthenticationException,
-			WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		Document doc = retrieveReadableDocument(docId, user);
-		checkPublished(user, doc);
-
-		VersionDAO versDao = VersionDAO.get();
-		Version ver = versDao.findByVersion(docId, version);
-		if (ver != null) {
-			versDao.initialize(ver);
-			WSDocument wsVersion = WSUtil.toWSDocument(ver);
-			wsVersion.setComment(ver.getComment());
-			return wsVersion;
-		}
-		return null;
-	}
-
-	@Override
-	public List<WSDocument> getVersions(String sid, long docId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		Document doc = retrieveReadableDocument(docId, user);
-
-		checkPublished(user, doc);
-
-		VersionDAO versDao = VersionDAO.get();
-		List<Version> versions = versDao.findByDocId(doc.getId());
-		List<WSDocument> wsVersions = new ArrayList<>();
-		for (Version version : versions) {
-			versDao.initialize(version);
-			WSDocument wsVersion = WSUtil.toWSDocument(version);
-			wsVersion.setComment(version.getComment());
-			wsVersions.add(wsVersion);
-		}
-
-		return wsVersions;
-	}
-
-	private Document retrieveReadableDocument(long docId, User user)
-			throws PersistenceException, PermissionException, UnexistingResourceException {
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findById(docId);
-		if (doc == null)
-			throw new UnexistingResourceException(user.getUsername(), "Document %d".formatted(docId));
-		checkDocumentPermission(Permission.READ, user, docId);
-		doc = docDao.findDocument(docId);
-		return doc;
-	}
-
-	@Override
-	public void setAccessControlList(String sid, long docId, List<WSAccessControlEntry> acl)
-			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
-		User sessionUser = validateSession(sid);
-
-		DocumentDAO documentDao = DocumentDAO.get();
-		// Check if the session user has the Security Permission of this
-		// document
-		if (!documentDao.isPermissionAllowed(Permission.SECURITY, docId, sessionUser.getId()))
-			throw new PermissionException(sessionUser.getUsername(), "Document %d".formatted(docId),
-					Permission.SECURITY);
-
-		Document document = documentDao.findById(docId);
-		documentDao.initialize(document);
-		document.getAccessControlList().clear();
-		for (WSAccessControlEntry wsAcwe : acl)
-			document.addAccessControlEntry(WSUtil.toDocumentAccessControlEntry(wsAcwe));
-
-		DocumentHistory history = new DocumentHistory();
-		history.setEvent(DocumentEvent.PERMISSION);
-		history.setSession(SessionManager.get().get(sid));
-		documentDao.store(document, history);
-	}
-
-	@Override
-	public List<WSAccessControlEntry> getAccessControlList(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		validateSession(sid);
-
-		List<WSAccessControlEntry> acl = new ArrayList<>();
-		DocumentDAO documentDao = DocumentDAO.get();
-
-		Document document = documentDao.findById(docId);
-		documentDao.initialize(document);
-
-		for (AccessControlEntry ace : document.getAccessControlList())
-			acl.add(WSUtil.toWSAccessControlEntry(ace));
-
-		return acl;
-	}
-
-	@Override
-	public boolean isRead(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return isGranted(sid, docId, Permission.READ.name());
-	}
-
-	@Override
-	public boolean isWrite(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return isGranted(sid, docId, Permission.WRITE.name());
-	}
-
-	@Override
-	public boolean isDownload(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return isGranted(sid, docId, Permission.DOWNLOAD.name());
-	}
-
-	@Override
-	public boolean isGranted(String sid, long docId, String permission)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		try {
-			checkDocumentPermission(Permission.valueOf(permission.toUpperCase()), user, docId);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return false;
-		}
-		return true;
-	}
+    private static final Logger log = LoggerFactory.getLogger(SoapDocumentService.class);
+
+    @Override
+    public WSDocument create(String sid, WSDocument document, DataHandler content) throws IOException,
+            AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        return create(sid, document, content.getInputStream());
+    }
+
+    public WSDocument create(String sid, WSDocument document, InputStream content)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+
+        checkFolderPermission(Permission.WRITE, user, document.getFolderId());
+
+        FolderDAO fdao = FolderDAO.get();
+        Folder folder = fdao.findById(document.getFolderId());
+
+        long rootId = fdao.findRoot(user.getTenantId()).getId();
+
+        if (folder == null) {
+            throw new WebserviceException(String.format("Folder %d not found", document.getFolderId()));
+        } else if (folder.getId() == rootId) {
+            throw new WebserviceException("Cannot add documents in the root");
+        }
+
+        Document doc = WSUtil.toDocument(document);
+        doc.setTenantId(user.getTenantId());
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.STORED);
+        transaction.setComment(document.getComment());
+        transaction.setUser(user);
+
+        doc = DocumentManager.get().create(content, doc, transaction).getDocument();
+        return WSUtil.toWSDocument(doc);
+    }
+
+    public void checkinDocument(
+            String sid,
+            long docId,
+            String comment,
+            String filename,
+            boolean release,
+            WSDocument docVO,
+            InputStream content) throws AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException, IOException {
+        checkin(sid, docId, comment, filename, release, docVO, content);
+    }
+
+    @Override
+    public void checkinDocument(
+            String sid,
+            long docId,
+            String comment,
+            String filename,
+            boolean release,
+            WSDocument docVO,
+            DataHandler content) throws IOException, AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException {
+        checkin(sid, docId, comment, filename, release, docVO, content.getInputStream());
+    }
+
+    @Override
+    public void checkin(String sid, long docId, String comment, String filename, boolean release, DataHandler content)
+            throws IOException, AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException {
+        checkin(sid, docId, comment, filename, release, null, content.getInputStream());
+    }
+
+    public void checkin(
+            String sid,
+            long docId,
+            String comment,
+            String filename,
+            boolean release,
+            WSDocument docVO,
+            InputStream content) throws AuthenticationException, WebserviceException, PersistenceException,
+            PermissionException, IOException {
+        User user = validateSession(sid);
+        DocumentDAO ddao = DocumentDAO.get();
+
+        Document document = ddao.findById(docId, true);
+        checkUnlocked(user, document);
+        checkDocumentPermission(Permission.WRITE, user, docId);
+
+        document = ddao.findDocument(docId);
+
+        if (document.getStatus() == DocumentStatus.CHECKEDOUT
+                && (user.getId() == document.getLockUserId() || user.isMemberOf(Group.GROUP_ADMIN))) {
+
+            // Create the document history event
+            DocumentHistory transaction = new DocumentHistory();
+            transaction.setSessionId(sid);
+            transaction.setEvent(DocumentEvent.CHECKEDIN);
+            transaction.setUser(user);
+            transaction.setComment(comment);
+
+            Document doc = null;
+            if (docVO != null) {
+                doc = WSUtil.toDocument(docVO);
+                doc.setTenantId(user.getTenantId());
+            }
+
+            /*
+             * checkin the document; throws an exception if something goes wrong
+             */
+            DocumentManager.get().checkin(document.getId(), content, filename, release, doc, transaction);
+
+            /* create positive log message */
+            log.info("Document {} checked in", document.getId());
+        } else {
+            throw new WebserviceException("document not checked in");
+        }
+
+    }
+
+    @Override
+    public void checkout(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findById(docId, true);
+        checkUnlocked(user, doc);
+        checkDocumentPermission(Permission.WRITE, user, docId);
+        checkDocumentPermission(Permission.DOWNLOAD, user, docId);
+
+        doc = docDao.findDocument(docId, true);
+
+        checkPublished(user, doc);
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.CHECKEDOUT);
+        transaction.setComment("");
+        transaction.setUser(user);
+
+        DocumentManager.get().checkout(doc, transaction);
+    }
+
+    @Override
+    public void delete(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findById(docId);
+        checkUnlocked(user, doc);
+        checkFolderPermission(Permission.DELETE, user, doc.getFolder().getId());
+        checkPublished(user, doc);
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.DELETED);
+        transaction.setComment("");
+        transaction.setUser(user);
+
+        docDao.delete(docId, transaction);
+    }
+
+    private void checkUnlocked(User user, Document doc) throws PermissionException {
+        if (user.isMemberOf(Group.GROUP_ADMIN))
+            return;
+
+        if (doc.isImmutable())
+            throw new PermissionException("The document %s is immutable".formatted(doc));
+
+        if (doc.getStatus() != DocumentStatus.UNLOCKED && user.getId() != doc.getLockUserId())
+            throw new PermissionException("The document %s is locked".formatted(doc));
+    }
+
+    @Override
+    public DataHandler getContent(String sid, long docId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, IOException {
+        return getVersionContent(sid, docId, null);
+    }
+
+    @Override
+    public DataHandler getVersionContent(String sid, long docId, String version) throws AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException, IOException {
+        String fileVersion = null;
+        if (version != null) {
+            VersionDAO vDao = VersionDAO.get();
+            Version v = vDao.findByVersion(docId, version);
+            fileVersion = v.getFileVersion();
+        }
+
+        return getResource(sid, docId, fileVersion, null);
+    }
+
+    @Override
+    public DataHandler getResource(String sid, long docId, String fileVersion, String suffix)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+            IOException {
+        User user = validateSession(sid);
+
+        checkDocumentPermission(Permission.READ, user, docId);
+        checkDocumentPermission(Permission.DOWNLOAD, user, docId);
+
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findDocument(docId);
+        checkPublished(user, doc);
+
+        if (doc.isPasswordProtected()) {
+            Session session = SessionManager.get().get(sid);
+            if (!session.getUnprotectedDocs().containsKey(doc.getId()))
+                throw new PermissionException(String.format("The document %s is protected by a password", doc));
+        }
+
+        Store store = Store.get();
+        StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build();
+        if (!store.exists(resource))
+            throw new WebserviceException("Resource %s not found".formatted(resource));
+
+        log.debug("Attach file {}", resource);
+
+        String fileName = doc.getFileName();
+        if (StringUtils.isNotEmpty(suffix))
+            fileName = suffix;
+        String mime = MimeType.getByFilename(fileName);
+        return new DataHandler(new InputStreamDataSource(store.getStream(resource), mime));
+    }
+
+    @Override
+    public void createPdf(String sid, long docId, String fileVersion) throws AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException, IOException {
+        User user = validateSession(sid);
+
+        checkDocumentPermission(Permission.READ, user, docId);
+
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findDocument(docId);
+
+        FormatConversionManager.get().convertToPdf(doc, fileVersion, sid);
+    }
+
+    @Override
+    public void createThumbnail(String sid, long docId, String fileVersion, String type)
+            throws AuthenticationException, WebserviceException, PersistenceException, IOException {
+        validateSession(sid);
+
+        ThumbnailManager manager = ThumbnailManager.get();
+        Store store = Store.get();
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findDocument(docId);
+
+        if (!type.toLowerCase().endsWith(".png"))
+            type += ".png";
+        StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(type).build();
+        if (!store.exists(resource)) {
+            if (type.equals(StoreResource.SUFFIX_THUMBNAIL))
+                manager.createTumbnail(doc, fileVersion, sid);
+            else if (type.equals(StoreResource.SUFFIX_TILE))
+                manager.createTile(doc, fileVersion, sid);
+            else if (type.equals(StoreResource.SUFFIX_MOBILE_THUMBNAIL))
+                manager.createMobile(doc, fileVersion, sid);
+            else if (type.startsWith(ThumbnailManager.THUMB)) {
+                /*
+                 * In this case the resource is like thumb450.png so we extract
+                 * the size from the name
+                 */
+                String sizeStr = resource.name().substring(resource.name().indexOf('-') + 6,
+                        resource.name().lastIndexOf('.'));
+                manager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
+            }
+        }
+    }
+
+    @Override
+    public void uploadResource(String sid, long docId, String fileVersion, String suffix, DataHandler content)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+            IOException {
+        User user = validateSession(sid);
+
+        if (StringUtils.isEmpty(suffix))
+            throw new WebserviceException("Please provide a suffix");
+
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findById(docId);
+
+        checkUnlocked(user, doc);
+        checkDocumentPermission(Permission.READ, user, doc.getId());
+        checkDocumentPermission(Permission.WRITE, user, doc.getId());
+
+        doc = docDao.findDocument(docId);
+
+        if ("sign.p7m".equalsIgnoreCase(suffix))
+            throw new PermissionException("You cannot upload a signature");
+
+        StoreResource resource = StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build();
+        log.debug("Attach file {}", resource);
+
+        Store.get().store(content.getInputStream(), resource);
+    }
+
+    @Override
+    public WSDocument getDocument(String sid, long docId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        Document doc = retrieveReadableDocument(docId, user);
+        checkPublished(user, doc);
+        return getDoc(docId);
+    }
+
+    @Override
+    public WSDocument getDocumentByCustomId(String sid, String customId)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findByCustomId(customId, user.getTenantId());
+        if (doc == null)
+            return null;
+
+        checkDocumentPermission(Permission.READ, user, doc.getId());
+        checkPublished(user, doc);
+
+        return getDoc(doc.getId());
+    }
+
+    @Override
+    public void lock(String sid, long docId) throws AuthenticationException, WebserviceException, PersistenceException,
+            PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = retrieveReadableDocument(docId, user);
+        checkUnlocked(user, doc);
+        checkDocumentPermission(Permission.WRITE, user, docId);
+
+        doc = docDao.findDocument(docId);
+        checkPublished(user, doc);
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.LOCKED);
+        transaction.setComment("");
+        transaction.setUser(user);
+
+        DocumentManager.get().lock(doc.getId(), DocumentStatus.LOCKED, transaction);
+    }
+
+    @Override
+    public WSDocument move(String sid, long docId, long folderId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        FolderDAO fdao = FolderDAO.get();
+        long rootId = fdao.findRoot(user.getTenantId()).getId();
+
+        if (folderId == rootId)
+            throw new PermissionException("Cannot move documents in the root");
+
+        Document doc = retrieveReadableDocument(docId, user);
+        checkFolderPermission(Permission.MOVE, user, doc.getFolder().getId());
+
+        DocumentDAO docDao = DocumentDAO.get();
+        doc = docDao.findDocument(docId);
+        checkPublished(user, doc);
+
+        FolderDAO dao = FolderDAO.get();
+        Folder folder = dao.findById(folderId);
+        checkUnlocked(user, doc);
+        checkFolderPermission(Permission.WRITE, user, folder.getId());
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.MOVED);
+        transaction.setComment("");
+        transaction.setUser(user);
+
+        Document movedDoc =  DocumentManager.get().moveToFolder(doc, folder, transaction).getDocument();
+        return getDoc(movedDoc.getId());
+    }
+
+    @Override
+    public WSDocument copy(String sid, long docId, long folderId, boolean links, boolean notes, boolean security)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+            IOException {
+        User user = validateSession(sid);
+        FolderDAO fdao = FolderDAO.get();
+        long rootId = fdao.findRoot(user.getTenantId()).getId();
+
+        if (folderId == rootId)
+            throw new PermissionException("Cannot create documents in the root");
+
+        checkFolderPermission(Permission.WRITE, user, folderId);
+
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findDocument(docId);
+        checkPublished(user, doc);
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.COPYED);
+        transaction.setComment("");
+        transaction.setUser(user);
+
+        Folder folder = fdao.findFolder(folderId);
+
+        Document createdDoc = DocumentManager.get().copyToFolder(doc, folder, transaction, links, notes, security)
+                .getDocument();
+        return getDoc(createdDoc.getId());
+    }
+
+    @Override
+    public void rename(String sid, long docId, String name) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+
+        Document doc = retrieveReadableDocument(docId, user);
+        checkDocumentPermission(Permission.RENAME, user, docId);
+        checkPublished(user, doc);
+        checkUnlocked(user, doc);
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setUser(user);
+        DocumentManager.get().rename(docId, name, transaction);
+    }
+
+    @Override
+    public void restore(String sid, long docId, long folderId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        DocumentDAO docDao = DocumentDAO.get();
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setUser(user);
+        transaction.setSessionId(sid);
+        docDao.restore(docId, folderId, transaction);
+    }
+
+    @Override
+    public void unlock(String sid, long docId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+
+        Document doc = retrieveReadableDocument(docId, user);
+        checkUnlocked(user, doc);
+
+        // Document is already unlocked, no need to do anything else
+        if (doc.getStatus() == DocumentStatus.UNLOCKED)
+            return;
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.UNLOCKED);
+        transaction.setComment("");
+        transaction.setUser(user);
+
+        DocumentManager.get().unlock(docId, transaction);
+    }
+
+    @Override
+    public void update(String sid, WSDocument document) throws AuthenticationException, PermissionException,
+            WebserviceException, PersistenceException, UnexistingResourceException {
+        updateDocument(sid, document);
+    }
+
+    private void updateDocument(String sid, WSDocument document) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+
+        Document doc = retrieveReadableDocument(document.getId(), user);
+        checkUnlocked(user, doc);
+        checkDocumentPermission(Permission.WRITE, user, doc.getId());
+        checkPublished(user, doc);
+
+        // Initialize the lazy loaded collections
+        DocumentDAO docDao = DocumentDAO.get();
+        doc = docDao.initialize(doc);
+
+        long originalFolderId = doc.getFolder().getId();
+
+        doc.setCustomId(document.getCustomId());
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.CHANGED);
+        transaction.setComment(document.getComment());
+        transaction.setUser(user);
+
+        DocumentManager.get().update(doc, WSUtil.toDocument(document), transaction);
+
+        // If the folder is different, handle the move
+        if (!document.getFolderId().equals(originalFolderId))
+            move(sid, document.getId(), document.getFolderId());
+    }
+
+    @Override
+    public List<WSDocument> listDocuments(String sid, long folderId, String fileName)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        return list(sid, folderId, fileName, "fileName asc", null, null);
+    }
+
+    @Override
+    public List<WSDocument> list(String sid, long folderId, String fileName, String sort, Integer page, Integer max)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+        checkFolderPermission(Permission.READ, user, folderId);
+
+        DocumentDAO docDao = DocumentDAO.get();
+
+        // Get the documents in folder sorted by file name
+        List<Document> docs = docDao.findByFolder(folderId, null);
+
+        // Sort based on the given criteria
+        if (StringUtils.isNotEmpty(sort))
+            Collections.sort(docs, DocumentComparator.getComparator(sort));
+
+        // Retain just those files accessible by the user that also matches the
+        // file name
+        docs = docDao
+                .initialize(docs.stream().filter(doc -> mustList(doc, user, fileName)).collect(Collectors.toList()));
+
+        // In case of pagination, extract just the wanted page
+        if (max != null && page != null && max < docs.size())
+            docs = docs.stream().skip((page - 1) * (long) max).limit(max).collect(Collectors.toList());
+
+        List<WSDocument> wsDocs = new ArrayList<>();
+        for (Document doc : docs)
+            wsDocs.add(WSUtil.toWSDocument(doc));
+        return wsDocs;
+    }
+
+    private boolean mustList(Document document, User user, String fileName) {
+        try {
+            checkPublished(user, document);
+            checkNotArchived(document);
+
+            if (fileName != null && !FileUtil.matches(document.getFileName(), List.of(fileName), null))
+                throw new ParsingException("no match");
+            return true;
+        } catch (Exception t) {
+            return false;
+        }
+    }
+
+    @Override
+    public List<WSDocument> getDocuments(String sid, List<Long> docIds)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        FolderDAO fdao = FolderDAO.get();
+        Collection<Long> folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
+
+        DocumentDAO docDao = DocumentDAO.get();
+        List<Document> docs = docDao.findByIds(Set.copyOf(docIds), null);
+        List<WSDocument> wsDocs = new ArrayList<>();
+        for (int i = 0; i < docs.size(); i++) {
+            try {
+                checkPublished(user, docs.get(i));
+                checkNotArchived(docs.get(i));
+            } catch (Exception t) {
+                continue;
+            }
+            if (user.isMemberOf(Group.GROUP_ADMIN) || folderIds.contains(docs.get(i).getFolder().getId()))
+                wsDocs.add(getDoc(docs.get(i).getId()));
+        }
+
+        return wsDocs;
+    }
+
+    @Override
+    public List<WSDocument> getRecentDocuments(String sid, Integer max)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+
+        StringBuilder query = new StringBuilder(
+                "select docId from DocumentHistory where deleted=0 and (docId is not NULL) and userId=" + user.getId());
+        query.append(" order by date desc");
+        List<Long> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null,
+                Long.class, max);
+
+        List<Long> docIds = new ArrayList<>();
+
+        /*
+         * Iterate over records composing the response XML document
+         */
+        for (Long id : records) {
+            // Discard a gridRecord if already visited
+            if (!docIds.contains(id))
+                docIds.add(id);
+        }
+
+        return getDocuments(sid, docIds);
+    }
+
+    @Override
+    public void sendEmail(String sid, List<Long> docIds, String recipients, String subject, String message)
+            throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException {
+        User user = validateSession(sid);
+
+        DocumentDAO docDao = DocumentDAO.get();
+        FolderDAO folderDao = FolderDAO.get();
+        ContextProperties config = Context.get().getConfig();
+        Session session = SessionManager.get().get(sid);
+
+        EMail mail = new EMail();
+        mail.setTenantId(user.getTenantId());
+        mail.setAccountId(-1);
+        mail.setAuthor(user.getUsername());
+        if (config.getBoolean(session.getTenantName() + ".smtp.userasfrom", true))
+            mail.setAuthorAddress(user.getEmail());
+        mail.parseRecipients(recipients);
+        for (Recipient recipient : mail.getRecipients()) {
+            recipient.setRead(1);
+        }
+        mail.setFolder("outbox");
+        mail.setMessageText(message);
+        mail.setSentDate(new Date());
+        mail.setSubject(subject);
+        mail.setUsername(user.getUsername());
+
+        /*
+         * Only readable documents can be sent
+         */
+        List<Document> docs = new ArrayList<>();
+        for (long id : docIds) {
+            Document doc = docDao.findById(id);
+            if (doc != null && folderDao.isReadAllowed(doc.getFolder().getId(), user.getId())) {
+                doc = docDao.findDocument(id);
+                createAttachment(mail, doc);
+                docs.add(doc);
+            }
+        }
+
+        // Send the message
+        EMailSender sender = new EMailSender(user.getTenantId());
+        sender.send(mail);
+
+        for (Document doc : docs) {
+            try {
+                checkPublished(user, doc);
+            } catch (Exception t) {
+                continue;
+            }
+
+            // Create the document history event
+            DocumentHistory history = new DocumentHistory();
+            history.setSessionId(sid);
+            history.setDocument(doc);
+            history.setDocId(doc.getId());
+            history.setEvent(DocumentEvent.SENT);
+            history.setUser(user);
+            history.setComment(StringUtils.abbreviate(recipients, 4000));
+            history.setFilename(doc.getFileName());
+            history.setVersion(doc.getVersion());
+            history.setFileVersion(doc.getFileVersion());
+            history.setPath(folderDao.computePathExtended(doc.getFolder().getId()));
+            docDao.saveDocumentHistory(doc, history);
+        }
+    }
+
+    private WSDocument getDoc(long docId) throws PersistenceException {
+        DocumentDAO docDao = DocumentDAO.get();
+
+        Document doc = docDao.findById(docId, true);
+        Long aliasId = null;
+        String aliasFileName = null;
+
+        // Check if it is an alias
+        if (doc.getDocRef() != null) {
+            aliasFileName = doc.getFileName();
+            long id = doc.getDocRef();
+            doc = docDao.findById(id, true);
+            aliasId = docId;
+        }
+
+        WSDocument document = WSUtil.toWSDocument(doc);
+
+        if (aliasId != null)
+            document.setDocRef(aliasId);
+        if (StringUtils.isNotEmpty(aliasFileName))
+            document.setFileName(aliasFileName);
+
+        return document;
+    }
+
+    private void createAttachment(EMail email, Document doc) throws IOException, PersistenceException {
+        EMailAttachment att = new EMailAttachment();
+        att.setIcon(doc.getIcon());
+        att.setData(Store.get().getBytes(StoreResource.builder().document(doc).build()));
+        att.setFileName(doc.getFileName());
+        att.setMimeType(MimeType.get(doc.getFileExtension()));
+
+        email.addAttachment(2 + email.getAttachments().size(), att);
+    }
+
+    @Override
+    public WSDocument createAlias(String sid, long docId, long folderId, String type)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+
+        FolderDAO fdao = FolderDAO.get();
+        long rootId = fdao.findRoot(user.getTenantId()).getId();
+
+        if (folderId == rootId)
+            throw new PermissionException("Cannot create alias in the root");
+
+        DocumentDAO docDao = DocumentDAO.get();
+        Document originalDoc = docDao.findById(docId);
+        checkDocumentPermission(Permission.DOWNLOAD, user, docId);
+        checkFolderPermission(Permission.WRITE, user, folderId);
+
+        FolderDAO mdao = FolderDAO.get();
+        Folder folder = mdao.findById(folderId);
+        if (folder == null)
+            throw new WebserviceException("error - folder not found");
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setEvent(DocumentEvent.SHORTCUT_STORED);
+        transaction.setComment("");
+        transaction.setUser(user);
+
+        Document doc = DocumentManager.get().createAlias(originalDoc, folder, type, transaction);
+
+        checkPublished(user, doc);
+
+        return WSUtil.toWSDocument(doc);
+    }
+
+    @Override
+    public void reindex(String sid, long docId, String content)
+            throws ParsingException, AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setUser(user);
+        DocumentManager.get().index(docId, content, transaction);
+    }
+
+    @Override
+    public List<WSDocument> getAliases(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        Collection<Long> folderIds = null;
+        if (!user.isMemberOf(Group.GROUP_ADMIN)) {
+            FolderDAO fdao = FolderDAO.get();
+            folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
+        }
+
+        DocumentDAO docDao = DocumentDAO.get();
+        List<Document> docs = new ArrayList<>();
+        if (user.isMemberOf(Group.GROUP_ADMIN))
+            docs = docDao.findByWhere("_entity.docRef=" + docId, null, null);
+        else if (folderIds != null) {
+            String idsStr = folderIds.toString().replace('[', '(').replace(']', ')');
+            docs = docDao.findByWhere("_entity.docRef=" + docId + " and _entity.id in " + idsStr, null, null);
+        }
+
+        List<WSDocument> wsDocs = new ArrayList<>();
+        docs = docDao.initialize(docs);
+        for (Document doc : docs) {
+            if (user.isMemberOf(Group.GROUP_ADMIN)
+                    || (folderIds != null && folderIds.contains(doc.getFolder().getId())))
+                wsDocs.add(WSUtil.toWSDocument(doc));
+        }
+
+        return wsDocs;
+    }
+
+    @Override
+    public long upload(
+            String sid,
+            Long docId,
+            Long folderId,
+            boolean release,
+            String filename,
+            String language,
+            DataHandler content) throws AuthenticationException, WebserviceException, PersistenceException,
+            PermissionException, IOException {
+        validateSession(sid);
+
+        if (docId != null) {
+            checkout(sid, docId);
+            checkin(sid, docId, "", filename, release, content);
+            return docId;
+        } else {
+            WSDocument doc = new WSDocument();
+            doc.setFileName(filename);
+            doc.setFolderId(folderId);
+            if (StringUtils.isEmpty(language))
+                doc.setLanguage("en");
+            else
+                doc.setLanguage(language);
+
+            return create(sid, doc, content).getId();
+        }
+
+    }
+
+    @Override
+    public WSLink link(String sid, long doc1, long doc2, String type) throws AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+
+        DocumentLink link = DocumentLinkDAO.get().findByDocIdsAndType(doc1, doc2, type);
+
+        Document document1 = retrieveReadableDocument(doc1, user);
+        Document document2 = retrieveReadableDocument(doc2, user);
+
+        checkDocumentPermission(Permission.WRITE, user, document2.getId());
+
+        if (link == null) {
+            // The link doesn't exist and must be created
+            link = new DocumentLink();
+            link.setTenantId(document1.getTenantId());
+            link.setDocument1(document1);
+            link.setDocument2(document2);
+            link.setType(type);
+            DocumentLinkDAO.get().store(link);
+
+            WSLink lnk = new WSLink();
+            lnk.setId(link.getId());
+            lnk.setDoc1(doc1);
+            lnk.setDoc2(doc2);
+            lnk.setType(type);
+            return lnk;
+        } else {
+            throw new WebserviceException("Documents already linked");
+        }
+    }
+
+    @Override
+    public List<WSLink> getLinks(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+
+        checkDocumentPermission(Permission.READ, user, docId);
+
+        List<DocumentLink> links = DocumentLinkDAO.get().findByDocId(docId);
+        List<WSLink> lnks = new ArrayList<>();
+        for (DocumentLink link : links) {
+            WSLink lnk = new WSLink();
+            lnk.setId(link.getId());
+            lnk.setDoc1(link.getDocument1().getId());
+            lnk.setDoc2(link.getDocument2().getId());
+            lnk.setType(link.getType());
+            lnks.add(lnk);
+        }
+
+        return lnks;
+    }
+
+    @Override
+    public void deleteLink(String sid, long id)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        validateSession(sid);
+        DocumentLinkDAO.get().delete(id);
+    }
+
+    @Override
+    public String getExtractedText(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        validateSession(sid);
+        return SearchEngine.get().getHit(docId).getContent();
+    }
+
+    @Override
+    public String createDownloadTicket(
+            String sid,
+            long docId,
+            String suffix,
+            Integer expireHours,
+            String expireDate,
+            Integer maxDownloads,
+            String password)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        validateSession(sid);
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSession(SessionManager.get().get(sid));
+
+        Ticket ticket = new Ticket();
+        ticket.setType(Ticket.DOWNLOAD);
+        ticket.setTenantId(transaction.getTenantId());
+        ticket.setDocId(docId);
+        ticket.setSuffix(suffix);
+        ticket.setExpireHours(expireHours);
+        ticket.setExpired(convertStringToDate(expireDate));
+        ticket.setMaxCount(maxDownloads);
+        try {
+            ticket.setDecodedPassword(password);
+        } catch (NoSuchAlgorithmException e) {
+            throw new PersistenceException(e);
+        }
+
+        ticket = DocumentManager.get().createTicket(ticket, transaction);
+
+        return ticket.getUrl();
+    }
+
+    @Override
+    public String createViewTicket(
+            String sid,
+            long docId,
+            String suffix,
+            Integer expireHours,
+            String expireDate,
+            Integer maxDownloads,
+            Integer maxViews,
+            String password)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        validateSession(sid);
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSession(SessionManager.get().get(sid));
+
+        Ticket ticket = new Ticket();
+        ticket.setType(Ticket.VIEW);
+        ticket.setTenantId(transaction.getTenantId());
+        ticket.setDocId(docId);
+        ticket.setSuffix(suffix);
+        ticket.setExpireHours(expireHours);
+        ticket.setExpired(convertStringToDate(expireDate));
+        ticket.setMaxCount(maxDownloads);
+        ticket.setMaxViews(maxViews);
+        try {
+            ticket.setDecodedPassword(password);
+        } catch (NoSuchAlgorithmException e) {
+            throw new PersistenceException(e);
+        }
+
+        ticket = DocumentManager.get().createTicket(ticket, transaction);
+
+        return ticket.getUrl();
+    }
+
+    @Override
+    public void setPassword(String sid, long docId, String password) throws AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+
+        Document doc = retrieveReadableDocument(docId, user);
+        checkUnlocked(user, doc);
+        checkDocumentPermission(Permission.PASSWORD, user, docId);
+
+        DocumentDAO dao = DocumentDAO.get();
+        doc = dao.findDocument(docId);
+
+        Session session = SessionManager.get().get(sid);
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSession(session);
+        transaction.setComment("");
+
+        dao.setPassword(doc.getId(), password, transaction);
+    }
+
+    @Override
+    public void unsetPassword(String sid, long docId, String currentPassword) throws AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        Document doc = retrieveReadableDocument(docId, user);
+        checkUnlocked(user, doc);
+        checkDocumentPermission(Permission.PASSWORD, user, docId);
+
+        DocumentDAO dao = DocumentDAO.get();
+        doc = dao.findDocument(docId);
+
+        Session session = SessionManager.get().get(sid);
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSession(session);
+        transaction.setComment("");
+
+        if (doc.isGranted(currentPassword))
+            dao.unsetPassword(doc.getId(), transaction);
+        else
+            throw new PermissionException("You cannot access the document");
+    }
+
+    @Override
+    public boolean unprotect(String sid, long docId, String password)
+            throws PersistenceException, AuthenticationException, WebserviceException {
+        validateSession(sid);
+        Document doc = DocumentDAO.get().findDocument(docId);
+        return DocumentManager.get().unprotect(sid, doc.getId(), password);
+    }
+
+    @Override
+    public WSNote addNote(String sid, long docId, String note) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+
+        WSDocument document = retrieveExistingWSDocument(docId, sid);
+
+        DocumentNote newNote = new DocumentNote();
+        newNote.setDocId(document.getId());
+        newNote.setMessage(note);
+        newNote.setUserId(user.getId());
+        newNote.setUsername(user.getFullName());
+
+        DocumentDAO ddao = DocumentDAO.get();
+        Document doc = ddao.findDocument(docId);
+        newNote.setFileName(doc.getFileName());
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setUser(user);
+
+        DocumentNoteDAO.get().store(newNote, transaction);
+
+        return WSNote.fromDocumentNote(newNote);
+    }
+
+    @Override
+    public WSNote saveNote(String sid, long docId, WSNote wsNote) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        retrieveExistingWSDocument(docId, sid);
+
+        DocumentNoteDAO dao = DocumentNoteDAO.get();
+        DocumentNote note = dao.findById(wsNote.getId(), true);
+        if (note == null) {
+            note = new DocumentNote();
+            note.setTenantId(user.getTenantId());
+            note.setDocId(docId);
+            note.setUserId(user.getId());
+            note.setUsername(user.getUsername());
+            note.setDate(new Date());
+        }
+
+        note.setPage(wsNote.getPage());
+        note.setMessage(wsNote.getMessage());
+        note.setColor(wsNote.getColor());
+        note.setTop(wsNote.getTop());
+        note.setLeft(wsNote.getLeft());
+        note.setWidth(wsNote.getWidth());
+        note.setHeight(wsNote.getHeight());
+
+        Document doc = DocumentDAO.get().findDocument(docId);
+        note.setFileName(doc.getFileName());
+
+        if (note.getId() == 0L) {
+            DocumentHistory transaction = new DocumentHistory();
+            transaction.setSessionId(sid);
+            transaction.setUser(user);
+            dao.store(note, transaction);
+        } else
+            dao.store(note);
+
+        return WSNote.fromDocumentNote(note);
+    }
+
+    private WSDocument retrieveExistingWSDocument(long docId, String sid)
+            throws WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
+        WSDocument document = getDocument(sid, docId);
+        if (document == null)
+            throw new PermissionException("Document %d not found or not accessible".formatted(docId));
+        else
+            return document;
+    }
+
+    @Override
+    public void deleteNote(String sid, long noteId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        DocumentNoteDAO dao = DocumentNoteDAO.get();
+        DocumentNote note = dao.findById(noteId);
+        if (note == null)
+            return;
+
+        if (user.isMemberOf(Group.GROUP_ADMIN) || user.getId() == note.getUserId())
+            dao.delete(note.getId());
+    }
+
+    @Override
+    public String deleteVersion(String sid, long docId, String version)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        validateSession(sid);
+
+        Version ver = VersionDAO.get().findByVersion(docId, version);
+
+        // Create the document history event
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+
+        return DocumentManager.get().deleteVersion(ver.getId(), transaction).getVersion();
+    }
+
+    @Override
+    public List<WSNote> getNotes(String sid, long docId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        WSDocument document = retrieveExistingWSDocument(docId, sid);
+
+        List<DocumentNote> notes = DocumentNoteDAO.get().findByDocId(docId, user.getId(), document.getFileVersion());
+        List<WSNote> wsNotes = new ArrayList<>();
+        if (notes != null)
+            for (DocumentNote note : notes)
+                wsNotes.add(WSNote.fromDocumentNote(note));
+        return wsNotes;
+    }
+
+    @Override
+    public WSRating rateDocument(String sid, long docId, int vote) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        retrieveExistingWSDocument(docId, sid);
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setSessionId(sid);
+        transaction.setUser(user);
+
+        RatingDAO ratingDao = RatingDAO.get();
+        Rating rating = ratingDao.findByDocIdAndUserId(docId, user.getId());
+        if (rating == null) {
+            rating = new Rating();
+            rating.setDocId(docId);
+            rating.setUserId(user.getId());
+            rating.setUsername(user.getFullName());
+        }
+        rating.setVote(vote);
+
+        ratingDao.store(rating, transaction);
+        return WSRating.fromRating(rating);
+    }
+
+    @Override
+    public List<WSRating> getRatings(String sid, long docId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        validateSession(sid);
+        retrieveExistingWSDocument(docId, sid);
+
+        List<Rating> ratings = RatingDAO.get().findByDocId(docId);
+        List<WSRating> wsRatings = new ArrayList<>();
+        if (ratings != null)
+            for (Rating rating : ratings)
+                wsRatings.add(WSRating.fromRating(rating));
+
+        return wsRatings;
+    }
+
+    @Override
+    public void replaceFile(String sid, long docId, String fileVersion, String comment, DataHandler content)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException,
+            UnexistingResourceException {
+        User user = validateSession(sid);
+
+        Document doc = retrieveReadableDocument(docId, user);
+        checkUnlocked(user, doc);
+        checkDocumentPermission(Permission.WRITE, user, docId);
+
+        DocumentDAO ddao = DocumentDAO.get();
+        doc = ddao.findDocument(docId);
+        checkUnlocked(user, doc);
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setComment(comment);
+        transaction.setUser(user);
+        transaction.setSession(SessionManager.get().get(sid));
+
+        DocumentManager.get().replaceFile(doc.getId(), fileVersion, content.getInputStream(), transaction);
+        log.info("Replaced fileVersion {} of document {}", fileVersion, doc);
+    }
+
+    @Override
+    public void promoteVersion(String sid, long docId, String version) throws AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException, IOException, UnexistingResourceException {
+        User user = validateSession(sid);
+        Document doc = retrieveReadableDocument(docId, user);
+
+        checkDocumentPermission(Permission.WRITE, user, docId);
+
+        checkUnlocked(user, doc);
+
+        DocumentHistory transaction = new DocumentHistory();
+        transaction.setUser(user);
+        transaction.setSession(SessionManager.get().get(sid));
+
+        DocumentManager.get().promoteVersion(doc.getId(), version, transaction);
+
+        log.info("Promoted version {} of document {}", version, doc);
+    }
+
+    @Override
+    public WSDocument getVersion(String sid, long docId, String version) throws AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        Document doc = retrieveReadableDocument(docId, user);
+        checkPublished(user, doc);
+
+        VersionDAO versDao = VersionDAO.get();
+        Version ver = versDao.findByVersion(docId, version);
+        if (ver != null) {
+            ver = versDao.initialize(ver);
+            WSDocument wsVersion = WSUtil.toWSDocument(ver);
+            wsVersion.setComment(ver.getComment());
+            return wsVersion;
+        }
+        return null;
+    }
+
+    @Override
+    public List<WSDocument> getVersions(String sid, long docId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        Document doc = retrieveReadableDocument(docId, user);
+
+        checkPublished(user, doc);
+
+        VersionDAO versDao = VersionDAO.get();
+        List<Version> versions = versDao.findByDocId(doc.getId());
+        List<WSDocument> wsVersions = new ArrayList<>();
+        for (Version version : versions) {
+            version = versDao.initialize(version);
+            WSDocument wsVersion = WSUtil.toWSDocument(version);
+            wsVersion.setComment(version.getComment());
+            wsVersions.add(wsVersion);
+        }
+
+        return wsVersions;
+    }
+
+    private Document retrieveReadableDocument(long docId, User user)
+            throws PersistenceException, PermissionException, UnexistingResourceException {
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findById(docId, true);
+        if (doc == null)
+            throw new UnexistingResourceException(user.getUsername(), "Document %d".formatted(docId));
+        checkDocumentPermission(Permission.READ, user, docId);
+        return docDao.findDocument(docId, true);
+    }
+
+    @Override
+    public void setAccessControlList(String sid, long docId, List<WSAccessControlEntry> acl)
+            throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
+        User sessionUser = validateSession(sid);
+
+        DocumentDAO documentDao = DocumentDAO.get();
+        // Check if the session user has the Security Permission of this
+        // document
+        if (!documentDao.isPermissionAllowed(Permission.SECURITY, docId, sessionUser.getId()))
+            throw new PermissionException(sessionUser.getUsername(), "Document %d".formatted(docId),
+                    Permission.SECURITY);
+
+        Document document = documentDao.findById(docId, true);
+        document.getAccessControlList().clear();
+        for (WSAccessControlEntry wsAcwe : acl)
+            document.addAccessControlEntry(WSUtil.toDocumentAccessControlEntry(wsAcwe));
+
+        DocumentHistory history = new DocumentHistory();
+        history.setEvent(DocumentEvent.PERMISSION);
+        history.setSession(SessionManager.get().get(sid));
+        documentDao.store(document, history);
+    }
+
+    @Override
+    public List<WSAccessControlEntry> getAccessControlList(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        validateSession(sid);
+
+        List<WSAccessControlEntry> acl = new ArrayList<>();
+        DocumentDAO documentDao = DocumentDAO.get();
+
+        Document document = documentDao.findById(docId, true);
+
+        for (AccessControlEntry ace : document.getAccessControlList())
+            acl.add(WSUtil.toWSAccessControlEntry(ace));
+
+        return acl;
+    }
+
+    @Override
+    public boolean isRead(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        return isGranted(sid, docId, Permission.READ.name());
+    }
+
+    @Override
+    public boolean isWrite(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        return isGranted(sid, docId, Permission.WRITE.name());
+    }
+
+    @Override
+    public boolean isDownload(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        return isGranted(sid, docId, Permission.DOWNLOAD.name());
+    }
+
+    @Override
+    public boolean isGranted(String sid, long docId, String permission)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        try {
+            checkDocumentPermission(Permission.valueOf(permission.toUpperCase()), user, docId);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+        return true;
+    }
 }

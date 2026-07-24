@@ -59,15 +59,15 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testMove() throws Exception {
-		Folder folderToMove = folderDao.findById(1203);
+		Folder folderToMove = folderDao.findById(1203L, true);
 		assertNotNull(folderToMove);
-		assertEquals(1201, folderToMove.getParentId());
-		Folder parentFolder = folderDao.findById(1200);
+		assertEquals(1201L, folderToMove.getParentId());
+		Folder parentFolder = folderDao.findById(1200L, true);
 		assertNotNull(parentFolder);
 
 		testSubject.move("", folderToMove.getId(), 1200L);
-		folderToMove = folderDao.findById(1203);
-		assertEquals(1200, folderToMove.getParentId());
+		folderToMove = folderDao.findById(1203L);
+		assertEquals(1200L, folderToMove.getParentId());
 	}
 
 	@Test
@@ -139,10 +139,9 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testRename() throws Exception {
-		Folder folder = folderDao.findById(103);
+		Folder folder = folderDao.findById(103L, true);
 		assertNotNull(folder);
 		assertEquals("menu.admin103", folder.getName());
-		folderDao.initialize(folder);
 
 		testSubject.rename("", 103, "paperino");
 

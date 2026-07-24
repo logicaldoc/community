@@ -63,7 +63,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 
 		testSubject.store(folder, "admin");
 		Folder result = testSubject.findByPath("/Workspace X/folder6/newfolder");
-		testSubject.initialize(folder);
+		result = testSubject.initialize(folder);
 		assertNotNull(result);
 		assertEquals("newfolder", result.getName());
 	}

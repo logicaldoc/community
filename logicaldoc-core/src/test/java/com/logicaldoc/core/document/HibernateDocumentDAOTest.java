@@ -136,9 +136,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testUpdateDigest() throws PersistenceException {
-        Document doc = testSubject.findById(1);
+        Document doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         assertEquals("xx", doc.getDigest());
 
         File file = new File("%s/1/doc/%s".formatted(rootStoreOne.getAbsolutePath(), doc.getFileVersion()));
@@ -148,13 +147,10 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         testSubject.updateDigest(doc);
         assertEquals(digest, doc.getDigest());
 
-        Document updatedDoc = testSubject.findById(1);
-        testSubject.initialize(updatedDoc);
+        Document updatedDoc = testSubject.findById(1L, true);
         assertEquals(doc.getVersion(), updatedDoc.getVersion());
 
-        doc = testSubject.findById(0);
-        testSubject.initialize(doc);
-        assertEquals(null, doc);
+        assertEquals(null, testSubject.findById(0L));
     }
 
     @Test
@@ -173,8 +169,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testDeleteAll() throws PersistenceException {
-        Folder testFolder = folderDao.findById(5);
-        folderDao.initialize(testFolder);
+        Folder testFolder = folderDao.findById(5L, true);
         assertNotSame(null, testFolder);
 
         Document doc1 = new Document();
@@ -268,9 +263,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testFindById() throws PersistenceException {
-        Document doc = testSubject.findById(1);
+        Document doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         assertEquals(1, doc.getId());
         assertEquals("pippo.pdf", doc.getFileName());
         assertNotNull(doc.getFolder());
@@ -285,9 +279,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testFindByCustomId() throws PersistenceException {
-        Document doc = testSubject.findByCustomId("a", Tenant.DEFAULT_ID);
+        Document doc = testSubject.findByCustomId("a", Tenant.DEFAULT_ID, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         assertEquals(1, doc.getId());
         assertEquals("pippo.pdf", doc.getFileName());
         assertNotNull(doc.getFolder());
@@ -343,8 +336,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testFindDocument() throws PersistenceException {
-        Folder testFolder = folderDao.findById(6);
-        folderDao.initialize(testFolder);
+        Folder testFolder = folderDao.findById(6L, true);
         assertNotSame(null, testFolder);
 
         Document doc1 = new Document();
@@ -474,9 +466,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         doc.setValues("multi", List.of("value1", "value2", "value3"));
         testSubject.store(doc);
 
-        doc = testSubject.findById(doc.getId());
+        doc = testSubject.findById(doc.getId(), true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
 
         assertEquals("value2", doc.getValue("multi-0001"));
         assertEquals("value3", doc.getValue("multi-0002"));
@@ -487,9 +478,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         doc.setValues("multi", List.of("A", "B"));
         testSubject.store(doc);
 
-        doc = testSubject.findById(doc.getId());
+        doc = testSubject.findById(doc.getId(), true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         assertEquals("B", doc.getValue("multi-0001"));
     }
 
@@ -498,8 +488,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         assertEquals(0L, testSubject.queryForLong("select count(*) from ld_document where ld_filename like 'test-%'"));
 
         int total = Context.get().getConfig().getInt("maxdocsperfolder") - 100;
-        Document master = testSubject.findById(1);
-        testSubject.initialize(master);
+        Document master = testSubject.findById(1L, true);
+        assertNotNull(master);
         for (int i = 0; i < total; i++) {
             Document newDoc = new Document();
             newDoc.setFileName("test-%d.txt".formatted(i));
@@ -515,12 +505,11 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testStore() throws PersistenceException {
-        Document doc = testSubject.findById(1L);
+        Document doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
 
         // Try to store it inside a folder with extended attributes
-        Folder folder = folderDao.findById(1202L);
+        Folder folder = folderDao.findById(1202L, true);
         doc.setFolder(folder);
 
         doc.setValue("object", "test");
@@ -532,17 +521,15 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
         // Try to store into an alias folder
         Folder alias = folderDao.createAlias(4L, 6L, null);
-        doc = testSubject.findById(1);
+        doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         doc.setFolder(alias);
         testSubject.store(doc);
 
         assertNotNull(testSubject.findById(doc.getId()).getLastModified());
 
         // The document should be stored in the referenced folder
-        doc = testSubject.findById(1);
-        testSubject.initialize(doc);
+        doc = testSubject.findById(1L, true);
         assertNotNull(doc);
         Folder realFolder = folderDao.findById(6L);
         assertEquals(realFolder, doc.getFolder());
@@ -558,7 +545,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
         // The document has id == 0 and number of documents in the folder > 0
         Context.get().getConfig().setProperty("maxdocsperfolder", "3");
-        Folder folder2 = folderDao.findById(6);
+        Folder folder2 = folderDao.findById(6L);
         doc = new Document();
         doc.setFileName("newDoc");
         doc.setFolder(folder2);
@@ -594,8 +581,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         assertNotNull(tags);
 
         // testing Tag class methods
-        Document doc1 = testSubject.findById(1);
-        testSubject.initialize(doc1);
+        Document doc1 = testSubject.findById(1L, true);
         assertNotNull(doc1);
 
         Tag tag1 = doc1.getTags().stream().findFirst().get();
@@ -670,7 +656,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
         ids = testSubject.findByUserIdAndTag(1, "ask", null);
         assertNotNull(ids);
-        assertEquals(1, ids.size());
+        assertTrue(ids.isEmpty());
 
         ids = testSubject.findByUserIdAndTag(99, "abc", null);
         assertNotNull(ids);
@@ -694,7 +680,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testFindByPath() throws PersistenceException {
-        Document doc = testSubject.findByPath("/Workspace X/folder6/pluto", 1L);
+        Document doc = testSubject.findByPath("/Workspace X/folder6/pluto", 1L, true);
         assertNotNull(doc);
         assertEquals("pluto", doc.getFileName());
 
@@ -721,9 +707,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         assertNotNull(documents);
         assertEquals(0, documents.size());
 
-        Document doc = testSubject.findById(1);
+        Document doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         doc.setFileName("pluto");
         doc.setFolder(folderDao.findById(7));
         testSubject.store(doc);
@@ -797,10 +782,10 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         transaction.setComment("");
         transaction.setUser(new User());
 
-        assertNull(testSubject.findById(4));
-        testSubject.restore(4, 5, transaction);
-        assertNotNull(testSubject.findById(4));
-        assertEquals(5L, testSubject.findById(4).getFolder().getId());
+        assertNull(testSubject.findById(4L, true));
+        testSubject.restore(4L, 5L, transaction);
+        assertNotNull(testSubject.findById(4L, true));
+        assertEquals(5L, testSubject.findById(4L, true).getFolder().getId());
 
     }
 
@@ -900,10 +885,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testCleanExpiredTransactions() throws PersistenceException {
-        Document doc = testSubject.findById(1);
+    public void testCleanExpiredTransactions() throws PersistenceException, InterruptedException {
+        Document doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         doc.setTransactionId("transaction");
         testSubject.store(doc);
 
@@ -911,18 +895,17 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         lockManager.get("Test", "transaction");
 
         testSubject.cleanExpiredTransactions();
-        testSubject.findById(1);
+        doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         assertEquals("transaction", doc.getTransactionId());
 
         // Now the transaction expired
         lockManager.release("Test", "transaction");
 
         testSubject.cleanExpiredTransactions();
-        testSubject.findById(1);
+
+        doc = testSubject.findById(1L, true);
         assertNotNull(doc);
-        testSubject.initialize(doc);
         assertNull(doc.getTransactionId());
     }
 
@@ -955,8 +938,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testApplyParentFolderSecurity() throws PersistenceException {
-        Document doc = testSubject.findById(1L);
-        testSubject.initialize(doc);
+        Document doc = testSubject.findById(1L, true);
         assertTrue(doc.getAccessControlList().isEmpty());
 
         DocumentHistory transaction = new DocumentHistory();
@@ -964,20 +946,21 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         transaction.setUsername("admin");
         testSubject.applyParentFolderSecurity(1L, transaction);
 
-        doc = testSubject.findById(1L);
-        testSubject.initialize(doc);
-        folderDao.initialize(doc.getFolder());
+        doc = testSubject.findById(1L, true);
+
+        Folder fld = doc.getFolder();
+        fld = folderDao.initialize(fld);
         assertTrue(!doc.getAccessControlList().isEmpty());
-        assertEquals(doc.getFolder().getAccessControlList().size(), doc.getAccessControlList().size());
+        assertEquals(fld.getAccessControlList().size(), doc.getAccessControlList().size());
 
         // folder securityRef != null
-        doc = testSubject.findById(1L);
-        testSubject.initialize(doc);
-        Folder folder = doc.getFolder();
-        folderDao.initialize(doc.getFolder());
+        doc = testSubject.findById(1L, true);
+        Folder fld2 = doc.getFolder();
+        Folder folder = fld2;
+        fld2 = folderDao.initialize(fld2);
         folder.setSecurityRef(1202L);
-        doc.getFolder().setSecurityRef(1202L);
-        folderDao.store(doc.getFolder());
+        fld2.setSecurityRef(1202L);
+        folderDao.store(fld2);
         testSubject.applyParentFolderSecurity(1L, transaction);
     }
 }

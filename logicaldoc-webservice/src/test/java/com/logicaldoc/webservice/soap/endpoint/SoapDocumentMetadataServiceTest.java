@@ -85,7 +85,7 @@ public class SoapDocumentMetadataServiceTest extends AbstractWebserviceTestCase 
 		Long templateId = testSubject.storeTemplate("", wsTemplateTest);
 		assertNotNull(templateId);
 
-		Template createdTemplate = templateDao.findById(templateId);
+		Template createdTemplate = templateDao.findById(templateId, true);
 		assertNotNull(createdTemplate);
 		assertEquals("template test", createdTemplate.getName());
 		assertEquals("template test descr", createdTemplate.getDescription());

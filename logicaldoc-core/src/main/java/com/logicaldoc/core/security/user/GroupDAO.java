@@ -73,10 +73,6 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	 */
 	public Collection<Group> findByLikeName(String name, long tenantId) throws PersistenceException;
 
-	/**
-	 * Initializes the group collections
-	 */
-	public void initialize(Group group);
 
 	public void fixGuestPermissions(Group group) throws PersistenceException;
 }

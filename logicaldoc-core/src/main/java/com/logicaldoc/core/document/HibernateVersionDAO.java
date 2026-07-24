@@ -74,14 +74,6 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
             return null;
     }
 
-    @Override
-    public void initialize(Version version) {
-        refresh(version);
-
-        if (version.getAttributes() != null)
-            log.trace("Initialized {} attributes", version.getAttributes().keySet().size());
-    }
-
     /**
      * This method persists the given version. Checks if is necessary to delete
      * some document versions reading the context property
@@ -131,7 +123,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
     @Override
     public void updateDigest(Version version) throws PersistenceException {
-        initialize(version);
+        version = initialize(version);
         StoreResource resource = StoreResource.builder().document(version).build();
         if (store.exists(resource)) {
             try (InputStream in = store.getStream(resource);) {

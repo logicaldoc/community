@@ -1,5 +1,6 @@
 package com.logicaldoc.core;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.MutationQuery;
@@ -98,7 +100,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
     public T findById(long id) throws PersistenceException {
         T entity = null;
         try {
-            entity = getCurrentSession().get(entityClass, id);
+            entity = getCurrentSession().find(entityClass, id);
             if (entity != null && entity.getDeleted() != 0)
                 return null;
             return entity;
@@ -265,22 +267,15 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
         if (entity == null)
             return;
 
-        try {
-            if (!getCurrentSession().contains(entity)) {
-                getCurrentSession().refresh(entity);
-            }
-        } catch (Exception e) {
-            // Nothing to do
-        }
+        if (!getCurrentSession().contains(entity))
+            getCurrentSession().refresh(entity);
     }
 
-    protected Object merge(Object entity) {
-        try {
-            return getCurrentSession().merge(entity);
-        } catch (Exception t) {
-            log.error(t.getMessage(), t);
-            return null;
-        }
+    protected T merge(T entity) {
+        if (entity == null)
+            return entity;
+
+        return getCurrentSession().merge(entity);
     }
 
     protected Query<Object[]> prepareQuery(String expression, Map<String, Object> values, Integer max) {
@@ -328,11 +323,60 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
     /**
      * Doesn't do anything by default
      * 
-     * @throws PersistenceException Error in the database
+     * @throws PersistenceException Error in initializing the collections
      */
     @Override
-    public void initialize(T entity) throws PersistenceException {
-        // By default do nothing
+    public final T initialize(T entity) throws PersistenceException {
+        if (entity == null)
+            return entity;
+
+        try {
+            T mergedEntity = merge(entity);
+            initializeCollections(mergedEntity);
+            return mergedEntity;
+        } catch (RuntimeException e) {
+            if (log.isTraceEnabled())
+                log.trace(e.getMessage(), e);
+            return entity;
+        }
+    }
+
+    /**
+     * Concrete implementations must put here their custom initialization of the
+     * collections. This default implementation uses the reflection to detect
+     * all the collections and initializes them.++
+     * 
+     * @param entity The entity to initialize
+     * 
+     * @throws PersistenceException Error in initializing the collections
+     */
+    protected void initializeCollections(T entity) throws PersistenceException {
+        Class<?> clazz = entity.getClass();
+
+        while (clazz != null && clazz != Object.class) {
+            for (Field field : clazz.getDeclaredFields()) {
+
+                Class<?> type = field.getType();
+
+                boolean isCollection = Collection.class.isAssignableFrom(type);
+                boolean isMap = Map.class.isAssignableFrom(type);
+
+                if (isCollection || isMap) {
+                    if (log.isTraceEnabled())
+                        log.trace("Trying to initialize attribute {} of {}", field.getName(), entity);
+                    field.setAccessible(true); // allow access to private fields
+                    try {
+                        Object value = field.get(entity);
+                        Hibernate.initialize(value);
+                    } catch (Exception e) {
+                        log.warn("Cannot initialize attribute {} of {}", field.getName(), entity);
+                    }
+
+                }
+            }
+
+            clazz = clazz.getSuperclass(); // walk inheritance chain
+        }
     }
 
     protected Session getCurrentSession() {
@@ -580,7 +624,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
     @Override
     public void evict(Class<? extends PersistentObject> obj, long id) {
-        evict(getCurrentSession().get(obj, id));
+        evict(getCurrentSession().find(obj, id));
         sessionFactory.getCache().evict(obj, id);
     }
 

@@ -256,8 +256,7 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 		GUIFolder folder9 = testSubject.getFolder(9L, false, false, false);
 		assertNull(folder9.getTemplateId());
 
-		Folder parentFolder = folderDao.findById(7L);
-		folderDao.initialize(parentFolder);
+		Folder parentFolder = folderDao.findById(7L, true);
 
 		TemplateDAO templateDao = TemplateDAO.get();
 		parentFolder.setTemplate(templateDao.findById(-1L));
@@ -460,14 +459,14 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testPaste() throws Exception {
-		Document doc = documentDao.findById(1L);
+		Document doc = documentDao.findById(1L, true);
 		assertEquals(5L, doc.getFolder().getId());
 
 		assertTrue(documentDao.findByFolder(1200L, null).isEmpty());
 
 		testSubject.paste(List.of(1L, 2L, 3L), 1200L, Clipboard.COPY, true, true, true);
 
-		doc = documentDao.findById(1L);
+		doc = documentDao.findById(1L, true);
 		assertEquals(5L, doc.getFolder().getId());
 		assertEquals(3, documentDao.findByFolder(1200L, null).size());
 
@@ -511,8 +510,7 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 		assertEquals(8L, folderDao.queryForLong("select ld_id from ld_folder where ld_id=" + 8L + " and ld_deleted=1"));
 
 		testSubject.restore(List.of(8L), 1200L);
-		Folder folder = folderDao.findById(8L);
-		folderDao.initialize(folder);
+		Folder folder = folderDao.findById(8L, true);
 		assertNotNull(folder);
 		assertEquals(1200L, folder.getParentId());
 	}

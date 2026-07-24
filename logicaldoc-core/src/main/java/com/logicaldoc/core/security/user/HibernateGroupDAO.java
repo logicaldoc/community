@@ -151,21 +151,10 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
     }
 
     @Override
-    public void initialize(Group group) {
-        if (group == null)
-            return;
-
-        if (group.getDeleted() == 0)
-            refresh(group);
-
-        UserDAO uDao = UserDAO.get();
-        try {
-            group.setUsers(uDao.findByGroup(group.getId()));
-        } catch (PersistenceException e) {
-            log.error(e.getMessage(), e);
-        }
+    public void initializeCollections(Group group) throws PersistenceException {
+        group.setUsers(UserDAO.get().findByGroup(group.getId()));
     }
-
+    
     @Override
     public void store(Group group) throws PersistenceException {
         super.store(group);

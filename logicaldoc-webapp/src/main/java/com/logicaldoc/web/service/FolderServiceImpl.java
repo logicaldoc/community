@@ -95,8 +95,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
         FolderDAO fdao = FolderDAO.get();
         try {
-            Folder folder = fdao.findById(guiFolder.getId());
-            fdao.initialize(folder);
+            Folder folder = fdao.findById(guiFolder.getId(), true);
 
             if (subtree) {
                 /*
@@ -164,7 +163,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
     public GUIFolder fromFolder(Folder folder, boolean computePath) throws PersistenceException {
         FolderDAO dao = FolderDAO.get();
-        dao.initialize(folder);
+        folder = dao.initialize(folder);
 
         GUIFolder guiFolder = new GUIFolder();
         guiFolder.setId(folder.getId());
@@ -245,14 +244,14 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         String pathPrefix = root.getPath();
         long[] stats = new long[] { 0L, 0L };
         dao.queryForResultSet("""
-                    select count(D.ld_id), sum(D.ld_filesize) 
-                      from ld_document D, ld_folder F 
-                     where D.ld_deleted = 0 
-                       and F.ld_deleted = 0 
-                       and D.ld_folderid = F.ld_id 
-                       and (F.ld_id = :folderId or F.ld_path like :path) 
-                       and not ld_status = :status
-                """, Map.of("folderId", folderId, "path", "%s/%%".formatted(pathPrefix), "status",
+                                  select count(D.ld_id), sum(D.ld_filesize)
+                                    from ld_document D, ld_folder F
+                                   where D.ld_deleted = 0
+                                     and F.ld_deleted = 0
+                                     and D.ld_folderid = F.ld_id
+                                     and (F.ld_id = :folderId or F.ld_path like :path)
+                                     and not ld_status = :status
+                              """, Map.of("folderId", folderId, "path", "%s/%%".formatted(pathPrefix), "status",
                 DocumentStatus.ARCHIVED.ordinal()), null, rows -> {
                     if (rows.next()) {
                         stats[0] = rows.getLong(1);
@@ -301,17 +300,14 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
                 checkPermission(Permission.READ, session.getUser(), folderId);
 
             Folder folder = null;
-            Folder test = dao.findById(folderId);
+            Folder test = dao.findById(folderId, true);
             if (test == null)
                 throw new ServerException("Unexisting folder %d".formatted(folderId));
-
-            dao.initialize(test);
 
             GUIFolder guiFolder = null;
             // Check if it is an alias
             if (test.getFoldRef() != null) {
-                folder = dao.findById(test.getFoldRef());
-                dao.initialize(folder);
+                folder = dao.findById(test.getFoldRef(), true);
                 guiFolder = fromFolder(folder, computePath);
 
                 // The alias rewrite some properties
@@ -334,11 +330,10 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
             Folder securityRef = folder;
             if (test.getSecurityRef() != null) {
-                Folder f = dao.findById(test.getSecurityRef());
+                Folder f = dao.findById(test.getSecurityRef(), true);
                 if (f != null)
                     securityRef = f;
             }
-            dao.initialize(securityRef);
 
             setACL(securityRef, guiFolder);
             return guiFolder;
@@ -451,7 +446,11 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
     }
 
     @Override
-    public void copyFolders(List<Long> folderIds, long targetId, boolean foldersOnly, String securityOption,
+    public void copyFolders(
+            List<Long> folderIds,
+            long targetId,
+            boolean foldersOnly,
+            String securityOption,
             GUIFolder model) throws ServerException {
         Session session = validateSession();
 
@@ -463,10 +462,15 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         }
     }
 
-    private void copyFolder(Session session, long folderId, long targetId, boolean foldersOnly, String securityOption,
+    private void copyFolder(
+            Session session,
+            long folderId,
+            long targetId,
+            boolean foldersOnly,
+            String securityOption,
             GUIFolder model) throws PersistenceException, ServerException {
         FolderDAO folderDao = FolderDAO.get();
-        Folder folderToCopy = folderDao.findById(folderId);
+        Folder folderToCopy = folderDao.findById(folderId, true);
 
         Folder destParentFolder = folderDao.findFolder(targetId);
 
@@ -474,8 +478,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         if (targetId == 0 || folderDao.isInPath(folderToCopy.getId(), destParentFolder.getId())) {
             return;
         }
-
-        folderDao.initialize(folderToCopy);
 
         // Check destParentId: Must be different from the current folder
         // parentId
@@ -502,7 +504,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
                 transaction);
         if (model != null) {
             model.setId(createdFolder.getId());
-            folderDao.initialize(createdFolder);
+            createdFolder = folderDao.initialize(createdFolder);
             save(model);
         }
     }
@@ -576,8 +578,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             }
             // To avoid a 'org.hibernate.StaleObjectStateException', we
             // must retrieve the folder from database.
-            Folder folder = dao.findById(folderId);
-            dao.initialize(folder);
+            Folder folder = dao.findById(folderId, true);
 
             // Add a folder history entry
             FolderHistory history = new FolderHistory();
@@ -600,8 +601,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         FolderDAO folderDao = FolderDAO.get();
 
         try {
-            Folder folder = folderDao.findById(guiFolder.getId());
-            folderDao.initialize(folder);
+            Folder folder = folderDao.findById(guiFolder.getId(), true);
 
             FolderHistory saveTransaction = new FolderHistory();
             saveTransaction.setSession(session);
@@ -617,8 +617,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
                 folder.setColor(guiFolder.getColor());
                 folderDao.store(folder);
 
-                folder = folderDao.findById(guiFolder.getFoldRef());
-                folderDao.initialize(folder);
+                folder = folderDao.findById(guiFolder.getFoldRef(), true);
             } else {
                 // The user is editing a real folder
                 folder.setType(guiFolder.getType());
@@ -804,10 +803,10 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
         Folder folder;
         try {
-            folder = fdao.findFolder(folderId);
+            folder = fdao.findFolder(folderId, true);
 
             if (!fdao.isWriteAllowed(folder.getId(), session.getUserId()))
-                throw new ServerException("Cannot write in folder " + folder.getName());
+                throw new ServerException("Cannot write in folder %s".formatted(folder.getName()));
 
             if (action.equals(Clipboard.CUT))
                 cut(session, docIds, folder.getId());
@@ -863,13 +862,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
     private void checkLocked(Document doc) throws PermissionException {
         if (doc.getStatus() != DocumentStatus.UNLOCKED || doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
-            throw new PermissionException("Document " + doc.getId() + " is locked");
+            throw new PermissionException("Document %d is locked".formatted(doc.getId()));
         }
     }
 
     private void checkImmutable(Document doc) throws PermissionException {
         if (doc.isImmutable()) {
-            throw new PermissionException("Document " + doc.getId() + " is immutable");
+            throw new PermissionException("Document %d is immutable".formatted(doc.getId()));
         }
     }
 
@@ -963,9 +962,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             return;
         }
 
-        TemplateDAO templateDao = TemplateDAO.get();
-        Template template = templateDao.findById(f.getTemplateId());
-        templateDao.initialize(template);
+        Template template = TemplateDAO.get().findById(f.getTemplateId(), true);
 
         folder.setTemplate(template);
         folder.setTemplateLocked(f.isTemplateLocked());
@@ -1187,8 +1184,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         executeLongRunningOperation("Merge", () -> {
             try {
                 FolderDAO fDao = FolderDAO.get();
-                Folder target = fDao.findFolder(targetId);
-                fDao.initialize(target);
+                Folder target = fDao.findFolder(targetId, true);
 
                 FolderHistory transaction = new FolderHistory();
                 transaction.setSession(session);

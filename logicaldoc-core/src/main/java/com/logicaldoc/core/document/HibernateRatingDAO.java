@@ -62,7 +62,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
         if (doc == null)
             return 0;
 
-        docDao.initialize(doc);
+        doc = docDao.initialize(doc);
         int average = 0;
         if (votesDoc != null && votesDoc.getAverage() != null)
             average = votesDoc.getAverage().intValue();

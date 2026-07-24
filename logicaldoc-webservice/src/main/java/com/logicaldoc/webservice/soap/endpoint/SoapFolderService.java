@@ -161,12 +161,9 @@ public class SoapFolderService extends AbstractService implements FolderService 
         User user = validateSession(sid);
         checkFolderPermission(Permission.READ, user, folderId);
         FolderDAO folderDao = FolderDAO.get();
-        Folder folder = folderDao.findById(folderId);
+        Folder folder = folderDao.findById(folderId, true);
         if (folder == null)
             return null;
-
-        folderDao.initialize(folder);
-
         return WSFolder.fromFolder(folder);
     }
 
@@ -180,7 +177,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
         if (folder == null)
             return null;
 
-        folderDao.initialize(folder);
+        folder = folderDao.initialize(folder);
         checkFolderPermission(Permission.READ, user, folder.getId());
         return WSFolder.fromFolder(folder);
     }
@@ -220,7 +217,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
         List<WSFolder> wsFolders = new ArrayList<>();
         for (Folder folder : folders) {
             if (!folder.isHidden()) {
-                folderDao.initialize(folder);
+                folder = folderDao.initialize(folder);
                 wsFolders.add(WSFolder.fromFolder(folder));
             }
         }
@@ -325,11 +322,9 @@ public class SoapFolderService extends AbstractService implements FolderService 
         if (folderId == rootId)
             throw new WebserviceException("cannot rename the root folder");
 
-        Folder folder = folderDao.findById(folderId);
+        Folder folder = folderDao.findById(folderId, true);
         if (folder == null)
             throw new WebserviceException(String.format("cannot find folder %s", folderId));
-
-        folderDao.initialize(folder);
 
         List<Folder> folders = folderDao.findByNameAndParentId(name, folder.getParentId());
         if (CollectionUtils.isNotEmpty(folders)) {
@@ -352,10 +347,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
     public WSFolder getRootFolder(String sid)
             throws AuthenticationException, WebserviceException, PersistenceException {
         User user = validateSession(sid);
-        FolderDAO folderDao = FolderDAO.get();
 
-        Folder folder = folderDao.findRoot(user.getTenantId());
-        folderDao.initialize(folder);
+        Folder folder = FolderDAO.get().findRoot(user.getTenantId(), true);
 
         return WSFolder.fromFolder(folder);
     }
@@ -405,13 +398,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
             // Iterate on the parents and populate the path
             List<Folder> folders = folderDao.findParents(folderId);
             for (Folder folder : folders) {
-                folderDao.initialize(folder);
+                folder = folderDao.initialize(folder);
                 WSFolder wsFolder = WSFolder.fromFolder(folder);
                 path.add(wsFolder);
             }
             // Insert the target folder itself
-            Folder f = folderDao.findById(folderId);
-            folderDao.initialize(f);
+            Folder f = folderDao.findById(folderId, true);
             WSFolder wsFolder = WSFolder.fromFolder(f);
             path.add(wsFolder);
         }
@@ -430,8 +422,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
         if (!folderDao.isPermissionAllowed(Permission.SECURITY, folderId, sessionUser.getId()))
             throw new PermissionException(sessionUser.getUsername(), FOLDER + folderId, Permission.SECURITY);
 
-        Folder folder = folderDao.findById(folderId);
-        folderDao.initialize(folder);
+        Folder folder = folderDao.findById(folderId, true);
         folder.setSecurityRef(null);
         folder.getAccessControlList().clear();
         for (WSAccessControlEntry wsAcwe : acl)
@@ -452,10 +443,9 @@ public class SoapFolderService extends AbstractService implements FolderService 
         List<WSAccessControlEntry> acl = new ArrayList<>();
 
         FolderDAO folderDao = FolderDAO.get();
-        Folder folder = folderDao.findById(folderId);
+        Folder folder = folderDao.findById(folderId, true);
         if (folder.getSecurityRef() != null)
-            folder = folderDao.findById(folder.getSecurityRef());
-        folderDao.initialize(folder);
+            folder = folderDao.findById(folder.getSecurityRef(), true);
 
         for (AccessControlEntry ace : folder.getAccessControlList())
             acl.add(WSUtil.toWSAccessControlEntry(ace));
@@ -486,7 +476,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
         if (CollectionUtils.isNotEmpty(folders) && folders.get(0).getId() != folder.getId()) {
             throw new WebserviceException(String.format("duplicate folder name %s", name));
         } else {
-            folderDao.initialize(folder);
+            folder = folderDao.initialize(folder);
 
             folder.setName(name);
             folder.setColor(wsFolder.getColor());
@@ -530,8 +520,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
         checkFolderPermission(Permission.ADD, user, parentId);
 
         FolderDAO folderDao = FolderDAO.get();
-        Folder parent = folderDao.findById(parentId);
-        folderDao.initialize(parent);
+        Folder parent = folderDao.findById(parentId, true);
 
         FolderHistory transaction = new FolderHistory();
         transaction.setUser(user);
@@ -556,8 +545,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
              */
             for (WSFolder w : listWorkspaces(sid)) {
                 if (path.startsWith(w.getName() + "/")) {
-                    workspace = folderDao.findById(w.getId());
-                    folderDao.initialize(workspace);
+                    workspace = folderDao.findById(w.getId(), true);
                     break;
                 }
             }
@@ -565,7 +553,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
             if (workspace == null) {
                 log.debug("Path {} will be created in the Default workspace", path);
                 parent = folderDao.findDefaultWorkspace(user.getTenantId());
-                folderDao.initialize(parent);
+                parent = folderDao.initialize(parent);
             }
         }
 
@@ -597,9 +585,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
         User user = validateSession(sid);
         FolderDAO folderDao = FolderDAO.get();
 
-        if (targetId == folderDao.findRoot(user.getTenantId()).getId()) {
+        if (targetId == folderDao.findRoot(user.getTenantId()).getId())
             throw new PermissionException(CANNOT_MOVE_FOLDERS_IN_THE_ROOT);
-        }
 
         Folder destTargetFolder = folderDao.findById(targetId);
         Folder folderToCopy = folderDao.findById(sourceId);

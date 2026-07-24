@@ -16,6 +16,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.util.plugin.PluginException;
 
 public class StandardSearchEngineTest extends AbstractCoreTestCase {
@@ -47,14 +48,10 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
         document.setFileName("Document test 1");
         document.setLanguage("en");
         document.setDate(referenceInstant);
-        Folder fold = new Folder();
-        fold.setId(Folder.DEFAULTWORKSPACEID);
-        fold.setName("test");
-        document.setFolder(fold);
+        document.setFolder(FolderDAO.get().findById(Folder.DEFAULTWORKSPACEID, true));
 
         testSubject.unlock();
-        documentDao.initialize(document);
-        testSubject.addHit(document, "Questo è un documento di prova. Per fortuna che esistono i test. document");
+        testSubject.addHit(document, "Questo e un documento di prova. Per fortuna che esistono i test. document");
 
         Hit hit = testSubject.getHit(1L);
         assertEquals(1L, hit.getId());
@@ -66,8 +63,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
         document.setTemplateId(0L);
         document.setLanguage("en");
         document.setDate(referenceInstant);
-        document.setFolder(fold);
-        documentDao.initialize(document);
+        document.setFolder(FolderDAO.get().findById(3000L, true));
         testSubject.addHit(document,
                 "This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response. document.");
 
@@ -135,7 +131,6 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
         document.setLanguage("en");
         document.setDate(referenceInstant);
         document.setFolder(fold);
-        documentDao.initialize(document);
         testSubject.addHit(document, "This test 200");
 
         document = new Document();
@@ -145,7 +140,6 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
         document.setLanguage("en");
         document.setDate(referenceInstant);
         document.setFolder(fold);
-        documentDao.initialize(document);
         testSubject.addHit(document, "This test 201");
 
         Hits hits = testSubject.query("*:*", 2, 3);
@@ -166,7 +160,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
                 50);
 
         assertEquals(1, hits.getCount());
-        assertEquals(111L, hits.next().getId());
+        assertEquals(1L, hits.next().getId());
 
         hits = testSubject.search("content:document", Set.of("templateId:1"), "en", 50);
         assertEquals(0, hits.getCount());
@@ -181,7 +175,6 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
         document.setId(1L);
         document.setFileName("Document test 1");
         document.setLanguage("en");
-        documentDao.initialize(document);
         testSubject.addHit(document, "This is a test content just for test insertion");
 
         Hit hit = testSubject.getHit(1L);

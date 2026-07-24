@@ -438,7 +438,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         Document doc;
         try {
-            doc = retrieveDocument(document.getId());
+            doc = DocumentDAO.get().findDocument(document.getId());
         } catch (PersistenceException e1) {
             return throwServerException(session, log, e1);
         }
@@ -545,11 +545,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         }
     }
 
-    private Document retrieveDocument(long docId) throws PersistenceException {
-        DocumentDAO dao = DocumentDAO.get();
-        return dao.findDocument(docId);
-    }
-
     private void prepareRecipients(
             List<Long> notifyUserids,
             Map<Locale, Set<Recipient>> emailRecipientsMap,
@@ -622,7 +617,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         log.debug("Promoting version {} of document {}", version, docId);
 
         try {
-            Document doc = retrieveDocument(docId);
+            Document doc = DocumentDAO.get().findDocument(docId);
             if (doc == null)
                 throw new ServerException(UNEXISTING_DOCUMENT);
 
@@ -805,21 +800,16 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         if (session != null)
             validateSession(session.getSid());
 
-        DocumentDAO docDao = DocumentDAO.get();
-        Document document = docDao.findById(docId);
+        Document document = DocumentDAO.get().findById(docId, true);
 
         GUIDocument guiDocument = null;
         GUIFolder folder = null;
 
         if (document != null) {
-            FolderDAO fDao = FolderDAO.get();
-            fDao.initialize(document.getFolder());
             folder = new FolderServiceImpl().fromFolder(document.getFolder(), false);
 
             if (session != null)
                 checkPublished(session.getUser(), document);
-
-            docDao.initialize(document);
 
             guiDocument = fromDocument(document, folder, session != null ? session.getUser() : null);
 
@@ -843,7 +833,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         boolean isFolder = doc.getType() != null && doc.getType().startsWith("folder");
         DocumentDAO docDao = DocumentDAO.get();
         if (doc.getId() != 0L && !isFolder)
-            docDao.initialize(doc);
+            doc = docDao.initialize(doc);
 
         Document realDoc = doc;
 
@@ -853,8 +843,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         guiDocument.setTenantId(doc.getTenantId());
 
         if (!isFolder && doc.getDocRef() != null && doc.getDocRef().longValue() != 0) {
-            realDoc = docDao.findById(doc.getDocRef());
-            docDao.initialize(realDoc);
+            realDoc = docDao.findById(doc.getDocRef(), true);
             guiDocument.setDocRef(doc.getDocRef());
             guiDocument.setDocRefType(doc.getDocRefType());
         }
@@ -931,8 +920,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             guiDocument.setFolder(f);
         }
 
-        FolderDAO fdao = FolderDAO.get();
-        guiDocument.setPathExtended(fdao.computePathExtended(guiDocument.getFolder().getId()));
+        guiDocument.setPathExtended(FolderDAO.get().computePathExtended(guiDocument.getFolder().getId()));
 
         return guiDocument;
     }
@@ -954,9 +942,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         VersionDAO versDao = VersionDAO.get();
         Version docVersion;
         try {
-            docVersion = versDao.findById(id1);
-            if (docVersion != null)
-                versDao.initialize(docVersion);
+            docVersion = versDao.findById(id1, true);
         } catch (Exception e) {
             return super.<List<GUIVersion>> throwServerException(session, log, e);
         }
@@ -999,9 +985,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         }
 
         try {
-            docVersion = versDao.findById(id2);
-            if (docVersion != null)
-                versDao.initialize(docVersion);
+            docVersion = versDao.findById(id2, true);
         } catch (Exception e) {
             return super.<List<GUIVersion>> throwServerException(session, log, e);
         }
@@ -1060,7 +1044,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         guiVersion.setTemplateId(docVersion.getTemplateId());
 
         try {
-            versDao.initialize(docVersion);
+            docVersion = versDao.initialize(docVersion);
         } catch (PersistenceException e) {
             throw new ServerException(e.getMessage(), e);
         }
@@ -1188,9 +1172,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
     public void restore(List<Long> docIds, long folderId) throws ServerException {
         Session session = validateSession();
 
-        for (Long docId : docIds) {
-            if (docId == null)
-                continue;
+        for (Long docId : docIds.stream().filter(id -> id != null).toList()) {
             DocumentHistory transaction = new DocumentHistory();
             transaction.setSession(session);
 
@@ -1230,8 +1212,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         try {
             DocumentDAO docDao = DocumentDAO.get();
-            Document document = docDao.findById(guiDocument.getId());
-            docDao.initialize(document);
+            Document document = docDao.findById(guiDocument.getId(), true);
 
             if (guiDocument.getDocRef() != null) {
                 /*
@@ -1243,8 +1224,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                 docDao.store(document);
 
                 // Load the real target document for further updates
-                document = docDao.findById(guiDocument.getDocRef());
-                docDao.initialize(document);
+                document = docDao.findById(guiDocument.getDocRef(), true);
             }
 
             // Fix the name of multiple attributes
@@ -1335,9 +1315,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         if (guiDocument.getTemplateId() != null) {
             docVO.setTemplateId(guiDocument.getTemplateId());
-            TemplateDAO templateDao = TemplateDAO.get();
-            Template template = templateDao.findById(guiDocument.getTemplateId());
-            templateDao.initialize(template);
+            Template template = TemplateDAO.get().findById(guiDocument.getTemplateId(), true);
             docVO.setTemplate(template);
 
             if (CollectionUtils.isNotEmpty(guiDocument.getAttributes()))
@@ -1506,22 +1484,20 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         mail.parseRecipientsCC(guiMail.getCcs().stream().map(c -> c.getEmail()).collect(Collectors.joining(",")));
         mail.parseRecipients(guiMail.getTos().stream().map(c -> c.getEmail()).collect(Collectors.joining(",")));
 
-        List<Document> attachedDocs = documentDao.findByIds(guiMail.getDocIds().stream().collect(Collectors.toSet()),
-                null);
-        for (Document document : attachedDocs)
-            documentDao.initialize(document);
-
-        /*
-         * Subject and email are processed by the scripting engine
-         */
-        Automation engine = new Automation("sendmail", LocaleUtil.toLocale(locale), session.getTenantId());
-        Map<String, Object> dictionary = new HashMap<>();
-        dictionary.put(Automation.LOCALE, LocaleUtil.toLocale(locale));
-        dictionary.put("sender", session.getUser());
-        dictionary.put("documents", attachedDocs);
-        dictionary.put(DOCUMENT, attachedDocs.get(0));
-
         try {
+            List<Document> attachedDocs = documentDao
+                    .initialize(documentDao.findByIds(guiMail.getDocIds().stream().collect(Collectors.toSet()), null));
+
+            /*
+             * Subject and email are processed by the scripting engine
+             */
+            Automation engine = new Automation("sendmail", LocaleUtil.toLocale(locale), session.getTenantId());
+            Map<String, Object> dictionary = new HashMap<>();
+            dictionary.put(Automation.LOCALE, LocaleUtil.toLocale(locale));
+            dictionary.put("sender", session.getUser());
+            dictionary.put("documents", attachedDocs);
+            dictionary.put(DOCUMENT, attachedDocs.get(0));
+
             prepareDownloadTicket(guiMail, locale, session, dictionary);
 
             StringBuilder message = new StringBuilder(engine.evaluate(guiMail.getMessage(), dictionary));
@@ -1778,8 +1754,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         Bookmark bk;
         try {
             if (bookmark.getId() != 0) {
-                bk = bookmarkDao.findById(bookmark.getId());
-                bookmarkDao.initialize(bk);
+                bk = bookmarkDao.findById(bookmark.getId(), true);
             } else
                 return;
 
@@ -1800,8 +1775,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         DocumentLinkDAO dao = DocumentLinkDAO.get();
         try {
-            DocumentLink link = dao.findById(id);
-            dao.initialize(link);
+            DocumentLink link = dao.findById(id, true);
             link.setType(type);
             dao.store(link);
         } catch (PersistenceException e) {
@@ -1821,26 +1795,24 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         RatingDAO ratingDao = RatingDAO.get();
         try {
-            GUIRating rating = new GUIRating();
-            Rating rat = ratingDao.findVotesByDocId(docId);
-            if (rat != null) {
-                ratingDao.initialize(rat);
-
-                rating.setId(rat.getId());
-                rating.setDocId(docId);
+            GUIRating guiRating = new GUIRating();
+            Rating rating = ratingDao.findVotesByDocId(docId);
+            if (rating != null) {
+                guiRating.setId(rating.getId());
+                guiRating.setDocId(docId);
                 // We use the rating userId value to know in the GUI if the user
                 // has already vote this document.
                 if (ratingDao.findByDocIdAndUserId(docId, session.getUserId()) != null)
-                    rating.setUserId(session.getUserId());
-                rating.setCount(rat.getCount());
-                rating.setAverage(rat.getAverage());
+                    guiRating.setUserId(session.getUserId());
+                guiRating.setCount(rating.getCount());
+                guiRating.setAverage(rating.getAverage());
             } else {
-                rating.setDocId(docId);
-                rating.setCount(0);
-                rating.setAverage(0F);
+                guiRating.setDocId(docId);
+                guiRating.setCount(0);
+                guiRating.setAverage(0F);
             }
 
-            return rating;
+            return guiRating;
         } catch (PersistenceException e) {
             return throwServerException(session, log, e);
         }
@@ -1867,8 +1839,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
             ratingDao.store(rat, transaction);
 
-            DocumentDAO docDao = DocumentDAO.get();
-            Document doc = docDao.findById(rating.getDocId());
+            Document doc = DocumentDAO.get().findById(rating.getDocId(), true);
             return doc.getRating();
         } catch (PersistenceException e) {
             return throwServerException(session, log, e);
@@ -1894,13 +1865,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         Session session = validateSession();
 
         try {
-            DocumentNoteDAO noteDao = DocumentNoteDAO.get();
-            DocumentNote note = noteDao.findById(noteId);
-            if (note != null)
-                noteDao.initialize(note);
-            else
-                return null;
-            return toGUINote(note, session);
+            return toGUINote(DocumentNoteDAO.get().findById(noteId, true), session);
         } catch (PersistenceException e) {
             return throwServerException(session, log, e);
         }
@@ -1958,7 +1923,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         Session session = validateSession();
 
         try {
-            Document document = retrieveDocument(docId);
+            Document document = DocumentDAO.get().findDocument(docId);
 
             if (document == null)
                 throw new ServerException("Unexisting document %d".formatted(docId));
@@ -1966,13 +1931,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             List<GUIDocumentNote> guiNotes = new ArrayList<>();
             DocumentNoteDAO dao = DocumentNoteDAO.get();
 
-            List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(), session.getUserId(),
-                    fileVersion != null ? fileVersion : document.getFileVersion(), types);
-            for (DocumentNote note : notes) {
-                dao.initialize(note);
+            List<DocumentNote> notes = dao.initialize(dao.findByDocIdAndTypes(document.getId(), session.getUserId(),
+                    fileVersion != null ? fileVersion : document.getFileVersion(), types));
+            for (DocumentNote note : notes)
                 guiNotes.add(toGUINote(note, session));
-            }
-
             return guiNotes;
         } catch (PersistenceException e) {
             return throwServerException(session, log, e);
@@ -1987,7 +1949,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         DocumentNoteDAO dao = DocumentNoteDAO.get();
         Document document = null;
         try {
-            document = retrieveDocument(docId);
+            document = DocumentDAO.get().findDocument(docId);
             if (document == null)
                 throw new UnexistingResourceException(DOCUMENT_D.formatted(docId));
 
@@ -2024,7 +1986,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         DocumentNoteDAO dao = DocumentNoteDAO.get();
 
-        DocumentNote note = dao.findById(guiNote.getId());
+        DocumentNote note = dao.findById(guiNote.getId(), true);
         if (note == null) {
             note = new DocumentNote();
             note.setTenantId(session.getTenantId());
@@ -2035,8 +1997,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             note.setUsername(session.getUser().getFullName());
             note.setDate(new Date());
             note.setPage(guiNote.getPage());
-        } else {
-            dao.initialize(note);
         }
 
         note.setFileName(document.getFileName());
@@ -2641,7 +2601,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             GUIRating rating = null;
             Rating rat = rDao.findByDocIdAndUserId(docId, session.getUserId());
             if (rat != null) {
-                rDao.initialize(rat);
+                rat = rDao.initialize(rat);
                 rating = new GUIRating();
                 rating.setId(rat.getId());
                 rating.setDocId(docId);
@@ -3194,8 +3154,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         DocumentDAO docDao = DocumentDAO.get();
         try {
-            Document document = docDao.findById(guiDocument.getId());
-            docDao.initialize(document);
+            Document document = docDao.findById(guiDocument.getId(), true);
 
             log.info("Applying {} security policies to document {}", guiDocument.getAccessControlList().size(),
                     guiDocument.getId());

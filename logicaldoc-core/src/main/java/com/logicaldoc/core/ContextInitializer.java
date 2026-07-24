@@ -122,8 +122,6 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 			}
 		}
 		
-		documentDAO.initialize(doc);
-		
-		return doc;
+		return documentDAO.initialize(doc);
 	}
 }

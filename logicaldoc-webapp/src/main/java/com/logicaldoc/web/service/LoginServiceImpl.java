@@ -173,11 +173,10 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public boolean isSecretKeyRequired(String username, String deviceId) throws ServerException {
-		UserDAO userDao = UserDAO.get();
 		User user;
 		try {
 			user = pickUser(username);
-			userDao.initialize(user);
+			user = UserDAO.get().initialize(user);
 		} catch (PersistenceException | ServerException e) {
 			log.warn(e.getMessage(), e);
 			return false;

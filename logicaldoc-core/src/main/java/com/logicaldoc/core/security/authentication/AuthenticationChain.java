@@ -74,8 +74,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
         log.debug("Collected authentication errors: {}", errors);
 
         if (user != null) {
-            initializeUser(user);
-
+            user = initializeUser(user);
             user = handleImpersonation(user, impersonatedUsername, errors);
         } else {
             handleErrors(errors);
@@ -117,7 +116,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
         if (StringUtils.isNotEmpty(impersonatedUsername) && user != null)
             try {
                 User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername);
-                UserDAO.get().initialize(impersonatedUser);
+                impersonatedUser = UserDAO.get().initialize(impersonatedUser);
                 if (!impersonatedUser.getImpersonators().contains(user.getUsername())) {
                     log.error("User {} not allowed to impersonate {}", user, impersonatedUser);
                     errors.add(new ForbiddenImpersonationException(user.getUsername(), impersonatedUsername));
@@ -135,12 +134,13 @@ public class AuthenticationChain extends AbstractAuthenticator {
         return user;
     }
 
-    private void initializeUser(User user) {
+    private User initializeUser(User user) {
         try {
             UserDAO userDao = UserDAO.get();
-            userDao.initialize(user);
+            return userDao.initialize(user);
         } catch (PersistenceException e) {
             log.warn(e.getMessage(), e);
+            return user;
         }
     }
 
@@ -229,8 +229,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
             }
         }
 
-        initializeUser(user);
-        return user;
+        return initializeUser(user);
     }
 
     /*

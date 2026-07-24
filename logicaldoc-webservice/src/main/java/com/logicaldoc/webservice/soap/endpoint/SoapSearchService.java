@@ -57,8 +57,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		DocumentDAO docDao = DocumentDAO.get();
 		List<WSDocument> docs = new ArrayList<>();
 		for (Hit hit : hitsList) {
-			Document d = docDao.findById(hit.getId());
-			docDao.initialize(d);
+			Document d = docDao.findById(hit.getId(), true);
 			WSDocument doc = WSUtil.toWSDocument(d);
 			doc.setScore(hit.getScore());
 			doc.setSummary(hit.getSummary());
@@ -94,7 +93,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 			} catch (Exception e) {
 				continue;
 			}
-			docDao.initialize(document);
+			document = docDao.initialize(document);
 			wsDocs.add(WSUtil.toWSDocument(document));
 		}
 
@@ -115,7 +114,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 			} catch (Exception e) {
 				continue;
 			}
-			folderDao.initialize(folder);
+			folder = folderDao.initialize(folder);
 			wsFolders.add(WSFolder.fromFolder(folder));
 		}
 

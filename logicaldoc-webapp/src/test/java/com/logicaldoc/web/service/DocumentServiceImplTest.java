@@ -233,8 +233,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
     public void testArchiveFolder() throws ServerException, PersistenceException {
 
         // Move a document inside the tree to archive
-        Document doc = docDao.findById(5);
-        docDao.initialize(doc);
+        Document doc = docDao.findById(5L, true);
         doc.setFolder(folderDao.findById(1201));
         docDao.store(doc);
 
@@ -440,16 +439,14 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
     @Test
     public void testEnforceFilesIntoFolderStore() throws ServerException, PersistenceException {
-        Folder folder = folderDao.findById(1200);
-        folderDao.initialize(folder);
+        Folder folder = folderDao.findById(1200L, true);
         assertEquals(Integer.valueOf(2), folder.getStore());
 
-        Document doc = docDao.findById(5);
-        docDao.initialize(doc);
+        Document doc = docDao.findById(5L, true);
         doc.setFolder(folderDao.findById(1201));
         docDao.store(doc);
 
-        doc = docDao.findById(5);
+        doc = docDao.findById(5L);
         assertNull(doc.getFolder().getStore());
 
         testSubject.enforceFilesIntoFolderStore(1200);
@@ -699,8 +696,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
     @Test
     public void testDeduplicate() throws ServerException, PersistenceException {
-        Document doc5 = docDao.findById(5);
-        docDao.initialize(doc5);
+        Document doc5 = docDao.findById(5L, true);
         doc5.setDigest("pippo");
         docDao.store(doc5);
 
@@ -833,16 +829,14 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         doc = testSubject.save(doc);
         assertNotNull(doc);
 
-        Document document = docDao.findById(1L);
-        docDao.initialize(document);
+        Document document = docDao.findById(1L, true);
         assertTrue(document.getAccessControlList().isEmpty());
 
         // Set some ACLs
         doc.getAccessControlList().add(new GUIAccessControlEntry(2, "read,write"));
         testSubject.saveACL(doc);
 
-        document = docDao.findById(1L);
-        docDao.initialize(document);
+        document = docDao.findById(1L, true);
         assertFalse(document.getAccessControlList().isEmpty());
     }
 
@@ -980,14 +974,12 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         att.setType(Attribute.TYPE_DATE);
         doc.addAttribute(att);
 
-        
         doc = testSubject.save(doc);
         assertNotNull(doc);
     }
 
     private void prepareTemplate() throws PersistenceException {
-        Template template = TemplateDAO.get().findById(5L);
-        TemplateDAO.get().initialize(template);
+        Template template = TemplateDAO.get().findById(5L, true);
 
         Attribute attr = new Attribute();
         attr.setMultiple(true);
@@ -999,49 +991,49 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         attr = new Attribute();
         attr.setType(Attribute.TYPE_BOOLEAN);
         template.setAttribute("boolean2", attr);
-        
+
         attr = new Attribute();
         attr.setType(Attribute.TYPE_INT);
         template.setAttribute("integer", attr);
         attr = new Attribute();
         attr.setType(Attribute.TYPE_INT);
         template.setAttribute("integer2", attr);
-        
+
         attr = new Attribute();
         attr.setType(Attribute.TYPE_DATE);
         template.setAttribute("date", attr);
         attr = new Attribute();
         attr.setType(Attribute.TYPE_DATE);
         template.setAttribute("date2", attr);
-        
+
         attr = new Attribute();
         attr.setType(Attribute.TYPE_DOUBLE);
         template.setAttribute("double", attr);
         attr = new Attribute();
         attr.setType(Attribute.TYPE_DOUBLE);
         template.setAttribute("double2", attr);
-        
+
         attr = new Attribute();
         attr.setType(Attribute.TYPE_FOLDER);
         template.setAttribute("folder", attr);
         attr = new Attribute();
         attr.setType(Attribute.TYPE_FOLDER);
         template.setAttribute("folder2", attr);
-        
+
         attr = new Attribute();
         attr.setType(Attribute.TYPE_USER);
         template.setAttribute("user", attr);
         attr = new Attribute();
         attr.setType(Attribute.TYPE_USER);
         template.setAttribute("user2", attr);
-        
+
         attr = new Attribute();
         attr.setType(Attribute.TYPE_DOCUMENT);
         template.setAttribute("document", attr);
         attr = new Attribute();
         attr.setType(Attribute.TYPE_DOCUMENT);
         template.setAttribute("document2", attr);
-        
+
         TemplateDAO.get().store(template);
     }
 
@@ -1114,26 +1106,22 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         assertNotNull(doc);
         assertEquals("pippo", doc.getFileName());
 
-        doc = docDao.findById(2L);
+        doc = docDao.findById(2L, true);
         assertNotNull(doc);
-
-        docDao.initialize(doc);
 
         // Make it an alias
         doc.setDocRef(4L);
         docDao.store(doc);
 
-        doc = docDao.findById(3L);
+        doc = docDao.findById(3L, true);
         assertNotNull(doc);
-        docDao.initialize(doc);
 
         // Make it immutable
         doc.setImmutable(true);
         docDao.store(doc);
 
-        doc = docDao.findById(6L);
+        doc = docDao.findById(6L, true);
         assertNotNull(doc);
-        docDao.initialize(doc);
 
         // Lock it
         doc.setStatus(DocumentStatus.LOCKED);
@@ -1211,18 +1199,18 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
         testSubject.unlock(List.of(1L, 2L));
 
-        doc = docDao.findDocument(1);
+        doc = docDao.findDocument(1L);
         assertNotNull(doc);
         assertNull(doc.getLockUserId());
-        doc = docDao.findDocument(2);
+        doc = docDao.findDocument(2L);
         assertNotNull(doc);
         assertNull(doc.getLockUserId());
 
         testSubject.lock(List.of(1L, 2L), "comment");
 
-        doc = docDao.findDocument(1);
+        doc = docDao.findDocument(1L);
         assertEquals(1L, doc.getLockUserId().longValue());
-        doc = docDao.findDocument(2);
+        doc = docDao.findDocument(2L);
         assertEquals(1L, doc.getLockUserId().longValue());
     }
 
@@ -1244,12 +1232,11 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
     @Test
     public void testRestore() throws ServerException, PersistenceException {
-        docDao.delete(4);
-        assertNull(docDao.findById(4));
-        testSubject.restore(List.of(4L), 5);
-        assertNotNull(docDao.findById(4));
-        assertNotNull(docDao.findById(4));
-        assertEquals(5L, docDao.findById(4).getFolder().getId());
+        docDao.delete(4L);
+        assertNull(docDao.findById(4L));
+        testSubject.restore(List.of(4L), Folder.DEFAULTWORKSPACEID);
+        assertNotNull(docDao.findById(4L));
+        assertEquals(Folder.DEFAULTWORKSPACEID, docDao.findById(4L).getFolder().getId());
     }
 
     @Test
@@ -1359,11 +1346,9 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         testSubject.validate(gdoc);
 
         // Update the document add a template
-        Document doc = docDao.findDocument(6);
-        docDao.initialize(doc);
+        Document doc = docDao.findDocument(6L, true);
 
-        Template template = templateDao.findById(5L);
-        templateDao.initialize(template);
+        Template template = templateDao.findById(5L, true);
 
         // Set the validator for attribute "attr1" to be email format
         template.getTemplateAttribute("attr1").setValidation(
@@ -1395,8 +1380,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
          */
 
         // Update the document add a template
-        doc = docDao.findDocument(6);
-        docDao.initialize(doc);
+        doc = docDao.findDocument(6L, true);
 
         // update the attribute and set the value as an email format
         Attribute xxx = new Attribute();
@@ -1582,8 +1566,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
         // Test with a doc locked
 
-        Document doc = docDao.findDocument(5);
-        docDao.initialize(doc);
+        Document doc = docDao.findDocument(5L, true);
         doc.setStatus(DocumentStatus.CHECKEDOUT);
         docDao.store(doc);
 

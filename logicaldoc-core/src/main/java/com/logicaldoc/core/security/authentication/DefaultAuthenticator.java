@@ -98,7 +98,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
             throw new AccountTypeNotAllowedException();
 
         try {
-            userDAO.initialize(user);
+            user = userDAO.initialize(user);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
         }

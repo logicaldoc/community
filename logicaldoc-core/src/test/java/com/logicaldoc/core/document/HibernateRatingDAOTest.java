@@ -39,15 +39,13 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testStore() throws PersistenceException {
-		Rating rat1 = testSubject.findById(1);
-		testSubject.initialize(rat1);
+		Rating rat1 = testSubject.findById(1L, true);
 		rat1.setVote(4);
 		rat1.setUserId(3);
 		testSubject.store(rat1);
 		assertNotNull(rat1);
 
-		Rating rat2 = testSubject.findById(2);
-		testSubject.initialize(rat2);
+		Rating rat2 = testSubject.findById(2L, true);
 		rat2.setVote(2);
 		rat2.setDocId(4);
 		testSubject.store(rat2);
@@ -62,7 +60,6 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 
 		// testing overridden method with Rating and DocumentHistory parameters
 		DocumentHistory history = DocumentHistoryDAO.get().findById(1L);
-		DocumentHistoryDAO.get().initialize(history);
 		assertNotNull(history);
 
 		testSubject.store(rat2, history);
@@ -104,13 +101,11 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testUpdateDocumentRating() throws PersistenceException {
 		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findById(1L);
-		docDao.initialize(doc);
+		Document doc = docDao.findById(1L, true);
 		assertNotNull(doc);
 
 		DocumentHistoryDAO historyDao = DocumentHistoryDAO.get();
 		DocumentHistory history = historyDao.findById(1L);
-		historyDao.initialize(history);
 		assertNotNull(history);
 
 		testSubject.updateDocumentRating(doc.getId(), history);

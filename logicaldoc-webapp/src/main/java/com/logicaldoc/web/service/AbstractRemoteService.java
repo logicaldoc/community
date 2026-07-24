@@ -212,24 +212,22 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	protected User getSessionUser(String sid) throws InvalidSessionServerException {
 		Session session = validateSession(sid);
 		User user = (User) session.getDictionary().get(USER);
-		initUser(user);
-		return user;
+		return initUser(user);
 	}
 
-	private void initUser(User user) {
+	private User initUser(User user) {
 		try {
-			UserDAO userDao = UserDAO.get();
-			userDao.initialize(user);
+			return UserDAO.get().initialize(user);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
+			return user;
 		}
 	}
 
 	protected User getSessionUser(HttpServletRequest request) throws InvalidSessionServerException {
 		Session session = validateSession(request);
 		User user = (User) session.getDictionary().get(USER);
-		initUser(user);
-		return user;
+		return initUser(user);
 	}
 
 	protected <R> R throwServerException(Session session, Logger logger, Throwable throwable) throws ServerException {
@@ -357,12 +355,14 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 */
 	protected List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
 		TemplateDAO tDao = TemplateDAO.get();
-		tDao.initialize(template);
-
-		List<GUIAttribute> attributes = new ArrayList<>();
-		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
-			return new ArrayList<>();
 		try {
+		    template = tDao.initialize(template);
+
+	        List<GUIAttribute> attributes = new ArrayList<>();
+	        if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
+	            return new ArrayList<>();
+
+		    
 			for (String attrName : template.getAttributeNames())
 				attributes.add(prepareGUIAttribute(attrName, template, attributes, extensibleObject));
 

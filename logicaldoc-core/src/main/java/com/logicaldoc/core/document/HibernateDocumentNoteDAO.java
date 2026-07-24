@@ -62,7 +62,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
          * declared at folder level or document level
          */
         if (note.getId() == 0L && note.getAccessControlList().isEmpty()) {
-            documentDao.initialize(doc);
+            doc = documentDao.initialize(doc);
             FolderDAO.get().initialize(doc.getFolder());
 
             if (CollectionUtils.isNotEmpty(doc.getAccessControlList())) {
@@ -72,8 +72,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
                 note.getAccessControlList().addAll(doc.getFolder().getAccessControlList().stream()
                         .map(NoteAccessControlEntry::new).collect(Collectors.toSet()));
             } else if (doc.getFolder().getSecurityRef() != null) {
-                Folder securityFolder = FolderDAO.get().findFolder(doc.getFolder().getSecurityRef());
-                FolderDAO.get().initialize(securityFolder);
+                Folder securityFolder = FolderDAO.get().findFolder(doc.getFolder().getSecurityRef(), true);
                 note.getAccessControlList().addAll(securityFolder.getAccessControlList().stream()
                         .map(NoteAccessControlEntry::new).collect(Collectors.toSet()));
             }
@@ -82,7 +81,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
         super.store(note);
 
         if (note.getPage() == 0) {
-            documentDao.initialize(doc);
+            doc = documentDao.initialize(doc);
             doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(note.getMessage()));
             if (doc.getIndexed() == IndexingStatus.INDEXED)
                 doc.setIndexingStatus(IndexingStatus.TO_INDEX);
@@ -98,7 +97,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
                 try {
                     DocumentDAO dao = DocumentDAO.get();
                     Document doc = dao.findById(note.getDocId());
-                    dao.initialize(doc);
+                    doc = dao.initialize(doc);
                     String lastNoteMessage = dao.queryForList(
                             "select ld_message from ld_note where ld_page=0 and ld_deleted=0 and ld_docid=:id order by ld_date desc",
                             Map.of("id", note.getDocId()), String.class, null).stream().findFirst().orElse("");
@@ -195,13 +194,12 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
             User user = userDao.findById(userId);
             if (user == null)
                 return new ArrayList<>();
-            userDao.initialize(user);
+            user = userDao.initialize(user);
             if (user.isAdmin()) {
                 return notes;
             } else {
                 Set<Long> userGroups = user.getGroups().stream().map(Group::getId).collect(Collectors.toSet());
-                for (DocumentNote note : notes)
-                    initialize(note);
+                notes = initialize(notes);
                 return notes.stream()
                         .filter(note -> note.getUserId() == userId || note.getAccessControlList().isEmpty()
                                 || note.getAccessControlEntries(userGroups).stream().anyMatch(ace -> ace.isRead()))
@@ -242,17 +240,6 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
     }
 
     @Override
-    public void initialize(DocumentNote note) throws PersistenceException {
-        if (note == null)
-            return;
-
-        refresh(note);
-
-        if (note.getAccessControlList() != null)
-            log.trace("Initialized {} aces", note.getAccessControlList().size());
-    }
-
-    @Override
     public boolean isWriteAllowed(long noteId, long userId) throws PersistenceException {
         return getAllowedPermissions(noteId, userId).contains(Permission.WRITE);
     }
@@ -266,8 +253,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
         User user = UserDAO.get().findById(userId);
         if (user == null)
             throw new PersistenceException("Unexisting user %d".formatted(userId));
-        UserDAO.get().initialize(user);
-        return user;
+        return UserDAO.get().initialize(user);
     }
 
     @Override
@@ -285,14 +271,14 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
         StringBuilder query = new StringBuilder(
                 """
-                select ld_read as LDREAD, ld_write as LDWRITE, ld_delete as LDDELETE, ld_security as LDSECURITY 
-                  from ld_note_acl 
+                select ld_read as LDREAD, ld_write as LDWRITE, ld_delete as LDDELETE, ld_security as LDSECURITY
+                  from ld_note_acl
                  where ld_noteid =
                 """);
         query.append(Long.toString(noteId));
         query.append("""
-                     and ld_groupid in (select ld_groupid 
-                                          from ld_usergroup 
+                     and ld_groupid in (select ld_groupid
+                                          from ld_usergroup
                                          where ld_userid =
                      """);
         query.append(Long.toString(userId));

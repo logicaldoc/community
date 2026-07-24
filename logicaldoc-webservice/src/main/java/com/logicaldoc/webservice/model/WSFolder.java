@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
@@ -130,11 +131,13 @@ public class WSFolder implements Serializable {
         return null;
     }
 
-    public static WSFolder fromFolder(Folder folder) {
+    public static WSFolder fromFolder(Folder folder) throws PersistenceException {
         return fromFolder(folder, true);
     }
 
-    public static WSFolder fromFolder(Folder folder, boolean withCollections) {
+    public static WSFolder fromFolder(Folder folder, boolean withCollections) throws PersistenceException {
+        folder = FolderDAO.get().initialize(folder);
+        
         WSFolder wsFolder = new WSFolder();
         wsFolder.setId(folder.getId());
         wsFolder.setFoldRef(folder.getFoldRef());

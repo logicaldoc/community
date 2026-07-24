@@ -4,7 +4,7 @@
     <artifactId>logicaldoc-parent</artifactId>
     <name>LogicalDOC Parent POM</name>
     <packaging>pom</packaging>
-    <version>114</version>
+    <version>115</version>
     <scm>
         <connection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</connection>
         <developerConnection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</developerConnection>
@@ -18,8 +18,8 @@
         <smartgwt.skins>Tahoe,Shiva,Simplicity</smartgwt.skins>
         <spring.version>6.2.8</spring.version>
         <spring-security.version>6.3.10</spring-security.version>
-        <hibernate.version>6.6.18.Final</hibernate.version>
-        <infinispan.version>15.2.4.Final</infinispan.version>
+        <hibernate.version>7.4.4.Final</hibernate.version>
+        <infinispan.version>15.2.6.Final</infinispan.version>
         <infinispan.hibernate.artifact>infinispan-hibernate-cache-v62</infinispan.hibernate.artifact>
         <ehcache.version>2.10.9.2</ehcache.version>
         <lucene.version>8.11.2</lucene.version>

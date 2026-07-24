@@ -87,10 +87,9 @@ public class HibernateGenericDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testInitialize() throws PersistenceException {
-		Generic generic = testSubject.findById(1);
+		Generic generic = testSubject.findById(1L, true);
 		assertNotNull(generic);
 		assertEquals(Long.valueOf(0L), generic.getInteger1());
-		testSubject.initialize(generic);
 		assertEquals(1, generic.getAttributes().size());
 		assertEquals("val1", generic.getValue("att1"));
 	}

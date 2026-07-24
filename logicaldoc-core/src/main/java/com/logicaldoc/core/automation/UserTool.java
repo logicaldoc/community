@@ -61,13 +61,16 @@ public class UserTool {
      * Initializes lazy loaded collections
      * 
      * @param user the user to initialize
+     * 
+     * @return initialized user
      */
-    public void initialize(User user) {
+    public User initialize(User user) {
         UserDAO uDao = UserDAO.get();
         try {
-            uDao.initialize(user);
+            return uDao.initialize(user);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
+            return user;
         }
     }
 

@@ -68,7 +68,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 		session = SessionManager.get().newSession(username, password, null, client);
 		if (session != null) {
 			User user = userDao.findByUsernameIgnoreCase(username);
-			userDao.initialize(user);
+			user = userDao.initialize(user);
 			LDAuthenticationToken token = new LDAuthenticationToken(username);
 			token.setSid(session.getSid());
 			SecurityContextHolder.getContext().setAuthentication(token);

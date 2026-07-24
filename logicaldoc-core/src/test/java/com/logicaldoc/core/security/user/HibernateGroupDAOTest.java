@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.plugin.PluginException;
@@ -29,62 +30,64 @@ import com.logicaldoc.util.plugin.PluginException;
 public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private GroupDAO dao;
+	private GroupDAO testSubject;
 
 	@Before
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		dao = GroupDAO.get();
+		testSubject = GroupDAO.get();
 	}
 
 	@Test
 	public void testDelete() throws PersistenceException {
-		assertNotNull(dao.findById(10));
+		assertNotNull(testSubject.findById(10L));
 
-		dao.delete(10);
-		assertNull(dao.findById(10));
+		testSubject.delete(10L);
+		assertNull(testSubject.findById(10L));
 
 		// Try to delete undeletable group
 		try {
-			dao.delete(1);
+			testSubject.delete(1);
 			fail("Group admin cannot be deleted");
 		} catch (PersistenceException e) {
 			// we expect an exception here
 		}
-		assertNotNull(dao.findById(1L));
+		assertNotNull(testSubject.findById(Group.GROUPID_ADMIN));
 	}
 
 	@Test
 	public void testFindByName() throws PersistenceException {
-		Group group = dao.findByName("admin", 1);
+		Group group = testSubject.findByName("admin", Group.GROUPID_ADMIN);
 		assertNotNull(group);
 		assertEquals("admin", group.getName());
 
 		// Try with unexisting name
-		group = dao.findByName("xxxx", 1);
+		group = testSubject.findByName("xxxx", Group.GROUPID_ADMIN);
 		assertNull(group);
 
 		// Try with unexisting tenant
-		group = dao.findByName("admin", 99);
+		group = testSubject.findByName("admin", 99L);
 		assertNull(group);
 	}
 
 	@Test
 	public void testFindById() throws PersistenceException {
-		Group group = dao.findById(1);
+		Group group = testSubject.findById(Group.GROUPID_ADMIN, true);
 		assertNotNull(group);
 		assertEquals("admin", group.getName());
-
+        assertEquals(2, group.getUsers().size());
+		
+		
 		// Try with unexisting id
-		group = dao.findById(999);
+		group = testSubject.findById(999L);
 		assertNull(group);
 	}
 
 	@Test
 	public void testFindAllGroupNames() throws PersistenceException {
-		Collection<String> groupNames = dao.findAllGroupNames(1);
+		Collection<String> groupNames = testSubject.findAllGroupNames(1);
 		assertNotNull(groupNames);
 		assertFalse(groupNames.isEmpty());
 		assertTrue(groupNames.contains("admin"));
@@ -93,39 +96,39 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testStore() throws PersistenceException {
-		assertNull(dao.findByName("LogicalObjects", 1));
+		assertNull(testSubject.findByName("LogicalObjects", Tenant.DEFAULT_ID));
 
 		Group group = new Group();
 		group.setName("LogicalObjects");
 		group.setDescription("Test group for store method");
 
-		dao.store(group);
-		assertNotNull(dao.findByName("LogicalObjects", 1));
+		testSubject.store(group);
+		assertNotNull(testSubject.findByName("LogicalObjects", Tenant.DEFAULT_ID));
 
-		Group group2 = dao.findByName("LogicalObjects", 1);
+		Group group2 = testSubject.findByName("LogicalObjects", Tenant.DEFAULT_ID);
 		assertEquals(group, group2);
 	}
 
 	@Test
 	public void testInsert() throws PersistenceException {
-		assertNull(dao.findByName("parentNone", 1));
+		assertNull(testSubject.findByName("parentNone", 1));
 
 		Group group = new Group();
 		group.setName("parentNone");
 		group.setDescription("Test group for insert method parent = none");
 
-		dao.insert(group, 90);
-		assertNotNull(dao.findByName("parentNone", 1));
+		testSubject.insert(group, 90);
+		assertNotNull(testSubject.findByName("parentNone", Tenant.DEFAULT_ID));
 
 		// Test with parentGroup Not Empty
-		assertNull(dao.findByName("parentNotEmpty", 1));
+		assertNull(testSubject.findByName("parentNotEmpty", Tenant.DEFAULT_ID));
 
 		group = new Group();
 		group.setName("parentNotEmpty");
 		group.setDescription("Test group for insertX method parentGroup Not Empty");
 
-		dao.insert(group, 90);
-		assertNotNull(dao.findByName("parentNotEmpty", 1));
+		testSubject.insert(group, 90);
+		assertNotNull(testSubject.findByName("parentNotEmpty", 1));
 	}
 
 	@Test
@@ -134,21 +137,18 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 		group.setName("parentNone");
 		group.setDescription("Test group for insert method parent = none");
 
-		dao.insert(group, 0);
+		testSubject.insert(group, 0);
 
 		MenuDAO menuDao = MenuDAO.get();
 
-		Menu menu = menuDao.findById(5L);
-		menuDao.initialize(menu);
+		Menu menu = menuDao.findById(5L, true);
 		assertNull(menu.getAccessControlEntry(group.getId()));
 
-		dao.inheritACLs(group, 2);
-		menu = menuDao.findById(5L);
-		menuDao.initialize(menu);
+		testSubject.inheritACLs(group, 2L);
+		menu = menuDao.findById(5L, true);
 		assertTrue(menu.getAccessControlEntry(group.getId()).isRead());
 
-		menu = menuDao.findById(2L);
-		menuDao.initialize(menu);
+		menu = menuDao.findById(2L, true);
 		assertNull(menu.getAccessControlEntry(group.getId()));
 	}
 }

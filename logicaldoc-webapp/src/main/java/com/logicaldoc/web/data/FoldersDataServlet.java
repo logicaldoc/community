@@ -83,9 +83,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
         Folder parentFolder = getParentFolder(parent, parentFolderId);
         boolean root = parentFolder.getParentId() == parentFolder.getId();
 
-        UserDAO udao = UserDAO.get();
-        User user = udao.findById(session.getUserId());
-        udao.initialize(user);
+        User user = UserDAO.get().findById(session.getUserId(), true);
 
         /*
          * Check if we have to paginate and what should be the start and end

@@ -96,8 +96,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testStore() throws PersistenceException, IOException {
-        Document doc = docDao.findById(1);
-        docDao.initialize(doc);
+        Document doc = docDao.findById(1L, true);
         assertEquals("1.0", doc.getVersion());
         User user = new User();
         user.setId(1);
@@ -149,8 +148,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
             store.store(is, StoreResource.builder().docId(doc.getId()).fileVersion(version.getFileVersion()).build());
         }
 
-        doc = docDao.findById(1);
-        docDao.initialize(doc);
+        doc = docDao.findById(1L, true);
         version = Version.create(doc, user, "", DocumentEvent.CHANGED, true);
         testSubject.store(version);
         assertEquals("2.0", version.getVersion());
@@ -210,12 +208,10 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
     public void testCreate() throws PersistenceException {
         UserDAO userDao = UserDAO.get();
 
-        Document doc = docDao.findById(1);
-        docDao.initialize(doc);
+        Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
 
-        User user = userDao.findById(1);
-        userDao.initialize(user);
+        User user = userDao.findById(1L, true);
         assertNotNull(user);
 
         assertNotNull(Version.create(doc, user, "testVersion", DocumentEvent.COPYED, false));

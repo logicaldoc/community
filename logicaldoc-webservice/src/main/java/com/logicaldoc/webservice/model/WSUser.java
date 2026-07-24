@@ -554,8 +554,7 @@ public class WSUser {
     public static WSUser fromUser(User user) {
         WSUser wsUser = new WSUser();
         try {
-            UserDAO dao = UserDAO.get();
-            dao.initialize(user);
+            user = UserDAO.get().initialize(user);
 
             wsUser.setId(user.getId());
             wsUser.setCity(user.getCity());

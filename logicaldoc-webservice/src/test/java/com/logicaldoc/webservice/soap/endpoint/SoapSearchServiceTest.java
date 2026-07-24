@@ -92,10 +92,9 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
         assertNotNull(documents);
         assertEquals(0, documents.size());
 
-        Document doc = documentDao.findById(1);
+        Document doc = documentDao.findById(1L, true);
         assertNotNull(doc);
         assertEquals("pippo", doc.getFileName());
-        documentDao.initialize(doc);
         doc.setFileName("paperina");
         documentDao.store(doc);
         assertEquals("paperina", doc.getFileName());
@@ -132,7 +131,6 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
         fold.setId(Folder.DEFAULTWORKSPACEID);
         fold.setName("test");
         document.setFolder(fold);
-        documentDao.initialize(document);
         searchEngine.addHit(document, "Questo e un documento di prova. Per fortuna che esistono i test. document");
 
         // Adding unexisting document 111
@@ -143,7 +141,6 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
         document.setLanguage("en");
         document.setDate(referenceInstant);
         document.setFolder(fold);
-        documentDao.initialize(document);
         searchEngine.addHit(document,
                 "This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response.");
 
@@ -153,7 +150,6 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
         document.setLanguage("en");
         document.setDate(referenceInstant);
         document.setFolder(fold);
-        documentDao.initialize(document);
         searchEngine.addHit(document, "Another document");
 
         document = new Document();
@@ -162,7 +158,6 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
         document.setLanguage("en");
         document.setDate(referenceInstant);
         document.setFolder(fold);
-        documentDao.initialize(document);
         searchEngine.addHit(document,
                 "Lorem ipsum dolor sit amet, consectetur 5568299afbX0 ZKBKCHZZ80A CH8900761016116097873 adipisicing elit");
     }

@@ -78,14 +78,12 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
     @Test
     public void testUpdate() throws AuthenticationException, PermissionException, PersistenceException,
             UnexistingResourceException, WebserviceException {
-        Document doc = docDao.findById(1);
+        Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
         assertEquals(103, doc.getFolder().getId());
-        Document newDoc = docDao.findById(2);
+        Document newDoc = docDao.findById(2L, true);
         assertNotNull(newDoc);
         assertEquals(103, newDoc.getFolder().getId());
-        docDao.initialize(doc);
-        docDao.initialize(newDoc);
 
         WSDocument wsDoc = WSUtil.toWSDocument(newDoc);
         assertEquals(2, wsDoc.getId());
@@ -96,8 +94,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
         testSubject.update("", wsDoc);
 
-        docDao.initialize(doc);
-        assertEquals("pluto(1)", doc.getFileName());
+        assertEquals("pluto(1)", docDao.findById(doc.getId()).getFileName());
     }
 
     @Test
@@ -138,20 +135,18 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
     @Test
     public void testMove() throws AuthenticationException, PersistenceException, PermissionException,
             UnexistingResourceException, WebserviceException {
-        Document doc = docDao.findById(1);
+        Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
         Folder folder = doc.getFolder();
-        assertEquals(103, folder.getId());
+        assertEquals(103L, folder.getId());
 
-        Folder newFolder = folderDao.findById(80);
-        docDao.initialize(doc);
+        Folder newFolder = folderDao.findById(80L, true);
         doc.setIndexingStatus(0);
         docDao.store(doc);
-        testSubject.move("", doc.getId(), newFolder.getId());
-        // NOTA: attenzione errore optimistic lock
-        assertSame(1L, doc.getId());
-        docDao.initialize(doc);
-        assertEquals(newFolder, doc.getFolder());
+        WSDocument wsDoc = testSubject.move("", doc.getId(), newFolder.getId());
+
+        assertSame(1L, wsDoc.getId());
+        assertEquals(newFolder.getId(), wsDoc.getFolderId().longValue());
     }
 
     @Test
@@ -159,9 +154,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
             UnexistingResourceException, WebserviceException {
         testSubject.lock("", 1);
 
-        Document doc = docDao.findById(1);
+        Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
-        docDao.initialize(doc);
         assertEquals(DocumentStatus.LOCKED, doc.getStatus());
         assertEquals(1L, doc.getLockUserId().longValue());
 
@@ -335,7 +329,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
                 .get(0);
 
         assertNotNull(doc);
-        docDao.initialize(doc);
+        doc = docDao.initialize(doc);
 
         assertEquals("document test.txt", doc.getFileName());
         assertEquals("coverage-val", doc.getValue("coverage"));
@@ -382,17 +376,15 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
             WebserviceException, IOException {
         testSubject.checkout("", 1);
 
-        Document doc = docDao.findById(1);
+        Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
-        docDao.initialize(doc);
         assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
         File file = new File("pom.xml");
         testSubject.checkin("", 1, "comment", "pom.xml", true, new DataHandler(new FileDataSource(file)));
 
-        doc = docDao.findById(1);
+        doc = docDao.findById(1L, true);
         assertNotNull(doc);
-        docDao.initialize(doc);
 
         assertFalse(doc.isSigned());
         assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
@@ -478,12 +470,10 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
     @Test
     public void testRename() throws PersistenceException, AuthenticationException, PermissionException,
             UnexistingResourceException, WebserviceException {
-        Document doc = docDao.findById(1);
+        Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
         assertEquals("pippo", doc.getFileName());
-        docDao.initialize(doc);
         testSubject.rename("", 1, "pippo");
-        docDao.initialize(doc);
         assertEquals("pippo", doc.getFileName());
     }
 

@@ -118,7 +118,7 @@ public class AbstractService {
 		if (user == null)
 			throw new AccountNotFoundException(null, String.format("User %s not found", username));
 		else
-			userDao.initialize(user);
+			user = userDao.initialize(user);
 		return user;
 	}
 

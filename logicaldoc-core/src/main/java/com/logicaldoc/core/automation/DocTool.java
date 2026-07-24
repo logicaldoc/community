@@ -316,9 +316,13 @@ public class DocTool {
      * 
      * @param doc the document to initialize
      */
-    public void initialize(Document doc) {
-        DocumentDAO docDao = DocumentDAO.get();
-        docDao.initialize(doc);
+    public Document initialize(Document doc) {
+        try {
+            return DocumentDAO.get().initialize(doc);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return doc;
+        }
     }
 
     /**
@@ -328,9 +332,11 @@ public class DocTool {
      * @param targetPath the full path of the target folder
      * @param username the user in whose name the method is run
      * 
+     * @return the updated document
+     * 
      * @throws InterruptedException In case or thread interruption
      */
-    public void move(Document doc, String targetPath, String username) throws InterruptedException {
+    public Document move(Document doc, String targetPath, String username) throws InterruptedException {
         User user = new SecurityTool().getUser(username);
 
         Folder folder = createPath(doc, targetPath, username);
@@ -341,11 +347,12 @@ public class DocTool {
         transaction.setUser(user);
 
         try {
-            DocumentManager.get().moveToFolder(doc, folder, transaction).get();
+            return DocumentManager.get().moveToFolder(doc, folder, transaction).get();
         } catch (InterruptedException ie) {
             throw ie;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            return doc;
         }
     }
 
@@ -358,7 +365,7 @@ public class DocTool {
      * @return The cloned document
      */
     public Document clone(Document doc) {
-        return new Document(doc);
+        return new Document(initialize(doc));
     }
 
     /**
@@ -407,7 +414,7 @@ public class DocTool {
      * @return the new document created
      */
     public Document copy(Document doc, String targetPath, String username) {
-        return copy(doc, targetPath, false, false, true, username);
+        return copy(initialize(doc), targetPath, false, false, true, username);
     }
 
     /**
@@ -697,11 +704,8 @@ public class DocTool {
      * @return the document object
      */
     public Document findById(long docId) {
-        DocumentDAO docDao = DocumentDAO.get();
         try {
-            Document doc = docDao.findDocument(docId);
-            docDao.initialize(doc);
-            return doc;
+            return DocumentDAO.get().findDocument(docId, true);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -728,9 +732,8 @@ public class DocTool {
      * @return the document object
      */
     public Document findByPath(String path, Long tenantId) {
-        DocumentDAO docDao = DocumentDAO.get();
         try {
-            return docDao.findByPath(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID);
+            return DocumentDAO.get().findByPath(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID, true);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return null;

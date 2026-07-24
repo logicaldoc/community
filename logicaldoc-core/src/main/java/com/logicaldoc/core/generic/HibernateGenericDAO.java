@@ -91,15 +91,6 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
     }
 
     @Override
-    public void initialize(Generic generic) {
-        refresh(generic);
-        for (String attribute : generic.getAttributes().keySet()) {
-            if (generic.getValue(attribute) != null)
-                generic.getValue(attribute).toString();
-        }
-    }
-
-    @Override
     public void store(Generic entity) throws PersistenceException {
         super.store(entity);
         flush();

@@ -40,14 +40,12 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testStore() throws PersistenceException {
-		Bookmark book1 = testSubject.findById(1);
-		testSubject.initialize(book1);
+		Bookmark book1 = testSubject.findById(1L, true);
 		book1.setDescription("pippo");
 		testSubject.store(book1);
 		assertNotNull(book1);
 
-		Bookmark book2 = testSubject.findById(2);
-		testSubject.initialize(book2);
+		Bookmark book2 = testSubject.findById(2L, true);
 		book2.setDescription("paperino");
 		testSubject.store(book2);
 		assertNotNull(book2);
@@ -127,8 +125,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 		bookmark = testSubject.findByUserIdAndDocId(1, 2);
 		assertNotNull(bookmark);
 
-		Bookmark book1 = testSubject.findById(1);
-		testSubject.initialize(book1);
+		Bookmark book1 = testSubject.findById(1L, true);
 		book1.setTargetId(3);
 		testSubject.store(book1);
 

@@ -1,6 +1,7 @@
 package com.logicaldoc.core;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
     public void store(T entity) throws PersistenceException;
 
     /**
-     * This method finds an entity by ID
+     * This method finds an entity by ID, lazy-loaded collections are not
+     * initialized.
      * 
      * @param id ID of the entity
      * 
@@ -54,7 +56,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
      * This method finds an entity by ID
      * 
      * @param id ID of the entity
-     * @param initialize True if the instance's lazy collections have to be
+     * @param initialize if the instance's lazy-loaded collections have to be
      *        initialized
      * 
      * @return Entity with given ID
@@ -64,7 +66,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
     public default T findById(long id, boolean initialize) throws PersistenceException {
         T entity = findById(id);
         if (initialize)
-            initialize(entity);
+            entity = initialize(entity);
         return entity;
     }
 
@@ -229,9 +231,11 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
      * 
      * @param entity The entity to be initialised
      * 
+     * @return A different entity already initialized
+     * 
      * @throws PersistenceException raised in case of errors in the database
      */
-    public void initialize(T entity) throws PersistenceException;
+    public T initialize(T entity) throws PersistenceException;
 
     /**
      * Initialises lazy loaded data such as collections of all specified
@@ -241,9 +245,11 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
      * 
      * @throws PersistenceException raised in case of errors in the database
      */
-    public default void initialize(Collection<T> entities) throws PersistenceException {
+    public default List<T> initialize(Collection<T> entities) throws PersistenceException {
+        List<T> out = new ArrayList<>();
         for (T entity : entities)
-            initialize(entity);
+            out.add(initialize(entity));
+        return out;
     }
 
     /**

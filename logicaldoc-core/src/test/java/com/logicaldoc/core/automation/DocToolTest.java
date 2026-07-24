@@ -130,9 +130,8 @@ public class DocToolTest extends AbstractCoreTestCase {
 		Folder testFolder = ft.createPath(ft.findById(4L), "/Default/test", "admin");
 		Document doc = testSubject.findById(1L);
 		assertNotNull(doc);
-		testSubject.initialize(doc);
 		
-		testSubject.move(doc, "/Default/test", "admin");
+		doc = testSubject.move(doc, "/Default/test", "admin");
 
 		assertEquals(testFolder, doc.getFolder());
 		
@@ -169,11 +168,11 @@ public class DocToolTest extends AbstractCoreTestCase {
 	public void testCreateAlias() throws PersistenceException {
 		Document doc = testSubject.findById(1);
 		assertNotNull(doc);
-		testSubject.initialize(doc);
+		doc = testSubject.initialize(doc);
 
 		FolderTool folderTool = new FolderTool();
 		Folder newFolder = folderTool.findById(6);
-		folderTool.initialize(newFolder);
+		newFolder = folderTool.initialize(newFolder);
 
 		Document alias = testSubject.createAlias(doc, newFolder, null, "admin");
 		assertNotSame(doc.getId(), alias.getId());
@@ -280,12 +279,12 @@ public class DocToolTest extends AbstractCoreTestCase {
 	public void testMerge() {
 		Document doc1 = testSubject.findById(1);
 		assertNotNull(doc1);
-		testSubject.initialize(doc1);
+		doc1 = testSubject.initialize(doc1);
 		assertEquals(55, testSubject.countPages(doc1));
 
 		Document doc3 = testSubject.findById(3);
 		assertNotNull(doc3);
-		testSubject.initialize(doc3);
+		doc3 = testSubject.initialize(doc3);
 		assertEquals(1, testSubject.countPages(doc3));
 
 		Document mergedDoc = testSubject.merge(Arrays.asList(doc1, doc3), 1200L, "merged.pdf", "admin");
@@ -293,7 +292,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 
 		mergedDoc = testSubject.findById(mergedDoc.getId());
 		assertNotNull(mergedDoc);
-		testSubject.initialize(mergedDoc);
+		mergedDoc = testSubject.initialize(mergedDoc);
 
 		assertEquals(56, testSubject.countPages(mergedDoc));
 	}

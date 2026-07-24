@@ -350,8 +350,7 @@ public class WSUtil {
         wsAttributeSet.setDescription(attributeSet.getDescription());
         wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
 
-        AttributeSetDAO setDao = AttributeSetDAO.get();
-        setDao.initialize(attributeSet);
+        attributeSet = AttributeSetDAO.get().initialize(attributeSet);
 
         // Populate extended attributes
         List<WSAttribute> wsAttributes;
@@ -477,9 +476,8 @@ public class WSUtil {
             wsTemplate.setInitialization(template.getInitialization());
             wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
 
-            TemplateDAO templateDao = TemplateDAO.get();
-            templateDao.initialize(template);
-            wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
+            template = TemplateDAO.get().initialize(template);
+            wsTemplate.setDocsCount(TemplateDAO.get().countDocs(template.getId()));
 
             // Populate extended attributes
             populateTemplateAttributes(template, wsTemplate);
@@ -560,9 +558,7 @@ public class WSUtil {
         }
 
         if (wsAce.getUserId() != 0L) {
-            UserDAO userDao = UserDAO.get();
-            User user = userDao.findById(wsAce.getUserId());
-            userDao.initialize(user);
+            User user = UserDAO.get().findById(wsAce.getUserId(), true);
             ace.setGroupId(user.getUserGroup().getId());
         }
         return ace;

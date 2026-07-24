@@ -121,7 +121,6 @@ insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (1203,'2009-10-19 00:00:00','2009-10-19 00:00:00',0,'qqqq',1201,'administration.gif',3,1,1,1,1);
 
-
 insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (2000,3,1,1);
 
 insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (-103,2,1,1);

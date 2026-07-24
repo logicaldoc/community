@@ -126,9 +126,9 @@ public class FolderTool {
      * @return the found folder
      */
     public Folder findById(long id) {
-        FolderDAO folderDao = FolderDAO.get();
         try {
-            return folderDao.findById(id);
+            FolderDAO fdao = FolderDAO.get();
+            return fdao.initialize(fdao.findById(id));
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -158,8 +158,7 @@ public class FolderTool {
         transaction.setUser(user);
 
         try {
-            FolderDAO folderDao = FolderDAO.get();
-            folderDao.store(folder, transaction);
+            FolderDAO.get().store(folder, transaction);
         } catch (Exception t) {
             log.error(t.getMessage(), t);
         }
@@ -169,10 +168,16 @@ public class FolderTool {
      * Initializes lazy loaded collections
      * 
      * @param folder the folder to initialize
+     * 
+     * @return the initialized folder
      */
-    public void initialize(Folder folder) {
-        FolderDAO folderDao = FolderDAO.get();
-        folderDao.initialize(folder);
+    public Folder initialize(Folder folder) {
+        try {
+            return FolderDAO.get().initialize(folder);
+        } catch (Exception t) {
+            log.error(t.getMessage(), t);
+            return folder;
+        }
     }
 
     /**
@@ -202,9 +207,11 @@ public class FolderTool {
      *        it will be created)
      * @param username the user in whose name the method is run
      * 
+     * @return the moved folder
+     * 
      * @throws PersistenceException Error in the persistence layer
      */
-    public void move(Folder folder, String targetPath, String username) throws PersistenceException {
+    public Folder move(Folder folder, String targetPath, String username) throws PersistenceException {
         User user = new SecurityTool().getUser(username);
 
         Folder target = createPath(folder, targetPath, username);
@@ -213,8 +220,7 @@ public class FolderTool {
         transaction.setFolder(folder);
         transaction.setUser(user);
 
-        FolderDAO fdao = FolderDAO.get();
-        fdao.move(folder, target, transaction);
+        return FolderDAO.get().move(folder, target, transaction);
     }
 
     /**
@@ -235,6 +241,7 @@ public class FolderTool {
      *        security policies of the source folder</li>
      *        </ul>
      * @param username the user in whose name the method is run
+     * 
      * @return The new folder created
      * 
      * @throws PersistenceException Error in the persistence layer
@@ -250,9 +257,7 @@ public class FolderTool {
         transaction.setFolder(source);
         transaction.setUser(user);
 
-        FolderDAO fdao = FolderDAO.get();
-
-        return fdao.copy(source, target, null, foldersOnly, securityOption, transaction);
+        return FolderDAO.get().copy(source, target, null, foldersOnly, securityOption, transaction);
     }
 
     /**
@@ -271,8 +276,7 @@ public class FolderTool {
         transaction.setFolder(source);
         transaction.setUser(user);
 
-        FolderDAO fdao = FolderDAO.get();
-        fdao.merge(source, target, transaction);
+        FolderDAO.get().merge(source, target, transaction);
     }
 
     /**

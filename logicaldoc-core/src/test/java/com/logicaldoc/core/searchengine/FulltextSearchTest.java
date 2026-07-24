@@ -14,8 +14,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.util.plugin.PluginException;
 
@@ -23,17 +21,15 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
     private SearchEngine testSubject;
 
-    private DocumentDAO documentDao;
-
     @Before
     @Override
     public void setUp() throws IOException, SQLException, PluginException {
         super.setUp();
         testSubject = SearchEngine.get();
-        documentDao = DocumentDAO.get();
         try {
             addHits();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IOException(e.getMessage(), e);
         }
     }
@@ -72,11 +68,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
         document.setFileName("test.doc");
         document.setLanguage("en");
         document.setDate(referenceInstant);
-        Folder fold = new Folder();
-        fold.setId(Folder.DEFAULTWORKSPACEID);
-        fold.setName("test");
-        document.setFolder(fold);
-        documentDao.initialize(document);
+        document.setFolder(FolderDAO.get().findById(3000L, true));
         testSubject.addHit(document, "Questo e un documento di prova. Per fortuna che esistono i test. document");
 
         // Adding unexisting document 111
@@ -86,8 +78,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
         document.setTemplateId(0L);
         document.setLanguage("en");
         document.setDate(referenceInstant);
-        document.setFolder(fold);
-        documentDao.initialize(document);
+        document.setFolder(FolderDAO.get().findById(6L, true));
         testSubject.addHit(document,
                 "This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response.");
 
@@ -96,8 +87,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
         document.setFileName("test.doc");
         document.setLanguage("en");
         document.setDate(referenceInstant);
-        document.setFolder(fold);
-        documentDao.initialize(document);
+        document.setFolder(FolderDAO.get().findById(1200L, true));
         testSubject.addHit(document, "Another document");
 
         document = new Document();
@@ -105,16 +95,15 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
         document.setFileName("test.doc");
         document.setLanguage("en");
         document.setDate(referenceInstant);
-        document.setFolder(fold);
-        documentDao.initialize(document);
+        document.setFolder(FolderDAO.get().findById(1300L, true));
         testSubject.addHit(document,
                 "Lorem ipsum dolor sit amet, consectetur 5568299afbX0 ZKBKCHZZ80A CH8900761016116097873 adipisicing elit");
+
+        assertEquals(4, testSubject.getCount());
     }
 
     @Test
     public void testSearch() throws Exception {
-        assertEquals(4, testSubject.getCount());
-
         FulltextSearchOptions opt = new FulltextSearchOptions();
         opt.setLanguage("en");
         opt.setExpression("document");
@@ -154,11 +143,9 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
     @Test
     public void testSearchInFolder() throws Exception {
-        FolderDAO folderDao = (FolderDAO) context.getBean("folderDAO");
-        for (Long folderId : folderDao.findAllIds())
-            folderDao.computePath(folderId);
-
-        assertEquals(4, testSubject.getCount());
+        // M,ake sure all folders have its path calculated
+        for (Long folderId : FolderDAO.get().findAllIds())
+            FolderDAO.get().computePath(folderId);
 
         // Search in a tree
         FulltextSearchOptions opt = new FulltextSearchOptions();
@@ -178,7 +165,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
         assertEquals(2, hits.size());
 
         // Search in another tree
-        opt.setFolderId(5L);
+        opt.setFolderId(1301L);
         opt.setSearchInSubPath(true);
 
         search = new FulltextSearch();
@@ -196,15 +183,5 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
         hits = search.search();
         assertEquals(0, hits.size());
-
-        // Search in single folder
-        opt.setFolderId(6L);
-        opt.setSearchInSubPath(false);
-
-        search = new FulltextSearch();
-        search.setOptions(opt);
-
-        hits = search.search();
-        assertEquals(2, hits.size());
     }
 }

@@ -87,9 +87,9 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public void move(String sid, long docId, long folderId) throws AuthenticationException, PermissionException,
+	public WSDocument move(String sid, long docId, long folderId) throws AuthenticationException, PermissionException,
 			WebserviceException, PersistenceException, UnexistingResourceException {
-		client.move(sid, docId, folderId);
+		return client.move(sid, docId, folderId);
 	}
 
 	@Override

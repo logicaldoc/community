@@ -32,105 +32,110 @@ import jakarta.persistence.Transient;
 @Cacheable
 public class Template extends AbstractAttributeSet implements Secure<AccessControlEntry> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Column(name = "ld_initialization")
-	private String initialization;
+    @Column(name = "ld_initialization")
+    private String initialization;
 
-	@Column(name = "ld_validation")
-	private String validation;
+    @Column(name = "ld_validation")
+    private String validation;
 
-	@Transient
-	private Set<AccessControlEntry> accessControlList = new HashSet<>();
+    @Transient
+    private Set<AccessControlEntry> accessControlList = new HashSet<>();
 
-	@ElementCollection
-	@CollectionTable(name = "ld_template_ext", joinColumns = @JoinColumn(name = "ld_templateid"))
-	@MapKeyColumn(name = "ld_name", length = 255)
-	@OrderBy("ld_position ASC, ld_name ASC")
-	private Map<String, Attribute> templateAttributes = new HashMap<>();
+    @ElementCollection
+    @CollectionTable(name = "ld_template_ext", joinColumns = @JoinColumn(name = "ld_templateid"))
+    @MapKeyColumn(name = "ld_name", length = 255)
+    @OrderBy("ld_position ASC, ld_name ASC")
+    private Map<String, Attribute> templateAttributes = new HashMap<>();
 
-	@Override
-	public Map<String, Attribute> getTemplateAttributes() {
-		return templateAttributes;
-	}
+    @Override
+    public Map<String, Attribute> getAttributes() {
+        return new AttributeMapWrapper(templateAttributes);
+    }
+    
+    @Override
+    public Map<String, Attribute> getTemplateAttributes() {
+        return templateAttributes;
+    }
 
-	@Override
-	public void setTemplateAttributes(Map<String, Attribute> templateAttributes) {
-		this.templateAttributes = templateAttributes;
-	}
+    @Override
+    public void setTemplateAttributes(Map<String, Attribute> templateAttributes) {
+        this.templateAttributes = templateAttributes;
+    }
 
-	public String getValidation() {
-		return validation;
-	}
+    public String getValidation() {
+        return validation;
+    }
 
-	public void setValidation(String validation) {
-		this.validation = validation;
-	}
+    public void setValidation(String validation) {
+        this.validation = validation;
+    }
 
-	public String getInitialization() {
-		return initialization;
-	}
+    public String getInitialization() {
+        return initialization;
+    }
 
-	public void setInitialization(String initialization) {
-		this.initialization = initialization;
-	}
+    public void setInitialization(String initialization) {
+        this.initialization = initialization;
+    }
 
-	@Override
-	public Set<AccessControlEntry> getAccessControlList() {
-		return accessControlList;
-	}
+    @Override
+    public Set<AccessControlEntry> getAccessControlList() {
+        return accessControlList;
+    }
 
-	@Override
-	public void setAccessControlList(Set<AccessControlEntry> accessControlList) {
-		this.accessControlList = accessControlList;
-	}
+    @Override
+    public void setAccessControlList(Set<AccessControlEntry> accessControlList) {
+        this.accessControlList = accessControlList;
+    }
 
-	@Override
-	public AccessControlEntry getAccessControlEntry(long groupId) {
-		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
-	}
-	
-	@Override
-	public Set<AccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
-		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
-				.collect(Collectors.toSet());
-	}
+    @Override
+    public AccessControlEntry getAccessControlEntry(long groupId) {
+        return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+    }
 
-	@Override
-	public void addAccessControlEntry(AccessControlEntry ace) {
-		if (!getAccessControlList().add(ace)) {
-			getAccessControlList().remove(ace);
-			getAccessControlList().add(ace);
-		}
-	}
-	
-	@Override
-	public void removeAccessControlEntries(long groupId) {
-		getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
-	}
+    @Override
+    public Set<AccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
+        return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
+                .collect(Collectors.toSet());
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((validation == null) ? 0 : validation.hashCode());
-		return result;
-	}
+    @Override
+    public void addAccessControlEntry(AccessControlEntry ace) {
+        if (!getAccessControlList().add(ace)) {
+            getAccessControlList().remove(ace);
+            getAccessControlList().add(ace);
+        }
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Template other = (Template) obj;
-		if (validation == null) {
-			if (other.validation != null)
-				return false;
-		} else if (!validation.equals(other.validation))
-			return false;
-		return true;
-	}
+    @Override
+    public void removeAccessControlEntries(long groupId) {
+        getAccessControlList().removeIf(ace -> ace.getGroupId() == groupId);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((validation == null) ? 0 : validation.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Template other = (Template) obj;
+        if (validation == null) {
+            if (other.validation != null)
+                return false;
+        } else if (!validation.equals(other.validation))
+            return false;
+        return true;
+    }
 }

@@ -77,10 +77,8 @@ public class DocumentsDataServletTest extends AbstractDataServletTestCase {
 	@Test
 	public void testServiceWithLastNote() throws Exception {
 		DocumentDAO dao = DocumentDAO.get();
-		Document doc = dao.findById(1L);
+		Document doc = dao.findById(1L, true);
 		assertNotNull(doc);
-
-		dao.initialize(doc);
 
 		String original = doc.getLastNote();
 

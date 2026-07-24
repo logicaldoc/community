@@ -198,7 +198,7 @@ public class StandardSearchEngine implements SearchEngine {
         if (document.getDocRef() != null) {
             // This is an alias
             Document referencedDoc = documentDao.findById(document.getDocRef());
-            documentDao.initialize(referencedDoc);
+            referencedDoc = documentDao.initialize(referencedDoc);
             doc = new Document(referencedDoc);
             doc.setId(document.getId());
             doc.setTenantId(document.getTenantId());
@@ -215,7 +215,7 @@ public class StandardSearchEngine implements SearchEngine {
             Document doc = document;
             if (doc.getDocRef() != null) {
                 doc = documentDao.findById(doc.getDocRef());
-                documentDao.initialize(doc);
+                doc = documentDao.initialize(doc);
             }
 
             Locale locale = doc.getLocale();

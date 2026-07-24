@@ -156,6 +156,7 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param docId The document id
 	 * @param folderId Identifier of the new document's folder
+	 * @return 
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -165,8 +166,9 @@ public interface DocumentService {
 	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@WebMethod(action = "move")
+	@WebResult(name = "document")
 	@WSDoc(description = "moves an existing document with the given identifier")
-	public void move(@WSDoc(description = "identifier of the session", required = true)
+	public WSDocument move(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "Document ID")
 	@WebParam(name = "docId")

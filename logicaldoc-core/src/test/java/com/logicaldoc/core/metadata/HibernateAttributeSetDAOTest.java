@@ -57,9 +57,8 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindById() throws PersistenceException {
-		AttributeSet set = testSubject.findById(-1);
+		AttributeSet set = testSubject.findById(-1L, true);
 		assertNotNull(set);
-		testSubject.initialize(set);
 		assertEquals(-1, set.getId());
 		assertEquals("default", set.getName());
 		assertTrue(set.getAttributes().containsKey("object"));
@@ -90,9 +89,8 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTestCase {
 		set.setValue("a1", "v1");
 		set.setValue("a2", "v2");
 		testSubject.store(set);
-		set = testSubject.findById(set.getId());
+		set = testSubject.findById(set.getId(), true);
 		assertEquals("test3", set.getName());
-		testSubject.initialize(set);
 		assertTrue(set.getTemplateAttributes().containsKey("a1"));
 		assertTrue(set.getAttributes().containsKey("a2"));
 	}

@@ -341,7 +341,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
                 // Take the document again in order to retrieve the updated
                 // persisted instance.
                 doc = findById(doc.getId());
-                initialize(doc);
+                doc = initialize(doc);
             }
 
             doc.setModified(false);
@@ -438,7 +438,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
                                     doc.getId()));
     }
 
-    private void copyFolderMetadata(Document doc) {
+    private void copyFolderMetadata(Document doc) throws PersistenceException {
         if (doc.getFolder().getTemplate() != null)
             copyFolderExtendedAttributes(doc);
 
@@ -453,12 +453,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             doc.setFillMode(FillMode.ALL);
     }
 
-    private void copyFolderExtendedAttributes(Document doc) {
-        folderDAO.initialize(doc.getFolder());
-        if (doc.getTemplate() == null || doc.getTemplate().equals(doc.getFolder().getTemplate())) {
-            doc.setTemplate(doc.getFolder().getTemplate());
-            for (String name : doc.getFolder().getAttributeNames()) {
-                Attribute fAtt = doc.getFolder().getAttribute(name);
+    private void copyFolderExtendedAttributes(Document doc) throws PersistenceException {
+        Folder folder = doc.getFolder();
+        if (doc.getTemplate() == null || doc.getTemplate().equals(folder.getTemplate())) {
+            doc.setTemplate(folder.getTemplate());
+            for (String name : folder.getAttributeNames()) {
+                Attribute fAtt = folder.getAttribute(name);
                 if (fAtt.getValue() == null || StringUtils.isEmpty(fAtt.getValue().toString()))
                     continue;
                 Attribute dAtt = doc.getAttribute(name);
@@ -490,8 +490,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             if (fld == null)
                 throw new PersistenceException(
                         String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
-            folderDAO.initialize(fld);
-            doc.setFolder(fld);
+            doc.setFolder(folderDAO.initialize(fld));
         }
     }
 
@@ -714,9 +713,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         List<Long> ids = findDocIdByUserIdAndTag(userId, tag);
         if (CollectionUtils.isNotEmpty(ids)) {
             try {
-                coll = findByObjectQuery(
-                        "select A from Document A where A.id in (%s)".formatted(CollectionUtil.join(ids)),
-                        (Map<String, Object>) null, max);
+                coll = findByObjectQuery("select A from Document A where A.deleted = 0 and A.id in (%s)"
+                        .formatted(CollectionUtil.join(ids)), (Map<String, Object>) null, max);
             } catch (PersistenceException e) {
                 log.error(e.getMessage(), e);
             }
@@ -886,23 +884,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     }
 
     @Override
-    public void initialize(Document doc) {
-        if (doc == null)
-            return;
-
-        refresh(doc);
-
-        if (doc.getAttributes() != null)
-            log.trace("Initialized {} attributes", doc.getAttributes().keySet().size());
-
-        if (doc.getTags() != null)
-            log.trace("Initialized {} tags", doc.getTags().size());
-
-        if (doc.getAccessControlList() != null)
-            log.trace("Initialized {} aces", doc.getAccessControlList().size());
-    }
-
-    @Override
     public List<Long> findDeletedDocIds() throws PersistenceException {
         String query = "select ld_id from ld_document where ld_deleted = 1 order by ld_lastmodified desc";
         return queryForList(query, Long.class);
@@ -972,37 +953,40 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public void restore(long docId, long folderId, final DocumentHistory transaction) throws PersistenceException {
 
-        // Update the document using HQL
-        bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId", Map.of(DOC_ID, docId));
-        bulkUpdate("set folder = :folder where id = :docId",
-                Map.of("folder", getCurrentSession().get(Folder.class, folderId), DOC_ID, docId));
+        // Resume document and versions with JDBC directly
+        jdbcUpdate(
+                "update ld_document set ld_deleted = 0, ld_lastmodified = CURRENT_TIMESTAMP, ld_folderid = %d where ld_id = %d"
+                        .formatted(folderId, docId));
+        jdbcUpdate(
+                "update ld_version set ld_deleted = 0, ld_lastmodified = CURRENT_TIMESTAMP, ld_folderid = %d where ld_documentid = %d"
+                        .formatted(folderId, docId));
 
-        // Update the version using HQL
-        versionDAO.bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId", Map.of(DOC_ID, docId));
-        versionDAO.bulkUpdate("set folderId = :folderId where id = :docId",
-                Map.of("folderId", folderId, DOC_ID, docId));
+        // Make sure that instances of this document get removed from session
+        // and cache
+        evict(docId);
 
-        Document doc = findById(docId);
+        Document doc = findById(docId, true);
+
         if (doc != null && transaction != null) {
             transaction.setDocId(docId);
             transaction.setEvent(DocumentEvent.RESTORED);
-
-            initialize(doc);
             store(doc, transaction);
         }
     }
 
     @Override
     public Document findByCustomId(String customId, long tenantId) throws PersistenceException {
+        return findByCustomId(customId, tenantId, false);
+    }
+
+    @Override
+    public Document findByCustomId(String customId, long tenantId, boolean initialize) throws PersistenceException {
         Document doc = null;
         if (customId != null) {
-            List<Document> coll = findByWhere("_entity.customId = '%s' and _entity.tenantId = %d"
-                    .formatted(SqlUtil.doubleQuotes(customId), tenantId), null, null);
-            if (!coll.isEmpty()) {
-                doc = coll.get(0);
-                if (doc.getDeleted() == 1)
-                    doc = null;
-            }
+            doc = findByWhere("_entity.customId = '%s' and _entity.tenantId = %d"
+                    .formatted(SqlUtil.doubleQuotes(customId), tenantId), null, null).stream().findFirst().orElse(null);
+            if (initialize)
+                doc = initialize(doc);
         }
         return doc;
     }
@@ -1010,7 +994,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException {
         Document doc = findById(docId);
-        initialize(doc);
+        doc = initialize(doc);
         doc.setImmutable(true);
         doc.setStatus(DocumentStatus.UNLOCKED);
         store(doc, transaction);
@@ -1366,9 +1350,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     @Override
     public Document findDocument(long docId) throws PersistenceException {
-        Document doc = findById(docId);
+        return findDocument(docId, false);
+    }
+
+    @Override
+    public Document findDocument(long docId, boolean initialize) throws PersistenceException {
+        Document doc = findById(docId, initialize);
         if (doc != null && doc.getDocRef() != null)
-            doc = findById(doc.getDocRef());
+            doc = findById(doc.getDocRef(), initialize);
         return doc;
     }
 
@@ -1390,12 +1379,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         transaction.setEvent(DocumentEvent.PASSWORD_PROTECTED);
 
-        Document doc = findDocument(docId);
+        Document doc = findDocument(docId, true);
         if (doc != null) {
             if (StringUtils.isNotEmpty(doc.getPassword()))
                 throw new PersistenceException("The document already has a password, unset it first");
 
-            initialize(doc);
             try {
                 doc.setDecodedPassword(password);
             } catch (NoSuchAlgorithmException e) {
@@ -1405,7 +1393,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
             List<Version> versions = versionDAO.findByDocId(docId);
             for (Version ver : versions) {
-                versionDAO.initialize(ver);
+                ver = versionDAO.initialize(ver);
                 ver.setPassword(doc.getPassword());
                 versionDAO.store(ver);
             }
@@ -1421,15 +1409,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         transaction.setEvent(DocumentEvent.PASSWORD_UNPROTECTED);
 
-        Document doc = findDocument(docId);
+        Document doc = findDocument(docId, true);
         if (doc != null) {
-            initialize(doc);
             doc.setPassword(null);
             store(doc, transaction);
 
             List<Version> versions = versionDAO.findByDocId(docId);
             for (Version ver : versions) {
-                versionDAO.initialize(ver);
+                ver = versionDAO.initialize(ver);
                 ver.setPassword(null);
                 versionDAO.store(ver);
             }
@@ -1438,19 +1425,22 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     @Override
     public Document findByPath(String path, long tenantId) throws PersistenceException {
+        return findByPath(path, tenantId, false);
+    }
+
+    @Override
+    public Document findByPath(String path, long tenantId, boolean initialize) throws PersistenceException {
         String folderPath = FileUtil.getPath(path);
         Folder folder = folderDAO.findByPathExtended(folderPath, tenantId);
         if (folder == null)
             return null;
 
         String fileName = FileUtil.getName(path);
-        List<Document> docs = findByFileNameAndParentFolderId(folder.getId(), fileName, null, tenantId, null);
-        for (Document doc : docs) {
-            if (doc.getFileName().equals(fileName))
-                return doc;
-        }
-
-        return null;
+        Document doc = findByFileNameAndParentFolderId(folder.getId(), fileName, null, tenantId, null).stream()
+                .filter(d -> d.getFileName().equals(fileName)).findFirst().orElse(null);
+        if (initialize)
+            doc = initialize(doc);
+        return doc;
     }
 
     @Override
@@ -1520,8 +1510,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     public Set<Permission> getAllowedPermissions(long docId, long userId) throws PersistenceException {
         final Set<Permission> permissions = new HashSet<>();
         User user = getExistingtUser(userId);
-
-        userDAO.initialize(user);
+        user = userDAO.initialize(user);
 
         if (findById(docId) == null)
             return new HashSet<>();

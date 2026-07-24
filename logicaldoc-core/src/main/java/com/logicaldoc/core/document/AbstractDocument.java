@@ -900,7 +900,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
             try {
                 Document testDocVO = docDao.findById(docVO.getId());
                 if (testDocVO != null) {
-                    docDao.initialize(testDocVO);
+                    testDocVO = docDao.initialize(testDocVO);
                     for (Entry<String, Attribute> entry : testDocVO.getAttributes().entrySet())
                         getAttributes().put(entry.getKey(), entry.getValue());
                 }

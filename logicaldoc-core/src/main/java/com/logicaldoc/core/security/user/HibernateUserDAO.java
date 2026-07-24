@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Hibernate;
 import org.java.plugin.registry.Extension;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -97,8 +98,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         User user = findByWhere("_entity.username = :username", Map.of(USERNAME, username), null, null).stream()
                 .findFirst().orElse(null);
-        initialize(user);
-        return user;
+        return initialize(user);
     }
 
     @Override
@@ -108,8 +108,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         User user = findByWhere("lower(_entity.username) = :username", Map.of(USERNAME, username.toLowerCase()), null,
                 null).stream().findFirst().orElse(null);
-        initialize(user);
-        return user;
+        return initialize(user);
     }
 
     @Override
@@ -785,11 +784,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     }
 
     @Override
-    public void initialize(User user) throws PersistenceException {
-        if (user == null || user.getId() == 0L)
-            return;
-
-        refresh(user);
+    protected void initializeCollections(User user) throws PersistenceException {
+        Hibernate.initialize(user.getGroups());
+        Hibernate.initialize(user.getWorkingTimes());
 
         List<Long> groupIds = new ArrayList<>();
         try {
@@ -832,7 +829,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         }
 
         // Manually initialize the collegtion of working times
-        user.getWorkingTimes().clear();
+        final Set<WorkingTime> workingTimes = user.getWorkingTimes();
+        workingTimes.clear();
 
         queryForResultSet(
                 "select ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description from ld_workingtime where ld_userid = %d"
@@ -844,7 +842,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
                         wt.setMinuteEnd(rows.getInt(5));
                         wt.setLabel(rows.getString(6));
                         wt.setDescription(rows.getString(7));
-                        user.getWorkingTimes().add(wt);
+                        workingTimes.add(wt);
                     }
                 });
     }
@@ -896,10 +894,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     @Override
     public User findById(long id) throws PersistenceException {
-        User user = super.findById(id);
-        if (user != null)
-            initialize(user);
-        return user;
+        return initialize(super.findById(id));
     }
 
     @Override
@@ -909,8 +904,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             user = findByUsernameIgnoreCase(username);
         else
             user = findByUsername(username);
-        initialize(user);
-        return user;
+        return initialize(user);
     }
 
     public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {

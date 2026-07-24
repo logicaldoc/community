@@ -124,7 +124,7 @@ public class UserUtil {
         UserDAO userDao = UserDAO.get();
         File tmpAvatarImage = null;
         try {
-            userDao.initialize(user);
+            user = userDao.initialize(user);
             if ("svg".equalsIgnoreCase(imageType)) {
                 // In case of SVG we save the image as is
                 user.setAvatar("data:image/svg+xml;base64,%s".formatted(ImageUtil.encode(avatarImageFile)));
@@ -158,7 +158,7 @@ public class UserUtil {
 
         File tmpAvatarImage = null;
         try {
-            userDao.initialize(user);
+            user = userDao.initialize(user);
             tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
             int size = Context.get().getConfig().getTenantInt(TenantDAO.get().getTenantName(user.getTenantId()),
                     "gui.avatar.size", 128);

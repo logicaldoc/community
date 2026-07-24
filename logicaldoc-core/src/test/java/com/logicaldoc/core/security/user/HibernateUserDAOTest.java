@@ -64,7 +64,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         assertEquals(2, testUser.getGroups().size());
         testUser.removeGroupMemberships(null);
         testSubject.store(testUser);
-        testSubject.initialize(testUser);
+        testUser = testSubject.initialize(testUser);
         assertEquals(1, testUser.getGroups().size());
 
         String name = testUser.getUserGroupName();
@@ -74,7 +74,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         assertNull(groupDao.findByName(name, 1));
 
         Group group = groupDao.findByName("guest", 1);
-        groupDao.initialize(group);
+        group = groupDao.initialize(group);
         assertFalse(group.getUsers().contains(testUser));
     }
 
@@ -218,13 +218,12 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
         assertEquals("valca", user.getFirstName());
 
-        user = testSubject.findById(user.getId());
-        testSubject.initialize(user);
+        user = testSubject.findById(user.getId(), true);
         user.addGroup(groupDao.findById(1L));
         testSubject.store(user);
 
         User storedUser = testSubject.findByUsername("xxx");
-        testSubject.initialize(storedUser);
+        storedUser = testSubject.initialize(storedUser);
         assertNotNull(user);
         assertEquals(user, storedUser);
         assertEquals(2, storedUser.getGroups().size());
@@ -247,8 +246,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         user.addGroup(groupDao.findById(1L));
         user.addGroup(groupDao.findById(10L));
         testSubject.store(user);
-        user = testSubject.findById(1);
-        testSubject.initialize(user);
+        user = testSubject.findById(1L, true);
         assertEquals(3, user.getGroups().size());
     }
 
@@ -256,24 +254,21 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
     public void testStorePasswordChanged() throws PersistenceException, NoSuchAlgorithmException {
         String pswd = PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
 
-        User user = testSubject.findById(1L);
-        testSubject.initialize(user);
+        User user = testSubject.findById(1L, true);
         assertFalse(user.isPasswordExpired());
         assertFalse(user.isPasswordExpires());
         user.setDecodedPassword(pswd);
 
         testSubject.store(user);
 
-        user = testSubject.findById(1L);
-        testSubject.initialize(user);
+        user = testSubject.findById(1L, true);
         assertFalse(user.isPasswordExpired());
         assertFalse(user.isPasswordExpires());
         user.setDecodedPassword("%s-*/!?".formatted(pswd));
         testSubject.store(user);
 
         // Give an already used password
-        user = testSubject.findById(1L);
-        testSubject.initialize(user);
+        user = testSubject.findById(1L, true);
         assertFalse(user.isPasswordExpired());
         assertFalse(user.isPasswordExpires());
         user.setDecodedPassword(pswd);
@@ -285,8 +280,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
             // Nothing to do
         }
 
-        user = testSubject.findById(1L);
-        testSubject.initialize(user);
+        user = testSubject.findById(1L,true);
         assertFalse(user.isPasswordExpired());
         user.setDecodedPassword("%s-#é+^".formatted(pswd));
         user.setPasswordExpired(true);

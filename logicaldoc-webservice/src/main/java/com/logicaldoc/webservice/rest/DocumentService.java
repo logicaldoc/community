@@ -464,7 +464,8 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/move")
-	public void move(@QueryParam("docId")
+	@Produces(MediaType.APPLICATION_JSON)
+	public WSDocument move(@QueryParam("docId")
 	long docId, @QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;

@@ -1004,7 +1004,7 @@ public class LDRepository {
             transaction.setComment("");
             transaction.setUser(getSessionUser());
 
-            documentDao.initialize(doc);
+            doc = documentDao.initialize(doc);
             doc.setStatus(DocumentStatus.UNLOCKED);
             documentDao.store(doc, transaction);
         } catch (Exception t) {
@@ -1560,8 +1560,8 @@ public class LDRepository {
         debug("filename: %s".formatted(filename));
 
         DocumentDAO docDao = DocumentDAO.get();
-        List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(),
-                maxItems);
+        List<Document> docs = docDao.initialize(
+                docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(), maxItems));
 
         for (int i = 0; i < docs.size(); i++) {
             // Check permissions on the documents found
@@ -1571,7 +1571,6 @@ public class LDRepository {
             } catch (Exception e) {
                 continue;
             }
-            docDao.initialize(docs.get(i));
 
             // filtro i risultati (lasciando solo le colonne richieste)
             ObjectData result = compileObjectType(null, docs.get(i), filter, false, false, null);
@@ -2017,9 +2016,9 @@ public class LDRepository {
         addPropertyString(result, typeId, filter, TypeManager.PROP_TEMPLATE, template.getName());
 
         if (doc instanceof Document document)
-            documentDao.initialize(document);
+            doc = documentDao.initialize(document);
         else
-            versionDao.initialize((Version) doc);
+            doc = versionDao.initialize((Version) doc);
 
         // Now load the extended properties
         Map<String, Attribute> attributes = doc.getAttributes();
@@ -2242,7 +2241,7 @@ public class LDRepository {
         if (template == null)
             return;
 
-        templateDao.initialize(template);
+        template = templateDao.initialize(template);
 
         String attributeName = p.getId().substring(TypeManager.PROP_EXT.length());
         String stringValue = (String) p.getFirstValue();
@@ -2343,7 +2342,7 @@ public class LDRepository {
         copyProperties(type, properties, result);
 
         if (object instanceof Document document) {
-            documentDao.initialize(document);
+            document = documentDao.initialize(document);
             updateDocumentMetadata(document, result, false);
 
             addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
@@ -2353,8 +2352,7 @@ public class LDRepository {
             transaction.setUser(getSessionUser());
             transaction.setSessionId(sid);
             transaction.setEvent(DocumentEvent.CHANGED);
-            Document actualDoc = documentDao.findById(document.getId());
-            documentDao.initialize(actualDoc);
+            Document actualDoc = documentDao.findById(document.getId(), true);
             document.setId(0);
             documentManager.update(actualDoc, document, transaction);
         } else {
@@ -2856,24 +2854,16 @@ public class LDRepository {
         try {
             if (objectId.startsWith(ID_PREFIX_DOC)) {
                 Long docId = Long.parseLong(objectId.substring(4));
-                Document doc = documentDao.findDocument(docId);
-                documentDao.initialize(doc);
-                out = doc;
+                out = documentDao.findDocument(docId, true);
             } else if (objectId.startsWith(ID_PREFIX_FLD)) {
                 Long folderId = Long.parseLong(objectId.substring(4));
-                Folder f = folderDao.findFolder(folderId);
-                folderDao.initialize(f);
-                out = f;
+                out = folderDao.findFolder(folderId, true);
             } else if (objectId.startsWith(ID_PREFIX_VER)) {
                 Long versionId = Long.parseLong(objectId.substring(4));
-                Version v = versionDao.findById(versionId);
-                versionDao.initialize(v);
-                out = v;
+                out = versionDao.findById(versionId, true);
             } else {
                 Long folderId = Long.parseLong(objectId);
-                Folder f = folderDao.findFolder(folderId);
-                folderDao.initialize(f);
-                out = f;
+                out = folderDao.findFolder(folderId, true);
             }
         } catch (NumberFormatException | PersistenceException e) {
             log.warn(e.getMessage(), e);

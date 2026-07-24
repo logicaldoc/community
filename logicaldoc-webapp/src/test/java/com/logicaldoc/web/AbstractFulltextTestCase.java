@@ -45,8 +45,7 @@ public abstract class AbstractFulltextTestCase extends AbstractWPTestCase {
 
     private void addHits() throws Exception {
         DocumentDAO documentDao = (DocumentDAO) context.getBean("documentDAO");
-        Document document = documentDao.findById(1L);
-        documentDao.initialize(document);
+        Document document = documentDao.findById(1L, true);
 
         TemplateDAO templateDao = TemplateDAO.get();
         document.setTemplate(templateDao.findById(-1L));

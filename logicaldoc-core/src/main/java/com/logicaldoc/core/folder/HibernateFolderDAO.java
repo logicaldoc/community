@@ -156,14 +156,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
             if (folder.getDeleted() == 0 && StringUtils.isEmpty(folder.getPath())) {
                 folder = findById(folder.getId());
-                initialize(folder);
+                folder = initialize(folder);
                 folder.setPath(computePath(folder.getId()));
                 saveOrUpdate(folder);
             }
 
             if (folder.getDeleted() == 0 && folder.getId() != 0L) {
                 folder = findById(folder.getId());
-                initialize(folder);
+                folder = initialize(folder);
             }
 
             log.debug("Invoke listeners after store");
@@ -221,11 +221,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         }
     }
 
-    private void updateAliases(Folder folder) {
+    private void updateAliases(Folder folder) throws PersistenceException {
         if (folder.getId() != 0L) {
             List<Folder> aliases = findAliases(folder.getId(), folder.getTenantId());
             for (Folder alias : aliases) {
-                initialize(alias);
+                alias = initialize(alias);
                 alias.setDeleted(folder.getDeleted());
                 alias.setDeleteUserId(folder.getDeleteUserId());
                 if (folder.getSecurityRef() != null)
@@ -829,7 +829,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
     @Override
     public Folder findWorkspace(long folderId) throws PersistenceException {
-        Folder folder = findById(folderId);
+        return findWorkspace(folderId, false);
+    }
+
+    @Override
+    public Folder findWorkspace(long folderId, boolean initialize) throws PersistenceException {
+        Folder folder = findById(folderId, initialize);
 
         if (folder != null && folder.isWorkspace())
             return folder;
@@ -837,7 +842,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             List<Folder> parents = findParents(folderId);
             for (Folder parent : parents) {
                 if (!SLASH.equals(parent.getName()) && parent.isWorkspace())
-                    return parent;
+                    if (initialize)
+                        return initialize(parent);
+                    else
+                        return parent;
             }
         }
 
@@ -1336,7 +1344,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             throws PersistenceException {
         parent = findFolder(parent);
         if (!org.hibernate.Hibernate.isInitialized(parent.getAttributes()))
-            initialize(parent);
+            parent = initialize(parent);
 
         Folder folder = new Folder();
         folder.setName(folderVO.getName());
@@ -1368,7 +1376,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             // At least the current user must be able to operate on the new
             // folder
             User user = userDAO.findById(transaction.getUserId());
-            userDAO.initialize(user);
+            user = userDAO.initialize(user);
             if (!user.isMemberOf(Group.GROUP_ADMIN)) {
                 Group userGroup = user.getUserGroup();
                 FolderAccessControlEntry ace = new FolderAccessControlEntry(userGroup.getId());
@@ -1443,7 +1451,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
                 Folder folderVO = new Folder();
                 folderVO.setName(name);
                 folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
-                initialize(folder);
+                folder = initialize(folder);
                 folder = create(folder, folderVO, inheritSecurity,
                         transaction != null ? new FolderHistory(transaction) : null);
                 flush();
@@ -1505,7 +1513,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             for (Long childId : childrenIds) {
                 Folder child = findById(childId);
                 if (child.getSecurityRef() != null && isInPath(source.getId(), child.getSecurityRef())) {
-                    initialize(child);
+                    child = initialize(child);
 
                     /*
                      * This node references the security of another node in the
@@ -1561,12 +1569,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
              */
             TemplateDAO tDao = TemplateDAO.get();
             List<Template> templates = tDao.findAll(source.getTenantId());
-            for (Template template : templates)
-                tDao.initialize(template);
+            templates = tDao.initialize(templates);
 
             List<Document> srcDocs = docDao.findByFolder(source.getId(), null);
             for (Document srcDoc : srcDocs) {
-                docDao.initialize(srcDoc);
+                srcDoc = docDao.initialize(srcDoc);
                 Document newDoc = new Document(srcDoc);
                 newDoc.setId(0L);
                 newDoc.setCustomId(null);
@@ -1595,10 +1602,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         }
 
         List<Folder> children = findChildren(source.getId(), transaction.getUser().getId());
-        for (Folder child : children) {
+        for (Folder child : children)
             internalCopy(child, newFolder, null, foldersOnly, securityOption, transaction);
-        }
-
         return newFolder;
     }
 
@@ -1629,8 +1634,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     private void replicateSecurityPolicies(Folder source, String securityOption, Folder newFolder)
             throws PersistenceException {
         if (REPLICATE.equals(securityOption) && newFolder.getFoldRef() == null) {
-            initialize(source);
-            initialize(newFolder);
+            source = initialize(source);
+            newFolder = initialize(newFolder);
 
             if (source.getSecurityRef() != null) {
                 newFolder.setSecurityRef(source.getSecurityRef());
@@ -1644,20 +1649,17 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     }
 
     @Override
-    public void move(Folder source, Folder target, FolderHistory transaction) throws PersistenceException {
+    public Folder move(Folder source, Folder target, FolderHistory transaction) throws PersistenceException {
         if (source == null)
             throw new PersistenceException("No source was specified");
         if (target == null)
             throw new PersistenceException("No target was specified");
         validateTransactionAndUser(transaction);
 
-        Folder targetFolder = findFolder(target.getId());
-        initialize(targetFolder);
+        Folder targetFolder = findFolder(target.getId(), true);
 
         if (isInPath(source.getId(), targetFolder.getId()))
             throw new IllegalArgumentException("Cannot move a folder inside the same path");
-
-        initialize(source);
 
         long oldParent = source.getParentId();
         String pathExtendedOld = computePathExtended(source.getId());
@@ -1678,6 +1680,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         // Modify folder history entry
         transaction.setEvent(FolderEvent.MOVED);
 
+        source = initialize(source);
         store(source, transaction);
 
         /*
@@ -1701,6 +1704,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         jdbcUpdate(
                 "update ld_folder set ld_path=REPLACE(ld_path,'%s/','%s/') where ld_path is not null and ld_path like '%s/%%'"
                         .formatted(pathOld, pathNew, pathOld));
+
+        return source;
     }
 
     @Override
@@ -1907,23 +1912,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         return workspaces;
     }
 
-    @Override
-    public void initialize(Folder folder) {
-        refresh(folder);
-
-        if (folder.getAccessControlList() != null)
-            log.trace("Initialized {} aces", folder.getAccessControlList().size());
-
-        if (folder.getTags() != null)
-            log.trace("Initialized {} tags", folder.getTags().size());
-
-        if (folder.getAttributes() != null)
-            log.trace("Initialized {} attributes", folder.getAttributes().keySet().size());
-
-        if (folder.getStores() != null)
-            log.trace("Initialized {} stores", folder.getStores().keySet().size());
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public List<Folder> findDeleted(long userId, Integer maxHits) {
@@ -1956,34 +1944,45 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
     @Override
     public Folder findRoot(long tenantId) throws PersistenceException {
-        List<Folder> folders = findByName(SLASH, tenantId);
-        if (!folders.isEmpty())
-            return folders.get(0);
-        return null;
+        return findRoot(tenantId, false);
+    }
+
+    @Override
+    public Folder findRoot(long tenantId, boolean initialize) throws PersistenceException {
+        Folder folder = findByName(SLASH, tenantId).stream().findFirst().orElse(null);
+        if (initialize)
+            return initialize(folder);
+        else
+            return folder;
     }
 
     @Override
     public Folder findDefaultWorkspace(long tenantId) throws PersistenceException {
-        Folder root = findRoot(tenantId);
+        return findDefaultWorkspace(tenantId, false);
+    }
+
+    @Override
+    public Folder findDefaultWorkspace(long tenantId, boolean initialize) throws PersistenceException {
+        Folder root = findRoot(tenantId, true);
         if (root == null)
             return null;
 
-        List<Folder> workspaces = findByWhere(
+        Folder workspace = findByWhere(
                 "_entity.parentId = %d and _entity.name = :wfName and _entity.tenantId = %d and _entity.type = %d"
                         .formatted(root.getId(), tenantId, Folder.TYPE_WORKSPACE),
-                Map.of("wfName", Folder.DEFAULTWORKSPACENAME), null, null);
+                Map.of("wfName", Folder.DEFAULTWORKSPACENAME), null, null).stream().findFirst().orElse(null);
 
-        if (workspaces.isEmpty())
-            return null;
+        if (initialize)
+            return initialize(workspace);
         else
-            return workspaces.get(0);
+            return workspace;
     }
 
     @Override
     public void updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction)
             throws PersistenceException {
-        Folder f = findById(folderId);
-        initialize(f);
+        Folder folder = findById(folderId);
+        folder = initialize(folder);
 
         Folder rightsFolder = findById(rightsFolderId);
         long securityRef = rightsFolderId;
@@ -1993,8 +1992,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         if (transaction != null)
             transaction.setEvent(FolderEvent.PERMISSION);
 
-        f.setSecurityRef(securityRef);
-        store(f, transaction);
+        folder.setSecurityRef(securityRef);
+        store(folder, transaction);
 
         // Now all the folders that are referencing this one must be updated
         bulkUpdate("set securityRef = %d where securityRef = %d".formatted(securityRef, folderId), null);
@@ -2096,9 +2095,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
     @Override
     public Folder findFolder(long folderId) throws PersistenceException {
-        Folder f = findById(folderId);
+        return findFolder(folderId, false);
+    }
+
+    @Override
+    public Folder findFolder(long folderId, boolean initialize) throws PersistenceException {
+        Folder f = findById(folderId, initialize);
         if (f != null && f.getFoldRef() != null)
-            f = findById(f.getFoldRef());
+            f = findById(f.getFoldRef(), initialize);
         return f;
     }
 
@@ -2114,8 +2118,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             return;
 
         Folder parent = getExistingFolder(id);
-
-        initialize(parent);
+        parent = initialize(parent);
         transaction.setEvent(FolderEvent.CHANGED);
         transaction.setTenantId(parent.getTenantId());
         transaction.setNotifyEvent(false);
@@ -2123,7 +2126,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         // Iterate over all children setting the template and field values
         List<Folder> children = findChildren(id, null);
         for (Folder folder : children) {
-            initialize(folder);
+            folder = initialize(folder);
 
             FolderHistory tr = new FolderHistory(transaction);
             tr.setFolderId(folder.getId());
@@ -2152,17 +2155,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     @Override
     public void applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException {
         Folder parent = getExistingFolder(id);
-
-        initialize(parent);
+        parent = initialize(parent);
         transaction.setEvent(FolderEvent.CHANGED);
         transaction.setTenantId(parent.getTenantId());
         transaction.setNotifyEvent(false);
 
         // Iterate over all children setting the template and field values
-        List<Folder> children = findChildren(id, null);
+        List<Folder> children = initialize(findChildren(id, null));
         for (Folder folder : children) {
-            initialize(folder);
-
             FolderHistory tr = new FolderHistory(transaction);
             tr.setFolderId(folder.getId());
 
@@ -2188,9 +2188,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         transaction.setNotifyEvent(false);
 
         // Iterate over all children setting the template and field values
-        List<Folder> children = findChildren(id, null);
+        List<Folder> children = initialize(findChildren(id, null));
         for (Folder folder : children) {
-            initialize(folder);
             folder.setGrid(parent.getGrid());
 
             FolderHistory tr = new FolderHistory(transaction);
@@ -2206,16 +2205,15 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     @Override
     public void applyStoreToTree(long id, FolderHistory transaction) throws PersistenceException {
         Folder parent = getExistingFolder(id);
-        initialize(parent);
+        parent = initialize(parent);
 
         transaction.setEvent(FolderEvent.CHANGED);
         transaction.setTenantId(parent.getTenantId());
         transaction.setNotifyEvent(false);
 
         // Iterate over all children setting the template and field values
-        List<Folder> children = findByParentId(id);
+        List<Folder> children = initialize(findByParentId(id));
         for (Folder folder : children) {
-            initialize(folder);
             folder.setStore(parent.getStore());
 
             FolderHistory tr = new FolderHistory(transaction);
@@ -2237,9 +2235,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         transaction.setNotifyEvent(false);
 
         // Iterate over all children setting the template and field values
-        List<Folder> children = findByParentId(id);
+        List<Folder> children = initialize(findByParentId(id));
         for (Folder folder : children) {
-            initialize(folder);
             folder.setFillerId(parent.getFillerId());
             folder.setFillMode(parent.getFillMode());
 

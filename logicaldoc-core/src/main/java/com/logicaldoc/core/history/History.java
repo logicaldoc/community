@@ -211,7 +211,7 @@ public abstract class History extends PersistentObject implements Comparable<His
             UserDAO uDao = UserDAO.get();
             try {
                 user = uDao.findById(userId);
-                uDao.initialize(user);
+                user = uDao.initialize(user);
             } catch (PersistenceException e) {
                 log.error(e.getMessage(), e);
             }

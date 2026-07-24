@@ -67,12 +67,9 @@ public class UsersDataServlet extends AbstractDataServlet {
          * Iterate over records composing the response XML document
          */
         UserDAO userDao = UserDAO.get();
-        for (User user : users) {
+        for (User user : userDao.initialize(users)) {
             if (user.getType() == UserType.SYSTEM || (skipdisabled && !user.isEnabled()))
                 continue;
-
-            userDao.initialize(user);
-
             printUser(writer, user);
         }
 
@@ -134,9 +131,7 @@ public class UsersDataServlet extends AbstractDataServlet {
         } else {
             List<User> users = UserDAO.get().findByWhere("_entity.username in (%s)"
                     .formatted(usernames.stream().map("'%s'"::formatted).collect(Collectors.joining(","))), null, null);
-            for (User user : users)
-                UserDAO.get().initialize(user);
-            return users;
+            return UserDAO.get().initialize(users);
         }
     }
 
@@ -149,13 +144,14 @@ public class UsersDataServlet extends AbstractDataServlet {
         if (StringUtils.isNotEmpty(groupIdOrName)) {
             Group group = null;
             try {
-                group = groupDao.findById(Long.parseLong(groupIdOrName));
+                group = groupDao.findById(Long.parseLong(groupIdOrName), true);
             } catch (Exception t) {
                 // Nothing to do
             }
-            if (group == null)
+            if (group == null) {
                 group = groupDao.findByName(groupIdOrName, session.getTenantId());
-            groupDao.initialize(group);
+                group = groupDao.initialize(group);
+            }
 
             users.addAll(group.getUsers());
         } else {

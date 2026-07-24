@@ -128,8 +128,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
         testSubject.store(message);
         assertNotNull(message);
 
-        message = testSubject.findById(message.getId());
-        testSubject.initialize(message);
+        message = testSubject.findById(message.getId(), true);
         assertNotNull(message);
         assertEquals(2, message.getRecipients().size());
 
@@ -141,8 +140,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
         message.setRecipients(recipients);
         testSubject.store(message);
 
-        message = testSubject.findById(1);
-        testSubject.initialize(message);
+        message = testSubject.findById(1L, true);
 
         assertNotNull(message);
         assertEquals("xxxx", message.getMessageText());

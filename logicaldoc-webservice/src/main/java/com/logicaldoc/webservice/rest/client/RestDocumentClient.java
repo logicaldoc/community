@@ -26,213 +26,221 @@ import jakarta.ws.rs.core.MediaType;
 
 public class RestDocumentClient extends AbstractRestClient<DocumentService> {
 
-	public RestDocumentClient(String endpoint, String apiKey) {
-		this(endpoint, apiKey, -1);
-	}
+    public RestDocumentClient(String endpoint, String apiKey) {
+        this(endpoint, apiKey, -1);
+    }
 
-	public RestDocumentClient(String endpoint, String apiKey, int timeout) {
-		super(DocumentService.class, endpoint, apiKey, timeout);
-	}
+    public RestDocumentClient(String endpoint, String apiKey, int timeout) {
+        super(DocumentService.class, endpoint, apiKey, timeout);
+    }
 
-	public WSDocument create(WSDocument document, File packageFile) throws FileNotFoundException {
+    public WSDocument create(WSDocument document, File packageFile) throws FileNotFoundException {
 
-		WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 
-		Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile),
-				new ContentDisposition("form-data; name=\"content\"; filename=\"" + packageFile.getName() + "\""));
+        Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile),
+                new ContentDisposition("form-data; name=\"content\"; filename=\"" + packageFile.getName() + "\""));
 
-		return proxy.create(document, fileAttachment);
-	}
+        return proxy.create(document, fileAttachment);
+    }
 
-	public WSDocument create(WSDocument document, DataHandler dataHandler) {
-		WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+    public WSDocument create(WSDocument document, DataHandler dataHandler) {
+        WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 
-		Attachment fileAttachment = new AttachmentBuilder().id("content").dataHandler(dataHandler)
-				.mediaType("application/octet-stream")
-				.contentDisposition(new ContentDisposition("form-data; name=\"content\"")).build();
+        Attachment fileAttachment = new AttachmentBuilder().id("content").dataHandler(dataHandler)
+                .mediaType("application/octet-stream")
+                .contentDisposition(new ContentDisposition("form-data; name=\"content\"")).build();
 
-		return proxy.create(document, fileAttachment);
-	}
+        return proxy.create(document, fileAttachment);
+    }
 
-	public List<WSDocument> list(long folderId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).type("*/*");
-		return proxy.list(folderId);
-	}
+    public WSDocument move(long docId, long folderId) throws AuthenticationException, PermissionException,
+            PersistenceException, UnexistingResourceException, WebserviceException {
+        WebClient.client(proxy).type("*/*");
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 
-	public List<WSDocument> listPaginated(long folderId, String fileName, String sort, Integer page, Integer max)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).type("*/*");
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        return proxy.move(docId, folderId);
+    }
 
-		return proxy.listPaginated(folderId, fileName, sort, page, max);
-	}
+    public List<WSDocument> list(long folderId)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).type("*/*");
+        return proxy.list(folderId);
+    }
 
-	public List<WSDocument> listDocuments(long folderId, String fileName)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).type("*/*");
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+    public List<WSDocument> listPaginated(long folderId, String fileName, String sort, Integer page, Integer max)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).type("*/*");
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 
-		return proxy.listDocuments(folderId, fileName);
-	}
+        return proxy.listPaginated(folderId, fileName, sort, page, max);
+    }
 
-	public WSDocument getDocument(long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		return proxy.getDocument(docId);
-	}
+    public List<WSDocument> listDocuments(long folderId, String fileName)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).type("*/*");
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 
-	public void delete(long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.delete(docId);
-	}
+        return proxy.listDocuments(folderId, fileName);
+    }
 
-	public DataHandler getContent(long docId) throws AuthenticationException, PermissionException, WebserviceException,
-			PersistenceException, IOException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_OCTET_STREAM);
-		return proxy.getContent(docId);
-	}
+    public WSDocument getDocument(long docId)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        return proxy.getDocument(docId);
+    }
 
-	public DataHandler getVersionContent(long docId, String version) throws AuthenticationException,
-			PermissionException, WebserviceException, PersistenceException, IOException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_OCTET_STREAM);
-		return proxy.getVersionContent(docId, version);
-	}
+    public void delete(long docId)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        proxy.delete(docId);
+    }
 
-	public void checkout(long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.checkout(docId);
-	}
+    public DataHandler getContent(long docId) throws AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException, IOException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_OCTET_STREAM);
+        return proxy.getContent(docId);
+    }
 
-	public void update(WSDocument document) throws AuthenticationException, PermissionException, WebserviceException,
-			PersistenceException, UnexistingResourceException {
-		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.update(document);
-	}
+    public DataHandler getVersionContent(long docId, String version) throws AuthenticationException,
+            PermissionException, WebserviceException, PersistenceException, IOException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_OCTET_STREAM);
+        return proxy.getVersionContent(docId, version);
+    }
 
-	public void checkin(long docId, String comment, Boolean release, File packageFile) throws FileNotFoundException {
-		Attachment fileAttachment = new Attachment("filedata", new FileInputStream(packageFile),
-				new ContentDisposition("form-data; name=\"filedata\"; filename=\"" + packageFile.getName() + "\""));
+    public void checkout(long docId)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        proxy.checkout(docId);
+    }
 
-		WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
-		WebClient.client(proxy).accept(MediaType.TEXT_PLAIN);
+    public void update(WSDocument document) throws AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException, UnexistingResourceException {
+        WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        proxy.update(document);
+    }
 
-		proxy.checkin(Long.toString(docId), comment, release.toString(), packageFile.getName(), fileAttachment);
-	}
+    public void checkin(long docId, String comment, Boolean release, File packageFile) throws FileNotFoundException {
+        Attachment fileAttachment = new Attachment("filedata", new FileInputStream(packageFile),
+                new ContentDisposition("form-data; name=\"filedata\"; filename=\"" + packageFile.getName() + "\""));
 
-	public WSNote addNote(long docId, String note) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, UnexistingResourceException {
-		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		return proxy.addNote(docId, note);
-	}
+        WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
+        WebClient.client(proxy).accept(MediaType.TEXT_PLAIN);
 
-	/**
-	 * Adds a new note for the given document
-	 * 
-	 * @param noteId identifier of the note
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 * @throws WebserviceException Error in the Webservice layer
-	 * @throws AuthenticationException Authentication issue
-	 */
-	public void deleteNote(long noteId) throws AuthenticationException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.deleteNote(noteId);
-	}
+        proxy.checkin(Long.toString(docId), comment, release.toString(), packageFile.getName(), fileAttachment);
+    }
 
-	/**
-	 * Adds a new note for the given document
-	 * 
-	 * @param docId identifier of the document
-	 * @param version document's version
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 * @throws WebserviceException Error in the Webservice layer
-	 * @throws AuthenticationException Authentication issue
-	 */
-	public void deleteVersion(long docId, String version)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.deleteVersion(docId, version);
-	}
+    public WSNote addNote(long docId, String note) throws AuthenticationException, PermissionException,
+            WebserviceException, PersistenceException, UnexistingResourceException {
+        WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        return proxy.addNote(docId, note);
+    }
 
-	/**
-	 * Gets the notes for the given document
-	 * 
-	 * @param docId identifier of the document
-	 * 
-	 * @return list of ratings
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 * @throws WebserviceException Error in the Webservice layer
-	 * @throws AuthenticationException Authentication issue
-	 * @throws PermissionException Not enough permissions
-	 * @throws UnexistingResourceException The specified document does not exist
-	 */
-	public List<WSNote> getNotes(long docId) throws AuthenticationException, PermissionException, WebserviceException,
-			PersistenceException, UnexistingResourceException {
-		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		return proxy.getNotes(docId);
-	}
+    /**
+     * Adds a new note for the given document
+     * 
+     * @param noteId identifier of the note
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws WebserviceException Error in the Webservice layer
+     * @throws AuthenticationException Authentication issue
+     */
+    public void deleteNote(long noteId) throws AuthenticationException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        proxy.deleteNote(noteId);
+    }
 
-	/**
-	 * Puts a new rating on the given document
-	 * 
-	 * @param docId identifier of the document
-	 * @param vote the vote
-	 * 
-	 * @return the rating
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 * @throws WebserviceException Error in the Webservice layer
-	 * @throws AuthenticationException Authentication issue
-	 * @throws PermissionException Not enough permissions
-	 * @throws UnexistingResourceException The specified document does not exist
-	 */
-	public WSRating rateDocument(long docId, int vote) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, UnexistingResourceException {
-		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		return proxy.rateDocument(docId, vote);
-	}
+    /**
+     * Adds a new note for the given document
+     * 
+     * @param docId identifier of the document
+     * @param version document's version
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws WebserviceException Error in the Webservice layer
+     * @throws AuthenticationException Authentication issue
+     */
+    public void deleteVersion(long docId, String version)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        proxy.deleteVersion(docId, version);
+    }
 
-	/**
-	 * Gets all the ratings of the given document
-	 * 
-	 * @param docId identifier of the document
-	 *
-	 * @return array of ratings
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 * @throws WebserviceException Error in the Webservice layer
-	 * @throws AuthenticationException Authentication issue
-	 * @throws PermissionException Not enough permissions
-	 * @throws UnexistingResourceException The specified document does not exist
-	 */
-	public List<WSRating> getRatings(long docId) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, UnexistingResourceException {
-		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		return proxy.getRatings(docId);
-	}
+    /**
+     * Gets the notes for the given document
+     * 
+     * @param docId identifier of the document
+     * 
+     * @return list of ratings
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws WebserviceException Error in the Webservice layer
+     * @throws AuthenticationException Authentication issue
+     * @throws PermissionException Not enough permissions
+     * @throws UnexistingResourceException The specified document does not exist
+     */
+    public List<WSNote> getNotes(long docId) throws AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException, UnexistingResourceException {
+        WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        return proxy.getNotes(docId);
+    }
 
-	public void createPdf(long docId, String fileVersion) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, IOException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.createPdf(docId, fileVersion);
-	}
+    /**
+     * Puts a new rating on the given document
+     * 
+     * @param docId identifier of the document
+     * @param vote the vote
+     * 
+     * @return the rating
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws WebserviceException Error in the Webservice layer
+     * @throws AuthenticationException Authentication issue
+     * @throws PermissionException Not enough permissions
+     * @throws UnexistingResourceException The specified document does not exist
+     */
+    public WSRating rateDocument(long docId, int vote) throws AuthenticationException, PermissionException,
+            WebserviceException, PersistenceException, UnexistingResourceException {
+        WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        return proxy.rateDocument(docId, vote);
+    }
 
-	public void createThumbnail(long docId, String fileVersion, String type)
-			throws AuthenticationException, WebserviceException, PersistenceException, IOException {
-		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.createThumbnail(docId, fileVersion, type);
-	}
+    /**
+     * Gets all the ratings of the given document
+     * 
+     * @param docId identifier of the document
+     *
+     * @return array of ratings
+     * 
+     * @throws PersistenceException Error in the data layer
+     * @throws WebserviceException Error in the Webservice layer
+     * @throws AuthenticationException Authentication issue
+     * @throws PermissionException Not enough permissions
+     * @throws UnexistingResourceException The specified document does not exist
+     */
+    public List<WSRating> getRatings(long docId) throws AuthenticationException, PermissionException,
+            WebserviceException, PersistenceException, UnexistingResourceException {
+        WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        return proxy.getRatings(docId);
+    }
+
+    public void createPdf(long docId, String fileVersion) throws AuthenticationException, PermissionException,
+            WebserviceException, PersistenceException, IOException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        proxy.createPdf(docId, fileVersion);
+    }
+
+    public void createThumbnail(long docId, String fileVersion, String type)
+            throws AuthenticationException, WebserviceException, PersistenceException, IOException {
+        WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+        proxy.createThumbnail(docId, fileVersion, type);
+    }
 }
