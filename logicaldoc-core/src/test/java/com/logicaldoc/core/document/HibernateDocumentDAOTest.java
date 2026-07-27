@@ -41,6 +41,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
@@ -160,7 +161,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         transaction.setSessionId("123");
         transaction.setEvent(DocumentEvent.DELETED);
         transaction.setComment("");
-        transaction.setUser(new User());
+        transaction.setUser(UserDAO.get().findById(User.USERID_ADMIN, true));
 
         testSubject.delete(1, transaction);
         Document doc = testSubject.findById(1);
@@ -193,7 +194,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         DocumentHistory transaction = new DocumentHistory();
         transaction.setSessionId("123");
         transaction.setEvent(DocumentEvent.DELETED);
-        transaction.setUser(new User());
+        transaction.setUser(UserDAO.get().findById(User.USERID_ADMIN, true));
 
         List<Document> documentsToDelete = Arrays.asList(retrievedDoc1, retrievedDoc2);
         testSubject.deleteAll(documentsToDelete, transaction);

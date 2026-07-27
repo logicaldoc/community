@@ -726,7 +726,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     public List<Long> findDocIdByUserIdAndTag(long userId, String tag) throws PersistenceException {
         List<Long> ids = new ArrayList<>();
 
-        User user = userDAO.findById(userId);
+        User user = userDAO.findById(userId, true);
         if (user == null)
             return ids;
 

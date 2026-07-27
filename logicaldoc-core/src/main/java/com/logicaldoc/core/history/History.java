@@ -13,7 +13,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
-import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
@@ -208,11 +207,9 @@ public abstract class History extends PersistentObject implements Comparable<His
 
     public User getUser() {
         if (user == null && (userId != null && userId.longValue() != 0L)) {
-            UserDAO uDao = UserDAO.get();
             try {
-                user = uDao.findById(userId);
-                user = uDao.initialize(user);
-            } catch (PersistenceException e) {
+                user = UserDAO.get().findById(userId, true);
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }

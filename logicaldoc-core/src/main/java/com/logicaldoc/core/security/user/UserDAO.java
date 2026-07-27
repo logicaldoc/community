@@ -19,199 +19,259 @@ import com.logicaldoc.util.spring.Context;
  */
 public interface UserDAO extends PersistentObjectDAO<User> {
 
-	/**
-	 * Gets the object available in the application context
-	 * 
-	 * @return the instance of this object in the application context
-	 */
-	public static UserDAO get() {
-		return Context.get(UserDAO.class);
-	}
+    /**
+     * Gets the object available in the application context
+     * 
+     * @return the instance of this object in the application context
+     */
+    public static UserDAO get() {
+        return Context.get(UserDAO.class);
+    }
 
-	/**
-	 * Counts the total number of regular users
-	 *
-	 * @param tenantId identifier of the tenant
-	 * 
-	 * @return total number of regular users
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public long countRegulars(Long tenantId) throws PersistenceException;
-	
-	/**
-	 * Counts the total number of guest users
-	 *
-	 * @param tenantId identifier of the tenant
-	 * 
-	 * @return total number of guest users
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public long countGuests(Long tenantId) throws PersistenceException;
+    /**
+     * Counts the total number of regular users
+     *
+     * @param tenantId identifier of the tenant
+     * 
+     * @return total number of regular users
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public long countRegulars(Long tenantId) throws PersistenceException;
 
-	/**
-	 * This method finds an User by its username. The search is case sensitive.
-	 * 
-	 * @param username username of wanted User.
-	 * 
-	 * @return Wanted User or null if user doesn't exist.
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 */
-	public User findByUsername(String username) throws PersistenceException;
+    /**
+     * Counts the total number of guest users
+     *
+     * @param tenantId identifier of the tenant
+     * 
+     * @return total number of guest users
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public long countGuests(Long tenantId) throws PersistenceException;
 
-	/**
-	 * This method finds an User by its username. The search is case
-	 * insensitive.
-	 * 
-	 * @param username username of wanted User.
-	 * 
-	 * @return Wanted User or null if user doesn't exist.
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 */
-	public User findByUsernameIgnoreCase(String username) throws PersistenceException;
+    /**
+     * This method finds an User by its username. The search is case sensitive.
+     * Lazy-loaded collections are not initialized.
+     * 
+     * @param username username of wanted User.
+     * 
+     * @return Wanted User or null if user doesn't exist.
+     * 
+     * @throws PersistenceException Error in the data layer
+     */
+    public User findByUsername(String username) throws PersistenceException;
 
-	/**
-	 * Depending on the global setting, it invokes findByUsername or
-	 * findByUsernameIgnoreCase
-	 * 
-	 * @param username The username of the user
-	 * 
-	 * @return The found user
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 */
-	public User getUser(String username) throws PersistenceException;
+    /**
+     * This method finds an User by its username.
+     * 
+     * @param username username of wanted User.
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return Wanted User or null if user doesn't exist.
+     * 
+     * @throws PersistenceException Error in the data layer
+     */
+    public User findByUsername(String username, boolean initialize) throws PersistenceException;
 
-	/**
-	 * This method finds an User by username.
-	 * 
-	 * @param username The username of wanted User.
-	 * 
-	 * @return Collection of selected users.
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public List<User> findByLikeUsername(String username) throws PersistenceException;
+    /**
+     * This method finds an User by its username. The search is case
+     * insensitive. Lazy-loaded collections are not initialized.
+     * 
+     * @param username username of wanted User.
+     * 
+     * @return Wanted User or null if user doesn't exist.
+     * 
+     * @throws PersistenceException Error in the data layer
+     */
+    public User findByUsernameIgnoreCase(String username) throws PersistenceException;
 
-	/**
-	 * This method finds an User by name.
-	 * 
-	 * @param name The name of wanted User.
-	 * 
-	 * @return Collection of selected users.
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public List<User> findByName(String name) throws PersistenceException;
+    /**
+     * This method finds an User by its username. The search is case
+     * insensitive.
+     * 
+     * @param username username of wanted User.
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return Wanted User or null if user doesn't exist.
+     * 
+     * @throws PersistenceException Error in the data layer
+     */
+    public User findByUsernameIgnoreCase(String username, boolean initialize) throws PersistenceException;
 
-	/**
-	 * This method finds an User by username and name.
-	 * 
-	 * @param username The username of wanted user
-	 * @param name The name of wanted user
-	 * 
-	 * @return Collection of selected users
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public List<User> findByUsernameAndName(String username, String name) throws PersistenceException;
+    /**
+     * Retrieve the administrator for the given tenant. The general rule is that
+     * the administrator's username is:
+     * <ol>
+     * <li>admin if the tenant is default</li>
+     * <li>admin<b>Tenantname</b> in all other cases</li>
+     * </ol>
+     * 
+     * @param tenantName name of the tenant
+     * 
+     * @return the user to administrate the tenant
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public User findAdminUser(String tenantName) throws PersistenceException;
 
-	/**
-	 * Is password expired.
-	 * 
-	 * @param username Username of the User to be validated.
-	 * 
-	 * @return True if the password is expired
-	 */
-	public boolean isPasswordExpired(String username);
+    /**
+     * Retrieve the administrator for the given tenant. The general rule is that
+     * the administrator's username is:
+     * <ol>
+     * <li>admin if the tenant is default</li>
+     * <li>admin<b>Tenantname</b> in all other cases</li>
+     * </ol>
+     * 
+     * @param tenantName name of the tenant
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return the user to administrate the tenant
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public User findAdminUser(String tenantName, boolean initialize) throws PersistenceException;
 
-	/**
-	 * Checks if a user is inactive, that is a user without interactions in the
-	 * last X days after it has last enabled. We look at the
-	 * {@link User#getMaxInactivity()} first and then we fallback to the general
-	 * parameter security.user.maxinactivity
-	 * 
-	 * @param username identifier of the user
-	 * 
-	 * @return the last interaction time
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public boolean isInactive(String username) throws PersistenceException;
+    /**
+     * Depending on the global setting, it invokes findByUsername or
+     * findByUsernameIgnoreCase. Lazy-loaded collections are not initialized.
+     * 
+     * @param username The username of the user
+     * 
+     * @return The found user
+     * 
+     * @throws PersistenceException Error in the data layer
+     */
+    public User getUser(String username) throws PersistenceException;
 
-	/**
-	 * This method deletes the user object and insert a new user history entry.
-	 * 
-	 * @param userId The id of the user to delete
-	 * @param transaction entry to log the event
-	 * 
-	 * @throws PersistenceException error at database level
-	 */
-	public void delete(long userId, UserHistory transaction) throws PersistenceException;
+    /**
+     * Depending on the global setting, it invokes findByUsername or
+     * findByUsernameIgnoreCase
+     * 
+     * @param username The username of the user
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return The found user
+     * 
+     * @throws PersistenceException Error in the data layer
+     */
+    public User getUser(String username, boolean initialize) throws PersistenceException;
 
-	/**
-	 * This method persists the user object and insert a new user history entry.
-	 * 
-	 * @param user the user to store
-	 * @param transaction entry to log the event
-	 * 
-	 * @throws PersistenceException error at database level
-	 */
-	public void store(User user, UserHistory transaction) throws PersistenceException;
+    /**
+     * This method finds an User by username.
+     * 
+     * @param username The username of wanted User.
+     * 
+     * @return Collection of selected users.
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public List<User> findByLikeUsername(String username) throws PersistenceException;
 
-	public void store(User user) throws PersistenceException;
+    /**
+     * This method finds an User by name.
+     * 
+     * @param name The name of wanted User.
+     * 
+     * @return Collection of selected users.
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public List<User> findByName(String name) throws PersistenceException;
 
-	/**
-	 * Retrieves the settings for a user. The settings are stored as Generics of
-	 * type <b>usersetting</b>.
-	 * 
-	 * @param userId Identifier of the user
-	 * @param namePrefix Name prefix of the property (optional)
-	 * 
-	 * @return The map setting_name-generic
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public Map<String, Generic> findUserSettings(long userId, String namePrefix) throws PersistenceException;
+    /**
+     * This method finds an User by username and name.
+     * 
+     * @param username The username of wanted user
+     * @param name The name of wanted user
+     * 
+     * @return Collection of selected users
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public List<User> findByUsernameAndName(String username, String name) throws PersistenceException;
 
-	/**
-	 * Retrieve the administrator for the given tenant. The general rule is that
-	 * the administrator's username is:
-	 * <ol>
-	 * <li>admin if the tenant is default</li>
-	 * <li>admin<b>Tenantname</b> in all other cases</li>
-	 * </ol>
-	 * 
-	 * @param tenantName name of the tenant
-	 * 
-	 * @return the user to administrate the tenant
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public User findAdminUser(String tenantName) throws PersistenceException;
+    /**
+     * Is password expired.
+     * 
+     * @param username Username of the User to be validated.
+     * 
+     * @return True if the password is expired
+     */
+    public boolean isPasswordExpired(String username);
 
-	/**
-	 * Retrieves the users belonging to a given group.
-	 * 
-	 * @param groupId Identifier of the group
-	 * 
-	 * @return the set of groups
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public Set<User> findByGroup(long groupId) throws PersistenceException;
+    /**
+     * Checks if a user is inactive, that is a user without interactions in the
+     * last X days after it has last enabled. We look at the
+     * {@link User#getMaxInactivity()} first and then we fallback to the general
+     * parameter security.user.maxinactivity
+     * 
+     * @param username identifier of the user
+     * 
+     * @return the last interaction time
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public boolean isInactive(String username) throws PersistenceException;
 
-	/**
-	 * Checks if the user's password complies the current quality criteria
-	 * 
-	 * @param user The user to check
-	 * 
-	 * @throws PasswordWeakException Raised when the password does not comply
-	 *         with the quality criteria
-	 * @throws PersistenceException Error in the database
-	 */
-	void checkPasswordCompliance(User user) throws PasswordWeakException, PersistenceException;
+    /**
+     * This method deletes the user object and insert a new user history entry.
+     * 
+     * @param userId The id of the user to delete
+     * @param transaction entry to log the event
+     * 
+     * @throws PersistenceException error at database level
+     */
+    public void delete(long userId, UserHistory transaction) throws PersistenceException;
+
+    /**
+     * This method persists the user object and insert a new user history entry.
+     * 
+     * @param user the user to store
+     * @param transaction entry to log the event
+     * 
+     * @throws PersistenceException error at database level
+     */
+    public void store(User user, UserHistory transaction) throws PersistenceException;
+
+    public void store(User user) throws PersistenceException;
+
+    /**
+     * Retrieves the settings for a user. The settings are stored as Generics of
+     * type <b>usersetting</b>.
+     * 
+     * @param userId Identifier of the user
+     * @param namePrefix Name prefix of the property (optional)
+     * 
+     * @return The map setting_name-generic
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public Map<String, Generic> findUserSettings(long userId, String namePrefix) throws PersistenceException;
+
+    /**
+     * Retrieves the users belonging to a given group.
+     * 
+     * @param groupId Identifier of the group
+     * 
+     * @return the set of groups
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public Set<User> findByGroup(long groupId) throws PersistenceException;
+
+    /**
+     * Checks if the user's password complies the current quality criteria
+     * 
+     * @param user The user to check
+     * 
+     * @throws PasswordWeakException Raised when the password does not comply
+     *         with the quality criteria
+     * @throws PersistenceException Error in the database
+     */
+    void checkPasswordCompliance(User user) throws PasswordWeakException, PersistenceException;
 }

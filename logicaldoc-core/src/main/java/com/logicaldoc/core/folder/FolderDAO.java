@@ -335,7 +335,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 
     public boolean isPrintAllowed(long folderId, long userId) throws PersistenceException;
 
-    public boolean isDownloadllowed(long folderId, long userId) throws PersistenceException;
+    public boolean isDownloadAllowed(long folderId, long userId) throws PersistenceException;
 
     public boolean isMoveAllowed(long folderId, long userId) throws PersistenceException;
 

@@ -98,13 +98,13 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
         Group group = groupDAO.findByName("author", Tenant.DEFAULT_ID);
         assertNotNull(group);
         testSubject.addUserToGroup(group.getId(), test.getId());
-        User user = userDAO.findByUsername("test");
+        User user = userDAO.findByUsername("test", true);
         assertTrue(user.getGroups().contains(group));
 
         group = groupDAO.findByName("guest", Tenant.DEFAULT_ID);
         assertNotNull(group);
         testSubject.addUserToGroup(group.getId(), test.getId());
-        user = userDAO.findByUsername("test");
+        user = userDAO.findByUsername("test", true);
         assertTrue(user.getGroups().contains(group));
     }
 
@@ -127,7 +127,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 
     @Test
     public void testDeleteUser() throws ServerException, PersistenceException {
-        User user = userDAO.findByUsername("author");
+        User user = userDAO.findByUsername("author", true);
         assertEquals(2, user.getGroups().size());
         testSubject.deleteUser(user.getId());
         user = userDAO.findByUsername("author");

@@ -32,8 +32,8 @@ public class UserTool {
     public User getUser(String username) {
         UserDAO userDao = UserDAO.get();
         try {
-            return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
-                    : userDao.findByUsername("_system");
+            return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username, true)
+                    : userDao.findByUsername("_system", true);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return null;

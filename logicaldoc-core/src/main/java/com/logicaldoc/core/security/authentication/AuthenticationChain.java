@@ -115,8 +115,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
     private User handleImpersonation(User user, String impersonatedUsername, List<AuthenticationException> errors) {
         if (StringUtils.isNotEmpty(impersonatedUsername) && user != null)
             try {
-                User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername);
-                impersonatedUser = UserDAO.get().initialize(impersonatedUser);
+                User impersonatedUser = UserDAO.get().findByUsername(impersonatedUsername, true);
                 if (!impersonatedUser.getImpersonators().contains(user.getUsername())) {
                     log.error("User {} not allowed to impersonate {}", user, impersonatedUser);
                     errors.add(new ForbiddenImpersonationException(user.getUsername(), impersonatedUsername));
@@ -184,7 +183,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
     protected void defaultValidations(String username, Client client)
             throws AuthenticationException, PersistenceException {
         UserDAO userDao = UserDAO.get();
-        User user = userDao.findByUsername(username);
+        User user = userDao.findByUsername(username, true);
         if (user == null)
             return;
 

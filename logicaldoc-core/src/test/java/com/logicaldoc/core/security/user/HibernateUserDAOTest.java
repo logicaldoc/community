@@ -53,14 +53,14 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
     @Test
     public void testDelete() throws PersistenceException {
         // User with history, not deletable
-        User user = testSubject.findByUsername("author");
+        User user = testSubject.findByUsername("author", true);
         assertEquals(3, user.getGroups().size());
         testSubject.delete(user.getId());
         user = testSubject.findByUsername("author");
         assertNull(user);
 
         // Try with a deletable user
-        User testUser = testSubject.findByUsername("test");
+        User testUser = testSubject.findByUsername("test", true);
         assertEquals(2, testUser.getGroups().size());
         testUser.removeGroupMemberships(null);
         testSubject.store(testUser);
@@ -69,7 +69,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
         String name = testUser.getUserGroupName();
         testSubject.delete(testUser.getId());
-        user = testSubject.findByUsername("test");
+        user = testSubject.findByUsername("test", true);
         assertNull(user);
         assertNull(groupDao.findByName(name, 1));
 
@@ -114,7 +114,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testFindByUserName() throws PersistenceException, NoSuchAlgorithmException {
-        User user = testSubject.findByUsername("admin");
+        User user = testSubject.findByUsername("admin", true);
         assertNotNull(user);
         assertEquals("admin", user.getUsername());
         assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
@@ -299,7 +299,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
     public void isPasswordExpired() throws PersistenceException {
         assertFalse(testSubject.isPasswordExpired("admin"));
-        User user = testSubject.findByUsername("boss");
+        User user = testSubject.findByUsername("boss", true);
         Date lastChange = null;
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(lastChange);

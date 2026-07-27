@@ -237,11 +237,9 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     public void testDeleteTree() throws Exception {
         assertNotNull(testSubject.findById(1200));
         assertNotNull(testSubject.findById(1202));
-        User user = new User();
-        user.setUsername("admin");
-        user.setId(1);
+
         FolderHistory transaction = new FolderHistory();
-        transaction.setUser(user);
+        transaction.setUser(UserDAO.get().findById(User.USERID_ADMIN, true));
         testSubject.deleteTree(1200L, PersistentObject.DELETED_CODE_DEFAULT, transaction);
         assertNull(testSubject.findById(1200));
 
@@ -1016,7 +1014,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         assertEquals(1, folders.size());
 
         // user author has id 4 and group id 2
-        User user4 = userDao.findById(4L);
+        User user4 = userDao.findById(4L, true);
         assertFalse(user4.isAdmin());
 
         Folder dependantFoler = new Folder();
@@ -1081,11 +1079,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
     @Test
     public void testIsDownloadEnabled() throws PersistenceException {
-        assertTrue(testSubject.isDownloadllowed(Folder.ROOTID, 1));
-        assertTrue(testSubject.isDownloadllowed(6, 1));
-        assertTrue(testSubject.isDownloadllowed(1200, 3));
-        assertTrue(testSubject.isDownloadllowed(Folder.ROOTID, 3));
-        assertFalse(testSubject.isDownloadllowed(1200, 4));
+        assertTrue(testSubject.isDownloadAllowed(Folder.ROOTID, 1));
+        assertTrue(testSubject.isDownloadAllowed(6, 1));
+        assertTrue(testSubject.isDownloadAllowed(1200, 3));
+        assertTrue(testSubject.isDownloadAllowed(Folder.ROOTID, 3));
+        assertFalse(testSubject.isDownloadAllowed(1200, 4));
     }
 
     @Test
@@ -1571,9 +1569,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     @Test
     public void testApplyTagsToTree() throws PersistenceException {
         FolderHistory transaction = new FolderHistory();
-        User user = new User();
-        user.setId(4);
-        transaction.setUser(user);
+        transaction.setUser(UserDAO.get().findById(4L));
         transaction.setNotified(false);
 
         // The root defines it's own policies
@@ -1610,11 +1606,12 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         assertEquals(1200L, folder.getSecurityRef().longValue());
         assertEquals(1201L, folder.getParentId());
 
-        // The root has its own policies
+        // Now we make the root inherit from default workspace 
         testSubject.updateSecurityRef(1200L, 5L, transaction);
-
         folder = testSubject.findById(1200L);
         assertEquals(5L, folder.getSecurityRef().longValue());
+
+        // all the subree should reflect this modification
         folder = testSubject.findById(1201L);
         assertEquals(5L, folder.getSecurityRef().longValue());
         folder = testSubject.findById(1202L);
@@ -1624,8 +1621,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     @Test
     public void testApplyMetadataToTree() throws PersistenceException {
         FolderHistory transaction = new FolderHistory();
-        User user = new User();
-        user.setId(4);
+        User user = UserDAO.get().findById(4L, true);
         transaction.setUser(user);
         transaction.setNotified(false);
 

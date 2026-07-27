@@ -93,22 +93,64 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     @Override
     public User findByUsername(String username) throws PersistenceException {
+        return findByUsername(username, false);
+    }
+
+    @Override
+    public User findByUsername(String username, boolean initialize) throws PersistenceException {
         if (StringUtils.isEmpty(username))
             return null;
 
         User user = findByWhere("_entity.username = :username", Map.of(USERNAME, username), null, null).stream()
                 .findFirst().orElse(null);
-        return initialize(user);
+        if (initialize)
+            return initialize(user);
+        else
+            return user;
     }
 
     @Override
     public User findByUsernameIgnoreCase(String username) throws PersistenceException {
+        return findByUsernameIgnoreCase(username, false);
+    }
+
+    @Override
+    public User findByUsernameIgnoreCase(String username, boolean initialize) throws PersistenceException {
         if (StringUtils.isEmpty(username))
             return null;
 
         User user = findByWhere("lower(_entity.username) = :username", Map.of(USERNAME, username.toLowerCase()), null,
                 null).stream().findFirst().orElse(null);
-        return initialize(user);
+        if (initialize)
+            return initialize(user);
+        else
+            return user;
+    }
+
+    @Override
+    public User findAdminUser(String tenantName) throws PersistenceException {
+        return findAdminUser(ADMIN, false);
+    }
+
+    @Override
+    public User findAdminUser(String tenantName, boolean initialize) throws PersistenceException {
+        if ("default".equals(tenantName))
+            return findByUsername(ADMIN, initialize);
+        else
+            return findByUsername("%s%s".formatted(ADMIN, StringUtils.capitalize(tenantName)), initialize);
+    }
+
+    @Override
+    public User getUser(String username) throws PersistenceException {
+        return getUser(username, false);
+    }
+
+    @Override
+    public User getUser(String username, boolean initialize) throws PersistenceException {
+        if (HibernateUserDAO.ignoreCaseLogin())
+            return findByUsernameIgnoreCase(username, initialize);
+        else
+            return findByUsername(username, initialize);
     }
 
     @Override
@@ -863,14 +905,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     }
 
     @Override
-    public User findAdminUser(String tenantName) throws PersistenceException {
-        if ("default".equals(tenantName))
-            return findByUsername(ADMIN);
-        else
-            return findByUsername(ADMIN + StringUtils.capitalize(tenantName));
-    }
-
-    @Override
     public Set<User> findByGroup(long groupId) throws PersistenceException {
         List<Long> docIds = new ArrayList<>();
         try {
@@ -890,21 +924,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             }
         }
         return set;
-    }
-
-    @Override
-    public User findById(long id) throws PersistenceException {
-        return initialize(super.findById(id));
-    }
-
-    @Override
-    public User getUser(String username) throws PersistenceException {
-        User user = null;
-        if (HibernateUserDAO.ignoreCaseLogin())
-            user = findByUsernameIgnoreCase(username);
-        else
-            user = findByUsername(username);
-        return initialize(user);
     }
 
     public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {

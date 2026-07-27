@@ -1805,7 +1805,7 @@ public class DocumentManager {
         if (document == null)
             throw new PersistenceException("Unexisting document %d".formatted(ticket.getDocId()));
 
-        if (!folderDAO.isDownloadllowed(document.getFolder().getId(), transaction.getUserId()))
+        if (!folderDAO.isDownloadAllowed(document.getFolder().getId(), transaction.getUserId()))
             throw new PermissionException(transaction.getUsername(),
                     "Folder %d".formatted(document.getFolder().getId()), Permission.DOWNLOAD);
 

@@ -332,7 +332,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
          */
         if (StringUtils.isNotEmpty(user.getImpersonator())) {
             try {
-                UserHistoryDAO.get().createUserHistory(UserDAO.get().findByUsername(user.getImpersonator()),
+                UserHistoryDAO.get().createUserHistory(UserDAO.get().findByUsername(user.getImpersonator(), true),
                         UserEvent.IMPERSONATION, "impersonating %s".formatted(user.getUsername()), sid, client);
             } catch (PersistenceException e) {
                 log.warn("Impersonation of user {} not saved", user.getImpersonator());

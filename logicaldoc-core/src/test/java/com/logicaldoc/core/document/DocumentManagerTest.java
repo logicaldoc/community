@@ -210,13 +210,13 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
         exceptionHappened = false;
         try {
             transaction = new DocumentHistory();
-            User userWithourPermission = userDao.findByUsername("sebastian");
+            User userWithourPermission = userDao.findByUsername("sebastian", true);
             transaction.setUser(userWithourPermission);
 
             userDao.jdbcUpdate("delete from ld_folder_acl where ld_folderid = %d".formatted(doc.getFolder().getId()));
             userDao.jdbcUpdate("delete from ld_usergroup where ld_groupid = %d".formatted(Group.GROUPID_ADMIN));
 
-            assertFalse(folderDao.isDownloadllowed(doc.getFolder().getId(), userWithourPermission.getId()));
+            assertFalse(folderDao.isDownloadAllowed(doc.getFolder().getId(), userWithourPermission.getId()));
 
             t = new Ticket();
             t.setDocId(1L);
@@ -231,7 +231,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
     @Test
     public void testCopyToFolder() throws PersistenceException, IOException {
-        User user = userDao.findByUsername("admin");
+        User user = userDao.findByUsername("admin", true);
         Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
         Folder folder = doc.getFolder();
@@ -662,7 +662,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
     @Test
     public void testCreate() throws PersistenceException, IOException {
-        User user = userDao.findByUsername("admin");
+        User user = userDao.findByUsername("admin", true);
         Document doc = docDao.findById(1L, true);
         assertNotNull(doc);
         doc = new Document(doc);
@@ -864,7 +864,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
     @Test
     public void testCheckin() throws PersistenceException, IOException, InterruptedException, ExecutionException {
-        User user = userDao.findByUsername("admin");
+        User user = userDao.findByUsername("admin", true);
         DocumentHistory transaction = new DocumentHistory();
         transaction.setFolderId(103L);
         transaction.setUser(user);
@@ -1005,7 +1005,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
     public void testDestroyDocument() throws PersistenceException, PermissionException {
         FolderHistory transaction = new FolderHistory();
         transaction.setSessionId("1234");
-        transaction.setUser(userDao.findByUsername("admin"));
+        transaction.setUser(userDao.findByUsername("admin", true));
 
         Document doc = docDao.findById(1L);
         assertNotNull(doc);
@@ -1021,7 +1021,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
     @Test
     public void testArchiveDocuments() throws PersistenceException {
-        User user = userDao.findByUsername("admin");
+        User user = userDao.findByUsername("admin", true);
         DocumentHistory transaction = new DocumentHistory();
         transaction.setSessionId("1234");
         transaction.setUser(user);

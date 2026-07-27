@@ -2491,7 +2491,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                 throw new ServerException(UNEXISTING_DOCUMENT);
 
             FolderDAO fDao = FolderDAO.get();
-            if (!fDao.isDownloadllowed(doc.getFolder().getId(), session.getUserId()))
+            if (!fDao.isDownloadAllowed(doc.getFolder().getId(), session.getUserId()))
                 throw new IOException("You don't have the DOWNLOAD permission");
 
             /*

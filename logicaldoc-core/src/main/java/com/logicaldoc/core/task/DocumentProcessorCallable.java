@@ -91,9 +91,9 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
     }
 
     private User loadUser() throws PersistenceException {
-        User user = UserDAO.get().findByUsername(getDefaultUser());
+        User user = UserDAO.get().findByUsername(getDefaultUser(), true);
         if (user == null)
-            user = UserDAO.get().findByUsername("_system");
+            user = UserDAO.get().findByUsername("_system", true);
         return user;
     }
 

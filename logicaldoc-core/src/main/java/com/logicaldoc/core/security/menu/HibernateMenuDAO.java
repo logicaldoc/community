@@ -106,7 +106,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
         List<Menu> coll = new ArrayList<>();
 
         try {
-            User user = userDAO.findById(userId);
+            User user = userDAO.findById(userId, true);
             if (user == null)
                 return coll;
             if (user.isMemberOf(Group.GROUP_ADMIN))
@@ -120,8 +120,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
              */
             if (user.getGroups().isEmpty())
                 return coll;
-            
-            
+
             StringBuilder query1 = new StringBuilder("""
                                                         select distinct(_entity)
                                                           from Menu _entity
@@ -134,11 +133,11 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
                           ) and _entity.parentId = :parentId
                             and _entity.id != _entity.parentId
                           """);
-            if(enabledOnly)
+            if (enabledOnly)
                 query1.append(" and _entity.enabled = true");
             if (type != null)
                 query1.append(" and _entity.type = %s".formatted(type.toString()));
-            
+
             coll = findByObjectQuery(query1.toString(), Map.of(PARENT_ID, parentId), null);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -163,7 +162,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
     public List<Menu> findChildren(long parentId, long userId) {
         List<Menu> coll = new ArrayList<>();
         try {
-            User user = userDAO.findById(userId);
+            User user = userDAO.findById(userId, true);
             if (user.isMemberOf(Group.GROUP_ADMIN))
                 return findChildren(parentId, null);
 
@@ -218,7 +217,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
     private boolean isWriteOrReadEnable(long menuId, long userId, boolean write) {
         try {
-            User user = userDAO.findById(userId);
+            User user = userDAO.findById(userId, true);
             if (user == null)
                 return false;
             if (user.isMemberOf(Group.GROUP_ADMIN))
@@ -263,8 +262,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
     @Override
     public String findNameById(long menuId) {
         try {
-            Menu menu = this.findById(menuId);
-            return menu.getName();
+            return this.findById(menuId).getName();
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -439,7 +437,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
     public List<Long> findMenuIdByUserIdAndPermission(long userId, Permission permission, boolean enabledOnly) {
         List<Long> ids = new ArrayList<>();
         try {
-            User user = userDAO.findById(userId);
+            User user = userDAO.findById(userId, true);
             if (user == null)
                 return ids;
 
@@ -497,7 +495,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
     public List<Long> findIdByUserId(long userId, long parentId) {
         List<Long> ids = new ArrayList<>();
         try {
-            User user = userDAO.findById(userId);
+            User user = userDAO.findById(userId, true);
             if (user == null)
                 return ids;
             if (user.isMemberOf(Group.GROUP_ADMIN))

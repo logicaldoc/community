@@ -119,7 +119,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         }
 
         try {
-            Folder parent = findFolder(folder.getParentId());
+            Folder parent = findFolder(folder.getParentId(), true);
             if (parent == null)
                 throw new PersistenceException("Unexisting parent folder %d".formatted(folder.getParentId()));
 
@@ -155,22 +155,18 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             saveOrUpdate(folder);
 
             if (folder.getDeleted() == 0 && StringUtils.isEmpty(folder.getPath())) {
-                folder = findById(folder.getId());
-                folder = initialize(folder);
+                folder = findById(folder.getId(), true);
                 folder.setPath(computePath(folder.getId()));
                 saveOrUpdate(folder);
             }
 
-            if (folder.getDeleted() == 0 && folder.getId() != 0L) {
-                folder = findById(folder.getId());
-                folder = initialize(folder);
-            }
-
+            if (folder.getDeleted() == 0 && folder.getId() != 0L)
+                
             log.debug("Invoke listeners after store");
             for (FolderListener listener : listenerManager.getListeners())
                 listener.afterStore(folder, transaction, dictionary);
 
-            saveFolderHistory(new Folder(folder), transaction);
+            saveFolderHistory(folder, transaction);
         } catch (PersistenceException e) {
             handleStoreError(transaction, e);
         }
@@ -290,7 +286,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     public List<Folder> findByUserId(long userId) throws PersistenceException {
         List<Folder> folders = new ArrayList<>();
 
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
 
         // The administrators can see all folders
         if (user.isMemberOf(Group.GROUP_ADMIN))
@@ -326,8 +322,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         return folders;
     }
 
-    private User getExistingtUser(long userId) throws PersistenceException {
-        User user = userDAO.findById(userId);
+    private User getExistingUser(long userId) throws PersistenceException {
+        User user = userDAO.findById(userId, true);
         if (user == null)
             throw new PersistenceException("Unexisting user %d".formatted(userId));
         return user;
@@ -337,7 +333,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     public List<Folder> findByUserId(long userId, long parentId) throws PersistenceException {
         List<Folder> accessibleFolders = new ArrayList<>();
 
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
 
         if (user.isMemberOf(Group.GROUP_ADMIN))
             return findByWhere("_entity.id != _entity.parentId and _entity.parentId = %d".formatted(parentId),
@@ -395,7 +391,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
         Folder parent = findFolder(parentId);
 
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
         if (user.isMemberOf(Group.GROUP_ADMIN))
             return findChildren(parent.getId(), null);
 
@@ -484,7 +480,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     }
 
     @Override
-    public boolean isDownloadllowed(long id, long userId) throws PersistenceException {
+    public boolean isDownloadAllowed(long id, long userId) throws PersistenceException {
         return isPermissionAllowed(Permission.DOWNLOAD, id, userId);
     }
 
@@ -500,7 +496,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
     @Override
     public boolean isReadAllowed(long folderId, long userId) throws PersistenceException {
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
         if (user.isMemberOf(Group.GROUP_ADMIN))
             return true;
 
@@ -581,7 +577,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     public List<Long> findIdByUserId(long userId, long parentId) throws PersistenceException {
         List<Long> ids = new ArrayList<>();
 
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
 
         if (user.isMemberOf(Group.GROUP_ADMIN))
             return findIdsByWhere("_entity.parentId = %d".formatted(parentId), null, null);
@@ -754,12 +750,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         // folder. This operation is not recursive, because we want to notify
         // only the parent folder.
         if (folder.getId() != folder.getParentId() && folder.getId() != rootId) {
-            Folder parent = findById(folder.getParentId());
+            Folder parent = findById(folder.getParentId(), true);
             // The parent folder can be 'null' when the user wants to delete a
             // folder with sub-folders under it (method 'deleteAll()').
-            if (parent != null) {
+            if (parent != null)
                 saveHistoryInParentFolder(parent, folder, transaction, pathExtended);
-            }
         }
     }
 
@@ -898,7 +893,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     @Override
     public Set<Permission> getAllowedPermissions(long folderId, long userId) throws PersistenceException {
         final Set<Permission> permissions = new HashSet<>();
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
 
         // If the user is an administrator bypass all controls
         if (user.isMemberOf(Group.GROUP_ADMIN))
@@ -985,7 +980,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
          */
         Set<Long> ids = new HashSet<>();
 
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
 
         getExistingFolder(parentId);
 
@@ -1063,7 +1058,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             Permission permission,
             Long parentId,
             boolean tree) throws PersistenceException {
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
 
         /*
          * Important: use an HashSet because of extremely quick in existence
@@ -1981,10 +1976,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     @Override
     public void updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction)
             throws PersistenceException {
-        Folder folder = findById(folderId);
-        folder = initialize(folder);
-
-        Folder rightsFolder = findById(rightsFolderId);
+        Folder folder = getExistingFolder(folderId);
+        Folder rightsFolder = getExistingFolder(rightsFolderId);
         long securityRef = rightsFolderId;
         if (rightsFolder.getSecurityRef() != null)
             securityRef = rightsFolder.getSecurityRef();
@@ -2146,7 +2139,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     }
 
     private Folder getExistingFolder(long id) throws PersistenceException {
-        Folder folder = findById(id);
+        Folder folder = findById(id, true);
         if (folder == null)
             throw new PersistenceException("Unexisting folder %d".formatted(id));
         return folder;
@@ -2265,7 +2258,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     private List<Long> findFolderIdByUserIdAndTag(long userId, String tag) throws PersistenceException {
         List<Long> ids = new ArrayList<>();
 
-        User user = getExistingtUser(userId);
+        User user = getExistingUser(userId);
 
         if (user.isMemberOf(Group.GROUP_ADMIN)) {
             ids = findFolderIdByTag(tag);

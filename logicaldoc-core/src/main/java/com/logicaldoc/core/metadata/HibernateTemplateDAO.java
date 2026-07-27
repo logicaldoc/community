@@ -252,7 +252,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
         Set<Permission> permissions = new HashSet<>();
 
         try {
-            User user = userDAO.findById(userId);
+            User user = userDAO.findById(userId, true);
             if (user == null)
                 return permissions;
 

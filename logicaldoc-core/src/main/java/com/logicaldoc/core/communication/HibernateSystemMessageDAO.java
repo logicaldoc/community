@@ -226,7 +226,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
                 history.setAuthor(message.getAuthor());
                 history.setNotifyEvent(message.isNotify() && RunLevel.current().aspectEnabled(Aspect.SENDINGMESSAGES));
 
-                User recipient = uDao.findByUsername(rec.getName());
+                User recipient = uDao.findByUsername(rec.getName(), true);
                 if (recipient != null)
                     history.setUser(recipient);
 

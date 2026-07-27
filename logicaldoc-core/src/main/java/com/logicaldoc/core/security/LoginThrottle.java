@@ -248,7 +248,7 @@ public class LoginThrottle {
         if (Context.get().getConfig().getBoolean("throttle.username.disableuser", false)) {
             try {
                 UserDAO userDao = UserDAO.get();
-                User user = userDao.findByUsername(username);
+                User user = userDao.findByUsername(username, true);
                 if (user != null && user.isEnabled()) {
                     user.setEnabled(false);
 
