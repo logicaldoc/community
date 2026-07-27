@@ -73,15 +73,17 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 
     @Override
     public Group findByName(String name, long tenantId) throws PersistenceException {
-        Group group = null;
-        Collection<Group> coll = findByWhere("_entity.tenantId = :tenantId and _entity.name = :name",
-                Map.of("tenantId", tenantId, "name", name), null, null);
-        if (CollectionUtils.isNotEmpty(coll)) {
-            group = coll.iterator().next();
-            if (group.getDeleted() == 1)
-                group = null;
-        }
-        return group;
+        return findByName(name, tenantId, false);
+    }
+
+    @Override
+    public Group findByName(String name, long tenantId, boolean initialize) throws PersistenceException {
+        Group group = findByWhere("_entity.tenantId = :tenantId and _entity.name = :name",
+                Map.of("tenantId", tenantId, "name", name), null, null).stream().findFirst().orElse(null);
+        if (initialize)
+            return initialize(group);
+        else
+            return group;
     }
 
     @Override
@@ -154,7 +156,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
     public void initializeCollections(Group group) throws PersistenceException {
         group.setUsers(UserDAO.get().findByGroup(group.getId()));
     }
-    
+
     @Override
     public void store(Group group) throws PersistenceException {
         super.store(group);

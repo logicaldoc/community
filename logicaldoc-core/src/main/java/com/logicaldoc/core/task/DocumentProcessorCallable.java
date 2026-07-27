@@ -69,8 +69,7 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
             log.debug("Process document {}", id);
 
             try {
-                Document doc = documentDao.findById(id);
-                doc = documentDao.initialize(doc);
+                Document doc = documentDao.findById(id, true);
 
                 processDocument(doc, user);
 
