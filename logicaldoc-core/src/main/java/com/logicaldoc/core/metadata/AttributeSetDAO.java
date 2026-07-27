@@ -25,7 +25,8 @@ public interface AttributeSetDAO extends PersistentObjectDAO<AttributeSet> {
 	}
 	
 	/**
-	 * This method finds a attribute set by name
+	 * This method finds a attribute set by name. Lazy-loaded collections are not
+     * initialized.
 	 * 
 	 * @param name Name of the attribute set
 	 * @param tenantId ID of the owning tenant
@@ -35,6 +36,20 @@ public interface AttributeSetDAO extends PersistentObjectDAO<AttributeSet> {
 	 */
 	public AttributeSet findByName(String name, long tenantId) throws PersistenceException;
 
+	   /**
+     * This method finds a attribute set by name
+     * 
+     * @param name Name of the attribute set
+     * @param tenantId ID of the owning tenant
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return AttributeSet with given name
+     * @throws PersistenceException Error in the database
+     */
+    public AttributeSet findByName(String name, long tenantId, boolean initialize) throws PersistenceException;
+	
+	
 	/**
 	 * This method finds a attribute set by type
 	 * 

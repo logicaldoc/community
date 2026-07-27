@@ -129,15 +129,17 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     @Override
     public User findAdminUser(String tenantName) throws PersistenceException {
-        return findAdminUser(ADMIN, false);
+        return findAdminUser(Tenant.DEFAULT_NAME, false);
     }
-
+    
     @Override
     public User findAdminUser(String tenantName, boolean initialize) throws PersistenceException {
-        if ("default".equals(tenantName))
-            return findByUsername(ADMIN, initialize);
+        User user = findByWhere("_entity.username = :username", 
+                Map.of(USERNAME, Tenant.DEFAULT_NAME.equals(tenantName) ? ADMIN:"%s%s".formatted(ADMIN, StringUtils.capitalize(tenantName))), null, null).stream().findFirst().orElse(null);
+        if (initialize)
+            return initialize(user);
         else
-            return findByUsername("%s%s".formatted(ADMIN, StringUtils.capitalize(tenantName)), initialize);
+            return user;
     }
 
     @Override

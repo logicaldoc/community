@@ -341,6 +341,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
         }
     }
 
+    @Override
+    public List<T> initialize(Collection<T> entities) throws PersistenceException {
+        List<T> out = new ArrayList<>();
+        for (T entity : entities)
+            out.add(initialize(entity));
+        return out;
+    }
+
     /**
      * Concrete implementations must put here their custom initialization of the
      * collections. This default implementation uses the reflection to detect

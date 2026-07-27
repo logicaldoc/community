@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -66,16 +65,17 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
     @Override
     public Template findByName(String name, long tenantId) throws PersistenceException {
-        Template template = null;
-
-        List<Template> coll = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
-                Map.of("name", name, "tenantId", tenantId), null, null);
-        if (CollectionUtils.isNotEmpty(coll))
-            template = coll.iterator().next();
-        if (template != null && template.getDeleted() == 1)
-            template = null;
-
-        return template;
+        return findByName(name, tenantId, false);
+    }
+    
+    @Override
+    public Template findByName(String name, long tenantId, boolean initialize) throws PersistenceException {
+        Template template = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
+                Map.of("name", name, "tenantId", tenantId), null, null).stream().findFirst().orElse(null);
+        if(initialize)
+            return initialize(template);
+        else
+            return template;
     }
 
     @Override

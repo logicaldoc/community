@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
@@ -46,17 +45,20 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
     public List<AttributeSet> findAll(long tenantId) throws PersistenceException {
         return findByWhere("_entity.tenantId = %d".formatted(tenantId), "_entity.name", null);
     }
-
+    
     @Override
     public AttributeSet findByName(String name, long tenantId) throws PersistenceException {
-        List<AttributeSet> coll = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
-                Map.of("name", name, "tenantId", tenantId), null, null);
-        AttributeSet template = null;
-        if (CollectionUtils.isNotEmpty(coll))
-            template = coll.iterator().next();
-        if (template != null && template.getDeleted() == 1)
-            template = null;
-        return template;
+        return findByName(name, tenantId, false);
+    }
+
+    @Override
+    public AttributeSet findByName(String name, long tenantId, boolean initialize) throws PersistenceException {
+        AttributeSet template = findByWhere("_entity.name = :name and _entity.tenantId = :tenantId",
+                Map.of("name", name, "tenantId", tenantId), null, null).stream().findFirst().orElse(null);
+        if (initialize)
+            return initialize(template);
+        else
+            return template;
     }
 
     @Override

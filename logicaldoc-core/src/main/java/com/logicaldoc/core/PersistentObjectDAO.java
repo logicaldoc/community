@@ -1,7 +1,6 @@
 package com.logicaldoc.core;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -245,12 +244,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
      * 
      * @throws PersistenceException raised in case of errors in the database
      */
-    public default List<T> initialize(Collection<T> entities) throws PersistenceException {
-        List<T> out = new ArrayList<>();
-        for (T entity : entities)
-            out.add(initialize(entity));
-        return out;
-    }
+    public List<T> initialize(Collection<T> entities) throws PersistenceException;
 
     /**
      * Counts the total number of not-deleted entities
