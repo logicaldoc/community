@@ -333,16 +333,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             if (user == null)
                 throw new ServerException(String.format("User %s not found", userId));
 
-            User currentUser = getSessionUser();
-
             /*
              * A non admin user cannot change the password of other users
              */
-            MenuDAO mDao = MenuDAO.get();
-            if (currentUser != null && currentUser.getId() != userId
-                    && !mDao.isReadAllowed(Menu.ACCESS_CONTROL, currentUser.getId()))
+            Session session = validateSession();
+            if (session.getUserId() != userId && !MenuDAO.get().isReadAllowed(Menu.ACCESS_CONTROL, session.getUserId()))
                 throw new PermissionException(String.format("User %s not allowed to change the password of user %s",
-                        currentUser.getUsername(), user.getUsername()));
+                        session.getUsername(), user.getUsername()));
 
             if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword()))
                 throw new ServerException("Wrong old passord");
@@ -381,19 +378,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             log.warn(e.getMessage(), e);
             return new GUIValue("2", null);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage(), e);
             return new GUIValue("1", null);
         }
-    }
-
-    private User getSessionUser() {
-        User currentUser = null;
-        try {
-            currentUser = getSessionUser(getThreadLocalRequest());
-        } catch (Exception e) {
-            // Do nothing
-        }
-        return currentUser;
     }
 
     @Override
@@ -1177,9 +1165,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         MenuDAO mdao = MenuDAO.get();
         if (!mdao.isReadAllowed(Menu.ACCESS_CONTROL, session.getUserId()))
             throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
-        
+
         GroupDAO gdao = GroupDAO.get();
-        
+
         // Remove all current tenant rights
         Set<AccessControlEntry> grps = new HashSet<>();
         for (AccessControlEntry mg : menu.getAccessControlList()) {
