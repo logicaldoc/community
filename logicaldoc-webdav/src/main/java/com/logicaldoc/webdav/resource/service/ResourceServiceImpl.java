@@ -525,8 +525,6 @@ public class ResourceServiceImpl implements ResourceService {
 				return null;
 			Collection<Document> docs = documentDAO.findByFileNameAndParentFolderId(parentFolder.getId(), name, null,
 					parentFolder.getTenantId(), null);
-			User user = userDAO.findById(parentResource.getRequestedPerson());
-			userDAO.initialize(user);
 
 			if (!docs.isEmpty()) {
 				for (Document document : docs) {
@@ -568,15 +566,13 @@ public class ResourceServiceImpl implements ResourceService {
 
 		// verify the move permission on source folders
 		Resource parentFolder = getParentResource(source);
-		Document document = documentDAO.findById(Long.parseLong(source.getID()));
+		Document document = documentDAO.findById(Long.parseLong(source.getID()), true);
 		User user = userDAO.findById(source.getRequestedPerson());
 		if (!documentDAO.isMoveAllowed(Long.parseLong(source.getID()), source.getRequestedPerson()))
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN,
 					"User does not have move permission on source resource");
 
 		assertDocumentIsNotImmutable(user, document);
-
-		document = documentDAO.initialize(document);
 
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();

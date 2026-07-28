@@ -162,8 +162,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
     }
 
     public GUIFolder fromFolder(Folder folder, boolean computePath) throws PersistenceException {
-        FolderDAO dao = FolderDAO.get();
-        folder = dao.initialize(folder);
+        folder = FolderDAO.get().initialize(folder);
 
         GUIFolder guiFolder = new GUIFolder();
         guiFolder.setId(folder.getId());
@@ -189,7 +188,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         guiFolder.setFillMode(folder.getFillMode().ordinal());
 
         if (computePath)
-            guiFolder.setPathExtended(dao.computePathExtended(folder.getId()));
+            guiFolder.setPathExtended(FolderDAO.get().computePathExtended(folder.getId()));
 
         if (guiFolder.isWorkspace()) {
             SequenceDAO seqDao = SequenceDAO.get();
@@ -201,7 +200,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             GUIFolder secRef = new GUIFolder();
             secRef.setId(folder.getSecurityRef());
             if (computePath)
-                secRef.setPathExtended(dao.computePathExtended(folder.getSecurityRef()));
+                secRef.setPathExtended(FolderDAO.get().computePathExtended(folder.getSecurityRef()));
             guiFolder.setSecurityRef(secRef);
         }
 

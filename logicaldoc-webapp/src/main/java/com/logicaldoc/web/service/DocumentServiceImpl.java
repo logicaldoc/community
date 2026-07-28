@@ -3087,9 +3087,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         DocumentDAO docDao = DocumentDAO.get();
         try {
-            Document doc = docDao.findDocument(docId);
+            Document doc = docDao.findDocument(docId, true);
             if (doc != null) {
-                docDao.initialize(doc);
                 int pages = DocumentManager.get().countPages(doc);
                 doc.setPages(pages);
                 return pages;

@@ -320,10 +320,8 @@ public abstract class Search {
     }
 
     private void initSearchUser() throws SearchException {
-        UserDAO uDao = UserDAO.get();
         try {
-            searchUser = uDao.findById(options.getUserId());
-            searchUser = uDao.initialize(searchUser);
+            searchUser = UserDAO.get().findById(options.getUserId(), true);
         } catch (PersistenceException e1) {
             throw new SearchException(e1);
         }
@@ -346,9 +344,8 @@ public abstract class Search {
         }
 
         StringBuilder condition = new StringBuilder(" and (");
-        FolderDAO folderDao = FolderDAO.get();
 
-        if (folderDao.isOracle()) {
+        if (DocumentDAO.get().isOracle()) {
             condition.append(" (").append(idColumnExpression).append(",0) in ( ")
                     .append(hitsIds.stream().map("(%d,0)"::formatted).collect(Collectors.joining(","))).append(" )");
         } else {
@@ -465,9 +462,8 @@ public abstract class Search {
 
         log.debug("Execute query {}", richQuery);
 
-        DocumentDAO dao = DocumentDAO.get();
         try {
-            dao.query(richQuery.toString(), new HitMapper(hitsMap), null);
+            DocumentDAO.get().query(richQuery.toString(), new HitMapper(hitsMap), null);
         } catch (PersistenceException e) {
             throw new SearchException(e);
         }

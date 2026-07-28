@@ -24,7 +24,8 @@ public interface VersionDAO extends PersistentObjectDAO<Version> {
 	}
 
 	/**
-	 * This method finds a version by the document's ID an the version code.
+	 * This method finds a version by the document's ID an the version code. Lazy-loaded collections are not
+     * initialized.
 	 * 
 	 * @param docId ID of the document
 	 * @param version the version code
@@ -34,6 +35,20 @@ public interface VersionDAO extends PersistentObjectDAO<Version> {
 	 * @throws PersistenceException Error in the database
 	 */
 	public Version findByVersion(long docId, String version) throws PersistenceException;
+	
+	   /**
+     * This method finds a version by the document's ID an the version code.
+     * 
+     * @param docId ID of the document
+     * @param version the version code
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return the found version
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public Version findByVersion(long docId, String version, boolean initialize) throws PersistenceException;
 
 	/**
 	 * This method finds a the first version with the given fileVersion

@@ -631,19 +631,11 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
     private Document retrieveHiliteDoc(List<Document> documentRecords, Long folderId, Long hiliteDocId)
             throws PersistenceException {
-
-        DocumentDAO dao = DocumentDAO.get();
         Document hiliteDoc = null;
 
         // Always add the hilight doc as first element of the collection
-        if (hiliteDocId != null) {
-            hiliteDoc = dao.findById(hiliteDocId);
-            if (hiliteDoc != null && folderId != null && hiliteDoc.getFolder() != null
-                    && hiliteDoc.getFolder().getId() == folderId) {
-                hiliteDoc = dao.initialize(hiliteDoc);
-            } else
-                hiliteDoc = null;
-        }
+        if (hiliteDocId != null)
+            hiliteDoc = DocumentDAO.get().findById(hiliteDocId, true);
         if (hiliteDoc != null && !documentRecords.contains(hiliteDoc))
             documentRecords.add(0, hiliteDoc);
         return hiliteDoc;

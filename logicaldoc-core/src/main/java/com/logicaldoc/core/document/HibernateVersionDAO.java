@@ -53,13 +53,18 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
     @Override
     public Version findByVersion(long docId, String version) throws PersistenceException {
-        List<Version> versions = findByWhere("_entity.docId = :docId and _entity.version = :version",
-                Map.of("docId", docId, "version", StringUtils.defaultString(version)), null, null);
+         return findByVersion(docId, version, false);
+    }
 
-        if (!versions.isEmpty())
-            return versions.get(0);
+    @Override
+    public Version findByVersion(long docId, String version, boolean initialize) throws PersistenceException {
+        Version ver = findByWhere("_entity.docId = :docId and _entity.version = :version",
+                Map.of("docId", docId, "version", StringUtils.defaultString(version)), null, null).stream().findFirst().orElse(null);
+
+        if (initialize)
+            return initialize(ver);
         else
-            return null;
+            return ver;
     }
 
     @Override

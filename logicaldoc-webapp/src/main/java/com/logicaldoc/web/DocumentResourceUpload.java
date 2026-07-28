@@ -112,10 +112,9 @@ public class DocumentResourceUpload extends HttpServlet {
 					VersionDAO vdao = VersionDAO.get();
 					Version version = null;
 					if (StringUtils.isNotEmpty(docVersion))
-						version = vdao.findByVersion(doc.getId(), docVersion);
+						version = vdao.findByVersion(doc.getId(), docVersion, true);
 					else
-						version = vdao.findByVersion(doc.getId(), doc.getVersion());
-					version = vdao.initialize(version);
+						version = vdao.findByVersion(doc.getId(), doc.getVersion(), true);
 					version.setSigned(true);
 					vdao.store(version);
 				}

@@ -795,8 +795,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         for (Long groupId : guiUser.getGroups().stream().map(g -> g.getId()).toList())
             user.addGroup(groupDao.findById(groupId));
 
-        Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
-        adminGroup = groupDao.initialize(adminGroup);
+        Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId(), true);
 
         // The admin user must be always member of admin group
         if (ADMIN.equals(guiUser.getUsername()) && !guiUser.isMemberOf(Group.GROUP_ADMIN))
@@ -1178,21 +1177,20 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         MenuDAO mdao = MenuDAO.get();
         if (!mdao.isReadAllowed(Menu.ACCESS_CONTROL, session.getUserId()))
             throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
-
+        
         GroupDAO gdao = GroupDAO.get();
-        menu = mdao.initialize(menu);
-
+        
         // Remove all current tenant rights
         Set<AccessControlEntry> grps = new HashSet<>();
         for (AccessControlEntry mg : menu.getAccessControlList()) {
-            Group group = gdao.findById(mg.getGroupId());
+            Group group = gdao.findById(mg.getGroupId(), true);
             if (group != null && group.getTenantId() != session.getTenantId())
                 grps.add(mg);
         }
         menu.getAccessControlList().clear();
 
         for (GUIAccessControlEntry right : aces) {
-            Group group = gdao.findById(right.getEntityId());
+            Group group = gdao.findById(right.getEntityId(), true);
             if (group == null || group.getTenantId() != session.getTenantId())
                 continue;
 
@@ -1208,11 +1206,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     }
 
     @Override
-    public void saveACL(GUIMenu menu) throws ServerException {
+    public void saveACL(GUIMenu guiMenu) throws ServerException {
         Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
-        MenuDAO mdao = MenuDAO.get();
         try {
-            saveACL(session, mdao.findById(menu.getId()), menu.getAccessControlList());
+            saveACL(session, MenuDAO.get().findById(guiMenu.getId(), true), guiMenu.getAccessControlList());
         } catch (PermissionException | PersistenceException e) {
             throwServerException(session, log, e);
         }

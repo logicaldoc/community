@@ -159,10 +159,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	}
 
 	private User pickUser(String username) throws ServerException {
-		UserDAO userDao = UserDAO.get();
 		User user;
 		try {
-			user = userDao.getUser(username);
+			user = UserDAO.get().getUser(username, true);
 		} catch (PersistenceException e) {
 			throw new ServerException(String.format("Error in the data layer for user %s", username));
 		}
@@ -176,8 +175,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		User user;
 		try {
 			user = pickUser(username);
-			user = UserDAO.get().initialize(user);
-		} catch (PersistenceException | ServerException e) {
+		} catch (ServerException e) {
 			log.warn(e.getMessage(), e);
 			return false;
 		}

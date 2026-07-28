@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -50,6 +49,12 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
     @Override
     public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId)
             throws PersistenceException {
+        return findByAlternateKey(type, subtype, qualifier, tenantId, false);
+    }
+
+    @Override
+    public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId, boolean initialize)
+            throws PersistenceException {
 
         StringBuilder sb = new StringBuilder(
                 "_entity.type = :type and _entity.subtype = :subtype and _entity.tenantId = :tenantId ");
@@ -57,12 +62,12 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
             sb.append(" and _entity.qualifier = %d".formatted(qualifier));
         else
             sb.append(" and _entity.qualifier is null");
-        List<Generic> coll = findByWhere(sb.toString(), Map.of("type", type, "subtype", subtype, "tenantId", tenantId),
-                null, null);
-        if (CollectionUtils.isNotEmpty(coll))
-            return coll.get(0);
+        Generic generic = findByWhere(sb.toString(), Map.of("type", type, "subtype", subtype, "tenantId", tenantId),
+                null, null).stream().findFirst().orElse(null);
+        if (initialize)
+            return initialize(generic);
         else
-            return null;
+            return generic;
     }
 
     @Override

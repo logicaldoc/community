@@ -354,9 +354,8 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * @return The list of attributes
 	 */
 	protected List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
-		TemplateDAO tDao = TemplateDAO.get();
 		try {
-		    template = tDao.initialize(template);
+		    template = TemplateDAO.get().initialize(template);
 
 	        List<GUIAttribute> attributes = new ArrayList<>();
 	        if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())

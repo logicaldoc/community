@@ -326,7 +326,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
      * @throws PersistenceException Error in initializing the collections
      */
     @Override
-    public final T initialize(T entity) throws PersistenceException {
+    public T initialize(T entity) throws PersistenceException {
         if (entity == null)
             return entity;
 

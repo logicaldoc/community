@@ -14,43 +14,61 @@ import com.logicaldoc.util.spring.Context;
  */
 public interface GenericDAO extends PersistentObjectDAO<Generic> {
 
-	/**
-	 * Gets the object available in the application context
-	 * 
-	 * @return the instance of this object in the application context
-	 */
-	public static GenericDAO get() {
-		return Context.get(GenericDAO.class);
-	}
+    /**
+     * Gets the object available in the application context
+     * 
+     * @return the instance of this object in the application context
+     */
+    public static GenericDAO get() {
+        return Context.get(GenericDAO.class);
+    }
 
-	/**
-	 * Finds a Generic by it's alternate key
-	 * 
-	 * @param type The type(you can use like jollies and can be null)
-	 * @param subtype The sub-type(you can use like jollies and can be null)
-	 * @param tenantId ID of the owning tenant
-	 * @param qualifier the qualifier, can be null
-	 * 
-	 * @return Wanted generic or null
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId)
-			throws PersistenceException;
+    /**
+     * Finds a Generic by it's alternate key. Lazy-loaded collections are not
+     * initialized.
+     * 
+     * @param type The type(you can use like jollies and can be null)
+     * @param subtype The sub-type(you can use like jollies and can be null)
+     * @param tenantId ID of the owning tenant
+     * @param qualifier the qualifier, can be null
+     * 
+     * @return Wanted generic or null
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId)
+            throws PersistenceException;
 
-	/**
-	 * Finds a Generic by it's alternate key. The search uses the like operator
-	 * and each parameter can be null.
-	 * 
-	 * @param type The type(you can use like jollies and can be null)
-	 * @param subtype The sub-type(you can use like jollies and can be null)
-	 * @param tenantId ID of the owning tenant (optional)
-	 * @param qualifier the qualifier, can be null
-	 * 
-	 * @return The collection of found Generics
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId)
-			throws PersistenceException;
+    /**
+     * Finds a Generic by it's alternate key.
+     * 
+     * @param type The type(you can use like jollies and can be null)
+     * @param subtype The sub-type(you can use like jollies and can be null)
+     * @param tenantId ID of the owning tenant
+     * @param qualifier the qualifier, can be null
+     * @param initialize if the instance's lazy-loaded collections have to be
+     *        initialized
+     * 
+     * @return Wanted generic or null
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId, boolean initialize)
+            throws PersistenceException;
+
+    /**
+     * Finds a Generic by it's alternate key. The search uses the like operator
+     * and each parameter can be null. 
+     * 
+     * @param type The type(you can use like jollies and can be null)
+     * @param subtype The sub-type(you can use like jollies and can be null)
+     * @param tenantId ID of the owning tenant (optional)
+     * @param qualifier the qualifier, can be null
+     * 
+     * @return The collection of found Generics
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId)
+            throws PersistenceException;
 }

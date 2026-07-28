@@ -148,10 +148,8 @@ public class UsersDataServlet extends AbstractDataServlet {
             } catch (Exception t) {
                 // Nothing to do
             }
-            if (group == null) {
-                group = groupDao.findByName(groupIdOrName, session.getTenantId());
-                group = groupDao.initialize(group);
-            }
+            if (group == null)
+                group = groupDao.findByName(groupIdOrName, session.getTenantId(), true);
 
             users.addAll(group.getUsers());
         } else {
