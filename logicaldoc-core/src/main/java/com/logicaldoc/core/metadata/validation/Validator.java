@@ -97,10 +97,8 @@ public class Validator {
 				// not
 				// be loaded, so load the bean again and initialize it.
 				log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-				TemplateDAO tDao = TemplateDAO.get();
 				try {
-					template = tDao.findById(template.getId());
-					tDao.initialize(template);
+					template = TemplateDAO.get().findById(template.getId(), true);
 				} catch (PersistenceException pe) {
 					log.warn(pe.getMessage(), pe);
 				}

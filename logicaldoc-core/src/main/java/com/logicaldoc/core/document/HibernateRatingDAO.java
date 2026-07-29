@@ -58,11 +58,10 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
     public int updateDocumentRating(long docId, DocumentHistory transaction) throws PersistenceException {
         Rating votesDoc = findVotesByDocId(docId);
         DocumentDAO docDao = DocumentDAO.get();
-        Document doc = docDao.findById(docId);
+        Document doc = docDao.findById(docId, true);
         if (doc == null)
             return 0;
-
-        doc = docDao.initialize(doc);
+        
         int average = 0;
         if (votesDoc != null && votesDoc.getAverage() != null)
             average = votesDoc.getAverage().intValue();

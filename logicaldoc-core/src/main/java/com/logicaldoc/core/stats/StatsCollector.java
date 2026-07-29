@@ -386,7 +386,8 @@ public class StatsCollector extends Task {
         Date lastLogin = null;
         try {
             lastLogin = documentDAO
-                    .queryForObject("select max(ld_date) from ld_user_history where ld_deleted = 0 and ld_event='%s'".formatted(UserEvent.LOGIN), Date.class);
+                    .queryForObject("select max(ld_date) from ld_user_history where ld_deleted = 0 and ld_event='%s'"
+                            .formatted(UserEvent.LOGIN), Date.class);
         } catch (Exception t) {
             log.warn("Unable to retrieve last login statistics - {}", t.getMessage());
         }
@@ -941,14 +942,13 @@ public class StatsCollector extends Task {
      * @throws PersistenceException Error in the database
      */
     protected void saveStatistic(String parameter, Object val, long tenantId) throws PersistenceException {
-        Generic gen = genericDAO.findByAlternateKey(STAT, parameter, null, tenantId);
+        Generic gen = genericDAO.findByAlternateKey(STAT, parameter, null, tenantId, true);
         if (gen == null) {
             gen = new Generic();
             gen.setType(STAT);
             gen.setTenantId(tenantId);
             gen.setSubtype(parameter);
-        } else
-            gen = genericDAO.initialize(gen);
+        }
 
         switch (val) {
             case Date dateVal -> gen.setDate1(dateVal);

@@ -568,14 +568,11 @@ public class SoapFolderService extends AbstractService implements FolderService 
         User user = validateSession(sid);
 
         FolderDAO folderDao = FolderDAO.get();
-        List<Folder> folders = folderDao.findByUserId(user.getId(), folderDao.findRoot(user.getTenantId()).getId());
+        List<Folder> folders = folderDao.findByUserId(user.getId(), folderDao.findRoot(user.getTenantId()).getId())
+                .stream().filter(f -> f.getType() == Folder.TYPE_WORKSPACE).toList();
         List<WSFolder> wsFolders = new ArrayList<>();
-        for (Folder folder : folders) {
-            if (folder.getType() == Folder.TYPE_WORKSPACE) {
-                folderDao.initialize(folder);
-                wsFolders.add(WSFolder.fromFolder(folder));
-            }
-        }
+        for (Folder folder : folderDao.initialize(folders))
+            wsFolders.add(WSFolder.fromFolder(folder));
         return wsFolders;
     }
 

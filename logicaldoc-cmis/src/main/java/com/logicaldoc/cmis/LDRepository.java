@@ -2017,8 +2017,8 @@ public class LDRepository {
 
         if (doc instanceof Document document)
             doc = documentDao.initialize(document);
-        else
-            doc = versionDao.initialize((Version) doc);
+        else if (doc instanceof Version version)
+            doc = versionDao.initialize(version);
 
         // Now load the extended properties
         Map<String, Attribute> attributes = doc.getAttributes();

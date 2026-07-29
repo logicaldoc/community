@@ -74,7 +74,6 @@ class Indexer extends DocumentProcessorCallable<IndexerStats> {
                             : config.getTenantProperty(tenant.getName(), "index.includes"),
                     config.getTenantProperty(tenant.getName(), "index.excludes") == null ? ""
                             : config.getTenantProperty(tenant.getName(), "index.excludes"))) {
-                document = documentDao.initialize(document);
                 document.setIndexingStatus(IndexingStatus.SKIP);
                 documentDao.store(document);
                 log.warn("Document {} with filename '{}' marked as unindexable", document.getId(),

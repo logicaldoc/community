@@ -197,8 +197,7 @@ public class StandardSearchEngine implements SearchEngine {
         Document doc = document;
         if (document.getDocRef() != null) {
             // This is an alias
-            Document referencedDoc = documentDao.findById(document.getDocRef());
-            referencedDoc = documentDao.initialize(referencedDoc);
+            Document referencedDoc = documentDao.findById(document.getDocRef(), true);
             doc = new Document(referencedDoc);
             doc.setId(document.getId());
             doc.setTenantId(document.getTenantId());
@@ -213,10 +212,8 @@ public class StandardSearchEngine implements SearchEngine {
     public synchronized void addHit(Document document, InputStream content) throws IndexException {
         try {
             Document doc = document;
-            if (doc.getDocRef() != null) {
-                doc = documentDao.findById(doc.getDocRef());
-                doc = documentDao.initialize(doc);
-            }
+            if (doc.getDocRef() != null)
+                doc = documentDao.findById(doc.getDocRef(), true);
 
             Locale locale = doc.getLocale();
             if (locale == null)

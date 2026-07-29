@@ -135,8 +135,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
     private User initializeUser(User user) {
         try {
-            UserDAO userDao = UserDAO.get();
-            return userDao.initialize(user);
+            return UserDAO.get().initialize(user);
         } catch (PersistenceException e) {
             log.warn(e.getMessage(), e);
             return user;
@@ -191,7 +190,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
         try {
             defaultValidator.validateUser(user);
         } catch (AccountInactiveException ie) {
-            userDao.initialize(user);
             UserHistory transaction = new UserHistory();
             transaction.setUser(user);
             transaction.setClient(client);

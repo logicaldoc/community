@@ -44,8 +44,7 @@ public class FolderSearch extends Search {
         UserDAO userDAO = UserDAO.get();
         User user;
         try {
-            user = userDAO.findById(options.getUserId());
-            user = userDAO.initialize(user);
+            user = userDAO.findById(options.getUserId(), true);
         } catch (PersistenceException e1) {
             throw new SearchException(e1);
         }

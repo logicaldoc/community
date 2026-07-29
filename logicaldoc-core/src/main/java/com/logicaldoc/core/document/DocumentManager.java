@@ -188,7 +188,7 @@ public class DocumentManager {
         transaction.setComment(String.format("file version %s - %s", fileVersion, transaction.getComment()));
 
         // identify the document and folder
-        Document document = documentDAO.findDocument(docId);
+        Document document = documentDAO.findDocument(docId, true);
 
         if (!document.isImmutable() && document.getStatus() == DocumentStatus.UNLOCKED) {
             StoreResource newFileResource = StoreResource.builder().document(document).fileVersion(fileVersion).build();
@@ -204,7 +204,6 @@ public class DocumentManager {
             long fileSize = newFile.length();
 
             // Update the document's gridRecord
-            document = documentDAO.initialize(document);
             document.setFileSize(fileSize);
             if (document.getIndexed() != IndexingStatus.SKIP)
                 document.setIndexingStatus(IndexingStatus.TO_INDEX);
@@ -314,15 +313,13 @@ public class DocumentManager {
          */
         synchronized (this) {
             // identify the document and folder
-            Document document = documentDAO.findDocument(docId);
+            Document document = documentDAO.findDocument(docId, true);
             String oldFileVersion = document.getFileVersion();
 
             document.setComment(transaction.getComment());
 
             Document oldDocument = null;
             checkImmutability(document, null);
-
-            document = documentDAO.initialize(document);
 
             oldDocument = new Document(document);
 
@@ -370,9 +367,8 @@ public class DocumentManager {
 
             documentDAO.store(document);
 
-            document = documentDAO.findById(document.getId());
+            document = documentDAO.findById(document.getId(), true);
             Folder folder = document.getFolder();
-            document = documentDAO.initialize(document);
 
             // create some strings containing paths
             document.setFileName(filename);
@@ -400,8 +396,7 @@ public class DocumentManager {
             try {
                 storeFile(document, file, transaction, false);
             } catch (IOException ioe) {
-                document = documentDAO.findById(document.getId());
-                document = documentDAO.initialize(document);
+                document = documentDAO.findById(document.getId(), true);
 
                 document.copyAttributes(oldDocument);
                 document.setFilled(oldDocument.isFilled());
@@ -419,8 +414,7 @@ public class DocumentManager {
             version.setFileSize(document.getFileSize());
             version.setDigest(null);
 
-            document = documentDAO.findById(document.getId());
-            document = documentDAO.initialize(document);
+            document = documentDAO.findById(document.getId(), true);
 
             DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
 
@@ -745,10 +739,8 @@ public class DocumentManager {
 
         if (exception instanceof ParsingException && Context.get().getConfig()
                 .getTenantBoolean(tenantName(document.getTenantId()), "index.skiponerror", false)) {
-            DocumentDAO dDao = DocumentDAO.get();
-            document = dDao.initialize(document);
             document.setIndexingStatus(IndexingStatus.SKIP);
-            dDao.store(document);
+            DocumentDAO.get().store(document);
         }
     }
 
@@ -1469,8 +1461,7 @@ public class DocumentManager {
             throw new PersistenceException(String.format("User %s without WRITE permission in folder %s",
                     transaction.getUsername(), folder.getId()));
 
-        Document originalDoc = documentDAO.findById(alias.getDocRef());
-        originalDoc = documentDAO.initialize(originalDoc);
+        Document originalDoc = documentDAO.findById(alias.getDocRef(), true);
         documentDAO.delete(aliasId, transaction);
 
         try {
@@ -1664,7 +1655,7 @@ public class DocumentManager {
     }
 
     protected Document enforceExistingDocument(long docId) throws PersistenceException {
-        Document document = documentDAO.findById(docId);
+        Document document = documentDAO.findById(docId, true);
         if (document == null)
             throw new IllegalArgumentException("Unexisting referenced document %d".formatted(docId));
         return document;
@@ -1695,7 +1686,6 @@ public class DocumentManager {
             Version lastVersion) throws PersistenceException {
         String currentVersion = document.getVersion();
         if (currentVersion.equals(versionToDeleteSpec) && lastVersion != null) {
-            document = documentDAO.initialize(document);
             document.setVersion(lastVersion.getVersion());
             document.setFileVersion(lastVersion.getFileVersion());
 
@@ -1918,10 +1908,9 @@ public class DocumentManager {
         // identify the document and folder
         Document document = documentDAO.findDocument(docId);
         if (!document.isImmutable() && document.getStatus() == DocumentStatus.UNLOCKED) {
-            Version ver = versionDAO.findByVersion(document.getId(), version);
+            Version ver = versionDAO.findByVersion(document.getId(), version, true);
             if (ver == null)
                 throw new PersistenceException(String.format("Unexisting version %s of document %d", version, docId));
-            ver = versionDAO.initialize(ver);
 
             transaction.setEvent(DocumentEvent.CHECKEDOUT);
             checkout(document.getId(), transaction);
@@ -2024,8 +2013,7 @@ public class DocumentManager {
                 List<Folder> parents = folderDAO.findParents(folder.getId());
                 Collections.reverse(parents);
 
-                for (Folder parentFolder : parents) {
-                    parentFolder = folderDAO.initialize(parentFolder);
+                for (Folder parentFolder : folderDAO.initialize(parents)) {
                     if (parentFolder.getStore() != null) {
                         targetStore = parentFolder.getStore().intValue();
                         break;

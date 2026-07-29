@@ -350,13 +350,11 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	public WSUser getUserByUsername(String sid, String username) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		try {
-			UserDAO userDao = UserDAO.get();
-			User user = userDao.findByUsername(username);
+			User user = UserDAO.get().findByUsername(username, true);
 
 			if (user == null)
 				return null;
 
-			userDao.initialize(user);
 			return WSUser.fromUser(user);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

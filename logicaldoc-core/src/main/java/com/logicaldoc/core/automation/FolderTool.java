@@ -127,8 +127,7 @@ public class FolderTool {
      */
     public Folder findById(long id) {
         try {
-            FolderDAO fdao = FolderDAO.get();
-            return fdao.initialize(fdao.findById(id));
+            return FolderDAO.get().findById(id, true);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return null;

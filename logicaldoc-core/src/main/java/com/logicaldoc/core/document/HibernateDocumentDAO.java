@@ -486,7 +486,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
     private void setFolder(Document doc) throws PersistenceException {
         if (doc.getFolder().getFoldRef() != null) {
-            Folder fld = folderDAO.findById(doc.getFolder().getFoldRef());
+            Folder fld = folderDAO.findById(doc.getFolder().getFoldRef(), true);
             if (fld == null)
                 throw new PersistenceException(
                         String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
@@ -1392,8 +1392,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             store(doc, transaction);
 
             List<Version> versions = versionDAO.findByDocId(docId);
-            for (Version ver : versions) {
-                ver = versionDAO.initialize(ver);
+            for (Version ver : versionDAO.initialize(versions)) {
                 ver.setPassword(doc.getPassword());
                 versionDAO.store(ver);
             }
@@ -1415,8 +1414,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             store(doc, transaction);
 
             List<Version> versions = versionDAO.findByDocId(docId);
-            for (Version ver : versions) {
-                ver = versionDAO.initialize(ver);
+            for (Version ver : versionDAO.initialize(versions)) {
                 ver.setPassword(null);
                 versionDAO.store(ver);
             }
@@ -1500,7 +1498,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     }
 
     private User getExistingtUser(long userId) throws PersistenceException {
-        User user = userDAO.findById(userId);
+        User user = userDAO.findById(userId, true);
         if (user == null)
             throw new PersistenceException("Unexisting user %d".formatted(userId));
         return user;
@@ -1510,7 +1508,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     public Set<Permission> getAllowedPermissions(long docId, long userId) throws PersistenceException {
         final Set<Permission> permissions = new HashSet<>();
         User user = getExistingtUser(userId);
-        user = userDAO.initialize(user);
 
         if (findById(docId) == null)
             return new HashSet<>();

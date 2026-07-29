@@ -1370,8 +1370,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         } else if (transaction != null && transaction.getUserId() != 0) {
             // At least the current user must be able to operate on the new
             // folder
-            User user = userDAO.findById(transaction.getUserId());
-            user = userDAO.initialize(user);
+            User user = userDAO.findById(transaction.getUserId(), true);
             if (!user.isMemberOf(Group.GROUP_ADMIN)) {
                 Group userGroup = user.getUserGroup();
                 FolderAccessControlEntry ace = new FolderAccessControlEntry(userGroup.getId());
@@ -1557,18 +1556,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
         // List source docs and create them in the new folder
         if (!foldersOnly) {
-            /*
-             * By initializing the templates makes the following
-             * query(findByFolder) to run properly without exception due to
-             * template.templateGroups
-             */
-            TemplateDAO tDao = TemplateDAO.get();
-            List<Template> templates = tDao.findAll(source.getTenantId());
-            templates = tDao.initialize(templates);
-
             List<Document> srcDocs = docDao.findByFolder(source.getId(), null);
-            for (Document srcDoc : srcDocs) {
-                srcDoc = docDao.initialize(srcDoc);
+            for (Document srcDoc : docDao.initialize(srcDocs)) {
                 Document newDoc = new Document(srcDoc);
                 newDoc.setId(0L);
                 newDoc.setCustomId(null);

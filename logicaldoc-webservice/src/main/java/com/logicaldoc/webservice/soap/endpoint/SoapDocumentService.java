@@ -840,8 +840,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
         }
 
         List<WSDocument> wsDocs = new ArrayList<>();
-        docs = docDao.initialize(docs);
-        for (Document doc : docs) {
+        for (Document doc : docDao.initialize(docs)) {
             if (user.isMemberOf(Group.GROUP_ADMIN)
                     || (folderIds != null && folderIds.contains(doc.getFolder().getId())))
                 wsDocs.add(WSUtil.toWSDocument(doc));

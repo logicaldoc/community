@@ -65,9 +65,8 @@ public class UserTool {
      * @return initialized user
      */
     public User initialize(User user) {
-        UserDAO uDao = UserDAO.get();
         try {
-            return uDao.initialize(user);
+            return UserDAO.get().initialize(user);
         } catch (PersistenceException e) {
             log.error(e.getMessage(), e);
             return user;

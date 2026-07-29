@@ -266,11 +266,9 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
                 log.debug("Got error when trying to copy collections from document {}", docVO, ex);
 
                 // load again the provided doc
-                DocumentDAO docDao = DocumentDAO.get();
                 try {
-                    Document testDocVO = docDao.findById(docVO.getId());
+                    Document testDocVO = DocumentDAO.get().findById(docVO.getId(), true);
                     if (testDocVO != null) {
-                        testDocVO = docDao.initialize(testDocVO);
                         for (Tag tag : testDocVO.getTags())
                             getTags().add(tag);
                     }

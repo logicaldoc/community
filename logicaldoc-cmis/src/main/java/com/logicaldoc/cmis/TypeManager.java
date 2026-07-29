@@ -335,8 +335,7 @@ public class TypeManager {
          * Extended properties
          */
         AttributeSetDAO dao = AttributeSetDAO.get();
-        List<AttributeSet> sets = dao.initialize(dao.findAll());
-        for (AttributeSet set : sets) {
+        for (AttributeSet set : dao.initialize(dao.findAll())) {
             Map<String, Attribute> attributes = set.getTemplateAttributes();
             for (String name : attributes.keySet()) {
                 type.addPropertyDefinition(createPropDef(PROP_EXT + name, name, name, PropertyType.STRING,

@@ -896,11 +896,9 @@ public abstract class AbstractDocument extends Fillable implements Transactional
             log.debug("Got error when trying to copy collections from document {}", docVO, ex);
 
             // load again the provided doc
-            DocumentDAO docDao = DocumentDAO.get();
             try {
-                Document testDocVO = docDao.findById(docVO.getId());
+                Document testDocVO = DocumentDAO.get().findById(docVO.getId(), true);
                 if (testDocVO != null) {
-                    testDocVO = docDao.initialize(testDocVO);
                     for (Entry<String, Attribute> entry : testDocVO.getAttributes().entrySet())
                         getAttributes().put(entry.getKey(), entry.getValue());
                 }
