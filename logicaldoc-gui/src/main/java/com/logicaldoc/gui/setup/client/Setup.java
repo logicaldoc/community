@@ -219,7 +219,7 @@ public class Setup implements EntryPoint {
 		// Prepare the fieldsMap with all database engines
 		engines.put(MYSQL, new String[] { MYSQL, "com.mysql.cj.jdbc.Driver",
 				"jdbc:mysql://<server>[,<failoverhost>][<:3306>]/<database>?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
-				"org.hibernate.dialect.MySQL8Dialect", SELECT_1 });
+				"org.hibernate.dialect.MySQLDialect", SELECT_1 });
 		engines.put(MARIADB, new String[] { MARIADB, "org.mariadb.jdbc.Driver",
 				"jdbc:mariadb://<server>[<:3306>]/<database>", "org.hibernate.dialect.MariaDB106Dialect", SELECT_1 });
 		engines.put(POSTGRESQL,
