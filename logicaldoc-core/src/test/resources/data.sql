@@ -159,7 +159,7 @@ values (2, '2008-11-07 00:00:00', '2008-11-07 00:00:00',0,'test2','test2_desc',0
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (3000,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'Workspace X',5,1,0,1,1,1,0,'/Workspace X');
-insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path,ld_maxversions)
+insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path,ld_versionsquota)
 values (6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder6',3000,0,0,1,1,2,0,'/Workspace X/folder6',1);
 insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_securityref,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (7,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder7',3000,0,0,6,1,1,3,0,'/Workspace X/folder7');

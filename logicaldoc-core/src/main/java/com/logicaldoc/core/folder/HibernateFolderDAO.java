@@ -36,8 +36,6 @@ import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.runtime.Aspect;
 import com.logicaldoc.core.runtime.RunLevel;
 import com.logicaldoc.core.security.Permission;
@@ -161,8 +159,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             }
 
             if (folder.getDeleted() == 0 && folder.getId() != 0L)
-                
-            log.debug("Invoke listeners after store");
+
+                log.debug("Invoke listeners after store");
             for (FolderListener listener : listenerManager.getListeners())
                 listener.afterStore(folder, transaction, dictionary);
 
@@ -1356,8 +1354,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         folder.setTemplateLocked(folderVO.isTemplateLocked());
         setExtendedAttributes(folder, folderVO);
 
-        folder.setQuotaDocs(folderVO.getQuotaDocs());
-        folder.setQuotaSize(folderVO.getQuotaSize());
+        folder.setDocumentsQuota(folderVO.getDocumentsQuota());
+        folder.setPagesQuota(folderVO.getPagesQuota());
+        folder.setStorageQuota(folderVO.getStorageQuota());
 
         if (folderVO.getFoldRef() != null) {
             folder.setFoldRef(folderVO.getFoldRef());
@@ -1991,9 +1990,32 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
             String query = """
                            SELECT COUNT(*) from ld_document D, ld_folder F
-                            WHERE D.ld_folderid=F.ld_id
-                              and F.ld_deleted=0
-                              and D.ld_deleted=0
+                            WHERE D.ld_folderid = F.ld_id
+                              and F.ld_deleted = 0
+                              and D.ld_deleted = 0
+                              and D.ld_tenantid = %d
+                              and (D.ld_folderid = %d or F.ld_path like '%s/%%')
+                           """.formatted(root.getTenantId(), rootId, SqlUtil.doubleQuotes(rootPath));
+            return queryForLong(query);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+            return 0;
+        }
+    }
+
+    @Override
+    public long countPagesInTree(long rootId) {
+        try {
+            Folder root = findFolder(rootId);
+            String rootPath = root.getPath();
+            if (SLASH.equals(rootPath))
+                rootPath = "";
+
+            String query = """
+                           SELECT SUM(D.ld_pages) from ld_document D, ld_folder F
+                            WHERE D.ld_folderid = F.ld_id
+                              and F.ld_deleted = 0
+                              and D.ld_deleted = 0
                               and D.ld_tenantid = %d
                               and (D.ld_folderid = %d or F.ld_path like '%s/%%')
                            """.formatted(root.getTenantId(), rootId, SqlUtil.doubleQuotes(rootPath));

@@ -152,7 +152,7 @@ public class WSFolder implements Serializable {
         wsFolder.setTemplateLocked(folder.isTemplateLocked() ? 1 : 0);
         wsFolder.setHidden(folder.isHidden() ? 1 : 0);
         wsFolder.setStore(folder.getStore());
-        wsFolder.setMaxVersions(folder.getMaxVersions());
+        wsFolder.setMaxVersions(folder.getVersionsQuota());
         wsFolder.setSecurityRef(folder.getSecurityRef());
         wsFolder.setFillerId(folder.getFillerId());
         wsFolder.setFillMode(folder.getFillMode().ordinal());

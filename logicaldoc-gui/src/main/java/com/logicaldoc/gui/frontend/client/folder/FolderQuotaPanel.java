@@ -14,7 +14,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
@@ -25,124 +24,128 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  */
 public class FolderQuotaPanel extends FolderDetailTab {
 
-	private static final String SIZEQUOTA = "sizequota";
+    private static final String STORAGEQUOTA = "storagequota";
 
-	private static final String DOCUMENTSQUOTA = "documentsquota";
+    private static final String DOCUMENTSQUOTA = "documentsquota";
 
-	private DynamicForm form = new DynamicForm();
+    private DynamicForm form = new DynamicForm();
 
-	private ValuesManager vm = new ValuesManager();
+    private ValuesManager vm = new ValuesManager();
 
-	private boolean update = false;
+    private boolean update = false;
 
-	private MultiComboBoxItem recipients;
+    private MultiComboBoxItem recipients;
 
-	public FolderQuotaPanel(GUIFolder folder, ChangedHandler changedHandler) {
-		super(folder, changedHandler);
-		setWidth100();
-		setHeight100();
-		setMembersMargin(20);
-		update = folder.isWorkspace() && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
-		refresh();
-	}
+    public FolderQuotaPanel(GUIFolder folder, ChangedHandler changedHandler) {
+        super(folder, changedHandler);
+        setWidth100();
+        setHeight100();
+        setMembersMargin(20);
+        update = folder.isWorkspace() && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
+        refresh();
+    }
 
-	private void refresh() {
-		vm = new ValuesManager();
+    private void refresh() {
+        vm = new ValuesManager();
 
-		if (form != null)
-			form.destroy();
+        if (form != null)
+            form.destroy();
 
-		if (Boolean.TRUE.equals(contains(form)))
-			removeChild(form);
+        if (Boolean.TRUE.equals(contains(form)))
+            removeChild(form);
 
-		form = new DynamicForm();
-		form.setValuesManager(vm);
-		form.setWrapItemTitles(false);
-		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setNumCols(2);
+        form = new DynamicForm();
+        form.setValuesManager(vm);
+        form.setWrapItemTitles(false);
+        form.setTitleOrientation(TitleOrientation.TOP);
+        form.setNumCols(2);
 
-		TextItem documentsQuota = ItemFactory.newLongItem(DOCUMENTSQUOTA, DOCUMENTSQUOTA, folder.getQuotaDocs());
-		documentsQuota.setDisabled(!update);
-		if (update)
-			documentsQuota.addChangedHandler(changedHandler);
+        SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, folder.getDocumentsQuota());
+        documentsQuota.setWidth(100);
+        documentsQuota.setMin(-1);
+        documentsQuota.setStep(1000);
+        documentsQuota.setDisabled(!update);
+        if (update)
+            documentsQuota.addChangedHandler(changedHandler);
 
-		TextItem sizeQuota = ItemFactory.newLongItem(SIZEQUOTA, SIZEQUOTA, folder.getQuotaSize());
-		sizeQuota.setHint("MB");
-		sizeQuota.setWidth(120);
-		sizeQuota.setDisabled(!update);
-		if (update)
-			sizeQuota.addChangedHandler(changedHandler);
+        SpinnerItem storageQuota = ItemFactory.newSpinnerItem(STORAGEQUOTA, folder.getDocumentsQuota());
+        storageQuota.setWidth(100);
+        documentsQuota.setMin(-1);
+        storageQuota.setHint("MB");
+        storageQuota.setStep(100);
+        storageQuota.setDisabled(!update);
+        if (update)
+            storageQuota.addChangedHandler(changedHandler);
 
-		StaticTextItem size = ItemFactory.newStaticTextItem("ssize", "size", Util.formatSizeW7(folder.getSizeTotal()));
-		size.setWrap(false);
+        StaticTextItem storage = ItemFactory.newStaticTextItem("storage", Util.formatSizeW7(folder.getStorage()));
+        storage.setWrap(false);
 
-		StaticTextItem documents = ItemFactory.newStaticTextItem("documents",
-				Util.formatLong(folder.getDocumentsTotal()));
+        StaticTextItem documents = ItemFactory.newStaticTextItem("documents", Util.formatLong(folder.getDocuments()));
 
-		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("alertthreshold", folder.getQuotaThreshold());
-		quotaThreshold.setDisabled(!update);
-		quotaThreshold.setMax(100);
-		quotaThreshold.setMin(0);
-		quotaThreshold.setHint("%");
-		if (update)
-			quotaThreshold.addChangedHandler(changedHandler);
+        SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("alertthreshold", folder.getQuotaThreshold());
+        quotaThreshold.setDisabled(!update);
+        quotaThreshold.setMax(100);
+        quotaThreshold.setMin(0);
+        quotaThreshold.setHint("%");
+        if (update)
+            quotaThreshold.addChangedHandler(changedHandler);
 
-		recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false, false),
-				folder.getQuotaAlertRecipients().toArray(new String[0]));
-		recipients.setValueField("username");
-		recipients.setDisplayField("username");
-		if (update)
-			recipients.addChangedHandler(changedHandler);
+        recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false, false),
+                folder.getQuotaAlertRecipients().toArray(new String[0]));
+        recipients.setValueField("username");
+        recipients.setDisplayField("username");
+        if (update)
+            recipients.addChangedHandler(changedHandler);
 
-		documentsQuota.setDisabled(!update);
-		sizeQuota.setDisabled(!update);
-		quotaThreshold.setDisabled(!update);
-		recipients.setDisabled(!update);
+        documentsQuota.setDisabled(!update);
+        storageQuota.setDisabled(!update);
+        quotaThreshold.setDisabled(!update);
+        recipients.setDisabled(!update);
 
-		form.setItems(documentsQuota, documents, sizeQuota, size, quotaThreshold, recipients);
-		addMember(form);
-	}
+        form.setItems(documentsQuota, documents, storageQuota, storage, quotaThreshold, recipients);
+        addMember(form);
+    }
 
-	@Override
-	public boolean validate() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = vm.getValues();
+    @Override
+    public boolean validate() {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> values = vm.getValues();
 
-		vm.validate();
-		if (Boolean.TRUE.equals(vm.hasErrors()))
-			return false;
+        vm.validate();
+        if (Boolean.TRUE.equals(vm.hasErrors()))
+            return false;
 
-		if (values.get(DOCUMENTSQUOTA) == null)
-			folder.setQuotaDocs(null);
-		else
-			folder.setQuotaDocs(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
+        if (values.get(DOCUMENTSQUOTA) == null)
+            folder.setDocumentsQuota(null);
+        else
+            folder.setDocumentsQuota(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
 
-		if (values.get(SIZEQUOTA) == null)
-			folder.setQuotaSize(null);
-		else
-			folder.setQuotaSize(Long.parseLong(values.get(SIZEQUOTA).toString()));
+        if (values.get(STORAGEQUOTA) == null)
+            folder.setStorageQuota(null);
+        else
+            folder.setStorageQuota(Long.parseLong(values.get(STORAGEQUOTA).toString()));
 
-		if (values.get("quotathreshold") == null)
-			folder.setQuotaThreshold(null);
-		else
-			folder.setQuotaThreshold(Integer.parseInt(values.get("quotathreshold").toString()));
+        if (values.get("quotathreshold") == null)
+            folder.setQuotaThreshold(null);
+        else
+            folder.setQuotaThreshold(Integer.parseInt(values.get("quotathreshold").toString()));
 
-		folder.clearQuotaAlertRecipients();
-		String[] usernames = recipients.getValues();
-		if (usernames != null && usernames.length > 0)
-			for (int i = 0; i < usernames.length; i++)
-				folder.addQuotaAlertRecipient(usernames[i]);
+        folder.clearQuotaAlertRecipients();
+        String[] usernames = recipients.getValues();
+        if (usernames != null && usernames.length > 0)
+            for (int i = 0; i < usernames.length; i++)
+                folder.addQuotaAlertRecipient(usernames[i]);
 
-		return !vm.hasErrors();
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+        return !vm.hasErrors();
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

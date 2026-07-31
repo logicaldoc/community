@@ -771,6 +771,12 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
+    public void testCountPages() throws PersistenceException {
+        assertEquals(45L, testSubject.countPages(null, true, false));
+        assertEquals(30L, testSubject.countPages(Tenant.DEFAULT_ID, false, false));
+    }
+    
+    @Test
     public void testCountByIndexed() throws PersistenceException {
         assertEquals(2L, testSubject.countByIndexed(IndexingStatus.TO_INDEX));
         assertEquals(4L, testSubject.countByIndexed(IndexingStatus.INDEXED));

@@ -737,7 +737,7 @@ public class LoginPanel extends VLayout {
                     new ChangePassword(user, LoginPanel.this).show();
                 } else if (user != null && !user.isEnabled()) {
                     SC.warn(I18N.message("userdisabledwarn"));
-                } else if (user != null && (user.getQuotaCount() >= user.getQuota() && user.getQuota() >= 0)) {
+                } else if (user != null && (user.getStorage() >= user.getStorageQuota() && user.getStorageQuota() >= 0)) {
                     SC.warn(I18N.message("quotadocsexceeded"));
                 } else if ("usernameblocked".equals(failure)) {
                     SC.warn(I18N.message("usernameblockedwarn", info.getConfig("throttle.username.wait")));

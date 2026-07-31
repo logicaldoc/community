@@ -844,6 +844,19 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
     public long countDocsInTree(long rootId) throws PersistenceException;
 
     /**
+     * Counts the number of pages inside a given folder's tree (direct and
+     * indirect children)
+     * 
+     * @param rootId identifier of the root folder
+     * 
+     * @return the number of pages contained in the tree
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public long countPagesInTree(long rootId) throws PersistenceException;
+
+    
+    /**
      * Counts the number of documents inside a given folder
      * 
      * @param folderId identifier of the folder

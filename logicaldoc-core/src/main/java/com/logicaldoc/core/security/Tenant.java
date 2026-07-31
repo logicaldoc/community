@@ -85,8 +85,11 @@ public class Tenant extends PersistentObject implements Serializable {
     @Column(name = "ld_maxsessions", nullable = true)
     private Integer maxSessions;
 
-    @Column(name = "ld_maxdocuments", nullable = true)
-    private Long maxDocuments;
+    @Column(name = "ld_documentsquota", nullable = true)
+    private Long documentsQuota;
+
+    @Column(name = "ld_pagesquota", nullable = true)
+    private Long pagesQuota;
 
     /**
      * Maximum repository size expressed in MB
@@ -145,7 +148,8 @@ public class Tenant extends PersistentObject implements Serializable {
         this.maxUsers = source.maxUsers;
         this.maxGuests = source.maxGuests;
         this.maxSessions = source.maxSessions;
-        this.maxDocuments = source.maxDocuments;
+        this.documentsQuota = source.documentsQuota;
+        this.pagesQuota = source.pagesQuota;
         this.enabled = source.enabled;
         this.expire = source.expire;
         this.maxRepoSize = source.maxRepoSize;
@@ -273,12 +277,12 @@ public class Tenant extends PersistentObject implements Serializable {
         this.maxSessions = maxSessions;
     }
 
-    public Long getMaxDocuments() {
-        return maxDocuments;
+    public Long getDocumentsQuota() {
+        return documentsQuota;
     }
 
-    public void setMaxDocuments(Long maxDocuments) {
-        this.maxDocuments = maxDocuments;
+    public void setDocumentsQuota(Long documentsQuota) {
+        this.documentsQuota = documentsQuota;
     }
 
     public Long getMaxRepoSize() {
@@ -423,6 +427,14 @@ public class Tenant extends PersistentObject implements Serializable {
 
     public void setMaxGuests(Integer maxGuests) {
         this.maxGuests = maxGuests;
+    }
+
+    public Long getPagesQuota() {
+        return pagesQuota;
+    }
+
+    public void setPagesQuota(Long pagesQuota) {
+        this.pagesQuota = pagesQuota;
     }
 
     @Override

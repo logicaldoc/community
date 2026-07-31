@@ -207,6 +207,27 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
+    public void testCountPagesInTree() throws PersistenceException {
+        /*
+         * Make sure to compute all the paths
+         */
+        List<Folder> folders = testSubject.findAll();
+        for (Folder folder : folders) {
+            if (folder.getPath() == null) {
+                folder = testSubject.initialize(folder);
+                folder.setPath(testSubject.computePath(folder));
+                testSubject.store(folder);
+            }
+        }
+
+        long count = testSubject.countPagesInTree(5L);
+        assertEquals(30, count);
+
+        count = testSubject.countPagesInTree(4L);
+        assertEquals(0, count);
+    }
+    
+    @Test
     public void testCountDocs() throws PersistenceException {
         long count = testSubject.countDocs(6L);
         assertEquals(6, count);

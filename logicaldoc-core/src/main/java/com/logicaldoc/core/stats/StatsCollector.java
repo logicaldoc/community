@@ -198,7 +198,6 @@ public class StatsCollector extends Task {
             /*
              * Collect pages statistics
              */
-
             long[] pageStats = extractPageStats(Tenant.SYSTEM_ID);
             long totalpages = pageStats[3];
 

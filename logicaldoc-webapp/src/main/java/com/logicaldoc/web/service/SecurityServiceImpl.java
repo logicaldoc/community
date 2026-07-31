@@ -178,8 +178,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         guiTenant.setState(tenant.getState());
         guiTenant.setStreet(tenant.getStreet());
         guiTenant.setTelephone(tenant.getTelephone());
-        guiTenant.setMaxRepoDocs(tenant.getMaxDocuments());
-        guiTenant.setMaxRepoSize(tenant.getMaxRepoSize());
+        guiTenant.setMaxDocuments(tenant.getDocumentsQuota());
+        guiTenant.setMaxStorage(tenant.getMaxRepoSize());
         guiTenant.setMaxSessions(tenant.getMaxSessions());
         guiTenant.setMaxApiCalls(tenant.getMaxApiCalls());
         guiTenant.setMaxUsers(tenant.getMaxUsers());
@@ -244,8 +244,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             guiUser.setCheckedOutDocs(
                     documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.CHECKEDOUT).size());
             guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.Type.SYSTEM));
-            guiUser.setQuota(user.getQuota());
-            guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
+            guiUser.setStorageQuota(user.getQuota());
+            guiUser.setStorage(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
             guiUser.setCertDN(user.getCertDN());
             guiUser.setCertExpire(user.getCertExpire());
             guiUser.setSecondFactor(user.getSecondFactor());
@@ -532,10 +532,14 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
                 guiUser.getImpersonators().addAll(user.getImpersonators());
 
-                guiUser.setQuota(user.getQuota());
-                guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
+                guiUser.setStorageQuota(user.getQuota());
+                guiUser.setStorage(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
                 guiUser.setSessionsQuota(user.getSessionsQuota());
-                guiUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
+                guiUser.setSessions(SessionManager.get().countOpened(user.getUsername()));
+                guiUser.setPagesQuota(user.getPagesQuota());
+                guiUser.setPages(SequenceDAO.get().getCurrentValue("userpages", user.getId(), user.getTenantId()));
+                guiUser.setDocumentsQuota(user.getDocumentsQuota());
+                guiUser.setDocuments(SequenceDAO.get().getCurrentValue("userdocuments", user.getId(), user.getTenantId()));
 
                 guiUser.setTenant(getTenant(user.getTenantId()));
 
@@ -690,7 +694,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             user.setIpBlackList(guiUser.getIpBlacklist());
             user.setEmailSignature(guiUser.getEmailSignature());
             user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
-            user.setQuota(guiUser.getQuota());
+            user.setQuota(guiUser.getStorageQuota());
             user.setSessionsQuota(guiUser.getSessionsQuota());
             user.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
             user.setKey(guiUser.getKey());

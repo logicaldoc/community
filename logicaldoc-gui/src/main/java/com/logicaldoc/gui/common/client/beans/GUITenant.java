@@ -18,478 +18,508 @@ import com.logicaldoc.gui.common.client.Constants;
  */
 public class GUITenant implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private long id = 0;
+    private long id = 0;
 
-	private long tenantId = 0;
+    private long tenantId = 0;
 
-	private String name;
+    private String name;
 
-	private String displayName;
+    private String displayName;
 
-	private String street;
+    private String street;
 
-	private String postalCode;
+    private String postalCode;
 
-	private String city;
+    private String city;
 
-	private String state;
+    private String state;
 
-	private String country;
+    private String country;
 
-	private String email;
+    private String email;
 
-	private String telephone;
+    private String telephone;
 
-	private int type = 0;
+    private int type = 0;
 
-	private String adminUsername = "admin";
+    private String adminUsername = "admin";
 
-	private Integer maxUsers;
+    private Integer maxUsers;
 
-	private Integer maxGuests;
+    private Integer maxGuests;
 
-	private Integer maxSessions;
+    private Integer maxSessions;
 
-	private Long maxRepoDocs;
+    private Long maxDocuments;
 
-	/**
-	 * Maximum repository size expressed in MB
-	 */
-	private Long maxRepoSize;
+    private Long maxPages;
 
-	private Long maxApiCalls;
+    /**
+     * Maximum repository size expressed in MB
+     */
+    private Long maxStorage;
 
-	private Long maxTickets;
+    private Long maxApiCalls;
 
-	private Long maxWorkflows;
+    private Long maxTickets;
 
-	private Long maxForms;
+    private Long maxWorkflows;
 
-	private Long maxReports;
+    private Long maxForms;
 
-	private Long maxStamps;
+    private Long maxReports;
 
-	private Long maxImportFolders;
-	
-	private Long maxEmailAccounts;
+    private Long maxStamps;
 
-	private boolean enabled = true;
+    private Long maxImportFolders;
 
-	private Date expire;
+    private Long maxEmailAccounts;
 
-	private long users;
+    private boolean enabled = true;
 
-	// The read-only users
-	private long guests;
+    private Date expire;
 
-	private long documents;
+    private long users;
 
-	private long size;
+    // The read-only users
+    private long guests;
 
-	private long sessions;
+    private long documents;
 
-	private long apiCalls;
+    private long storage;
 
-	private long tickets;
+    private long pages;
 
-	private long workflows;
+    private long size;
 
-	private long forms;
+    private long sessions;
 
-	private long reports;
+    private long apiCalls;
 
-	private long stamps;
+    private long tickets;
 
-	private long importFolders;
+    private long workflows;
 
-	private long emailAccounts;
-	
-	private GUIBranding branding;
+    private long forms;
 
-	private Integer quotaThreshold = null;
+    private long reports;
 
-	private List<String> quotaAlertRecipients = new ArrayList<>();
+    private long stamps;
 
-	public String getName() {
-		return name;
-	}
+    private long importFolders;
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
-
-	public String getStreet() {
-		return street;
-	}
-
-	public void setStreet(String street) {
-		this.street = street;
-	}
-
-	public String getPostalCode() {
-		return postalCode;
-	}
-
-	public void setPostalCode(String postalCode) {
-		this.postalCode = postalCode;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public String getState() {
-		return state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getTelephone() {
-		return telephone;
-	}
-
-	public void setTelephone(String telephone) {
-		this.telephone = telephone;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public long getTenantId() {
-		return tenantId;
-	}
-
-	public void setTenantId(long tenantId) {
-		this.tenantId = tenantId;
-	}
-
-	public String getAdminUsername() {
-		return adminUsername;
-	}
-
-	public void setAdminUsername(String adminUsername) {
-		this.adminUsername = adminUsername;
-	}
-
-	public Integer getMaxUsers() {
-		return maxUsers;
-	}
-
-	public void setMaxUsers(Integer maxUsers) {
-		this.maxUsers = maxUsers;
-	}
-
-	public Integer getMaxSessions() {
-		return maxSessions;
-	}
-
-	public void setMaxSessions(Integer maxSessions) {
-		this.maxSessions = maxSessions;
-	}
-
-	public Long getMaxRepoDocs() {
-		return maxRepoDocs;
-	}
-
-	public void setMaxRepoDocs(Long maxRepoDocs) {
-		this.maxRepoDocs = maxRepoDocs;
-	}
-
-	public Long getMaxRepoSize() {
-		return maxRepoSize;
-	}
-
-	public void setMaxRepoSize(Long maxRepoSize) {
-		this.maxRepoSize = maxRepoSize;
-	}
-
-	public Long getMaxApiCalls() {
-		return maxApiCalls;
-	}
-
-	public void setMaxApiCalls(Long maxApiCalls) {
-		this.maxApiCalls = maxApiCalls;
-	}
-
-	public Long getMaxWorkflows() {
-		return maxWorkflows;
-	}
-
-	public void setMaxWorkflows(Long maxWorkflows) {
-		this.maxWorkflows = maxWorkflows;
-	}
-
-	public long getWorkflows() {
-		return workflows;
-	}
-
-	public void setWorkflows(long workflows) {
-		this.workflows = workflows;
-	}
-
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	public boolean isDefault() {
-		return id == Constants.TENANT_DEFAULTID;
-	}
-
-	public boolean isSystem() {
-		return id == Constants.TENANT_SYSTEMID;
-	}
-
-	public Date getExpire() {
-		return expire;
-	}
-
-	public void setExpire(Date expire) {
-		this.expire = expire;
-	}
-
-	public boolean isAvailable() {
-		if (!enabled)
-			return false;
-		return expire == null || expire.before(new Date());
-	}
-
-	public long getUsers() {
-		return users;
-	}
-
-	public void setUsers(long users) {
-		this.users = users;
-	}
-
-	public long getDocuments() {
-		return documents;
-	}
-
-	public void setDocuments(long documents) {
-		this.documents = documents;
-	}
-
-	public long getSize() {
-		return size;
-	}
-
-	public void setSize(long size) {
-		this.size = size;
-	}
-
-	public long getSessions() {
-		return sessions;
-	}
-
-	public void setSessions(long sessions) {
-		this.sessions = sessions;
-	}
-
-	public Long getMaxForms() {
-		return maxForms;
-	}
-
-	public void setMaxForms(Long maxForms) {
-		this.maxForms = maxForms;
-	}
-
-	public long getForms() {
-		return forms;
-	}
-
-	public void setForms(long forms) {
-		this.forms = forms;
-	}
-
-	public long getReports() {
-		return reports;
-	}
-
-	public void setReports(long reports) {
-		this.reports = reports;
-	}
-
-	public Long getMaxReports() {
-		return maxReports;
-	}
-
-	public void setMaxReports(Long maxReports) {
-		this.maxReports = maxReports;
-	}
-
-	public Long getMaxStamps() {
-		return maxStamps;
-	}
-
-	public void setMaxStamps(Long maxStamps) {
-		this.maxStamps = maxStamps;
-	}
-
-	public long getStamps() {
-		return stamps;
-	}
-
-	public void setStamps(long stamps) {
-		this.stamps = stamps;
-	}
-
-	public long getImportFolders() {
-		return importFolders;
-	}
-
-	public void setImportFolders(long importFolders) {
-		this.importFolders = importFolders;
-	}
-
-	public GUIBranding getBranding() {
-		return branding;
-	}
-
-	public void setBranding(GUIBranding branding) {
-		this.branding = branding;
-	}
-
-	public Integer getQuotaThreshold() {
-		return quotaThreshold;
-	}
-
-	public void setQuotaThreshold(Integer quotaThreshold) {
-		this.quotaThreshold = quotaThreshold;
-	}
-
-	public List<String> getQuotaAlertRecipients() {
-		return quotaAlertRecipients;
-	}
-
-	public void setQuotaAlertRecipients(List<String> quotaAlertRecipients) {
-		this.quotaAlertRecipients = quotaAlertRecipients;
-	}
-
-	public void addQuotaAlertRecipient(String recipient) {
-		if (!quotaAlertRecipients.contains(recipient))
-			quotaAlertRecipients.add(recipient);
-	}
-
-	public void removeQuotaAlertRecipient(String recipient) {
-		quotaAlertRecipients = quotaAlertRecipients.stream().filter(r -> !r.equals(recipient))
-				.collect(Collectors.toList());
-	}
-
-	public Integer getMaxGuests() {
-		return maxGuests;
-	}
-
-	public void setMaxGuests(Integer maxGuests) {
-		this.maxGuests = maxGuests;
-	}
-
-	public long getGuests() {
-		return guests;
-	}
-
-	public void setGuests(long guests) {
-		this.guests = guests;
-	}
-
-	public long getApiCalls() {
-		return apiCalls;
-	}
-
-	public void setApiCalls(long apiCalls) {
-		this.apiCalls = apiCalls;
-	}
-
-	public Long getMaxTickets() {
-		return maxTickets;
-	}
-
-	public void setMaxTickets(Long maxTickets) {
-		this.maxTickets = maxTickets;
-	}
-
-	public long getTickets() {
-		return tickets;
-	}
-
-	public void setTickets(long tickets) {
-		this.tickets = tickets;
-	}
-
-	public Long getMaxImportFolders() {
-		return maxImportFolders;
-	}
-
-	public void setMaxImportFolders(Long maxImportFolders) {
-		this.maxImportFolders = maxImportFolders;
-	}
-
-	public Long getMaxEmailAccounts() {
-		return maxEmailAccounts;
-	}
-
-	public void setMaxEmailAccounts(Long maxEmailAccounts) {
-		this.maxEmailAccounts = maxEmailAccounts;
-	}
-
-	public long getEmailAccounts() {
-		return emailAccounts;
-	}
-
-	public void setEmailAccounts(long emailAccounts) {
-		this.emailAccounts = emailAccounts;
-	}
+    private long emailAccounts;
+
+    private GUIBranding branding;
+
+    private Integer quotaThreshold = null;
+
+    private List<String> quotaAlertRecipients = new ArrayList<>();
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(long tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getAdminUsername() {
+        return adminUsername;
+    }
+
+    public void setAdminUsername(String adminUsername) {
+        this.adminUsername = adminUsername;
+    }
+
+    public Integer getMaxUsers() {
+        return maxUsers;
+    }
+
+    public void setMaxUsers(Integer maxUsers) {
+        this.maxUsers = maxUsers;
+    }
+
+    public Integer getMaxSessions() {
+        return maxSessions;
+    }
+
+    public void setMaxSessions(Integer maxSessions) {
+        this.maxSessions = maxSessions;
+    }
+
+    public Long getMaxRepoDocs() {
+        return maxDocuments;
+    }
+
+    public void setMaxDocuments(Long maxDocuments) {
+        this.maxDocuments = maxDocuments;
+    }
+
+    public Long getMaxStorage() {
+        return maxStorage;
+    }
+
+    public void setMaxStorage(Long maxStorage) {
+        this.maxStorage = maxStorage;
+    }
+
+    public Long getMaxApiCalls() {
+        return maxApiCalls;
+    }
+
+    public void setMaxApiCalls(Long maxApiCalls) {
+        this.maxApiCalls = maxApiCalls;
+    }
+
+    public Long getMaxWorkflows() {
+        return maxWorkflows;
+    }
+
+    public void setMaxWorkflows(Long maxWorkflows) {
+        this.maxWorkflows = maxWorkflows;
+    }
+
+    public long getWorkflows() {
+        return workflows;
+    }
+
+    public void setWorkflows(long workflows) {
+        this.workflows = workflows;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isDefault() {
+        return id == Constants.TENANT_DEFAULTID;
+    }
+
+    public boolean isSystem() {
+        return id == Constants.TENANT_SYSTEMID;
+    }
+
+    public Date getExpire() {
+        return expire;
+    }
+
+    public void setExpire(Date expire) {
+        this.expire = expire;
+    }
+
+    public boolean isAvailable() {
+        if (!enabled)
+            return false;
+        return expire == null || expire.before(new Date());
+    }
+
+    public long getUsers() {
+        return users;
+    }
+
+    public void setUsers(long users) {
+        this.users = users;
+    }
+
+    public long getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(long documents) {
+        this.documents = documents;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public long getSessions() {
+        return sessions;
+    }
+
+    public void setSessions(long sessions) {
+        this.sessions = sessions;
+    }
+
+    public Long getMaxForms() {
+        return maxForms;
+    }
+
+    public void setMaxForms(Long maxForms) {
+        this.maxForms = maxForms;
+    }
+
+    public long getForms() {
+        return forms;
+    }
+
+    public void setForms(long forms) {
+        this.forms = forms;
+    }
+
+    public long getReports() {
+        return reports;
+    }
+
+    public void setReports(long reports) {
+        this.reports = reports;
+    }
+
+    public Long getMaxReports() {
+        return maxReports;
+    }
+
+    public void setMaxReports(Long maxReports) {
+        this.maxReports = maxReports;
+    }
+
+    public Long getMaxStamps() {
+        return maxStamps;
+    }
+
+    public void setMaxStamps(Long maxStamps) {
+        this.maxStamps = maxStamps;
+    }
+
+    public long getStamps() {
+        return stamps;
+    }
+
+    public void setStamps(long stamps) {
+        this.stamps = stamps;
+    }
+
+    public long getImportFolders() {
+        return importFolders;
+    }
+
+    public void setImportFolders(long importFolders) {
+        this.importFolders = importFolders;
+    }
+
+    public GUIBranding getBranding() {
+        return branding;
+    }
+
+    public void setBranding(GUIBranding branding) {
+        this.branding = branding;
+    }
+
+    public Integer getQuotaThreshold() {
+        return quotaThreshold;
+    }
+
+    public void setQuotaThreshold(Integer quotaThreshold) {
+        this.quotaThreshold = quotaThreshold;
+    }
+
+    public List<String> getQuotaAlertRecipients() {
+        return quotaAlertRecipients;
+    }
+
+    public void setQuotaAlertRecipients(List<String> quotaAlertRecipients) {
+        this.quotaAlertRecipients = quotaAlertRecipients;
+    }
+
+    public void addQuotaAlertRecipient(String recipient) {
+        if (!quotaAlertRecipients.contains(recipient))
+            quotaAlertRecipients.add(recipient);
+    }
+
+    public void removeQuotaAlertRecipient(String recipient) {
+        quotaAlertRecipients = quotaAlertRecipients.stream().filter(r -> !r.equals(recipient))
+                .collect(Collectors.toList());
+    }
+
+    public Integer getMaxGuests() {
+        return maxGuests;
+    }
+
+    public void setMaxGuests(Integer maxGuests) {
+        this.maxGuests = maxGuests;
+    }
+
+    public long getGuests() {
+        return guests;
+    }
+
+    public void setGuests(long guests) {
+        this.guests = guests;
+    }
+
+    public long getApiCalls() {
+        return apiCalls;
+    }
+
+    public void setApiCalls(long apiCalls) {
+        this.apiCalls = apiCalls;
+    }
+
+    public Long getMaxTickets() {
+        return maxTickets;
+    }
+
+    public void setMaxTickets(Long maxTickets) {
+        this.maxTickets = maxTickets;
+    }
+
+    public long getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(long tickets) {
+        this.tickets = tickets;
+    }
+
+    public Long getMaxImportFolders() {
+        return maxImportFolders;
+    }
+
+    public void setMaxImportFolders(Long maxImportFolders) {
+        this.maxImportFolders = maxImportFolders;
+    }
+
+    public Long getMaxEmailAccounts() {
+        return maxEmailAccounts;
+    }
+
+    public void setMaxEmailAccounts(Long maxEmailAccounts) {
+        this.maxEmailAccounts = maxEmailAccounts;
+    }
+
+    public long getEmailAccounts() {
+        return emailAccounts;
+    }
+
+    public void setEmailAccounts(long emailAccounts) {
+        this.emailAccounts = emailAccounts;
+    }
+
+    public long getPages() {
+        return pages;
+    }
+
+    public void setPages(long pages) {
+        this.pages = pages;
+    }
+
+    public Long getMaxPages() {
+        return maxPages;
+    }
+
+    public void setMaxPages(Long maxPages) {
+        this.maxPages = maxPages;
+    }
+
+    public long getStorage() {
+        return storage;
+    }
+
+    public void setStorage(long storage) {
+        this.storage = storage;
+    }
 }

@@ -177,7 +177,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
         Folder folder1 = new Folder();
         folder1.setName("folderBVO");
         folder1.setType(Folder.TYPE_WORKSPACE);
-        folder1.setMaxVersions(1);
+        folder1.setVersionsQuota(1);
         folderDao.store(folder1);
 
         Document doc1 = new Document();

@@ -166,16 +166,28 @@ public class User extends PersistentObject implements Serializable {
     @Column(name = "ld_sessionsquota", nullable = false)
     private long sessionsQuota = -1;
 
-    @Column(name = "ld_welcomescreen", nullable = true)
+    @Column(name = "ld_pages")
+    private Long pages;
+
+    @Column(name = "ld_pagesquota")
+    private Long pagesQuota;
+    
+    @Column(name = "ld_documents")
+    private Long documents;
+
+    @Column(name = "ld_documentsquota")
+    private Long documentsQuota;
+    
+    @Column(name = "ld_welcomescreen")
     private Integer welcomeScreen = 1520;
 
     @Column(name = "ld_defworkspace")
     private Long defaultWorkspace;
 
-    @Column(name = "ld_ipwhitelist", length = 1000, nullable = true)
+    @Column(name = "ld_ipwhitelist", length = 1000)
     private String ipWhiteList;
 
-    @Column(name = "ld_ipblacklist", length = 1000, nullable = true)
+    @Column(name = "ld_ipblacklist", length = 1000)
     private String ipBlackList;
 
     /**
@@ -205,13 +217,13 @@ public class User extends PersistentObject implements Serializable {
     /**
      * Description of the grid that displays the list of documents
      */
-    @Column(name = "ld_docsgrid", nullable = true)
+    @Column(name = "ld_docsgrid")
     private String docsGrid;
 
     /**
      * Description of the grid that shows the results of a search
      */
-    @Column(name = "ld_hitsgrid", nullable = true)
+    @Column(name = "ld_hitsgrid")
     private String hitsGrid;
 
     @Column(name = "ld_dateformat", length = 255)
@@ -562,6 +574,38 @@ public class User extends PersistentObject implements Serializable {
      */
     public String getUserGroupName() {
         return "_user_%d".formatted(getId());
+    }
+
+    public Long getPages() {
+        return pages;
+    }
+
+    public void setPages(Long pages) {
+        this.pages = pages;
+    }
+
+    public Long getPagesQuota() {
+        return pagesQuota;
+    }
+
+    public void setPagesQuota(Long pagesQuota) {
+        this.pagesQuota = pagesQuota;
+    }
+
+    public Long getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(Long documents) {
+        this.documents = documents;
+    }
+
+    public Long getDocumentsQuota() {
+        return documentsQuota;
+    }
+
+    public void setDocumentsQuota(Long documentsQuota) {
+        this.documentsQuota = documentsQuota;
     }
 
     /**

@@ -176,7 +176,7 @@ public class TenantQuotaPanel extends HLayout {
 				Util.formatLong(tenant.getMaxRepoDocs()));
 		documentsSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem sizeSystemQuota = ItemFactory.newStaticTextItem("sys" + SIZEQUOTA, SIZEQUOTA,
-				Util.formatSizeW7((double)tenant.getMaxRepoSize() * 1024D * 1024D));
+				Util.formatSizeW7((double)tenant.getMaxStorage() * 1024D * 1024D));
 		sizeSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem monthlyApiCallsSystemQuota = ItemFactory.newStaticTextItem("sys" + MONTHLYAPICALLSQUOTA,
 				MONTHLYAPICALLSQUOTA, Util.formatLong(tenant.getMaxApiCalls()));
@@ -305,7 +305,7 @@ public class TenantQuotaPanel extends HLayout {
 	}
 
 	private SpinnerItem prepareSizeQuotaItem() {
-		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(SIZEQUOTA, tenant.getMaxRepoSize());
+		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(SIZEQUOTA, tenant.getMaxStorage());
 		sizeQuota.setHint("MB");
 		sizeQuota.setDisabled(changedHandler == null);
 		sizeQuota.setRequired(false);
@@ -500,16 +500,16 @@ public class TenantQuotaPanel extends HLayout {
 
 	private void validateSizeQuota(Map<String, Object> values) {
 		if (values.get(SIZEQUOTA) == null)
-			tenant.setMaxRepoSize(null);
+			tenant.setMaxStorage(null);
 		else
-			tenant.setMaxRepoSize(Long.parseLong(values.get(SIZEQUOTA).toString()));
+			tenant.setMaxStorage(Long.parseLong(values.get(SIZEQUOTA).toString()));
 	}
 
 	private void validateDocumentsQuota(Map<String, Object> values) {
 		if (values.get(DOCUMENTSQUOTA) == null)
-			tenant.setMaxRepoDocs(null);
+			tenant.setMaxDocuments(null);
 		else
-			tenant.setMaxRepoDocs(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
+			tenant.setMaxDocuments(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
 	}
 
 	private void setQuotaAlertRecipients() {

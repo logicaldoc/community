@@ -107,11 +107,17 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     @Column(name = "ld_hidden", nullable = false)
     private boolean hidden = false;
 
-    @Column(name = "ld_quotadocs")
-    private Long quotaDocs = null;
+    @Column(name = "ld_documentsquota")
+    private Long documentsQuota = null;
 
-    @Column(name = "ld_quotasize")
-    private Long quotaSize = null;
+    @Column(name = "ld_pagesquota")
+    private Long pagesQuota = null;
+
+    @Column(name = "ld_versionsquota")
+    private Integer versionsQuota;
+    
+    @Column(name = "ld_storagequota")
+    private Long storageQuota = null;
 
     @Column(name = "ld_qthreshold")
     private Integer quotaThreshold = null;
@@ -119,8 +125,6 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     @Column(name = "ld_qrecipients", length = 1000)
     private String quotaAlertRecipients = null;
 
-    @Column(name = "ld_maxversions")
-    private Integer maxVersions;
 
     @Column(name = "ld_color", length = 255)
     private String color;
@@ -150,10 +154,15 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
      * The default stores to use for this folder in the nodes(key: nodeId -
      * value: storeId)
      */
-    @ElementCollection @CollectionTable(name = "ld_folder_store", joinColumns = @JoinColumn(name = "ld_folderid")) @MapKeyColumn(name = "ld_nodeid") @Column(name = "ld_storeid")
+    @ElementCollection
+    @CollectionTable(name = "ld_folder_store", joinColumns = @JoinColumn(name = "ld_folderid"))
+    @MapKeyColumn(name = "ld_nodeid")
+    @Column(name = "ld_storeid")
     private Map<String, Integer> stores = new HashMap<>();
 
-    @ElementCollection @CollectionTable(name = "ld_foldertag", joinColumns = @JoinColumn(name = "ld_folderid")) @OrderBy("ld_tag")
+    @ElementCollection
+    @CollectionTable(name = "ld_foldertag", joinColumns = @JoinColumn(name = "ld_folderid"))
+    @OrderBy("ld_tag")
     private Set<Tag> tags = new HashSet<>();
 
     /**
@@ -163,13 +172,18 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     @Transient
     private String pathExtended;
 
-    @ElementCollection(fetch = FetchType.LAZY) @CollectionTable(name = "ld_folder_acl", joinColumns = @JoinColumn(name = "ld_folderid"))
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "ld_folder_acl", joinColumns = @JoinColumn(name = "ld_folderid"))
     private Set<FolderAccessControlEntry> accessControlList = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.LAZY) @CollectionTable(name = "ld_folder_ext", joinColumns = @JoinColumn(name = "ld_folderid")) @MapKeyColumn(name = "ld_name") @OrderBy("ld_position ASC, ld_name ASC")
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "ld_folder_ext", joinColumns = @JoinColumn(name = "ld_folderid"))
+    @MapKeyColumn(name = "ld_name")
+    @OrderBy("ld_position ASC, ld_name ASC")
     private Map<String, Attribute> attributes = new HashMap<>();
 
-    @ManyToOne(cascade = CascadeType.DETACH) @JoinColumn(name = "ld_templateid")
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "ld_templateid")
     private Template template;
 
     public Folder() {
@@ -190,13 +204,14 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
         this.templateLocked = source.templateLocked;
         this.deleteUserId = source.deleteUserId;
         this.deleteUser = source.deleteUser;
-        this.quotaDocs = source.quotaDocs;
-        this.quotaSize = source.quotaSize;
+        this.documentsQuota = source.documentsQuota;
+        this.pagesQuota = source.pagesQuota;
+        this.storageQuota = source.storageQuota;
         this.quotaThreshold = source.quotaThreshold;
         this.quotaAlertRecipients = source.quotaAlertRecipients;
         this.foldRef = source.foldRef;
         this.stores = source.stores;
-        this.maxVersions = source.maxVersions;
+        this.versionsQuota = source.versionsQuota;
         this.color = source.color;
         this.tags = source.tags;
         this.tgs = source.tgs;
@@ -360,20 +375,20 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
         this.hidden = hidden;
     }
 
-    public Long getQuotaDocs() {
-        return quotaDocs;
+    public Long getDocumentsQuota() {
+        return documentsQuota;
     }
 
-    public void setQuotaDocs(Long quotaDocs) {
-        this.quotaDocs = quotaDocs;
+    public void setDocumentsQuota(Long documentsQuota) {
+        this.documentsQuota = documentsQuota;
     }
 
-    public Long getQuotaSize() {
-        return quotaSize;
+    public Long getStorageQuota() {
+        return storageQuota;
     }
 
-    public void setQuotaSize(Long quotaSize) {
-        this.quotaSize = quotaSize;
+    public void setStorageQuota(Long storageQuota) {
+        this.storageQuota = storageQuota;
     }
 
     public Long getFoldRef() {
@@ -414,12 +429,12 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
         }
     }
 
-    public Integer getMaxVersions() {
-        return maxVersions;
+    public Integer getVersionsQuota() {
+        return versionsQuota;
     }
 
-    public void setMaxVersions(Integer maxVersions) {
-        this.maxVersions = maxVersions;
+    public void setVersionsQuota(Integer versionsQuota) {
+        this.versionsQuota = versionsQuota;
     }
 
     public String getColor() {
@@ -655,6 +670,14 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     public Set<FolderAccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
         return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
                 .collect(Collectors.toSet());
+    }
+
+    public Long getPagesQuota() {
+        return pagesQuota;
+    }
+
+    public void setPagesQuota(Long pagesQuota) {
+        this.pagesQuota = pagesQuota;
     }
 
     @Override

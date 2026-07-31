@@ -111,11 +111,11 @@ public class Profile extends Window {
         ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector(TIMEZONE, user.getTimeZone());
         timeZone.setEndRow(true);
 
-        StaticTextItem quota = ItemFactory.newStaticTextItem("quota", "maxquota", Util.formatSizeW7(user.getQuota()));
+        StaticTextItem quota = ItemFactory.newStaticTextItem("quota", "maxquota", Util.formatSizeW7(user.getStorageQuota()));
         quota.setWrap(false);
 
         StaticTextItem quotaCount = ItemFactory.newStaticTextItem("quotaCount", "quota",
-                Util.formatSizeW7(user.getQuotaCount()));
+                Util.formatSizeW7(user.getStorage()));
         quotaCount.setWrap(false);
 
         detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell, whatsapp,

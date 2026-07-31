@@ -945,6 +945,22 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     }
 
     @Override
+    public long countPages(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException {
+        StringBuilder query = new StringBuilder("select sum(ld_pages) from ld_document where 1 = 1 ");
+
+        if (!computeDeleted)
+            query.append(" and ld_deleted = 0 ");
+
+        if (!computeArchived)
+            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+
+        if (tenantId != null)
+            query.append(AND_LD_TENANTID_D.formatted(tenantId));
+
+        return queryForLong(query.toString());
+    }
+    
+    @Override
     public List<Document> findByIndexingStatus(IndexingStatus indexingStatus) throws PersistenceException {
         return findByWhere("_entity.docRef is null and _entity.indexingStatus = %d".formatted(indexingStatus.ordinal()),
                 "_entity.lastModified asc", null);

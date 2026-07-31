@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.Constants;
 
+
 /**
  * User bean as used in the GUI
  * 
@@ -107,14 +108,22 @@ public class GUIUser implements Serializable {
 
     private GUITenant tenant = null;
 
-    private long quota = -1;
+    private long storage = -1;
 
-    private long quotaCount = 0;
+    private long storageQuota = 0;
 
     private long sessionsQuota = -1;
 
-    private long sessionsQuotaCount = 0;
+    private long sessions = 0;
+    
+    private Long pages;
 
+    private Long pagesQuota;
+    
+    private Long documents;
+
+    private Long documentsQuota;
+    
     private Integer welcomeScreen = 1500;
 
     private String ipWhitelist;
@@ -414,20 +423,62 @@ public class GUIUser implements Serializable {
         }
     }
 
-    public long getQuota() {
-        return quota;
+    public long getStorageQuota() {
+        return storageQuota;
     }
 
-    public void setQuota(long quota) {
-        this.quota = quota;
+    public void setStorageQuota(long storageQuota) {
+        this.storageQuota = storageQuota;
     }
 
-    public long getQuotaCount() {
-        return quotaCount;
+    public long getStorage() {
+        return storage;
     }
 
-    public void setQuotaCount(long quotaCount) {
-        this.quotaCount = quotaCount;
+    public void setStorage(long storage) {
+        this.storage = storage;
+    }
+    
+    
+
+    public long getSessions() {
+        return sessions;
+    }
+
+    public void setSessions(long sessions) {
+        this.sessions = sessions;
+    }
+
+    public Long getPages() {
+        return pages;
+    }
+
+    public void setPages(Long pages) {
+        this.pages = pages;
+    }
+
+    public Long getPagesQuota() {
+        return pagesQuota;
+    }
+
+    public void setPagesQuota(Long pagesQuota) {
+        this.pagesQuota = pagesQuota;
+    }
+
+    public Long getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(Long documents) {
+        this.documents = documents;
+    }
+
+    public Long getDocumentsQuota() {
+        return documentsQuota;
+    }
+
+    public void setDocumentsQuota(Long documentsQuota) {
+        this.documentsQuota = documentsQuota;
     }
 
     public Integer getWelcomeScreen() {
@@ -802,14 +853,6 @@ public class GUIUser implements Serializable {
 
     public void setSessionsQuota(long sessionsQuota) {
         this.sessionsQuota = sessionsQuota;
-    }
-
-    public long getSessionsQuotaCount() {
-        return sessionsQuotaCount;
-    }
-
-    public void setSessionsQuotaCount(long count) {
-        this.sessionsQuotaCount = count;
     }
 
     public List<String> getImpersonators() {

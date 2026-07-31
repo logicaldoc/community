@@ -18,93 +18,134 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class UserQuotaPanel extends HLayout {
 
-	private static final String MAX_CONCURRENT_SESSIONS = "maxconcurrentsessions";
+    private static final String PAGESQUOTA = "pagesquota";
 
-	private static final String MAX_STORAGE = "maxstorage";
+    private static final String DOCUMENTSQUOTA = "documentsquota";
 
-	private DynamicForm form = new DynamicForm();
+    private static final String SESSIONSQUOTA = "sessionsquota";
 
-	private GUIUser user;
+    private static final String STORAGEQUOTA = "storagequota";
 
-	private ChangedHandler changedHandler;
+    private DynamicForm form = new DynamicForm();
 
-	public UserQuotaPanel(GUIUser user, ChangedHandler changedHandler) {
-		this.user = user;
-		this.changedHandler = changedHandler;
+    private GUIUser user;
 
-		setWidth100();
-		setHeight100();
-		setMembersMargin(20);
-		refresh();
-	}
+    private ChangedHandler changedHandler;
 
-	private void refresh() {
-		boolean readonly = (changedHandler == null);
-		form.clearValues();
-		form.clearErrors(false);
-		form.destroy();
+    public UserQuotaPanel(GUIUser user, ChangedHandler changedHandler) {
+        this.user = user;
+        this.changedHandler = changedHandler;
 
-		if (Boolean.TRUE.equals(contains(form)))
-			removeChild(form);
-		form = new DynamicForm();
-		form.setTitleOrientation(TitleOrientation.TOP);
+        setWidth100();
+        setHeight100();
+        setMembersMargin(20);
+        refresh();
+    }
 
-		SpinnerItem maxStorage = ItemFactory.newSpinnerItem(MAX_STORAGE, MAX_STORAGE, (Integer) null);
-		maxStorage.setRequired(true);
-		maxStorage.setWidth(120);
-		maxStorage.setMin(-1);
-		maxStorage.setStep(10);
-		maxStorage.setValue(user.getQuota() >= 0 ? user.getQuota() / (1024 * 1024) : -1);
-		maxStorage.setHint("MB");
-		if (!readonly)
-			maxStorage.addChangedHandler(changedHandler);
+    private void refresh() {
+        boolean readonly = (changedHandler == null);
+        form.clearValues();
+        form.clearErrors(false);
+        form.destroy();
 
-		StaticTextItem storageUsage = ItemFactory.newStaticTextItem("storageUsage", "usage",
-				Util.formatSizeW7(user.getQuotaCount()));
-		storageUsage.setWrap(false);
+        if (Boolean.TRUE.equals(contains(form)))
+            removeChild(form);
+        form = new DynamicForm();
+        form.setTitleOrientation(TitleOrientation.TOP);
 
-		SpinnerItem maxConcurrentSessions = ItemFactory.newSpinnerItem(MAX_CONCURRENT_SESSIONS, MAX_CONCURRENT_SESSIONS,
-				(Integer) null);
-		maxConcurrentSessions.setRequired(true);
-		maxConcurrentSessions.setWidth(120);
-		maxConcurrentSessions.setMin(-1);
-		maxConcurrentSessions.setStep(1);
-		maxConcurrentSessions.setValue(user.getSessionsQuota());
-		if (!readonly)
-			maxConcurrentSessions.addChangedHandler(changedHandler);
+        SpinnerItem storageQuota = ItemFactory.newSpinnerItem(STORAGEQUOTA, STORAGEQUOTA, (Integer) null);
+        storageQuota.setRequired(true);
+        storageQuota.setWidth(120);
+        storageQuota.setMin(-1);
+        storageQuota.setStep(10);
+        storageQuota.setValue(user.getStorageQuota() >= 0 ? user.getStorageQuota() / (1024 * 1024) : -1);
+        storageQuota.setHint("MB");
+        if (!readonly)
+            storageQuota.addChangedHandler(changedHandler);
 
-		StaticTextItem sessionsUsage = ItemFactory.newStaticTextItem("sessionsUsage", "usage",
-				Long.toString(user.getSessionsQuotaCount()));
-		sessionsUsage.setWrap(false);
+        StaticTextItem storageUsage = ItemFactory.newStaticTextItem("storageUsage", "usage",
+                Util.formatSizeW7(user.getStorage()));
+        storageUsage.setWrap(false);
 
-		form.setItems(maxStorage, storageUsage, maxConcurrentSessions, sessionsUsage);
-		addMember(form);
-	}
+        StaticTextItem sessionsUsage = ItemFactory.newStaticTextItem("sessionsUsage", "usage",
+                Long.toString(user.getSessions()));
+        sessionsUsage.setWrap(false);
 
-	boolean validate() {
-		if (form.validate()) {
-			long maxRepoSize = Long.parseLong(form.getValueAsString(MAX_STORAGE));
-			if (maxRepoSize > 0)
-				user.setQuota(maxRepoSize * (1024 * 1024));
-			else
-				user.setQuota(-1);
+        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, SESSIONSQUOTA,
+                (Integer) null);
+        sessionsQuota.setRequired(true);
+        sessionsQuota.setWidth(120);
+        sessionsQuota.setMin(-1);
+        sessionsQuota.setStep(1);
+        sessionsQuota.setValue(user.getSessionsQuota());
+        if (!readonly)
+            sessionsQuota.addChangedHandler(changedHandler);
 
-			long maxSessions = Long.parseLong(form.getValueAsString(MAX_CONCURRENT_SESSIONS));
-			if (maxSessions > 0)
-				user.setSessionsQuota(maxSessions);
-			else
-				user.setSessionsQuota(-1);
-		}
-		return !form.hasErrors();
-	}
+        StaticTextItem pagesUsage = ItemFactory.newStaticTextItem("pagesUsage", "usage",
+                Long.toString(user.getPages()));
+        pagesUsage.setWrap(false);
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+        SpinnerItem pagesQuota = ItemFactory.newSpinnerItem(PAGESQUOTA, PAGESQUOTA, (Integer) null);
+        pagesQuota.setWidth(120);
+        pagesQuota.setMin(-1);
+        pagesQuota.setStep(10);
+        pagesQuota.setValue(user.getPages());
+        if (!readonly)
+            pagesQuota.addChangedHandler(changedHandler);
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+        StaticTextItem documentsUsage = ItemFactory.newStaticTextItem("documentsUsage", "usage",
+                Long.toString(user.getDocuments()));
+        documentsUsage.setWrap(false);
+
+        SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, DOCUMENTSQUOTA, (Integer) null);
+        documentsQuota.setWidth(120);
+        documentsQuota.setMin(-1);
+        documentsQuota.setStep(10);
+        documentsQuota.setValue(user.getDocuments());
+        if (!readonly)
+            documentsQuota.addChangedHandler(changedHandler);
+
+        form.setItems(storageQuota, storageUsage, documentsQuota, documentsUsage, pagesQuota, pagesUsage, sessionsQuota,
+                sessionsUsage);
+        addMember(form);
+    }
+
+    boolean validate() {
+        if (form.validate()) {
+            long maxRepoSize = Long.parseLong(form.getValueAsString(STORAGEQUOTA));
+            if (maxRepoSize > 0)
+                user.setStorageQuota(maxRepoSize * (1024 * 1024));
+            else
+                user.setStorageQuota(-1);
+
+            long maxSessions = Long.parseLong(form.getValueAsString(SESSIONSQUOTA));
+            if (maxSessions > 0)
+                user.setSessionsQuota(maxSessions);
+            else
+                user.setSessionsQuota(-1);
+            
+            String val=form.getValueAsString(DOCUMENTSQUOTA);
+            if(val!=null) 
+                user.setSessionsQuota(Long.parseLong(form.getValueAsString(DOCUMENTSQUOTA)));
+            else 
+                user.setDocumentsQuota(null);
+            
+            val=form.getValueAsString(PAGESQUOTA);
+            if(val!=null) 
+                user.setPagesQuota(Long.parseLong(form.getValueAsString(PAGESQUOTA)));
+            else 
+                user.setPagesQuota(null);
+        }
+        return !form.hasErrors();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

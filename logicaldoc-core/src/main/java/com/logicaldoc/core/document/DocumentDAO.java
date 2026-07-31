@@ -348,6 +348,20 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
     public long count(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException;
 
     /**
+     * Counts the number of pages
+     * 
+     * @param tenantId The tenant to search in
+     * @param computeDeleted If true, even deleted documents are considered
+     * @param computeArchived If true, even archived documents are considered
+     * 
+     * @return number of pages
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public long countPages(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException;
+
+    
+    /**
      * Finds all documents by the indexing status. Order by ascending
      * lastModifed
      * 

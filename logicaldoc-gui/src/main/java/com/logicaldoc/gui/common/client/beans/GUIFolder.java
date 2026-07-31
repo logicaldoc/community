@@ -54,33 +54,35 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
     private long subfolderCount;
 
-    private long size;
-
     private int type;
 
     private boolean templateLocked = false;
 
     private int position = 1;
 
-    private Long quotaDocs = null;
+    private Long documentsQuota = null;
 
-    private Long quotaSize = null;
+    private Long pagesQuota = null;
+    
+    private Integer versionsQuota = null;
+
+    private Long storageQuota = null;
 
     private Integer quotaThreshold = null;
 
     private List<String> quotaAlertRecipients = new ArrayList<>();
 
     // Total number of documents inside the folder's tree
-    private long documentsTotal = 0L;
+    private long documents = 0L;
+
+    private long pages = 0L;
 
     // Total size of the folder's tree
-    private long sizeTotal = 0L;
+    private long storage = 0L;
 
     private Long foldRef = null;
 
     private Integer store = null;
-
-    private Integer maxVersions = null;
 
     private String color;
 
@@ -301,36 +303,36 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
         this.position = position;
     }
 
-    public Long getQuotaDocs() {
-        return quotaDocs;
+    public Long getDocumentsQuota() {
+        return documentsQuota;
     }
 
-    public void setQuotaDocs(Long quotaDocs) {
-        this.quotaDocs = quotaDocs;
+    public void setDocumentsQuota(Long documentsQuota) {
+        this.documentsQuota = documentsQuota;
     }
 
-    public Long getQuotaSize() {
-        return quotaSize;
+    public Long getStorageQuota() {
+        return storageQuota;
     }
 
-    public void setQuotaSize(Long quotaSize) {
-        this.quotaSize = quotaSize;
+    public void setStorageQuota(Long storageQuota) {
+        this.storageQuota = storageQuota;
     }
 
-    public long getDocumentsTotal() {
-        return documentsTotal;
+    public long getDocuments() {
+        return documents;
     }
 
-    public void setDocumentsTotal(long documentsTotal) {
-        this.documentsTotal = documentsTotal;
+    public void setDocuments(long documents) {
+        this.documents = documents;
     }
 
-    public long getSizeTotal() {
-        return sizeTotal;
+    public long getStorage() {
+        return storage;
     }
 
-    public void setSizeTotal(long sizeTotal) {
-        this.sizeTotal = sizeTotal;
+    public void setStorage(long storage) {
+        this.storage = storage;
     }
 
     public Long getFoldRef() {
@@ -349,12 +351,12 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
         this.store = store;
     }
 
-    public Integer getMaxVersions() {
-        return maxVersions;
+    public Integer getVersionsQuota() {
+        return versionsQuota;
     }
 
-    public void setMaxVersions(Integer maxVersions) {
-        this.maxVersions = maxVersions;
+    public void setVersionsQuota(Integer versionsQuota) {
+        this.versionsQuota = versionsQuota;
     }
 
     public String getColor() {
@@ -462,12 +464,20 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
         this.tile = tile;
     }
 
-    public long getSize() {
-        return size;
+    public Long getPagesQuota() {
+        return pagesQuota;
     }
 
-    public void setSize(long size) {
-        this.size = size;
+    public void setPagesQuota(Long pagesQuota) {
+        this.pagesQuota = pagesQuota;
+    }
+
+    public long getPages() {
+        return pages;
+    }
+
+    public void setPages(long pages) {
+        this.pages = pages;
     }
 
     @Override

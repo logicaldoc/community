@@ -174,11 +174,12 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         guiFolder.setCreatorId(folder.getCreatorId());
         guiFolder.setType(folder.getType());
         guiFolder.setPosition(folder.getPosition());
-        guiFolder.setQuotaDocs(folder.getQuotaDocs());
-        guiFolder.setQuotaSize(folder.getQuotaSize());
+        guiFolder.setDocumentsQuota(folder.getDocumentsQuota());
+        guiFolder.setPagesQuota(folder.getPagesQuota());
+        guiFolder.setStorageQuota(folder.getStorageQuota());
         guiFolder.setFoldRef(folder.getFoldRef());
         guiFolder.setStore(folder.getStore());
-        guiFolder.setMaxVersions(folder.getMaxVersions());
+        guiFolder.setVersionsQuota(folder.getVersionsQuota());
         guiFolder.setColor(folder.getColor());
         guiFolder.setTile(folder.getTile());
         guiFolder.setGrid(folder.getGrid());
@@ -192,8 +193,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
         if (guiFolder.isWorkspace()) {
             SequenceDAO seqDao = SequenceDAO.get();
-            guiFolder.setDocumentsTotal(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
-            guiFolder.setSizeTotal(seqDao.getCurrentValue("wssize", folder.getId(), folder.getTenantId()));
+            guiFolder.setDocuments(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
+            guiFolder.setStorage(seqDao.getCurrentValue("wssize", folder.getId(), folder.getTenantId()));
         }
 
         if (folder.getSecurityRef() != null) {
@@ -625,7 +626,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
                 folder.setColor(guiFolder.getColor());
 
                 if (folder.isWorkspace()) {
-                    folder.setMaxVersions(guiFolder.getMaxVersions());
+                    folder.setVersionsQuota(guiFolder.getVersionsQuota());
                 }
 
                 saveTransaction.setEvent(FolderEvent.CHANGED);
@@ -647,8 +648,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             folder.setDescription(guiFolder.getDescription());
             folder.setTile(guiFolder.getTile());
             folder.setTemplateLocked(guiFolder.isTemplateLocked());
-            folder.setQuotaDocs(guiFolder.getQuotaDocs());
-            folder.setQuotaSize(guiFolder.getQuotaSize());
+            folder.setDocumentsQuota(guiFolder.getDocumentsQuota());
+            folder.setStorageQuota(guiFolder.getStorageQuota());
             folder.setQuotaThreshold(guiFolder.getQuotaThreshold());
             folder.setQuotaAlertRecipients(guiFolder.getQuotaAlertRecipientsAsString());
             folder.setGrid(guiFolder.getGrid());
