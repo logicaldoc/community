@@ -48,10 +48,12 @@ public class User extends PersistentObject implements Serializable {
 
     private static final long serialVersionUID = 8093874904302301982L;
 
-    @Column(name = "ld_type", nullable = false) @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_type", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private UserType type = UserType.DEFAULT;
 
-    @Column(name = "ld_source", nullable = false) @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_source", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private UserSource source = UserSource.DEFAULT;
 
     @Column(name = "ld_username", length = 255, nullable = false)
@@ -166,18 +168,12 @@ public class User extends PersistentObject implements Serializable {
     @Column(name = "ld_sessionsquota")
     private Long sessionsQuota;
 
-    @Column(name = "ld_pages")
-    private Long pages;
-
     @Column(name = "ld_pagesquota")
     private Long pagesQuota;
-    
-    @Column(name = "ld_documents")
-    private Long documents;
 
     @Column(name = "ld_documentsquota")
     private Long documentsQuota;
-    
+
     @Column(name = "ld_welcomescreen")
     private Integer welcomeScreen = 1520;
 
@@ -576,28 +572,12 @@ public class User extends PersistentObject implements Serializable {
         return "_user_%d".formatted(getId());
     }
 
-    public Long getPages() {
-        return pages;
-    }
-
-    public void setPages(Long pages) {
-        this.pages = pages;
-    }
-
     public Long getPagesQuota() {
         return pagesQuota;
     }
 
     public void setPagesQuota(Long pagesQuota) {
         this.pagesQuota = pagesQuota;
-    }
-
-    public Long getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(Long documents) {
-        this.documents = documents;
     }
 
     public Long getDocumentsQuota() {

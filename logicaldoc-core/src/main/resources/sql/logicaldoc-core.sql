@@ -121,8 +121,7 @@ create table ld_user (ld_id bigint not null, ld_lastmodified timestamp not null,
                       ld_dateformat varchar(255), ld_dateformatshort varchar(255), ld_dateformatlong varchar(255),
                       ld_searchpref varchar(255), ld_timezone varchar(255), ld_company varchar(255), ld_sessionsquota bigint, 
                       ld_department varchar(255), ld_organizationalunit varchar(255), ld_building varchar(255), 
-                      ld_pages bigint,  ld_pagesquota bigint, ld_documents bigint, ld_documentsquota bigint, 
-                      primary key (ld_id));
+                      ld_pagesquota bigint, ld_documentsquota bigint, primary key (ld_id));
 create table ld_workingtime (ld_userid bigint not null, ld_dayofweek int not null, ld_hourstart int not null, ld_minutestart int not null, 
                              ld_hourend int not null, ld_minuteend int not null, ld_label varchar(255), ld_description varchar(1000), 
                              primary key(ld_userid, ld_dayofweek, ld_hourstart, ld_minutestart));
