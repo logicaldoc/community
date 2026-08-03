@@ -71,8 +71,7 @@ public class UserQuotaPanel extends HLayout {
                 Long.toString(user.getSessions()));
         sessionsUsage.setWrap(false);
 
-        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, SESSIONSQUOTA,
-                (Integer) null);
+        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, SESSIONSQUOTA, (Integer) null);
         sessionsQuota.setRequired(true);
         sessionsQuota.setWidth(120);
         sessionsQuota.setMin(-1);
@@ -112,28 +111,28 @@ public class UserQuotaPanel extends HLayout {
 
     boolean validate() {
         if (form.validate()) {
-            long maxRepoSize = Long.parseLong(form.getValueAsString(STORAGEQUOTA));
-            if (maxRepoSize > 0)
-                user.setStorageQuota(maxRepoSize * (1024 * 1024));
+            String val = form.getValueAsString(STORAGEQUOTA);
+            if (val != null)
+                user.setStorageQuota(Long.parseLong(form.getValueAsString(STORAGEQUOTA)) * 1024 * 1024);
             else
-                user.setStorageQuota(-1);
+                user.setStorageQuota(null);
 
-            long maxSessions = Long.parseLong(form.getValueAsString(SESSIONSQUOTA));
-            if (maxSessions > 0)
-                user.setSessionsQuota(maxSessions);
+            val = form.getValueAsString(DOCUMENTSQUOTA);
+            if (val != null)
+                user.setSessionsQuota(Long.parseLong(form.getValueAsString(SESSIONSQUOTA)));
             else
-                user.setSessionsQuota(-1);
-            
-            String val=form.getValueAsString(DOCUMENTSQUOTA);
-            if(val!=null) 
+                user.setSessionsQuota(null);
+
+            val = form.getValueAsString(DOCUMENTSQUOTA);
+            if (val != null)
                 user.setSessionsQuota(Long.parseLong(form.getValueAsString(DOCUMENTSQUOTA)));
-            else 
+            else
                 user.setDocumentsQuota(null);
-            
-            val=form.getValueAsString(PAGESQUOTA);
-            if(val!=null) 
+
+            val = form.getValueAsString(PAGESQUOTA);
+            if (val != null)
                 user.setPagesQuota(Long.parseLong(form.getValueAsString(PAGESQUOTA)));
-            else 
+            else
                 user.setPagesQuota(null);
         }
         return !form.hasErrors();

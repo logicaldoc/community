@@ -46,34 +46,34 @@ public class GUITenant implements Serializable {
 
     private String adminUsername = "admin";
 
-    private Integer maxUsers;
+    private Integer usersQuota;
 
-    private Integer maxGuests;
+    private Integer readOnlyUsersQuota;
 
-    private Integer maxSessions;
+    private Integer sessionsQuota;
 
-    private Long maxDocuments;
+    private Long documentsQuota;
 
-    private Long maxPages;
+    private Long pagesQuota;
 
     /**
      * Maximum repository size expressed in MB
      */
-    private Long maxStorage;
+    private Long storageQuota;
 
-    private Long maxApiCalls;
+    private Long apiCallsQuota;
 
-    private Long maxTickets;
+    private Long ticketsQuota;
 
-    private Long maxWorkflows;
+    private Long workflowsQuota;
 
-    private Long maxForms;
+    private Long formsQuota;
 
-    private Long maxReports;
+    private Long reportsQuota;
 
-    private Long maxStamps;
+    private Long stampsQuota;
 
-    private Long maxImportFolders;
+    private Long importFoldersQuota;
 
     private Long maxEmailAccounts;
 
@@ -227,52 +227,52 @@ public class GUITenant implements Serializable {
         this.adminUsername = adminUsername;
     }
 
-    public Integer getMaxUsers() {
-        return maxUsers;
+    public Integer getUsersQuota() {
+        return usersQuota;
     }
 
-    public void setMaxUsers(Integer maxUsers) {
-        this.maxUsers = maxUsers;
+    public void setUsersQuota(Integer usersQuota) {
+        this.usersQuota = usersQuota;
     }
 
-    public Integer getMaxSessions() {
-        return maxSessions;
+    public Integer getSessionsQuota() {
+        return sessionsQuota;
     }
 
-    public void setMaxSessions(Integer maxSessions) {
-        this.maxSessions = maxSessions;
+    public void setSessionsQuota(Integer sessionsQuota) {
+        this.sessionsQuota = sessionsQuota;
     }
 
-    public Long getMaxRepoDocs() {
-        return maxDocuments;
+    public Long getDocumentsQuota() {
+        return documentsQuota;
     }
 
-    public void setMaxDocuments(Long maxDocuments) {
-        this.maxDocuments = maxDocuments;
+    public void setDocumentsQuota(Long documentsQuota) {
+        this.documentsQuota = documentsQuota;
     }
 
-    public Long getMaxStorage() {
-        return maxStorage;
+    public Long getStorageQuota() {
+        return storageQuota;
     }
 
-    public void setMaxStorage(Long maxStorage) {
-        this.maxStorage = maxStorage;
+    public void setStorageQuota(Long storageQuota) {
+        this.storageQuota = storageQuota;
     }
 
-    public Long getMaxApiCalls() {
-        return maxApiCalls;
+    public Long getApiCallsQuota() {
+        return apiCallsQuota;
     }
 
-    public void setMaxApiCalls(Long maxApiCalls) {
-        this.maxApiCalls = maxApiCalls;
+    public void setApiCallsQuota(Long apiCallsQuota) {
+        this.apiCallsQuota = apiCallsQuota;
     }
 
-    public Long getMaxWorkflows() {
-        return maxWorkflows;
+    public Long getWorkflowsQuota() {
+        return workflowsQuota;
     }
 
-    public void setMaxWorkflows(Long maxWorkflows) {
-        this.maxWorkflows = maxWorkflows;
+    public void setWorkflowsQuota(Long workflowsQuota) {
+        this.workflowsQuota = workflowsQuota;
     }
 
     public long getWorkflows() {
@@ -345,12 +345,12 @@ public class GUITenant implements Serializable {
         this.sessions = sessions;
     }
 
-    public Long getMaxForms() {
-        return maxForms;
+    public Long getFormsQuota() {
+        return formsQuota;
     }
 
-    public void setMaxForms(Long maxForms) {
-        this.maxForms = maxForms;
+    public void setFormsQuota(Long formsQuota) {
+        this.formsQuota = formsQuota;
     }
 
     public long getForms() {
@@ -369,20 +369,20 @@ public class GUITenant implements Serializable {
         this.reports = reports;
     }
 
-    public Long getMaxReports() {
-        return maxReports;
+    public Long getReportsQuota() {
+        return reportsQuota;
     }
 
-    public void setMaxReports(Long maxReports) {
-        this.maxReports = maxReports;
+    public void setReportsQuota(Long reportsQuota) {
+        this.reportsQuota = reportsQuota;
     }
 
-    public Long getMaxStamps() {
-        return maxStamps;
+    public Long getStampsQuota() {
+        return stampsQuota;
     }
 
-    public void setMaxStamps(Long maxStamps) {
-        this.maxStamps = maxStamps;
+    public void setStampsQuota(Long stampsQuota) {
+        this.stampsQuota = stampsQuota;
     }
 
     public long getStamps() {
@@ -435,12 +435,12 @@ public class GUITenant implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public Integer getMaxGuests() {
-        return maxGuests;
+    public Integer getReadOnlyUsersQuota() {
+        return readOnlyUsersQuota;
     }
 
-    public void setMaxGuests(Integer maxGuests) {
-        this.maxGuests = maxGuests;
+    public void setReadOnlyUsersQuota(Integer readOnlyUsersQuota) {
+        this.readOnlyUsersQuota = readOnlyUsersQuota;
     }
 
     public long getGuests() {
@@ -459,12 +459,12 @@ public class GUITenant implements Serializable {
         this.apiCalls = apiCalls;
     }
 
-    public Long getMaxTickets() {
-        return maxTickets;
+    public Long getTicketsQuota() {
+        return ticketsQuota;
     }
 
-    public void setMaxTickets(Long maxTickets) {
-        this.maxTickets = maxTickets;
+    public void setTicketsQuota(Long ticketsQuota) {
+        this.ticketsQuota = ticketsQuota;
     }
 
     public long getTickets() {
@@ -475,12 +475,12 @@ public class GUITenant implements Serializable {
         this.tickets = tickets;
     }
 
-    public Long getMaxImportFolders() {
-        return maxImportFolders;
+    public Long getImportFoldersQuota() {
+        return importFoldersQuota;
     }
 
-    public void setMaxImportFolders(Long maxImportFolders) {
-        this.maxImportFolders = maxImportFolders;
+    public void setImportFoldersQuota(Long importFoldersQuota) {
+        this.importFoldersQuota = importFoldersQuota;
     }
 
     public Long getMaxEmailAccounts() {
@@ -507,12 +507,12 @@ public class GUITenant implements Serializable {
         this.pages = pages;
     }
 
-    public Long getMaxPages() {
-        return maxPages;
+    public Long getPagesQuota() {
+        return pagesQuota;
     }
 
-    public void setMaxPages(Long maxPages) {
-        this.maxPages = maxPages;
+    public void setPagesQuota(Long pagesQuota) {
+        this.pagesQuota = pagesQuota;
     }
 
     public long getStorage() {

@@ -108,19 +108,19 @@ public class GUIUser implements Serializable {
 
     private GUITenant tenant = null;
 
-    private long storage = -1;
+    private long storage = 0L;
 
-    private long storageQuota = 0;
+    private Long storageQuota;
 
-    private long sessionsQuota = -1;
-
-    private long sessions = 0;
+    private long sessions = 0L;
     
-    private Long pages;
+    private Long sessionsQuota;
+    
+    private long pages = 0L;
 
     private Long pagesQuota;
     
-    private Long documents;
+    private long documents = 0L;
 
     private Long documentsQuota;
     
@@ -423,11 +423,11 @@ public class GUIUser implements Serializable {
         }
     }
 
-    public long getStorageQuota() {
+    public Long getStorageQuota() {
         return storageQuota;
     }
 
-    public void setStorageQuota(long storageQuota) {
+    public void setStorageQuota(Long storageQuota) {
         this.storageQuota = storageQuota;
     }
 
@@ -438,8 +438,6 @@ public class GUIUser implements Serializable {
     public void setStorage(long storage) {
         this.storage = storage;
     }
-    
-    
 
     public long getSessions() {
         return sessions;
@@ -449,11 +447,11 @@ public class GUIUser implements Serializable {
         this.sessions = sessions;
     }
 
-    public Long getPages() {
+    public long getPages() {
         return pages;
     }
 
-    public void setPages(Long pages) {
+    public void setPages(long pages) {
         this.pages = pages;
     }
 
@@ -465,11 +463,11 @@ public class GUIUser implements Serializable {
         this.pagesQuota = pagesQuota;
     }
 
-    public Long getDocuments() {
+    public long getDocuments() {
         return documents;
     }
 
-    public void setDocuments(Long documents) {
+    public void setDocuments(long documents) {
         this.documents = documents;
     }
 
@@ -847,11 +845,11 @@ public class GUIUser implements Serializable {
         this.legals = legals;
     }
 
-    public long getSessionsQuota() {
+    public Long getSessionsQuota() {
         return sessionsQuota;
     }
 
-    public void setSessionsQuota(long sessionsQuota) {
+    public void setSessionsQuota(Long sessionsQuota) {
         this.sessionsQuota = sessionsQuota;
     }
 

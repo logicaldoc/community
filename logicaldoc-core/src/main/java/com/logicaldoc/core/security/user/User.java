@@ -160,11 +160,11 @@ public class User extends PersistentObject implements Serializable {
     @Transient
     private String repass;
 
-    @Column(name = "ld_quota", nullable = false)
-    private long quota = -1;
+    @Column(name = "ld_storagequota")
+    private Long storageQuota;
 
-    @Column(name = "ld_sessionsquota", nullable = false)
-    private long sessionsQuota = -1;
+    @Column(name = "ld_sessionsquota")
+    private Long sessionsQuota;
 
     @Column(name = "ld_pages")
     private Long pages;
@@ -530,11 +530,11 @@ public class User extends PersistentObject implements Serializable {
         telephone = phone;
     }
 
-    public long getSessionsQuota() {
+    public Long getSessionsQuota() {
         return sessionsQuota;
     }
 
-    public void setSessionsQuota(long sessionsQuota) {
+    public void setSessionsQuota(Long sessionsQuota) {
         this.sessionsQuota = sessionsQuota;
     }
 
@@ -709,12 +709,12 @@ public class User extends PersistentObject implements Serializable {
         this.source = UserSource.values()[source];
     }
 
-    public long getQuota() {
-        return quota;
+    public Long getStorageQuota() {
+        return storageQuota;
     }
 
-    public void setQuota(long quota) {
-        this.quota = quota;
+    public void setStorageQuota(Long storageQuota) {
+        this.storageQuota = storageQuota;
     }
 
     public Integer getWelcomeScreen() {

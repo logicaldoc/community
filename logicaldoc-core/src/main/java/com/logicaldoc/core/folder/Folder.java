@@ -207,11 +207,11 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
         this.documentsQuota = source.documentsQuota;
         this.pagesQuota = source.pagesQuota;
         this.storageQuota = source.storageQuota;
+        this.versionsQuota = source.versionsQuota;
         this.quotaThreshold = source.quotaThreshold;
         this.quotaAlertRecipients = source.quotaAlertRecipients;
         this.foldRef = source.foldRef;
         this.stores = source.stores;
-        this.versionsQuota = source.versionsQuota;
         this.color = source.color;
         this.tags = source.tags;
         this.tgs = source.tgs;

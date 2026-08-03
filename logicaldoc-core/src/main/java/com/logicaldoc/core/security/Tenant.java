@@ -76,53 +76,53 @@ public class Tenant extends PersistentObject implements Serializable {
     @Column(name = "ld_type", nullable = false)
     private int type = DEFAULT_TYPE;
 
-    @Column(name = "ld_maxusers", nullable = true)
-    private Integer maxUsers;
+    @Column(name = "ld_usersquota")
+    private Integer usersQuota;
 
-    @Column(name = "ld_maxguests", nullable = true)
-    private Integer maxGuests;
+    @Column(name = "ld_rousersquota")
+    private Integer readOnlyUsersQuota;
 
-    @Column(name = "ld_maxsessions", nullable = true)
-    private Integer maxSessions;
+    @Column(name = "ld_sessionsquota")
+    private Integer sessionsQuota;
 
-    @Column(name = "ld_documentsquota", nullable = true)
+    @Column(name = "ld_documentsquota")
     private Long documentsQuota;
 
-    @Column(name = "ld_pagesquota", nullable = true)
+    @Column(name = "ld_pagesquota")
     private Long pagesQuota;
 
     /**
      * Maximum repository size expressed in MB
      */
-    @Column(name = "ld_maxreposize", nullable = true)
-    private Long maxRepoSize;
+    @Column(name = "ld_storagequota")
+    private Long storageQuota;
 
     /**
      * Maximum monthly API calls
      */
-    @Column(name = "ld_maxapicalls", nullable = true)
-    private Long maxApiCalls;
+    @Column(name = "ld_apicallsquota")
+    private Long apiCallsQuota;
 
-    @Column(name = "ld_maxtickets", nullable = true)
-    private Long maxTickets;
+    @Column(name = "ld_ticketsquota")
+    private Long ticketsQuota;
 
-    @Column(name = "ld_maxworkflows", nullable = true)
-    private Long maxWorkflows;
+    @Column(name = "ld_workflowsquota")
+    private Long workflowsQuota;
 
-    @Column(name = "ld_maxforms", nullable = true)
-    private Long maxForms;
+    @Column(name = "ld_formsquota")
+    private Long formsQuota;
 
-    @Column(name = "ld_maxreports", nullable = true)
-    private Long maxReports;
+    @Column(name = "ld_reportsquota")
+    private Long reportsQuota;
 
-    @Column(name = "ld_maxstamps", nullable = true)
-    private Long maxStamps;
+    @Column(name = "ld_stampsquota")
+    private Long stampsQuota;
 
-    @Column(name = "ld_maximportfolders", nullable = true)
-    private Long maxImportFolders;
+    @Column(name = "ld_importfoldersquota")
+    private Long importFoldersQuota;
 
-    @Column(name = "ld_maxemailaccounts", nullable = true)
-    private Long maxEmailAccounts;
+    @Column(name = "ld_emailaccountsquota")
+    private Long emailAccountsQuota;
 
     @Column(name = "ld_qthreshold")
     private Integer quotaThreshold = null;
@@ -145,22 +145,22 @@ public class Tenant extends PersistentObject implements Serializable {
         this.email = source.email;
         this.telephone = source.telephone;
         this.type = source.type;
-        this.maxUsers = source.maxUsers;
-        this.maxGuests = source.maxGuests;
-        this.maxSessions = source.maxSessions;
+        this.usersQuota = source.usersQuota;
+        this.readOnlyUsersQuota = source.readOnlyUsersQuota;
+        this.sessionsQuota = source.sessionsQuota;
         this.documentsQuota = source.documentsQuota;
         this.pagesQuota = source.pagesQuota;
         this.enabled = source.enabled;
         this.expire = source.expire;
-        this.maxRepoSize = source.maxRepoSize;
-        this.maxApiCalls = source.maxApiCalls;
-        this.maxTickets = source.maxTickets;
-        this.maxWorkflows = source.maxWorkflows;
-        this.maxForms = source.maxForms;
-        this.maxReports = source.maxReports;
-        this.maxStamps = source.maxStamps;
-        this.maxImportFolders = source.maxImportFolders;
-        this.maxEmailAccounts = source.maxEmailAccounts;
+        this.storageQuota = source.storageQuota;
+        this.apiCallsQuota = source.apiCallsQuota;
+        this.ticketsQuota = source.ticketsQuota;
+        this.workflowsQuota = source.workflowsQuota;
+        this.formsQuota = source.formsQuota;
+        this.reportsQuota = source.reportsQuota;
+        this.stampsQuota = source.stampsQuota;
+        this.importFoldersQuota = source.importFoldersQuota;
+        this.emailAccountsQuota = source.emailAccountsQuota;
         this.quotaThreshold = source.quotaThreshold;
         this.quotaAlertRecipients = source.quotaAlertRecipients;
 
@@ -261,20 +261,20 @@ public class Tenant extends PersistentObject implements Serializable {
         return displayName != null ? displayName : name;
     }
 
-    public Integer getMaxUsers() {
-        return maxUsers;
+    public Integer getUsersQuota() {
+        return usersQuota;
     }
 
-    public void setMaxUsers(Integer maxUsers) {
-        this.maxUsers = maxUsers;
+    public void setUsersQuota(Integer usersQuota) {
+        this.usersQuota = usersQuota;
     }
 
-    public Integer getMaxSessions() {
-        return maxSessions;
+    public Integer getSessionsQuota() {
+        return sessionsQuota;
     }
 
-    public void setMaxSessions(Integer maxSessions) {
-        this.maxSessions = maxSessions;
+    public void setSessionsQuota(Integer sessionsQuota) {
+        this.sessionsQuota = sessionsQuota;
     }
 
     public Long getDocumentsQuota() {
@@ -285,76 +285,76 @@ public class Tenant extends PersistentObject implements Serializable {
         this.documentsQuota = documentsQuota;
     }
 
-    public Long getMaxRepoSize() {
-        return maxRepoSize;
+    public Long getStorageQuota() {
+        return storageQuota;
     }
 
-    public void setMaxRepoSize(Long maxRepoSize) {
-        this.maxRepoSize = maxRepoSize;
+    public void setStorageQuota(Long storageQuota) {
+        this.storageQuota = storageQuota;
     }
 
-    public Long getMaxApiCalls() {
-        return maxApiCalls;
+    public Long getApiCallsQuota() {
+        return apiCallsQuota;
     }
 
-    public void setMaxApiCalls(Long maxApiCalls) {
-        this.maxApiCalls = maxApiCalls;
+    public void setApiCallsQuota(Long apiCallsQuota) {
+        this.apiCallsQuota = apiCallsQuota;
     }
 
-    public Long getMaxTickets() {
-        return maxTickets;
+    public Long getTicketsQuota() {
+        return ticketsQuota;
     }
 
-    public void setMaxTickets(Long maxTickets) {
-        this.maxTickets = maxTickets;
+    public void setTicketsQuota(Long ticketsQuota) {
+        this.ticketsQuota = ticketsQuota;
     }
 
-    public Long getMaxWorkflows() {
-        return maxWorkflows;
+    public Long getWorkflowsQuota() {
+        return workflowsQuota;
     }
 
-    public void setMaxWorkflows(Long maxWorkflows) {
-        this.maxWorkflows = maxWorkflows;
+    public void setWorkflowsQuota(Long workflowsQuota) {
+        this.workflowsQuota = workflowsQuota;
     }
 
-    public Long getMaxForms() {
-        return maxForms;
+    public Long getFormsQuota() {
+        return formsQuota;
     }
 
-    public void setMaxForms(Long maxForms) {
-        this.maxForms = maxForms;
+    public void setFormsQuota(Long formsQuota) {
+        this.formsQuota = formsQuota;
     }
 
-    public Long getMaxReports() {
-        return maxReports;
+    public Long getReportsQuota() {
+        return reportsQuota;
     }
 
-    public void setMaxReports(Long maxReports) {
-        this.maxReports = maxReports;
+    public void setReportsQuota(Long reportsQuota) {
+        this.reportsQuota = reportsQuota;
     }
 
-    public Long getMaxStamps() {
-        return maxStamps;
+    public Long getStampsQuota() {
+        return stampsQuota;
     }
 
-    public void setMaxStamps(Long maxStamps) {
-        this.maxStamps = maxStamps;
+    public void setStampsQuota(Long stampsQuota) {
+        this.stampsQuota = stampsQuota;
     }
 
-    public Long getMaxImportFolders() {
-        return maxImportFolders;
+    public Long getImportFoldersQuota() {
+        return importFoldersQuota;
     }
 
-    public void setMaxImportFolders(Long maxImportFolders) {
-        this.maxImportFolders = maxImportFolders;
+    public void setImportFoldersQuota(Long importFoldersQuota) {
+        this.importFoldersQuota = importFoldersQuota;
     }
 
-    public Long getMaxEmailAccounts() {
-        return maxEmailAccounts;
+    public Long getEmailAccountsQuota() {
+        return emailAccountsQuota;
     }
 
-    public void setMaxEmailAccounts(Long maxEmailAccounts) {
-        this.maxEmailAccounts = maxEmailAccounts;
+    public void setEmailAccountsQuota(Long emailAccountsQuota) {
+        this.emailAccountsQuota = emailAccountsQuota;
     }
 
     public boolean isEnabled() {
@@ -421,12 +421,12 @@ public class Tenant extends PersistentObject implements Serializable {
         setQuotaAlertRecipients(str);
     }
 
-    public Integer getMaxGuests() {
-        return maxGuests;
+    public Integer getReadOnlyUsersQuota() {
+        return readOnlyUsersQuota;
     }
 
-    public void setMaxGuests(Integer maxGuests) {
-        this.maxGuests = maxGuests;
+    public void setReadOnlyUsersQuota(Integer readOnlyUsersQuota) {
+        this.readOnlyUsersQuota = readOnlyUsersQuota;
     }
 
     public Long getPagesQuota() {

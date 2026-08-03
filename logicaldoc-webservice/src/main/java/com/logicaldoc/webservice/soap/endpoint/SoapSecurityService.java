@@ -148,7 +148,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setUsername(wsUser.getUsername());
 				usr.setEnabled(wsUser.isEnabled());
 				usr.setPasswordExpires(wsUser.getPasswordExpires() == 1);
-				usr.setQuota(wsUser.getQuota());
+				usr.setStorageQuota(wsUser.getStorageQuota());
 				usr.setType(wsUser.getType());
 				usr.setSource(wsUser.getSource());
 				usr.setDateFormat(wsUser.getDateFormat());

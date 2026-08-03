@@ -154,17 +154,17 @@ public class WSUser {
     @WSDoc(description = "must be <b>0</b>")
     private int source = 0;
 
-    @WSDoc(description = "maximum allowed user's storage expressed in bytes, <b>-1</b> for no limits")
-    private long quota = -1;
+    @WSDoc(description = "maximum allowed user's storage expressed in bytes")
+    private Long storageQuota;
 
     @WSDoc(description = " actual storage quota used by the user ")
-    private long quotaCount = 0;
+    private long storage = 0;
 
-    @WSDoc(description = "maximum allowed user's concurrent sessions, <b>-1</b> for no limits")
-    private long sessionsQuota = -1;
+    @WSDoc(description = "maximum allowed user's concurrent sessions")
+    private Long sessionsQuota;
 
-    @WSDoc(description = " actual sessions for this userr")
-    private long sessionsQuotaCount = 0;
+    @WSDoc(description = "actual sessions count for this userr")
+    private long sessions = 0;
 
     @WSDoc(required = false)
     private String lastModified;
@@ -419,20 +419,20 @@ public class WSUser {
         this.source = source;
     }
 
-    public long getQuota() {
-        return quota;
+    public Long getStorageQuota() {
+        return storageQuota;
     }
 
-    public void setQuota(long quota) {
-        this.quota = quota;
+    public void setStorageQuota(Long storageQuota) {
+        this.storageQuota = storageQuota;
     }
 
-    public long getQuotaCount() {
-        return quotaCount;
+    public long getStgorage() {
+        return storage;
     }
 
-    public void setQuotaCount(long quotaCount) {
-        this.quotaCount = quotaCount;
+    public void setStorage(long storage) {
+        this.storage = storage;
     }
 
     public String getLastModified() {
@@ -500,7 +500,7 @@ public class WSUser {
             user.setUsername(getUsername());
             user.setEnabled(isEnabled());
             user.setPasswordExpires(getPasswordExpires() == 1);
-            user.setQuota(getQuota());
+            user.setStorageQuota(getStorageQuota());
             user.setSessionsQuota(getSessionsQuota());
             user.setType(getType());
             user.setSource(getSource());
@@ -577,7 +577,7 @@ public class WSUser {
             wsUser.setUsername(user.getUsername());
             wsUser.setEnabled(user.isEnabled());
             wsUser.setPasswordExpires(user.isPasswordExpires() ? 1 : 0);
-            wsUser.setQuota(user.getQuota());
+            wsUser.setStorageQuota(user.getStorageQuota());
             wsUser.setType(user.getType().ordinal());
             wsUser.setSource(user.getSource().ordinal());
             wsUser.setPassword(user.getPassword());
@@ -613,8 +613,8 @@ public class WSUser {
             }).collect(Collectors.toList());
             wsUser.setWorkingTimes(tmp);
 
-            wsUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
-            wsUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
+            wsUser.setStorage(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
+            wsUser.setSessions(SessionManager.get().countOpened(user.getUsername()));
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -775,19 +775,19 @@ public class WSUser {
         this.legals = legals;
     }
 
-    public long getSessionsQuota() {
+    public Long getSessionsQuota() {
         return sessionsQuota;
     }
 
-    public void setSessionsQuota(long sessionsQuota) {
+    public void setSessionsQuota(Long sessionsQuota) {
         this.sessionsQuota = sessionsQuota;
     }
 
-    public long getSessionsQuotaCount() {
-        return sessionsQuotaCount;
+    public long getSessions() {
+        return sessions;
     }
 
-    public void setSessionsQuotaCount(long sessionsQuotaCount) {
-        this.sessionsQuotaCount = sessionsQuotaCount;
+    public void setSessions(long sessions) {
+        this.sessions = sessions;
     }
 }
