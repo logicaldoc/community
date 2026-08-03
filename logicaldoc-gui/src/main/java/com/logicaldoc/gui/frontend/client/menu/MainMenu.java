@@ -195,24 +195,25 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
         trayPanel.addMember(trays.get(0));
         addMember(trayPanel);
 
-        ToolStripButton rotateTrays = AwesomeFactory.newToolStripButton("exchange-alt",
-                I18N.message("switchto", I18N.message(trays.get(1).getName())), null);
-        rotateTrays.addClickHandler(click -> {
-            if (currentTray >= trays.size() - 1)
-                currentTray = 0;
-            else
-                currentTray++;
-            trayPanel.removeMembers(trayPanel.getMembers());
-            trayPanel.addMember(trays.get(currentTray));
+        if (trays.size() > 1) {
+            ToolStripButton rotateTrays = AwesomeFactory.newToolStripButton("exchange-alt",
+                    I18N.message("switchto", I18N.message(trays.get(1).getName())), null);
+            rotateTrays.addClickHandler(click -> {
+                if (currentTray >= trays.size() - 1)
+                    currentTray = 0;
+                else
+                    currentTray++;
+                trayPanel.removeMembers(trayPanel.getMembers());
+                trayPanel.addMember(trays.get(currentTray));
 
-            int nextTray = currentTray + 1;
-            if (nextTray > trays.size() - 1)
-                nextTray = 0;
+                int nextTray = currentTray + 1;
+                if (nextTray > trays.size() - 1)
+                    nextTray = 0;
 
-            rotateTrays.setTooltip(I18N.message("switchto", I18N.message(trays.get(nextTray).getName())));
-        });
-        if (trays.size() > 1)
+                rotateTrays.setTooltip(I18N.message("switchto", I18N.message(trays.get(nextTray).getName())));
+            });
             addButton(rotateTrays);
+        }
     }
 
     private MenuItem getWebContentMenuItem(GUIFolder folder, final GUIDocument document) {
