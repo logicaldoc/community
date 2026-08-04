@@ -19,7 +19,7 @@ public enum Feature {
 	 * @return The corresponding entry
 	 */
 	public static Feature fromKey(String key) {
-		return Arrays.asList(values()).stream().filter(e -> key.equals(e.key())).findFirst().orElseThrow();
+		return Arrays.asList(values()).stream().filter(e -> key.equalsIgnoreCase(e.key())).findFirst().orElseThrow();
 	}
 
 	/**

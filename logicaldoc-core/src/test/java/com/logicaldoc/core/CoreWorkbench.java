@@ -21,6 +21,10 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
+import com.logicaldoc.core.runtime.Aspect;
+import com.logicaldoc.core.runtime.AspectDisabledException;
+import com.logicaldoc.core.runtime.Feature;
+import com.logicaldoc.core.runtime.FeatureDisabledException;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
@@ -37,10 +41,8 @@ public class CoreWorkbench {
      */
     public static void main(String[] args) throws IOException, ParseException {
 
-        String[] parts = "pippo.pluto".split("\\.");
-        for (String part : parts) {
-            System.out.println(part);
-        }
+        new FeatureDisabledException(Feature.fromKey("Feature_19")).printStackTrace();
+
 
 //		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 //		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));

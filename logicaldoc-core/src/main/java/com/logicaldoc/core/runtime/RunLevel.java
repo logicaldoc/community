@@ -22,103 +22,95 @@ import com.logicaldoc.util.spring.Context;
  * @since 7.6.4
  */
 public enum RunLevel {
-	DEFAULT, BULKLOAD, DEVEL, DEMO, UPDATED, SLAVE;
+    DEFAULT, BULKLOAD, DEVEL, DEMO, UPDATED, SLAVE;
 
-	private static final Logger log = LoggerFactory.getLogger(RunLevel.class);
+    private static final Logger log = LoggerFactory.getLogger(RunLevel.class);
 
-	@Override
-	public String toString() {
-		return this.name().toLowerCase();
-	}
+    @Override
+    public String toString() {
+        return this.name().toLowerCase();
+    }
 
-	public static RunLevel current() {
-		ContextProperties config = getConfig();
-		String runLevel = config != null ? config.getProperty("runlevel", DEFAULT.toString()) : DEFAULT.toString();
-		return RunLevel.fromString(runLevel);
-	}
+    public static RunLevel current() {
+        ContextProperties config = getConfig();
+        String runLevel = config != null ? config.getProperty("runlevel", DEFAULT.toString()) : DEFAULT.toString();
+        return RunLevel.fromString(runLevel);
+    }
 
-	public static RunLevel fromString(String event) {
-		if (event != null)
-			for (RunLevel b : RunLevel.values())
-				if (event.equalsIgnoreCase(b.toString())) {
-					return b;
-				}
-		return DEFAULT;
-	}
+    public static RunLevel fromString(String event) {
+        if (event != null)
+            for (RunLevel b : RunLevel.values())
+                if (event.equalsIgnoreCase(b.toString())) {
+                    return b;
+                }
+        return DEFAULT;
+    }
 
-	private String getAspectProperty(String aspect) {
-		return "aspect.%s.%s".formatted(aspect.toLowerCase(), toString());
-	}
+    private String getAspectProperty(Aspect aspect) {
+        return "aspect.%s.%s".formatted(aspect.name().toLowerCase(), toString());
+    }
 
-	public boolean aspectEnabled(Aspect aspect) {
-		return aspectEnabled(aspect.name());
-	}
+    public boolean aspectEnabled(Aspect aspect) {
+        ContextProperties cfg = getConfig();
+        return cfg != null && cfg.getBoolean(getAspectProperty(aspect), false);
+    }
 
-	public boolean aspectEnabled(String aspect) {
-		ContextProperties cfg = getConfig();
-		return cfg != null && cfg.getBoolean(getAspectProperty(aspect), false);
-	}
+    public void checkAspect(Aspect aspect) throws AspectDisabledException {
+        if (!aspectEnabled(aspect))
+            throw new AspectDisabledException(aspect);
+    }
 
-	public void checkAspect(Aspect aspect) throws AspectDisabledException {
-		checkAspect(aspect.name());
-	}
+    public void setAspect(Aspect aspect, boolean enabled) {
+        ContextProperties cfg = getConfig();
+        if (cfg != null)
+            cfg.setProperty(getAspectProperty(aspect), Boolean.toString(enabled));
+    }
 
-	public void checkAspect(String aspect) throws AspectDisabledException {
-		if (!aspectEnabled(aspect))
-			throw new AspectDisabledException(aspect);
-	}
+    private static ContextProperties getConfig() {
+        ContextProperties conf = null;
+        try {
+            Context context = Context.get();
+            if (context != null)
+                conf = context.getConfig();
+        } catch (Exception t) {
+            // Nothing to do
+        }
 
-	public void setAspect(String aspect, boolean enabled) {
-		ContextProperties cfg = getConfig();
-		if (cfg != null)
-			cfg.setProperty(getAspectProperty(aspect), Boolean.toString(enabled));
-	}
+        if (conf == null)
+            try {
+                conf = new ContextProperties();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        return conf;
+    }
 
-	private static ContextProperties getConfig() {
-		ContextProperties conf = null;
-		try {
-			Context context = Context.get();
-			if (context != null)
-				conf = context.getConfig();
-		} catch (Exception t) {
-			// Nothing to do
-		}
+    public boolean isDefault() {
+        return this == DEFAULT;
+    }
 
-		if (conf == null)
-			try {
-				conf = new ContextProperties();
-			} catch (IOException e) {
-				log.error(e.getMessage(), e);
-			}
-		return conf;
-	}
+    public boolean isDemo() {
+        return this == DEMO;
+    }
 
-	public boolean isDefault() {
-		return this == DEFAULT;
-	}
+    public boolean isBulkload() {
+        return this == BULKLOAD;
+    }
 
-	public boolean isDemo() {
-		return this == DEMO;
-	}
+    public boolean isDevel() {
+        return this == DEVEL;
+    }
 
-	public boolean isBulkload() {
-		return this == BULKLOAD;
-	}
+    public static List<String> getAspects() {
+        // Acquire the 'Aspect' extensions
+        PluginRegistry registry = PluginRegistry.getInstance();
+        Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Aspect");
 
-	public boolean isDevel() {
-		return this == DEVEL;
-	}
+        List<String> aspects = new ArrayList<>();
+        for (Extension ext : exts)
+            aspects.add(ext.getParameter("code").valueAsString());
+        Collections.sort(aspects);
 
-	public static List<String> getAspects() {
-		// Acquire the 'Aspect' extensions
-		PluginRegistry registry = PluginRegistry.getInstance();
-		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Aspect");
-
-		List<String> aspects = new ArrayList<>();
-		for (Extension ext : exts)
-			aspects.add(ext.getParameter("code").valueAsString());
-		Collections.sort(aspects);
-
-		return aspects;
-	}
+        return aspects;
+    }
 }

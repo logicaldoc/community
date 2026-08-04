@@ -10,11 +10,11 @@ public class AspectDisabledException extends FeatureDisabledException {
 
 	private static final long serialVersionUID = 1L;
 
-	public AspectDisabledException(String aspectId) {
-		super(aspectId, "Aspect ", "aspect.");
+	public AspectDisabledException(Aspect aspect) {
+		this(aspect, null);
 	}
 
-	public AspectDisabledException(String aspectId, Throwable cause) {
-		super(aspectId, "Aspect ", "aspect.", cause);
+	public AspectDisabledException(Aspect aspect, Throwable cause) {
+	    super(aspect.key(), "aspect.", "Aspect '%s' disabled", cause);
 	}
 }
