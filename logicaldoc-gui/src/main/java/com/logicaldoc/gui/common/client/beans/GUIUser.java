@@ -124,6 +124,8 @@ public class GUIUser implements Serializable {
 
     private Long documentsQuota;
     
+    private Integer quotaThreshold = null;
+    
     private Integer welcomeScreen = 1500;
 
     private String ipWhitelist;
@@ -859,5 +861,13 @@ public class GUIUser implements Serializable {
 
     public void setImpersonators(List<String> impersonators) {
         this.impersonators = impersonators;
+    }
+
+    public Integer getQuotaThreshold() {
+        return quotaThreshold;
+    }
+
+    public void setQuotaThreshold(Integer quotaThreshold) {
+        this.quotaThreshold = quotaThreshold;
     }
 }

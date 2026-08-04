@@ -540,7 +540,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 guiUser.setPages(SequenceDAO.get().getCurrentValue("userpages", user.getId(), user.getTenantId()));
                 guiUser.setDocumentsQuota(user.getDocumentsQuota());
                 guiUser.setDocuments(SequenceDAO.get().getCurrentValue("userdocuments", user.getId(), user.getTenantId()));
-
+                guiUser.setQuotaThreshold(user.getQuotaThreshold());
+                
                 guiUser.setTenant(getTenant(user.getTenantId()));
 
                 ContextProperties config = Context.get().getConfig();
@@ -694,8 +695,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             user.setIpBlackList(guiUser.getIpBlacklist());
             user.setEmailSignature(guiUser.getEmailSignature());
             user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
+            user.setPagesQuota(guiUser.getPagesQuota());
+            user.setDocumentsQuota(guiUser.getDocumentsQuota());
             user.setStorageQuota(guiUser.getStorageQuota());
             user.setSessionsQuota(guiUser.getSessionsQuota());
+            user.setQuotaThreshold(guiUser.getQuotaThreshold());
             user.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
             user.setKey(guiUser.getKey());
             user.setType(guiUser.getType());

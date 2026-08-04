@@ -71,7 +71,7 @@ public class UserQuotaPanel extends HLayout {
                 Long.toString(user.getSessions()));
         sessionsUsage.setWrap(false);
 
-        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, SESSIONSQUOTA, (Integer) null);
+        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, SESSIONSQUOTA, (Long) null);
         sessionsQuota.setRequired(true);
         sessionsQuota.setWidth(120);
         sessionsQuota.setMin(-1);
@@ -84,7 +84,7 @@ public class UserQuotaPanel extends HLayout {
                 Long.toString(user.getPages()));
         pagesUsage.setWrap(false);
 
-        SpinnerItem pagesQuota = ItemFactory.newSpinnerItem(PAGESQUOTA, PAGESQUOTA, (Integer) null);
+        SpinnerItem pagesQuota = ItemFactory.newSpinnerItem(PAGESQUOTA, PAGESQUOTA, (Long) null);
         pagesQuota.setWidth(120);
         pagesQuota.setMin(-1);
         pagesQuota.setStep(10);
@@ -96,7 +96,7 @@ public class UserQuotaPanel extends HLayout {
                 Long.toString(user.getDocuments()));
         documentsUsage.setWrap(false);
 
-        SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, DOCUMENTSQUOTA, (Integer) null);
+        SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, DOCUMENTSQUOTA, (Long) null);
         documentsQuota.setWidth(120);
         documentsQuota.setMin(-1);
         documentsQuota.setStep(10);
@@ -104,8 +104,15 @@ public class UserQuotaPanel extends HLayout {
         if (!readonly)
             documentsQuota.addChangedHandler(changedHandler);
 
+        SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("alertthreshold", user.getQuotaThreshold());
+        quotaThreshold.setMax(100);
+        quotaThreshold.setMin(0);
+        quotaThreshold.setHint("%");
+        if (!readonly)
+            quotaThreshold.addChangedHandler(changedHandler);
+
         form.setItems(storageQuota, storageUsage, documentsQuota, documentsUsage, pagesQuota, pagesUsage, sessionsQuota,
-                sessionsUsage);
+                sessionsUsage, quotaThreshold);
         addMember(form);
     }
 
@@ -134,6 +141,12 @@ public class UserQuotaPanel extends HLayout {
                 user.setPagesQuota(Long.parseLong(form.getValueAsString(PAGESQUOTA)));
             else
                 user.setPagesQuota(null);
+
+            if (form.getValueAsString("alertthreshold") == null)
+                user.setQuotaThreshold(null);
+            else
+                user.setQuotaThreshold(Integer.parseInt(form.getValueAsString("alertthreshold")));
+
         }
         return !form.hasErrors();
     }

@@ -24,6 +24,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  */
 public class FolderQuotaPanel extends FolderDetailTab {
 
+    private static final String PAGESQUOTA = "pagesquota";
+
     private static final String STORAGEQUOTA = "storagequota";
 
     private static final String DOCUMENTSQUOTA = "documentsquota";
@@ -61,15 +63,23 @@ public class FolderQuotaPanel extends FolderDetailTab {
         form.setNumCols(2);
 
         SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, folder.getDocumentsQuota());
-        documentsQuota.setWidth(100);
+        documentsQuota.setWidth(120);
         documentsQuota.setMin(-1);
         documentsQuota.setStep(1000);
         documentsQuota.setDisabled(!update);
         if (update)
             documentsQuota.addChangedHandler(changedHandler);
 
+        SpinnerItem pagesQuota = ItemFactory.newSpinnerItem(PAGESQUOTA, folder.getPagesQuota());
+        pagesQuota.setWidth(120);
+        pagesQuota.setMin(-1);
+        pagesQuota.setStep(1000);
+        pagesQuota.setDisabled(!update);
+        if (update)
+            pagesQuota.addChangedHandler(changedHandler);
+
         SpinnerItem storageQuota = ItemFactory.newSpinnerItem(STORAGEQUOTA, folder.getDocumentsQuota());
-        storageQuota.setWidth(100);
+        storageQuota.setWidth(120);
         documentsQuota.setMin(-1);
         storageQuota.setHint("MB");
         storageQuota.setStep(100);
@@ -81,6 +91,8 @@ public class FolderQuotaPanel extends FolderDetailTab {
         storage.setWrap(false);
 
         StaticTextItem documents = ItemFactory.newStaticTextItem("documents", Util.formatLong(folder.getDocuments()));
+
+        StaticTextItem pages = ItemFactory.newStaticTextItem("pages", Util.formatLong(folder.getPages()));
 
         SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("alertthreshold", folder.getQuotaThreshold());
         quotaThreshold.setDisabled(!update);
@@ -102,7 +114,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
         quotaThreshold.setDisabled(!update);
         recipients.setDisabled(!update);
 
-        form.setItems(documentsQuota, documents, storageQuota, storage, quotaThreshold, recipients);
+        form.setItems(documentsQuota, documents, pagesQuota, pages, storageQuota, storage, quotaThreshold, recipients);
         addMember(form);
     }
 
@@ -115,11 +127,16 @@ public class FolderQuotaPanel extends FolderDetailTab {
         if (Boolean.TRUE.equals(vm.hasErrors()))
             return false;
 
-        if (values.get(DOCUMENTSQUOTA) == null)
+        if (values.get(PAGESQUOTA) == null)
+            folder.setPagesQuota(null);
+        else
+            folder.setPagesQuota(Long.parseLong(values.get(PAGESQUOTA).toString()));
+
+        if (values.get(PAGESQUOTA) == null)
             folder.setDocumentsQuota(null);
         else
             folder.setDocumentsQuota(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
-
+        
         if (values.get(STORAGEQUOTA) == null)
             folder.setStorageQuota(null);
         else
@@ -128,7 +145,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
         if (values.get("quotathreshold") == null)
             folder.setQuotaThreshold(null);
         else
-            folder.setQuotaThreshold(Integer.parseInt(values.get("quotathreshold").toString()));
+            folder.setQuotaThreshold(Integer.parseInt(values.get("alertthreshold").toString()));
 
         folder.clearQuotaAlertRecipients();
         String[] usernames = recipients.getValues();

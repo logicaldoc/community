@@ -649,6 +649,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
             folder.setTile(guiFolder.getTile());
             folder.setTemplateLocked(guiFolder.isTemplateLocked());
             folder.setDocumentsQuota(guiFolder.getDocumentsQuota());
+            folder.setPagesQuota(guiFolder.getPagesQuota());
             folder.setStorageQuota(guiFolder.getStorageQuota());
             folder.setQuotaThreshold(guiFolder.getQuotaThreshold());
             folder.setQuotaAlertRecipients(guiFolder.getQuotaAlertRecipientsAsString());
