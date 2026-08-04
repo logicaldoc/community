@@ -64,7 +64,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
     private Long pagesQuota = null;
     
-    private Integer versionsQuota = null;
+    private Long versionsQuota = null;
 
     private Long storageQuota = null;
 
@@ -351,11 +351,11 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
         this.store = store;
     }
 
-    public Integer getVersionsQuota() {
+    public Long getVersionsQuota() {
         return versionsQuota;
     }
 
-    public void setVersionsQuota(Integer versionsQuota) {
+    public void setVersionsQuota(Long versionsQuota) {
         this.versionsQuota = versionsQuota;
     }
 

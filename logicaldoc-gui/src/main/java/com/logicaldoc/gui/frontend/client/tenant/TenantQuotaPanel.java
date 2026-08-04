@@ -163,14 +163,14 @@ public class TenantQuotaPanel extends HLayout {
 
 		// Static items to display whole system quotas
 		StaticTextItem usersSystemQuota = ItemFactory.newStaticTextItem("sys" + USERSQUOTA, USERSQUOTA,
-				Util.formatInt(tenant.getUsersQuota()));
+				Util.formatLong(tenant.getUsersQuota()));
 		usersSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem guestsSystemQuota = ItemFactory.newStaticTextItem("sys" + GUESTSQUOTA, "readonlyusersquota",
-				Util.formatInt(tenant.getReadOnlyUsersQuota()));
+				Util.formatLong(tenant.getReadonlyUsersQuota()));
 		guestsSystemQuota.setVisible(tenant.isSystem());
 
 		StaticTextItem sessionsSystemQuota = ItemFactory.newStaticTextItem("sys" + SESSIONSQUOTA, SESSIONSQUOTA,
-				Util.formatInt(tenant.getSessionsQuota()));
+				Util.formatLong(tenant.getSessionsQuota()));
 		sessionsSystemQuota.setVisible(tenant.isSystem());
 		StaticTextItem documentsSystemQuota = ItemFactory.newStaticTextItem("sys" + DOCUMENTSQUOTA, DOCUMENTSQUOTA,
 				Util.formatLong(tenant.getDocumentsQuota()));
@@ -358,7 +358,7 @@ public class TenantQuotaPanel extends HLayout {
 	}
 
 	private SpinnerItem prepareGuestsQuotaItem() {
-		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota", tenant.getReadOnlyUsersQuota());
+		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota", tenant.getReadonlyUsersQuota());
 		guestsQuota.setDisabled(changedHandler == null);
 		guestsQuota.setRequired(false);
 		guestsQuota.setMin(-1);
@@ -476,19 +476,19 @@ public class TenantQuotaPanel extends HLayout {
 		if (values.get(SESSIONSQUOTA) == null)
 			tenant.setSessionsQuota(null);
 		else
-			tenant.setSessionsQuota(Integer.parseInt(values.get(SESSIONSQUOTA).toString()));
+			tenant.setSessionsQuota(Long.parseLong(values.get(SESSIONSQUOTA).toString()));
 	}
 
 	private void validateUsersQuota(Map<String, Object> values) {
 		if (values.get(USERSQUOTA) == null)
-			tenant.setUsersQuota(null);
+			tenant.setRegularUsersQuota(null);
 		else
-			tenant.setUsersQuota(Integer.parseInt(values.get(USERSQUOTA).toString()));
+			tenant.setRegularUsersQuota(Long.parseLong(values.get(USERSQUOTA).toString()));
 
 		if (values.get(GUESTSQUOTA) == null)
-			tenant.setReadOnlyUsersQuota(null);
+			tenant.setReadonlyUsersQuota(null);
 		else
-			tenant.setReadOnlyUsersQuota(Integer.parseInt(values.get(GUESTSQUOTA).toString()));
+			tenant.setReadonlyUsersQuota(Long.parseLong(values.get(GUESTSQUOTA).toString()));
 	}
 
 	private void validateApiCallsQuota(Map<String, Object> values) {

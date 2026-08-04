@@ -105,7 +105,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
     @Column(name = "ld_tenantid", nullable = false)
     private long tenantId;
 
-    @Column(name = "ld_status", nullable = false) @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_status", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private SessionStatus status = SessionStatus.OPEN;
 
     @Embedded
@@ -176,7 +177,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
         return diffMinutes >= timeout;
     }
 
-    protected void setExpired() {
+    protected void setExpired() throws PersistenceException {
         log.warn("Session {} expired", getSid());
         logWarn("Session expired");
 
@@ -187,7 +188,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
         UserHistoryDAO.get().createUserHistory(user, UserEvent.TIMEOUT, null, sid, client);
     }
 
-    public void setClosed() {
+    public void setClosed() throws PersistenceException {
         log.info("Session {} was closed", getSid());
         logInfo("Session closed");
 
@@ -352,12 +353,14 @@ public class Session extends PersistentObject implements Comparable<Session> {
                 historyComment = addr;
         }
 
-        // Add a user history entry
-        UserHistory history = UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN, historyComment, sid,
-                client);
-
-        // Update the last login into the DB
+        UserHistory history = null;
         try {
+            // Add a user history entry
+            history = UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN, historyComment, sid,
+                    client);
+
+            // Update the last login into the DB
+
             user.setLastLogin(history.getDate());
             userHistoryDAO.jdbcUpdate("update ld_user set ld_lastlogin = :lastLogin where ld_id = :userId",
                     Map.of("lastLogin", user.getLastLogin(), "userId", user.getId()));

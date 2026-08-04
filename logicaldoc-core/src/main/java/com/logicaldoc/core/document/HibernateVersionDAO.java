@@ -96,17 +96,17 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
         try {
             // Checks the context property 'document.maxversions'
             ContextProperties bean = new ContextProperties();
-            int maxVersions = bean.getInt("document.maxversions", -1);
+            long versionsQuota = bean.getLong("document.maxversions", -1L);
             Folder workspace = folderDAO.findWorkspace(version.getFolderId());
             if (workspace != null && workspace.getVersionsQuota() != null && workspace.getVersionsQuota() > 0)
-                maxVersions = workspace.getVersionsQuota();
+                versionsQuota = workspace.getVersionsQuota();
 
-            if (maxVersions > 0) {
+            if (versionsQuota > 0) {
                 List<Version> versions = findByDocId(version.getDocId());
 
-                if (versions.size() > maxVersions) {
+                if (versions.size() > versionsQuota) {
                     // Delete the oldest versions
-                    deleteOldestVersions(versions, maxVersions);
+                    deleteOldestVersions(versions, versionsQuota);
                 }
             }
         } catch (IOException e) {
@@ -114,7 +114,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
         }
     }
 
-    private void deleteOldestVersions(List<Version> versions, int maxVersions) {
+    private void deleteOldestVersions(List<Version> versions, long maxVersions) {
         if (versions.size() <= maxVersions)
             return;
 

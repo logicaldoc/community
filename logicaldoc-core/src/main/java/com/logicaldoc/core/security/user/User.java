@@ -174,6 +174,9 @@ public class User extends PersistentObject implements Serializable {
     @Column(name = "ld_documentsquota")
     private Long documentsQuota;
 
+    @Column(name = "ld_qthreshold")
+    private Integer quotaThreshold = null;
+
     @Column(name = "ld_welcomescreen")
     private Integer welcomeScreen = 1520;
 
@@ -992,6 +995,14 @@ public class User extends PersistentObject implements Serializable {
 
     public void setEnforceWorkingTime(boolean enforceWorkingTime) {
         this.enforceWorkingTime = enforceWorkingTime;
+    }
+
+    public Integer getQuotaThreshold() {
+        return quotaThreshold;
+    }
+
+    public void setQuotaThreshold(Integer quotaThreshold) {
+        this.quotaThreshold = quotaThreshold;
     }
 
     @Override

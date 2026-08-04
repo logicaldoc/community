@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.user;
 
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,23 +27,29 @@ public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> im
     }
 
     @Override
-    public List<UserHistory> findByUserId(long userId) {
-        return findByUserIdAndEvent(userId, null);
+    public List<UserHistory> findByUserId(long userId) throws PersistenceException {
+        return findByUserIdAndEvent(userId, null, null);
     }
 
     @Override
-    public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
-        try {
-            if (StringUtils.isEmpty(event))
-                return findByWhere("_entity.userId = %d".formatted(userId), "_entity.date desc", null);
-            else {
-                return findByWhere("_entity.userId = :userId and _entity.event = :event",
-                        Map.of("userId", userId, "event", event), "_entity.date desc", null);
-            }
-        } catch (PersistenceException e) {
-            log.error(e.getMessage(), e);
-            return new ArrayList<>();
+    public List<UserHistory> findByUserIdAndEvent(long userId, String event, Date oldestDate)
+            throws PersistenceException {
+        StringBuilder query = new StringBuilder("_entity.userId = :userId");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        if (StringUtils.isNotEmpty(event)) {
+            params.put("event", event);
+            query.append(" and _entity.event = :event ");
         }
+
+        if (oldestDate != null) {
+            params.put("oldestDate", oldestDate);
+            query.append(" and _entity.date >= :oldestDate");
+        }
+
+        return findByWhere(query.toString(), params, "order by _entity.date asc", null);
     }
 
     @Override
@@ -51,7 +58,7 @@ public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> im
             UserEvent eventType,
             String comment,
             String sessionId,
-            Client client) {
+            Client client) throws PersistenceException {
         UserHistory history = new UserHistory();
         history.setComment(comment);
         history.setEvent(eventType);
@@ -73,21 +80,12 @@ public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> im
                 history.setGeolocation(client.getGeolocation().toString());
         }
 
-        try {
-            store(history);
-            return history;
-        } catch (PersistenceException e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        store(history);
+        return history;
     }
 
     @Override
-    public void cleanOldHistories(int ttl) {
-        try {
-            log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_user_history"));
-        } catch (PersistenceException e) {
-            log.error(e.getMessage(), e);
-        }
+    public void cleanOldHistories(int ttl) throws PersistenceException {
+        log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_user_history"));
     }
 }

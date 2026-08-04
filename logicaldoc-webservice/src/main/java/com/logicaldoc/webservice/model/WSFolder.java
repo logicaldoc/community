@@ -87,7 +87,7 @@ public class WSFolder implements Serializable {
     private List<String> tags = new ArrayList<>();
 
     @WSDoc(required = false, description = "maximum number of versions maintaned in the workspace")
-    private Integer maxVersions;
+    private Long versionsQuota;
 
     @WSDoc(required = false, description = "optional color assigned to the folder")
     private String color;
@@ -100,7 +100,6 @@ public class WSFolder implements Serializable {
 
     @WSDoc(required = false, description = "filling policy: 0 = ALL, 1 = IMMEDIATE, 2 = DEFERRED")
     private Integer fillMode = 0;
-   
 
     public void addAttribute(WSAttribute att) {
         if (attributes == null)
@@ -137,7 +136,7 @@ public class WSFolder implements Serializable {
 
     public static WSFolder fromFolder(Folder folder, boolean withCollections) throws PersistenceException {
         folder = FolderDAO.get().initialize(folder);
-        
+
         WSFolder wsFolder = new WSFolder();
         wsFolder.setId(folder.getId());
         wsFolder.setFoldRef(folder.getFoldRef());
@@ -152,11 +151,11 @@ public class WSFolder implements Serializable {
         wsFolder.setTemplateLocked(folder.isTemplateLocked() ? 1 : 0);
         wsFolder.setHidden(folder.isHidden() ? 1 : 0);
         wsFolder.setStore(folder.getStore());
-        wsFolder.setMaxVersions(folder.getVersionsQuota());
+        wsFolder.setVersionsQuota(folder.getVersionsQuota());
         wsFolder.setSecurityRef(folder.getSecurityRef());
         wsFolder.setFillerId(folder.getFillerId());
         wsFolder.setFillMode(folder.getFillMode().ordinal());
-        
+
         wsFolder.setColor(folder.getColor());
         wsFolder.setTile(folder.getTile());
 
@@ -241,7 +240,7 @@ public class WSFolder implements Serializable {
     public void setFillMode(Integer fillMode) {
         this.fillMode = fillMode;
     }
-    
+
     public long getId() {
         return id;
     }
@@ -383,12 +382,12 @@ public class WSFolder implements Serializable {
         this.tags = tags;
     }
 
-    public Integer getMaxVersions() {
-        return maxVersions;
+    public Long getVersionsQuota() {
+        return versionsQuota;
     }
 
-    public void setMaxVersions(Integer maxVersions) {
-        this.maxVersions = maxVersions;
+    public void setVersionsQuota(Long versionsQuota) {
+        this.versionsQuota = versionsQuota;
     }
 
     public String getColor() {

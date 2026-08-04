@@ -85,7 +85,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 			// Retrieve the reason for the last login failure
 			List<UserHistory> failures = UserHistoryDAO.get().findByUserIdAndEvent(user.getId(),
-					UserEvent.LOGIN_FAILED.toString());
+					UserEvent.LOGIN_FAILED.toString(), null);
 			if (failures != null && !failures.isEmpty())
 				usr.setLastLoginFailureReason(failures.get(0).getComment());
 

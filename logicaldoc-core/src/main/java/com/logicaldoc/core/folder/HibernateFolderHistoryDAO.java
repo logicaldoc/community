@@ -91,11 +91,15 @@ public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory
     @Override
     public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate)
             throws PersistenceException {
-        StringBuilder query = new StringBuilder("_entity.folderId = :folderId and _entity.event = :event ");
+        StringBuilder query = new StringBuilder("_entity.folderId = :folderId");
 
         Map<String, Object> params = new HashMap<>();
         params.put("folderId", folderId);
-        params.put("event", event);
+  
+        if (StringUtils.isNotEmpty(event)) {
+            query.append(" and _entity.event = :event ");
+            params.put("event", event);
+        }
 
         if (oldestDate != null) {
             query.append(" and _entity.date >= :oldestDate");

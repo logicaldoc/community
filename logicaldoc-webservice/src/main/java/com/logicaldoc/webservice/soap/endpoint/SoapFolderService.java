@@ -77,7 +77,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
         folderVO.setHidden(wsFolder.getHidden() == 1);
         folderVO.setFoldRef(wsFolder.getFoldRef());
         folderVO.setStore(wsFolder.getStore());
-        folderVO.setVersionsQuota(wsFolder.getMaxVersions());
+        folderVO.setVersionsQuota(wsFolder.getVersionsQuota());
         folderVO.setSecurityRef(wsFolder.getSecurityRef());
         folderVO.setFoldRef(wsFolder.getFoldRef());
         folderVO.setFillerId(wsFolder.getFillerId());
@@ -490,7 +490,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
             if (wsFolder.getFillMode() != null)
                 folder.setFillMode(FillMode.values()[wsFolder.getFillMode()]);
             folder.setStore(wsFolder.getStore());
-            folder.setVersionsQuota(wsFolder.getMaxVersions());
+            folder.setVersionsQuota(wsFolder.getVersionsQuota());
             folder.setTagsFromWords(new HashSet<>(wsFolder.getTags()));
 
             wsFolder.updateAttributes(folder);

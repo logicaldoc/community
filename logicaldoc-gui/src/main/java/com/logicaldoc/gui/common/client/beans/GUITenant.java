@@ -46,11 +46,11 @@ public class GUITenant implements Serializable {
 
     private String adminUsername = "admin";
 
-    private Integer usersQuota;
+    private Long regularUsersQuota;
 
-    private Integer readOnlyUsersQuota;
+    private Long readonlyUsersQuota;
 
-    private Integer sessionsQuota;
+    private Long sessionsQuota;
 
     private Long documentsQuota;
 
@@ -227,19 +227,19 @@ public class GUITenant implements Serializable {
         this.adminUsername = adminUsername;
     }
 
-    public Integer getUsersQuota() {
-        return usersQuota;
+    public Long getUsersQuota() {
+        return regularUsersQuota;
     }
 
-    public void setUsersQuota(Integer usersQuota) {
-        this.usersQuota = usersQuota;
+    public void setRegularUsersQuota(Long regularUsersQuota) {
+        this.regularUsersQuota = regularUsersQuota;
     }
 
-    public Integer getSessionsQuota() {
+    public Long getSessionsQuota() {
         return sessionsQuota;
     }
 
-    public void setSessionsQuota(Integer sessionsQuota) {
+    public void setSessionsQuota(Long sessionsQuota) {
         this.sessionsQuota = sessionsQuota;
     }
 
@@ -435,12 +435,12 @@ public class GUITenant implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public Integer getReadOnlyUsersQuota() {
-        return readOnlyUsersQuota;
+    public Long getReadonlyUsersQuota() {
+        return readonlyUsersQuota;
     }
 
-    public void setReadOnlyUsersQuota(Integer readOnlyUsersQuota) {
-        this.readOnlyUsersQuota = readOnlyUsersQuota;
+    public void setReadonlyUsersQuota(Long readonlyUsersQuota) {
+        this.readonlyUsersQuota = readonlyUsersQuota;
     }
 
     public long getGuests() {

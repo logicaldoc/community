@@ -77,13 +77,13 @@ public class Tenant extends PersistentObject implements Serializable {
     private int type = DEFAULT_TYPE;
 
     @Column(name = "ld_usersquota")
-    private Integer usersQuota;
+    private Long regularUsersQuota;
 
     @Column(name = "ld_rousersquota")
-    private Integer readOnlyUsersQuota;
+    private Long readonlyUsersQuota;
 
     @Column(name = "ld_sessionsquota")
-    private Integer sessionsQuota;
+    private Long sessionsQuota;
 
     @Column(name = "ld_documentsquota")
     private Long documentsQuota;
@@ -145,8 +145,8 @@ public class Tenant extends PersistentObject implements Serializable {
         this.email = source.email;
         this.telephone = source.telephone;
         this.type = source.type;
-        this.usersQuota = source.usersQuota;
-        this.readOnlyUsersQuota = source.readOnlyUsersQuota;
+        this.regularUsersQuota = source.regularUsersQuota;
+        this.readonlyUsersQuota = source.readonlyUsersQuota;
         this.sessionsQuota = source.sessionsQuota;
         this.documentsQuota = source.documentsQuota;
         this.pagesQuota = source.pagesQuota;
@@ -261,19 +261,27 @@ public class Tenant extends PersistentObject implements Serializable {
         return displayName != null ? displayName : name;
     }
 
-    public Integer getUsersQuota() {
-        return usersQuota;
+    public Long getRegularUsersQuota() {
+        return regularUsersQuota;
     }
 
-    public void setUsersQuota(Integer usersQuota) {
-        this.usersQuota = usersQuota;
+    public void setRegularUsersQuota(Long regularUsersQuota) {
+        this.regularUsersQuota = regularUsersQuota;
     }
 
-    public Integer getSessionsQuota() {
+    public Long getReadonlyUsersQuota() {
+        return readonlyUsersQuota;
+    }
+
+    public void setReadonlyUsersQuota(Long readonlyUsersQuota) {
+        this.readonlyUsersQuota = readonlyUsersQuota;
+    }
+
+    public Long getSessionsQuota() {
         return sessionsQuota;
     }
 
-    public void setSessionsQuota(Integer sessionsQuota) {
+    public void setSessionsQuota(Long sessionsQuota) {
         this.sessionsQuota = sessionsQuota;
     }
 
@@ -421,13 +429,6 @@ public class Tenant extends PersistentObject implements Serializable {
         setQuotaAlertRecipients(str);
     }
 
-    public Integer getReadOnlyUsersQuota() {
-        return readOnlyUsersQuota;
-    }
-
-    public void setReadOnlyUsersQuota(Integer readOnlyUsersQuota) {
-        this.readOnlyUsersQuota = readOnlyUsersQuota;
-    }
 
     public Long getPagesQuota() {
         return pagesQuota;

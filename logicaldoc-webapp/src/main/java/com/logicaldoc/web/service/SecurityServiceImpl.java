@@ -182,8 +182,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         guiTenant.setStorageQuota(tenant.getStorageQuota());
         guiTenant.setSessionsQuota(tenant.getSessionsQuota());
         guiTenant.setApiCallsQuota(tenant.getApiCallsQuota());
-        guiTenant.setUsersQuota(tenant.getUsersQuota());
-        guiTenant.setReadOnlyUsersQuota(tenant.getReadOnlyUsersQuota());
+        guiTenant.setRegularUsersQuota(tenant.getRegularUsersQuota());
+        guiTenant.setReadonlyUsersQuota(tenant.getReadonlyUsersQuota());
         guiTenant.setTicketsQuota(tenant.getTicketsQuota());
         guiTenant.setWorkflowsQuota(tenant.getWorkflowsQuota());
         guiTenant.setFormsQuota(tenant.getFormsQuota());

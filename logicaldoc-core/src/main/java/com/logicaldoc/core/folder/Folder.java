@@ -114,8 +114,8 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     private Long pagesQuota = null;
 
     @Column(name = "ld_versionsquota")
-    private Integer versionsQuota;
-    
+    private Long versionsQuota;
+
     @Column(name = "ld_storagequota")
     private Long storageQuota = null;
 
@@ -124,7 +124,6 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
 
     @Column(name = "ld_qrecipients", length = 1000)
     private String quotaAlertRecipients = null;
-
 
     @Column(name = "ld_color", length = 255)
     private String color;
@@ -429,11 +428,11 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
         }
     }
 
-    public Integer getVersionsQuota() {
+    public Long getVersionsQuota() {
         return versionsQuota;
     }
 
-    public void setVersionsQuota(Integer versionsQuota) {
+    public void setVersionsQuota(Long versionsQuota) {
         this.versionsQuota = versionsQuota;
     }
 

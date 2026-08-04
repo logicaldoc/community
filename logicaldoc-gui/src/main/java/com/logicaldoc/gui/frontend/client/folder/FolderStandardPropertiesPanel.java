@@ -425,7 +425,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
         if (folder.isWorkspace())
             try {
-                folder.setVersionsQuota(Integer.parseInt(vm.getValueAsString("versionsquota")));
+                folder.setVersionsQuota(Long.parseLong(vm.getValueAsString("versionsquota")));
                 if (folder.getVersionsQuota() != null && folder.getVersionsQuota() < 1)
                     folder.setVersionsQuota(null);
             } catch (Exception t) {

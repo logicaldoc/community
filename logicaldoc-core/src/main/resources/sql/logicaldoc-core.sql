@@ -121,7 +121,7 @@ create table ld_user (ld_id bigint not null, ld_lastmodified timestamp not null,
                       ld_dateformat varchar(255), ld_dateformatshort varchar(255), ld_dateformatlong varchar(255),
                       ld_searchpref varchar(255), ld_timezone varchar(255), ld_company varchar(255), ld_sessionsquota bigint, 
                       ld_department varchar(255), ld_organizationalunit varchar(255), ld_building varchar(255), 
-                      ld_pagesquota bigint, ld_documentsquota bigint, primary key (ld_id));
+                      ld_pagesquota bigint, ld_documentsquota bigint, ld_qthreshold int, primary key (ld_id));
 create table ld_workingtime (ld_userid bigint not null, ld_dayofweek int not null, ld_hourstart int not null, ld_minutestart int not null, 
                              ld_hourend int not null, ld_minuteend int not null, ld_label varchar(255), ld_description varchar(1000), 
                              primary key(ld_userid, ld_dayofweek, ld_hourstart, ld_minutestart));
@@ -163,7 +163,7 @@ create table ld_folder (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_type int not null, ld_creation timestamp, ld_creator varchar(255), ld_creatorid bigint, 
                         ld_templateid bigint, ld_templocked int not null, ld_deleteuserid bigint, ld_deleteuser varchar(255), ld_position int not null,
                         ld_documentsquota bigint, ld_storagequota bigint, ld_hidden int not null, ld_foldref bigint, 
-                        ld_level int, ld_versionsquota int, ld_color varchar(255), ld_tgs varchar(1000),
+                        ld_level int, ld_versionsquota bigint, ld_color varchar(255), ld_tgs varchar(1000),
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_path varchar(255), ld_grid varchar(4000), 
                         ld_tile varchar(10000), ld_fillerid bigint, ld_fillmode int default 0 not null, ld_pagesquota bigint,
                         primary key (ld_id));
@@ -217,9 +217,9 @@ create table ld_tenant (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_street varchar(255), ld_postalcode varchar(255),
                         ld_city varchar(255), ld_country varchar(255), ld_state varchar(255),
                         ld_email varchar(255), ld_telephone varchar(255), ld_formsquota bigint,
-                        ld_usersquota int, ld_sessionsquota int, ld_documentsquota bigint, ld_workflowsquota bigint, 
+                        ld_usersquota bigint, ld_sessionsquota bigint, ld_documentsquota bigint, ld_workflowsquota bigint, 
                         ld_storagequota bigint, ld_type int not null, ld_creation timestamp, 
-                        ld_qthreshold int, ld_qrecipients varchar(1000), ld_rousersquota int, ld_reportsquota bigint, 
+                        ld_qthreshold int, ld_qrecipients varchar(1000), ld_rousersquota bigint, ld_reportsquota bigint, 
                         ld_apicallsquota bigint, ld_ticketsquota bigint, ld_stampsquota bigint, ld_importfoldersquota bigint,
                         ld_emailaccountsquota bigint, ld_pagesquota bigint, primary key (ld_id));    
 create table ld_sequence (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,

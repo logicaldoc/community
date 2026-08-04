@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -26,94 +28,97 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 
-	// Instance under test
-	private UserHistoryDAO testSubject;
+    // Instance under test
+    private UserHistoryDAO testSubject;
 
-	@Before
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Before
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		testSubject = UserHistoryDAO.get();
-	}
+        testSubject = UserHistoryDAO.get();
+    }
 
-	@Test
-	public void testDelete() throws PersistenceException {
-		Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(1);
-		assertNotNull(histories);
-		assertEquals(2, histories.size());
+    @Test
+    public void testDelete() throws PersistenceException {
+        Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(1);
+        assertNotNull(histories);
+        assertEquals(2, histories.size());
 
-		for (UserHistory history : histories)
-			testSubject.delete(history.getId());
+        for (UserHistory history : histories)
+            testSubject.delete(history.getId());
 
-		histories = (Collection<UserHistory>) testSubject.findByUserId(4);
-		assertNotNull(histories);
-		assertEquals(0, histories.size());
-	}
+        histories = (Collection<UserHistory>) testSubject.findByUserId(4);
+        assertNotNull(histories);
+        assertEquals(0, histories.size());
+    }
 
-	@Test
-	public void testFindByUserIdAndType() {
-		List<UserHistory> histories = testSubject.findByUserId(1);
-		assertNotNull(histories);
-		assertEquals(2, histories.size());
+    @Test
+    public void testFindByUserIdAndType() throws PersistenceException {
+        List<UserHistory> histories = testSubject.findByUserId(1);
+        assertNotNull(histories);
+        assertEquals(2, histories.size());
 
-		histories = testSubject.findByUserIdAndEvent(1L, "data test 02");
-		assertNotNull(histories);
-		assertEquals(1, histories.size());
-		assertEquals("data test 02", histories.get(0).getEvent());
+        histories = testSubject.findByUserIdAndEvent(1L, "data test 02", null);
+        assertNotNull(histories);
+        assertEquals(1, histories.size());
+        assertEquals("data test 02", histories.get(0).getEvent());
 
-		// Try with unexisting user
-		histories = testSubject.findByUserId(99);
-		assertNotNull(histories);
-		assertEquals(0, histories.size());
-	}
+        histories = testSubject.findByUserIdAndEvent(1L, "data test 02", new Date());
+        assertTrue(histories.isEmpty());
 
-	@Test
-	public void testStore() throws PersistenceException {
-		UserHistory userHistory = new UserHistory();
-		userHistory.setDate(DateBean.dateFromCompactString("20061220"));
-		userHistory.setUsername("sebastian");
-		userHistory.setUserId(3L);
-		userHistory.setEvent(UserEvent.CREATED);
+        // Try with unexisting user
+        histories = testSubject.findByUserId(99);
+        assertNotNull(histories);
+        assertEquals(0, histories.size());
+    }
 
-		testSubject.store(userHistory);
-		assertNotNull(userHistory);
+    @Test
+    public void testStore() throws PersistenceException {
+        UserHistory userHistory = new UserHistory();
+        userHistory.setDate(DateBean.dateFromCompactString("20061220"));
+        userHistory.setUsername("sebastian");
+        userHistory.setUserId(3L);
+        userHistory.setEvent(UserEvent.CREATED);
 
-		UserHistory newUserHistory = new UserHistory();
-		newUserHistory.setDate(DateBean.dateFromCompactString("20061220"));
-		newUserHistory.setUsername("sebastian");
-		newUserHistory.setUserId(3L);
-		newUserHistory.setEvent(UserEvent.CREATED);
+        testSubject.store(userHistory);
+        assertNotNull(userHistory);
 
-		testSubject.store(newUserHistory);
-		assertNotNull(newUserHistory);
+        UserHistory newUserHistory = new UserHistory();
+        newUserHistory.setDate(DateBean.dateFromCompactString("20061220"));
+        newUserHistory.setUsername("sebastian");
+        newUserHistory.setUserId(3L);
+        newUserHistory.setEvent(UserEvent.CREATED);
 
-		// Test the stored history
-		Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(3L);
-		assertNotNull(histories);
-		assertFalse(histories.isEmpty());
+        testSubject.store(newUserHistory);
+        assertNotNull(newUserHistory);
 
-		UserHistory hStored = null;
-		for (UserHistory userHistory2 : histories) {
-			if (userHistory2.getId() == newUserHistory.getId()) {
-				hStored = userHistory2;
-				break;
-			}
-		}
+        // Test the stored history
+        Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(3L);
+        assertNotNull(histories);
+        assertFalse(histories.isEmpty());
 
-		assertEquals(hStored, newUserHistory);
-		assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
-		assertEquals("sebastian", hStored.getUsername());
-		assertEquals(UserEvent.CREATED, hStored.getEventEnum());
-	}
+        UserHistory hStored = null;
+        for (UserHistory userHistory2 : histories) {
+            if (userHistory2.getId() == newUserHistory.getId()) {
+                hStored = userHistory2;
+                break;
+            }
+        }
 
-	@Test
-	public void testCleanOldHistories() throws PersistenceException {
-		testSubject.cleanOldHistories(5);
+        assertEquals(hStored, newUserHistory);
+        assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
+        assertEquals("sebastian", hStored.getUsername());
+        assertEquals(UserEvent.CREATED, hStored.getEventEnum());
+    }
 
-		UserHistory history = testSubject.findById(1);
-		assertNull(history);
-		List<UserHistory> histories = testSubject.findAll();
-		assertEquals(0, histories.size());
-	}
+    @Test
+    public void testCleanOldHistories() throws PersistenceException {
+        testSubject.cleanOldHistories(5);
+
+        UserHistory history = testSubject.findById(1);
+        assertNull(history);
+        List<UserHistory> histories = testSubject.findAll();
+        assertEquals(0, histories.size());
+    }
 }

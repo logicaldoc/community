@@ -269,7 +269,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
     public void kill(String sid) {
         Session session = get(sid);
         if (session != null) {
-            session.setClosed();
+            try {
+                session.setClosed();
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage(), e);
+            }
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (log.isWarnEnabled())
                 log.warn("Killed session {} of user {} started at {}", sid, session.getUsername(),
@@ -314,7 +318,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
         if (isOpen(sid)) {
             Session session = get(sid);
             if (session.isTimedOut()) {
-                session.setExpired();
+                try {
+                    session.setExpired();
+                } catch (PersistenceException e) {
+                    log.warn(e.getMessage(), e);
+                }
             } else {
                 session.setLastRenew(new Date());
             }
@@ -326,7 +334,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
         if (session == null)
             return null;
         if (session.getStatus().equals(SessionStatus.OPEN) && session.isTimedOut()) {
-            session.setExpired();
+            try {
+                session.setExpired();
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage(), e);
+            }
             saveSession(session);
         }
         return session.getStatus();
@@ -459,12 +471,17 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
     /**
      * Gets the Session ID specification from the current request following this
-     * lookup strategy: <ol> <li>Request parameter <code>PARAM_SID</code></li>
-     * <li>Request header <code>PARAM_SID</code></li> <li>Request attribute
-     * <code>PARAM_SID</code></li> <li>Session attribute
-     * <code>PARAM_SID</code></li> <li>Cookie <code>COOKIE_SID</code></li>
-     * <li>Header <code>X-API-KEY</code></li> <li>Client ID</li> <li>Spring
-     * SecurityContextHolder</li> </ol>
+     * lookup strategy:
+     * <ol>
+     * <li>Request parameter <code>PARAM_SID</code></li>
+     * <li>Request header <code>PARAM_SID</code></li>
+     * <li>Request attribute <code>PARAM_SID</code></li>
+     * <li>Session attribute <code>PARAM_SID</code></li>
+     * <li>Cookie <code>COOKIE_SID</code></li>
+     * <li>Header <code>X-API-KEY</code></li>
+     * <li>Client ID</li>
+     * <li>Spring SecurityContextHolder</li>
+     * </ol>
      * 
      * @param request The current request to inspect
      * 
@@ -728,7 +745,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
                 for (Session session : SessionManager.this.getSessions()) {
                     if (session.isOpen() && session.isTimedOut()) {
-                        session.setExpired();
+                        try {
+                            session.setExpired();
+                        } catch (PersistenceException e) {
+                            log.warn(e.getMessage(), e);
+                         }
                         saveSession(session);
                     }
                 }
