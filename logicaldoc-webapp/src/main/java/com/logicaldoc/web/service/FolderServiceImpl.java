@@ -177,14 +177,14 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         guiFolder.setDocumentsQuota(folder.getDocumentsQuota());
         guiFolder.setPagesQuota(folder.getPagesQuota());
         guiFolder.setStorageQuota(folder.getStorageQuota());
+        guiFolder.setQuotaThreshold(folder.getQuotaThreshold());
+        guiFolder.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList());
         guiFolder.setFoldRef(folder.getFoldRef());
         guiFolder.setStore(folder.getStore());
         guiFolder.setVersionsQuota(folder.getVersionsQuota());
         guiFolder.setColor(folder.getColor());
         guiFolder.setTile(folder.getTile());
         guiFolder.setGrid(folder.getGrid());
-        guiFolder.setQuotaThreshold(folder.getQuotaThreshold());
-        guiFolder.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList());
         guiFolder.setFillerId(folder.getFillerId());
         guiFolder.setFillMode(folder.getFillMode().ordinal());
 

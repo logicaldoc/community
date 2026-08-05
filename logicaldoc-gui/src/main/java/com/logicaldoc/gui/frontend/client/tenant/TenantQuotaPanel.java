@@ -24,35 +24,37 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TenantQuotaPanel extends HLayout {
 
-    private static final String PAGESQUOTA = "pagesquota";
+    private static final String USAGE = "usage";
 
-    private static final String MONTHLYAPICALLSQUOTA = "monthlyapicallsquota";
+    private static final String PAGES_QUOTA = "pagesquota";
+
+    private static final String MONTHLYAPICALLS_QUOTA = "monthlyapicallsquota";
 
     private static final String QUOTA_THRESHOLD = "quotaThreshold";
 
-    private static final String SIZEQUOTA = "sizequota";
+    private static final String STORAGE_QUOTA = "storagequota";
 
-    private static final String DOCUMENTSQUOTA = "documentsquota";
+    private static final String DOCUMENTS_QUOTA = "documentsquota";
 
-    private static final String SESSIONSQUOTA = "sessionsquota";
+    private static final String SESSIONS_QUOTA = "sessionsquota";
 
-    private static final String GUESTSQUOTA = "guestsquota";
+    private static final String READONLY_USERS_QUOTA = "readonlyusersquota";
 
-    private static final String USERSQUOTA = "usersquota";
+    private static final String REGULAR_USERS_QUOTA = "regularusersquota";
 
-    private static final String TICKETSQUOTA = "ticketsquota";
+    private static final String TICKETS_QUOTA = "ticketsquota";
 
-    private static final String WORKFLOWSQUOTA = "workflowsquota";
+    private static final String WORKFLOWS_QUOTA = "workflowsquota";
 
-    private static final String FORMSQUOTA = "formsquota";
+    private static final String FORMS_QUOTA = "formsquota";
 
-    private static final String REPORTSQUOTA = "reportsquota";
+    private static final String REPORTS_QUOTA = "reportsquota";
 
-    private static final String STAMPSQUOTA = "stampsquota";
+    private static final String STAMPS_QUOTA = "stampsquota";
 
-    private static final String IMPORTFOLDERSQUOTA = "importfoldersquota";
+    private static final String IMPORTFOLDERS_QUOTA = "importfoldersquota";
 
-    private static final String EMAILACCOUNTSQUOTA = "emailaccountsquota";
+    private static final String EMAILACCOUNTS_QUOTA = "emailaccountsquota";
 
     private DynamicForm form = new DynamicForm();
 
@@ -146,84 +148,87 @@ public class TenantQuotaPanel extends HLayout {
         if (changedHandler != null)
             recipients.addChangedHandler(changedHandler);
 
-        StaticTextItem size = ItemFactory.newStaticTextItem("ssize", "size", Util.formatSizeW7(tenant.getSize()));
-        size.setWrap(false);
-        StaticTextItem documents = ItemFactory.newStaticTextItem("documents", Util.formatLong(tenant.getDocuments()));
-        StaticTextItem pages = ItemFactory.newStaticTextItem("pages", Util.formatLong(tenant.getPages()));
-        StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", Util.formatLong(tenant.getSessions()));
-        StaticTextItem apicalls = ItemFactory.newStaticTextItem("monthlyapicalls",
+        StaticTextItem storage = ItemFactory.newStaticTextItem("storage", USAGE, Util.formatSizeW7(tenant.getStorage()));
+        storage.setWrap(false);
+        StaticTextItem documents = ItemFactory.newStaticTextItem("documents", USAGE,
+                Util.formatLong(tenant.getDocuments()));
+        StaticTextItem pages = ItemFactory.newStaticTextItem("pages", USAGE, Util.formatLong(tenant.getPages()));
+        StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", USAGE,
+                Util.formatLong(tenant.getSessions()));
+        StaticTextItem apicalls = ItemFactory.newStaticTextItem("monthlyapicalls", USAGE,
                 Util.formatLong(tenant.getApiCalls()));
-        StaticTextItem regularUsers = ItemFactory.newStaticTextItem("users", Util.formatLong(tenant.getUsers()));
-        StaticTextItem readonlyUsers = ItemFactory.newStaticTextItem("guests", "readonlyusers",
-                Util.formatLong(tenant.getGuests()));
-        StaticTextItem tickets = ItemFactory.newStaticTextItem("tickets", Util.formatLong(tenant.getTickets()));
-        StaticTextItem workflows = ItemFactory.newStaticTextItem("workflows", Util.formatLong(tenant.getWorkflows()));
-        StaticTextItem forms = ItemFactory.newStaticTextItem("forms", Util.formatLong(tenant.getForms()));
-        StaticTextItem reports = ItemFactory.newStaticTextItem("reports", Util.formatLong(tenant.getReports()));
-        StaticTextItem stamps = ItemFactory.newStaticTextItem("stamps", Util.formatLong(tenant.getStamps()));
-        StaticTextItem importFolders = ItemFactory.newStaticTextItem("importfolders",
+        StaticTextItem regularUsers = ItemFactory.newStaticTextItem("regularusers", USAGE,
+                Util.formatLong(tenant.getRegularUsers()));
+        StaticTextItem readonlyUsers = ItemFactory.newStaticTextItem("readonlyusers", USAGE,
+                Util.formatLong(tenant.getReadonlyUsers()));
+        StaticTextItem tickets = ItemFactory.newStaticTextItem("tickets", USAGE, Util.formatLong(tenant.getTickets()));
+        StaticTextItem workflows = ItemFactory.newStaticTextItem("workflows", USAGE,
+                Util.formatLong(tenant.getWorkflows()));
+        StaticTextItem forms = ItemFactory.newStaticTextItem("forms", USAGE, Util.formatLong(tenant.getForms()));
+        StaticTextItem reports = ItemFactory.newStaticTextItem("reports", USAGE, Util.formatLong(tenant.getReports()));
+        StaticTextItem stamps = ItemFactory.newStaticTextItem("stamps", USAGE, Util.formatLong(tenant.getStamps()));
+        StaticTextItem importFolders = ItemFactory.newStaticTextItem("importfolders", USAGE,
                 Util.formatLong(tenant.getImportFolders()));
-        StaticTextItem emailAccounts = ItemFactory.newStaticTextItem("emailaccounts",
+        StaticTextItem emailAccounts = ItemFactory.newStaticTextItem("emailaccounts", USAGE,
                 Util.formatLong(tenant.getEmailAccounts()));
 
         // Static items to display whole system quotas
-        StaticTextItem regularUsersSystemQuota = ItemFactory.newStaticTextItem("sys" + USERSQUOTA, USERSQUOTA,
-                Util.formatLong(tenant.getUsersQuota()));
+        StaticTextItem regularUsersSystemQuota = ItemFactory.newStaticTextItem("sys" + REGULAR_USERS_QUOTA,
+                REGULAR_USERS_QUOTA, Util.formatLong(tenant.getUsersQuota()));
         regularUsersSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem readonlyUsersSystemQuota = ItemFactory.newStaticTextItem("sys" + GUESTSQUOTA, "readonlyusersquota",
-                Util.formatLong(tenant.getReadonlyUsersQuota()));
+        StaticTextItem readonlyUsersSystemQuota = ItemFactory.newStaticTextItem("sys" + READONLY_USERS_QUOTA,
+                "readonlyusersquota", Util.formatLong(tenant.getReadonlyUsersQuota()));
         readonlyUsersSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem sessionsSystemQuota = ItemFactory.newStaticTextItem("sys" + SESSIONSQUOTA, SESSIONSQUOTA,
+        StaticTextItem sessionsSystemQuota = ItemFactory.newStaticTextItem("sys" + SESSIONS_QUOTA, SESSIONS_QUOTA,
                 Util.formatLong(tenant.getSessionsQuota()));
         sessionsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem documentsSystemQuota = ItemFactory.newStaticTextItem("sys" + DOCUMENTSQUOTA, DOCUMENTSQUOTA,
+        StaticTextItem documentsSystemQuota = ItemFactory.newStaticTextItem("sys" + DOCUMENTS_QUOTA, DOCUMENTS_QUOTA,
                 Util.formatLong(tenant.getDocumentsQuota()));
         documentsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem pagesSystemQuota = ItemFactory.newStaticTextItem("sys" + PAGESQUOTA, PAGESQUOTA,
+        StaticTextItem pagesSystemQuota = ItemFactory.newStaticTextItem("sys" + PAGES_QUOTA, PAGES_QUOTA,
                 Util.formatLong(tenant.getPagesQuota()));
         pagesSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem sizeSystemQuota = ItemFactory.newStaticTextItem("sys" + SIZEQUOTA, SIZEQUOTA,
+        StaticTextItem sizeSystemQuota = ItemFactory.newStaticTextItem("sys" + STORAGE_QUOTA, STORAGE_QUOTA,
                 Util.formatSizeW7((double) tenant.getStorageQuota() * 1024D * 1024D));
         sizeSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem monthlyApiCallsSystemQuota = ItemFactory.newStaticTextItem("sys" + MONTHLYAPICALLSQUOTA,
-                MONTHLYAPICALLSQUOTA, Util.formatLong(tenant.getApiCallsQuota()));
+        StaticTextItem monthlyApiCallsSystemQuota = ItemFactory.newStaticTextItem("sys" + MONTHLYAPICALLS_QUOTA,
+                MONTHLYAPICALLS_QUOTA, Util.formatLong(tenant.getApiCallsQuota()));
         monthlyApiCallsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem ticketsSystemQuota = ItemFactory.newStaticTextItem("sys" + TICKETSQUOTA, TICKETSQUOTA,
+        StaticTextItem ticketsSystemQuota = ItemFactory.newStaticTextItem("sys" + TICKETS_QUOTA, TICKETS_QUOTA,
                 Util.formatLong(tenant.getTicketsQuota()));
         ticketsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem workflowsSystemQuota = ItemFactory.newStaticTextItem("sys" + WORKFLOWSQUOTA, WORKFLOWSQUOTA,
+        StaticTextItem workflowsSystemQuota = ItemFactory.newStaticTextItem("sys" + WORKFLOWS_QUOTA, WORKFLOWS_QUOTA,
                 Util.formatLong(tenant.getWorkflowsQuota()));
         workflowsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem formsSystemQuota = ItemFactory.newStaticTextItem("sys" + FORMSQUOTA, FORMSQUOTA,
+        StaticTextItem formsSystemQuota = ItemFactory.newStaticTextItem("sys" + FORMS_QUOTA, FORMS_QUOTA,
                 Util.formatLong(tenant.getFormsQuota()));
         formsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem reportsSystemQuota = ItemFactory.newStaticTextItem("sys" + REPORTSQUOTA, REPORTSQUOTA,
+        StaticTextItem reportsSystemQuota = ItemFactory.newStaticTextItem("sys" + REPORTS_QUOTA, REPORTS_QUOTA,
                 Util.formatLong(tenant.getReportsQuota()));
         reportsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem stampsSystemQuota = ItemFactory.newStaticTextItem("sys" + STAMPSQUOTA, STAMPSQUOTA,
+        StaticTextItem stampsSystemQuota = ItemFactory.newStaticTextItem("sys" + STAMPS_QUOTA, STAMPS_QUOTA,
                 Util.formatLong(tenant.getStampsQuota()));
         stampsSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem importFoldersSystemQuota = ItemFactory.newStaticTextItem("sys" + IMPORTFOLDERSQUOTA,
-                IMPORTFOLDERSQUOTA, Util.formatLong(tenant.getImportFoldersQuota()));
+        StaticTextItem importFoldersSystemQuota = ItemFactory.newStaticTextItem("sys" + IMPORTFOLDERS_QUOTA,
+                IMPORTFOLDERS_QUOTA, Util.formatLong(tenant.getImportFoldersQuota()));
         importFoldersSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem emailAccountsSystemQuota = ItemFactory.newStaticTextItem("sys" + EMAILACCOUNTSQUOTA,
-                EMAILACCOUNTSQUOTA, Util.formatLong(tenant.getMaxEmailAccounts()));
+        StaticTextItem emailAccountsSystemQuota = ItemFactory.newStaticTextItem("sys" + EMAILACCOUNTS_QUOTA,
+                EMAILACCOUNTS_QUOTA, Util.formatLong(tenant.getMaxEmailAccounts()));
         emailAccountsSystemQuota.setVisible(tenant.isSystem());
 
         form.setItems(regularUsersQuota, regularUsersSystemQuota, regularUsers, readonlyUsersQuota,
-                readonlyUsersSystemQuota,
-                readonlyUsers, sessionsQuota,
-                sessionsSystemQuota, sessions, documentsQuota, documentsSystemQuota, documents, pagesQuota, pagesSystemQuota, pages, sizeQuota,
-                sizeSystemQuota, size, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls, ticketsQuota,
-                ticketsSystemQuota, tickets, workflowsQuota, workflowsSystemQuota, workflows, formsSystemQuota,
-                formsQuota, forms, reportsSystemQuota, reportsQuota, reports, stampsSystemQuota, stampsQuota, stamps,
+                readonlyUsersSystemQuota, readonlyUsers, sessionsQuota, sessionsSystemQuota, sessions, documentsQuota,
+                documentsSystemQuota, documents, pagesQuota, pagesSystemQuota, pages, sizeQuota, sizeSystemQuota, storage,
+                monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls, ticketsQuota, ticketsSystemQuota, tickets,
+                workflowsQuota, workflowsSystemQuota, workflows, formsSystemQuota, formsQuota, forms,
+                reportsSystemQuota, reportsQuota, reports, stampsSystemQuota, stampsQuota, stamps,
                 importFoldersSystemQuota, importFoldersQuota, importFolders, emailAccountsSystemQuota,
                 emailAccountsQuota, emailAccounts, quotaThreshold, recipients);
         addMember(layout);
     }
 
     private SpinnerItem prepareEmailAccountsQuotaItem() {
-        SpinnerItem emailAccountsQuota = ItemFactory.newSpinnerItem(EMAILACCOUNTSQUOTA, tenant.getMaxEmailAccounts());
+        SpinnerItem emailAccountsQuota = ItemFactory.newSpinnerItem(EMAILACCOUNTS_QUOTA, tenant.getMaxEmailAccounts());
         emailAccountsQuota.setDisabled(changedHandler == null);
         emailAccountsQuota.setRequired(false);
         emailAccountsQuota.setMin(-1);
@@ -236,7 +241,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareImportFoldersQuotaItem() {
-        SpinnerItem importFoldersQuota = ItemFactory.newSpinnerItem(IMPORTFOLDERSQUOTA, tenant.getImportFoldersQuota());
+        SpinnerItem importFoldersQuota = ItemFactory.newSpinnerItem(IMPORTFOLDERS_QUOTA, tenant.getImportFoldersQuota());
         importFoldersQuota.setDisabled(changedHandler == null);
         importFoldersQuota.setRequired(false);
         importFoldersQuota.setMin(-1);
@@ -249,7 +254,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareStampsQuotaItem() {
-        SpinnerItem stampsQuota = ItemFactory.newSpinnerItem(STAMPSQUOTA, tenant.getStampsQuota());
+        SpinnerItem stampsQuota = ItemFactory.newSpinnerItem(STAMPS_QUOTA, tenant.getStampsQuota());
         stampsQuota.setDisabled(changedHandler == null);
         stampsQuota.setRequired(false);
         stampsQuota.setMin(-1);
@@ -262,7 +267,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareReportsQuotaItem() {
-        SpinnerItem reportsQuota = ItemFactory.newSpinnerItem(REPORTSQUOTA, tenant.getReportsQuota());
+        SpinnerItem reportsQuota = ItemFactory.newSpinnerItem(REPORTS_QUOTA, tenant.getReportsQuota());
         reportsQuota.setDisabled(changedHandler == null);
         reportsQuota.setRequired(false);
         reportsQuota.setMin(-1);
@@ -275,7 +280,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareFormsQuotaItem() {
-        SpinnerItem formsQuota = ItemFactory.newSpinnerItem(FORMSQUOTA, tenant.getFormsQuota());
+        SpinnerItem formsQuota = ItemFactory.newSpinnerItem(FORMS_QUOTA, tenant.getFormsQuota());
         formsQuota.setDisabled(changedHandler == null);
         formsQuota.setRequired(false);
         formsQuota.setMin(-1);
@@ -288,7 +293,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareWorkflowQuotaItem() {
-        SpinnerItem workflowsQuota = ItemFactory.newSpinnerItem(WORKFLOWSQUOTA, tenant.getWorkflowsQuota());
+        SpinnerItem workflowsQuota = ItemFactory.newSpinnerItem(WORKFLOWS_QUOTA, tenant.getWorkflowsQuota());
         workflowsQuota.setDisabled(changedHandler == null);
         workflowsQuota.setRequired(false);
         workflowsQuota.setMin(-1);
@@ -301,7 +306,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareTicketsQuoteItem() {
-        SpinnerItem ticketsQuota = ItemFactory.newSpinnerItem(TICKETSQUOTA, tenant.getTicketsQuota());
+        SpinnerItem ticketsQuota = ItemFactory.newSpinnerItem(TICKETS_QUOTA, tenant.getTicketsQuota());
         ticketsQuota.setDisabled(changedHandler == null);
         ticketsQuota.setRequired(false);
         ticketsQuota.setMin(-1);
@@ -314,7 +319,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareSizeQuotaItem() {
-        SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(SIZEQUOTA, tenant.getStorageQuota());
+        SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(STORAGE_QUOTA, tenant.getStorageQuota());
         sizeQuota.setHint("MB");
         sizeQuota.setDisabled(changedHandler == null);
         sizeQuota.setRequired(false);
@@ -328,7 +333,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareDocumentsQuotaItem() {
-        SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, tenant.getDocumentsQuota());
+        SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTS_QUOTA, tenant.getDocumentsQuota());
         documentsQuota.setDisabled(changedHandler == null);
         documentsQuota.setRequired(false);
         documentsQuota.setMin(-1);
@@ -341,7 +346,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem preparePagesQuotaItem() {
-        SpinnerItem pagesQuota = ItemFactory.newSpinnerItem(PAGESQUOTA, tenant.getPagesQuota());
+        SpinnerItem pagesQuota = ItemFactory.newSpinnerItem(PAGES_QUOTA, tenant.getPagesQuota());
         pagesQuota.setDisabled(changedHandler == null);
         pagesQuota.setRequired(false);
         pagesQuota.setWidth(120);
@@ -354,7 +359,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareMonthlyApiCallsQuotaItem() {
-        SpinnerItem monthlyApiCallsQuota = ItemFactory.newSpinnerItem(MONTHLYAPICALLSQUOTA, tenant.getApiCallsQuota());
+        SpinnerItem monthlyApiCallsQuota = ItemFactory.newSpinnerItem(MONTHLYAPICALLS_QUOTA, tenant.getApiCallsQuota());
         monthlyApiCallsQuota.setDisabled(changedHandler == null);
         monthlyApiCallsQuota.setRequired(false);
         monthlyApiCallsQuota.setMin(-1);
@@ -367,7 +372,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareSessionsQuotaItem() {
-        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, tenant.getSessionsQuota());
+        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONS_QUOTA, tenant.getSessionsQuota());
         sessionsQuota.setDisabled(changedHandler == null);
         sessionsQuota.setRequired(false);
         sessionsQuota.setMin(-1);
@@ -380,7 +385,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareReadonlyUsersQuotaItem() {
-        SpinnerItem readonlyUsersQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota",
+        SpinnerItem readonlyUsersQuota = ItemFactory.newSpinnerItem(READONLY_USERS_QUOTA, "readonlyusersquota",
                 tenant.getReadonlyUsersQuota());
         readonlyUsersQuota.setDisabled(changedHandler == null);
         readonlyUsersQuota.setRequired(false);
@@ -394,7 +399,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareRegularUsersQuotaItem() {
-        SpinnerItem regularUsersQuota = ItemFactory.newSpinnerItem(USERSQUOTA, tenant.getUsersQuota());
+        SpinnerItem regularUsersQuota = ItemFactory.newSpinnerItem(REGULAR_USERS_QUOTA, tenant.getUsersQuota());
         regularUsersQuota.setDisabled(changedHandler == null);
         regularUsersQuota.setRequired(false);
         regularUsersQuota.setMin(1);
@@ -413,7 +418,7 @@ public class TenantQuotaPanel extends HLayout {
             return false;
 
         validateDocumentsQuota(values);
-        
+
         validatePagesQuota(values);
 
         validateSizeQuota(values);
@@ -449,99 +454,99 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private void validateEmailAccountsQuota(Map<String, Object> values) {
-        if (values.get(EMAILACCOUNTSQUOTA) == null)
+        if (values.get(EMAILACCOUNTS_QUOTA) == null)
             tenant.setMaxEmailAccounts(null);
         else
-            tenant.setMaxEmailAccounts(Long.parseLong(values.get(EMAILACCOUNTSQUOTA).toString()));
+            tenant.setMaxEmailAccounts(Long.parseLong(values.get(EMAILACCOUNTS_QUOTA).toString()));
     }
 
     private void validateImportFoldersQuota(Map<String, Object> values) {
-        if (values.get(IMPORTFOLDERSQUOTA) == null)
+        if (values.get(IMPORTFOLDERS_QUOTA) == null)
             tenant.setImportFoldersQuota(null);
         else
-            tenant.setImportFoldersQuota(Long.parseLong(values.get(IMPORTFOLDERSQUOTA).toString()));
+            tenant.setImportFoldersQuota(Long.parseLong(values.get(IMPORTFOLDERS_QUOTA).toString()));
     }
 
     private void validateStampsQuota(Map<String, Object> values) {
-        if (values.get(STAMPSQUOTA) == null)
+        if (values.get(STAMPS_QUOTA) == null)
             tenant.setStampsQuota(null);
         else
-            tenant.setStampsQuota(Long.parseLong(values.get(STAMPSQUOTA).toString()));
+            tenant.setStampsQuota(Long.parseLong(values.get(STAMPS_QUOTA).toString()));
     }
 
     private void validatereportsQuota(Map<String, Object> values) {
-        if (values.get(REPORTSQUOTA) == null)
+        if (values.get(REPORTS_QUOTA) == null)
             tenant.setReportsQuota(null);
         else
-            tenant.setReportsQuota(Long.parseLong(values.get(REPORTSQUOTA).toString()));
+            tenant.setReportsQuota(Long.parseLong(values.get(REPORTS_QUOTA).toString()));
     }
 
     private void validateFormsQuota(Map<String, Object> values) {
-        if (values.get(FORMSQUOTA) == null)
+        if (values.get(FORMS_QUOTA) == null)
             tenant.setFormsQuota(null);
         else
-            tenant.setFormsQuota(Long.parseLong(values.get(FORMSQUOTA).toString()));
+            tenant.setFormsQuota(Long.parseLong(values.get(FORMS_QUOTA).toString()));
     }
 
     private void validateWorkflowsQuota(Map<String, Object> values) {
-        if (values.get(WORKFLOWSQUOTA) == null)
+        if (values.get(WORKFLOWS_QUOTA) == null)
             tenant.setWorkflowsQuota(null);
         else
-            tenant.setWorkflowsQuota(Long.parseLong(values.get(WORKFLOWSQUOTA).toString()));
+            tenant.setWorkflowsQuota(Long.parseLong(values.get(WORKFLOWS_QUOTA).toString()));
     }
 
     private void validateTicketsQuota(Map<String, Object> values) {
-        if (values.get(TICKETSQUOTA) == null)
+        if (values.get(TICKETS_QUOTA) == null)
             tenant.setTicketsQuota(null);
         else
-            tenant.setTicketsQuota(Long.parseLong(values.get(TICKETSQUOTA).toString()));
+            tenant.setTicketsQuota(Long.parseLong(values.get(TICKETS_QUOTA).toString()));
     }
 
     private void validateSessionsQuota(Map<String, Object> values) {
-        if (values.get(SESSIONSQUOTA) == null)
+        if (values.get(SESSIONS_QUOTA) == null)
             tenant.setSessionsQuota(null);
         else
-            tenant.setSessionsQuota(Long.parseLong(values.get(SESSIONSQUOTA).toString()));
+            tenant.setSessionsQuota(Long.parseLong(values.get(SESSIONS_QUOTA).toString()));
     }
 
     private void validateUsersQuota(Map<String, Object> values) {
-        if (values.get(USERSQUOTA) == null)
+        if (values.get(REGULAR_USERS_QUOTA) == null)
             tenant.setRegularUsersQuota(null);
         else
-            tenant.setRegularUsersQuota(Long.parseLong(values.get(USERSQUOTA).toString()));
+            tenant.setRegularUsersQuota(Long.parseLong(values.get(REGULAR_USERS_QUOTA).toString()));
 
-        if (values.get(GUESTSQUOTA) == null)
+        if (values.get(READONLY_USERS_QUOTA) == null)
             tenant.setReadonlyUsersQuota(null);
         else
-            tenant.setReadonlyUsersQuota(Long.parseLong(values.get(GUESTSQUOTA).toString()));
+            tenant.setReadonlyUsersQuota(Long.parseLong(values.get(READONLY_USERS_QUOTA).toString()));
     }
 
     private void validateApiCallsQuota(Map<String, Object> values) {
-        if (values.get(MONTHLYAPICALLSQUOTA) == null)
+        if (values.get(MONTHLYAPICALLS_QUOTA) == null)
             tenant.setApiCallsQuota(null);
         else
-            tenant.setApiCallsQuota(Long.parseLong(values.get(MONTHLYAPICALLSQUOTA).toString()));
+            tenant.setApiCallsQuota(Long.parseLong(values.get(MONTHLYAPICALLS_QUOTA).toString()));
     }
 
     private void validateSizeQuota(Map<String, Object> values) {
-        if (values.get(SIZEQUOTA) == null)
+        if (values.get(STORAGE_QUOTA) == null)
             tenant.setStorageQuota(null);
         else
-            tenant.setStorageQuota(Long.parseLong(values.get(SIZEQUOTA).toString()));
+            tenant.setStorageQuota(Long.parseLong(values.get(STORAGE_QUOTA).toString()));
     }
 
     private void validateDocumentsQuota(Map<String, Object> values) {
-        if (values.get(DOCUMENTSQUOTA) == null)
+        if (values.get(DOCUMENTS_QUOTA) == null)
             tenant.setDocumentsQuota(null);
         else
-            tenant.setDocumentsQuota(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
+            tenant.setDocumentsQuota(Long.parseLong(values.get(DOCUMENTS_QUOTA).toString()));
     }
-    
+
     private void validatePagesQuota(Map<String, Object> values) {
-        if (values.get(PAGESQUOTA) == null)
+        if (values.get(PAGES_QUOTA) == null)
             tenant.setPagesQuota(null);
         else
-            tenant.setPagesQuota(Long.parseLong(values.get(PAGESQUOTA).toString()));
+            tenant.setPagesQuota(Long.parseLong(values.get(PAGES_QUOTA).toString()));
     }
 
     private void setQuotaAlertRecipients() {

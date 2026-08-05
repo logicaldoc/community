@@ -75,24 +75,24 @@ public class GUITenant implements Serializable {
 
     private Long importFoldersQuota;
 
+    private Integer quotaThreshold = null;
+
     private Long maxEmailAccounts;
 
     private boolean enabled = true;
 
     private Date expire;
 
-    private long users;
+    private long regularUsers;
 
     // The read-only users
-    private long guests;
+    private long readonlyUsers;
 
     private long documents;
 
     private long storage;
 
     private long pages;
-
-    private long size;
 
     private long sessions;
 
@@ -113,8 +113,6 @@ public class GUITenant implements Serializable {
     private long emailAccounts;
 
     private GUIBranding branding;
-
-    private Integer quotaThreshold = null;
 
     private List<String> quotaAlertRecipients = new ArrayList<>();
 
@@ -313,12 +311,12 @@ public class GUITenant implements Serializable {
         return expire == null || expire.before(new Date());
     }
 
-    public long getUsers() {
-        return users;
+    public long getRegularUsers() {
+        return regularUsers;
     }
 
-    public void setUsers(long users) {
-        this.users = users;
+    public void setRegularUsers(long regularUsers) {
+        this.regularUsers = regularUsers;
     }
 
     public long getDocuments() {
@@ -327,14 +325,6 @@ public class GUITenant implements Serializable {
 
     public void setDocuments(long documents) {
         this.documents = documents;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
     }
 
     public long getSessions() {
@@ -443,12 +433,12 @@ public class GUITenant implements Serializable {
         this.readonlyUsersQuota = readonlyUsersQuota;
     }
 
-    public long getGuests() {
-        return guests;
+    public long getReadonlyUsers() {
+        return readonlyUsers;
     }
 
-    public void setGuests(long guests) {
-        this.guests = guests;
+    public void setReadonlyUsers(long readonlyUsers) {
+        this.readonlyUsers = readonlyUsers;
     }
 
     public long getApiCalls() {

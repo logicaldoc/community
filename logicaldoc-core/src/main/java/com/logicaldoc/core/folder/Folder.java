@@ -116,6 +116,9 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     @Column(name = "ld_versionsquota")
     private Long versionsQuota;
 
+    /**
+     * Maximum tree size expressed in MB
+     */
     @Column(name = "ld_storagequota")
     private Long storageQuota = null;
 
