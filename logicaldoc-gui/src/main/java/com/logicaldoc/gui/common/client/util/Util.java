@@ -580,31 +580,27 @@ public abstract class Util {
 	}-*/;
 
     public static String formatLong(Long number) {
-        String str = "";
-        if (number == null)
-            return str;
+        if(number==null)
+            return null;
+
         NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
-        str = fmt.format(number);
-        str = str.replace(',', I18N.groupingSepator());
-        return str;
+        return fmt.format(number).replace(',', I18N.groupingSepator());
     }
 
     public static String formatInt(Integer number) {
-        String str = "";
-        if (number == null)
-            return str;
+        if(number==null)
+            return null;
+        
         NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
-        str = fmt.format(number);
-        str = str.replace(',', I18N.groupingSepator());
-        return str;
+        return fmt.format(number).replace(',', I18N.groupingSepator());
     }
 
     public static String formatDouble(Double number) {
-        String str = "";
-        if (number == null)
-            return str;
+        if(number==null)
+            return null;
+        
         NumberFormat fmt = NumberFormat.getFormat("#,###.##");
-        str = fmt.format(number);
+        String str = fmt.format(number);
         str = str.replace(',', '#');
         str = str.replace('.', I18N.decimalSepator());
         str = str.replace('#', I18N.groupingSepator());

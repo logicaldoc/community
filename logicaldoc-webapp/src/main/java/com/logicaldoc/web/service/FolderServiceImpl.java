@@ -194,6 +194,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         if (guiFolder.isWorkspace()) {
             SequenceDAO seqDao = SequenceDAO.get();
             guiFolder.setDocuments(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
+            guiFolder.setPages(seqDao.getCurrentValue("wspages", folder.getId(), folder.getTenantId()));
             guiFolder.setStorage(seqDao.getCurrentValue("wssize", folder.getId(), folder.getTenantId()));
         }
 

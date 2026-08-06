@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,14 +134,14 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
     private void setAttributes(GUIInfo info, String tenantName) {
         TenantDAO tDAO = TenantDAO.get();
-        AttributeSetDAO aDAO = AttributeSetDAO.get();
         try {
-            Tenant tenant = tDAO.findByName(tenantName);
+            Tenant tenant = tDAO.findByName(StringUtils.defaultIfEmpty(tenantName, Tenant.DEFAULT_NAME));
             if (tenant == null) {
                 log.debug("Tenant with name {} not found, fallback to the default", tenantName);
                 tenant = tDAO.findById(Tenant.DEFAULT_ID);
             }
-            Map<String, Attribute> attributes = aDAO.findAttributes(tenant.getId(), null);
+
+            Map<String, Attribute> attributes = AttributeSetDAO.get().findAttributes(tenant.getId(), null);
             List<GUIAttribute> guiAttributes = new ArrayList<>();
 
             for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {

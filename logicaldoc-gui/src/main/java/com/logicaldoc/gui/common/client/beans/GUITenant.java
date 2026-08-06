@@ -225,7 +225,7 @@ public class GUITenant implements Serializable {
         this.adminUsername = adminUsername;
     }
 
-    public Long getUsersQuota() {
+    public Long getRegularUsersQuota() {
         return regularUsersQuota;
     }
 

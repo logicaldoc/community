@@ -4,6 +4,8 @@ import java.util.Map;
 
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.data.UsersDS;
+import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.TitleOrientation;
@@ -24,7 +26,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TenantQuotaPanel extends HLayout {
 
-    private static final String USAGE = "usage";
+    private static final String USEDHINT = "usedhint";
 
     private static final String PAGES_QUOTA = "pagesquota";
 
@@ -113,7 +115,7 @@ public class TenantQuotaPanel extends HLayout {
 
         SpinnerItem pagesQuota = preparePagesQuotaItem();
 
-        SpinnerItem sizeQuota = prepareSizeQuotaItem();
+        SpinnerItem sizeQuota = prepareStorageQuotaItem();
 
         SpinnerItem ticketsQuota = prepareTicketsQuoteItem();
 
@@ -148,33 +150,9 @@ public class TenantQuotaPanel extends HLayout {
         if (changedHandler != null)
             recipients.addChangedHandler(changedHandler);
 
-        StaticTextItem storage = ItemFactory.newStaticTextItem("storage", USAGE, Util.formatSizeW7(tenant.getStorage()));
-        storage.setWrap(false);
-        StaticTextItem documents = ItemFactory.newStaticTextItem("documents", USAGE,
-                Util.formatLong(tenant.getDocuments()));
-        StaticTextItem pages = ItemFactory.newStaticTextItem("pages", USAGE, Util.formatLong(tenant.getPages()));
-        StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", USAGE,
-                Util.formatLong(tenant.getSessions()));
-        StaticTextItem apicalls = ItemFactory.newStaticTextItem("monthlyapicalls", USAGE,
-                Util.formatLong(tenant.getApiCalls()));
-        StaticTextItem regularUsers = ItemFactory.newStaticTextItem("regularusers", USAGE,
-                Util.formatLong(tenant.getRegularUsers()));
-        StaticTextItem readonlyUsers = ItemFactory.newStaticTextItem("readonlyusers", USAGE,
-                Util.formatLong(tenant.getReadonlyUsers()));
-        StaticTextItem tickets = ItemFactory.newStaticTextItem("tickets", USAGE, Util.formatLong(tenant.getTickets()));
-        StaticTextItem workflows = ItemFactory.newStaticTextItem("workflows", USAGE,
-                Util.formatLong(tenant.getWorkflows()));
-        StaticTextItem forms = ItemFactory.newStaticTextItem("forms", USAGE, Util.formatLong(tenant.getForms()));
-        StaticTextItem reports = ItemFactory.newStaticTextItem("reports", USAGE, Util.formatLong(tenant.getReports()));
-        StaticTextItem stamps = ItemFactory.newStaticTextItem("stamps", USAGE, Util.formatLong(tenant.getStamps()));
-        StaticTextItem importFolders = ItemFactory.newStaticTextItem("importfolders", USAGE,
-                Util.formatLong(tenant.getImportFolders()));
-        StaticTextItem emailAccounts = ItemFactory.newStaticTextItem("emailaccounts", USAGE,
-                Util.formatLong(tenant.getEmailAccounts()));
-
         // Static items to display whole system quotas
         StaticTextItem regularUsersSystemQuota = ItemFactory.newStaticTextItem("sys" + REGULAR_USERS_QUOTA,
-                REGULAR_USERS_QUOTA, Util.formatLong(tenant.getUsersQuota()));
+                REGULAR_USERS_QUOTA, Util.formatLong(tenant.getRegularUsersQuota()));
         regularUsersSystemQuota.setVisible(tenant.isSystem());
         StaticTextItem readonlyUsersSystemQuota = ItemFactory.newStaticTextItem("sys" + READONLY_USERS_QUOTA,
                 "readonlyusersquota", Util.formatLong(tenant.getReadonlyUsersQuota()));
@@ -189,7 +167,8 @@ public class TenantQuotaPanel extends HLayout {
                 Util.formatLong(tenant.getPagesQuota()));
         pagesSystemQuota.setVisible(tenant.isSystem());
         StaticTextItem sizeSystemQuota = ItemFactory.newStaticTextItem("sys" + STORAGE_QUOTA, STORAGE_QUOTA,
-                Util.formatSizeW7((double) tenant.getStorageQuota() * 1024D * 1024D));
+                tenant.getStorageQuota() != null ? Util.formatSizeW7((double) tenant.getStorageQuota() * 1024D * 1024D)
+                        : null);
         sizeSystemQuota.setVisible(tenant.isSystem());
         StaticTextItem monthlyApiCallsSystemQuota = ItemFactory.newStaticTextItem("sys" + MONTHLYAPICALLS_QUOTA,
                 MONTHLYAPICALLS_QUOTA, Util.formatLong(tenant.getApiCallsQuota()));
@@ -216,24 +195,22 @@ public class TenantQuotaPanel extends HLayout {
                 EMAILACCOUNTS_QUOTA, Util.formatLong(tenant.getMaxEmailAccounts()));
         emailAccountsSystemQuota.setVisible(tenant.isSystem());
 
-        form.setItems(regularUsersQuota, regularUsersSystemQuota, regularUsers, readonlyUsersQuota,
-                readonlyUsersSystemQuota, readonlyUsers, sessionsQuota, sessionsSystemQuota, sessions, documentsQuota,
-                documentsSystemQuota, documents, pagesQuota, pagesSystemQuota, pages, sizeQuota, sizeSystemQuota, storage,
-                monthlyApiCallsQuota, monthlyApiCallsSystemQuota, apicalls, ticketsQuota, ticketsSystemQuota, tickets,
-                workflowsQuota, workflowsSystemQuota, workflows, formsSystemQuota, formsQuota, forms,
-                reportsSystemQuota, reportsQuota, reports, stampsSystemQuota, stampsQuota, stamps,
-                importFoldersSystemQuota, importFoldersQuota, importFolders, emailAccountsSystemQuota,
-                emailAccountsQuota, emailAccounts, quotaThreshold, recipients);
+        form.setItems(regularUsersQuota, regularUsersSystemQuota, readonlyUsersQuota, readonlyUsersSystemQuota,
+                sessionsQuota, sessionsSystemQuota, documentsQuota, documentsSystemQuota, pagesQuota, pagesSystemQuota,
+                sizeQuota, sizeSystemQuota, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, ticketsQuota,
+                ticketsSystemQuota, workflowsQuota, workflowsSystemQuota, formsSystemQuota, formsQuota,
+                reportsSystemQuota, reportsQuota, stampsSystemQuota, stampsQuota, importFoldersSystemQuota,
+                importFoldersQuota, emailAccountsSystemQuota, emailAccountsQuota, quotaThreshold, recipients);
         addMember(layout);
     }
 
     private SpinnerItem prepareEmailAccountsQuotaItem() {
         SpinnerItem emailAccountsQuota = ItemFactory.newSpinnerItem(EMAILACCOUNTS_QUOTA, tenant.getMaxEmailAccounts());
         emailAccountsQuota.setDisabled(changedHandler == null);
-        emailAccountsQuota.setRequired(false);
         emailAccountsQuota.setMin(-1);
         emailAccountsQuota.setStep(1);
         emailAccountsQuota.setWidth(120);
+        emailAccountsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getEmailAccounts())));
         emailAccountsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             emailAccountsQuota.addChangedHandler(changedHandler);
@@ -241,12 +218,13 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareImportFoldersQuotaItem() {
-        SpinnerItem importFoldersQuota = ItemFactory.newSpinnerItem(IMPORTFOLDERS_QUOTA, tenant.getImportFoldersQuota());
+        SpinnerItem importFoldersQuota = ItemFactory.newSpinnerItem(IMPORTFOLDERS_QUOTA,
+                tenant.getImportFoldersQuota());
         importFoldersQuota.setDisabled(changedHandler == null);
-        importFoldersQuota.setRequired(false);
         importFoldersQuota.setMin(-1);
         importFoldersQuota.setStep(1);
         importFoldersQuota.setWidth(120);
+        importFoldersQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getImportFoldersQuota())));
         importFoldersQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             importFoldersQuota.addChangedHandler(changedHandler);
@@ -256,10 +234,10 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareStampsQuotaItem() {
         SpinnerItem stampsQuota = ItemFactory.newSpinnerItem(STAMPS_QUOTA, tenant.getStampsQuota());
         stampsQuota.setDisabled(changedHandler == null);
-        stampsQuota.setRequired(false);
         stampsQuota.setMin(-1);
         stampsQuota.setStep(1);
         stampsQuota.setWidth(120);
+        stampsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getStamps())));
         stampsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             stampsQuota.addChangedHandler(changedHandler);
@@ -269,10 +247,10 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareReportsQuotaItem() {
         SpinnerItem reportsQuota = ItemFactory.newSpinnerItem(REPORTS_QUOTA, tenant.getReportsQuota());
         reportsQuota.setDisabled(changedHandler == null);
-        reportsQuota.setRequired(false);
         reportsQuota.setMin(-1);
         reportsQuota.setStep(1);
         reportsQuota.setWidth(120);
+        reportsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getReports())));
         reportsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             reportsQuota.addChangedHandler(changedHandler);
@@ -282,10 +260,10 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareFormsQuotaItem() {
         SpinnerItem formsQuota = ItemFactory.newSpinnerItem(FORMS_QUOTA, tenant.getFormsQuota());
         formsQuota.setDisabled(changedHandler == null);
-        formsQuota.setRequired(false);
         formsQuota.setMin(-1);
         formsQuota.setStep(1);
         formsQuota.setWidth(120);
+        formsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getForms())));
         formsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             formsQuota.addChangedHandler(changedHandler);
@@ -295,10 +273,10 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareWorkflowQuotaItem() {
         SpinnerItem workflowsQuota = ItemFactory.newSpinnerItem(WORKFLOWS_QUOTA, tenant.getWorkflowsQuota());
         workflowsQuota.setDisabled(changedHandler == null);
-        workflowsQuota.setRequired(false);
         workflowsQuota.setMin(-1);
         workflowsQuota.setStep(1);
         workflowsQuota.setWidth(120);
+        workflowsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getWorkflows())));
         workflowsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             workflowsQuota.addChangedHandler(changedHandler);
@@ -308,21 +286,20 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareTicketsQuoteItem() {
         SpinnerItem ticketsQuota = ItemFactory.newSpinnerItem(TICKETS_QUOTA, tenant.getTicketsQuota());
         ticketsQuota.setDisabled(changedHandler == null);
-        ticketsQuota.setRequired(false);
         ticketsQuota.setMin(-1);
         ticketsQuota.setStep(10);
         ticketsQuota.setWidth(120);
+        ticketsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getTickets())));
         ticketsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             ticketsQuota.addChangedHandler(changedHandler);
         return ticketsQuota;
     }
 
-    private SpinnerItem prepareSizeQuotaItem() {
+    private SpinnerItem prepareStorageQuotaItem() {
         SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(STORAGE_QUOTA, tenant.getStorageQuota());
-        sizeQuota.setHint("MB");
+        sizeQuota.setHint("MB " + I18N.message(USEDHINT, Util.formatSizeW7(tenant.getStorage())));
         sizeQuota.setDisabled(changedHandler == null);
-        sizeQuota.setRequired(false);
         sizeQuota.setMin(-1);
         sizeQuota.setStep(1024);
         sizeQuota.setWidth(120);
@@ -335,10 +312,10 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareDocumentsQuotaItem() {
         SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTS_QUOTA, tenant.getDocumentsQuota());
         documentsQuota.setDisabled(changedHandler == null);
-        documentsQuota.setRequired(false);
         documentsQuota.setMin(-1);
         documentsQuota.setStep(10000);
         documentsQuota.setWidth(120);
+        documentsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getDocuments())));
         documentsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             documentsQuota.addChangedHandler(changedHandler);
@@ -352,6 +329,7 @@ public class TenantQuotaPanel extends HLayout {
         pagesQuota.setWidth(120);
         pagesQuota.setMin(-1);
         pagesQuota.setStep(10);
+        pagesQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getPages())));
         pagesQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             pagesQuota.addChangedHandler(changedHandler);
@@ -361,10 +339,10 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareMonthlyApiCallsQuotaItem() {
         SpinnerItem monthlyApiCallsQuota = ItemFactory.newSpinnerItem(MONTHLYAPICALLS_QUOTA, tenant.getApiCallsQuota());
         monthlyApiCallsQuota.setDisabled(changedHandler == null);
-        monthlyApiCallsQuota.setRequired(false);
         monthlyApiCallsQuota.setMin(-1);
         monthlyApiCallsQuota.setStep(10);
         monthlyApiCallsQuota.setWidth(120);
+        monthlyApiCallsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getApiCalls())));
         monthlyApiCallsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             monthlyApiCallsQuota.addChangedHandler(changedHandler);
@@ -374,10 +352,10 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareSessionsQuotaItem() {
         SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONS_QUOTA, tenant.getSessionsQuota());
         sessionsQuota.setDisabled(changedHandler == null);
-        sessionsQuota.setRequired(false);
         sessionsQuota.setMin(-1);
         sessionsQuota.setStep(1);
         sessionsQuota.setWidth(120);
+        sessionsQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getSessions())));
         sessionsQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             sessionsQuota.addChangedHandler(changedHandler);
@@ -385,13 +363,14 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareReadonlyUsersQuotaItem() {
-        SpinnerItem readonlyUsersQuota = ItemFactory.newSpinnerItem(READONLY_USERS_QUOTA, "readonlyusersquota",
+        SpinnerItem readonlyUsersQuota = ItemFactory.newSpinnerItem(READONLY_USERS_QUOTA,
                 tenant.getReadonlyUsersQuota());
         readonlyUsersQuota.setDisabled(changedHandler == null);
         readonlyUsersQuota.setRequired(false);
         readonlyUsersQuota.setMin(-1);
         readonlyUsersQuota.setStep(1);
-        readonlyUsersQuota.setWidth(80);
+        readonlyUsersQuota.setWidth(120);
+        readonlyUsersQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getReadonlyUsers())));
         readonlyUsersQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             readonlyUsersQuota.addChangedHandler(changedHandler);
@@ -399,15 +378,16 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareRegularUsersQuotaItem() {
-        SpinnerItem regularUsersQuota = ItemFactory.newSpinnerItem(REGULAR_USERS_QUOTA, tenant.getUsersQuota());
+        SpinnerItem regularUsersQuota = ItemFactory.newSpinnerItem(REGULAR_USERS_QUOTA, tenant.getRegularUsers());
         regularUsersQuota.setDisabled(changedHandler == null);
-        regularUsersQuota.setRequired(false);
         regularUsersQuota.setMin(1);
         regularUsersQuota.setStep(1);
-        regularUsersQuota.setWidth(80);
+        regularUsersQuota.setWidth(120);
+        regularUsersQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getRegularUsers())));
         regularUsersQuota.setVisible(!tenant.isSystem());
         if (changedHandler != null)
             regularUsersQuota.addChangedHandler(changedHandler);
+
         return regularUsersQuota;
     }
 
