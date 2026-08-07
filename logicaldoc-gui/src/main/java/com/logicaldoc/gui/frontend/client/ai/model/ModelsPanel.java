@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -24,7 +25,9 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -44,6 +47,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ModelsPanel extends VLayout {
 
+    private static final String TYPE = "type";
+
     private static final String QUESTION = "question";
 
     private static final String TRAINED = "trained";
@@ -61,6 +66,10 @@ public class ModelsPanel extends VLayout {
     private static final String LABEL = "label";
 
     private static final String DESCRIPTION = "description";
+
+    private static final String NEURAL = "neural";
+
+    private static final String EMBEDDER = "embedder";
 
     protected Layout detailsContainer;
 
@@ -103,7 +112,7 @@ public class ModelsPanel extends VLayout {
         description.setCanFilter(true);
         description.setCanSort(false);
 
-        ListGridField modelType = new ListGridField("type", I18N.message("type"));
+        ListGridField modelType = new ListGridField(TYPE, I18N.message(TYPE));
         modelType.setAutoFit(AutoFitWidthApproach.BOTH);
         modelType.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("aimodeltype." + value));
 
@@ -222,7 +231,9 @@ public class ModelsPanel extends VLayout {
         for (ListGridRecord rec : selection)
             ids.add(rec.getAttributeAsLong(ID));
 
-        String type = selection[0].getAttributeAsString("type");
+        String type = selection[0].getAttributeAsString(TYPE);
+
+        boolean trainable = NEURAL.equals(type) || EMBEDDER.equals(type);
 
         Long selectedModelId = selection[0].getAttributeAsLong("id");
 
@@ -282,7 +293,7 @@ public class ModelsPanel extends VLayout {
         }));
         evaluate.setEnabled(
                 !selection[0].getAttributeAsBoolean(TRAINING) && !selection[0].getAttributeAsBoolean(EVALUATING)
-                        && "neural".equals(selection[0].getAttributeAsString("type"))
+                        && NEURAL.equals(selection[0].getAttributeAsString(TYPE))
                         && selection[0].getAttribute(TRAINED) != null);
 
         MenuItem query = new MenuItem();
@@ -317,7 +328,7 @@ public class ModelsPanel extends VLayout {
         iimport.addClickHandler(
                 click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-        if (!"zeroshot".equals(type) && !"language".equals(type) && !"yolo".equals(type)) {
+        if (trainable) {
             contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(),
                     clone, iimport, export, new MenuItemSeparator(), delete);
         } else {
@@ -357,7 +368,7 @@ public class ModelsPanel extends VLayout {
             list.selectRecord(rec);
         }
 
-        rec.setAttribute("type", model.getType());
+        rec.setAttribute(TYPE, model.getType());
         rec.setAttribute("name", model.getName());
         rec.setAttribute(LABEL,
                 model.getLabel() != null && !model.getLabel().trim().isEmpty() ? model.getLabel() : model.getName());
@@ -396,7 +407,22 @@ public class ModelsPanel extends VLayout {
 
     protected void onAddModel() {
         list.deselectAllRecords();
-        showModelDetails(new GUIModel());
+
+        SelectItem type = ItemFactory.newSelectItem(TYPE);
+        type.setOptionDataSource(new ModelTypesDS());
+        type.setValueField("value");
+        type.setDisplayField("label");
+        type.setRequired(true);
+
+        LD.askForValue("addmodel", TYPE, null, type, new ValueCallback() {
+
+            @Override
+            public void execute(String value) {
+                GUIModel model = new GUIModel();
+                model.setType(value);
+                showModelDetails(model);
+            }
+        });
     }
 
     private void loadModels() {

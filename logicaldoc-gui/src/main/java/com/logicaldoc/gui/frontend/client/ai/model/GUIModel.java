@@ -27,6 +27,8 @@ public class GUIModel implements Serializable {
 
     private String type = "neural";
 
+    private String embedderType;
+
     private String categories;
 
     private String activation = "RELU";
@@ -171,6 +173,14 @@ public class GUIModel implements Serializable {
         this.featureDescriptors = featureDescriptors;
     }
 
+    public String getEmbedderType() {
+        return embedderType;
+    }
+
+    public void setEmbedderType(String embedderType) {
+        this.embedderType = embedderType;
+    }
+
     public String getFeatureNames() {
         List<String> names = new ArrayList<>();
         for (GUIFeatureDescriptor fd : featureDescriptors)
@@ -210,7 +220,7 @@ public class GUIModel implements Serializable {
             }
         }
 
-        categories = sb.toString();  
+        categories = sb.toString();
     }
 
     public void setCategories(String categories) {
@@ -307,6 +317,10 @@ public class GUIModel implements Serializable {
 
     public boolean isZeroShot() {
         return "zeroshot".equals(type);
+    }
+
+    public boolean isTrainable() {
+        return "neural".equals(type) || ("embedder".equals(type) && "paragraphvectors".equals(embedderType));
     }
 
     public GUIUpdater getUpdater() {

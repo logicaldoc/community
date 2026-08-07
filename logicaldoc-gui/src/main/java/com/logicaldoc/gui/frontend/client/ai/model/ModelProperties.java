@@ -18,7 +18,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DoubleItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -86,15 +85,13 @@ public class ModelProperties extends ModelDetailsTab {
 
     private static final String NAME = "name";
 
-    private static final String VALUE = "value";
-
     private static final String TYPE = "type";
 
     private static final AdvancedCriteria NEURAL_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL);
 
-    private static final AdvancedCriteria EMBEDDER_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, EMBEDDER);
+    private static final String CLASSIFIER = "classifier";
 
-    private static final AdvancedCriteria YOLO_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, YOLO);
+    private static final String MINI_EMBEDDER = "miniembedder";
 
     private DynamicForm form = new DynamicForm();
 
@@ -126,6 +123,19 @@ public class ModelProperties extends ModelDetailsTab {
         form.setNumCols(4);
         form.setTitleOrientation(TitleOrientation.TOP);
 
+        /*
+         * Pre-compute the model type flags used to control the visibility of
+         * the various property fields in the form.
+         */
+        boolean neural = NEURAL.equals(model.getType());
+        boolean embedder = EMBEDDER.equals(model.getType());
+        boolean miniEmbedder = MINI_EMBEDDER.equals(model.getType());
+        boolean anyembedder = embedder || miniEmbedder;
+        boolean nlp = CLASSIFIER.equals(model.getType()) || TOKENS.equals(model.getType());
+        boolean yolo = YOLO.equals(model.getType());
+
+        boolean trainable = neural || embedder;
+
         TextItem name = ItemFactory.newSimpleTextItem(NAME, model.getName());
         name.addChangedHandler(changedHandler);
         name.setRequired(true);
@@ -142,31 +152,17 @@ public class ModelProperties extends ModelDetailsTab {
         windowSize.setMin(2);
         windowSize.setStep(1);
         windowSize.addChangedHandler(changedHandler);
-        setEmbedderVisibility(windowSize);
+        windowSize.setVisible(embedder);
+        windowSize.setRequired(embedder);
 
-        SelectItem type = ItemFactory.newSelectItem(TYPE);
-        type.setOptionDataSource(new ModelTypesDS());
-        type.setValueField(VALUE);
-        type.setDisplayField(LABEL);
-        type.setValue(model.getType());
-        type.addChangedHandler(changedHandler);
-        type.addChangedHandler(changed -> {
-            layersStack.setVisible(NEURAL.equals(type.getValueAsString()));
-            if (EMBEDDER.equals(type.getValueAsString()))
-                windowSize.setValue(10);
-        });
-        type.setRequired(true);
-        type.setVisible(model.getId() == 0L);
-
-        StaticTextItem typeValue = ItemFactory.newStaticTextItem("typeValue", TYPE,
-                I18N.message("aimodeltype." + model.getType()));
-        typeValue.setVisible(model.getId() != 0L);
+        StaticTextItem type = ItemFactory.newStaticTextItem(TYPE, TYPE, I18N.message("aimodeltype." + model.getType()));
 
         StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(model.getId()));
         id.setVisible(model.getId() != 0L);
 
         String[] faturesArray = model.getFeatureDescriptors().stream().map(fd -> fd.getName())
                 .collect(Collectors.toList()).toArray(new String[0]);
+
         MultiComboBoxItem features = ItemFactory.newMultiComboBoxItem(FEATURES, FEATURES, null, faturesArray);
         features.setShowPending(true);
         features.setAddUnknownValues(true);
@@ -174,17 +170,25 @@ public class ModelProperties extends ModelDetailsTab {
         features.setWidth("*");
         features.addChangedHandler(changedHandler);
         features.setValueMap(faturesArray);
-        setNeuralNetworkVisibility(features);
+        features.setVisible(neural);
+        features.setRequired(trainable && neural);
 
         SelectItem activationSelector = activationSeletor();
-        setNeuralNetworkVisibility(activationSelector);
+        activationSelector.setVisible(neural);
+        activationSelector.setRequired(neural);
         activationSelector.addChangedHandler(changedHandler);
 
         SelectItem weightInit = weightInitSeletor();
+        weightInit.setVisible(neural);
+        weightInit.setRequired(neural);
 
         SelectItem loss = lossSeletor();
+        loss.setVisible(neural);
+        loss.setRequired(neural);
 
         SelectItem updater = updaterSelector();
+        updater.setVisible(neural);
+        updater.setRequired(neural);
 
         DoubleItem learningRate = ItemFactory.newDoubleItem(LEARNINGRATE, LEARNINGRATE,
                 model.getUpdater().getLearningRate());
@@ -206,62 +210,70 @@ public class ModelProperties extends ModelDetailsTab {
         SpinnerItem batch = ItemFactory.newSpinnerItem(BATCH, model.getBatch());
         batch.setMin(1);
         batch.addChangedHandler(changedHandler);
-        setNeuralNetworkVisibility(batch);
+        batch.setVisible(neural);
+        batch.setRequired(neural);
 
         SpinnerItem seed = ItemFactory.newSpinnerItem(SEED, SEED, model.getSeed());
         seed.setMin(1);
         seed.setStep(1);
         seed.addChangedHandler(changedHandler);
-        AdvancedCriteria neuralOrEmbedder = new AdvancedCriteria(TYPE, OperatorId.IN_SET,
-                new String[] { NEURAL, EMBEDDER });
-        seed.setVisibleWhen(neuralOrEmbedder);
-        seed.setRequiredWhen(neuralOrEmbedder);
+        boolean neuralOrEmbedder = neural || anyembedder;
+        seed.setVisible(neuralOrEmbedder);
+        seed.setRequired(neuralOrEmbedder);
 
         SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
         language.setValue(model.getLanguage());
         language.addChangedHandler(changedHandler);
-        setNLPVisibility(language);
+        language.setVisible(nlp);
+        language.setRequired(nlp);
 
         SpinnerItem cutoff = ItemFactory.newSpinnerItem("cutoff", model.getCutoff());
         cutoff.setMin(1);
         cutoff.addChangedHandler(changedHandler);
-        setNLPVisibility(cutoff);
+        cutoff.setVisible(nlp);
+        cutoff.setRequired(nlp);
 
         SpinnerItem ngramMin = ItemFactory.newSpinnerItem("ngrammin", model.getNgramMin());
         ngramMin.setMin(2);
         ngramMin.addChangedHandler(changedHandler);
-        setNLPVisibility(ngramMin);
+        ngramMin.setVisible(nlp);
+        ngramMin.setRequired(nlp);
 
         SpinnerItem ngramMax = ItemFactory.newSpinnerItem("ngrammax", model.getNgramMax());
         ngramMax.setMin(2);
         ngramMax.addChangedHandler(changedHandler);
-        setNLPVisibility(ngramMax);
+        ngramMax.setVisible(nlp);
+        ngramMax.setRequired(nlp);
 
         SpinnerItem vectorSize = ItemFactory.newSpinnerItem("vectorsize", model.getVectorSize());
         vectorSize.setMin(100);
         vectorSize.setStep(50);
         vectorSize.addChangedHandler(changedHandler);
-        setEmbedderVisibility(vectorSize);
+        vectorSize.setVisible(embedder);
+        vectorSize.setRequired(embedder);
 
         SpinnerItem minWordFrequency = ItemFactory.newSpinnerItem("minwordfrequency", model.getMinWordFrequency());
         minWordFrequency.setMin(1);
         minWordFrequency.setStep(1);
         minWordFrequency.addChangedHandler(changedHandler);
-        setEmbedderVisibility(minWordFrequency);
+        minWordFrequency.setVisible(embedder);
+        minWordFrequency.setRequired(embedder);
 
         SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", model.getChunking().getChunkSize());
         chunkSize.setHint(I18N.message(TOKENS).toLowerCase());
         chunkSize.setMin(1);
         chunkSize.setStep(10);
         chunkSize.addChangedHandler(changedHandler);
-        setEmbedderVisibility(chunkSize);
+        chunkSize.setVisible(anyembedder);
+        chunkSize.setRequired(anyembedder);
 
         SpinnerItem minChunkSize = ItemFactory.newSpinnerItem(MINCHUNKSIZE, model.getChunking().getMinChunkSize());
         minChunkSize.setHint(I18N.message(TOKENS).toLowerCase());
         minChunkSize.setMin(1);
         minChunkSize.setStep(5);
         minChunkSize.addChangedHandler(changedHandler);
-        setEmbedderVisibility(minChunkSize);
+        minChunkSize.setVisible(anyembedder);
+        minChunkSize.setRequired(anyembedder);
 
         SpinnerItem minChunkSizeChars = ItemFactory.newSpinnerItem("minchunksizechars", MINCHUNKSIZE,
                 model.getChunking().getMinChunkSizeChars());
@@ -269,33 +281,40 @@ public class ModelProperties extends ModelDetailsTab {
         minChunkSizeChars.setMin(1);
         minChunkSizeChars.setStep(10);
         minChunkSizeChars.addChangedHandler(changedHandler);
-        setEmbedderVisibility(minChunkSizeChars);
+        minChunkSizeChars.setVisible(anyembedder);
+        minChunkSizeChars.setRequired(anyembedder);
 
         SpinnerItem maxChunks = ItemFactory.newSpinnerItem("maxchunks", model.getChunking().getMaxChunks());
         maxChunks.setMin(1);
         maxChunks.setStep(10);
         maxChunks.addChangedHandler(changedHandler);
-        setEmbedderVisibility(maxChunks);
+        maxChunks.setVisible(anyembedder);
+        maxChunks.setRequired(anyembedder);
 
         SpinnerItem workers = ItemFactory.newSpinnerItem("workers", model.getWorkers());
         workers.setMin(1);
         workers.setStep(1);
         workers.addChangedHandler(changedHandler);
-        setEmbedderVisibility(workers);
+        workers.setVisible(embedder);
+        workers.setRequired(embedder);
 
         FloatRangeValidator rangevalidator = new FloatRangeValidator();
         rangevalidator.setMin(0);
         rangevalidator.setMax(1);
+
         DoubleItem alpha = ItemFactory.newDoubleItem("alpha", model.getAlpha());
         alpha.setValidators(rangevalidator);
         alpha.setWidth(60);
         alpha.addChangedHandler(changedHandler);
-        setEmbedderVisibility(alpha);
+        alpha.setVisible(embedder);
+        alpha.setRequired(embedder);
+
         DoubleItem minAlpha = ItemFactory.newDoubleItem("minalpha", model.getMinAlpha());
         minAlpha.setValidators(rangevalidator);
         minAlpha.setWidth(60);
         minAlpha.addChangedHandler(changedHandler);
-        setEmbedderVisibility(minAlpha);
+        minAlpha.setVisible(embedder);
+        minAlpha.setRequired(embedder);
 
         MultiComboBoxItem categories = ItemFactory.newMultiComboBoxItem(CATEGORIES, CATEGORIES, null,
                 model.getCategoriesArray());
@@ -305,11 +324,8 @@ public class ModelProperties extends ModelDetailsTab {
         categories.setWidth("*");
         categories.addChangedHandler(changedHandler);
         categories.setValueMap(model.getCategoriesArray());
-
-        AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
-                new Criterion[] { NEURAL_CRITERIA, YOLO_CRITERIA });
-        categories.setVisibleWhen(criteria);
-        categories.setRequiredWhen(criteria);
+        categories.setVisible(neural || yolo);
+        categories.setRequired(neural || yolo);
 
         SpinnerItem trainingImagesWidth = ItemFactory.newSpinnerItem("trainingimageswidth",
                 model.getTrainingImagesWidth());
@@ -317,8 +333,8 @@ public class ModelProperties extends ModelDetailsTab {
         trainingImagesWidth.setMin(1);
         trainingImagesWidth.setStep(1);
         trainingImagesWidth.addChangedHandler(changedHandler);
-        trainingImagesWidth.setVisibleWhen(YOLO_CRITERIA);
-        trainingImagesWidth.setRequiredWhen(YOLO_CRITERIA);
+        trainingImagesWidth.setVisible(yolo);
+        trainingImagesWidth.setRequired(yolo);
 
         SpinnerItem trainingImagesHeight = ItemFactory.newSpinnerItem("trainingimagesheight",
                 model.getTrainingImagesHeight());
@@ -326,19 +342,19 @@ public class ModelProperties extends ModelDetailsTab {
         trainingImagesHeight.setMin(1);
         trainingImagesHeight.setStep(1);
         trainingImagesHeight.addChangedHandler(changedHandler);
-        trainingImagesHeight.setVisibleWhen(YOLO_CRITERIA);
-        trainingImagesHeight.setRequiredWhen(YOLO_CRITERIA);
+        trainingImagesHeight.setVisible(yolo);
+        trainingImagesHeight.setRequired(yolo);
 
         SpinnerItem threshold = ItemFactory.newSpinnerItem(THRESHOLD, Math.round(model.getThreshold() * 100));
         threshold.setMin(0);
         threshold.setMax(100);
         threshold.setStep(1);
         threshold.addChangedHandler(changedHandler);
-        threshold.setVisibleWhen(YOLO_CRITERIA);
-        threshold.setRequiredWhen(YOLO_CRITERIA);
+        threshold.setVisible(yolo);
+        threshold.setRequired(yolo);
 
-        form.setItems(id, typeValue, type, name, label, features, categories, activationSelector, weightInit, loss,
-                updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
+        form.setItems(id, type, name, label, features, categories, activationSelector, weightInit, loss, updater,
+                learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
                 minWordFrequency, windowSize, chunkSize, minChunkSize, minChunkSizeChars, maxChunks, workers, alpha,
                 minAlpha, trainingImagesWidth, trainingImagesHeight, threshold, description);
 
@@ -356,7 +372,6 @@ public class ModelProperties extends ModelDetailsTab {
         model.setLabel(form.getValueAsString(LABEL));
         model.setDescription(form.getValueAsString("description"));
         model.setLanguage(form.getValueAsString(LANGUAGE));
-        model.setType(form.getValueAsString(TYPE));
 
         validateCategories();
 
@@ -451,22 +466,6 @@ public class ModelProperties extends ModelDetailsTab {
         model.setCategoriesArray(categories.toArray(new String[0]));
     }
 
-    private void setNeuralNetworkVisibility(FormItem item) {
-        applyTrainableVisibility(item, NEURAL_CRITERIA);
-    }
-
-    private void setEmbedderVisibility(FormItem item) {
-        applyTrainableVisibility(item, EMBEDDER_CRITERIA);
-    }
-
-    private void setNLPVisibility(FormItem item) {
-        AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
-                new Criterion[] { new AdvancedCriteria(TYPE, OperatorId.EQUALS, "classifier"),
-                        new AdvancedCriteria(TYPE, OperatorId.EQUALS, TOKENS) });
-
-        applyTrainableVisibility(item, criteria);
-    }
-
     private SelectItem updaterSelector() {
         SelectItem item = ItemFactory.newSelectItem(UPDATER, UPDATER);
         item.addChangedHandler(changedHandler);
@@ -478,7 +477,6 @@ public class ModelProperties extends ModelDetailsTab {
 
         item.setValue(model.getUpdater().getUpdateAlgorithm());
 
-        setNeuralNetworkVisibility(item);
         return item;
     }
 
@@ -496,7 +494,6 @@ public class ModelProperties extends ModelDetailsTab {
 
         item.setValue(model.getLoss());
 
-        setNeuralNetworkVisibility(item);
         return item;
     }
 
@@ -513,11 +510,10 @@ public class ModelProperties extends ModelDetailsTab {
         map.put("VI", "VI");
         map.put("ZERO", "ZERO");
         map.put("XAVIER", "XAVIER");
-        item.setValueMap(map);
 
+        item.setValueMap(map);
         item.setValue(model.getWeightInit());
 
-        setNeuralNetworkVisibility(item);
         return item;
     }
 
@@ -656,21 +652,6 @@ public class ModelProperties extends ModelDetailsTab {
 
         contextMenu.setItems(delete);
         contextMenu.showContextMenu();
-    }
-
-    private boolean isTrainable() {
-        return model.getTraining() != null && model.getTraining().isTrainable();
-    }
-
-    private void applyTrainableVisibility(FormItem item, AdvancedCriteria criteria) {
-        if (!isTrainable()) {
-            item.setVisible(false);
-            item.setRequired(false);
-            return;
-        }
-
-        item.setVisibleWhen(criteria);
-        item.setRequiredWhen(criteria);
     }
 
     @Override
