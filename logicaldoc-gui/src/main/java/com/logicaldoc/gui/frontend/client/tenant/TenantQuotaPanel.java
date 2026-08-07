@@ -377,9 +377,9 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareRegularUsersQuotaItem() {
-        SpinnerItem regularUsersQuota = ItemFactory.newSpinnerItem(REGULAR_USERS_QUOTA, tenant.getRegularUsers());
+        SpinnerItem regularUsersQuota = ItemFactory.newSpinnerItem(REGULAR_USERS_QUOTA, tenant.getRegularUsersQuota());
         regularUsersQuota.setDisabled(changedHandler == null);
-        regularUsersQuota.setMin(1);
+        regularUsersQuota.setMin(-1);
         regularUsersQuota.setStep(1);
         regularUsersQuota.setWidth(120);
         regularUsersQuota.setHint(I18N.message(USEDHINT, Util.formatLong(tenant.getRegularUsers())));
@@ -414,7 +414,7 @@ public class TenantQuotaPanel extends HLayout {
 
         validateFormsQuota(values);
 
-        validatereportsQuota(values);
+        validateReportsQuota(values);
 
         validateStampsQuota(values);
 
@@ -453,7 +453,7 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setStampsQuota(Long.parseLong(values.get(STAMPS_QUOTA).toString()));
     }
 
-    private void validatereportsQuota(Map<String, Object> values) {
+    private void validateReportsQuota(Map<String, Object> values) {
         if (values.get(REPORTS_QUOTA) == null)
             tenant.setReportsQuota(null);
         else
