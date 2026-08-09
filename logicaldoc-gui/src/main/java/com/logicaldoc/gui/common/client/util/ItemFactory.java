@@ -1421,6 +1421,16 @@ public class ItemFactory {
         return newSpinnerItem(name, name, value);
     }
 
+    public static SpinnerItem newQuotaSpinnerItem(String name, Long quota, long usage) {
+        SpinnerItem item = ItemFactory.newSpinnerItem(name, quota);
+        item.setRequired(false);
+        item.setMin(-1);
+        item.setStep(1);
+        item.setWidth(120);
+        item.setHint(I18N.message("usedhint", Util.formatLong(usage)));
+        return item;
+    }
+
     public static Img newImgIcon(String name) {
         Img img = newImg(name);
         img.setWidth("16px");

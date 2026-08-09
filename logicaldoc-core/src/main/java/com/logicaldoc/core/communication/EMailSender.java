@@ -181,7 +181,7 @@ public class EMailSender {
             foldering = config.getTenantInt(tenant, "smtp.save.foldering", FOLDERING_DAY);
             clientSecret = config.getTenantProperty(tenant, "smtp.clientSecret");
             clientId = config.getTenantProperty(tenant, "smtp.clientId");
-            clientTenant = config.getProperty(tenant, "smtp.clientTenant");
+            clientTenant = config.getTenantProperty(tenant, "smtp.clientTenant");
         } catch (Exception t) {
             log.warn(t.getMessage(), t);
         }

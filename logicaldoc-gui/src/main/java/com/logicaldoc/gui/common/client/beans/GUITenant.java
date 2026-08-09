@@ -77,7 +77,7 @@ public class GUITenant implements Serializable {
 
     private Integer quotaThreshold = null;
 
-    private Long maxEmailAccounts;
+    private Long emailAccountsQuota;
 
     private boolean enabled = true;
 
@@ -473,12 +473,12 @@ public class GUITenant implements Serializable {
         this.importFoldersQuota = importFoldersQuota;
     }
 
-    public Long getMaxEmailAccounts() {
-        return maxEmailAccounts;
+    public Long getEmailAccountsQuota() {
+        return emailAccountsQuota;
     }
 
-    public void setMaxEmailAccounts(Long maxEmailAccounts) {
-        this.maxEmailAccounts = maxEmailAccounts;
+    public void setEmailAccountsQuota(Long emailAccountsQuota) {
+        this.emailAccountsQuota = emailAccountsQuota;
     }
 
     public long getEmailAccounts() {
