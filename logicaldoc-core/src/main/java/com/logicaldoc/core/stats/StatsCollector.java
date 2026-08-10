@@ -144,8 +144,8 @@ public class StatsCollector extends Task {
             /*
              * Collect users statistics
              */
-            long users = userDao.countRegulars(null);
-            long guests = userDao.countGuests(null);
+            long users = userDao.countRegularUsers(null);
+            long guests = userDao.countReadonlyUsers(null);
             long groups = groupDAO.count();
             log.debug("Collected users data");
 

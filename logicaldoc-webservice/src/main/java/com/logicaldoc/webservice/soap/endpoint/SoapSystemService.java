@@ -85,12 +85,12 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			UserDAO userDao = UserDAO.get();
 			WSParameter users = new WSParameter();
 			users.setName("users_regular");
-			users.setValue(Long.toString(userDao.countRegulars(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
+			users.setValue(Long.toString(userDao.countRegularUsers(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
 			parameters.add(users);
 			
 			WSParameter readonly = new WSParameter();
 			readonly.setName("users_readonly");
-			readonly.setValue(Long.toString(userDao.countGuests(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
+			readonly.setValue(Long.toString(userDao.countReadonlyUsers(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
 			parameters.add(readonly);
 					
 			/*

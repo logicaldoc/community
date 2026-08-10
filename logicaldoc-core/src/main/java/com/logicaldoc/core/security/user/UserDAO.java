@@ -37,10 +37,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
      * 
      * @throws PersistenceException Error in the database
      */
-    public long countRegulars(Long tenantId) throws PersistenceException;
+    public long countRegularUsers(Long tenantId) throws PersistenceException;
 
     /**
-     * Counts the total number of guest users
+     * Counts the total number of read-only users
      *
      * @param tenantId identifier of the tenant
      * 
@@ -48,7 +48,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
      * 
      * @throws PersistenceException Error in the database
      */
-    public long countGuests(Long tenantId) throws PersistenceException;
+    public long countReadonlyUsers(Long tenantId) throws PersistenceException;
 
     /**
      * This method finds an User by its username. The search is case sensitive.
