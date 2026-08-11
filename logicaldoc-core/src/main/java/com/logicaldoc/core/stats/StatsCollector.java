@@ -739,7 +739,7 @@ public class StatsCollector extends Task {
             log.error(e.getMessage(), e);
         }
 
-        stats[5] = documentDAO.computeTotalSize(tenantId != Tenant.SYSTEM_ID ? tenantId : null, null, true);
+        stats[5] = documentDAO.computeTotalStorage(tenantId != Tenant.SYSTEM_ID ? tenantId : null, null, true);
 
         stats[6] = 0;
         try {
@@ -756,7 +756,7 @@ public class StatsCollector extends Task {
             log.error(e.getMessage(), e);
         }
 
-        stats[7] = stats[5] - documentDAO.computeTotalSize(tenantId, null, false);
+        stats[7] = stats[5] - documentDAO.computeTotalStorage(tenantId, null, false);
 
         saveStatistic("notindexeddocs", stats[0], tenantId);
         saveStatistic("indexeddocs", stats[1], tenantId);

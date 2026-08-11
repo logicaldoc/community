@@ -539,11 +539,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 guiUser.setPagesQuota(user.getPagesQuota());
                 guiUser.setPages(SequenceDAO.get().getCurrentValue("userpages", user.getId(), user.getTenantId()));
                 guiUser.setDocumentsQuota(user.getDocumentsQuota());
-                guiUser.setDocuments(SequenceDAO.get().getCurrentValue("userdocuments", user.getId(), user.getTenantId()));
+                guiUser.setDocuments(SequenceDAO.get().getCurrentValue("userdocs", user.getId(), user.getTenantId()));
                 guiUser.setQuotaThreshold(user.getQuotaThreshold());
                 
                 guiUser.setTenant(getTenant(user.getTenantId()));
-
+                
                 ContextProperties config = Context.get().getConfig();
                 guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(guiUser.getTenant().getName()), 12));
 

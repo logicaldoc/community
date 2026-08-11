@@ -299,7 +299,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
             Integer max) throws PersistenceException;
 
     /**
-     * Obtains the total size of the repository, that is the sum of sizes of all
+     * Obtains the total storage of the repository, that is the sum of sizes of all
      * documents and their versions
      * 
      * @param tenantId identifier of the tenant(optional)
@@ -310,7 +310,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
      * 
      * @throws PersistenceException error at data layer
      */
-    public long computeTotalSize(Long tenantId, Long publisherId, boolean computeDeleted) throws PersistenceException;
+    public long computeTotalStorage(Long tenantId, Long publisherId, boolean computeDeleted) throws PersistenceException;
 
     /**
      * Gets the collection of deleted document ids
@@ -360,6 +360,32 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
      */
     public long countPages(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException;
 
+    /**
+     * Counts the number of documents uploaded by a user (number of documents where the user is creator or publisher) 
+     * 
+     * @param userId The user
+     * @param computeDeleted If true, even deleted documents are considered
+     * @param computeArchived If true, even archived documents are considered
+     * 
+     * @return number of documents
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public long countUserDocuments(Long userId, boolean computeDeleted, boolean computeArchived) throws PersistenceException;
+
+    /**
+     * Counts the number of pages uploaded by a user (number of pages in documents where the user is creator or publisher)
+     * 
+     * @param userId The tenant to search in
+     * @param computeDeleted If true, even deleted documents are considered
+     * @param computeArchived If true, even archived documents are considered
+     * 
+     * @return number of pages
+     * 
+     * @throws PersistenceException error at data layer
+     */
+    public long countUserPages(Long userId, boolean computeDeleted, boolean computeArchived) throws PersistenceException;
+    
     
     /**
      * Finds all documents by the indexing status. Order by ascending

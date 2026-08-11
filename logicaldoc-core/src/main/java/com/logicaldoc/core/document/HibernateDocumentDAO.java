@@ -911,7 +911,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     }
 
     @Override
-    public long computeTotalSize(Long tenantId, Long userId, boolean computeDeleted) throws PersistenceException {
+    public long computeTotalStorage(Long tenantId, Long userId, boolean computeDeleted) throws PersistenceException {
         // Count all the versions of the documents related to file change
         StringBuilder query = new StringBuilder(
                 "select sum(ld_filesize) from ld_version where ld_version = ld_fileversion ");
@@ -943,6 +943,24 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         return queryForLong(query.toString());
     }
+    
+    @Override
+    public long countUserDocuments(Long userId, boolean computeDeleted, boolean computeArchived)
+            throws PersistenceException {
+        StringBuilder query = new StringBuilder("select count(distinct(ld_id)) from ld_document where 1=1 ");
+
+        if (!computeDeleted)
+            query.append(" and ld_deleted = 0 ");
+
+        if (!computeArchived)
+            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+
+        if (userId != null)
+            query.append(" and (ld_publisherid = %d or ld_creatorid = %d)".formatted(userId, userId));
+
+        return queryForLong(query.toString());
+
+    }
 
     @Override
     public long countPages(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException {
@@ -956,6 +974,23 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         if (tenantId != null)
             query.append(AND_LD_TENANTID_D.formatted(tenantId));
+
+        return queryForLong(query.toString());
+    }
+    
+    @Override
+    public long countUserPages(Long userId, boolean computeDeleted, boolean computeArchived)
+            throws PersistenceException {
+        StringBuilder query = new StringBuilder("select sum(ld_pages) from ld_document where 1 = 1 ");
+
+        if (!computeDeleted)
+            query.append(" and ld_deleted = 0 ");
+
+        if (!computeArchived)
+            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+
+        if (userId != null)
+            query.append(" and (ld_publisherid = %d or ld_creatorid = %d)".formatted(userId, userId));
 
         return queryForLong(query.toString());
     }

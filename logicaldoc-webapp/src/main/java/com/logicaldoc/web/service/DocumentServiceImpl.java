@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
@@ -2274,6 +2273,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         DocumentHistory transaction = new DocumentHistory();
         transaction.setSession(session);
+        transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
         try {
             DocumentManager.get().archiveDocuments(docIds.stream().collect(Collectors.toSet()), transaction);
         } catch (PersistenceException e) {
@@ -2426,7 +2426,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             List<String> messages = pwe.getMessages();
             messages.add(0, "passwordweek");
             return messages;
-        } catch (PermissionException | PersistenceException | URISyntaxException | NoSuchAlgorithmException e) {
+        } catch (Exception e) {
             return throwServerException(session, log, e);
         }
     }

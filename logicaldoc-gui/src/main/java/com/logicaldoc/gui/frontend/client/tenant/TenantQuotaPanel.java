@@ -25,8 +25,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TenantQuotaPanel extends HLayout {
 
-    private static final String USEDHINT = "usedhint";
-
     private static final String PAGES_QUOTA = "pagesquota";
 
     private static final String MONTHLYAPICALLS_QUOTA = "monthlyapicallsquota";
@@ -248,7 +246,7 @@ public class TenantQuotaPanel extends HLayout {
     private SpinnerItem prepareStorageQuotaItem() {
         SpinnerItem item = ItemFactory.newQuotaSpinnerItem(STORAGE_QUOTA, tenant.getStorageQuota(),
                 tenant.getStorage());    
-        item.setHint("MB " + I18N.message(USEDHINT, Util.formatSizeW7(tenant.getStorage())));
+        item.setHint("MB " + I18N.message("usedhint", Util.formatSizeW7(tenant.getStorage())));
         item.setStep(1024);
         return applyQuotaItemVisibility(item);
     }

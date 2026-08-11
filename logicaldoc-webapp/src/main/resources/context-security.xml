@@ -127,6 +127,7 @@
         <security:custom-filter ref="webserviceBasicAuthenticationFilter" before="BASIC_AUTH_FILTER" />
     </security:http>
  
+    <security:http pattern="/download-ticket" security="none" />
  
     <security:http use-expressions="true" create-session="never"
         disable-url-rewriting="true" auto-config="false"

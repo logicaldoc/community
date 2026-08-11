@@ -1,12 +1,12 @@
 package com.logicaldoc.gui.frontend.client.security.user;
 
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -18,17 +18,15 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class UserQuotaPanel extends HLayout {
 
-    private static final String QUOTA_THRESHOLD = "quotathreshold";
+    private static final String QUOTA_THRESHOLD = "quotaThreshold";
 
-    private static final String USAGE = "usage";
+    private static final String PAGES_QUOTA = "pagesquota";
 
-    private static final String PAGESQUOTA = "pagesquota";
+    private static final String DOCUMENTS_QUOTA = "documentsquota";
 
-    private static final String DOCUMENTSQUOTA = "documentsquota";
+    private static final String SESSIONS_QUOTA = "sessionsquota";
 
-    private static final String SESSIONSQUOTA = "sessionsquota";
-
-    private static final String STORAGEQUOTA = "storagequota";
+    private static final String STORAGE_QUOTA = "storagequota";
 
     private DynamicForm form = new DynamicForm();
 
@@ -57,45 +55,30 @@ public class UserQuotaPanel extends HLayout {
         form = new DynamicForm();
         form.setTitleOrientation(TitleOrientation.TOP);
 
-        StaticTextItem storage = ItemFactory.newStaticTextItem("storage", USAGE, Util.formatSizeW7(user.getStorage()));
-        storage.setWrap(false);
-
-        StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", USAGE, Long.toString(user.getSessions()));
-        sessions.setWrap(false);
-
-        StaticTextItem pages = ItemFactory.newStaticTextItem("pages", USAGE, Long.toString(user.getPages()));
-        pages.setWrap(false);
-
-        StaticTextItem documents = ItemFactory.newStaticTextItem("documents", USAGE,
-                Long.toString(user.getDocuments()));
-        documents.setWrap(false);
-        
-        SpinnerItem storageQuota = ItemFactory.newSpinnerItem(STORAGEQUOTA, user.getStorageQuota());
-        storageQuota.setWidth(120);
-        storageQuota.setMin(-1);
-        storageQuota.setHint("MB");
-        storageQuota.setStep(10);
+        SpinnerItem storageQuota = ItemFactory.newQuotaSpinnerItem(STORAGE_QUOTA, user.getStorageQuota(),
+                user.getStorage());
+        storageQuota.setHint("MB " + I18N.message("usedhint", Util.formatSizeW7(user.getStorage())));
+        storageQuota.setStep(1024);
+        storageQuota.setDisabled(readonly);
         if (!readonly)
             storageQuota.addChangedHandler(changedHandler);
 
-        SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, user.getSessionsQuota());
-        sessionsQuota.setWidth(120);
-        sessionsQuota.setMin(-1);
-        sessionsQuota.setStep(1);
+        SpinnerItem sessionsQuota = ItemFactory.newQuotaSpinnerItem(SESSIONS_QUOTA, user.getSessionsQuota(),
+                user.getSessions());
+        sessionsQuota.setDisabled(readonly);
         if (!readonly)
             sessionsQuota.addChangedHandler(changedHandler);
 
-        SpinnerItem pagesQuota = ItemFactory.newSpinnerItem(PAGESQUOTA, user.getPagesQuota());
-        pagesQuota.setWidth(120);
-        pagesQuota.setMin(-1);
-        pagesQuota.setStep(10);
+        SpinnerItem pagesQuota = ItemFactory.newQuotaSpinnerItem(PAGES_QUOTA, user.getPagesQuota(), user.getPages());
+        pagesQuota.setStep(1000);
+        pagesQuota.setDisabled(readonly);
         if (!readonly)
             pagesQuota.addChangedHandler(changedHandler);
 
-        SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, user.getDocumentsQuota());
-        documentsQuota.setWidth(120);
-        documentsQuota.setMin(-1);
-        documentsQuota.setStep(10);
+        SpinnerItem documentsQuota = ItemFactory.newQuotaSpinnerItem(DOCUMENTS_QUOTA, user.getDocumentsQuota(),
+                user.getDocuments());
+        documentsQuota.setStep(1000);
+        documentsQuota.setDisabled(readonly);
         if (!readonly)
             documentsQuota.addChangedHandler(changedHandler);
 
@@ -107,37 +90,36 @@ public class UserQuotaPanel extends HLayout {
         if (!readonly)
             quotaThreshold.addChangedHandler(changedHandler);
 
-        form.setItems(documentsQuota, documents, pagesQuota, pages, storageQuota, storage, sessionsQuota, sessions,
-                quotaThreshold);
+        form.setItems(documentsQuota, pagesQuota, storageQuota, sessionsQuota, quotaThreshold);
         addMember(form);
     }
 
     boolean validate() {
         if (form.validate()) {
-            String val = form.getValueAsString(STORAGEQUOTA);
+            String val = form.getValueAsString(STORAGE_QUOTA);
             if (val != null)
-                user.setStorageQuota(Long.parseLong(form.getValueAsString(STORAGEQUOTA)));
+                user.setStorageQuota(Long.parseLong(form.getValueAsString(STORAGE_QUOTA)));
             else
                 user.setStorageQuota(null);
 
-            val = form.getValueAsString(DOCUMENTSQUOTA);
+            val = form.getValueAsString(DOCUMENTS_QUOTA);
             if (val != null)
-                user.setDocumentsQuota(Long.parseLong(form.getValueAsString(DOCUMENTSQUOTA)));
+                user.setDocumentsQuota(Long.parseLong(form.getValueAsString(DOCUMENTS_QUOTA)));
             else
                 user.setDocumentsQuota(null);
 
-            val = form.getValueAsString(PAGESQUOTA);
+            val = form.getValueAsString(PAGES_QUOTA);
             if (val != null)
-                user.setPagesQuota(Long.parseLong(form.getValueAsString(PAGESQUOTA)));
+                user.setPagesQuota(Long.parseLong(form.getValueAsString(PAGES_QUOTA)));
             else
                 user.setPagesQuota(null);
 
-            val = form.getValueAsString(SESSIONSQUOTA);
+            val = form.getValueAsString(SESSIONS_QUOTA);
             if (val != null)
-                user.setSessionsQuota(Long.parseLong(form.getValueAsString(SESSIONSQUOTA)));
+                user.setSessionsQuota(Long.parseLong(form.getValueAsString(SESSIONS_QUOTA)));
             else
                 user.setSessionsQuota(null);
-            
+
             if (form.getValueAsString(QUOTA_THRESHOLD) == null)
                 user.setQuotaThreshold(null);
             else

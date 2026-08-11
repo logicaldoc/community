@@ -79,21 +79,21 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testComputeTotalSize() throws PersistenceException {
-        long totalSize = testSubject.computeTotalSize(1L, null, false);
+    public void testComputeTotalStorage() throws PersistenceException {
+        long totalSize = testSubject.computeTotalStorage(1L, null, false);
         assertEquals(22658L, totalSize);
 
-        totalSize = testSubject.computeTotalSize(1L, null, true);
+        totalSize = testSubject.computeTotalStorage(1L, null, true);
         assertEquals(22658L, totalSize);
 
-        totalSize = testSubject.computeTotalSize(1L, 1L, true);
+        totalSize = testSubject.computeTotalStorage(1L, 1L, true);
         assertEquals(22658L, totalSize);
 
-        totalSize = testSubject.computeTotalSize(1L, 3L, true);
+        totalSize = testSubject.computeTotalStorage(1L, 3L, true);
         assertEquals(0L, totalSize);
 
         // Non-existent tenant
-        totalSize = testSubject.computeTotalSize(99L, 1L, true);
+        totalSize = testSubject.computeTotalStorage(99L, 1L, true);
         assertEquals(0L, totalSize);
     }
 
@@ -771,9 +771,23 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
+    public void testCountUserDocuments() throws PersistenceException {
+        assertEquals(9L, testSubject.countUserDocuments(null, true, false));
+        assertEquals(6L, testSubject.countUserDocuments(1L, false, false));
+        assertEquals(0L, testSubject.countUserDocuments(99L, false, false));
+    }
+    
+    @Test
     public void testCountPages() throws PersistenceException {
         assertEquals(45L, testSubject.countPages(null, true, false));
         assertEquals(30L, testSubject.countPages(Tenant.DEFAULT_ID, false, false));
+    }
+    
+    @Test
+    public void testCountUserPages() throws PersistenceException {
+        assertEquals(45L, testSubject.countUserPages(null, true, false));
+        assertEquals(30L, testSubject.countUserPages(1L, false, false));
+        assertEquals(0L, testSubject.countUserPages(99L, false, false));
     }
     
     @Test
