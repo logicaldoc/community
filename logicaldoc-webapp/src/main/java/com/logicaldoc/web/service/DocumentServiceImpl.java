@@ -2348,6 +2348,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
         DocumentHistory transaction = new DocumentHistory();
         transaction.setSession(session);
+        transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
         try {
             DocumentManager.get().archiveDocuments(docIds.stream().collect(Collectors.toSet()), transaction);
         } catch (PersistenceException e) {
