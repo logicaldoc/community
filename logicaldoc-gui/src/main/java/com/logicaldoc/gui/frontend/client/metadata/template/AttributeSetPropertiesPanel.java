@@ -445,7 +445,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	private void addTypeSelector() {
 		type = new SelectItem("type", I18N.message("type"));
 		LinkedHashMap<String, String> types = new LinkedHashMap<>();
-		types.put("" + GUIAttribute.TYPE_STRING, I18N.message("string"));
+		types.put("" + GUIAttribute.TYPE_STRING, I18N.message("text"));
 		types.put("" + GUIAttribute.TYPE_INT, I18N.message("integer"));
 		types.put("" + GUIAttribute.TYPE_DOUBLE, I18N.message("decimal"));
 		types.put("" + GUIAttribute.TYPE_DATE, I18N.message("date"));

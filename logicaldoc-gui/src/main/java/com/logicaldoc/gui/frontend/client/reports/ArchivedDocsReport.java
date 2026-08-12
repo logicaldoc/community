@@ -41,182 +41,181 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ArchivedDocsReport extends ReportPanel implements FolderChangeListener {
 
-	private static final String FOLDER = "folder";
+    private static final String FOLDER = "folder";
 
-	private FolderSelector folderSelector;
+    private FolderSelector folderSelector;
 
-	private SpinnerItem max;
+    private SpinnerItem max;
 
-	public ArchivedDocsReport() {
-		super("archiveddocs", "showndocuments");
-	}
+    public ArchivedDocsReport() {
+        super("archiveddocs", "showndocuments");
+    }
 
-	@Override
-	protected void fillToolBar(ToolStrip toolStrip) {
-		max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
-		max.setHint(I18N.message("elements"));
-		max.setStep(10);
-		max.setShowTitle(false);
-		max.addChangedHandler(event -> refresh());
+    @Override
+    protected void fillToolBar(ToolStrip toolStrip) {
+        max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
+        max.setHint(I18N.message("elements"));
+        max.setStep(10);
+        max.setShowTitle(false);
+        max.addChangedHandler(event -> refresh());
 
-		ToolStripButton display = new ToolStripButton();
-		display.setTitle(I18N.message("display"));
-		display.addClickHandler(event -> {
-			if (Boolean.TRUE.equals(max.validate()))
-				refresh();
-		});
-		toolStrip.addButton(display);
-		toolStrip.addFormItem(max);
-		toolStrip.addSeparator();
+        ToolStripButton display = new ToolStripButton();
+        display.setTitle(I18N.message("display"));
+        display.addClickHandler(event -> {
+            if (Boolean.TRUE.equals(max.validate()))
+                refresh();
+        });
+        toolStrip.addButton(display);
+        toolStrip.addFormItem(max);
+        toolStrip.addSeparator();
 
-		folderSelector = new FolderSelector(FOLDER, null);
-		folderSelector.setWrapTitle(false);
-		folderSelector.setWidth(250);
-		folderSelector.addFolderChangeListener(this);
-		toolStrip.addFormItem(folderSelector);
-	}
+        folderSelector = new FolderSelector(FOLDER, null);
+        folderSelector.setWrapTitle(false);
+        folderSelector.setWidth(250);
+        folderSelector.addFolderChangeListener(this);
+        toolStrip.addFormItem(folderSelector);
+    }
 
-	@Override
-	protected void prepareListGrid() {
-		ListGridField id = new ColoredListGridField("id", I18N.message("id"));
-		id.setHidden(true);
-		id.setCanGroupBy(false);
+    @Override
+    protected void prepareListGrid() {
+        ListGridField id = new ColoredListGridField("id", I18N.message("id"));
+        id.setHidden(true);
+        id.setCanGroupBy(false);
 
-		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
-		size.setCanFilter(false);
-		size.setCanGroupBy(false);
+        ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 
-		ListGridField version = new VersionListGridField();
-		version.setCanFilter(false);
-		version.setCanGroupBy(false);
+        ListGridField version = new VersionListGridField();
 
-		ListGridField fileVersion = new VersionListGridField("fileVersion", "fileversion");
-		fileVersion.setCanFilter(false);
-		fileVersion.setCanGroupBy(false);
-		fileVersion.setHidden(true);
+        ListGridField fileVersion = new VersionListGridField("fileVersion", "fileversion");
+        fileVersion.setHidden(true);
 
-		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified",
-				DateCellFormatter.FORMAT_LONG);
-		lastModified.setCanFilter(false);
-		lastModified.setCanGroupBy(false);
-		lastModified.setHidden(true);
+        ListGridField lastModified = new DateListGridField("lastModified", "lastmodified",
+                DateCellFormatter.FORMAT_LONG);
+        lastModified.setHidden(true);
 
-		ListGridField created = new DateListGridField("created", "createdon", DateCellFormatter.FORMAT_LONG);
+        ListGridField created = new DateListGridField("created", "createdon", DateCellFormatter.FORMAT_LONG);
+        created.setHidden(true);
 
-		ListGridField folder = new ColoredListGridField(FOLDER, I18N.message(FOLDER), 200);
-		folder.setAlign(Alignment.CENTER);
-		folder.setCanFilter(true);
-		folder.setCanGroupBy(true);
+        ListGridField archived = new DateListGridField("date", "archivedon", DateCellFormatter.FORMAT_LONG);
 
-		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
-		customId.setType(ListGridFieldType.TEXT);
-		customId.setHidden(true);
-		customId.setCanGroupBy(false);
+        ListGridField folder = new ColoredListGridField(FOLDER, I18N.message(FOLDER), 200);
+        folder.setAlign(Alignment.CENTER);
+        folder.setHidden(true);
 
-		FileNameListGridField filename = new FileNameListGridField();
-		filename.setWidth(200);
-		filename.setCanFilter(true);
+        ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
+        customId.setType(ListGridFieldType.TEXT);
+        customId.setHidden(true);
 
-		ListGridField type = new ColoredListGridField("type", I18N.message("type"), 55);
-		type.setType(ListGridFieldType.TEXT);
-		type.setAlign(Alignment.CENTER);
-		type.setHidden(true);
-		type.setCanGroupBy(false);
+        ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"));
+        comment.setType(ListGridFieldType.TEXT);
 
-		list.setFields(filename, version, fileVersion, size, created, lastModified, folder, id, customId, type);
+        ListGridField user = new ColoredListGridField("archiver", I18N.message("archivedby"), 110);
+        user.setType(ListGridFieldType.TEXT);
 
-		list.addDoubleClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
-	}
+        FileNameListGridField filename = new FileNameListGridField();
+        filename.setWidth(200);
 
-	@Override
-	protected void refresh() {
-		Long folderId = folderSelector.getFolderId();
-		list.refresh(new ArchivedDocsDS(folderId, max.getValueAsInteger()));
-	}
+        ListGridField type = new ColoredListGridField("type", I18N.message("type"), 55);
+        type.setType(ListGridFieldType.TEXT);
+        type.setAlign(Alignment.CENTER);
+        type.setHidden(true);
+        type.setCanGroupBy(false);
 
-	@Override
-	protected void showContextMenu() {
-		Menu contextMenu = new Menu();
-		final ListGridRecord[] selection = list.getSelectedRecords();
+        list.setFields(filename, version, fileVersion, size, created, lastModified, archived, user, comment, folder, id,
+                customId, type);
 
-		MenuItem preview = new MenuItem();
-		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(event -> {
-			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
+        list.addDoubleClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+    }
 
-			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
-				@Override
-				public void handleSuccess(GUIDocument doc) {
-					new PreviewPopup(doc).show();
-				}
-			});
-		});
-		preview.setEnabled(
-				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+    @Override
+    protected void refresh() {
+        Long folderId = folderSelector.getFolderId();
+        list.refresh(new ArchivedDocsDS(folderId, max.getValueAsInteger()));
+    }
 
-		MenuItem download = new MenuItem();
-		download.setTitle(I18N.message("download"));
-		download.addClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+    @Override
+    protected void showContextMenu() {
+        Menu contextMenu = new Menu();
+        final ListGridRecord[] selection = list.getSelectedRecords();
 
-		MenuItem openFolder = new MenuItem();
-		openFolder.setTitle(I18N.message("openfolder"));
-		openFolder.addClickHandler(event -> {
-			ListGridRecord rec = list.getSelectedRecord();
-			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
-					Long.parseLong(rec.getAttributeAsString("id")));
-		});
+        MenuItem preview = new MenuItem();
+        preview.setTitle(I18N.message("preview"));
+        preview.addClickHandler(event -> {
+            long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 
-		MenuItem restore = new MenuItem();
-		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler(event -> DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void arg0) {
-						list.removeSelectedData();
-						GuiLog.info(I18N.message("docsrestored"), null);
-					}
-				}));
+            DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
+                @Override
+                public void handleSuccess(GUIDocument doc) {
+                    new PreviewPopup(doc).show();
+                }
+            });
+        });
+        preview.setEnabled(
+                com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-			if (Boolean.TRUE.equals(answer)) {
-				DocumentService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						list.removeSelectedData();
-					}
-				});
-			}
-		}));
+        MenuItem download = new MenuItem();
+        download.setTitle(I18N.message("download"));
+        download.addClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
-		MenuItem sendToExpArchive = new MenuItem();
-		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
-		sendToExpArchive.addClickHandler(event -> new SendToArchiveDialog(GridUtil.getIds(selection), true).show());
+        MenuItem openFolder = new MenuItem();
+        openFolder.setTitle(I18N.message("openfolder"));
+        openFolder.addClickHandler(event -> {
+            ListGridRecord rec = list.getSelectedRecord();
+            DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+                    Long.parseLong(rec.getAttributeAsString("id")));
+        });
 
-		download.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);
-		preview.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);
-		openFolder.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);
-		sendToExpArchive.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
-		delete.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
-		restore.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
+        MenuItem restore = new MenuItem();
+        restore.setTitle(I18N.message("restore"));
+        restore.addClickHandler(event -> DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection),
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void arg0) {
+                        list.removeSelectedData();
+                        GuiLog.info(I18N.message("docsrestored"), null);
+                    }
+                }));
 
-		contextMenu.setItems(download, preview, openFolder, restore, sendToExpArchive, new MenuItemSeparator(), delete);
-		contextMenu.showContextMenu();
-	}
+        MenuItem delete = new MenuItem();
+        delete.setTitle(I18N.message("ddelete"));
+        delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+            if (Boolean.TRUE.equals(answer)) {
+                DocumentService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        list.removeSelectedData();
+                    }
+                });
+            }
+        }));
 
-	@Override
-	public void onChanged(GUIFolder folder) {
-		refresh();
-	}
+        MenuItem sendToExpArchive = new MenuItem();
+        sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
+        sendToExpArchive.addClickHandler(event -> new SendToArchiveDialog(GridUtil.getIds(selection), true).show());
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+        download.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);
+        preview.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);
+        openFolder.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);
+        sendToExpArchive.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
+        delete.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
+        restore.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+        contextMenu.setItems(download, preview, openFolder, restore, sendToExpArchive, new MenuItemSeparator(), delete);
+        contextMenu.showContextMenu();
+    }
+
+    @Override
+    public void onChanged(GUIFolder folder) {
+        refresh();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

@@ -14,34 +14,38 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class ArchivedDocsDS extends DataSource {
 
-	public ArchivedDocsDS(Long folderId, Integer max) {
-		setTitleField("filename");
-		setRecordXPath("/list/document");
+    public ArchivedDocsDS(Long folderId, Integer max) {
+        setTitleField("filename");
+        setRecordXPath("/list/document");
 
-		DataSourceTextField id = new DataSourceTextField("id");
-		id.setPrimaryKey(true);
-		id.setHidden(true);
-		id.setRequired(true);
-		DataSourceImageField icon = new DataSourceImageField("icon");
-		DataSourceTextField customId = new DataSourceTextField("customId");
-		DataSourceTextField version = new DataSourceTextField("version");
-		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
-		DataSourceFloatField size = new DataSourceFloatField("size");
-		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
-		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
-		DataSourceTextField filename = new DataSourceTextField("filename");
-		DataSourceTextField fid = new DataSourceTextField("folderId");
-		DataSourceTextField folder = new DataSourceTextField("folder");
-		DataSourceTextField type = new DataSourceTextField("type");
+        DataSourceTextField id = new DataSourceTextField("id");
+        id.setPrimaryKey(true);
+        id.setHidden(true);
+        id.setRequired(true);
+        DataSourceImageField icon = new DataSourceImageField("icon");
+        DataSourceTextField customId = new DataSourceTextField("customId");
+        DataSourceTextField version = new DataSourceTextField("version");
+        DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
+        DataSourceFloatField size = new DataSourceFloatField("size");
+        DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
+        DataSourceDateTimeField created = new DataSourceDateTimeField("created");
+        DataSourceTextField filename = new DataSourceTextField("filename");
+        DataSourceTextField fid = new DataSourceTextField("folderId");
+        DataSourceTextField folder = new DataSourceTextField("folder");
+        DataSourceTextField type = new DataSourceTextField("type");
+        DataSourceTextField archiver = new DataSourceTextField("archiver");
+        DataSourceDateTimeField date = new DataSourceDateTimeField("date");
+        DataSourceTextField comment = new DataSourceTextField("comment");
 
-		setFields(id, size, version, fileVersion, created, lastModified, customId, icon, filename, fid, folder, type);
-		setClientOnly(true);
+        setFields(id, size, version, fileVersion, created, lastModified, date, archiver, comment, customId, icon,
+                filename, fid, folder, type);
+        setClientOnly(true);
 
-		String url = "data/archiveddocs.xml?1=1";
-		if (folderId != null)
-			url += "&folderId=" + folderId;
-		if (max != null)
-			url += "&max=" + max;
-		setDataURL(url);
-	}
+        String url = "data/archiveddocs.xml?1=1";
+        if (folderId != null)
+            url += "&folderId=" + folderId;
+        if (max != null)
+            url += "&max=" + max;
+        setDataURL(url);
+    }
 }

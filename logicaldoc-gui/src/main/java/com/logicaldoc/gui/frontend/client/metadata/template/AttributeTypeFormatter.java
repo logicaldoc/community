@@ -20,7 +20,7 @@ public class AttributeTypeFormatter implements CellFormatter {
 		int intValue = Integer.parseInt(value.toString());
 		switch (intValue) {
 		case GUIAttribute.TYPE_STRING:
-			return I18N.message("string");
+			return I18N.message("text");
 		case GUIAttribute.TYPE_INT:
 			return I18N.message("integer");
 		case GUIAttribute.TYPE_DOUBLE:
