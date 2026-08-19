@@ -218,7 +218,7 @@ public class DocumentManager {
                 if (version.getFileVersion().equals(fileVersion)) {
                     version = versionDAO.initialize(version);
                     version.setFileSize(fileSize);
-                    futures.add(storeVersionAsync(version, document));
+                    futures.add(saveVersionAsync(version, document));
                 }
             }
 
@@ -416,7 +416,7 @@ public class DocumentManager {
 
             document = documentDAO.findById(document.getId(), true);
 
-            DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
+            DocumentFuture elaboration = new DocumentFuture(document, saveVersionAsync(version, document));
 
             debug("Stored version {}", version.getVersion());
             debug("Invoke listeners after checkin");
@@ -525,33 +525,6 @@ public class DocumentManager {
         documentDAO.store(document, transaction);
 
         debug("locked document {}", document);
-    }
-
-    private void storeFile(Document doc, File file, DocumentHistory transaction, boolean newDocument)
-            throws IOException, PersistenceException {
-        store.store(file, StoreResource.builder().document(doc).newEntry(newDocument).build());
-
-        Map<String, Object> dictionary = new HashMap<>();
-        dictionary.put("newdoc", newDocument);
-        transaction.setFile(file);
-        for (DocumentListener listener : DocumentListenerManager.get().getListeners())
-            listener.afterFileStore(doc, transaction, dictionary);
-
-        if (StringUtils.isEmpty(doc.getLanguage())) {
-            doc.setLanguage("en");
-            doc.setModified(true);
-        }
-
-        if (doc.isModified()) {
-            /*
-             * Check record version of eventual existing document and replicate
-             * it into the document being saved in order to prevent ORM error
-             */
-            Document existingDoc = documentDAO.findById(doc.getId());
-            if (existingDoc != null && existingDoc.getRecordVersion() != doc.getRecordVersion())
-                doc.setRecordVersion(existingDoc.getRecordVersion());
-            documentDAO.store(doc);
-        }
     }
 
     /**
@@ -836,8 +809,6 @@ public class DocumentManager {
 
             setFileName(document, docVO);
 
-            document = documentDAO.initialize(document);
-
             document.clearTags();
             document.setTags(docVO.getTags());
 
@@ -851,6 +822,7 @@ public class DocumentManager {
 
             // Modify document history entry
             document.setVersion(version.getVersion());
+            document.setFolder(FolderDAO.get().findById(document.getFolder().getId(), true));
             if (renameTransaction != null) {
                 renameTransaction.setUser(transaction.getUser());
                 documentDAO.store(document, renameTransaction);
@@ -862,7 +834,7 @@ public class DocumentManager {
 
             markAliasesToIndex(document.getId());
 
-            return document;
+            return documentDAO.findById(document.getId(), true);
         } else {
             throw new PersistenceException(String.format("Document %s is immutable", document));
         }
@@ -977,7 +949,7 @@ public class DocumentManager {
 
             documentDAO.store(doc, transaction);
 
-            return new DocumentFuture(doc, storeVersionAsync(version, doc));
+            return new DocumentFuture(doc, saveVersionAsync(version, doc));
         }
     }
 
@@ -1078,8 +1050,34 @@ public class DocumentManager {
             Version version = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
                     DocumentEvent.STORED, true);
 
-            return new DocumentFuture(docVO, storeVersionAsync(version, docVO));
+            return new DocumentFuture(docVO, saveVersionAsync(version, docVO));
         }
+    }
+
+    private void storeFile(Document doc, File file, DocumentHistory transaction, boolean newDocument)
+            throws IOException, PersistenceException {
+
+        store.store(file, StoreResource.builder().document(doc).newEntry(newDocument).build());
+
+        transaction.setFile(file);
+
+        Document document = documentDAO.findById(doc.getId(), true);
+
+        Map<String, Object> dictionary = new HashMap<>();
+        dictionary.put("newdoc", newDocument);
+
+        // afterFileStore(doc, transaction, newDocument);
+
+        for (DocumentListener listener : DocumentListenerManager.get().getListeners())
+            listener.afterFileStore(document, transaction, dictionary);
+
+        if (StringUtils.isEmpty(document.getLanguage())) {
+            document.setLanguage("en");
+            document.setModified(true);
+        }
+
+        if (document.isModified())
+            documentDAO.store(document);
     }
 
     /**
@@ -1089,7 +1087,7 @@ public class DocumentManager {
      * @param version the version to save
      * @param document the document the version refers to
      */
-    Future<Document> storeVersionAsync(Version version, Document document) {
+    Future<Document> saveVersionAsync(Version version, Document document) {
         /*
          * Probably the document's record has not been written yet, we should
          * fork a thread to wait for its write.
@@ -1125,7 +1123,6 @@ public class DocumentManager {
 
             return document;
         }, "VersionSave", 100L);
-
     }
 
     private void debug(String message, Object... args) {
@@ -1235,18 +1232,15 @@ public class DocumentManager {
             boolean security) throws PersistenceException, IOException {
         validateTransaction(transaction);
 
-        // initialize the document
-        doc = documentDAO.initialize(doc);
-
         if (doc.getDocRef() != null)
             return new DocumentFuture(createAlias(doc, folder, doc.getDocRefType(), transaction), new FutureValue<>());
 
         try (InputStream is = store.getStream(StoreResource.builder().document(doc).build());) {
             Document cloned = new Document(doc);
-            cloned.setId(0);
+            cloned.setId(0L);
+            cloned.setRecordVersion(0L);
             cloned.setCustomId(null);
-            if (doc.getFolder().getId() != folder.getId())
-                cloned.setFolder(folder);
+            cloned.setFolder(folder);
             cloned.setLastModified(null);
             cloned.setDate(null);
             if (cloned.getIndexed() == IndexingStatus.INDEXED)
@@ -1271,7 +1265,7 @@ public class DocumentManager {
 
             String newPath = folderDAO.computePathExtended(folder.getId());
             copyEvent.setComment("%s/%s".formatted(newPath, createdDocument.getFileName()));
-            documentDAO.saveDocumentHistory(doc, copyEvent);
+            DocumentHistoryDAO.get().store(copyEvent);
 
             if (links)
                 copyLinks(doc, createdDocument);
@@ -1422,7 +1416,7 @@ public class DocumentManager {
 
             Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
                     DocumentEvent.RENAMED, false);
-            DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
+            DocumentFuture elaboration = new DocumentFuture(document, saveVersionAsync(version, document));
 
             transaction.setEvent(DocumentEvent.RENAMED);
             documentDAO.store(document, transaction);
@@ -1795,9 +1789,9 @@ public class DocumentManager {
         if (document == null)
             throw new PersistenceException("Unexisting document %d".formatted(ticket.getDocId()));
 
-        if (!folderDAO.isDownloadAllowed(document.getFolder().getId(), transaction.getUserId()))
-            throw new PermissionException(transaction.getUsername(),
-                    "Folder %d".formatted(document.getFolder().getId()), Permission.DOWNLOAD);
+        if (!documentDAO.isDownloadAllowed(document.getId(), transaction.getUserId()))
+            throw new PermissionException(transaction.getUsername(), "Document %s".formatted(document),
+                    Permission.DOWNLOAD);
 
         ticket.setUserId(transaction.getUserId());
 

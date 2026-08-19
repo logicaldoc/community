@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.docusign;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocuSignSettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
@@ -52,11 +53,11 @@ public class DocuSignSettings extends Window {
 		accountId.setRequired(true);
 		accountId.setWidth(300);
 
-		TextItem integrationKey = ItemFactory.newTextItem("integrationkey", settings.getIntegrationKey());
+		TextItem integrationKey = ItemFactory.newPasswordItemPreventAutocomplete("integrationkey", "integrationkey", settings.getIntegrationKey());
 		integrationKey.setRequired(true);
 		integrationKey.setWidth(300);
 
-		TextItem secretKey = ItemFactory.newTextItem("secretkey", settings.getSecretKey());
+		TextItem secretKey = ItemFactory.newPasswordItemPreventAutocomplete("secretkey", "secretkey", settings.getSecretKey());
 		secretKey.setRequired(true);
 		secretKey.setWidth(300);
 
@@ -99,7 +100,7 @@ public class DocuSignSettings extends Window {
 		DocuSignService.Instance.get().authorize(settings, new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(String authorizationUrl) {
-				WindowUtils.openUrl(authorizationUrl, "_blank", null);
+			    WindowUtils.openUrl(authorizationUrl, "_blank", null);
 				destroy();
 			}
 		});

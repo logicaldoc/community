@@ -9,11 +9,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.conversion.ImageConverter;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Takes care of images thumbnail builder
@@ -35,19 +33,17 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
             int quality) throws IOException {
 
         String outExt = FileUtil.getExtension(dest.getName().toLowerCase());
-        ContextProperties conf = Context.get().getConfig();
-        List<String> commandLine = new ArrayList<>();
-        commandLine.add(conf.getProperty("converter.ImageConverter.path"));
+        List<String> arguments = new ArrayList<>();
         if ("png".equals(outExt)) {
-            commandLine.add("-alpha");
-            commandLine.add("on");
+            arguments.add("-alpha");
+            arguments.add("on");
         }
-        commandLine.addAll(List.of("-compress", "JPEG", "-quality", Integer.toString(quality), "-resize",
-                "x%d".formatted(size), src.getPath(), dest.getPath()));
+        arguments.addAll(
+                List.of("-compress", "JPEG", "-quality", Integer.toString(quality), "-resize", "x%d".formatted(size)));
 
-        log.debug("Executing: {}", commandLine);
-
-        new Exec().exec(commandLine, null, null, conf.getInt("converter.ImageConverter.timeout", 10));
+        log.debug("Executing: {}", arguments);
+      
+        new ImageConverter().convert(src, dest, arguments, null);
 
         if (!dest.exists() || dest.length() == 0) {
             /*
@@ -73,5 +69,9 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 
         if (dest.length() < 1)
             throw new IOException("Empty thumbnail image");
+    }
+
+    public void convert(File src, File dest, Integer size, Integer quality) {
+
     }
 }

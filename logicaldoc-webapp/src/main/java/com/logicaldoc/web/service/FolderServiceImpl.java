@@ -883,7 +883,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         try {
             Folder selectedFolderFolder = folderDao.findById(folderId);
             for (long id : docIds) {
-                Document doc = docDao.findById(id);
+                Document doc = docDao.findById(id, true);
                 // Create the document history event
                 DocumentHistory transaction = new DocumentHistory();
                 transaction.setSession(session);

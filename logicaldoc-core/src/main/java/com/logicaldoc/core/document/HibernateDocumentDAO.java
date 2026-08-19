@@ -552,16 +552,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     }
 
     private void checkUniqueCustomId(Document doc) throws PersistenceException {
-        if (!RunLevel.current().aspectEnabled(Aspect.UNIQUENESSCUSTOMID))
+        if (StringUtils.isEmpty(doc.getCustomId()) || !RunLevel.current().aspectEnabled(Aspect.UNIQUENESSCUSTOMID))
             return;
 
         queryForResultSet(
                 "select ld_id, ld_filename from ld_document where ld_tenantid = :tenantId and ld_customid = :customId and not ld_id = :docId",
                 Map.of("tenantId", doc.getTenantId(), "customId", doc.getCustomId(), DOC_ID, doc.getId()), 2,
                 resultSet -> {
-                    if (resultSet.next())
+                    if (resultSet.next()) {
                         throw new PersistenceException("Custom ID %s already identifies the document %s (%d)"
                                 .formatted(doc.getCustomId(), resultSet.getString(2), resultSet.getLong(1)));
+                    }
                 });
     }
 
@@ -943,7 +944,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         return queryForLong(query.toString());
     }
-    
+
     @Override
     public long countUserDocuments(Long userId, boolean computeDeleted, boolean computeArchived)
             throws PersistenceException {
@@ -977,7 +978,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         return queryForLong(query.toString());
     }
-    
+
     @Override
     public long countUserPages(Long userId, boolean computeDeleted, boolean computeArchived)
             throws PersistenceException {
@@ -994,7 +995,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         return queryForLong(query.toString());
     }
-    
+
     @Override
     public List<Document> findByIndexingStatus(IndexingStatus indexingStatus) throws PersistenceException {
         return findByWhere("_entity.docRef is null and _entity.indexingStatus = %d".formatted(indexingStatus.ordinal()),

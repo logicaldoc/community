@@ -87,10 +87,6 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
         copyAttributes(source);
         setId(source.getId());
 
-        setTemplate(source.getTemplate());
-        setTemplateId(source.getTemplateId());
-        setTemplateName(source.getTemplateName());
-
         if (source.getIndexed() != IndexingStatus.INDEXED)
             setIndexingStatus(source.getIndexed());
 
@@ -104,6 +100,42 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
             // may happen do nothing
         }
     }
+    
+    /**
+     * Copies in the current instance the attributes of the passed values
+     * object, but NOT the ID
+     * 
+     * @param docVO the document to get the attributes from
+     */
+    @Override
+    public void copyAttributes(AbstractDocument docVO) {
+        super.copyAttributes(docVO);
+
+        tags.clear();
+
+        if (docVO instanceof Document document) {
+            setDocRef(document.getDocRef());
+            setFolder(document.getFolder());
+            try {
+                for (Tag tag : document.getTags())
+                    getTags().add(tag);
+            } catch (GenericJDBCException | LazyInitializationException ex) {
+                log.debug("Got error when trying to copy tags from document %s".formatted(docVO), ex);
+
+                // load again the provided doc
+                try {
+                    Document testDocVO = DocumentDAO.get().findById(docVO.getId(), true);
+                    if (testDocVO != null) {
+                        for (Tag tag : testDocVO.getTags())
+                            getTags().add(tag);
+                    }
+                } catch (PersistenceException e) {
+                    log.warn("Cannot copy tags from document %s".formatted(docVO), e);
+                }
+            }
+        }
+    }
+    
 
     @Override
     public Map<String, Attribute> getAttributes() {
@@ -242,41 +274,6 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
         }
 
         return icon;
-    }
-
-    /**
-     * Copies in the current instance the attributes of the passed values
-     * object, but NOT the ID
-     * 
-     * @param docVO the document to get the attributes from
-     */
-    @Override
-    public void copyAttributes(AbstractDocument docVO) {
-        super.copyAttributes(docVO);
-
-        setTags(new HashSet<>());
-
-        if (docVO instanceof Document document) {
-            setDocRef(document.getDocRef());
-            setFolder(document.getFolder());
-            try {
-                for (Tag tag : document.getTags())
-                    getTags().add(tag);
-            } catch (GenericJDBCException | LazyInitializationException ex) {
-                log.debug("Got error when trying to copy collections from document {}", docVO, ex);
-
-                // load again the provided doc
-                try {
-                    Document testDocVO = DocumentDAO.get().findById(docVO.getId(), true);
-                    if (testDocVO != null) {
-                        for (Tag tag : testDocVO.getTags())
-                            getTags().add(tag);
-                    }
-                } catch (PersistenceException e) {
-                    log.warn("Cannot copy collections from document {}", docVO, e);
-                }
-            }
-        }
     }
 
     @Override

@@ -87,123 +87,123 @@ public abstract class Filler extends PersistentObject {
     protected String automation;
 
     private static final String EXPLICATION_TOP = """
-            <html>
-            <header>
-              <style>
-                body {
-                  font-family: arial;
-                  font-size: 0.9rem;
-                }
-                
-                th {
-                 white-space: nowrap; 
-                 text-align: left; 
-                 background-color: WhiteSmoke;
-                 vertical-align: middle; 
-                 height: 1px;
-                }
-                
-                th.title {
-                 background-color: RoyalBlue;
-                 color: White;
-                 font-weight: bold;
-                }
-                
-                .accordion {
-                  background-color: #eee;
-                  color: #444;
-                  cursor: pointer;
-                  padding: 8px;
-                  width: 100\u0025;
-                  border: none;
-                  text-align: left;
-                  outline: none;
-                  font-size: 15px;
-                  transition: 0.4s;
-                }
-                
-                .active, .accordion:hover {
-                  background-color: #ccc; 
-                }
-                
-                .panel {
-                  padding: 0 18px;
-                  display: none;
-                  background-color: white;
-                  overflow: hidden;
-                }    
-                
-                    
-          /* Thumbnail */
-          .thumb {
-            max-width: 300px;
-            cursor: pointer;
-          }
+                                                      <html>
+                                                      <header>
+                                                        <style>
+                                                          body {
+                                                            font-family: arial;
+                                                            font-size: 0.9rem;
+                                                          }
 
-          /* Lightbox overlay (hidden by default) */
-          .lightbox {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-          }
+                                                          th {
+                                                           white-space: nowrap;
+                                                           text-align: left;
+                                                           background-color: WhiteSmoke;
+                                                           vertical-align: middle;
+                                                           height: 1px;
+                                                          }
 
-          /* Show when targeted */
-          .lightbox:target {
-            display: flex;
-          }
+                                                          th.title {
+                                                           background-color: RoyalBlue;
+                                                           color: White;
+                                                           font-weight: bold;
+                                                          }
 
-          .lightbox img {
-            max-width: 90vw;
-            max-height: 90vh;
-            box-shadow: 0 0 20px #000;
-          }
+                                                          .accordion {
+                                                            background-color: #eee;
+                                                            color: #444;
+                                                            cursor: pointer;
+                                                            padding: 8px;
+                                                            width: 100\u0025;
+                                                            border: none;
+                                                            text-align: left;
+                                                            outline: none;
+                                                            font-size: 15px;
+                                                            transition: 0.4s;
+                                                          }
 
-          /* Click anywhere to close */
-          .lightbox-close {
-            position: fixed;
-            inset: 0;
-          }
-                            
-              </style>
-            </header>
-            <body>
-        """;
+                                                          .active, .accordion:hover {
+                                                            background-color: #ccc;
+                                                          }
 
-    private static final String EXPLICATION_BOTTOM = """        
-                <script>
-                    var acc = document.getElementsByClassName("accordion");
-                    var i;
-                    
-                    for (i = 0; i < acc.length; i++) {
-                      acc[i].addEventListener("click", function() {
-                        this.classList.toggle("active");
-                        var panel = this.nextElementSibling;
-                        if (panel.style.display === "block") {
-                          panel.style.display = "none";
-                        } else {
-                          panel.style.display = "block";
-                        }
-                      });
-                    }
-                </script>       
-            </body>
-        </html>
-        """;
+                                                          .panel {
+                                                            padding: 0 18px;
+                                                            display: none;
+                                                            background-color: white;
+                                                            overflow: hidden;
+                                                          }
+
+
+                                                    /* Thumbnail */
+                                                    .thumb {
+                                                      max-width: 300px;
+                                                      cursor: pointer;
+                                                    }
+
+                                                    /* Lightbox overlay (hidden by default) */
+                                                    .lightbox {
+                                                      position: fixed;
+                                                      inset: 0;
+                                                      background: rgba(0,0,0,0.8);
+                                                      display: none;
+                                                      align-items: center;
+                                                      justify-content: center;
+                                                      z-index: 999;
+                                                    }
+
+                                                    /* Show when targeted */
+                                                    .lightbox:target {
+                                                      display: flex;
+                                                    }
+
+                                                    .lightbox img {
+                                                      max-width: 90vw;
+                                                      max-height: 90vh;
+                                                      box-shadow: 0 0 20px #000;
+                                                    }
+
+                                                    /* Click anywhere to close */
+                                                    .lightbox-close {
+                                                      position: fixed;
+                                                      inset: 0;
+                                                    }
+
+                                                        </style>
+                                                      </header>
+                                                      <body>
+                                                  """;
+
+    private static final String EXPLICATION_BOTTOM = """
+                                                             <script>
+                                                                 var acc = document.getElementsByClassName("accordion");
+                                                                 var i;
+
+                                                                 for (i = 0; i < acc.length; i++) {
+                                                                   acc[i].addEventListener("click", function() {
+                                                                     this.classList.toggle("active");
+                                                                     var panel = this.nextElementSibling;
+                                                                     if (panel.style.display === "block") {
+                                                                       panel.style.display = "none";
+                                                                     } else {
+                                                                       panel.style.display = "block";
+                                                                     }
+                                                                   });
+                                                                 }
+                                                             </script>
+                                                         </body>
+                                                     </html>
+                                                     """;
 
     protected static final String FILLER_EXPLICATION_TOP = """
-        <table align='left' border='1' width='100%%'>
-            <thead>
-               <tr>
-                 <th class='title'>%s &nbsp;&nbsp; <small><em>%s</em></small></th>
-               </tr>
-            </thead>
-            <tbody>
-            <tr><td>
-        """;
+                                                           <table align='left' border='1' width='100%%'>
+                                                               <thead>
+                                                                  <tr>
+                                                                    <th class='title'>%s &nbsp;&nbsp; <small><em>%s</em></small></th>
+                                                                  </tr>
+                                                               </thead>
+                                                               <tbody>
+                                                               <tr><td>
+                                                           """;
 
     protected static final String FILLER_EXPLICATION_BOTTOM = "</td></tr></tbody></table>";
 
@@ -295,10 +295,10 @@ public abstract class Filler extends PersistentObject {
      *        taken from the transaction's file.
      * @param transaction the current transaction
      * @param dictionary Dictionary of the execution pipeline
-     * @param explication optional buffer to receive the explication of the
+     * @param explication optional buffer to receive the description of the
      *        processing
      * 
-     * @return String representation of the filled content
+     * @return Representation of the filled content
      * 
      * @throws PersistenceException Error in the data layer
      * @throws IOException I/O error
@@ -307,8 +307,12 @@ public abstract class Filler extends PersistentObject {
      * @throws AutomationException Error in the automation (if the filler makes
      *         use of automation)
      */
-    protected abstract String fillDocument(Document document, String content, History transaction,
-            Map<String, Object> dictionary, StringBuilder explication)
+    protected abstract FillResult fillDocument(
+            Document document,
+            String content,
+            History transaction,
+            Map<String, Object> dictionary,
+            StringBuilder explication)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException;
 
     /**
@@ -322,7 +326,7 @@ public abstract class Filler extends PersistentObject {
      * @param explication optional buffer to receive the explication of the
      *        processing
      * 
-     * @return String representation of the filled content
+     * @return Representation of the filled content
      * 
      * @throws PersistenceException Error in the data layer
      * @throws IOException I/O error
@@ -331,7 +335,11 @@ public abstract class Filler extends PersistentObject {
      * @throws AutomationException Error in the automation (if the filler makes
      *         use of automation)
      */
-    public final String fill(Document document, String content, History transaction, Map<String, Object> dictionary,
+    public final FillResult fill(
+            Document document,
+            String content,
+            History transaction,
+            Map<String, Object> dictionary,
             StringBuilder explication)
             throws PersistenceException, IOException, FeatureDisabledException, SearchException, AutomationException {
 
@@ -339,17 +347,18 @@ public abstract class Filler extends PersistentObject {
             throw new PersistenceException("Cannot fill a form");
         if (!RunLevel.current().aspectEnabled(Aspect.AUTOFILL))
             return null;
-        
+
         if (explication != null) {
             explication.append(EXPLICATION_TOP);
             explication.append(
                     FILLER_EXPLICATION_TOP.formatted(this.getClass().getSimpleName(), getExplicationSubtitle()));
         }
 
-        if(dictionary==null)
+        if (dictionary == null)
             dictionary = new HashMap<>();
-        
-        String value = fillDocument(document, content, transaction, dictionary, explication);
+
+        FillResult output = fillDocument(document, content, transaction, dictionary, explication);
+        document = output.document();
 
         // In any case after filling we must update the filled flag
         if (!document.isFilled()) {
@@ -367,11 +376,11 @@ public abstract class Filler extends PersistentObject {
         if (transaction != null && document.isModified()) {
             DocumentHistory fillHistory = new DocumentHistory(transaction);
             fillHistory.setEvent(DocumentEvent.FILLED);
-            fillHistory.setComment("%s > %s".formatted(this.getClass().getSimpleName(), value));
+            fillHistory.setComment("%s > %s".formatted(getName(), output.content()));
             DocumentDAO.get().saveDocumentHistory(document, fillHistory);
         }
 
-        return value;
+        return output;
     }
 
     /**
@@ -383,7 +392,7 @@ public abstract class Filler extends PersistentObject {
      * @param explication optional buffer to receive the explication of the
      *        processing
      * 
-     * @return String representation of the filled content
+     * @return Representation of the filled content
      * 
      * @throws PersistenceException Error in the data layer
      * @throws IOException I/O error
@@ -394,7 +403,10 @@ public abstract class Filler extends PersistentObject {
      * @throws AutomationException Error in the automation execution(if any
      *         automation script has been provided)
      */
-    public final String fill(Document document, DocumentHistory transaction, Map<String, Object> dictionary,
+    public final FillResult fill(
+            Document document,
+            DocumentHistory transaction,
+            Map<String, Object> dictionary,
             StringBuilder explication) throws PersistenceException, IOException, FeatureDisabledException,
             ParsingException, SearchException, AutomationException {
 
@@ -411,7 +423,8 @@ public abstract class Filler extends PersistentObject {
         if (log.isDebugEnabled())
             log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
 
-        String result = fill(document, extractedContent, transaction, dictionary, explication);
+        FillResult out = fill(document, extractedContent, transaction, dictionary, explication);
+        document = out.document();
 
         Value<String> filledValue = new Value<>();
         if (StringUtils.isNotEmpty(automation)) {
@@ -420,7 +433,7 @@ public abstract class Filler extends PersistentObject {
                     "fillerDictionary", dictionary, "value", filledValue));
         }
 
-        return StringUtils.defaultIfEmpty(filledValue.getValue(), result);
+        return new FillResult(out.document(), StringUtils.defaultIfEmpty(filledValue.getValue(), out.content()));
     }
 
     protected boolean mustOverwrite(History transaction) {

@@ -20,7 +20,6 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -31,127 +30,124 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class ZonalOCRTemplateSettings extends Window {
 
-	private Upload uploader;
+    private Upload uploader;
 
-	private ValuesManager vm;
+    private ValuesManager vm;
 
-	private DynamicForm form;
+    private DynamicForm form;
 
-	private IButton save;
+    private IButton save;
 
-	private ZonalOCRTemplatesPanel ocrPanel;
+    private ZonalOCRTemplatesPanel ocrPanel;
 
-	public ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel ocrPanel) {
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("ocrtemplate"));
-		setCanDragResize(true);
-		setIsModal(true);
-		setShowModalMask(true);
-		centerInPage();
-		setAutoSize(true);
+    public ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel ocrPanel) {
+        setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+        setTitle(I18N.message("ocrtemplate"));
+        setCanDragResize(true);
+        setIsModal(true);
+        setShowModalMask(true);
+        centerInPage();
+        setAutoSize(true);
 
-		this.ocrPanel = ocrPanel;
+        this.ocrPanel = ocrPanel;
 
-		save = new IButton(I18N.message("save"));
-		save.addClickHandler(event -> onSave());
+        save = new IButton(I18N.message("save"));
+        save.addClickHandler(event -> onSave());
 
-		prepareForm();
+        prepareForm();
 
-		VLayout layout = new VLayout();
-		layout.setMembersMargin(5);
-		layout.setWidth100();
+        VLayout layout = new VLayout();
+        layout.setMembersMargin(5);
+        layout.setWidth100();
 
-		layout.addMember(form);
+        layout.addMember(form);
 
-		uploader = new Upload(save);
-		layout.addMember(uploader);
-		layout.addMember(save);
+        uploader = new Upload(save);
+        layout.addMember(uploader);
+        layout.addMember(save);
 
-		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(Void result) {
-				destroy();
-			}
-		}));
+        // Clean the upload folder if the window is closed
+        addCloseClickHandler(
+                event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        destroy();
+                    }
+                }));
 
-		addItem(layout);
+        addItem(layout);
 
-		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
-	}
+        // Just to clean the upload folder
+        DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
+    }
 
-	private void prepareForm() {
-		form = new DynamicForm();
-		form.setWidth100();
-		form.setAlign(Alignment.LEFT);
-		form.setColWidths("1px, 100%");
-		vm = new ValuesManager();
-		form.setValuesManager(vm);
+    private void prepareForm() {
+        form = new DynamicForm();
+        form.setWidth100();
+        form.setAlign(Alignment.LEFT);
+        form.setColWidths("1px, 100%");
+        vm = new ValuesManager();
+        form.setValuesManager(vm);
 
-		final StaticTextItem fileNameWaring = ItemFactory.newStaticTextItem("fileNameWarning",
-				I18N.message("attention"), I18N.message("filenamewarning"));
-		fileNameWaring.setRequired(true);
+        final StaticTextItem fileNameWaring = ItemFactory.newStaticTextItem("fileNameWarning",
+                I18N.message("attention"), I18N.message("filenamewarning"));
+        fileNameWaring.setRequired(true);
 
-		TextItem name = ItemFactory.newTextItem("name", ocrPanel.getSelectedOcrTemplate().getName());
-		name.setRequired(true);
-		name.setDisabled(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
+        TextItem name = ItemFactory.newTextItem("name", ocrPanel.getSelectedOcrTemplate().getName());
+        name.setRequired(true);
+        name.setDisabled(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + ocrPanel.getSelectedOcrTemplate().getId());
-		id.setVisible(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
+        StaticTextItem id = ItemFactory.newStaticTextItem("id",
+                Long.toString(ocrPanel.getSelectedOcrTemplate().getId()));
+        id.setVisible(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		ToggleItem saveChangeEvent = ItemFactory.newToggleItem("savechangeevent",
-				ocrPanel.getSelectedOcrTemplate().isSaveChangeEvent());
-		saveChangeEvent.setWrapTitle(false);
+        SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt("zonalocr.batch"));
+        batch.setStep(50);
+        batch.setMin(1);
 
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt("zonalocr.batch"));
-		batch.setStep(50);
-		batch.setMin(1);
+        TextAreaItem description = ItemFactory.newTextAreaItem("description",
+                ocrPanel.getSelectedOcrTemplate().getDescription());
+        description.setHeight(200);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description",
-				ocrPanel.getSelectedOcrTemplate().getDescription());
-		description.setHeight(200);
+        if (Session.get().isDefaultTenant())
+            form.setItems(id, name, description, batch);
+        else
+            form.setItems(id, name, description);
+    }
 
-		if (Session.get().isDefaultTenant())
-			form.setItems(id, name, description, saveChangeEvent, batch);
-		else
-			form.setItems(id, name, description, saveChangeEvent);
-	}
+    public void onSave() {
+        if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getUploadedFile() == null) {
+            SC.warn(I18N.message("samplerequired"));
+            return;
+        }
+        if (Boolean.FALSE.equals(vm.validate()))
+            return;
 
-	public void onSave() {
-		if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getUploadedFile() == null) {
-			SC.warn(I18N.message("samplerequired"));
-			return;
-		}
-		if (Boolean.FALSE.equals(vm.validate()))
-			return;
+        ocrPanel.getSelectedOcrTemplate().setName(vm.getValueAsString("name"));
+        ocrPanel.getSelectedOcrTemplate().setDescription(vm.getValueAsString("description"));
 
-		ocrPanel.getSelectedOcrTemplate().setName(vm.getValueAsString("name"));
-		ocrPanel.getSelectedOcrTemplate().setDescription(vm.getValueAsString("description"));
-		ocrPanel.getSelectedOcrTemplate().setSaveChangeEvent(Boolean.valueOf(vm.getValueAsString("savechangeevent")));
+        if (Session.get().isDefaultTenant()) {
+            int batch = Integer.parseInt(vm.getValueAsString("batch"));
+            Session.get().setConfig("zonalocr.batch", Integer.toString(batch));
+            ocrPanel.getSelectedOcrTemplate().setBatch(batch);
+        }
 
-		if (Session.get().isDefaultTenant()) {
-			int batch = Integer.parseInt(vm.getValueAsString("batch"));
-			Session.get().setConfig("zonalocr.batch", "" + batch);
-			ocrPanel.getSelectedOcrTemplate().setBatch(batch);
-		}
+        ZonalOCRService.Instance.get().save(ocrPanel.getSelectedOcrTemplate(), new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(GUIOCRTemplate template) {
+                ocrPanel.setSelectedOcrTemplate(template);
+                destroy();
+            }
+        });
+    }
 
-		ZonalOCRService.Instance.get().save(ocrPanel.getSelectedOcrTemplate(), new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(GUIOCRTemplate template) {
-				ocrPanel.setSelectedOcrTemplate(template);
-				destroy();
-			}
-		});
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

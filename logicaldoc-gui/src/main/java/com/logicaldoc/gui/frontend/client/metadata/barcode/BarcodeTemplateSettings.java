@@ -24,7 +24,6 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -36,171 +35,166 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class BarcodeTemplateSettings extends Window {
 
-	private static final String ZONAL = "zonal";
+    private static final String ZONAL = "zonal";
 
-	private ValuesManager vm;
+    private ValuesManager vm;
 
-	private DynamicForm form;
+    private DynamicForm form;
 
-	private IButton save;
+    private IButton save;
 
-	private BarcodeTemplatesPanel panel;
+    private BarcodeTemplatesPanel panel;
 
-	private GUIBarcodeTemplate template;
+    private GUIBarcodeTemplate template;
 
-	private Upload sampleUploader;
+    private Upload sampleUploader;
 
-	public BarcodeTemplateSettings(BarcodeTemplatesPanel panel, GUIBarcodeTemplate template) {
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("barcodetemplate"));
-		setCanDragResize(true);
-		setIsModal(true);
-		setShowModalMask(true);
-		centerInPage();
-		setAutoSize(true);
+    public BarcodeTemplateSettings(BarcodeTemplatesPanel panel, GUIBarcodeTemplate template) {
+        setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+        setTitle(I18N.message("barcodetemplate"));
+        setCanDragResize(true);
+        setIsModal(true);
+        setShowModalMask(true);
+        centerInPage();
+        setAutoSize(true);
 
-		this.panel = panel;
-		this.template = template;
+        this.panel = panel;
+        this.template = template;
 
-		prepareForm();
+        prepareForm();
 
-		VLayout layout = new VLayout();
-		layout.setMembersMargin(5);
-		layout.setWidth100();
+        VLayout layout = new VLayout();
+        layout.setMembersMargin(5);
+        layout.setWidth100();
 
-		layout.addMember(form);
+        layout.addMember(form);
 
-		if (template.getId() == 0L || template.isZonal()) {
-			sampleUploader = new Upload(save);
-			layout.addMember(sampleUploader);
-		}
+        if (template.getId() == 0L || template.isZonal()) {
+            sampleUploader = new Upload(save);
+            layout.addMember(sampleUploader);
+        }
 
-		save = new IButton(I18N.message("save"));
-		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSave());
-		layout.addMember(save);
+        save = new IButton(I18N.message("save"));
+        save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSave());
+        layout.addMember(save);
 
-		addItem(layout);
+        addItem(layout);
 
-		// Clean the upload folder if the window is closed
-		addCloseClickHandler(
-				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						destroy();
-					}
-				}));
+        // Clean the upload folder if the window is closed
+        addCloseClickHandler(
+                event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        destroy();
+                    }
+                }));
 
-		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
-	}
+        // Just to clean the upload folder
+        DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
+    }
 
-	private void prepareForm() {
-		form = new DynamicForm();
-		form.setWidth100();
-		form.setAlign(Alignment.LEFT);
-		form.setColWidths("1px, 100%");
-		vm = new ValuesManager();
-		form.setValuesManager(vm);
+    private void prepareForm() {
+        form = new DynamicForm();
+        form.setWidth100();
+        form.setAlign(Alignment.LEFT);
+        form.setColWidths("1px, 100%");
+        vm = new ValuesManager();
+        form.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newTextItem("name", template.getName());
-		name.setRequired(true);
-		name.setDisabled(template.getId() != 0L);
+        TextItem name = ItemFactory.newTextItem("name", template.getName());
+        name.setRequired(true);
+        name.setDisabled(template.getId() != 0L);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + template.getId());
-		id.setVisible(template.getId() != 0L);
+        StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + template.getId());
+        id.setVisible(template.getId() != 0L);
 
-		SelectItem type = ItemFactory.newSelectItem("type");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
-		opts.put(ZONAL, I18N.message(ZONAL).toLowerCase());
-		opts.put("positional", I18N.message("positional").toLowerCase());
-		type.setValueMap(opts);
-		type.setRequired(true);
-		type.setDisabled(template.getId() != 0L || !Feature.enabled(Feature.ZONAL_BARCODE));
-		if (template.getId() != 0L)
-			type.setValue(template.isZonal() ? ZONAL : "positonal");
-		if (!Feature.enabled(Feature.ZONAL_BARCODE))
-			type.setValue("positonal");
-		type.addChangedHandler(
-				(ChangedEvent event) -> sampleUploader.setVisible(ZONAL.equals(event.getValue().toString())));
+        SelectItem type = ItemFactory.newSelectItem("type");
+        LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+        opts.put(ZONAL, I18N.message(ZONAL).toLowerCase());
+        opts.put("positional", I18N.message("positional").toLowerCase());
+        type.setValueMap(opts);
+        type.setRequired(true);
+        type.setDisabled(template.getId() != 0L || !Feature.enabled(Feature.ZONAL_BARCODE));
+        if (template.getId() != 0L)
+            type.setValue(template.isZonal() ? ZONAL : "positonal");
+        if (!Feature.enabled(Feature.ZONAL_BARCODE))
+            type.setValue("positonal");
+        type.addChangedHandler(
+                (ChangedEvent event) -> sampleUploader.setVisible(ZONAL.equals(event.getValue().toString())));
 
-		ToggleItem saveChangeEvent = ItemFactory.newToggleItem("savechangeevent", template.isSaveChangeEvent());
-		saveChangeEvent.setWrapTitle(false);
+        TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
+        description.setHeight(150);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
-		description.setHeight(150);
+        // The optional batch
+        SpinnerItem batch = ItemFactory.newSpinnerItem("batch", template.getBatch());
+        batch.setRequired(true);
+        batch.setMin(1);
+        batch.setStep(10);
+        batch.setHintStyle("hint");
 
-		// The optional batch
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", template.getBatch());
-		batch.setRequired(true);
-		batch.setMin(1);
-		batch.setStep(10);
-		batch.setHintStyle("hint");
+        // The image threshold
+        SpinnerItem threshold = ItemFactory.newSpinnerItem("threshold", I18N.message("resolutionthreshold"),
+                template.getThreshold());
+        threshold.setRequired(true);
+        threshold.setWrapTitle(false);
+        threshold.setMin(50);
+        threshold.setStep(100);
+        threshold.setHint("pixels");
 
-		// The image threshold
-		SpinnerItem threshold = ItemFactory.newSpinnerItem("threshold", I18N.message("resolutionthreshold"),
-				template.getThreshold());
-		threshold.setRequired(true);
-		threshold.setWrapTitle(false);
-		threshold.setMin(50);
-		threshold.setStep(100);
-		threshold.setHint("pixels");
+        // Resolution used to print the document
+        SpinnerItem rendRes = ItemFactory.newSpinnerItem("rendres", I18N.message("ocrrendres"), template.getRendRes());
+        rendRes.setRequired(true);
+        rendRes.setWrapTitle(false);
+        rendRes.setHint("dpi");
+        rendRes.setMin(100);
+        rendRes.setStep(100);
 
-		// Resolution used to print the document
-		SpinnerItem rendRes = ItemFactory.newSpinnerItem("rendres", I18N.message("ocrrendres"), template.getRendRes());
-		rendRes.setRequired(true);
-		rendRes.setWrapTitle(false);
-		rendRes.setHint("dpi");
-		rendRes.setMin(100);
-		rendRes.setStep(100);
+        if (Session.get().isDefaultTenant() && template.getId() != 0L)
+            form.setItems(id, type, name, description, batch, threshold, rendRes);
+        else
+            form.setItems(id, type, name, description);
+    }
 
-		if (Session.get().isDefaultTenant() && template.getId() != 0L)
-			form.setItems(id, type, name, description, saveChangeEvent, batch, threshold, rendRes);
-		else
-			form.setItems(id, type, name, description, saveChangeEvent);
-	}
+    public void onSave() {
+        if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L
+                && sampleUploader.getUploadedFile() == null) {
+            SC.warn(I18N.message("samplerequired"));
+            return;
+        }
 
-	public void onSave() {
-		if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L
-				&& sampleUploader.getUploadedFile() == null) {
-			SC.warn(I18N.message("samplerequired"));
-			return;
-		}
+        if (Boolean.FALSE.equals(vm.validate()))
+            return;
 
-		if (Boolean.FALSE.equals(vm.validate()))
-			return;
+        template.setName(vm.getValueAsString("name"));
+        template.setDescription(vm.getValueAsString("description"));
 
-		template.setName(vm.getValueAsString("name"));
-		template.setDescription(vm.getValueAsString("description"));
+        if (Feature.enabled(Feature.ZONAL_BARCODE))
+            template.setZonal(ZONAL.equals(vm.getValueAsString("type")));
+        else
+            template.setZonal(false);
 
-		if (Feature.enabled(Feature.ZONAL_BARCODE))
-			template.setZonal(ZONAL.equals(vm.getValueAsString("type")));
-		else
-			template.setZonal(false);
+        if (Session.get().isDefaultTenant() && template.getId() != 0L) {
+            template.setBatch(Integer.parseInt(vm.getValueAsString("batch")));
+            template.setThreshold(Integer.parseInt(vm.getValueAsString("threshold")));
+            template.setRendRes(Integer.parseInt(vm.getValueAsString("rendres")));
+        }
 
-		template.setSaveChangeEvent(Boolean.valueOf(vm.getValueAsString("savechangeevent")));
+        BarcodeService.Instance.get().save(template, new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(GUIBarcodeTemplate tmpl) {
+                panel.setSelectedOcrTemplate(tmpl);
+                destroy();
+            }
+        });
+    }
 
-		if (Session.get().isDefaultTenant() && template.getId() != 0L) {
-			template.setBatch(Integer.parseInt(vm.getValueAsString("batch")));
-			template.setThreshold(Integer.parseInt(vm.getValueAsString("threshold")));
-			template.setRendRes(Integer.parseInt(vm.getValueAsString("rendres")));
-		}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
 
-		BarcodeService.Instance.get().save(template, new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(GUIBarcodeTemplate tmpl) {
-				panel.setSelectedOcrTemplate(tmpl);
-				destroy();
-			}
-		});
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

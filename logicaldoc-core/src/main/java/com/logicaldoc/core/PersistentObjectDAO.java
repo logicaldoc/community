@@ -663,6 +663,17 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
     public int jdbcUpdate(String sql, Map<String, Object> parameters) throws PersistenceException;
 
     /**
+     * Retrieve the current record version in use for a given instance
+     * 
+     * @param entity The entity to inspect
+     * 
+     * @return the record version in use
+     * 
+     * @throws PersistenceException Error in the database
+     */
+    public long recordVersion(PersistentObject entity) throws PersistenceException;
+    
+    /**
      * Get the DBMS name currently connected(possible values are: <b>mysql</b>,
      * <b>mariadb</b>, <b>postgresql</b>, <b>hsqldb</b>, <b>oracle</b>,
      * <b>mssql</b>)

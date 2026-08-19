@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -131,11 +132,14 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     public User findAdminUser(String tenantName) throws PersistenceException {
         return findAdminUser(Tenant.DEFAULT_NAME, false);
     }
-    
+
     @Override
     public User findAdminUser(String tenantName, boolean initialize) throws PersistenceException {
-        User user = findByWhere("_entity.username = :username", 
-                Map.of(USERNAME, Tenant.DEFAULT_NAME.equals(tenantName) ? ADMIN:"%s%s".formatted(ADMIN, StringUtils.capitalize(tenantName))), null, null).stream().findFirst().orElse(null);
+        User user = findByWhere("_entity.username = :username",
+                Map.of(USERNAME,
+                        Tenant.DEFAULT_NAME.equals(tenantName) ? ADMIN
+                                : "%s%s".formatted(ADMIN, StringUtils.capitalize(tenantName))),
+                null, null).stream().findFirst().orElse(null);
         if (initialize)
             return initialize(user);
         else
@@ -723,23 +727,14 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         log.info("Checking if the user {} had interactions in the last {} days", user.getUsername(), maxInactiveDays);
 
-        List<Date> interactions = queryForList("select max(ld_lastrenew) from ld_session where ld_username = :username",
-                Map.of(USERNAME, user.getUsername()), Date.class, null);
-        Date lastInteraction = null;
-        if (!interactions.isEmpty())
-            lastInteraction = interactions.get(0);
+        // Take the most recent session or in absence of sessions, take the
+        // last enabled date as last interaction
+        Date lastInteraction = queryForList("select max(ld_lastrenew) from ld_session where ld_username = :username",
+                Map.of(USERNAME, user.getUsername()), Date.class, null).stream().findFirst().orElse(user.getLastEnabled());
 
-        // Perhaps the user never had interactions until now so we use his
-        // creation date as last interaction
-        if (lastInteraction == null)
-            lastInteraction = user.getCreation();
-
-        // In case the user has been enabled again after being disabled for
-        // inactivity we should consider the last enabled date as last
-        // interaction
-        if (user.getLastEnabled() != null && user.getLastEnabled().after(lastInteraction))
-            lastInteraction = user.getLastEnabled();
-
+        // In case of not last interaction, we consider the creation date
+        lastInteraction = Optional.ofNullable(lastInteraction).orElse(user.getCreation());
+        
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(lastInteraction);
         calendar.set(Calendar.MILLISECOND, 0);
@@ -828,7 +823,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     }
 
     @Override
-    protected void initializeCollections(User user) throws PersistenceException {
+    protected void initializeEntity(User user) throws PersistenceException {
         Hibernate.initialize(user.getGroups());
         Hibernate.initialize(user.getWorkingTimes());
 

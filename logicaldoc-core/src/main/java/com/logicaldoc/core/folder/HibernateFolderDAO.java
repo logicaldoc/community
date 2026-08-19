@@ -1685,7 +1685,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
          * At the end remove the path specification in the subtree
          */
         jdbcUpdate(
-                "update ld_folder set ld_path=REPLACE(ld_path,'%s/','%s/') where ld_path is not null and ld_path like '%s/%%'"
+                "update ld_folder set ld_path = REPLACE(ld_path,'%s/','%s/') where ld_path is not null and ld_path like '%s/%%'"
                         .formatted(pathOld, pathNew, pathOld));
 
         return source;
@@ -2363,7 +2363,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         for (Folder folder : foldersInSource) {
             // Move only non-clashing folders
             if (findByNameAndParentId(folder.getName(), target.getId()).isEmpty())
-                move(folder, target, new FolderHistory(transaction));
+                folder = move(folder, target, new FolderHistory(transaction));
         }
 
         /*
@@ -2404,8 +2404,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
             throws PersistenceException {
         log.debug("move documents from folder {} to folder {}", source, target);
         DocumentManager manager = DocumentManager.get();
-        DocumentDAO docDao = DocumentDAO.get();
-        List<Document> docs = docDao.findByFolder(source.getId(), null);
+        List<Document> docs = DocumentDAO.get().findByFolder(source.getId(), null);
         for (Document document : docs) {
             DocumentHistory hist = new DocumentHistory();
             hist.setDocument(document);

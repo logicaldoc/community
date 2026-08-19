@@ -36,7 +36,7 @@ public class GhostUtil {
     }
 
     /**
-     * Prints a PDF file into a Jpeg image using 150dpi resolution
+     * Prints a PDF file into a Jpeg image using given resolution
      * 
      * @param srcPdf The original file
      * @param dst The output image(in case of multiple page more files are

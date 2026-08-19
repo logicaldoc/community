@@ -654,7 +654,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
         // written. This fails some times because the referenced document is
         // not already available.
         DocumentManager docMan = (DocumentManager) testSubject;
-        doc = docMan.storeVersionAsync(version, doc).get();
+        doc = docMan.saveVersionAsync(version, doc).get();
 
         assertEquals(doc.getId(), version.getDocId());
         assertNotNull(docDao.findById(version.getDocId()));

@@ -243,7 +243,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
         Session session = getCurrentSession();
         PersistentObject obj = session.find(entity.getClass(), entity.getId());
-        if (Objects.isNull(obj)) {
+        if (Objects.isNull(obj) && entity.getId() == 0L) {
             session.persist(entity);
             flush();
         } else {
@@ -253,6 +253,22 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
             // Adjust the record version as it gets persisted
             entity.setRecordVersion(persistedEntity.getRecordVersion());
         }
+    }
+
+    @Override
+    public long recordVersion(PersistentObject entity) throws PersistenceException {
+        Session session = getCurrentSession();
+        PersistentObject obj = session.find(entity.getClass(), entity.getId());
+        if (Objects.isNull(obj)) {
+            Table table = entity.getClass().getAnnotation(Table.class);
+            long dbRecordVersion = queryForLong(
+                    "select ld_recordversion from %s where ld_id = %d".formatted(table.name(), entity.getId()));
+            if (dbRecordVersion == 0L)
+                return entity.getRecordVersion();
+            else
+               return dbRecordVersion;
+        } else
+            return obj.getRecordVersion();
     }
 
     protected void flush() {
@@ -332,7 +348,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
         try {
             T mergedEntity = merge(entity);
-            initializeCollections(mergedEntity);
+            initializeEntity(mergedEntity);
             return mergedEntity;
         } catch (RuntimeException e) {
             if (log.isTraceEnabled())
@@ -351,14 +367,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
     /**
      * Concrete implementations must put here their custom initialization of the
-     * collections. This default implementation uses the reflection to detect
-     * all the collections and initializes them.++
+     * persistent objeft. This default implementation uses the reflection to detect
+     * all the collections and all fields of type {@link PersistentObject} to initialize them.
      * 
      * @param entity The entity to initialize
      * 
      * @throws PersistenceException Error in initializing the collections
      */
-    protected void initializeCollections(T entity) throws PersistenceException {
+    protected void initializeEntity(T entity) throws PersistenceException {
         Class<?> clazz = entity.getClass();
 
         while (clazz != null && clazz != Object.class) {
@@ -368,8 +384,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
                 boolean isCollection = Collection.class.isAssignableFrom(type);
                 boolean isMap = Map.class.isAssignableFrom(type);
+                boolean isPersistentObject = PersistentObject.class.isAssignableFrom(type);
 
-                if (isCollection || isMap) {
+                if (isCollection || isMap || isPersistentObject) {
                     if (log.isTraceEnabled())
                         log.trace("Trying to initialize attribute {} of {}", field.getName(), entity);
                     field.setAccessible(true); // allow access to private fields
@@ -379,7 +396,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
                     } catch (Exception e) {
                         log.warn("Cannot initialize attribute {} of {}", field.getName(), entity);
                     }
-
                 }
             }
 

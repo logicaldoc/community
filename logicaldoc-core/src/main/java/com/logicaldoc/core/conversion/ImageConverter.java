@@ -2,8 +2,12 @@ package com.logicaldoc.core.conversion;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.exec.Exec;
@@ -49,5 +53,19 @@ public class ImageConverter extends AbstractFormatConverter {
     @Override
     public List<String> getParameterNames() {
         return Arrays.asList("path", "timeout");
+    }
+
+    public void convert(File src, File dest, List<String> arguments, Integer timeout) throws IOException {
+        loadParameters();
+
+        List<String> commandLine = new ArrayList<>();
+        commandLine.add(getParameter("path"));
+        if (CollectionUtils.isNotEmpty(arguments))
+            commandLine.addAll(arguments);
+        if (src != null)
+            commandLine.add(src.getAbsolutePath());
+        commandLine.add(dest.getAbsolutePath());
+
+        new Exec().exec(commandLine, null, null, Optional.ofNullable(timeout).orElse(getTimeout()));
     }
 }

@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.time.TimeDiff;
 
 /**
@@ -265,6 +266,20 @@ public class FileUtil {
         }
     }
 
+    /**
+     * It encloses the provided path inside "..." in case of Windows or '...' for all the other systems
+     * 
+     * @param path the path to treat
+     * 
+     * @return the enclosed path
+     */
+    public static String quotePath(String path) {
+        if (SystemUtil.isWindows())
+            return "\"%s\"".formatted(path);
+        else
+            return "'%s'".formatted(path);
+    }
+    
     /**
      * Gets the file name excluding the path
      * 

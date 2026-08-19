@@ -34,7 +34,6 @@ public class ImageUtilTest extends AbstractCoreTestCase {
         File out = new File("target/out.png");
         try {
             ImageUtil.save(LOGO_IMAGE, out);
-
             assertEquals(this.getClass().getResource("/logo.png").openConnection().getContentLength(), out.length());
         } finally {
             FileUtil.delete(out);
@@ -89,18 +88,11 @@ public class ImageUtilTest extends AbstractCoreTestCase {
 
     @Test
     public void testPrintFirstPage() throws IOException {
-        File src = new File("src/test/resources/logo.png");
-        File dest = new File("target/out.pdf");
+        File src = new File("src/test/resources/probiotic-1.4.pdf");
+        File dest = new File("target/out.png");
+        assertFalse(dest.exists());
         try {
-            ImageUtil.printFirstPage(src, "logo.png", dest);
-            assertTrue(dest.length() > 0);
-        } finally {
-            FileUtil.delete(dest);
-        }
-
-        dest = new File("target/out.jpg");
-        try {
-            ImageUtil.printFirstPage(src, "logo.png", dest);
+            ImageUtil.printFirstPage(src, "probiotic-1.4.pdf", dest);
             assertTrue(dest.length() > 0);
         } finally {
             FileUtil.delete(dest);

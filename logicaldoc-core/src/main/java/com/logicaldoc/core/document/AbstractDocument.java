@@ -19,6 +19,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.TransactionalObject;
 import com.logicaldoc.core.filler.Fillable;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -115,13 +116,16 @@ public abstract class AbstractDocument extends Fillable implements Transactional
     @Column(name = "ld_creatorid", nullable = false)
     private long creatorId;
 
-    @Column(name = "ld_status") @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_status")
+    @Enumerated(EnumType.ORDINAL)
     private DocumentStatus status = DocumentStatus.UNLOCKED;
 
-    @Column(name = "ld_indexed", nullable = false) @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_indexed", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private IndexingStatus indexingStatus = IndexingStatus.TO_INDEX;
 
-    @Column(name = "ld_embedded", nullable = false) @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_embedded", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private EmbeddingStatus embeddingStatus = EmbeddingStatus.TO_EMBED;
 
     @Column(name = "ld_type", length = 255)
@@ -241,7 +245,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
 
     @Transient
     private Long documentTemplateId;
-    
+
     protected AbstractDocument() {
         super();
         setFilled(false);
@@ -878,22 +882,28 @@ public abstract class AbstractDocument extends Fillable implements Transactional
         setSigned(docVO.isSigned());
         setStamped(docVO.isStamped());
         setDigest(docVO.getDigest());
-        setTemplate(docVO.getTemplate());
+        setFillerId(docVO.getFillerId());
+        setFillMode(docVO.getFillMode());
         setPages(docVO.getPages());
         setWorkflowStatus(docVO.getWorkflowStatus());
         setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
         setColor(docVO.getColor());
-        setTemplateId(docVO.getTemplateId());
-        setTemplateName(docVO.getTemplateName());
-        setFillerId(docVO.getFillerId());
-        setFillMode(docVO.getFillMode());
+
+        // Seems that on recent Hibernate 7, the simple copy of the template
+        // leads to errors
+        if (docVO.getTemplate() != null)
+            try {
+                setTemplate(TemplateDAO.get().findById(docVO.getTemplate().getId()));
+            } catch (PersistenceException e) {
+                log.warn("Cannot copy template {} from object {}", docVO.getTemplate(), docVO, e);
+            }
 
         setAttributes(new HashMap<>());
         try {
             for (Entry<String, Attribute> entry : docVO.getAttributes().entrySet())
                 getAttributes().put(entry.getKey(), entry.getValue());
         } catch (GenericJDBCException | LazyInitializationException ex) {
-            log.debug("Got error when trying to copy collections from document {}", docVO, ex);
+            log.debug("Got error when trying to copy attributes from document %s".formatted(docVO), ex);
 
             // load again the provided doc
             try {
@@ -903,7 +913,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
                         getAttributes().put(entry.getKey(), entry.getValue());
                 }
             } catch (PersistenceException e) {
-                log.warn("Cannot copy collections from document {}", docVO, e);
+                log.warn("Cannot copy attributes from document %s".formatted(docVO), e);
             }
         }
     }

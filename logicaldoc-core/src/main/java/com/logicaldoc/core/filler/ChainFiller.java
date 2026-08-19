@@ -47,7 +47,9 @@ public class ChainFiller extends Filler {
 
     private static final Logger log = LoggerFactory.getLogger(ChainFiller.class);
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH) @JoinTable(name = "ld_filler_chain", joinColumns = @JoinColumn(name = "ld_fillerid"), inverseJoinColumns = @JoinColumn(name = "ld_chainedid")) @OrderColumn(name = "ld_position")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @JoinTable(name = "ld_filler_chain", joinColumns = @JoinColumn(name = "ld_fillerid"), inverseJoinColumns = @JoinColumn(name = "ld_chainedid"))
+    @OrderColumn(name = "ld_position")
     private List<Filler> chain = new ArrayList<>();
 
     public List<Filler> getChain() {
@@ -59,7 +61,7 @@ public class ChainFiller extends Filler {
     }
 
     @Override
-    protected String fillDocument(
+    protected FillResult fillDocument(
             Document document,
             String content,
             History transaction,
@@ -94,16 +96,19 @@ public class ChainFiller extends Filler {
                 explication.append(FILLER_EXPLICATION_TOP.formatted(filler.getClass().getSimpleName(),
                         filler.getExplicationSubtitle()));
 
-            String extraction = filler.fillDocument(document, content, transaction, pipelineDict, explication);
-            debug("Filler {} extracted {}", filler.getClass().getSimpleName(), extraction);
-            if (StringUtils.isNotEmpty(extraction))
-                extractions.add("%s > %s".formatted(filler.getClass().getSimpleName(), extraction));
+            FillResult out = filler.fillDocument(document, content, transaction, pipelineDict, explication);
+            document = out.document();
+            
+            debug("Filler {} extracted {}", filler.getClass().getSimpleName(), out.content());
+            if (StringUtils.isNotEmpty(out.content()))
+                extractions.add("%s > %s".formatted(filler.getClass().getSimpleName(), out.content()));
 
             if (explication != null)
                 explication.append(FILLER_EXPLICATION_BOTTOM);
         }
 
-        return StringUtils.defaultIfEmpty(extractions.stream().collect(Collectors.joining(" | ")), null);
+        return new FillResult(document,
+                StringUtils.defaultIfEmpty(extractions.stream().collect(Collectors.joining(" | ")), null));
     }
 
     private void debug(String message, Object... args) {

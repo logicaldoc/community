@@ -1793,7 +1793,10 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         source = testSubject.findByPathExtended("/Default/Source", 1L);
         assertTrue(source == null || source.getDeleted() != 0);
 
-        target = testSubject.findByPathExtended("/Default/Target", 1L);
+        target = testSubject.findByPathExtended("/Default/Target/Pippo", 1L);
+        assertNotNull(target);
+        
+        target = testSubject.findByPathExtended("/Default/Target/Pluto", 1L);
         assertNotNull(target);
 
         Folder folder = testSubject.findByPathExtended("/Default/Target/Pollo/ABC", 1L);

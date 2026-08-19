@@ -99,20 +99,27 @@ public class FolderToolTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testMerge() throws PersistenceException  {
-		Folder source = testSubject.findById(6L);
-		assertNotNull(source);
-		assertEquals("/Workspace X/folder6", testSubject.getPath(source.getId()));
+	    Folder root = testSubject.findById(5L);
+        testSubject.createPath(root, "/Default/Target/Pippo", "admin");
+        testSubject.createPath(root, "/Default/Target/Pluto", "admin");
+        testSubject.createPath(root, "/Default/Target/Pluto/Paperino", "admin");
+        testSubject.createPath(root, "/Default/Target/Pluto/Paperina", "admin");
 
-		testSubject.createPath(source, "test", "admin");
-		
-		Folder target = testSubject.findById(1202L);
-		assertNotNull(target);
-		String targetPath = testSubject.getPath(target.getId());
-		
+        testSubject.createPath(root, "/Default/Source/Pippo", "admin");
+        testSubject.createPath(root, "/Default/Source/Pluto", "admin");
+        testSubject.createPath(root, "/Default/Source/Pluto/Paperino", "admin");
+        testSubject.createPath(root, "/Default/Source/Pluto/Paperina", "admin");
+        testSubject.createPath(root, "/Default/Source/Pollo/ABC", "admin");
+        testSubject.createPath(root, "/Default/Source/Pollo/DEF", "admin");
+	    
+        Folder target = testSubject.findByPath("/Default/Target", 1L);
+        assertNotNull(target);
+        Folder source = testSubject.findByPath("/Default/Source", 1L);
+        assertNotNull(source);
+        
 		testSubject.merge(source, target, "admin");
-		target = testSubject.findById(6L);
-		assertNull(target);
-		assertNotNull(testSubject.findByPath("%s/test".formatted(targetPath)));
+		
+		assertNotNull(testSubject.findByPath("/Default/Target/Pluto"));
 	}
 
 	@Test

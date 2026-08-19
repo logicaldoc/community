@@ -467,6 +467,7 @@ public class ContextMenu extends Menu {
 
 			@Override
 			public void execute(Map<String, Object> values) {
+			    LD.contactingServer();
 				FolderService.Instance.get().paste(
 						Clipboard.getInstance().stream().map(doc -> doc.getId()).collect(Collectors.toList()), folderId,
 						Clipboard.getInstance().getLastAction(), Boolean.TRUE.equals(values.get("copylinks")),
@@ -474,6 +475,7 @@ public class ContextMenu extends Menu {
 						new DefaultAsyncCallback<>() {
 							@Override
 							public void handleSuccess(Void result) {
+							    LD.clearPrompt();
 								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
 								Clipboard.getInstance().clear();
 							}

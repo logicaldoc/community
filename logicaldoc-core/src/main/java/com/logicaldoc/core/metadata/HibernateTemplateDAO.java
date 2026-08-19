@@ -200,7 +200,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
     }
 
     @Override
-    protected void initializeCollections(Template template) throws PersistenceException {
+    protected void initializeEntity(Template template) throws PersistenceException {
         Hibernate.initialize(template.getTemplateAttributes());
         log.trace("Initialized {} attributes", template.getTemplateAttributes().size());
 

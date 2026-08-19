@@ -72,6 +72,7 @@ public class FileUtilTest {
 	public void testMatch() {
 		assertTrue(FileUtil.matches("ReleaseNotes.txt", "*.doc,*.txt", ""));
 		assertFalse(FileUtil.matches("ReleaseNotes.txt", "*.doc,*.txt", "*.txt"));
+		assertFalse(FileUtil.matches("ReleaseNotes.tmp", "*.pdf", "*.tmp"));
 	}
 
 	@Test

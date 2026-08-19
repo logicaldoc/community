@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class ContextProperties extends OrderedProperties {
     }
 
     public ContextProperties() throws IOException {
-        String config = StringUtils.defaultString(System.getProperty(LD_CONFIG), "context.properties");
+        String config = StringUtils.defaultIfEmpty(System.getProperty(LD_CONFIG), "context.properties");
         if (log.isDebugEnabled())
             log.debug("Take configuration from resource {}", config);
         load(ContextProperties.class.getClassLoader().getResource(config));
@@ -102,8 +102,8 @@ public class ContextProperties extends OrderedProperties {
     private File detectOverrideFile() {
         if (file == null || !file.exists())
             return null;
-        File override = new File(file.getParentFile(),
-                FileUtil.getBaseName(file.getName()) + "-override." + FileUtil.getExtension(file.getName()));
+        File override = new File(file.getParentFile(), "%s-override.%s".formatted(FileUtil.getBaseName(file.getName()),
+                FileUtil.getExtension(file.getName())));
         return override.exists() ? override : null;
     }
 
@@ -145,7 +145,7 @@ public class ContextProperties extends OrderedProperties {
                 load(fis);
             }
         } catch (IOException e) {
-            throw new IOException("Unable to read from " + file.getPath(), e);
+            throw new IOException("Unable to read from %s".formatted(file.getPath()), e);
         }
 
         overrideFile = detectOverrideFile();
@@ -186,7 +186,7 @@ public class ContextProperties extends OrderedProperties {
         checkFile();
         backup();
 
-        File tmpFile = new File(file.getParentFile(), file.getName() + ".tmp");
+        File tmpFile = new File(file.getParentFile(), "%s.tmp".formatted(file.getName()));
 
         try {
             Files.deleteIfExists(tmpFile.toPath());
@@ -228,7 +228,7 @@ public class ContextProperties extends OrderedProperties {
          */
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
         String today = df.format(new Date());
-        File backup = new File(parent, file.getName() + "." + today);
+        File backup = new File(parent, "%s.%s".formatted(file.getName(), today));
         if (!backup.exists()) {
             FileUtils.copyFile(file, backup);
             log.debug("Backup saved in {}", backup.getPath());
@@ -253,8 +253,9 @@ public class ContextProperties extends OrderedProperties {
     public List<File> getBackups() throws IOException {
         checkFile();
 
-        File[] oldBackups = file.getParentFile().listFiles((dir, name) -> name.startsWith(file.getName() + ".")
-                && name.substring(name.lastIndexOf('.') + 1).length() == 8);
+        File[] oldBackups = file.getParentFile()
+                .listFiles((dir, name) -> name.startsWith("%s.".formatted(file.getName()))
+                        && name.substring(name.lastIndexOf('.') + 1).length() == 8);
 
         // Sort old backup by descending date
         Arrays.sort(oldBackups, (f1, f2) -> {
@@ -266,10 +267,27 @@ public class ContextProperties extends OrderedProperties {
         return Arrays.asList(oldBackups);
     }
 
+    /**
+     * Returns a setting as string. It replaces the variables by using
+     * {@link ContextProperties#replaceVariables(String)}
+     * 
+     * @param property The name of the setting
+     * 
+     * @return The setting's value as string
+     */
     public String getString(String property) {
         return getString(property, null);
     }
 
+    /**
+     * Returns a setting as string. It replaces the variables by using
+     * {@link ContextProperties#replaceVariables(String)}
+     * 
+     * @param property The name of the setting
+     * @param defaultValue The default value to use
+     * 
+     * @return The setting's value as string
+     */
     public String getString(String property, String defaultValue) {
         String value = getProperty(property, defaultValue);
         if (value == null)
@@ -278,7 +296,45 @@ public class ContextProperties extends OrderedProperties {
         if (value.startsWith(BASE64_PREFIX))
             value = new String(Base64.getDecoder().decode(value.substring(BASE64_PREFIX.length())),
                     StandardCharsets.UTF_8);
-        return StrSubstitutor.replaceSystemProperties(value);
+        return replaceVariables(value);
+    }
+
+    /**
+     * It takes a value and expands the variables referenced in it. You can
+     * reference whatever setting in the main configuration file or by using the
+     * <code>env.</code> prefix you may reference whatever environment
+     * variable.<br>
+     * Eg., suppose a main configuration file like this:
+     * 
+     * <pre>
+     *   default.avatar.size = 144
+     * </pre>
+     * 
+     * And a system environment like this:
+     * 
+     * <pre>
+     * DB_PASSWORD = abcd
+     * </pre>
+     * 
+     * Then:
+     * <ul>
+     * <li>the value <code>${default.avatar.size}</code> will be expanded to
+     * <code>144</code></li>
+     * <li>the value <code>${env.DB_PASSWORD}</code> will be expanded to
+     * <code>abcd</code></li>
+     * </ul>
+     * 
+     * @param value The string to evaluate
+     * 
+     * @return The final result with variables expanded
+     */
+    public static String replaceVariables(String value) {
+        if (value == null)
+            return null;
+        value = StrSubstitutor.replaceSystemProperties(value);
+        if (value.contains("${env."))
+            value = value.replace("${env.", "${");
+        return StrSubstitutor.replace(value, System.getenv());
     }
 
     public int getInt(String property) {
@@ -359,30 +415,32 @@ public class ContextProperties extends OrderedProperties {
     }
 
     /**
-     * Gets the property value replacing all variable references
+     * Returns property's value. It replaces the variables by using
+     * {@link ContextProperties#replaceVariables(String)}
      * 
-     * @param property name of the setting to process
+     * @param property The name of the property
      * 
-     * @return the porperty's value with expanded variables
+     * @return The property's value
      */
     @Override
     public String getProperty(String property) {
         String value = super.getProperty(property);
-        return StrSubstitutor.replaceSystemProperties(value);
+        return replaceVariables(value);
     }
 
     /**
-     * Gets the property value replacing all variable references
+     * Returns property's value. It replaces the variables by using
+     * {@link ContextProperties#replaceVariables(String)}
      * 
-     * @param property name of the setting to process
-     * @param defaultValue default value returned in case of absence of property
+     * @param property The name of the setting
+     * @param defaultValue The default value to use
      * 
-     * @return the porperty's value with expanded variables
+     * @return The property's value
      */
     @Override
     public String getProperty(String property, String defaultValue) {
         String value = super.getProperty(property, defaultValue);
-        return StrSubstitutor.replaceSystemProperties(value);
+        return replaceVariables(value);
     }
 
     public int getMaxBackups() {
@@ -392,42 +450,42 @@ public class ContextProperties extends OrderedProperties {
     public void setMaxBackups(int maxBackups) {
         this.maxBackups = maxBackups;
     }
-    
+
     private String fullKey(String tenant, String property) {
         return "%s.%s".formatted(tenant, property);
     }
-    
+
     public int getTenantInt(String tenant, String property) {
         return getTenantInt(tenant, property, 0);
     }
-    
+
     public int getTenantInt(String tenant, String property, int defaultValue) {
         String key = fullKey(tenant, property);
         return getInt(key, defaultValue);
     }
-    
+
     public long getTenantLong(String tenant, String property) {
         return getTenantLong(tenant, property, 0L);
     }
-    
+
     public long getTenantLong(String tenant, String property, long defaultValue) {
         String key = fullKey(tenant, property);
         return getLong(key, defaultValue);
     }
-    
+
     public boolean getTenantBoolean(String tenant, String property) {
         return getTenantBoolean(tenant, property, false);
     }
-    
+
     public boolean getTenantBoolean(String tenant, String property, boolean defaultValue) {
         String key = fullKey(tenant, property);
         return getBoolean(key, defaultValue);
     }
-    
+
     public String getTenantString(String tenant, String property) {
         return getTenantString(tenant, property, null);
     }
-    
+
     public String getTenantString(String tenant, String property, String defaultValue) {
         String key = fullKey(tenant, property);
         return getString(key, defaultValue);
@@ -503,7 +561,7 @@ public class ContextProperties extends OrderedProperties {
         for (String prop : defaultProps.keySet()) {
             String tenantProp = tenant + "." + prop;
             if (!containsKey(tenantProp))
-                setProperty(tenantProp, getProperty("default." + prop));
+                setProperty(tenantProp, getProperty("default.%s".formatted(prop)));
         }
     }
 

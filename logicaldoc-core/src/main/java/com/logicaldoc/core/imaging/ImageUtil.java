@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.conversion.FormatConversionManager;
-import com.logicaldoc.core.util.GhostUtil;
+import com.logicaldoc.core.conversion.PopplerConverter;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -299,16 +299,16 @@ public class ImageUtil {
         if (inputExt.equals(outputExt)) {
             FileUtil.copyFile(originalFile, out);
         } else {
-            File pdfFile = FileUtil.createTempFile("firstpage", ".pdf");
-            try {
-                if (!"pdf".equals(inputExt)) {
+            if (!"pdf".equals(inputExt)) {
+                File pdfFile = FileUtil.createTempFile("firstpage", ".pdf");
+                try {
                     FormatConversionManager.get().convertFile(originalFile, originalFileName, pdfFile, outputExt, null);
-                } else {
-                    pdfFile = originalFile;
+                    new PopplerConverter().print(pdfFile, out, 1);
+                } finally {
+                    FileUtil.delete(pdfFile);
                 }
-                GhostUtil.print(pdfFile, out, 1);
-            } finally {
-                FileUtil.delete(pdfFile);
+            } else {
+                new PopplerConverter().print(originalFile, out, 1);
             }
         }
     }

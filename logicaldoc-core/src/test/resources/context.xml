@@ -50,6 +50,8 @@
         <property name="mappingLocations" value="classpath*:mappings/*.hbm.xml" />
         <property name="hibernateProperties">
             <props>
+                <prop key="hibernate.jdbc.time_zone">Europe/Rome</prop>
+            
 				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
                 <prop key="hibernate.id.optimizer.pooled.preferred">${hibernate.id.optimizer}</prop>
                 <prop key="hibernate.generate_statistics">true</prop>

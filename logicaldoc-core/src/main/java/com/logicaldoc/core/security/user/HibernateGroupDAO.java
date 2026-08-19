@@ -152,7 +152,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
     }
 
     @Override
-    public void initializeCollections(Group group) throws PersistenceException {
+    public void initializeEntity(Group group) throws PersistenceException {
         group.setUsers(UserDAO.get().findByGroup(group.getId()));
     }
 

@@ -269,7 +269,6 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 			return;
 
 		for (SystemEventListener evt : evts) {
-
 			try {
 				evt.processEvent();
 			} catch (Exception t) {
