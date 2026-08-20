@@ -23,6 +23,14 @@ public class MockFiller extends Filler {
 
     private static final long serialVersionUID = 1L;
 
+    public MockFiller(MockFiller src) {
+        super(src);
+    }
+
+    public MockFiller() {
+        super();
+    }
+
     @Override
     protected FillResult fillDocument(
             Document document,

@@ -41,6 +41,18 @@ public interface AutofillService extends RemoteService {
     public GUIFiller saveFiller(GUIFiller filler) throws ServerException;
 
     /**
+     * Clones a given filler
+     * 
+     * @param fillerId Identifier of the original filler to clone
+     * @param newName Name to give to the cloned filler
+     * 
+     * @return The created clone
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIFiller cloneFiller(long fillerId, String newName) throws ServerException;
+
+    /**
      * Retrieves a filler from the data layer
      * 
      * @param fillerId identifier of the filler
@@ -112,7 +124,6 @@ public interface AutofillService extends RemoteService {
      */
     public String testRegex(String sample, String regex, boolean inclusive) throws ServerException;
 
-    
     /**
      * Reschedule all documents for processing
      * 
@@ -128,7 +139,7 @@ public interface AutofillService extends RemoteService {
      * @throws ServerException an error happened in the server application
      */
     public void markUnprocessable(List<Long> ids) throws ServerException;
-    
+
     public static class Instance {
         private static AutofillServiceAsync inst;
 

@@ -52,6 +52,16 @@ public class ChainFiller extends Filler {
     @OrderColumn(name = "ld_position")
     private List<Filler> chain = new ArrayList<>();
 
+    public ChainFiller() {
+        super();
+    }
+    
+    public ChainFiller(ChainFiller src) {
+        super(src);
+        for (Filler filler : src.getChain())
+            chain.add(filler);
+    }
+
     public List<Filler> getChain() {
         return chain;
     }
@@ -98,7 +108,7 @@ public class ChainFiller extends Filler {
 
             FillResult out = filler.fillDocument(document, content, transaction, pipelineDict, explication);
             document = out.document();
-            
+
             debug("Filler {} extracted {}", filler.getClass().getSimpleName(), out.content());
             if (StringUtils.isNotEmpty(out.content()))
                 extractions.add("%s > %s".formatted(filler.getClass().getSimpleName(), out.content()));

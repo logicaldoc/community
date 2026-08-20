@@ -31,7 +31,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.2
  */
-public class DigitalSignaturePanel extends DocumentDetailTab {
+public class DigitalSignaturesPanel extends DocumentDetailTab {
 
     private static final String REASON = "reason";
 
@@ -39,7 +39,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 
     private ListGrid list = null;
 
-    public DigitalSignaturePanel(final GUIDocument document) {
+    public DigitalSignaturesPanel(final GUIDocument document) {
         super(document, null);
     }
 

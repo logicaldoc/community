@@ -18,7 +18,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.document.note.NotesPanel;
-import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignaturePanel;
+import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignaturesPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.util.SC;
@@ -80,7 +80,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
     protected DocumentHistoryPanel historyPanel;
 
-    protected DigitalSignaturePanel signaturePanel;
+    protected DigitalSignaturesPanel signaturePanel;
 
     protected AliasesPanel aliasesPanel;
 
@@ -465,7 +465,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
                 signatureTabPanel.removeMember(signaturePanel);
         }
         try {
-            signaturePanel = new DigitalSignaturePanel(document);
+            signaturePanel = new DigitalSignaturesPanel(document);
             signatureTabPanel.addMember(signaturePanel);
         } catch (Exception t) {
             // Nothing to do

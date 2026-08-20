@@ -26,6 +26,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -181,6 +182,19 @@ public class FillersPanel extends AdminPanel {
         for (ListGridRecord rec : selection)
             ids.add(rec.getAttributeAsLong(ID));
 
+        Long selectedFillerlId = selection[0].getAttributeAsLong("id");
+
+        MenuItem clone = new MenuItem();
+        clone.setTitle(I18N.message("clone"));
+        clone.addClickHandler(click -> LD.askForString("clone", "name",
+                selection[0].getAttributeAsString("name") + "Cloned", value -> AutofillService.Instance.get()
+                        .cloneFiller(selectedFillerlId, value, new DefaultAsyncCallback<>() {
+                            @Override
+                            public void handleSuccess(GUIFiller cloned) {
+                                refresh();
+                            }
+                        })));
+
         MenuItem delete = new MenuItem();
         delete.setTitle(I18N.message("ddelete"));
         delete.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), confirm -> {
@@ -196,7 +210,7 @@ public class FillersPanel extends AdminPanel {
             }
         }));
 
-        contextMenu.setItems(delete);
+        contextMenu.setItems(clone, new MenuItemSeparator(), delete);
 
         contextMenu.showContextMenu();
     }

@@ -207,6 +207,20 @@ public abstract class Filler extends PersistentObject {
 
     protected static final String FILLER_EXPLICATION_BOTTOM = "</td></tr></tbody></table>";
 
+    public Filler() {
+        // Default constructor
+    }
+
+    public Filler(Filler src) {
+        setTenantId(src.getTenantId());
+        name = src.getName();
+        label = src.getLabel();
+        description = src.getDescription();
+        checkin = src.isCheckin();
+        overwrite = src.isOverwrite();
+        automation = src.getAutomation();
+    }
+
     public String getName() {
         return name;
     }
