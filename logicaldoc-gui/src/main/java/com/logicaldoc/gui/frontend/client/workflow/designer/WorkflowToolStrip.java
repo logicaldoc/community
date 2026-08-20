@@ -433,10 +433,11 @@ public class WorkflowToolStrip extends ToolStrip {
 		WorkflowService.Instance.get().save(currentWorkflow, new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(GUIWorkflow result) {
+			    boolean isNew = currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId());
 				if (result == null) {
 					SC.warn(I18N.message("workflowalreadyexist"));
 				} else {
-					if (currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId())) {
+					if (isNew) {
 						currentWorkflow = result;
 						designer.redraw(currentWorkflow);
 					} else
@@ -445,8 +446,10 @@ public class WorkflowToolStrip extends ToolStrip {
 				update();
 				reload(currentWorkflow.getName());
 
-				workflowSelector.setOptionDataSource(new WorkflowsDS(false, false, Session.get().getUser().getId()));
-				workflowSelector.setValue(currentWorkflow.getId());
+                if (isNew) {
+				    workflowSelector.setOptionDataSource(new WorkflowsDS(false, false, Session.get().getUser().getId()));
+				    workflowSelector.setValue(currentWorkflow.getId());
+				}
 			}
 		});
 	}
