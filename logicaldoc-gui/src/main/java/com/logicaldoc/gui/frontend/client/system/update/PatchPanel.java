@@ -59,505 +59,513 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
  */
 public class PatchPanel extends VLayout {
 
-	private static final String LOCAL = "local";
+    private static final String LOCAL = "local";
 
-	private static final String DESCRIPTION = "description";
+    private static final String DESCRIPTION = "description";
 
-	private static final String RATING = "rating";
+    private static final String RATING = "rating";
 
-	private static final String RESTART = "restart";
+    private static final String RESTART = "restart";
 
-	private static final String INSTALLED = "installed";
+    private static final String INSTALLED = "installed";
 
-	private static final long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
+    private static final long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
 
-	// Shows the install notes panel
-	VLayout notesPanel = new VLayout();
+    // Shows the install notes panel
+    VLayout notesPanel = new VLayout();
 
-	// Shows the download panel
-	VLayout downloadPanel = new VLayout();
+    // Shows the download panel
+    VLayout downloadPanel = new VLayout();
 
-	// Shows the lis of patches
-	VLayout listPanel = new VLayout();
+    // Shows the lis of patches
+    VLayout listPanel = new VLayout();
 
-	private IButton download = new IButton(I18N.message("download"));
+    private IButton download = new IButton(I18N.message("download"));
 
-	private IButton cancel = new IButton(I18N.message("cancel"));
+    private IButton cancel = new IButton(I18N.message("cancel"));
 
-	private IButton deleteButton = new IButton(I18N.message("ddelete"));
+    private IButton deleteButton = new IButton(I18N.message("ddelete"));
 
-	private IButton confirmPatch = new IButton(I18N.message("confirmpatch"));
+    private IButton confirmPatch = new IButton(I18N.message("confirmpatch"));
 
-	private IButton upload = new IButton(I18N.message("uploadpatch"));
+    private IButton upload = new IButton(I18N.message("uploadpatch"));
 
-	private ButtonItem ok;
+    private ButtonItem ok;
 
-	private TextAreaItem log;
+    private TextAreaItem log;
 
-	private Date lastConfirmed = null;
+    private Date lastConfirmed = null;
 
-	public PatchPanel() {
-		setMembersMargin(3);
-	}
+    public PatchPanel() {
+        setMembersMargin(3);
+    }
 
-	@Override
-	public void onDraw() {
-		if (!Feature.enabled(Feature.PATCHES)) {
-			setMembers(new FeatureDisabled(Feature.PATCHES));
-			return;
-		}
+    @Override
+    public void onDraw() {
+        if (!Feature.enabled(Feature.PATCHES)) {
+            setMembers(new FeatureDisabled(Feature.PATCHES));
+            return;
+        }
 
-		showList();
-	}
+        showList();
+    }
 
-	private void switchListView(List<GUIPatch> patches) {
-		Util.removeChildren(this);
-		Util.removeChildren(notesPanel);
+    private void switchListView(List<GUIPatch> patches) {
+        Util.removeChildren(this);
+        Util.removeChildren(notesPanel);
 
-		ListGridField id = new IdListGridField();
+        ListGridField id = new IdListGridField();
 
-		ListGridField file = new ListGridField("file", I18N.message("file"), 150);
-		file.setHidden(true);
+        ListGridField file = new ListGridField("file", I18N.message("file"), 150);
+        file.setHidden(true);
 
-		ListGridField name = new ListGridField("name", I18N.message("patch"), 110);
+        ListGridField name = new ListGridField("name", I18N.message("patch"), 110);
 
-		ListGridField installed = new ListGridField(INSTALLED, I18N.message(INSTALLED), 100);
-		installed.setType(ListGridFieldType.BOOLEAN);
+        ListGridField installed = new ListGridField(INSTALLED, I18N.message(INSTALLED), 100);
+        installed.setType(ListGridFieldType.BOOLEAN);
 
-		ListGridField restart = new ListGridField(RESTART, I18N.message("requiresrestart"), 110);
-		restart.setType(ListGridFieldType.BOOLEAN);
+        ListGridField restart = new ListGridField(RESTART, I18N.message("requiresrestart"), 110);
+        restart.setType(ListGridFieldType.BOOLEAN);
 
-		ListGridField rating = new ListGridField(RATING, I18N.message("severityrating"), 110);
-		rating.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
-			int ratingVal = 0;
-			if (value != null)
-				ratingVal = Integer.parseInt(value.toString());
+        ListGridField rating = new ListGridField(RATING, I18N.message("severityrating"), 110);
+        rating.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+            int ratingVal = 0;
+            if (value != null)
+                ratingVal = Integer.parseInt(value.toString());
 
-			return "<span style='color: " + GUIPatch.getColor(ratingVal) + "'>"
-					+ I18N.message("severityrating." + ratingVal) + "</span>";
-		});
+            return "<span style='color: " + GUIPatch.getColor(ratingVal) + "'>"
+                    + I18N.message("severityrating." + ratingVal) + "</span>";
+        });
 
-		ListGridField date = new DateListGridField("date", I18N.message("date"), DateCellFormatter.FORMAT_SHORT);
+        ListGridField date = new DateListGridField("date", I18N.message("date"), DateCellFormatter.FORMAT_SHORT);
 
-		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
-
-		ListGridField local = new ListGridField(LOCAL, I18N.message(LOCAL), 70);
-		local.setType(ListGridFieldType.BOOLEAN);
-		local.setHidden(true);
-
-		size.setCanFilter(false);
+        ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
+
+        ListGridField local = new ListGridField(LOCAL, I18N.message(LOCAL), 70);
+        local.setType(ListGridFieldType.BOOLEAN);
+        local.setHidden(true);
+
+        size.setCanFilter(false);
 
-		final ListGrid list = new ListGrid() {
-			@Override
-			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(INSTALLED)))
-					return super.getCellCSSText(rec, rowNum, colNum);
-				else
-					return "color: #888888; font-style: italic;";
-			}
-		};
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setCanFreezeFields(true);
-		list.setAutoFetchData(true);
-		list.setSelectionType(SelectionStyle.SINGLE);
-		list.setCanExpandRecords(true);
-		list.setExpansionMode(ExpansionMode.DETAIL_FIELD);
-		list.setDetailField(DESCRIPTION);
-		list.setFields(id, name, rating, date, size, installed, restart, file, local);
-
-		list.addCellContextClickHandler(contextClick -> {
-			showContextMenu(list);
-			contextClick.cancel();
-		});
-
-		List<ListGridRecord> records = new ArrayList<>();
-		for (GUIPatch patch : patches) {
-			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute("id", patch.getId());
-			rec.setAttribute("name", patch.getName());
-			rec.setAttribute(RATING, patch.getRating());
-			rec.setAttribute("file", patch.getFile());
-			rec.setAttribute("date", patch.getDate());
-			rec.setAttribute("size", patch.getSize());
-			rec.setAttribute(DESCRIPTION, patch.getDescription());
-			rec.setAttribute(INSTALLED, patch.isInstalled());
-			rec.setAttribute(RESTART, patch.isRestart());
-			rec.setAttribute(LOCAL, patch.isLocal());
-			records.add(rec);
-		}
-		list.setRecords(records.toArray(new ListGridRecord[0]));
-
-		listPanel = new VLayout();
-		listPanel.setMembersMargin(3);
-		listPanel.setWidth100();
-		listPanel.setHeight100();
-		listPanel.setMembers(list);
-		listPanel.addMember(upload);
-		addMember(listPanel);
-
-		upload.setAutoFit(true);
-		upload.addClickHandler(click -> new PatchUploader(this).show());
-	}
-
-	private void switchDetailView(GUIPatch patch) {
-		Util.removeChildren(this);
-
-		DynamicForm form = new DynamicForm();
-		form.setWidth100();
-		form.setAlign(Alignment.LEFT);
-		form.setColWidths("1px", "*");
-		form.setTitleOrientation(TitleOrientation.LEFT);
-
-		StaticTextItem name = ItemFactory.newStaticTextItem("name", patch.getName());
-		name.setRequired(true);
-		name.setWrapTitle(false);
-
-		StaticTextItem rating = ItemFactory.newStaticTextItem(RATING, "severityrating", "<span style='color: "
-				+ patch.getColor() + "'>" + I18N.message("severityrating." + patch.getRating()) + "</span>");
-		rating.setRequired(true);
-		rating.setWrapTitle(false);
-
-		StaticTextItem date = ItemFactory.newStaticTextItem("date", I18N.formatDateShort(patch.getDate()));
-		date.setRequired(true);
-		date.setWrapTitle(false);
-
-		StaticTextItem size = ItemFactory.newStaticTextItem("size", Util.formatSize(patch.getSize()));
-		size.setRequired(true);
-		size.setWrapTitle(false);
-
-		StaticTextItem requiresRestart = ItemFactory.newStaticTextItem(RESTART, "requiresrestart",
-				patch.isRestart() ? I18N.message("yes") : I18N.message("no"));
-		requiresRestart.setRequired(true);
-		requiresRestart.setWrapTitle(false);
-
-		form.setItems(name, date, size, requiresRestart);
-
-		Label message = new Label();
-		message.setContents(I18N.message("installpatch", patch.getName()));
-		message.setWrap(false);
-		message.setAlign(Alignment.LEFT);
-		message.setStyleName("updateavailable");
-		message.setLayoutAlign(Alignment.LEFT);
-		message.setLayoutAlign(VerticalAlignment.TOP);
-		message.setHeight(20);
-
-		VLayout downloadLayout = prepareActionBar(patch);
-
-		VLayout infoPanel = new VLayout();
-		infoPanel.setMembersMargin(10);
-		infoPanel.setMembers(form, downloadLayout);
-
-		HLayout body = new HLayout();
-		body.setWidth100();
-		body.setMembersMargin(50);
-		notesPanel.setWidth100();
-		body.setMembers(infoPanel, notesPanel);
-
-		downloadPanel = new VLayout();
-		downloadPanel.setWidth100();
-		downloadPanel.setHeight100();
-		downloadPanel.setMembers(message, body);
-
-		addMember(downloadPanel);
-	}
-
-	private void switchLogView(GUIPatch patch) {
-		Util.removeChildren(this);
-
-		DynamicForm form = new DynamicForm();
-		form.setWidth100();
-		form.setHeight100();
-		form.setAlign(Alignment.LEFT);
-		form.setColWidths("*");
-		form.setTitleOrientation(TitleOrientation.TOP);
-
-		log = ItemFactory.newTextAreaItem("log", "");
-		log.setWidth("*");
-
-		ok = new ButtonItem("back", I18N.message("ok"));
-		ok.addClickHandler(event -> onOk(patch));
-		ok.setDisabled(true);
-
-		form.setItems(log, ok);
-
-		addMember(form);
-
-		getStatus(patch);
-	}
-
-	private void onOk(GUIPatch patch) {
-		if (patch.isRestart())
-			Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
-		else
-			showList();
-	}
-
-	public void showList() {
-		LD.contactingServer();
-
-		UpdateService.Instance.get().checkPatch(new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(List<GUIPatch> patches) {
-				switchListView(patches);
-			}
-		});
-	}
-
-	private VLayout prepareActionBar(GUIPatch patch) {
-		final String fileName = patch.getFile();
-
-		VLayout layout = new VLayout(4);
-		layout.setWidth100();
-
-		final Label barLabel = new Label(I18N.message("downloadprogress"));
-		barLabel.setHeight(16);
-		barLabel.setWrap(false);
-		layout.addMember(barLabel);
-		barLabel.setVisible(!patch.isLocal());
-
-		final Progressbar bar = new Progressbar();
-		bar.setHeight(24);
-		bar.setVertical(false);
-		bar.setLength(300);
-		bar.setVisible(!patch.isLocal());
-		layout.addMember(bar);
-
-		confirmPatch.setAutoFit(true);
-		confirmPatch.setVisible(patch.isLocal());
-		confirmPatch.addClickHandler(event -> onConfirm(patch));
-
-		cancel.setAutoFit(true);
-		cancel.addClickHandler(event -> showList());
-
-		deleteButton.setAutoFit(true);
-		deleteButton.addClickHandler(event -> onDelete(fileName));
-		download.setVisible(patch.isLocal());
-
-		download.setAutoFit(true);
-		download.setVisible(!patch.isLocal());
-		download.addClickHandler(event -> {
-			bar.setPercentDone(0);
-			download.setDisabled(true);
-
-			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
-					new DefaultAsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							super.onFailure(caught);
-							download.setDisabled(false);
-						}
-
-						@Override
-						public void handleSuccess(Void arg) {
-							confirmPatch.setVisible(false);
-
-							new Timer() {
-								public void run() {
-									UpdateService.Instance.get().checkDownloadStatus(new DefaultAsyncCallback<>() {
-										@Override
-										public void handleSuccess(List<Integer> status) {
-											bar.setPercentDone(status.get(1));
-
-											if (status.get(1) == 100) {
-												download.setDisabled(false);
-												confirmPatch.setVisible(true);
-												deleteButton.setVisible(true);
-												displayNotes(fileName);
-											} else
-												schedule(50);
-										}
-									});
-								}
-							}.schedule(50);
-						}
-					});
-		});
-
-		HLayout buttonCanvas = new HLayout();
-		buttonCanvas.setMembersMargin(6);
-		buttonCanvas.setMembers(cancel, download, confirmPatch, deleteButton);
-
-		layout.addMember(buttonCanvas);
-
-		if (patch.isLocal())
-			displayNotes(fileName);
-
-		return layout;
-	}
-
-	private void onDelete(String fileName) {
-		SC.ask(I18N.message("delete"), I18N.message("deletepatchquestion"), choice -> {
-			if (Boolean.TRUE.equals(choice)) {
-				UpdateService.Instance.get().deletePatch(fileName, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void ret) {
-						showList();
-					}
-				});
-			}
-		});
-	}
-
-	private void displayNotes(String fileName) {
-		UpdateService.Instance.get().getPatchNotes(fileName, new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(List<String> infos) {
-				VLayout panel = new VLayout();
-
-				Label notesLabel = new Label(I18N.message("patchnotes"));
-				notesLabel.setWrap(false);
-				notesLabel.setAutoFit(true);
-				notesLabel.setHeight(20);
-				notesLabel.setStyleName("update-notes");
-				String notesContent = infos.get(1);
-				if (!notesContent.contains("<p") && !notesContent.contains("<div") && !notesContent.contains("<br")
-						&& !notesContent.contains("<span") && !notesContent.contains("<table"))
-					notesContent = notesContent.replace("\n", "<br>");
-
-				HTMLPane notesContentPanel = new HTMLPane();
-				notesContentPanel.setWidth100();
-				notesContentPanel.setHeight("50%");
-				notesContentPanel.setShowEdges(true);
-				notesContentPanel.setContents(notesContent);
-				notesContentPanel.setContentsType(ContentsType.FRAGMENT);
-
-				Label changesLabel = new Label(I18N.message("changelog"));
-				changesLabel.setWrap(false);
-				changesLabel.setAutoFit(true);
-				changesLabel.setHeight(20);
-				changesLabel.setStyleName("update-changelog");
-				String changesContent = infos.get(0);
-				if (!changesContent.contains("<p") && !changesContent.contains("<div")
-						&& !changesContent.contains("<br") && !changesContent.contains("<span")
-						&& !changesContent.contains("<table"))
-					changesContent = changesContent.replace("\n", "<br>");
-
-				HTMLPane changesContentPanel = new HTMLPane();
-				changesContentPanel.setWidth100();
-				changesContentPanel.setHeight("50%");
-				changesContentPanel.setShowEdges(true);
-				changesContentPanel.setContents(changesContent);
-				changesContentPanel.setContentsType(ContentsType.FRAGMENT);
-
-				Label separator = new Label(" ");
-				separator.setHeight(10);
-
-				panel.setMembers(notesLabel, notesContentPanel, separator, changesLabel, changesContentPanel);
-
-				notesPanel.addMember(panel);
-			}
-		});
-	}
-
-	private void showContextMenu(ListGrid list) {
-		ListGridRecord rec = list.getSelectedRecord();
-		final GUIPatch patch = new GUIPatch();
-		patch.setId(rec.getAttribute("id"));
-		patch.setName(rec.getAttribute("name"));
-		patch.setFile(rec.getAttribute("file"));
-		patch.setDescription(rec.getAttribute(DESCRIPTION));
-		patch.setSize(rec.getAttributeAsLong("size"));
-		patch.setDate(rec.getAttributeAsDate("date"));
-		patch.setInstalled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(INSTALLED)));
-		patch.setLocal(Boolean.TRUE.equals(rec.getAttributeAsBoolean(LOCAL)));
-
-		Menu contextMenu = new Menu();
-
-		MenuItem install = new MenuItem();
-		install.setTitle(I18N.message("install"));
-		install.addClickHandler(event -> switchDetailView(patch));
-		install.setEnabled(!patch.isInstalled());
-
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> onDelete(patch.getFile()));
-		delete.setEnabled(patch.isLocal());
-
-		contextMenu.setItems(install, new MenuItemSeparator(), delete);
-		contextMenu.showContextMenu();
-	}
-
-	private void onConfirm(GUIPatch patch) {
-		SC.ask(I18N.message("confirmpatch"), I18N.message("confirmpatchquestion"), choice -> {
-			if (Boolean.TRUE.equals(choice)) {
-				confirmPatch.setVisible(false);
-				download.setVisible(false);
-				UpdateService.Instance.get().confirmPatch(patch.getFile(), new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(String path) {
-						Session.get().setUpdating(true);
-						cancel.setVisible(false);
-						switchLogView(patch);
-						lastConfirmed = new Date();
-					}
-				});
-			}
-		});
-	}
-
-	private void getStatus(GUIPatch patch) {
-		LD.updatingServer();
-
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
-				Util.contextPath() + "updatestatus?fileName=" + patch.getFile());
-
-		try {
-			builder.sendRequest(null, new RequestCallback() {
-				public void onError(Request request, Throwable exception) {
-					scheduleGetStatus(patch);
-				}
-
-				public void onResponseReceived(Request request, Response response) {
-					if (response != null && response.getStatusCode() < 400) {
-						String[] tokens = response.getText().split("\\|");
-						String statusLabel = tokens[0];
-						String command = tokens[1];
-						String logContent = tokens[2];
-
-						log.setValue(logContent);
-
-						Date now = new Date();
-						long elapsedTime = now.getTime() - lastConfirmed.getTime();
-
-						if ("processed".equals(statusLabel)) {
-							LD.clearPrompt();
-							ok.setDisabled(patch.isRestart());
-							GuiLog.info(I18N.message("patchinstalled"));
-							if (patch.isRestart())
-								Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
-						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME && command != null
-								&& !command.isEmpty()) {
-							LD.clearPrompt();
-							ApplicationRestarting.get(I18N.message("patchnotstarted", command)).show();
-						}
-
-						scheduleGetStatus(patch);
-					}
-				}
-			});
-		} catch (RequestException e) {
-			scheduleGetStatus(patch);
-		}
-	}
-
-	private void scheduleGetStatus(GUIPatch patch) {
-		new Timer() {
-			public void run() {
-				getStatus(patch);
-			}
-		}.schedule(500);
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+        final ListGrid list = new ListGrid() {
+            @Override
+            protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+                if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(INSTALLED)))
+                    return super.getCellCSSText(rec, rowNum, colNum);
+                else
+                    return "color: #888888; font-style: italic;";
+            }
+        };
+        list.setEmptyMessage(I18N.message("notitemstoshow"));
+        list.setShowRecordComponents(true);
+        list.setShowRecordComponentsByCell(true);
+        list.setCanFreezeFields(true);
+        list.setAutoFetchData(true);
+        list.setSelectionType(SelectionStyle.SINGLE);
+        list.setCanExpandRecords(true);
+        list.setExpansionMode(ExpansionMode.DETAIL_FIELD);
+        list.setDetailField(DESCRIPTION);
+        list.setFields(id, name, rating, date, size, installed, restart, file, local);
+
+        list.addCellContextClickHandler(contextClick -> {
+            showContextMenu(list);
+            contextClick.cancel();
+        });
+
+        List<ListGridRecord> records = new ArrayList<>();
+        for (GUIPatch patch : patches) {
+            ListGridRecord rec = new ListGridRecord();
+            rec.setAttribute("id", patch.getId());
+            rec.setAttribute("name", patch.getName());
+            rec.setAttribute(RATING, patch.getRating());
+            rec.setAttribute("file", patch.getFile());
+            rec.setAttribute("date", patch.getDate());
+            rec.setAttribute("size", patch.getSize());
+            rec.setAttribute(DESCRIPTION, patch.getDescription());
+            rec.setAttribute(INSTALLED, patch.isInstalled());
+            rec.setAttribute(RESTART, patch.isRestart());
+            rec.setAttribute(LOCAL, patch.isLocal());
+            records.add(rec);
+        }
+        list.setRecords(records.toArray(new ListGridRecord[0]));
+
+        listPanel = new VLayout();
+        listPanel.setMembersMargin(3);
+        listPanel.setWidth100();
+        listPanel.setHeight100();
+        listPanel.setMembers(list);
+        listPanel.addMember(upload);
+        addMember(listPanel);
+
+        upload.setAutoFit(true);
+        upload.addClickHandler(click -> new PatchUploader(this).show());
+    }
+
+    private void switchDetailView(GUIPatch patch) {
+        Util.removeChildren(this);
+
+        DynamicForm form = new DynamicForm();
+        form.setWidth100();
+        form.setAlign(Alignment.LEFT);
+        form.setColWidths("1px", "*");
+        form.setTitleOrientation(TitleOrientation.LEFT);
+
+        StaticTextItem name = ItemFactory.newStaticTextItem("name", patch.getName());
+        name.setRequired(true);
+        name.setWrapTitle(false);
+
+        StaticTextItem rating = ItemFactory.newStaticTextItem(RATING, "severityrating", "<span style='color: "
+                + patch.getColor() + "'>" + I18N.message("severityrating." + patch.getRating()) + "</span>");
+        rating.setRequired(true);
+        rating.setWrapTitle(false);
+
+        StaticTextItem date = ItemFactory.newStaticTextItem("date", I18N.formatDateShort(patch.getDate()));
+        date.setRequired(true);
+        date.setWrapTitle(false);
+
+        StaticTextItem size = ItemFactory.newStaticTextItem("size", Util.formatSize(patch.getSize()));
+        size.setRequired(true);
+        size.setWrapTitle(false);
+
+        StaticTextItem requiresRestart = ItemFactory.newStaticTextItem(RESTART, "requiresrestart",
+                patch.isRestart() ? I18N.message("yes") : I18N.message("no"));
+        requiresRestart.setRequired(true);
+        requiresRestart.setWrapTitle(false);
+
+        form.setItems(name, date, size, requiresRestart);
+
+        Label message = new Label();
+        message.setContents(I18N.message("installpatch", patch.getName()));
+        message.setWrap(false);
+        message.setAlign(Alignment.LEFT);
+        message.setStyleName("updateavailable");
+        message.setLayoutAlign(Alignment.LEFT);
+        message.setLayoutAlign(VerticalAlignment.TOP);
+        message.setHeight(20);
+
+        VLayout downloadLayout = prepareActionBar(patch);
+
+        VLayout infoPanel = new VLayout();
+        infoPanel.setMembersMargin(10);
+        infoPanel.setMembers(form, downloadLayout);
+
+        HLayout body = new HLayout();
+        body.setWidth100();
+        body.setMembersMargin(50);
+        notesPanel.setWidth100();
+        body.setMembers(infoPanel, notesPanel);
+
+        downloadPanel = new VLayout();
+        downloadPanel.setWidth100();
+        downloadPanel.setHeight100();
+        downloadPanel.setMembers(message, body);
+
+        addMember(downloadPanel);
+    }
+
+    private void switchLogView(GUIPatch patch) {
+        Util.removeChildren(this);
+
+        DynamicForm form = new DynamicForm();
+        form.setWidth100();
+        form.setHeight100();
+        form.setAlign(Alignment.LEFT);
+        form.setColWidths("*");
+        form.setTitleOrientation(TitleOrientation.TOP);
+
+        log = ItemFactory.newTextAreaItem("log", "");
+        log.setWidth("*");
+
+        ok = new ButtonItem("back", I18N.message("ok"));
+        ok.addClickHandler(event -> onOk(patch));
+        ok.setDisabled(true);
+
+        form.setItems(log, ok);
+
+        addMember(form);
+
+        getStatus(patch);
+    }
+
+    private void onOk(GUIPatch patch) {
+        if (patch.isRestart())
+            Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
+        else
+            showList();
+    }
+
+    public void showList() {
+        LD.contactingServer();
+
+        UpdateService.Instance.get().checkPatch(new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(List<GUIPatch> patches) {
+                switchListView(patches);
+            }
+        });
+    }
+
+    private VLayout prepareActionBar(GUIPatch patch) {
+        final String fileName = patch.getFile();
+
+        VLayout layout = new VLayout(4);
+        layout.setWidth100();
+
+        final Label barLabel = new Label(I18N.message("downloadprogress"));
+        barLabel.setHeight(16);
+        barLabel.setWrap(false);
+        layout.addMember(barLabel);
+        barLabel.setVisible(!patch.isLocal());
+
+        final Progressbar bar = new Progressbar();
+        bar.setHeight(24);
+        bar.setVertical(false);
+        bar.setLength(300);
+        bar.setVisible(!patch.isLocal());
+        layout.addMember(bar);
+
+        confirmPatch.setAutoFit(true);
+        confirmPatch.setVisible(patch.isLocal());
+        confirmPatch.addClickHandler(event -> onConfirm(patch));
+
+        cancel.setAutoFit(true);
+        cancel.addClickHandler(event -> showList());
+
+        deleteButton.setAutoFit(true);
+        deleteButton.addClickHandler(event -> onDelete(fileName));
+        download.setVisible(patch.isLocal());
+
+        download.setAutoFit(true);
+        download.setVisible(!patch.isLocal());
+        download.addClickHandler(event -> {
+            bar.setPercentDone(0);
+            download.setDisabled(true);
+
+            UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
+                    new DefaultAsyncCallback<>() {
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            super.onFailure(caught);
+                            download.setDisabled(false);
+                        }
+
+                        @Override
+                        public void handleSuccess(Void arg) {
+                            confirmPatch.setVisible(false);
+
+                            new Timer() {
+                                public void run() {
+                                    UpdateService.Instance.get().checkDownloadStatus(new DefaultAsyncCallback<>() {
+                                        @Override
+                                        public void handleSuccess(List<Integer> status) {
+                                            bar.setPercentDone(status.get(1));
+
+                                            if (status.get(1) == 100) {
+                                                download.setDisabled(false);
+                                                confirmPatch.setVisible(true);
+                                                deleteButton.setVisible(true);
+                                                displayNotes(fileName);
+                                            } else
+                                                schedule(50);
+                                        }
+                                    });
+                                }
+                            }.schedule(50);
+                        }
+                    });
+        });
+
+        HLayout buttonCanvas = new HLayout();
+        buttonCanvas.setMembersMargin(6);
+        buttonCanvas.setMembers(cancel, download, confirmPatch, deleteButton);
+
+        layout.addMember(buttonCanvas);
+
+        if (patch.isLocal())
+            displayNotes(fileName);
+
+        return layout;
+    }
+
+    private void onDelete(String fileName) {
+        SC.ask(I18N.message("delete"), I18N.message("deletepatchquestion"), choice -> {
+            if (Boolean.TRUE.equals(choice)) {
+                UpdateService.Instance.get().deletePatch(fileName, new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void ret) {
+                        showList();
+                    }
+                });
+            }
+        });
+    }
+
+    private void displayNotes(String fileName) {
+        UpdateService.Instance.get().getPatchNotes(fileName, new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(List<String> infos) {
+                VLayout panel = new VLayout();
+
+                Label notesLabel = new Label(I18N.message("patchnotes"));
+                notesLabel.setWrap(false);
+                notesLabel.setAutoFit(true);
+                notesLabel.setHeight(20);
+                notesLabel.setStyleName("update-notes");
+                String notesContent = infos.get(1);
+                if (!notesContent.contains("<p") && !notesContent.contains("<div") && !notesContent.contains("<br")
+                        && !notesContent.contains("<span") && !notesContent.contains("<table"))
+                    notesContent = notesContent.replace("\n", "<br>");
+
+                HTMLPane notesContentPanel = new HTMLPane();
+                notesContentPanel.setWidth100();
+                notesContentPanel.setHeight("50%");
+                notesContentPanel.setShowEdges(true);
+                notesContentPanel.setContents(notesContent);
+                notesContentPanel.setContentsType(ContentsType.FRAGMENT);
+
+                Label changesLabel = new Label(I18N.message("changelog"));
+                changesLabel.setWrap(false);
+                changesLabel.setAutoFit(true);
+                changesLabel.setHeight(20);
+                changesLabel.setStyleName("update-changelog");
+                String changesContent = infos.get(0);
+                if (!changesContent.contains("<p") && !changesContent.contains("<div")
+                        && !changesContent.contains("<br") && !changesContent.contains("<span")
+                        && !changesContent.contains("<table"))
+                    changesContent = changesContent.replace("\n", "<br>");
+
+                HTMLPane changesContentPanel = new HTMLPane();
+                changesContentPanel.setWidth100();
+                changesContentPanel.setHeight("50%");
+                changesContentPanel.setShowEdges(true);
+                changesContentPanel.setContents(changesContent);
+                changesContentPanel.setContentsType(ContentsType.FRAGMENT);
+
+                Label separator = new Label(" ");
+                separator.setHeight(10);
+
+                panel.setMembers(notesLabel, notesContentPanel, separator, changesLabel, changesContentPanel);
+
+                notesPanel.addMember(panel);
+            }
+        });
+    }
+
+    private void showContextMenu(ListGrid list) {
+        ListGridRecord rec = list.getSelectedRecord();
+        final GUIPatch patch = new GUIPatch();
+        patch.setId(rec.getAttribute("id"));
+        patch.setName(rec.getAttribute("name"));
+        patch.setFile(rec.getAttribute("file"));
+        patch.setDescription(rec.getAttribute(DESCRIPTION));
+        patch.setSize(rec.getAttributeAsLong("size"));
+        patch.setDate(rec.getAttributeAsDate("date"));
+        patch.setInstalled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(INSTALLED)));
+        patch.setLocal(Boolean.TRUE.equals(rec.getAttributeAsBoolean(LOCAL)));
+
+        Menu contextMenu = new Menu();
+
+        MenuItem install = new MenuItem();
+        install.setTitle(I18N.message("install"));
+        install.addClickHandler(event -> switchDetailView(patch));
+        install.setEnabled(!patch.isInstalled());
+
+        MenuItem delete = new MenuItem();
+        delete.setTitle(I18N.message("ddelete"));
+        delete.addClickHandler(event -> onDelete(patch.getFile()));
+        delete.setEnabled(patch.isLocal());
+
+        contextMenu.setItems(install, new MenuItemSeparator(), delete);
+        contextMenu.showContextMenu();
+    }
+
+    private void onConfirm(GUIPatch patch) {
+        SC.ask(I18N.message("confirmpatch"), I18N.message("confirmpatchquestion"), choice -> {
+            if (Boolean.TRUE.equals(choice)) {
+                confirmPatch.setVisible(false);
+                download.setVisible(false);
+
+                LD.ask("confirmpatch", "askexecutepackage", "applynow", "applybymself", null, runImmediately -> {
+                    UpdateService.Instance.get().confirmPatch(patch.getFile(), runImmediately,
+                            new DefaultAsyncCallback<>() {
+                                @Override
+                                public void handleSuccess(String path) {
+                                    if (Boolean.TRUE.equals(runImmediately)) {
+                                        Session.get().setUpdating(true);
+                                        cancel.setVisible(false);
+                                        switchLogView(patch);
+                                        lastConfirmed = new Date();
+                                    } else {
+                                        LD.prompt(I18N.message("openshelandexecute", path));
+                                    }
+                                }
+                            });
+                });
+            }
+        });
+    }
+
+    private void getStatus(GUIPatch patch) {
+        LD.updatingServer();
+
+        RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
+                Util.contextPath() + "updatestatus?fileName=" + patch.getFile());
+
+        try {
+            builder.sendRequest(null, new RequestCallback() {
+                public void onError(Request request, Throwable exception) {
+                    scheduleGetStatus(patch);
+                }
+
+                public void onResponseReceived(Request request, Response response) {
+                    if (response != null && response.getStatusCode() < 400) {
+                        String[] tokens = response.getText().split("\\|");
+                        String statusLabel = tokens[0];
+                        String command = tokens[1];
+                        String logContent = tokens[2];
+
+                        log.setValue(logContent);
+
+                        Date now = new Date();
+                        long elapsedTime = now.getTime() - lastConfirmed.getTime();
+
+                        if ("processed".equals(statusLabel)) {
+                            LD.clearPrompt();
+                            ok.setDisabled(patch.isRestart());
+                            GuiLog.info(I18N.message("patchinstalled"));
+                            if (patch.isRestart())
+                                Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
+                        } else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME && command != null
+                                && !command.isEmpty()) {
+                            LD.clearPrompt();
+                            ApplicationRestarting.get(I18N.message("patchnotstarted", command)).show();
+                        }
+
+                        scheduleGetStatus(patch);
+                    }
+                }
+            });
+        } catch (RequestException e) {
+            scheduleGetStatus(patch);
+        }
+    }
+
+    private void scheduleGetStatus(GUIPatch patch) {
+        new Timer() {
+            public void run() {
+                getStatus(patch);
+            }
+        }.schedule(500);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

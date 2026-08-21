@@ -47,23 +47,25 @@ public interface UpdateService extends RemoteService {
 	 * Confirms an update package
 	 * 
 	 * @param updateFileName The update file to confirm
+	 * @param executeImmediately If the package must be run immediately
 	 * 
-	 * @return The path of the update folder
+	 * @return The path of the update folder and the path of the update command
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String confirmUpdate(String updateFileName) throws ServerException;
+	public String confirmUpdate(String updateFileName, boolean executeImmediately) throws ServerException;
 
 	/**
 	 * Confirms a patch
 	 * 
 	 * @param patchFileName The patch file to confirm
+	 * @param executeImmediately If the package must be run immediately
 	 * 
-	 * @return The path of the patch folder
+	 * @return The path of the patch command used to execute the package
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String confirmPatch(String patchFileName) throws ServerException;
+	public String confirmPatch(String patchFileName, boolean executeImmediately) throws ServerException;
 
 	/**
 	 * Retrieves more informations from the update

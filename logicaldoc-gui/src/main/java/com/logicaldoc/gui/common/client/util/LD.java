@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -48,10 +49,19 @@ public class LD {
      * 
      * @param title title of the dialog box
      * @param message text printed in the body of the dialog box
+     * @param yesLabel the label to use for the affirmative choice
+     * @param noLabel the label to use for the negative choice
+     * 
      * @param width width dimension expressed in pixels
      * @param callback a call back invoked when the user confirm his choice
      */
-    public static void ask(String title, String message, Integer width, final BooleanCallback callback) {
+    public static void ask(
+            String title,
+            String message,
+            String yesLabel,
+            String noLabel,
+            Integer width,
+            final BooleanCallback callback) {
         final Window dialog = new Window();
 
         dialog.setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -63,7 +73,7 @@ public class LD {
         dialog.setCanDragResize(false);
         dialog.setCanDrag(true);
         dialog.centerInPage();
-        dialog.setTitle(title);
+        dialog.setTitle(I18N.message(title));
         if (width != null)
             dialog.setWidth(width);
         else
@@ -80,15 +90,18 @@ public class LD {
         textForm.setTitleOrientation(TitleOrientation.TOP);
         textForm.setAlign(Alignment.CENTER);
         textForm.setNumCols(1);
-        StaticTextItem text = ItemFactory.newStaticTextItem("text", "", message);
+        StaticTextItem text = ItemFactory.newStaticTextItem("text", "", I18N.message(message));
         text.setShouldSaveValue(false);
         text.setWrapTitle(false);
         text.setAlign(Alignment.CENTER);
         text.setShowTitle(false);
         textForm.setFields(text);
 
-        IButton yes = new IButton(I18N.message("yes"));
-        yes.setWidth(70);
+        IButton yes = new IButton(I18N.message(yesLabel));
+        yes.setMinWidth(70);
+        yes.setOverflow(Overflow.VISIBLE);
+        yes.setAutoWidth();
+        yes.setWrap(false);
         yes.addClickHandler(event -> {
             if (callback != null) {
                 dialog.close();
@@ -97,8 +110,11 @@ public class LD {
             }
         });
 
-        IButton no = new IButton(I18N.message("no"));
-        no.setWidth(70);
+        IButton no = new IButton(I18N.message(noLabel));
+        no.setMinWidth(70);
+        no.setOverflow(Overflow.VISIBLE);
+        no.setAutoWidth();
+        no.setWrap(false);
         no.addClickHandler(event -> {
             if (callback != null) {
                 dialog.close();
@@ -122,6 +138,18 @@ public class LD {
         dialog.show();
     }
 
+    /**
+     * Show a dialog to confirm a operation
+     * 
+     * @param title title of the dialog box
+     * @param message text printed in the body of the dialog box
+     * @param width width dimension expressed in pixels
+     * @param callback a call back invoked when the user confirm his choice
+     */
+    public static void ask(String title, String message, Integer width, final BooleanCallback callback) {
+        ask(title, message, "yes", "no", width, callback);
+    }
+
     public static void ask(String title, String message, final BooleanCallback callback) {
         ask(title, message, null, callback);
     }
@@ -135,13 +163,20 @@ public class LD {
      * @param width width of the dialog box
      * @param callback call back used when the user confirms the input
      */
-    public static void askForValue(String title, String message, String defaultValue, Integer width,
+    public static void askForValue(
+            String title,
+            String message,
+            String defaultValue,
+            Integer width,
             ValueCallback callback) {
         TextItem textItem = ItemFactory.newTextItem(VALUE, message, defaultValue);
         askForValue(title, message, defaultValue, textItem, width, callback);
     }
 
-    public static void askForDocumentPassword(String title, String message, Integer width,
+    public static void askForDocumentPassword(
+            String title,
+            String message,
+            Integer width,
             final ValueCallback callback) {
         final Window dialog = prepareDialogForDocumentPassword(title, width);
 
@@ -263,8 +298,13 @@ public class LD {
      * @param cancelCallback call back used when the user cancels the input
      */
     @SuppressWarnings("unchecked")
-    public static void askForValues(String title, String message, List<FormItem> items, Integer width,
-            final ValueCallback callback, final ClickHandler cancelCallback) {
+    public static void askForValues(
+            String title,
+            String message,
+            List<FormItem> items,
+            Integer width,
+            final ValueCallback callback,
+            final ClickHandler cancelCallback) {
         final Window dialog = prepareDialogForAskValues(title, width);
         if (cancelCallback != null)
             dialog.addCloseClickHandler(click -> cancelCallback.onClick(null));
@@ -338,13 +378,21 @@ public class LD {
      * @param width width of the dialog box
      * @param callback call back used when the user confirms the input
      */
-    public static void askForValues(String title, String message, List<FormItem> items, Integer width,
+    public static void askForValues(
+            String title,
+            String message,
+            List<FormItem> items,
+            Integer width,
             final ValueCallback callback) {
         askForValues(title, message, items, width, callback, null);
     }
 
-    private static void prepareItemsForAskValues(String message, List<FormItem> items, final ValueCallback callback,
-            final Window dialog, final DynamicForm form) {
+    private static void prepareItemsForAskValues(
+            String message,
+            List<FormItem> items,
+            final ValueCallback callback,
+            final Window dialog,
+            final DynamicForm form) {
         for (FormItem item : items) {
             if (items.size() == 1) {
                 item.setName(VALUE);
@@ -404,7 +452,12 @@ public class LD {
      * @param width width of the dialog box
      * @param callback call back used when the user confirms the input
      */
-    public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
+    public static void askForValue(
+            String title,
+            String message,
+            String defaultValue,
+            FormItem item,
+            Integer width,
             final ValueCallback callback) {
         askForValue(title, message, defaultValue, item, width, callback, null);
     }
@@ -421,8 +474,14 @@ public class LD {
      * @param callback call back used when the user confirms the input
      * @param cancelCallback call back used when the user cancels the input
      */
-    public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
-            ValueCallback callback, ClickHandler cancelCallback) {
+    public static void askForValue(
+            String title,
+            String message,
+            String defaultValue,
+            FormItem item,
+            Integer width,
+            ValueCallback callback,
+            ClickHandler cancelCallback) {
         askForValues(title, message, Arrays.asList(item), width, callback, cancelCallback);
 
         if (defaultValue != null) {
@@ -435,7 +494,11 @@ public class LD {
         }
     }
 
-    public static void askForValue(String title, String message, String defaultValue, FormItem item,
+    public static void askForValue(
+            String title,
+            String message,
+            String defaultValue,
+            FormItem item,
             final ValueCallback callback) {
         askForValue(title, message, defaultValue, item, null, callback);
     }
@@ -444,13 +507,20 @@ public class LD {
         askForValue(title, message, defaultValue, new TextItem(), null, callback);
     }
 
-    public static void askForStringMandatory(String title, String message, String defaultValue,
+    public static void askForStringMandatory(
+            String title,
+            String message,
+            String defaultValue,
             ValueCallback valueCallBack) {
         askForStringMandatory(title, message, defaultValue, valueCallBack, null);
     }
 
-    public static void askForStringMandatory(String title, String message, String defaultValue,
-            ValueCallback valueCallBack, ClickHandler cancelCallback) {
+    public static void askForStringMandatory(
+            String title,
+            String message,
+            String defaultValue,
+            ValueCallback valueCallBack,
+            ClickHandler cancelCallback) {
         TextItem item = new TextItem();
         item.setRequired(true);
         askForValue(title, message, defaultValue, item, null, valueCallBack, cancelCallback);

@@ -247,6 +247,19 @@ public class FileUtil {
     }
 
     /**
+     * Retrieve the same file name but with different extension
+     * 
+     * @param filename the original filename
+     * @param newExt the new extension
+     * 
+     * @return the renamed filename
+     */
+    public static String swithExtension(String filename, String newExt) {
+        String baseName = getBaseName(filename);
+        return "%s.%s".formatted(baseName, newExt);
+    }
+
+    /**
      * Gets the file base name
      * 
      * @param fileName name of the file
@@ -267,7 +280,8 @@ public class FileUtil {
     }
 
     /**
-     * It encloses the provided path inside "..." in case of Windows or '...' for all the other systems
+     * It encloses the provided path inside "..." in case of Windows or '...'
+     * for all the other systems
      * 
      * @param path the path to treat
      * 
@@ -279,7 +293,7 @@ public class FileUtil {
         else
             return "'%s'".formatted(path);
     }
-    
+
     /**
      * Gets the file name excluding the path
      * 
