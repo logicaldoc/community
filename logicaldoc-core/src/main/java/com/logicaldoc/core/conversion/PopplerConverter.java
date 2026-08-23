@@ -2,10 +2,15 @@ package com.logicaldoc.core.conversion;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -38,6 +43,7 @@ public class PopplerConverter extends AbstractFormatConverter {
                 case "tif", "tiff":
                     outputExt = "tif";
                     commandLine.add(getParameter("pdftoppm"));
+                    commandLine.add("-singlefile");
                     commandLine.add("-tiff");
                     commandLine.add("-tiffcompression lzw");
                     if (StringUtils.isNotEmpty(getParameter("ppmarguments")))
@@ -46,18 +52,28 @@ public class PopplerConverter extends AbstractFormatConverter {
                 case "png":
                     outputExt = "png";
                     commandLine.add(getParameter("pdftoppm"));
+                    commandLine.add("-singlefile");
                     commandLine.add("-png");
                     if (StringUtils.isNotEmpty(getParameter("ppmarguments")))
                         commandLine.addAll(Arrays.asList(getParameter("ppmarguments").split(" ")));
                     break;
                 case "txt":
                     commandLine.add(getParameter("pdftotext"));
+                    commandLine.add("-singlefile");
                     if (StringUtils.isNotEmpty(getParameter("textarguments")))
                         commandLine.addAll(Arrays.asList(getParameter("textarguments").split(" ")));
+                    break;
+                case "html":
+                    commandLine.add(getParameter("pdftohtml"));
+                    commandLine.add("-s");
+                    commandLine.add("-c");
+                    if (StringUtils.isNotEmpty(getParameter("htmlarguments")))
+                        commandLine.addAll(Arrays.asList(getParameter("htmlarguments").split(" ")));
                     break;
                 default:
                     outputExt = "jpg";
                     commandLine.add(getParameter("pdftoppm"));
+                    commandLine.add("-singlefile");
                     commandLine.add("-jpeg");
                     if (StringUtils.isNotEmpty(getParameter("ppmarguments")))
                         commandLine.addAll(Arrays.asList(getParameter("ppmarguments").split(" ")));
@@ -71,7 +87,7 @@ public class PopplerConverter extends AbstractFormatConverter {
 
             // Poppler appends file extension in case of images at the end so we
             // have to copy it into dest
-            if (!"txt".equals(ext)) {
+            if (!"txt".equals(ext) && !"html".equals(ext)) {
                 File outputFile = new File("%s.%s".formatted(dest.getAbsolutePath(), outputExt));
                 if (outputFile.exists())
                     try {
@@ -81,6 +97,21 @@ public class PopplerConverter extends AbstractFormatConverter {
                     }
             }
 
+            if ("html".equals(ext)) {
+                // the pdftohtml puts a -html suffix in the base filename
+                File outputFile = new File(dest.getParentFile(),
+                        "%s-html.html".formatted(FileUtil.getBaseName(dest.getName())));
+                if (outputFile.exists())
+                    try {
+                        FileUtil.copyFile(outputFile, dest);
+                    } finally {
+                        FileUtil.delete(outputFile);
+                    }
+                
+                // Embed all the external images
+                embedImagesInHtml(dest);
+            }
+
             if (!dest.exists() || dest.length() < 1)
                 throw new IOException("Empty conversion");
         } catch (IOException ioe) {
@@ -88,6 +119,52 @@ public class PopplerConverter extends AbstractFormatConverter {
         } catch (Exception e) {
             throw new IOException("Error in PDF to image conversion", e);
         }
+    }
+
+    private void embedImagesInHtml(File htmlFile) throws IOException {
+
+        // Read HTML
+        String html = Files.readString(htmlFile.toPath());
+
+        // Regex to find <img src="filename.png">
+        Pattern pattern = Pattern.compile("src=\"([^\"]+)\"");
+        Matcher matcher = pattern.matcher(html);
+
+        StringBuffer sb = new StringBuffer();
+
+        while (matcher.find()) {
+            String filename = matcher.group(1);
+            Path imgPath = Path.of(htmlFile.getParentFile().getAbsolutePath(), filename);
+
+            if (!Files.exists(imgPath)) {
+                System.err.println("Image not found: " + imgPath);
+                continue;
+            }
+
+            // Read image bytes
+            byte[] bytes = Files.readAllBytes(imgPath);
+
+            // Encode Base64
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+
+            // Determine MIME type from extension
+            String ext = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+            String mime = switch (ext) {
+                case "jpg", "jpeg" -> "image/jpeg";
+                case "png" -> "image/png";
+                case "gif" -> "image/gif";
+                default -> "application/octet-stream";
+            };
+
+            // Replace src="file.png" with src="data:image/png;base64,...."
+            String replacement = "src=\"data:" + mime + ";base64," + base64 + "\"";
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+
+        matcher.appendTail(sb);
+
+        // Write final HTML
+        Files.writeString(htmlFile.toPath(), sb.toString());
     }
 
     private int getTimeout() {
@@ -102,7 +179,8 @@ public class PopplerConverter extends AbstractFormatConverter {
 
     @Override
     public List<String> getParameterNames() {
-        return Arrays.asList("pdftoppm", "ppmarguments", "pdftotext", "textarguments", "timeout");
+        return Arrays.asList("pdftoppm", "ppmarguments", "pdftotext", "textarguments", "pdftohtml", "htmlarguments",
+                "timeout");
     }
 
     /**
