@@ -720,6 +720,7 @@ public class LoginPanel extends VLayout {
     protected void onAuthenticationFailure() {
         SC.clearPrompt();
         lockInput();
+
         LoginService.Instance.get().getUser((String) username.getValue(), new AsyncCallback<>() {
 
             @Override
@@ -733,23 +734,28 @@ public class LoginPanel extends VLayout {
                 unlockInput();
 
                 String failure = user != null ? user.getLastLoginFailureReason() : null;
+
                 if (user != null && user.isPasswordExpired()) {
                     new ChangePassword(user, LoginPanel.this).show();
                 } else if (user != null && !user.isEnabled()) {
                     SC.warn(I18N.message("userdisabledwarn"));
-                } else if (user != null && (user.getStorage() >= user.getStorageQuota() && user.getStorageQuota() >= 0)) {
+                } else if (user != null && (user.getStorageQuota() != null
+                        && user.getStorage() >= user.getStorageQuota() && user.getStorageQuota() >= 0)) {
                     SC.warn(I18N.message("quotadocsexceeded"));
                 } else if ("usernameblocked".equals(failure)) {
                     SC.warn(I18N.message("usernameblockedwarn", info.getConfig("throttle.username.wait")));
                 } else if ("ipblocked".equals(failure)) {
                     SC.warn(I18N.message("ipblockedwarn", info.getConfig("throttle.ip.wait")));
-                } else if ("unconfirmedlegals".equals(failure)) {
+                }
+
+                else if ("unconfirmedlegals".equals(failure)) {
                     handleUnconfirmedLegals(user.getUsername());
                 } else
                     SC.warn(I18N.message(ACCESSDENIED));
 
             }
         });
+
     }
 
     protected void handleUnconfirmedLegals(String username) {
