@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,6 @@ public class PopplerConverter extends AbstractFormatConverter {
                         commandLine.addAll(Arrays.asList(getParameter("ppmarguments").split(" ")));
             }
 
-            commandLine.add("-singlefile");
             commandLine.add(src.getAbsolutePath());
             commandLine.add(dest.getAbsolutePath());
 
@@ -107,7 +107,7 @@ public class PopplerConverter extends AbstractFormatConverter {
                     } finally {
                         FileUtil.delete(outputFile);
                     }
-                
+
                 // Embed all the external images
                 embedImagesInHtml(dest);
             }
@@ -137,7 +137,7 @@ public class PopplerConverter extends AbstractFormatConverter {
             Path imgPath = Path.of(htmlFile.getParentFile().getAbsolutePath(), filename);
 
             if (!Files.exists(imgPath)) {
-                System.err.println("Image not found: " + imgPath);
+                log.error("Image not found: {}", imgPath);
                 continue;
             }
 
@@ -227,7 +227,6 @@ public class PopplerConverter extends AbstractFormatConverter {
 
         }
 
-        commandLine.add("-forcenum");
         if (dpi != null)
             commandLine.add("-r %d".formatted(dpi));
         if (firstPage != null)
@@ -238,7 +237,9 @@ public class PopplerConverter extends AbstractFormatConverter {
             commandLine.addAll(arguments);
 
         commandLine.add(FileUtil.quotePath(src.getAbsolutePath()));
-        commandLine.add(FileUtil.quotePath(dest.getAbsolutePath()));
+
+        // Poppler wants the path prefix, it will then append the extesion
+        commandLine.add(FilenameUtils.removeExtension(dest.getAbsolutePath()));
 
         executePoppler(commandLine, timeout);
 
@@ -247,15 +248,34 @@ public class PopplerConverter extends AbstractFormatConverter {
         File[] children = root.listFiles(
                 (dir, name) -> !name.equals(dest.getName()) && name.startsWith(FileUtil.getBaseName(dest.getName())));
         pages.addAll(Arrays.asList(children));
-        pages = pages.stream().sorted().toList();
+
+        // Sort the pages extracing the index from file name
+        pages = pages.stream().sorted((f1, f2) -> {
+            // Remove extension
+            String base1 = FilenameUtils.getBaseName(f1.getName()); // "test-12"
+
+            // Extract number after last dash
+            int idx1 = base1.contains("-") ? Integer.parseInt(base1.substring(base1.lastIndexOf('-') + 1)) : 0;
+
+            String base2 = FilenameUtils.getBaseName(f2.getName());
+            int idx2 = base2.contains("-") ? Integer.parseInt(base2.substring(base2.lastIndexOf('-') + 1)) : 0;
+
+            if (idx1 < idx2)
+                return -1;
+            else if (idx1 > idx2)
+                return 1;
+            else
+                return 0;
+        }).toList();
 
         // Poppler appends file extension at the end so we have to copy the
         // first page to dest
-        if (!pages.isEmpty())
+        if (!pages.isEmpty() && !pages.getFirst().equals(dest)) {
             FileUtil.copyFile(pages.getFirst(), dest);
-
+        }
+        
         // In case of single page we maintain just dest file
-        if (pages.size() == 1) {
+        if (pages.size() == 1 && !pages.getFirst().equals(dest)) {
             FileUtil.delete(pages.getFirst());
             pages = List.of(dest);
         }

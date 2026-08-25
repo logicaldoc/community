@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
@@ -40,9 +42,7 @@ public class CoreWorkbench {
      * @throws ParseException
      */
     public static void main(String[] args) throws IOException, ParseException {
-
-        new FeatureDisabledException(Feature.fromKey("Feature_19")).printStackTrace();
-
+        System.out.println(FilenameUtils.removeExtension(new File("/C:/tmp/test.pdf").getAbsolutePath()));
 
 //		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 //		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
