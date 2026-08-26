@@ -145,21 +145,28 @@ public class DocumentsDataServlet extends AbstractDataServlet {
          */
         final Map<String, Object> extendedAttributesValues = new HashMap<>();
 
-        Document hiliteDoc = null;
+        Document hiliteDoc;
 
         if (status != null && status.intValue() != DocumentStatus.ARCHIVED.ordinal()) {
             findDocumentsByStatus(session, maxRecords, page, status, documentsInCurrentPage);
+            hiliteDoc = null;
         } else if (StringUtils.isNotEmpty(request.getParameter("docIds"))) {
             findDocumentsByIds(request, session, documentsInCurrentPage);
+            hiliteDoc = null;
         } else {
             hiliteDoc = findDocumentsByFilters(request, session, locale, maxRecords, page, documentsInCurrentPage,
                     extendedAttributes, extendedAttributesSpec, extendedAttributesValues);
         }
-
+        
+        if (hiliteDoc != null)
+            printDocument(writer, hiliteDoc, hiliteDoc, bookmarks, extendedAttributes, extendedAttributesValues,
+                    session.getTenantName());
         /*
-         * Iterate over the documents printing the output
+         * Iterate over the documents printing the output but not the hilited
+         * one(if any)
          */
-        for (Document document : documentsInCurrentPage) {
+        for (Document document : documentsInCurrentPage.stream()
+                .filter(d -> hiliteDoc == null || d.getId() != hiliteDoc.getId()).toList()) {
             printDocument(writer, document, hiliteDoc, bookmarks, extendedAttributes, extendedAttributesValues,
                     session.getTenantName());
         }

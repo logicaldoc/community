@@ -41,424 +41,425 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
  */
 public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, DocumentObserver {
 
-	private static final String CLOSE_TD = "</td>";
-
-	private static final String SHOWNDOCUMENTS = "showndocuments";
-
-	private Cursor cursor;
-
-	private GUIFolder folder = null;
-
-	private List<DetailViewerField> fields = new ArrayList<>();
-
-	public DocumentsTileGrid(GUIFolder folder) {
-		this.folder = folder;
-		setTileWidth(200);
-		setTileHeight(250);
-		setAutoFetchData(true);
-		setSelectionType(SelectionStyle.MULTIPLE);
-		setShowAllRecords(false);
-		setCanReorderTiles(false);
-		setCanDrag(folder != null && folder.isMove());
-		setWidth100();
-
-		prepareDataSource(folder);
-
-		addThumbnail();
-
-		addFilename();
-
-		setFields(fields.toArray(new DetailViewerField[0]));
-
-		addDataArrivedHandler((DataArrivedEvent event) -> {
-			if (cursor != null)
-				cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getCount())));
-			setSort(new SortSpecifier("filename", SortDirection.ASCENDING));
-		});
-
-		DocumentController.get().addObserver(this);
-	}
-
-	private void addFilename() {
-		DetailViewerField filename = new DetailViewerField("filename");
-		filename.setDetailFormatter((Object value, Record rec, DetailViewerField field) -> {
-			try {
-				String html = "<table style='margin-top:2px' align='center' border='0' cellspacing='0'>";
-
-				// The title row
-				html += "<tr><td>" + Util.imageHTML(rec.getAttribute("icon") + ".png") + "</td><td>" + value
-						+ "</td></tr></table>";
-				html += "<table align='center' border='0' cellspacing='0'><tr>";
-
-				// The status row
-				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
-					html += "<td>"
-							+ DocUtil.getBookmarkedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
-							+ CLOSE_TD;
-				html += "<td>" + AwesomeFactory.getIndexedIcon(rec.getAttributeAsInt("indexed")) + CLOSE_TD;
-
-				// The locked icon
-				if (rec.getAttribute("status") != null) {
-					Integer status = rec.getAttributeAsInt("status");
-					if (status != null && status.intValue() > 0) {
-						String alt = "";
-						if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
-							alt = I18N.message("lockedby") + " " + rec.getAttributeAsString("lockUser");
-						html += "<td><span title='" + alt + "'>" + DocUtil.getLockedIcon(status) + "</span></td>";
-					}
-				}
-
-				html += "<td>"
-						+ DocUtil.getPasswordProtectedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("password")))
-						+ CLOSE_TD;
-				html += "<td>" + DocUtil.getImmutableIcon(rec.getAttributeAsInt("immutable")) + CLOSE_TD;
-				html += "<td>" + DocUtil.getSignedIcon(rec.getAttributeAsInt("signed")) + CLOSE_TD;
-				html += "<td>" + DocUtil.getStampedIcon(rec.getAttributeAsInt("stamped")) + CLOSE_TD;
-				html += "</tr></table>";
-
-				return html;
-			} catch (Exception e) {
-				return "";
-			}
-		});
-		fields.add(filename);
-	}
-
-	private void addThumbnail() {
-		DetailViewerField thumbnail = new DetailViewerField("thumbnail");
-		thumbnail.setDetailFormatter((Object value, Record rec, DetailViewerField field) -> {
-			int thumbnailSize = 200;
-			if (Session.get().getConfig("gui.thumbnail.size") != null)
-				thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
-
-			try {
-				if ("folder".equals(rec.getAttribute("type")))
-					return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
-				else {
-					long docId = Long.parseLong(rec.getAttribute("id"));
-					if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("password"))
-							|| DocumentProtectionManager.isUnprotected(docId))
-						return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
-					else
-						return Util.imageHTML("blank.png", null,
-								"width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
-				}
-			} catch (Exception e) {
-				return "";
-			}
-		});
-		fields.add(thumbnail);
-	}
-
-	private void prepareDataSource(GUIFolder folder) {
-		DocumentsDS ds = null;
-		if (folder != null) {
-			int max = loadGridLayout(folder);
-			DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null, max, 1, null);
-			ds = new DocumentsDS(params);
-		}
-
-		if (ds == null) {
-			/*
-			 * We are searching
-			 */
-			setSelectionType(SelectionStyle.SINGLE);
-		} else {
-			setDataSource(ds);
-		}
-	}
-
-	@Override
-	public void updateDocument(GUIDocument document) {
-		Record rec = findRecord(document.getId());
-		if (rec != null) {
-			DocumentGridUtil.updateRecord(document, rec);
-			Canvas tile = getTile(rec);
-			tile.redraw();
-		}
-	}
-
-	@Override
-	public void setDocuments(List<GUIDocument> documents) {
-		List<Record> records = new ArrayList<>();
-		for (GUIDocument document : documents)
-			records.add(DocumentGridUtil.fromDocument(document));
-		setData(records.toArray(new Record[0]));
-	}
-
-	@Override
-	public GUIDocument getSelectedDocument() {
-		return DocumentGridUtil.toDocument(getSelectedRecord());
-	}
-
-	@Override
-	public List<GUIDocument> getSelectedDocuments() {
-		return DocumentGridUtil.toDocuments(getSelection());
-	}
-
-	@Override
-	public List<GUIDocument> getDocuments() {
-		return DocumentGridUtil.toDocuments(getRecordList().toArray());
-	}
-
-	@Override
-	public int getSelectedIndex() {
-		return super.getRecordIndex(getSelectedRecord());
-	}
-
-	@Override
-	public List<Long> getSelectedIds() {
-		return DocumentGridUtil.getIds(getSelection());
-	}
-
-	@Override
-	public List<Long> getIds() {
-		return DocumentGridUtil.getIds(getRecordList().toArray());
-	}
-
-	@Override
-	public void deselectAll() {
-		deselectAllRecords();
-	}
-
-	@Override
-	public void setCanExpandRows() {
-		// Nothing to do
-	}
-
-	@Override
-	public int getCount() {
-		RecordList rl = getRecordList();
-		if (rl != null)
-			return getRecordList().getLength();
-		else
-			return 0;
-	}
-
-	@Override
-	public int getSelectedCount() {
-		Record[] selection = getSelection();
-		if (selection != null)
-			return selection.length;
-		else
-			return 0;
-	}
-
-	@Override
-	public void showFilters(boolean showFilters) {
-		// Nothing to do
-	}
-
-	@Override
-	public void selectDocument(long docId) {
-		deselectAll();
-		RecordList rlist = getDataAsRecordList();
-		Record rec = rlist.find("id", Long.toString(docId));
-		if (rec != null)
-			selectRecord(rec);
-	}
-
-	@Override
-	public void expandVisibleRows() {
-		// Nothing to do
-	}
-
-	@Override
-	public void setCanDrag(boolean drag) {
-		super.setCanDrag(drag);
-		setCanDragTilesOut(drag);
-	}
-
-	@Override
-	public void registerDoubleClickHandler(CellDoubleClickHandler handler) {
-		addDoubleClickHandler(click -> {
-			GUIDocument selectedDocument = getSelectedDocument();
-			if (selectedDocument == null)
-				return;
-			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onCellDoubleClick(null));
-		});
-	}
-
-	@Override
-	public void registerSelectionChangedHandler(final SelectionChangedHandler handler) {
-		addSelectionChangedHandler(changed -> {
-			GUIDocument selectedDocument = getSelectedDocument();
-			if (selectedDocument == null)
-				return;
-			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onSelectionChanged(null));
-		});
-	}
-
-	@Override
-	public void registerCellContextClickHandler(final CellContextClickHandler handler) {
-		addShowContextMenuHandler(click -> {
-			GUIDocument selectedDocument = getSelectedDocument();
-			if (selectedDocument == null)
-				return;
-			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onCellContextClick(null));
-			if (click != null)
-				click.cancel();
-		});
-	}
-
-	@Override
-	public void registerDataArrivedHandler(final DataArrivedHandler handler) {
-		addDataArrivedHandler((DataArrivedEvent event) -> handler.onDataArrived(null));
-	}
-
-	@Override
-	public void removeSelectedDocuments() {
-		removeSelectedData();
-	}
-
-	@Override
-	public void onDocumentSelected(GUIDocument document) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentModified(GUIDocument document) {
-		updateDocument(document);
-	}
-
-	@Override
-	public void onDocumentStored(GUIDocument document) {
-		if (folder != null && document.getFolder().getId() == folder.getId()) {
-			Record doc = findRecord(document.getId());
-			if (doc != null)
-				return;
-
-			addData(DocumentGridUtil.fromDocument(document));
-			cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getData().length)));
-		}
-	}
-
-	@Override
-	public void onDocumentsDeleted(List<GUIDocument> documents) {
-		for (GUIDocument doc : documents) {
-			Record rec = findRecord(doc.getId());
-			if (rec != null) {
-				try {
-					removeData(rec);
-					cursor.setMessage(I18N.message(SHOWNDOCUMENTS,
-							"" + (getData() != null ? Integer.toString(getData().length) : 0)));
-				} catch (Exception t) {
-					// Nothing to do
-				}
-			}
-		}
-	}
-
-	@Override
-	public void onDocumentCheckedIn(GUIDocument document) {
-		onDocumentModified(document);
-	}
-
-	@Override
-	public void onDocumentCheckedOut(GUIDocument document) {
-		onDocumentModified(document);
-	}
-
-	@Override
-	public void onDocumentLocked(GUIDocument document) {
-		onDocumentModified(document);
-	}
-
-	@Override
-	public void onDocumentUnlocked(GUIDocument document) {
-		onDocumentModified(document);
-	}
-
-	@Override
-	public void onDocumentMoved(GUIDocument document) {
-		if (folder != null && document.getFolder().getId() != folder.getId())
-			onDocumentsDeleted(Arrays.asList(document));
-	}
-
-	@Override
-	public void onDocumentBeginEditing(GUIDocument document) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentCancelEditing(GUIDocument document) {
-		// Nothing to do
-	}
-
-	private Record findRecord(long docId) {
-		Record rec = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
-		if (rec == null)
-			rec = find(new AdvancedCriteria("docref", OperatorId.EQUALS, docId));
-		return rec;
-	}
-
-	@Override
-	public GUIFolder getFolder() {
-		return folder;
-	}
-
-	@Override
-	public void destroy() {
-		DocumentController.get().removeObserver(this);
-	}
-
-	@Override
-	protected void onUnload() {
-		destroy();
-		super.onUnload();
-	}
-
-	@Override
-	protected void onDestroy() {
-		destroy();
-		super.onDestroy();
-	}
-
-	@Override
-	public void fetchNewData(DocumentsDS ds) {
-		getDataSource().destroy();
-		setDataSource(ds, fields.toArray(new DetailViewerField[0]));
-		fetchData();
-		redraw();
-	}
-
-	@Override
-	public void setGridCursor(Cursor gridCursor) {
-		this.cursor = gridCursor;
-	}
-
-	@Override
-	public Cursor getGridCursor() {
-		return cursor;
-	}
-
-	@Override
-	public int loadGridLayout(GUIFolder folder) {
-		this.folder = folder;
-		String previouslySavedState = folder != null ? folder.getGrid() : null;
-		if (previouslySavedState == null || previouslySavedState.isEmpty())
-			previouslySavedState = Session.get().getUser().getDocsGrid();
-
-		Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(previouslySavedState);
-		if (pageSize == null)
-			pageSize = Session.get().getConfigAsInt("gui.document.pagesize");
-
-		if (getGridCursor() != null) {
-			getGridCursor().setPageSize(pageSize);
-			if (folder != null)
-				getGridCursor().setTotalRecords((int) folder.getDocumentCount());
-		}
-
-		return pageSize;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    private static final String CLOSE_TD = "</td>";
+
+    private static final String SHOWNDOCUMENTS = "showndocuments";
+
+    private Cursor cursor;
+
+    private GUIFolder folder = null;
+
+    private List<DetailViewerField> fields = new ArrayList<>();
+
+    public DocumentsTileGrid(GUIFolder folder) {
+        this.folder = folder;
+        setTileWidth(200);
+        setTileHeight(250);
+        setAutoFetchData(true);
+        setSelectionType(SelectionStyle.MULTIPLE);
+        setShowAllRecords(false);
+        setCanReorderTiles(false);
+        setCanDrag(folder != null && folder.isMove());
+        setWidth100();
+
+        prepareDataSource(folder);
+
+        addThumbnail();
+
+        addFilename();
+
+        setFields(fields.toArray(new DetailViewerField[0]));
+
+        addDataArrivedHandler((DataArrivedEvent event) -> {
+            if (cursor != null)
+                cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getCount())));
+            setSort(new SortSpecifier("filename", SortDirection.ASCENDING));
+        });
+
+        DocumentController.get().addObserver(this);
+    }
+
+    private void addFilename() {
+        DetailViewerField filename = new DetailViewerField("filename");
+        filename.setDetailFormatter((Object value, Record rec, DetailViewerField field) -> {
+            try {
+                String html = "<table style='margin-top:2px' align='center' border='0' cellspacing='0'>";
+
+                // The title row
+                html += "<tr><td>" + Util.imageHTML(rec.getAttribute("icon") + ".png") + "</td><td>" + value
+                        + "</td></tr></table>";
+                html += "<table align='center' border='0' cellspacing='0'><tr>";
+
+                // The status row
+                if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
+                    html += "<td>"
+                            + DocUtil.getBookmarkedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
+                            + CLOSE_TD;
+                html += "<td>" + AwesomeFactory.getIndexedIcon(rec.getAttributeAsInt("indexed")) + CLOSE_TD;
+
+                // The locked icon
+                if (rec.getAttribute("status") != null) {
+                    Integer status = rec.getAttributeAsInt("status");
+                    if (status != null && status.intValue() > 0) {
+                        String alt = "";
+                        if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
+                            alt = I18N.message("lockedby") + " " + rec.getAttributeAsString("lockUser");
+                        html += "<td><span title='" + alt + "'>" + DocUtil.getLockedIcon(status) + "</span></td>";
+                    }
+                }
+
+                html += "<td>"
+                        + DocUtil.getPasswordProtectedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("password")))
+                        + CLOSE_TD;
+                html += "<td>" + DocUtil.getImmutableIcon(rec.getAttributeAsInt("immutable")) + CLOSE_TD;
+                html += "<td>" + DocUtil.getSignedIcon(rec.getAttributeAsInt("signed")) + CLOSE_TD;
+                html += "<td>" + DocUtil.getStampedIcon(rec.getAttributeAsInt("stamped")) + CLOSE_TD;
+                html += "</tr></table>";
+
+                return html;
+            } catch (Exception e) {
+                return "";
+            }
+        });
+        fields.add(filename);
+    }
+
+    private void addThumbnail() {
+        DetailViewerField thumbnail = new DetailViewerField("thumbnail");
+        thumbnail.setDetailFormatter((Object value, Record rec, DetailViewerField field) -> {
+            int thumbnailSize = 200;
+            if (Session.get().getConfig("gui.thumbnail.size") != null)
+                thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
+
+            try {
+                if ("folder".equals(rec.getAttribute("type")))
+                    return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
+                else {
+                    long docId = Long.parseLong(rec.getAttribute("id"));
+                    if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("password"))
+                            || DocumentProtectionManager.isUnprotected(docId))
+                        return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
+                    else
+                        return Util.imageHTML("blank.png", null,
+                                "width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
+                }
+            } catch (Exception e) {
+                return "";
+            }
+        });
+        fields.add(thumbnail);
+    }
+
+    private void prepareDataSource(GUIFolder folder) {
+        DocumentsDS ds = null;
+        if (folder != null) {
+            int max = loadGridLayout(folder);
+            DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null, max, 1, null);
+            ds = new DocumentsDS(params);
+        }
+
+        if (ds == null) {
+            /*
+             * We are searching
+             */
+            setSelectionType(SelectionStyle.SINGLE);
+        } else {
+            setDataSource(ds);
+        }
+    }
+
+    @Override
+    public void updateDocument(GUIDocument document) {
+        Record rec = findRecord(document.getId());
+        if (rec != null) {
+            DocumentGridUtil.updateRecord(document, rec);
+            Canvas tile = getTile(rec);
+            tile.redraw();
+        }
+    }
+
+    @Override
+    public void setDocuments(List<GUIDocument> documents) {
+        List<Record> records = new ArrayList<>();
+        for (GUIDocument document : documents)
+            records.add(DocumentGridUtil.fromDocument(document));
+        setData(records.toArray(new Record[0]));
+    }
+
+    @Override
+    public GUIDocument getSelectedDocument() {
+        return DocumentGridUtil.toDocument(getSelectedRecord());
+    }
+
+    @Override
+    public List<GUIDocument> getSelectedDocuments() {
+        return DocumentGridUtil.toDocuments(getSelection());
+    }
+
+    @Override
+    public List<GUIDocument> getDocuments() {
+        return DocumentGridUtil.toDocuments(getRecordList().toArray());
+    }
+
+    @Override
+    public int getSelectedIndex() {
+        return super.getRecordIndex(getSelectedRecord());
+    }
+
+    @Override
+    public List<Long> getSelectedIds() {
+        return DocumentGridUtil.getIds(getSelection());
+    }
+
+    @Override
+    public List<Long> getIds() {
+        return DocumentGridUtil.getIds(getRecordList().toArray());
+    }
+
+    @Override
+    public void deselectAll() {
+        deselectAllRecords();
+    }
+
+    @Override
+    public void setCanExpandRows() {
+        // Nothing to do
+    }
+
+    @Override
+    public int getCount() {
+        RecordList rl = getRecordList();
+        if (rl != null)
+            return getRecordList().getLength();
+        else
+            return 0;
+    }
+
+    @Override
+    public int getSelectedCount() {
+        Record[] selection = getSelection();
+        if (selection != null)
+            return selection.length;
+        else
+            return 0;
+    }
+
+    @Override
+    public void showFilters(boolean showFilters) {
+        // Nothing to do
+    }
+
+    @Override
+    public Record selectDocument(long docId) {
+        deselectAll();
+        RecordList rlist = getDataAsRecordList();
+        Record rec = rlist.find("id", Long.toString(docId));
+        if (rec != null)
+            selectRecord(rec);
+        return rec;
+    }
+
+    @Override
+    public void expandVisibleRows() {
+        // Nothing to do
+    }
+
+    @Override
+    public void setCanDrag(boolean drag) {
+        super.setCanDrag(drag);
+        setCanDragTilesOut(drag);
+    }
+
+    @Override
+    public void registerDoubleClickHandler(CellDoubleClickHandler handler) {
+        addDoubleClickHandler(click -> {
+            GUIDocument selectedDocument = getSelectedDocument();
+            if (selectedDocument == null)
+                return;
+            DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onCellDoubleClick(null));
+        });
+    }
+
+    @Override
+    public void registerSelectionChangedHandler(final SelectionChangedHandler handler) {
+        addSelectionChangedHandler(changed -> {
+            GUIDocument selectedDocument = getSelectedDocument();
+            if (selectedDocument == null)
+                return;
+            DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onSelectionChanged(null));
+        });
+    }
+
+    @Override
+    public void registerCellContextClickHandler(final CellContextClickHandler handler) {
+        addShowContextMenuHandler(click -> {
+            GUIDocument selectedDocument = getSelectedDocument();
+            if (selectedDocument == null)
+                return;
+            DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onCellContextClick(null));
+            if (click != null)
+                click.cancel();
+        });
+    }
+
+    @Override
+    public void registerDataArrivedHandler(final DataArrivedHandler handler) {
+        addDataArrivedHandler((DataArrivedEvent event) -> handler.onDataArrived(null));
+    }
+
+    @Override
+    public void removeSelectedDocuments() {
+        removeSelectedData();
+    }
+
+    @Override
+    public void onDocumentSelected(GUIDocument document) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentModified(GUIDocument document) {
+        updateDocument(document);
+    }
+
+    @Override
+    public void onDocumentStored(GUIDocument document) {
+        if (folder != null && document.getFolder().getId() == folder.getId()) {
+            Record doc = findRecord(document.getId());
+            if (doc != null)
+                return;
+
+            addData(DocumentGridUtil.fromDocument(document));
+            cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getData().length)));
+        }
+    }
+
+    @Override
+    public void onDocumentsDeleted(List<GUIDocument> documents) {
+        for (GUIDocument doc : documents) {
+            Record rec = findRecord(doc.getId());
+            if (rec != null) {
+                try {
+                    removeData(rec);
+                    cursor.setMessage(I18N.message(SHOWNDOCUMENTS,
+                            "" + (getData() != null ? Integer.toString(getData().length) : 0)));
+                } catch (Exception t) {
+                    // Nothing to do
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDocumentCheckedIn(GUIDocument document) {
+        onDocumentModified(document);
+    }
+
+    @Override
+    public void onDocumentCheckedOut(GUIDocument document) {
+        onDocumentModified(document);
+    }
+
+    @Override
+    public void onDocumentLocked(GUIDocument document) {
+        onDocumentModified(document);
+    }
+
+    @Override
+    public void onDocumentUnlocked(GUIDocument document) {
+        onDocumentModified(document);
+    }
+
+    @Override
+    public void onDocumentMoved(GUIDocument document) {
+        if (folder != null && document.getFolder().getId() != folder.getId())
+            onDocumentsDeleted(Arrays.asList(document));
+    }
+
+    @Override
+    public void onDocumentBeginEditing(GUIDocument document) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentCancelEditing(GUIDocument document) {
+        // Nothing to do
+    }
+
+    private Record findRecord(long docId) {
+        Record rec = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
+        if (rec == null)
+            rec = find(new AdvancedCriteria("docref", OperatorId.EQUALS, docId));
+        return rec;
+    }
+
+    @Override
+    public GUIFolder getFolder() {
+        return folder;
+    }
+
+    @Override
+    public void destroy() {
+        DocumentController.get().removeObserver(this);
+    }
+
+    @Override
+    protected void onUnload() {
+        destroy();
+        super.onUnload();
+    }
+
+    @Override
+    protected void onDestroy() {
+        destroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void fetchNewData(DocumentsDS ds) {
+        getDataSource().destroy();
+        setDataSource(ds, fields.toArray(new DetailViewerField[0]));
+        fetchData();
+        redraw();
+    }
+
+    @Override
+    public void setGridCursor(Cursor gridCursor) {
+        this.cursor = gridCursor;
+    }
+
+    @Override
+    public Cursor getGridCursor() {
+        return cursor;
+    }
+
+    @Override
+    public int loadGridLayout(GUIFolder folder) {
+        this.folder = folder;
+        String previouslySavedState = folder != null ? folder.getGrid() : null;
+        if (previouslySavedState == null || previouslySavedState.isEmpty())
+            previouslySavedState = Session.get().getUser().getDocsGrid();
+
+        Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(previouslySavedState);
+        if (pageSize == null)
+            pageSize = Session.get().getConfigAsInt("gui.document.pagesize");
+
+        if (getGridCursor() != null) {
+            getGridCursor().setPageSize(pageSize);
+            if (folder != null)
+                getGridCursor().setTotalRecords((int) folder.getDocumentCount());
+        }
+
+        return pageSize;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
@@ -116,8 +117,10 @@ public interface DocumentsGrid {
 	 * Selects the specified document
 	 * 
 	 * @param docId identifier of the document to display
+	 * 
+	 * @return the record of the grid 
 	 */
-	public void selectDocument(long docId);
+	public Record selectDocument(long docId);
 
 	/**
 	 * Removed the selected documents from visualization
