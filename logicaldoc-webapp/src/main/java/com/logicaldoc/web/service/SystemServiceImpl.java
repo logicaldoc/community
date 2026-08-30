@@ -972,79 +972,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
     @Override
     public void installPlugin() throws ServerException {
-        Session session = validateSession();
-
-        if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
-            throw new AccessDeniedException();
-
-        Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
-        if (uploadedFilesMap == null || uploadedFilesMap.size() < 1)
-            throw new ServerException("Cannot find a plugin package to install");
-
-        try (ZipUtil zipUtil = new ZipUtil();) {
-            File pluginPackage = uploadedFilesMap.values().iterator().next();
-
-            ContextProperties config = Context.get().getConfig();
-            File rootFolder;
-            if (getThreadLocalRequest() != null)
-                rootFolder = new File(getThreadLocalRequest().getSession().getServletContext().getRealPath("/"));
-            else
-                rootFolder = defaultWebappRootFolder;
-
-            String pluginId = null;
-            String pluginVersion = null;
-            String pluginJar = null;
-
-            try (InputStream pluginStream = zipUtil.getEntryStream(pluginPackage, "/plugin.xml")) {
-                if (pluginStream == null)
-                    throw new ServerException("The plugin package does not include the descriptor plugin.xml");
-
-                PluginDescriptorConfigurator pd = new PluginDescriptorConfigurator(pluginStream);
-                pluginId = pd.getId();
-                pluginVersion = pd.getVersion();
-
-                PluginRegistry pluginRegistry = PluginRegistry.getInstance();
-                Set<String> dependencies = pd.getDependencies();
-                for (String dependency : dependencies) {
-                    PluginDescriptor dep = pluginRegistry.getPlugin(dependency);
-                    if (dep == null)
-                        throw new ServerException("The dependency from plugin " + dependency + " cannot be resolved");
-                }
-
-                pluginJar = pluginId + "-" + pluginVersion + "-plugin.jar";
-            }
-
-            List<String> entries = zipUtil.listEntries(pluginPackage);
-            if (!entries.contains("WEB-INF/lib/" + pluginJar))
-                throw new ServerException(
-                        "The plugin package does not include the plugin file WEB-INF/lib/" + pluginJar);
-
-            log.info("Unpacking plugin package {} into {}", pluginPackage.getName(), rootFolder.getAbsolutePath());
-            zipUtil.unzip(pluginPackage, rootFolder);
-
-            // Delete the plugin.xml file
-            FileUtils.deleteQuietly(new File(rootFolder, "plugin.xml"));
-
-            File pluginHome = PluginRegistry.getPluginHome(pluginId);
-            if (pluginHome.exists()) {
-                FileUtil.delete(pluginHome);
-                log.info("Deleted existing plugin home {}", pluginHome.getAbsolutePath());
-            }
-
-            /*
-             * Copy the plugin archive as .installed so it will be maintained
-             * over the updates
-             */
-            File pluginsDir = new File(config.getProperty("conf.plugindir"));
-            File targetFile = new File(pluginsDir, pluginId + "-" + pluginVersion + "-plugin.zip.installed");
-            log.info("Copying plugin package {} into {}", pluginPackage.getName(), targetFile.getAbsolutePath());
-            FileUtil.copyFile(pluginPackage, targetFile);
-            ApplicationListener.restartRequired();
-        } catch (ServerException | IOException | IllegalArgumentException e) {
-            throwServerException(session, log, e);
-        } finally {
-            UploadServlet.cleanUploads(session.getSid());
-        }
+        throw new AccessDeniedException(
+                "Upload of plugins, updates, patches has been disabled for security reasons");
     }
 
     @Override
