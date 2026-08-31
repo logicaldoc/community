@@ -14,8 +14,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
-import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.junit.AbstractTestCase;
@@ -35,45 +33,42 @@ import com.logicaldoc.web.service.SecurityServiceImpl;
  */
 public abstract class AbstractWebappTestCase extends AbstractTestCase {
 
-	protected GUISession guiSession;
+    protected GUISession guiSession;
 
-	protected Session session;
+    protected Session session;
 
-	protected MockServletSession servletSession = new MockServletSession();
+    protected MockServletSession servletSession = new MockServletSession();
 
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		try {
-			prepareSession("admin", "admin");
-		} catch (ServerException e) {
-			throw new IOException(e);
-		}
+        try {
+            prepareSession("admin", "admin");
+        } catch (ServerException e) {
+            throw new IOException(e);
+        }
 
-		assertNotNull(guiSession);
-		assertNotNull(SessionManager.get().get(guiSession.getSid()));
-	}
+        assertNotNull(guiSession);
+        assertNotNull(SessionManager.get().get(guiSession.getSid()));
+    }
 
-	protected void prepareSession(String username, String password) throws ServerException, PersistenceException {
-		UserDAO userDao = UserDAO.get();
+    protected void prepareSession(String username, String password) throws ServerException, PersistenceException {
+        guiSession = new GUISession();
+        Client client = new Client("xyz", "192.168.2.231", "ghost");
+        Device device = new Device();
+        device.setBrowser("Firefox");
+        device.setBrowserVersion("18");
+        device.setOperativeSystem("Windows");
+        client.setDevice(device);
+        session = SessionManager.get().newSession(username, password, null, client);
+        if (session != null) {
+            LDAuthenticationToken token = new LDAuthenticationToken(username);
+            token.setSid(session.getSid());
+            SecurityContextHolder.getContext().setAuthentication(token);
+            guiSession = new SecurityServiceImpl().loadSession(session, null);
 
-		guiSession = new GUISession();
-		Client client = new Client("xyz", "192.168.2.231", "ghost");
-		Device device = new Device();
-		device.setBrowser("Firefox");
-		device.setBrowserVersion("18");
-		device.setOperativeSystem("Windows");
-		client.setDevice(device);
-		session = SessionManager.get().newSession(username, password, null, client);
-		if (session != null) {
-			User user = userDao.findByUsernameIgnoreCase(username, true);
-			LDAuthenticationToken token = new LDAuthenticationToken(username);
-			token.setSid(session.getSid());
-			SecurityContextHolder.getContext().setAuthentication(token);
-			guiSession = new SecurityServiceImpl().loadSession(session, null);
-
-			LDDeferredSecurityContext.bindServletSession(guiSession.getSid(), servletSession);
-		}
-	}
+            LDDeferredSecurityContext.bindServletSession(guiSession.getSid(), servletSession);
+        }
+    }
 }

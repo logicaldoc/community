@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.system.update;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.UpdateService;
@@ -66,7 +67,7 @@ public class PatchUploader extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				SC.warn(caught.getMessage());
+			    GuiLog.serverError(caught);
 				cleanUploads();
 			}
 

@@ -43,12 +43,6 @@ public interface SystemServiceAsync {
 
 	void unscheduleJobs(List<GUIValue> jobs, AsyncCallback<Void> callback);
 
-	void initializePlugin(String plugin, AsyncCallback<Void> callback);
-
-	void installPlugin(AsyncCallback<Void> callback);
-
-	void uninstallPlugin(String plugin, AsyncCallback<Void> callback);
-
 	void saveLogger(String name, String level, boolean additivity, AsyncCallback<Void> callback);
 
 	void removeLogger(String name, AsyncCallback<Void> callback);

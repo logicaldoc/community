@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIPatch;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 /**
  * The client side stub for the Document Service. This service allows r/w
@@ -21,129 +22,159 @@ import com.logicaldoc.gui.common.client.beans.GUIPatch;
 @RemoteServiceRelativePath("update")
 public interface UpdateService extends RemoteService {
 
-	/**
-	 * Check if the current installation has an update package available
-	 * 
-	 * @return List of informations about the available update package or null
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIParameter> checkUpdate() throws ServerException;
+    /**
+     * Check if the current installation has an update package available
+     * 
+     * @return List of informations about the available update package or null
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIParameter> checkUpdate() throws ServerException;
 
-	/**
-	 * Check if the current installation has patches available
-	 * 
-	 * @return List of available patches
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIPatch> checkPatch() throws ServerException;
+    /**
+     * Check if the current installation has patches available
+     * 
+     * @return List of available patches
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIPatch> checkPatch() throws ServerException;
 
-	void downloadUpdate(String id, String fileName, long fileSize) throws ServerException;
+    void downloadUpdate(String id, String fileName, long fileSize) throws ServerException;
 
-	void downloadPatch(String id, String fileName, long fileSize) throws ServerException;
+    void downloadPatch(String id, String fileName, long fileSize) throws ServerException;
 
-	/**
-	 * Confirms an update package
-	 * 
-	 * @param updateFileName The update file to confirm
-	 * @param executeImmediately If the package must be run immediately
-	 * 
-	 * @return The path of the update folder and the path of the update command
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public String confirmUpdate(String updateFileName, boolean executeImmediately) throws ServerException;
+    /**
+     * Confirms an update package
+     * 
+     * @param updateFileName The update file to confirm
+     * @param executeImmediately If the package must be run immediately
+     * 
+     * @return The path of the update folder and the path of the update command
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public String confirmUpdate(String updateFileName, boolean executeImmediately) throws ServerException;
 
-	/**
-	 * Confirms a patch
-	 * 
-	 * @param patchFileName The patch file to confirm
-	 * @param executeImmediately If the package must be run immediately
-	 * 
-	 * @return The path of the patch command used to execute the package
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public String confirmPatch(String patchFileName, boolean executeImmediately) throws ServerException;
+    /**
+     * Confirms a patch
+     * 
+     * @param patchFileName The patch file to confirm
+     * @param executeImmediately If the package must be run immediately
+     * 
+     * @return The path of the patch command used to execute the package
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public String confirmPatch(String patchFileName, boolean executeImmediately) throws ServerException;
 
-	/**
-	 * Retrieves more informations from the update
-	 * 
-	 * @param updateFileName File name of the downloaded update package
-	 * 
-	 * @return ChangeLog and Install file contents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<String> getUpdateNotes(String updateFileName) throws ServerException;
+    /**
+     * Retrieves more informations from the update
+     * 
+     * @param updateFileName File name of the downloaded update package
+     * 
+     * @return ChangeLog and Install file contents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<String> getUpdateNotes(String updateFileName) throws ServerException;
 
-	/**
-	 * Retrieves more informations from the patch
-	 * 
-	 * @param patchFileName File name of the downloaded patch package
-	 * 
-	 * @return ChangeLog and Install file contents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<String> getPatchNotes(String patchFileName) throws ServerException;
+    /**
+     * Retrieves more informations from the patch
+     * 
+     * @param patchFileName File name of the downloaded patch package
+     * 
+     * @return ChangeLog and Install file contents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<String> getPatchNotes(String patchFileName) throws ServerException;
 
-	/**
-	 * Checks the status of the current download process
-	 * 
-	 * @return download status code and download progress
-	 */
-	public List<Integer> checkDownloadStatus();
+    /**
+     * Checks the status of the current download process
+     * 
+     * @return download status code and download progress
+     */
+    public List<Integer> checkDownloadStatus();
 
-	/**
-	 * Loads a new update package
-	 * 
-	 * @return a result code
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public String loadUpdate() throws ServerException;
-	
-	/**
-	 * Deletes a local update package
-	 * 
-	 * @param updateFileName The update file to delete
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteUpdate(String updateFileName) throws ServerException;
+    /**
+     * Loads a new update package
+     * 
+     * @return a result code
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public String loadUpdate() throws ServerException;
 
-	/**
-	 * Loads a new patch
-	 * 
-	 * @return a result code
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public String loadPatch() throws ServerException;
+    /**
+     * Deletes a local update package
+     * 
+     * @param updateFileName The update file to delete
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteUpdate(String updateFileName) throws ServerException;
 
-	/**
-	 * Deletes a local patch
-	 * 
-	 * @param patchFileName The patch file to delete
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deletePatch(String patchFileName) throws ServerException;
-	
-	public static class Instance {
-		private static UpdateServiceAsync inst;
+    /**
+     * Loads a new patch
+     * 
+     * @return a result code
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public String loadPatch() throws ServerException;
 
-		private Instance() {
-		}
-		
-		public static UpdateServiceAsync get() {
-			if (inst == null) {
-				inst = GWT.create(UpdateService.class);
-				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
-			}
-			return inst;
-		}
-	}
+    /**
+     * Deletes a local patch
+     * 
+     * @param patchFileName The patch file to delete
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deletePatch(String patchFileName) throws ServerException;
+
+    
+    /**
+     * Retrieves all plug-ins
+     * 
+     * @return the installed plug-ins names
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIValue> getPlugins() throws ServerException;
+    
+    public void installPlugin() throws ServerException;
+
+    /**
+     * Launches the initialization of a plugin
+     * 
+     * @param plugin the name of the plugin to initialize
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void initializePlugin(String plugin) throws ServerException;
+
+    /**
+     * Uninstalls the given plugin
+     * 
+     * @param plugin identifier of the plugin to uninstall
+     * 
+     * @throws ServerException error happened in the server application
+     */
+    public void uninstallPlugin(String plugin) throws ServerException;
+    
+    public static class Instance {
+        private static UpdateServiceAsync inst;
+
+        private Instance() {
+        }
+
+        public static UpdateServiceAsync get() {
+            if (inst == null) {
+                inst = GWT.create(UpdateService.class);
+                ((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
+            }
+            return inst;
+        }
+    }
 }

@@ -2,8 +2,6 @@ package com.logicaldoc.web.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -17,7 +15,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -35,7 +32,6 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.dbinit.PluginDbInit;
 import com.logicaldoc.core.document.AbstractDocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -49,7 +45,6 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.menu.Menu;
-import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.stats.StatsCollector;
@@ -70,19 +65,12 @@ import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LogConfigurator;
-import com.logicaldoc.util.config.PluginDescriptorConfigurator;
-import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.io.ZipUtil;
-import com.logicaldoc.util.plugin.LogicalDOCPlugin;
-import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.util.time.TimeDiff;
-import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.data.LogDataServlet;
-import com.logicaldoc.web.listener.ApplicationListener;
 import com.logicaldoc.web.websockets.WebsocketTool;
 
 import jakarta.persistence.Table;
@@ -616,8 +604,15 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
     }
 
     @Override
-    public List<GUIHistory> search(Long userId, Long impersonatorId, Date from, Date till, int maxResult,
-            String historySid, List<String> events, Long rootFolderId) throws ServerException {
+    public List<GUIHistory> search(
+            Long userId,
+            Long impersonatorId,
+            Date from,
+            Date till,
+            int maxResult,
+            String historySid,
+            List<String> events,
+            Long rootFolderId) throws ServerException {
         Session session = validateSession();
 
         int i = 0;
@@ -727,7 +722,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
             from = DateUtil.truncateToDay(from);
             query.append(AND + tableAlias + ".ld_date >= '" + new Timestamp(from.getTime()) + "' ");
         }
-        
+
         if (till != null) {
             till = DateUtil.truncateToDay(till);
             till = DateUtils.addHours(till, 23);
@@ -812,8 +807,14 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
     }
 
     @Override
-    public List<GUIHistory> searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol,
-            String uri, int maxResult) throws ServerException {
+    public List<GUIHistory> searchApiCalls(
+            Long userId,
+            Date from,
+            Date till,
+            String callSid,
+            String protocol,
+            String uri,
+            int maxResult) throws ServerException {
         Session session = validateSession();
 
         try {
@@ -883,168 +884,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
             } catch (SchedulerException e) {
                 throwServerException(session, log, e);
             }
-    }
-
-    private File getPluginArchive(String pluginId) {
-        String location = PluginRegistry.getInstance().getPlugin(pluginId).getLocation().toString().substring(9);
-        return new File(location.substring(0, location.lastIndexOf('!')));
-    }
-
-    @Override
-    public void uninstallPlugin(String pluginId) throws ServerException {
-        Session session = validateSession();
-
-        if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
-            throw new AccessDeniedException();
-
-        PluginRegistry pluginRegistry = PluginRegistry.getInstance();
-
-        /*
-         * Launch the plugin's install
-         */
-        PluginDescriptor plugin = pluginRegistry.getPlugin(pluginId);
-        if (plugin == null)
-            return;
-
-        if (plugin.getAttribute("removable") == null || "false".equals(plugin.getAttribute("removable").getValue()))
-            throw new ServerException("The plugin " + pluginId + " cannot be uninstalled");
-
-        File pluginJarFile = getPluginArchive(pluginId);
-
-        pluginRegistry.getManager().deactivatePlugin(pluginId);
-
-        FileUtil.delete(PluginRegistry.getPluginHome(pluginId));
-        FileUtil.delete(pluginJarFile);
-        if (pluginJarFile.exists())
-            try {
-                FileUtils.forceDelete(pluginJarFile);
-            } catch (IOException t) {
-                // Nothing to do
-            }
-
-        if (pluginJarFile.exists())
-            throw new ServerException("Cannot remove plugin file " + pluginJarFile.getAbsolutePath()
-                    + ". Please stop the application and delete that file manually.");
-    }
-
-    @Override
-    public void initializePlugin(String pluginId) throws ServerException {
-        Session session = validateSession();
-
-        if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
-            throw new AccessDeniedException();
-
-        try {
-            /*
-             * Launch the plugin's install
-             */
-            PluginDescriptor plugin = PluginRegistry.getInstance().getPlugin(pluginId);
-            if (plugin.getPluginClassName() != null) {
-                LogicalDOCPlugin pluginInstance = (LogicalDOCPlugin) Class.forName(plugin.getPluginClassName())
-                        .getDeclaredConstructor().newInstance();
-                pluginInstance.install();
-            }
-
-            /*
-             * Initialize the database
-             */
-            ContextProperties config = Context.get().getConfig();
-            PluginDbInit dbInit = new PluginDbInit();
-            dbInit.setDbms(config.getProperty("jdbc.dbms"));
-            dbInit.setDriver(config.getProperty("jdbc.driver"));
-            dbInit.setUrl(config.getProperty("jdbc.url"));
-            dbInit.setUsername(config.getProperty("jdbc.username"));
-            dbInit.setPassword(config.getProperty("jdbc.password"));
-
-            if (dbInit.testConnection()) {
-                // connection success
-                dbInit.init(Set.of(pluginId));
-            } else {
-                // connection failure
-                log.debug("connection failure");
-                throw new ServerException("Database Connection failure.");
-            }
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | ClassNotFoundException | PluginException | ServerException | SQLException e) {
-            throwServerException(session, log, e);
-        }
-    }
-
-    @Override
-    public void installPlugin() throws ServerException {
-        Session session = validateSession();
-
-        if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
-            throw new AccessDeniedException();
-
-        Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
-        if (uploadedFilesMap == null || uploadedFilesMap.size() < 1)
-            throw new ServerException("Cannot find a plugin package to install");
-
-        try (ZipUtil zipUtil = new ZipUtil();) {
-            File pluginPackage = uploadedFilesMap.values().iterator().next();
-
-            ContextProperties config = Context.get().getConfig();
-            File rootFolder;
-            if (getThreadLocalRequest() != null)
-                rootFolder = new File(getThreadLocalRequest().getSession().getServletContext().getRealPath("/"));
-            else
-                rootFolder = defaultWebappRootFolder;
-
-            String pluginId = null;
-            String pluginVersion = null;
-            String pluginJar = null;
-
-            try (InputStream pluginStream = zipUtil.getEntryStream(pluginPackage, "/plugin.xml")) {
-                if (pluginStream == null)
-                    throw new ServerException("The plugin package does not include the descriptor plugin.xml");
-
-                PluginDescriptorConfigurator pd = new PluginDescriptorConfigurator(pluginStream);
-                pluginId = pd.getId();
-                pluginVersion = pd.getVersion();
-
-                PluginRegistry pluginRegistry = PluginRegistry.getInstance();
-                Set<String> dependencies = pd.getDependencies();
-                for (String dependency : dependencies) {
-                    PluginDescriptor dep = pluginRegistry.getPlugin(dependency);
-                    if (dep == null)
-                        throw new ServerException("The dependency from plugin " + dependency + " cannot be resolved");
-                }
-
-                pluginJar = pluginId + "-" + pluginVersion + "-plugin.jar";
-            }
-
-            List<String> entries = zipUtil.listEntries(pluginPackage);
-            if (!entries.contains("WEB-INF/lib/" + pluginJar))
-                throw new ServerException(
-                        "The plugin package does not include the plugin file WEB-INF/lib/" + pluginJar);
-
-            log.info("Unpacking plugin package {} into {}", pluginPackage.getName(), rootFolder.getAbsolutePath());
-            zipUtil.unzip(pluginPackage, rootFolder);
-
-            // Delete the plugin.xml file
-            FileUtils.deleteQuietly(new File(rootFolder, "plugin.xml"));
-
-            File pluginHome = PluginRegistry.getPluginHome(pluginId);
-            if (pluginHome.exists()) {
-                FileUtil.delete(pluginHome);
-                log.info("Deleted existing plugin home {}", pluginHome.getAbsolutePath());
-            }
-
-            /*
-             * Copy the plugin archive as .installed so it will be maintained
-             * over the updates
-             */
-            File pluginsDir = new File(config.getProperty("conf.plugindir"));
-            File targetFile = new File(pluginsDir, pluginId + "-" + pluginVersion + "-plugin.zip.installed");
-            log.info("Copying plugin package {} into {}", pluginPackage.getName(), targetFile.getAbsolutePath());
-            FileUtil.copyFile(pluginPackage, targetFile);
-            ApplicationListener.restartRequired();
-        } catch (ServerException | IOException | IllegalArgumentException e) {
-            throwServerException(session, log, e);
-        } finally {
-            UploadServlet.cleanUploads(session.getSid());
-        }
     }
 
     @Override

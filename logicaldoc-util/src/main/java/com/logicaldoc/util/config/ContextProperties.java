@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 
 /**
  * A configuration utility used to retrieve and alter context properties
@@ -58,11 +59,18 @@ public class ContextProperties extends OrderedProperties {
         this.maxBackups = maxBackups;
     }
 
+    protected String getDefaultConfigLocation() {
+        return StringUtils.defaultIfEmpty(System.getProperty(LD_CONFIG), "context.properties");
+    }
+
     public ContextProperties() throws IOException {
-        String config = StringUtils.defaultIfEmpty(System.getProperty(LD_CONFIG), "context.properties");
+        String config = getDefaultConfigLocation();
         if (log.isDebugEnabled())
             log.debug("Take configuration from resource {}", config);
-        load(ContextProperties.class.getClassLoader().getResource(config));
+        if (ResourceUtil.existsResource(config))
+            load(ContextProperties.class.getClassLoader().getResource(config));
+        else if (log.isDebugEnabled())
+            log.debug("Resource {} not found", config);
     }
 
     public ContextProperties(String filePath) throws IOException {
@@ -99,7 +107,7 @@ public class ContextProperties extends OrderedProperties {
         }
     }
 
-    private File detectOverrideFile() {
+    protected File detectOverrideFile() {
         if (file == null || !file.exists())
             return null;
         File override = new File(file.getParentFile(), "%s-override.%s".formatted(FileUtil.getBaseName(file.getName()),

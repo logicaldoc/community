@@ -167,7 +167,10 @@ public class UpdatePanel extends VLayout {
         label.setAlign(Alignment.LEFT);
         label.setWrap(true);
         addMember(label);
-        addMember(upload);
+
+        if (Session.get().isAdmin() && Session.get().isDefaultTenant() && !Session.get().isDemo()
+                && Session.get().getInfo().isCanUploadPackages())
+            addMember(upload);
     }
 
     private void onUpdateTemporarilyUnavailable(String reason) {

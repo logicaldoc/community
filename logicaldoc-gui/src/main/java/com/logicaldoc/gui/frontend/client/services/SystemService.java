@@ -142,31 +142,6 @@ public interface SystemService extends RemoteService {
 	public List<GUIValue> getPlugins() throws ServerException;
 
 	/**
-	 * Launches the initialization of a plugin
-	 * 
-	 * @param plugin the name of the plugin to initialize
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void initializePlugin(String plugin) throws ServerException;
-
-	/**
-	 * Installs the uploaded plugin package
-	 * 
-	 * @throws ServerException error happened in the server application
-	 */
-	public void installPlugin() throws ServerException;
-
-	/**
-	 * Uninstalls the given plugin
-	 * 
-	 * @param plugin identifier of the plugin to uninstall
-	 * 
-	 * @throws ServerException error happened in the server application
-	 */
-	public void uninstallPlugin(String plugin) throws ServerException;
-
-	/**
 	 * Confirms the last update
 	 * 
 	 * @throws ServerException an error happened in the server application

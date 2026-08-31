@@ -216,7 +216,7 @@ public class DownloadServlet extends HttpServlet {
 						session.getUser());
 			}
 		} else {
-			throw new FileNotFoundException("Cannot find document " + resource.getDocId());
+			throw new FileNotFoundException("Cannot find document %d".formatted(resource.getDocId()));
 		}
 	}
 

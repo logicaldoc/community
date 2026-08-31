@@ -194,7 +194,9 @@ public class PatchPanel extends VLayout {
         listPanel.setWidth100();
         listPanel.setHeight100();
         listPanel.setMembers(list);
-        listPanel.addMember(upload);
+        if (Session.get().isAdmin() && Session.get().isDefaultTenant() && !Session.get().isDemo()
+                && Session.get().getInfo().isCanUploadPackages())
+            listPanel.addMember(upload);
         addMember(listPanel);
 
         upload.setAutoFit(true);

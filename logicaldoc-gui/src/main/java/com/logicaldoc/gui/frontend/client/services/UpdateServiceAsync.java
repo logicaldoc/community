@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIPatch;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 public interface UpdateServiceAsync {
 
@@ -33,4 +34,12 @@ public interface UpdateServiceAsync {
     void loadPatch(AsyncCallback<String> callback);
 
     void deletePatch(String patchFileName, AsyncCallback<Void> callback);
+
+    void installPlugin(AsyncCallback<Void> callback);
+    
+    void initializePlugin(String plugin, AsyncCallback<Void> callback);
+
+    void uninstallPlugin(String plugin, AsyncCallback<Void> callback);
+    
+    void getPlugins(AsyncCallback<List<GUIValue>> callback);
 }
