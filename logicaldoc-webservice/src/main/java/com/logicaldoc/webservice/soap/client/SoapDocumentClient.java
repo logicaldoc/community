@@ -53,6 +53,8 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 			PermissionException, IOException, WebserviceException, PersistenceException {
 		if (StringUtils.isEmpty(document.getFileName()))
 			document.setFileName(content.getName());
+		
+		System.out.println("content: "+content.length());
 		return create(sid, document, new DataHandler(new FileDataSource(content)));
 	}
 
