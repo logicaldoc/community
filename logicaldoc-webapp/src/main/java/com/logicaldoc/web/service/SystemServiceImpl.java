@@ -2,7 +2,6 @@ package com.logicaldoc.web.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -70,9 +69,7 @@ import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LogConfigurator;
-import com.logicaldoc.util.config.PluginDescriptorConfigurator;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.io.ZipUtil;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
@@ -80,9 +77,7 @@ import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.util.time.TimeDiff;
-import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.data.LogDataServlet;
-import com.logicaldoc.web.listener.ApplicationListener;
 import com.logicaldoc.web.websockets.WebsocketTool;
 
 import jakarta.persistence.Table;
@@ -727,7 +722,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
             from = DateUtil.truncateToDay(from);
             query.append(AND + tableAlias + ".ld_date >= '" + new Timestamp(from.getTime()) + "' ");
         }
-        
+
         if (till != null) {
             till = DateUtil.truncateToDay(till);
             till = DateUtils.addHours(till, 23);
@@ -972,8 +967,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
     @Override
     public void installPlugin() throws ServerException {
-        throw new AccessDeniedException(
-                "Upload of plugins, updates, patches has been disabled for security reasons");
+        throw new AccessDeniedException("Upload of plugins, updates, patches has been disabled for security reasons");
     }
 
     @Override
