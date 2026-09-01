@@ -339,7 +339,7 @@ public class DocTool {
      * 
      * @throws InterruptedException In case or thread interruption
      */
-    public Document move(Document doc, String targetPath, String username) throws InterruptedException {
+    public void move(Document doc, String targetPath, String username) throws InterruptedException {
         User user = new SecurityTool().getUser(username);
 
         Folder folder = createPath(doc, targetPath, username);
@@ -350,12 +350,9 @@ public class DocTool {
         transaction.setUser(user);
 
         try {
-            return DocumentManager.get().moveToFolder(doc, folder, transaction).get();
-        } catch (InterruptedException ie) {
-            throw ie;
+            DocumentManager.get().moveToFolder(doc, folder, transaction);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return doc;
         }
     }
 

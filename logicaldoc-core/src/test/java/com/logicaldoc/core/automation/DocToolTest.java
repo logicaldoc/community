@@ -131,7 +131,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		Document doc = testSubject.findById(1L);
 		assertNotNull(doc);
 		
-		doc = testSubject.move(doc, "/Default/test", "admin");
+		testSubject.move(doc, "/Default/test", "admin");
 
 		assertEquals(testFolder, doc.getFolder());
 		
