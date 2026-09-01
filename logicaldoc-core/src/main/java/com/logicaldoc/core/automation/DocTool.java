@@ -341,9 +341,7 @@ public class DocTool {
         transaction.setUser(user);
 
         try {
-            DocumentManager.get().moveToFolder(doc, folder, transaction).get();
-        } catch (InterruptedException ie) {
-            throw ie;
+            DocumentManager.get().moveToFolder(doc, folder, transaction);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
