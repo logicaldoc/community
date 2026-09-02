@@ -295,16 +295,16 @@ public class ContextProperties extends AdvancedProperties {
 
     @Override
     public String getProperty(String property) {
-        if(overrideProperties!=null)
-            return overrideProperties.getProperty(property, super.getProperty(property));
+        if(overrideProperties!=null && overrideProperties.containsKey(property))
+            return overrideProperties.getProperty(property);
         else
             return super.getProperty(property);
     }
 
     @Override
     public String getProperty(String property, String defaultValue) {
-        if(overrideProperties!=null)
-            return overrideProperties.getProperty(property, super.getProperty(property, defaultValue));
+        if(overrideProperties!=null && overrideProperties.containsKey(property))
+            return overrideProperties.getProperty(property, defaultValue);
         else
             return super.getProperty(property, defaultValue);
     }
