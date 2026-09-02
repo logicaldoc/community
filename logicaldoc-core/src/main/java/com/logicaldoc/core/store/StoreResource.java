@@ -39,6 +39,11 @@ public class StoreResource {
      */
     public static final String SUFFIX_MOBILE_THUMBNAIL = "mobile.png";
 
+    /**
+     * The suffix for the document's resource that contains the summary
+     */
+    public static final String SUFFIX_SUMMARY = "summary.html";
+
     private long docId;
 
     private String fileVersion;
@@ -198,6 +203,15 @@ public class StoreResource {
          */
         public Builder suffixMobile() {
             return suffix(SUFFIX_MOBILE_THUMBNAIL);
+        }
+
+        /**
+         * Assigns the suffix of the summary
+         * 
+         * @return The configured builder
+         */
+        public Builder suffixSummary() {
+            return suffix(SUFFIX_SUMMARY);
         }
 
         public Builder docId(long docId) {

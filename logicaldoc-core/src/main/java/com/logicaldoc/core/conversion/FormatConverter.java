@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 
 /**
  * Implementations of this interface are specialized classes that perform
@@ -38,7 +38,7 @@ public interface FormatConverter {
 	 *        
 	 * @throws IOException raised if the conversion resulted in an error
 	 */
-	public void convert(String sid, Document document, File src, File dest) throws IOException;
+	public void convert(String sid, AbstractDocument document, File src, File dest) throws IOException;
 
 	/**
 	 * Implementations should return the list of the required parameters. A

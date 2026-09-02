@@ -34,7 +34,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.http.UrlUtil;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -51,7 +51,7 @@ public class XMLConverter extends AbstractFormatConverter {
     private static final Logger log = LoggerFactory.getLogger(XMLConverter.class);
 
     @Override
-    public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+    public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
         String destExt = FileUtil.getExtension(dest.getName()).toLowerCase();
         File xslt = null;
         File xml = null;
@@ -95,7 +95,7 @@ public class XMLConverter extends AbstractFormatConverter {
 
     private void convert(
             String sid,
-            Document document,
+            AbstractDocument document,
             File dest,
             String destExt,
             File xslt,
@@ -175,7 +175,8 @@ public class XMLConverter extends AbstractFormatConverter {
         FileUtil.writeFile(htmlContent, transformedFile.getAbsolutePath());
     }
 
-    private void convertFromTxt(String sid, Document document, File dest, String destExt, File xml) throws IOException {
+    private void convertFromTxt(String sid, AbstractDocument document, File dest, String destExt, File xml)
+            throws IOException {
         FormatConverter converter = FormatConversionManager.get().getConverter("txt", destExt);
         if (converter == null)
             throw new IOException(String.format("Unable to find a converter from txt to %s", destExt));
@@ -183,7 +184,7 @@ public class XMLConverter extends AbstractFormatConverter {
     }
 
     private String getXsltOutputFormat(
-            Document document,
+            AbstractDocument document,
             File xslt,
             File xml,
             SAXBuilder builder,

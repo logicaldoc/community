@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 
@@ -30,7 +30,8 @@ public class NotAvailableConverter implements FormatConverter {
 	}
 
 	@Override
-	public void convert(String sid, Document document, File src, File dest) throws IOException {
+	public void convert(String sid, AbstractDocument
+	        document, File src, File dest) throws IOException {
 		convert(src, dest);
 	}
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.logicaldoc.core.conversion.AbstractFormatConverter;
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 
 /**
  * A do-nothing conveter just for testing purposes
@@ -24,7 +24,7 @@ public class DummyConverter extends AbstractFormatConverter {
     }
 
     @Override
-    protected void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+    protected void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
         // Do nothing
     }
 }

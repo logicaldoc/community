@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 
@@ -18,7 +18,7 @@ import com.logicaldoc.util.io.ZipUtil;
 public class ZipConverter extends CompressedArchiveConverter {
 
     @Override
-    public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+    public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
         if ((document != null && document.getFileName() != null
                 && document.getFileName().toLowerCase().endsWith(".zip"))
                 || (src != null && src.getName().toLowerCase().endsWith(".zip")))
@@ -27,7 +27,7 @@ public class ZipConverter extends CompressedArchiveConverter {
             convertGZip(sid, document, src, dest);
     }
 
-    private void convertGZip(String sid, Document document, File src, File dest) throws IOException {
+    private void convertGZip(String sid, AbstractDocument document, File src, File dest) throws IOException {
         if (src == null)
             throw new IOException("No source");
 
@@ -58,7 +58,7 @@ public class ZipConverter extends CompressedArchiveConverter {
         }
     }
 
-    private void convertZip(String sid, Document document, File src, File dest) throws IOException {
+    private void convertZip(String sid, AbstractDocument document, File src, File dest) throws IOException {
         try (ZipUtil zipUtil = new ZipUtil();) {
             List<String> entries = zipUtil.listEntries(src);
             if (entries.size() > 1)

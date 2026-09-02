@@ -1,5 +1,6 @@
 package com.logicaldoc.web.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -3234,6 +3235,58 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                     .collect(Collectors.toSet()).toArray(new String[0]));
         } catch (PersistenceException e) {
             return throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public String getSummary(long docId, String fileVersion) throws ServerException {
+        Session session = validateSession();
+
+        try {
+            Document document = DocumentDAO.get().findById(docId);
+
+            //@formatter:off
+            StoreResource resource = StoreResource.builder()
+                    .document(document)
+                    .fileVersion(fileVersion)
+                    .suffixSummary()
+                    .build();
+            //@formatter:on
+
+            Store store = Store.get();
+
+            if (!store.exists(resource))
+                return "";
+
+            return store.getString(resource);
+
+        } catch (Exception e) {
+            return throwServerException(session, log, e);
+        }
+    }
+
+    @Override
+    public void saveSummary(long docId, String fileVersion, String summary) throws ServerException {
+
+        Session session = validateSession();
+
+        try {
+            Document document = DocumentDAO.get().findById(docId);
+
+            //@formatter:off
+            StoreResource resource = StoreResource.builder()
+                    .document(document)
+                    .fileVersion(fileVersion)
+                    .suffixSummary()
+                    .build();
+          //@formatter:on
+
+            try (InputStream in = new ByteArrayInputStream(summary.getBytes(StandardCharsets.UTF_8))) {
+                Store.get().store(in, resource);
+            }
+
+        } catch (Exception e) {
+            throwServerException(session, log, e);
         }
     }
 }

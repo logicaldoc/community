@@ -3,7 +3,7 @@ package com.logicaldoc.core.conversion;
 import java.io.File;
 import java.io.IOException;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.P7M;
 
@@ -16,7 +16,7 @@ import com.logicaldoc.util.io.P7M;
 public class P7MConverter extends AbstractFormatConverter {
 
     @Override
-    public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+    public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
         File tmp = null;
         try {
             String baseName = FileUtil.getBaseName(document.getFileName());

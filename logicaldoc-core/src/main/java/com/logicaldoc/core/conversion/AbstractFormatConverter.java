@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
@@ -45,7 +46,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
      * {@link #internalConvert(String, Document, File, File)}
      */
     @Override
-    public final void convert(String sid, Document document, File src, File dest) throws IOException {
+    public final void convert(String sid, AbstractDocument document, File src, File dest) throws IOException {
         if (!isEnabled())
             throw new IOException("Converter %s is disabled".formatted(this.getClass().getSimpleName()));
         else
@@ -55,7 +56,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
     /**
      * Extend this method to implement the conversion
      */
-    protected abstract void internalConvert(String sid, Document document, File src, File dest) throws IOException;
+    protected abstract void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException;
 
     protected ContextProperties config() {
         ContextProperties config = null;

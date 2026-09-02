@@ -23,271 +23,287 @@ import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
  */
 @RemoteServiceRelativePath("ai")
 public interface AIService extends RemoteService {
-	/**
-	 * Deletes some samplers
-	 * 
-	 * @param samplerIds identifiers of the samplers
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteSamplers(List<Long> samplerIds) throws ServerException;
+    /**
+     * Deletes some samplers
+     * 
+     * @param samplerIds identifiers of the samplers
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteSamplers(List<Long> samplerIds) throws ServerException;
 
-	/**
-	 * Creates or updates a sampler
-	 * 
-	 * @param sampler the sampler to save
-	 * 
-	 * @return the saved sampler
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUISampler saveSampler(GUISampler sampler) throws ServerException;
+    /**
+     * Creates or updates a sampler
+     * 
+     * @param sampler the sampler to save
+     * 
+     * @return the saved sampler
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUISampler saveSampler(GUISampler sampler) throws ServerException;
 
-	/**
-	 * Retrieves a sampler from the data layer
-	 * 
-	 * @param samplerId identifier of the sampler
-	 * 
-	 * @return the sampler
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUISampler getSampler(long samplerId) throws ServerException;
+    /**
+     * Retrieves a sampler from the data layer
+     * 
+     * @param samplerId identifier of the sampler
+     * 
+     * @return the sampler
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUISampler getSampler(long samplerId) throws ServerException;
 
-	/**
-	 * Deletes a set of models
-	 * 
-	 * @param modelIds identifiers of the models to delete
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteModels(List<Long> modelIds) throws ServerException;
+    /**
+     * Deletes a set of models
+     * 
+     * @param modelIds identifiers of the models to delete
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteModels(List<Long> modelIds) throws ServerException;
 
-	/**
-	 * Creates or updates a model
-	 * 
-	 * @param model the model to save
-	 * 
-	 * @return the saved model
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIModel saveModel(GUIModel model) throws ServerException;
+    /**
+     * Creates or updates a model
+     * 
+     * @param model the model to save
+     * 
+     * @return the saved model
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIModel saveModel(GUIModel model) throws ServerException;
 
-	/**
-	 * Retrieves a model from the data layer
-	 * 
-	 * @param modelId identifier of the model
-	 * 
-	 * @return the model
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIModel getModel(long modelId) throws ServerException;
+    /**
+     * Retrieves a model from the data layer
+     * 
+     * @param modelId identifier of the model
+     * 
+     * @return the model
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIModel getModel(long modelId) throws ServerException;
 
-	/**
-	 * Retrieves all the models
-	 * 
-	 * @return the list of models
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIModel> getModels() throws ServerException;
+    /**
+     * Retrieves all the models
+     * 
+     * @return the list of models
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIModel> getModels() throws ServerException;
 
-	/**
-	 * Trains a model
-	 * 
-	 * @param modelId identifier of the model to train
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void trainModel(long modelId) throws ServerException;
+    /**
+     * Trains a model
+     * 
+     * @param modelId identifier of the model to train
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void trainModel(long modelId) throws ServerException;
 
-	/**
-	 * Stops the training of a model
-	 * 
-	 * @param modelId identifier of the model to stop training
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void stopTraining(long modelId) throws ServerException;
-	
-	/**
-	 * Evaluated a neural network model
-	 * 
-	 * @param modelId identifier of the neural network model to evaluate
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void evaluateModel(long modelId) throws ServerException;
+    /**
+     * Stops the training of a model
+     * 
+     * @param modelId identifier of the model to stop training
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void stopTraining(long modelId) throws ServerException;
 
-	/**
-	 * Runs a model and gets the prediction
-	 * 
-	 * @param modelId identifier of the model
-	 * @param features ordered list of feature values
-	 * 
-	 * @return the list of predictions ordered by descending score
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIQueryResult> query(long modelId, List<String> features) throws ServerException;
+    /**
+     * Evaluated a neural network model
+     * 
+     * @param modelId identifier of the neural network model to evaluate
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void evaluateModel(long modelId) throws ServerException;
 
-	/**
-	 * Imports a new model
-	 * 
-	 * @param modelName Name to give to the new imported model
-	 * @param includeTrainingData Id training data must be imported as well
-	 * 
-	 * @return The created model
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIModel importModel(String modelName, boolean includeTrainingData) throws ServerException;
+    /**
+     * Runs a model and gets the prediction
+     * 
+     * @param modelId identifier of the model
+     * @param features ordered list of feature values
+     * 
+     * @return the list of predictions ordered by descending score
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIQueryResult> query(long modelId, List<String> features) throws ServerException;
 
-	/**
-	 * Clones a model
-	 * 
-	 * @param modelId Identifier of the model to clone
-	 * @param newName The name to give to the clone
-	 * 
-	 * @return The clone
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIModel cloneModel(long modelId, String newName) throws ServerException;
+    /**
+     * Imports a new model
+     * 
+     * @param modelName Name to give to the new imported model
+     * @param includeTrainingData Id training data must be imported as well
+     * 
+     * @return The created model
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIModel importModel(String modelName, boolean includeTrainingData) throws ServerException;
 
-	/**
-	 * Loads the statistics from of the AI
-	 * 
-	 * @param modelId Optional indentifier of the model
-	 * @param tenantId Optional indentifier of the tenant
-	 * 
-	 * @return all the stats
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIParameter> getStats(Long modelId, Long tenantId) throws ServerException;
+    /**
+     * Clones a model
+     * 
+     * @param modelId Identifier of the model to clone
+     * @param newName The name to give to the clone
+     * 
+     * @return The clone
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIModel cloneModel(long modelId, String newName) throws ServerException;
 
-	/**
-	 * Loads all the settings related to the vector store
-	 * 
-	 * @return List of settings
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIParameter> loadVectorStore() throws ServerException;
+    /**
+     * Loads the statistics from of the AI
+     * 
+     * @param modelId Optional indentifier of the model
+     * @param tenantId Optional indentifier of the tenant
+     * 
+     * @return all the stats
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIParameter> getStats(Long modelId, Long tenantId) throws ServerException;
 
-	/**
-	 * Saves all the settings related to the vector store
-	 * 
-	 * @param settings The vector store's settings
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void saveVectorStore(List<GUIParameter> settings) throws ServerException;
+    /**
+     * Loads all the settings related to the vector store
+     * 
+     * @return List of settings
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIParameter> loadVectorStore() throws ServerException;
 
-	/**
-	 * Checks the connection to the vector store
-	 * 
-	 * @param settings The vector store's settings, they are not persisted but
-	 *        just used to test the connection
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public boolean testVectorStore(List<GUIParameter> settings) throws ServerException;
+    /**
+     * Saves all the settings related to the vector store
+     * 
+     * @param settings The vector store's settings
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void saveVectorStore(List<GUIParameter> settings) throws ServerException;
 
-	/**
-	 * Enables / Disables an embedding scheme
-	 * 
-	 * @param schemeId Identifier of the scheme
-	 * @param enabled new status
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void enableEmbeddingScheme(long schemeId, boolean enabled) throws ServerException;
+    /**
+     * Checks the connection to the vector store
+     * 
+     * @param settings The vector store's settings, they are not persisted but
+     *        just used to test the connection
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public boolean testVectorStore(List<GUIParameter> settings) throws ServerException;
 
-	/**
-	 * Creates or updates a scheme
-	 * 
-	 * @param scheme the scheme to save
-	 * 
-	 * @return the saved scheme
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIEmbeddingScheme saveEmbeddingScheme(GUIEmbeddingScheme scheme) throws ServerException;
+    /**
+     * Enables / Disables an embedding scheme
+     * 
+     * @param schemeId Identifier of the scheme
+     * @param enabled new status
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void enableEmbeddingScheme(long schemeId, boolean enabled) throws ServerException;
 
-	/**
-	 * Retrieves a scheme from the data layer
-	 * 
-	 * @param schemeId identifier of the scheme
-	 * 
-	 * @return the scheme
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIEmbeddingScheme getEmbeddingScheme(long schemeId) throws ServerException;
+    /**
+     * Creates or updates a scheme
+     * 
+     * @param scheme the scheme to save
+     * 
+     * @return the saved scheme
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIEmbeddingScheme saveEmbeddingScheme(GUIEmbeddingScheme scheme) throws ServerException;
 
-	/**
-	 * Retrieves all the embedding schemes
-	 * 
-	 * @return the list of schemes
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIEmbeddingScheme> getEmbeddingSchemes() throws ServerException;
+    /**
+     * Retrieves a scheme from the data layer
+     * 
+     * @param schemeId identifier of the scheme
+     * 
+     * @return the scheme
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIEmbeddingScheme getEmbeddingScheme(long schemeId) throws ServerException;
 
-	/**
-	 * Deletes a set of schemes
-	 * 
-	 * @param schemeIds identifiers of the schemes to delete
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteEmbeddingSchemes(List<Long> schemeIds) throws ServerException;
+    /**
+     * Retrieves all the embedding schemes
+     * 
+     * @return the list of schemes
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIEmbeddingScheme> getEmbeddingSchemes() throws ServerException;
 
-	/**
-	 * Removes the embeddings generated for the given scheme
-	 * 
-	 * @param schemeId Id of the scheme
-	 * @param docIds The list of doc Ids to delete or null if you want to delete
-	 *        all the embeddings
-	 * 
-	 * @throws ServerException Error in the server application
-	 */
-	public void removeEmbeddings(long schemeId, List<Long> docIds) throws ServerException;
-	
-	/**
-	 * Marks a set of documents as unembeddable
-	 * 
-	 * @param docIds identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void markUnembeddable(List<Long> docIds) throws ServerException;
+    /**
+     * Deletes a set of schemes
+     * 
+     * @param schemeIds identifiers of the schemes to delete
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteEmbeddingSchemes(List<Long> schemeIds) throws ServerException;
 
-	/**
-	 * Marks a set of documents as embeddable
-	 * 
-	 * @param docIds identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void markEmbeddable(List<Long> docIds) throws ServerException;
+    /**
+     * Removes the embeddings generated for the given scheme
+     * 
+     * @param schemeId Id of the scheme
+     * @param docIds The list of doc Ids to delete or null if you want to delete
+     *        all the embeddings
+     * 
+     * @throws ServerException Error in the server application
+     */
+    public void removeEmbeddings(long schemeId, List<Long> docIds) throws ServerException;
 
-	public static class Instance {
-		private static AIServiceAsync inst;
+    /**
+     * Marks a set of documents as unembeddable
+     * 
+     * @param docIds identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void markUnembeddable(List<Long> docIds) throws ServerException;
 
-		private Instance() {
-		}
+    /**
+     * Marks a set of documents as embeddable
+     * 
+     * @param docIds identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void markEmbeddable(List<Long> docIds) throws ServerException;
 
-		public static AIServiceAsync get() {
-			if (inst == null) {
-				inst = GWT.create(AIService.class);
-				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
-			}
-			return inst;
-		}
-	}
+    /**
+     * Generates a new summary for the given document.
+     *
+     * @param docId identifier of the document
+     * @param fileVersion optional file version
+     * @param modelId identifier of the local summarizer model, or {@code null}
+     *        to use ChatGPT
+     * @param modelSpec ChatGPT model specification (for example "gpt-5") when
+     *        using ChatGPT, otherwise {@code null}
+     *
+     * @return the generated summary in HTML format
+     *
+     * @throws ServerException an error happened in the server application
+     */
+    public String summarize(long docId, String fileVersion, Long modelId, String modelSpec) throws ServerException;
+    
+    public static class Instance {
+        private static AIServiceAsync inst;
+
+        private Instance() {
+        }
+
+        public static AIServiceAsync get() {
+            if (inst == null) {
+                inst = GWT.create(AIService.class);
+                ((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
+            }
+            return inst;
+        }
+    }
 }

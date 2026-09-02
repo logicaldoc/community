@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -17,7 +18,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public abstract class CompressedArchiveConverter extends AbstractFormatConverter {
 
-    protected void convertMultipleEntries(String sid, Document document, File dest, List<String> entries)
+    protected void convertMultipleEntries(String sid, AbstractDocument document, File dest, List<String> entries)
             throws IOException {
         File tempFile = FileUtil.createTempFile("zipconvert", ".txt");
         try (FileWriter writer = new FileWriter(tempFile);) {
@@ -51,7 +52,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
         }
     }
 
-    protected void convertSingleEntry(String sid, Document document, File src, File dest, String entry)
+    protected void convertSingleEntry(String sid, AbstractDocument document, File src, File dest, String entry)
             throws IOException {
         String entryExtension = FileUtil.getExtension(entry);
         File uncompressedEntryFile = FileUtil.createTempFile("unzip", ".%s".formatted(entryExtension));

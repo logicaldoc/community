@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -24,7 +24,7 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 	private static final String LAST_PAGE_1 = "-dLastPage=1";
 
 	@Override
-	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+	public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
 		String ext = FileUtil.getExtension(dest.getName()).toLowerCase();
 
 		try {

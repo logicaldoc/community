@@ -82,6 +82,10 @@ public class GUIModel implements Serializable {
 
     private List<GUIFeatureDescriptor> featureDescriptors = new ArrayList<>();
 
+    private int summarySentences = 5;
+
+    private double mmrLambda = 0.7;
+
     public GUIModel(long id, String name) {
         super();
         this.id = id;
@@ -393,5 +397,21 @@ public class GUIModel implements Serializable {
 
     public void setThreshold(double threshold) {
         this.threshold = threshold;
+    }
+
+    public int getSummarySentences() {
+        return summarySentences;
+    }
+
+    public void setSummarySentences(int summarySentences) {
+        this.summarySentences = summarySentences;
+    }
+
+    public double getMmrLambda() {
+        return mmrLambda;
+    }
+
+    public void setMmrLambda(double mmrLambda) {
+        this.mmrLambda = mmrLambda;
     }
 }

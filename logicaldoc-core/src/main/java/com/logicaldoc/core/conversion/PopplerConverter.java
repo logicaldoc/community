@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -34,7 +34,7 @@ public class PopplerConverter extends AbstractFormatConverter {
     private static final Logger log = LoggerFactory.getLogger(PopplerConverter.class);
 
     @Override
-    public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+    public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
         String ext = FileUtil.getExtension(dest.getName()).toLowerCase();
 
         try {

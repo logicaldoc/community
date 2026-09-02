@@ -52,10 +52,10 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
     public T findById(long id) throws PersistenceException;
 
     /**
-     * This method finds an entity by ID
+     * This method finds an entity by ID and optionally initializes it
      * 
      * @param id ID of the entity
-     * @param initialize if the instance's lazy-loaded collections have to be
+     * @param initialize if the instance's lazy-loaded objects have to be
      *        initialized
      * 
      * @return Entity with given ID

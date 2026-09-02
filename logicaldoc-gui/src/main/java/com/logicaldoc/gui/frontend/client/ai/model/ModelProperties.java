@@ -93,6 +93,8 @@ public class ModelProperties extends ModelDetailsTab {
 
     private static final String MINI_EMBEDDER = "miniembedder";
 
+    private static final String SUMMARIZER = "summarizer";
+
     private DynamicForm form = new DynamicForm();
 
     private HLayout container = new HLayout();
@@ -133,6 +135,7 @@ public class ModelProperties extends ModelDetailsTab {
         boolean anyembedder = embedder || miniEmbedder;
         boolean nlp = CLASSIFIER.equals(model.getType()) || TOKENS.equals(model.getType());
         boolean yolo = YOLO.equals(model.getType());
+        boolean summarizer = SUMMARIZER.equals(model.getType());
 
         boolean trainable = neural || embedder;
 
@@ -353,10 +356,28 @@ public class ModelProperties extends ModelDetailsTab {
         threshold.setVisible(yolo);
         threshold.setRequired(yolo);
 
+        SpinnerItem sentences = ItemFactory.newSpinnerItem("sentences", model.getSummarySentences());
+
+        sentences.setMin(1);
+        sentences.setVisible(summarizer);
+        sentences.setRequired(summarizer);
+        sentences.addChangedHandler(changedHandler);
+
+        DoubleItem mmrLambda = ItemFactory.newDoubleItem("mmrlambda", model.getMmrLambda());
+
+        FloatRangeValidator validator = new FloatRangeValidator();
+        validator.setMin(0);
+        validator.setMax(1);
+
+        mmrLambda.setValidators(validator);
+        mmrLambda.setVisible(summarizer);
+        mmrLambda.setRequired(summarizer);
+        mmrLambda.addChangedHandler(changedHandler);
+
         form.setItems(id, type, name, label, features, categories, activationSelector, weightInit, loss, updater,
                 learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
                 minWordFrequency, windowSize, chunkSize, minChunkSize, minChunkSizeChars, maxChunks, workers, alpha,
-                minAlpha, trainingImagesWidth, trainingImagesHeight, threshold, description);
+                minAlpha, trainingImagesWidth, trainingImagesHeight, threshold, sentences, mmrLambda, description);
 
         container.setMembersMargin(3);
         container.addMember(form);
@@ -409,6 +430,7 @@ public class ModelProperties extends ModelDetailsTab {
         model.setTrainingImagesHeight(Integer.parseInt(form.getValueAsString("trainingimagesheight")));
 
         Integer thresholdValue = (Integer) form.getValue(THRESHOLD);
+
         if (thresholdValue != null) {
             model.setThreshold(thresholdValue / 100d);
         } else {
@@ -431,6 +453,11 @@ public class ModelProperties extends ModelDetailsTab {
             model.setCutoff(Integer.parseInt(form.getValueAsString("cutoff")));
             model.setNgramMin(Integer.parseInt(form.getValueAsString("ngrammin")));
             model.setNgramMax(Integer.parseInt(form.getValueAsString("ngrammax")));
+        }
+
+        if ("summarizer".equals(model.getType())) {
+            model.setSummarySentences(Integer.parseInt(form.getValueAsString("sentences")));
+            model.setMmrLambda(Double.parseDouble(form.getValueAsString("mmrlambda")));
         }
 
         return !form.hasErrors();

@@ -7,7 +7,7 @@ import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -19,7 +19,7 @@ import com.logicaldoc.util.io.FileUtil;
 public class MarkdownConverter extends AbstractFormatConverter {
 
 	@Override
-	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+	public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
 		File htmlTemp = null;
 		File pdfTemp = null;
 		try {

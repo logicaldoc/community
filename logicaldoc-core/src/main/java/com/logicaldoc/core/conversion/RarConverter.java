@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.io.RarUtil;
 
 /**
@@ -16,7 +16,7 @@ import com.logicaldoc.util.io.RarUtil;
 public class RarConverter extends CompressedArchiveConverter {
 
 	@Override
-	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+	public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
 		List<String> entries = new RarUtil().listEntries(src);
 		if (entries.size() > 1)
 			convertMultipleEntries(sid, document, dest, entries);

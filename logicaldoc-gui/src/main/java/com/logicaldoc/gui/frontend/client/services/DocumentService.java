@@ -27,757 +27,797 @@ import com.logicaldoc.gui.common.client.beans.GUIVersion;
  */
 @RemoteServiceRelativePath("document")
 public interface DocumentService extends RemoteService {
-	/**
-	 * Retrieves a specific document by its ID
-	 * 
-	 * @param docId identifier of the document
-	 * 
-	 * @return the document retrieved by the server application
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument getById(long docId) throws ServerException;
-
-	/**
-	 * Checks if the document is protected by a password
-	 * 
-	 * @param docId identifier of the document
-	 * 
-	 * @return true only if the document has been protected by a password
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public boolean isPasswordProtected(long docId) throws ServerException;
-
-	/**
-	 * Saves the document in the DB
-	 * 
-	 * @param document The document to save
-	 * 
-	 * @return The saved document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument save(GUIDocument document) throws ServerException;
-
-	/**
-	 * Validates the metadata
-	 * 
-	 * @param document The document to validate
-	 * 
-	 * @throws ServerException in case of invalid instance, this exception
-	 *         contains the errors
-	 */
-	public void validate(GUIDocument document) throws ServerException;
-
-	/**
-	 * Renames the given document
-	 * 
-	 * @param documentId identifier of the documents
-	 * @param name the new document's filename
-	 * 
-	 * @return The updated document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument rename(long documentId, String name) throws ServerException;
-
-	/**
-	 * Retrieves two specific versions by its ID
-	 * 
-	 * @param id1 identifier of the first version
-	 * @param id2 identifier of the second version
-	 * 
-	 * @return the two versions
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIVersion> getVersionsById(long id1, long id2) throws ServerException;
-
-	/**
-	 * Sends a document as email(attachment or download ticket)
-	 * 
-	 * @param email the email to send
-	 * @param locale the locale specification
-	 * 
-	 * @return "ok" otherwise an error code
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public String sendAsEmail(GUIEmail email, String locale) throws ServerException;
-
-	/**
-	 * Extracts the email representation from a .eml or .msg file
-	 * 
-	 * @param docId the identifier of the mail document
-	 * @param fileVersion the File Version
-	 * 
-	 * @return the email representation
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIEmail extractEmail(long docId, String fileVersion) throws ServerException;
-
-	/**
-	 * Extracts an email attachment and saves it in the same folder of the
-	 * document
-	 * 
-	 * @param docId the identifier of the mail document
-	 * @param fileVersion the File Version
-	 * @param attachmentFileName name of the attachment
-	 * 
-	 * @return the just created document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument saveEmailAttachment(long docId, String fileVersion, String attachmentFileName)
-			throws ServerException;
-
-	/**
-	 * Updates the links type
-	 * 
-	 * @param id The link identifier
-	 * @param type The new type to be set
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void updateLink(long id, String type) throws ServerException;
-
-	/**
-	 * Deletes a selection of links
-	 * 
-	 * @param ids identifiers of the links
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteLinks(List<Long> ids) throws ServerException;
-
-	/**
-	 * Deletes a selection of versions
-	 * 
-	 * @param ids identifiers of the versions
-	 * 
-	 * @return the document the deleted versions belongs to
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument deleteVersions(List<Long> ids) throws ServerException;
-
-	/**
-	 * Links a set of documents
-	 * 
-	 * @param inDocIds identifiers of the documents for the IN direction
-	 * @param outDocIds identifiers of the documents for the OUT direction
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void linkDocuments(List<Long> inDocIds, List<Long> outDocIds) throws ServerException;
-
-	/**
-	 * Deletes a selection of documents
-	 * 
-	 * @param ids identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void delete(List<Long> ids) throws ServerException;
-
-	/**
-	 * Permanently deletes a selection of documents, no restore will be possible
-	 * later
-	 * 
-	 * @param ids identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void destroyDocuments(List<Long> ids) throws ServerException;
-
-	/**
-	 * Deletes a selection of documents from trash
-	 * 
-	 * @param ids identifiers of documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteFromTrash(List<Long> ids) throws ServerException;
-
-	/**
-	 * Clear the user's trash
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void emptyTrash() throws ServerException;
-
-	/**
-	 * Makes immutable a set of documents
-	 * 
-	 * @param docIds identifiers of the documents
-	 * @param comment the commit
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void makeImmutable(List<Long> docIds, String comment) throws ServerException;
-
-	/**
-	 * Archives a set of documents
-	 * 
-	 * @param docIds identifiers of the documents
-	 * @param comment the commit
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void archiveDocuments(List<Long> docIds, String comment) throws ServerException;
-
-	/**
-	 * Archives the documents in a folder
-	 * 
-	 * @param folderId identifier of the folder
-	 * @param comment a comment for the action
-	 * 
-	 * @return number of records added to the archive
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public long archiveFolder(long folderId, String comment) throws ServerException;
-
-	/**
-	 * Converts a document in a given format
-	 * 
-	 * @param docId identifier of the document to convert
-	 * @param fileVersion version of the file
-	 * @param format the format to convert to (e.g.: <b>pdf</b>, <b>txt</b>, ...
-	 * 
-	 * @return the converted document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument convert(long docId, String fileVersion, String format) throws ServerException;
-
-	/**
-	 * Counts the documents in a given status contained the specified folder's
-	 * trees
-	 * 
-	 * @param folderIds identifiers of the folders
-	 * @param status a filter on the document's status
-	 * 
-	 * @return the count
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public long countDocuments(List<Long> folderIds, int status) throws ServerException;
-
-	/**
-	 * Unlocks a set of documents
-	 * 
-	 * @param docIds identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void unlock(List<Long> docIds) throws ServerException;
-
-	/**
-	 * Locks a set of documents
-	 * 
-	 * @param docIds identifiers of the documents
-	 * @param comment the comment to the lock
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void lock(List<Long> docIds, String comment) throws ServerException;
-
-	/**
-	 * Checks out the document
-	 * 
-	 * @param docIds identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void checkout(List<Long> docIds) throws ServerException;
-
-	/**
-	 * Adds new documents previously uploaded
-	 * 
-	 * @param language The language applied to all documents
-	 * @param folderId The destination folder identifier
-	 * @param importZip If .zip files have to be unpacked and the contained
-	 *        documents imported
-	 * @param charset Charset to use to process the .zip files
-	 * @param immediateIndexing If the documents must be immediately indexed
-	 * @param templateId The documents template
-	 * 
-	 * @return The list of created documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIDocument> addDocuments(String language, long folderId, boolean importZip, String charset,
-			boolean immediateIndexing, Long templateId) throws ServerException;
-
-	public List<GUIDocument> addDocuments(boolean importZip, String charset, boolean immediateIndexing,
-			GUIDocument metadata) throws ServerException;
-
-	/**
-	 * Creates a ticket
-	 * 
-	 * @param docId identifier of the document
-	 * @param type the ticket type (0='download' 2='view')
-	 * @param suffix the suffix(null or 'pdf')
-	 * @param expireHours how many validity hours
-	 * @param expireDate the exact expiration date
-	 * @param maxDownloads maximum number of allowed downloads
-	 * @param maxViews maximum number of allowed views
-	 * @param password an optional password
-	 * 
-	 * @return the generated ticket ID, a sample URL using the browser's URL, a
-	 *         sample URL using the server.url setting
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<String> createTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, Integer maxViews, String password) throws ServerException;
-
-	/**
-	 * Puts a password protection to the ticket
-	 * 
-	 * @param ticketId the identifier of the ticket to protect
-	 * @param password the password to assign(null to remove the password)
-	 * 
-	 * @return password errors, empty list in case all was ok
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<String> setTicketPassword(long ticketId, String password) throws ServerException;
-
-	public void deleteTicket(long ticketId) throws ServerException;
-
-	public void enableTicket(long ticketId) throws ServerException;
-
-	public void disableTicket(long ticketId) throws ServerException;
-
-	/**
-	 * Indexes the given set of documents
-	 * 
-	 * @param docIds The set of documents to index
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void indexDocuments(List<Long> docIds) throws ServerException;
-
-	/**
-	 * Checks-in a new document version
-	 * 
-	 * @param document The document to update
-	 * @param major True if this is a major version
-	 * 
-	 * @return The updated document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument checkin(GUIDocument document, boolean major) throws ServerException;
-
-	/**
-	 * Checks-in a new document's text content
-	 * 
-	 * @param docId identifier of the document
-	 * @param content content of the file
-	 * 
-	 * @return the document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument checkinContent(long docId, String content) throws ServerException;
-
-	/**
-	 * Replaces the file associated to a given version
-	 * 
-	 * @param docId the identifier of the document
-	 * @param fileVersion the file version
-	 * @param comment the comment
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void replaceFile(long docId, String fileVersion, String comment) throws ServerException;
-
-	/**
-	 * If you promote a prior version, what it does is make it the default
-	 * version again. (regardless of there being many versions)
-	 * 
-	 * @param docId the identifier of the document
-	 * @param version version specification
-	 * 
-	 * @return the document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument promoteVersion(long docId, String version) throws ServerException;
-
-	/**
-	 * Creates a new document with the given text content
-	 * 
-	 * @param document the document to create
-	 * @param content the contents
-	 * 
-	 * @return the created document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument createDocument(GUIDocument document, String content) throws ServerException;
-
-	/**
-	 * Retrieves the document's content as a string
-	 * 
-	 * @param docId identifier of the document
-	 * 
-	 * @return the document's extracted content
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public String getContentAsString(long docId) throws ServerException;
-
-	/**
-	 * Restores a given document
-	 * 
-	 * @param docIds identifiers of the documents
-	 * @param folderId identifier of the folder in which to restore the
-	 *        documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void restore(List<Long> docIds, long folderId) throws ServerException;
-
-	/**
-	 * Restores a given set of archived documents
-	 * 
-	 * @param docIds identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void unarchiveDocuments(List<Long> docIds) throws ServerException;
-
-	/**
-	 * Adds new bookmarks
-	 * 
-	 * @param targetIds identfiers of the documents or folders to bookmark
-	 * @param type the type of bookmark (<b>0</b> = document, <b>1</b> = folder)
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void addBookmarks(List<Long> targetIds, int type) throws ServerException;
-
-	/**
-	 * Deletes a set of bookmarks
-	 * 
-	 * @param bookmarkIds identifiers of the bookmarks to delete
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteBookmarks(List<Long> bookmarkIds) throws ServerException;
-
-	/**
-	 * Updates a single bookmark's data
-	 * 
-	 * @param bookmark the bookmark to update
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void updateBookmark(GUIBookmark bookmark) throws ServerException;
-
-	/**
-	 * Marks as read the histories related to the current user and the given
-	 * event.
-	 * 
-	 * @param event The history event to mark as read
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void markHistoryAsRead(String event) throws ServerException;
-
-	/**
-	 * Marks a set of documents as unindexable
-	 * 
-	 * @param docIds identifiers of the documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void markUnindexable(List<Long> docIds) throws ServerException;
-
-	/**
-	 * Marks a set of documents as indexable
-	 * 
-	 * @param docIds identifiers of the documents
-	 * @param policy indexing policy:
-	 *        {@link com.logicaldoc.gui.common.client.Constants#INDEX_TO_INDEX}
-	 *        or
-	 *        {@link com.logicaldoc.gui.common.client.Constants#INDEX_TO_INDEX_METADATA}
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void markIndexable(List<Long> docIds, int policy) throws ServerException;
-
-	/**
-	 * Cleans the uploaded files folder
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void cleanUploadedFileFolder() throws ServerException;
-
-	/**
-	 * Retrieves the rating of the given document
-	 * 
-	 * @param docId identifier of the document
-	 * 
-	 * @return the rating retrieved by the server application
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIRating getRating(long docId) throws ServerException;
-
-	/**
-	 * Save a rating vote on a document
-	 * 
-	 * @param rating the document's rating
-	 * 
-	 * @return the new document rating value
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public int saveRating(GUIRating rating) throws ServerException;
-
-	/**
-	 * Updates a document note on the given document
-	 * 
-	 * @param note the note to save
-	 * 
-	 * @return the updated / created quote
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocumentNote saveNote(GUIDocumentNote note) throws ServerException;
-
-	/**
-	 * Retrieves the notes of a document
-	 * 
-	 * @param docId identifier of the document
-	 * @param fileVersion file version specification
-	 * @param types optional filter for the note type
-	 * 
-	 * @return the notes on the given version
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types)
-			throws ServerException;
-
-	/**
-	 * Retrieves the note of a document
-	 * 
-	 * @param noteId identifier of the note
-	 * 
-	 * @return the existing note
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocumentNote getNote(long noteId) throws ServerException;
-
-	/**
-	 * Saves a set of notes
-	 * 
-	 * @param docId identifier of the document
-	 * @param fileVersion optional file version all the notes are bound to
-	 * @param notes the notes to save
-	 * @param types optional filter for the note type
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void saveNotes(long docId, String fileVersion, List<GUIDocumentNote> notes, Collection<String> types)
-			throws ServerException;
-
-	/**
-	 * Deletes a selection of document notes
-	 * 
-	 * @param ids identifiers of the notes
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deleteNotes(List<Long> ids) throws ServerException;
-
-	/**
-	 * Applies to a selection of documents all the given data
-	 * 
-	 * @param ids identifiers of the documents to update
-	 * @param vo the value object to use as template
-	 * @param ignoreEmptyFields flag to skip fields empty in the <code>vo</code>
-	 * 
-	 * @return the updated documents
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIDocument> bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields)
-			throws ServerException;
-
-	/**
-	 * Creates a new empty document
-	 * 
-	 * @param vo the value object to use as template
-	 * @param content the text body of the new document
-	 * @param checkout if the new document must be checked out
-	 * 
-	 * @return the created document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument createWithContent(GUIDocument vo, String content, boolean checkout) throws ServerException;
-
-	/**
-	 * Puts a password protection to the document
-	 * 
-	 * @param docId the identifier of the document to protect
-	 * @param password the password to assign
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void setPassword(long docId, String password) throws ServerException;
-
-	/**
-	 * Removes the password protection from the document
-	 * 
-	 * @param docId the identifier of the document to unprotect
-	 * @param password the password to clear
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void unsetPassword(long docId, String password) throws ServerException;
-
-	/**
-	 * Checks if the document can be accessed with the given password
-	 * 
-	 * @param docId the identifier of the document to unprotect
-	 * @param password the password to clear
-	 * 
-	 * @return is the password is correct
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public boolean unprotect(long docId, String password) throws ServerException;
-
-	/**
-	 * Retrieves the vote of the current user on the specified document
-	 * 
-	 * @param docId the identifier of the document
-	 * 
-	 * @return the rating
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIRating getUserRating(long docId) throws ServerException;
-
-	/**
-	 * Deletes a vote
-	 * 
-	 * @param id identifier of the rating to delete
-	 * 
-	 * @return the result
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public Integer deleteRating(long id) throws ServerException;
-
-	/**
-	 * Replaces an alias with a copy of the original file
-	 * 
-	 * @param aliasId ID of the alias to replace
-	 * 
-	 * @return the just created document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument replaceAlias(long aliasId) throws ServerException;
-
-	/**
-	 * Convert duplicates with aliases, just one of the documents is maintained
-	 * 
-	 * @param folderId optional ID of the folder to process
-	 * @param retainNewest true if the newest has to be retained, otherwise it
-	 *        will be the oldest.
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void deDuplicate(Long folderId, boolean retainNewest) throws ServerException;
-
-	/**
-	 * Enforces that all the files in the given tree are stored in the store
-	 * configured in the owning folder. The process is asynchronous, at the end
-	 * an internal message to the user will be sent to alert him about its end.
-	 * 
-	 * @param folderId identifier of the tree root
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void enforceFilesIntoFolderStore(long folderId) throws ServerException;
-
-	/**
-	 * Merges a set of documents into a single PDF
-	 * 
-	 * @param docIds identifiers of the documents to merge
-	 * 
-	 * @param targetFolderId identifier of the folder that will receive the
-	 *        merged PDF
-	 * @param fileName file name of the merged file
-	 * 
-	 * @return the newly created merged document
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIDocument merge(List<Long> docIds, long targetFolderId, String fileName) throws ServerException;
-
-	/**
-	 * Counts the pages of a document and updates the DB.
-	 * 
-	 * @param docId identifier of the document
-	 * 
-	 * @return number of pages
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public int updatePages(long docId) throws ServerException;
-
-	/**
-	 * Gets the allowed permissions on a set of documents in regards of the
-	 * current user
-	 * 
-	 * @param docIds collection of the documents
-	 */
-	public GUIAccessControlEntry getAllowedPermissions(List<Long> docIds) throws ServerException;
-
-	/**
-	 * Applies all security settings to document
-	 * 
-	 * @param document The document that will contain the new security settings
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void saveACL(GUIDocument document) throws ServerException;
-
-	/**
-	 * Applies all security settings from the folder to the document
-	 * 
-	 * @param docId The document that will contain the new security settings
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void applyParentFolderSecurity(long docId) throws ServerException;
-
-	public static class Instance {
-		private static DocumentServiceAsync inst;
-
-		private Instance() {
-		}
-
-		public static DocumentServiceAsync get() {
-			if (inst == null) {
-				inst = GWT.create(DocumentService.class);
-				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
-			}
-			return inst;
-		}
-	}
+    /**
+     * Retrieves a specific document by its ID
+     * 
+     * @param docId identifier of the document
+     * 
+     * @return the document retrieved by the server application
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument getById(long docId) throws ServerException;
+
+    /**
+     * Checks if the document is protected by a password
+     * 
+     * @param docId identifier of the document
+     * 
+     * @return true only if the document has been protected by a password
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public boolean isPasswordProtected(long docId) throws ServerException;
+
+    /**
+     * Saves the document in the DB
+     * 
+     * @param document The document to save
+     * 
+     * @return The saved document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument save(GUIDocument document) throws ServerException;
+
+    /**
+     * Validates the metadata
+     * 
+     * @param document The document to validate
+     * 
+     * @throws ServerException in case of invalid instance, this exception
+     *         contains the errors
+     */
+    public void validate(GUIDocument document) throws ServerException;
+
+    /**
+     * Renames the given document
+     * 
+     * @param documentId identifier of the documents
+     * @param name the new document's filename
+     * 
+     * @return The updated document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument rename(long documentId, String name) throws ServerException;
+
+    /**
+     * Retrieves two specific versions by its ID
+     * 
+     * @param id1 identifier of the first version
+     * @param id2 identifier of the second version
+     * 
+     * @return the two versions
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIVersion> getVersionsById(long id1, long id2) throws ServerException;
+
+    /**
+     * Sends a document as email(attachment or download ticket)
+     * 
+     * @param email the email to send
+     * @param locale the locale specification
+     * 
+     * @return "ok" otherwise an error code
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public String sendAsEmail(GUIEmail email, String locale) throws ServerException;
+
+    /**
+     * Extracts the email representation from a .eml or .msg file
+     * 
+     * @param docId the identifier of the mail document
+     * @param fileVersion the File Version
+     * 
+     * @return the email representation
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIEmail extractEmail(long docId, String fileVersion) throws ServerException;
+
+    /**
+     * Extracts an email attachment and saves it in the same folder of the
+     * document
+     * 
+     * @param docId the identifier of the mail document
+     * @param fileVersion the File Version
+     * @param attachmentFileName name of the attachment
+     * 
+     * @return the just created document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument saveEmailAttachment(long docId, String fileVersion, String attachmentFileName)
+            throws ServerException;
+
+    /**
+     * Updates the links type
+     * 
+     * @param id The link identifier
+     * @param type The new type to be set
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void updateLink(long id, String type) throws ServerException;
+
+    /**
+     * Deletes a selection of links
+     * 
+     * @param ids identifiers of the links
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteLinks(List<Long> ids) throws ServerException;
+
+    /**
+     * Deletes a selection of versions
+     * 
+     * @param ids identifiers of the versions
+     * 
+     * @return the document the deleted versions belongs to
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument deleteVersions(List<Long> ids) throws ServerException;
+
+    /**
+     * Links a set of documents
+     * 
+     * @param inDocIds identifiers of the documents for the IN direction
+     * @param outDocIds identifiers of the documents for the OUT direction
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void linkDocuments(List<Long> inDocIds, List<Long> outDocIds) throws ServerException;
+
+    /**
+     * Deletes a selection of documents
+     * 
+     * @param ids identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void delete(List<Long> ids) throws ServerException;
+
+    /**
+     * Permanently deletes a selection of documents, no restore will be possible
+     * later
+     * 
+     * @param ids identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void destroyDocuments(List<Long> ids) throws ServerException;
+
+    /**
+     * Deletes a selection of documents from trash
+     * 
+     * @param ids identifiers of documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteFromTrash(List<Long> ids) throws ServerException;
+
+    /**
+     * Clear the user's trash
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void emptyTrash() throws ServerException;
+
+    /**
+     * Makes immutable a set of documents
+     * 
+     * @param docIds identifiers of the documents
+     * @param comment the commit
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void makeImmutable(List<Long> docIds, String comment) throws ServerException;
+
+    /**
+     * Archives a set of documents
+     * 
+     * @param docIds identifiers of the documents
+     * @param comment the commit
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void archiveDocuments(List<Long> docIds, String comment) throws ServerException;
+
+    /**
+     * Archives the documents in a folder
+     * 
+     * @param folderId identifier of the folder
+     * @param comment a comment for the action
+     * 
+     * @return number of records added to the archive
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public long archiveFolder(long folderId, String comment) throws ServerException;
+
+    /**
+     * Converts a document in a given format
+     * 
+     * @param docId identifier of the document to convert
+     * @param fileVersion version of the file
+     * @param format the format to convert to (e.g.: <b>pdf</b>, <b>txt</b>, ...
+     * 
+     * @return the converted document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument convert(long docId, String fileVersion, String format) throws ServerException;
+
+    /**
+     * Counts the documents in a given status contained the specified folder's
+     * trees
+     * 
+     * @param folderIds identifiers of the folders
+     * @param status a filter on the document's status
+     * 
+     * @return the count
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public long countDocuments(List<Long> folderIds, int status) throws ServerException;
+
+    /**
+     * Unlocks a set of documents
+     * 
+     * @param docIds identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void unlock(List<Long> docIds) throws ServerException;
+
+    /**
+     * Locks a set of documents
+     * 
+     * @param docIds identifiers of the documents
+     * @param comment the comment to the lock
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void lock(List<Long> docIds, String comment) throws ServerException;
+
+    /**
+     * Checks out the document
+     * 
+     * @param docIds identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void checkout(List<Long> docIds) throws ServerException;
+
+    /**
+     * Adds new documents previously uploaded
+     * 
+     * @param language The language applied to all documents
+     * @param folderId The destination folder identifier
+     * @param importZip If .zip files have to be unpacked and the contained
+     *        documents imported
+     * @param charset Charset to use to process the .zip files
+     * @param immediateIndexing If the documents must be immediately indexed
+     * @param templateId The documents template
+     * 
+     * @return The list of created documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIDocument> addDocuments(
+            String language,
+            long folderId,
+            boolean importZip,
+            String charset,
+            boolean immediateIndexing,
+            Long templateId) throws ServerException;
+
+    public List<GUIDocument> addDocuments(
+            boolean importZip,
+            String charset,
+            boolean immediateIndexing,
+            GUIDocument metadata) throws ServerException;
+
+    /**
+     * Creates a ticket
+     * 
+     * @param docId identifier of the document
+     * @param type the ticket type (0='download' 2='view')
+     * @param suffix the suffix(null or 'pdf')
+     * @param expireHours how many validity hours
+     * @param expireDate the exact expiration date
+     * @param maxDownloads maximum number of allowed downloads
+     * @param maxViews maximum number of allowed views
+     * @param password an optional password
+     * 
+     * @return the generated ticket ID, a sample URL using the browser's URL, a
+     *         sample URL using the server.url setting
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<String> createTicket(
+            long docId,
+            int type,
+            String suffix,
+            Integer expireHours,
+            Date expireDate,
+            Integer maxDownloads,
+            Integer maxViews,
+            String password) throws ServerException;
+
+    /**
+     * Puts a password protection to the ticket
+     * 
+     * @param ticketId the identifier of the ticket to protect
+     * @param password the password to assign(null to remove the password)
+     * 
+     * @return password errors, empty list in case all was ok
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<String> setTicketPassword(long ticketId, String password) throws ServerException;
+
+    public void deleteTicket(long ticketId) throws ServerException;
+
+    public void enableTicket(long ticketId) throws ServerException;
+
+    public void disableTicket(long ticketId) throws ServerException;
+
+    /**
+     * Indexes the given set of documents
+     * 
+     * @param docIds The set of documents to index
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void indexDocuments(List<Long> docIds) throws ServerException;
+
+    /**
+     * Checks-in a new document version
+     * 
+     * @param document The document to update
+     * @param major True if this is a major version
+     * 
+     * @return The updated document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument checkin(GUIDocument document, boolean major) throws ServerException;
+
+    /**
+     * Checks-in a new document's text content
+     * 
+     * @param docId identifier of the document
+     * @param content content of the file
+     * 
+     * @return the document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument checkinContent(long docId, String content) throws ServerException;
+
+    /**
+     * Replaces the file associated to a given version
+     * 
+     * @param docId the identifier of the document
+     * @param fileVersion the file version
+     * @param comment the comment
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void replaceFile(long docId, String fileVersion, String comment) throws ServerException;
+
+    /**
+     * If you promote a prior version, what it does is make it the default
+     * version again. (regardless of there being many versions)
+     * 
+     * @param docId the identifier of the document
+     * @param version version specification
+     * 
+     * @return the document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument promoteVersion(long docId, String version) throws ServerException;
+
+    /**
+     * Creates a new document with the given text content
+     * 
+     * @param document the document to create
+     * @param content the contents
+     * 
+     * @return the created document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument createDocument(GUIDocument document, String content) throws ServerException;
+
+    /**
+     * Retrieves the document's content as a string
+     * 
+     * @param docId identifier of the document
+     * 
+     * @return the document's extracted content
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public String getContentAsString(long docId) throws ServerException;
+
+    /**
+     * Restores a given document
+     * 
+     * @param docIds identifiers of the documents
+     * @param folderId identifier of the folder in which to restore the
+     *        documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void restore(List<Long> docIds, long folderId) throws ServerException;
+
+    /**
+     * Restores a given set of archived documents
+     * 
+     * @param docIds identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void unarchiveDocuments(List<Long> docIds) throws ServerException;
+
+    /**
+     * Adds new bookmarks
+     * 
+     * @param targetIds identfiers of the documents or folders to bookmark
+     * @param type the type of bookmark (<b>0</b> = document, <b>1</b> = folder)
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void addBookmarks(List<Long> targetIds, int type) throws ServerException;
+
+    /**
+     * Deletes a set of bookmarks
+     * 
+     * @param bookmarkIds identifiers of the bookmarks to delete
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteBookmarks(List<Long> bookmarkIds) throws ServerException;
+
+    /**
+     * Updates a single bookmark's data
+     * 
+     * @param bookmark the bookmark to update
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void updateBookmark(GUIBookmark bookmark) throws ServerException;
+
+    /**
+     * Marks as read the histories related to the current user and the given
+     * event.
+     * 
+     * @param event The history event to mark as read
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void markHistoryAsRead(String event) throws ServerException;
+
+    /**
+     * Marks a set of documents as unindexable
+     * 
+     * @param docIds identifiers of the documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void markUnindexable(List<Long> docIds) throws ServerException;
+
+    /**
+     * Marks a set of documents as indexable
+     * 
+     * @param docIds identifiers of the documents
+     * @param policy indexing policy:
+     *        {@link com.logicaldoc.gui.common.client.Constants#INDEX_TO_INDEX}
+     *        or
+     *        {@link com.logicaldoc.gui.common.client.Constants#INDEX_TO_INDEX_METADATA}
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void markIndexable(List<Long> docIds, int policy) throws ServerException;
+
+    /**
+     * Cleans the uploaded files folder
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void cleanUploadedFileFolder() throws ServerException;
+
+    /**
+     * Retrieves the rating of the given document
+     * 
+     * @param docId identifier of the document
+     * 
+     * @return the rating retrieved by the server application
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIRating getRating(long docId) throws ServerException;
+
+    /**
+     * Save a rating vote on a document
+     * 
+     * @param rating the document's rating
+     * 
+     * @return the new document rating value
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public int saveRating(GUIRating rating) throws ServerException;
+
+    /**
+     * Updates a document note on the given document
+     * 
+     * @param note the note to save
+     * 
+     * @return the updated / created quote
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocumentNote saveNote(GUIDocumentNote note) throws ServerException;
+
+    /**
+     * Retrieves the notes of a document
+     * 
+     * @param docId identifier of the document
+     * @param fileVersion file version specification
+     * @param types optional filter for the note type
+     * 
+     * @return the notes on the given version
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types)
+            throws ServerException;
+
+    /**
+     * Retrieves the note of a document
+     * 
+     * @param noteId identifier of the note
+     * 
+     * @return the existing note
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocumentNote getNote(long noteId) throws ServerException;
+
+    /**
+     * Saves a set of notes
+     * 
+     * @param docId identifier of the document
+     * @param fileVersion optional file version all the notes are bound to
+     * @param notes the notes to save
+     * @param types optional filter for the note type
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void saveNotes(long docId, String fileVersion, List<GUIDocumentNote> notes, Collection<String> types)
+            throws ServerException;
+
+    /**
+     * Deletes a selection of document notes
+     * 
+     * @param ids identifiers of the notes
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deleteNotes(List<Long> ids) throws ServerException;
+
+    /**
+     * Applies to a selection of documents all the given data
+     * 
+     * @param ids identifiers of the documents to update
+     * @param vo the value object to use as template
+     * @param ignoreEmptyFields flag to skip fields empty in the <code>vo</code>
+     * 
+     * @return the updated documents
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public List<GUIDocument> bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields)
+            throws ServerException;
+
+    /**
+     * Creates a new empty document
+     * 
+     * @param vo the value object to use as template
+     * @param content the text body of the new document
+     * @param checkout if the new document must be checked out
+     * 
+     * @return the created document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument createWithContent(GUIDocument vo, String content, boolean checkout) throws ServerException;
+
+    /**
+     * Puts a password protection to the document
+     * 
+     * @param docId the identifier of the document to protect
+     * @param password the password to assign
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void setPassword(long docId, String password) throws ServerException;
+
+    /**
+     * Removes the password protection from the document
+     * 
+     * @param docId the identifier of the document to unprotect
+     * @param password the password to clear
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void unsetPassword(long docId, String password) throws ServerException;
+
+    /**
+     * Checks if the document can be accessed with the given password
+     * 
+     * @param docId the identifier of the document to unprotect
+     * @param password the password to clear
+     * 
+     * @return is the password is correct
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public boolean unprotect(long docId, String password) throws ServerException;
+
+    /**
+     * Retrieves the vote of the current user on the specified document
+     * 
+     * @param docId the identifier of the document
+     * 
+     * @return the rating
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIRating getUserRating(long docId) throws ServerException;
+
+    /**
+     * Deletes a vote
+     * 
+     * @param id identifier of the rating to delete
+     * 
+     * @return the result
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public Integer deleteRating(long id) throws ServerException;
+
+    /**
+     * Replaces an alias with a copy of the original file
+     * 
+     * @param aliasId ID of the alias to replace
+     * 
+     * @return the just created document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument replaceAlias(long aliasId) throws ServerException;
+
+    /**
+     * Convert duplicates with aliases, just one of the documents is maintained
+     * 
+     * @param folderId optional ID of the folder to process
+     * @param retainNewest true if the newest has to be retained, otherwise it
+     *        will be the oldest.
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void deDuplicate(Long folderId, boolean retainNewest) throws ServerException;
+
+    /**
+     * Enforces that all the files in the given tree are stored in the store
+     * configured in the owning folder. The process is asynchronous, at the end
+     * an internal message to the user will be sent to alert him about its end.
+     * 
+     * @param folderId identifier of the tree root
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void enforceFilesIntoFolderStore(long folderId) throws ServerException;
+
+    /**
+     * Merges a set of documents into a single PDF
+     * 
+     * @param docIds identifiers of the documents to merge
+     * 
+     * @param targetFolderId identifier of the folder that will receive the
+     *        merged PDF
+     * @param fileName file name of the merged file
+     * 
+     * @return the newly created merged document
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public GUIDocument merge(List<Long> docIds, long targetFolderId, String fileName) throws ServerException;
+
+    /**
+     * Counts the pages of a document and updates the DB.
+     * 
+     * @param docId identifier of the document
+     * 
+     * @return number of pages
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public int updatePages(long docId) throws ServerException;
+
+    /**
+     * Gets the allowed permissions on a set of documents in regards of the
+     * current user
+     * 
+     * @param docIds collection of the documents
+     */
+    public GUIAccessControlEntry getAllowedPermissions(List<Long> docIds) throws ServerException;
+
+    /**
+     * Applies all security settings to document
+     * 
+     * @param document The document that will contain the new security settings
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void saveACL(GUIDocument document) throws ServerException;
+
+    /**
+     * Applies all security settings from the folder to the document
+     * 
+     * @param docId The document that will contain the new security settings
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void applyParentFolderSecurity(long docId) throws ServerException;
+
+    public static class Instance {
+        private static DocumentServiceAsync inst;
+
+        private Instance() {
+        }
+
+        public static DocumentServiceAsync get() {
+            if (inst == null) {
+                inst = GWT.create(DocumentService.class);
+                ((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
+            }
+            return inst;
+        }
+    }
+
+    /**
+     * Retrieves the stored summary of a document version.
+     *
+     * @param docId identifier of the document
+     * @param fileVersion optional file version specification, {@code null} for
+     *        the current version
+     *
+     * @return the stored HTML summary, or {@code null} if no summary exists
+     *
+     * @throws ServerException an error happened in the server application
+     */
+    public String getSummary(long docId, String fileVersion) throws ServerException;
+
+    /**
+     * Saves the summary of a document version.
+     *
+     * @param docId identifier of the document
+     * @param fileVersion optional file version specification, {@code null} for
+     *        the current version
+     * @param summary the HTML summary
+     *
+     * @throws ServerException an error happened in the server application
+     */
+    public void saveSummary(long docId, String fileVersion, String summary) throws ServerException;
 }

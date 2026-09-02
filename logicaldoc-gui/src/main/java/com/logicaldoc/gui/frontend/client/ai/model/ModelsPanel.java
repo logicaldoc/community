@@ -235,6 +235,8 @@ public class ModelsPanel extends VLayout {
 
         boolean trainable = NEURAL.equals(type) || EMBEDDER.equals(type);
 
+        boolean queryable = "summarizer".equals(type) || selection[0].getAttribute(TRAINED) != null;
+
         Long selectedModelId = selection[0].getAttributeAsLong("id");
 
         MenuItem delete = new MenuItem();
@@ -306,7 +308,7 @@ public class ModelsPanel extends VLayout {
         }));
 
         query.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING)
-                && !selection[0].getAttributeAsBoolean(EVALUATING) && selection[0].getAttribute(TRAINED) != null);
+                && !selection[0].getAttributeAsBoolean(EVALUATING) && queryable);
 
         MenuItem clone = new MenuItem();
         clone.setTitle(I18N.message("clone"));
@@ -317,7 +319,7 @@ public class ModelsPanel extends VLayout {
                     public void handleSuccess(GUIModel mdl) {
                         refresh();
                     }
-                })));
+                })));     
 
         MenuItem export = new MenuItem();
         export.setTitle(I18N.message("export"));

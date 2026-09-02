@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * This popup window is used to show the HTML content of an Automation item
+ * This pop-up window is used to show the HTML content of an Automation item
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.3.4
@@ -34,7 +34,7 @@ public class HtmlItemEditor extends Window {
     public HtmlItemEditor(HTMLFlow flow, ChangedHandler handler) {
         this.flow = flow;
         this.handler = handler;
-
+        init();
     }
 
     public HtmlItemEditor(FormItem item, ChangedHandler handler) {
@@ -74,7 +74,7 @@ public class HtmlItemEditor extends Window {
     }
 
     /**
-     * Prepares the popup body
+     * Prepares the pop-up body
      */
     private void prepareBody() {
         setSavedHtmlContent(getContent());
@@ -102,7 +102,7 @@ public class HtmlItemEditor extends Window {
 
     private void onClose() {
         String editedHtml = getSavedHtmlContent() != null ? getSavedHtmlContent() : "";
-        String originalHtml = item.getValue() != null ? item.getValue().toString() : "";
+        String originalHtml = getContent();
         if (!editedHtml.equals(originalHtml)) {
             if (item != null)
                 item.setValue(editedHtml);

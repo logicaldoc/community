@@ -180,9 +180,9 @@ public class DocTool {
             ticket.setUrl(getServerUrl());
 
             ticket = DocumentManager.get().createTicket(ticket, transaction);
-            
+
             System.out.println(ticket);
-            
+
             return ticket.getUrl();
         } catch (PermissionException | PersistenceException e) {
             log.error(e.getMessage(), e);
@@ -334,8 +334,6 @@ public class DocTool {
      * @param doc the document
      * @param targetPath the full path of the target folder
      * @param username the user in whose name the method is run
-     * 
-     * @return the updated document
      * 
      * @throws InterruptedException In case or thread interruption
      */

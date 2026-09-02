@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -141,7 +142,7 @@ public class FormatConversionManager {
      * @throws IOException If something went wrong
      * @throws PersistenceException Error in the persistence layer
      */
-    public void convertToPdf(Document document, String fileVersion, String sid)
+    public void convertToPdf(AbstractDocument document, String fileVersion, String sid)
             throws IOException, PersistenceException {
         String fileName = DocUtil.getFileName(document, fileVersion);
 
@@ -493,7 +494,7 @@ public class FormatConversionManager {
      * @throws IOException raised if the file cannot be written
      * @throws PersistenceException Error in the data layer
      */
-    private File writeToFile(Document document, String fileVersion) throws IOException, PersistenceException {
+    private File writeToFile(AbstractDocument document, String fileVersion) throws IOException, PersistenceException {
         File target = FileUtil.createTempFile("scr",
                 ".%s".formatted(AbstractFormatConverter.getExtension(document.getFileName())));
         store.writeToFile(StoreResource.builder().document(document)
@@ -510,7 +511,7 @@ public class FormatConversionManager {
      * 
      * @return the file version
      */
-    private String getSuitableFileVersion(Document document, String fileVersion) {
+    private String getSuitableFileVersion(AbstractDocument document, String fileVersion) {
         String fver = fileVersion;
         if (fver == null)
             fver = document.getFileVersion();

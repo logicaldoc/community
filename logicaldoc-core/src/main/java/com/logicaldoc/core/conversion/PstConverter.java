@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.logicaldoc.core.communication.PSTWorker;
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -17,7 +17,7 @@ import com.logicaldoc.util.io.FileUtil;
 public class PstConverter extends AbstractFormatConverter {
 
 	@Override
-	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+	public void internalConvert(String sid, AbstractDocument document, File src, File dest) throws IOException {
 		PSTWorker worker = new PSTWorker(src);
 
 		String listing = worker.printListing();
