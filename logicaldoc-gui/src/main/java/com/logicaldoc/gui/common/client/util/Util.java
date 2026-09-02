@@ -1133,9 +1133,7 @@ public abstract class Util {
 
     public static void waitForUpAndRunning(String tenant, String locale) {
         final String url = Util.getJavascriptVariable("j_loginurl") + "?tenant=" + tenant + AND_LOCALE_EQUAL + locale;
-
-        LD.contactingServer();
-
+        
         RequestBuilder checkRequest = new RequestBuilder(RequestBuilder.HEAD, url);
         checkRequest.setCallback(new RequestCallback() {
             @Override

@@ -19,7 +19,6 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.java.plugin.registry.PluginDescriptor;
@@ -63,8 +62,10 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LogConfigurator;
+import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
@@ -549,37 +550,35 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
     @Override
     public void restart() throws ServerException {
-        validateSession();
+        Session session = validateSession();
+
+        log.info("Restart requested");
 
         try {
             log.warn("Alerting the connected users about the shutdown");
             List<Session> sessions = SessionManager.get().getSessions();
             WebsocketTool websocket = new WebsocketTool();
-            for (Session session : sessions)
-                websocket.showMessage(session, I18N.message("systemisshuttingdown", session.getUser().getLocale()),
-                        "warn");
+            for (Session ses : sessions)
+                websocket.showMessage(ses, I18N.message("systemisshuttingdown", session.getUser().getLocale()), "warn");
         } catch (Exception e) {
             log.warn(e.getMessage());
         }
 
         try {
-            SecurityServiceImpl secService = new SecurityServiceImpl();
-            secService.logout();
+            new SecurityServiceImpl().logout();
         } catch (Exception e) {
             log.warn(e.getMessage());
         }
 
-        ContextProperties config = Context.get().getConfig();
-        File restartFile = new File(config.getProperty("LDOCHOME") + "/updates/restart");
-        if (restartFile.exists())
-            FileUtils.deleteQuietly(restartFile);
-        restartFile.getParentFile().mkdirs();
+        File root = new File(Context.get().getConfig().getString("LDOCHOME"));
+        File commandFile = new File(root, "bin");
+        commandFile = new File(commandFile, "restart.%s".formatted(SystemUtil.isWindows() ? "bat" : "sh"));
 
         try {
-            if (!restartFile.createNewFile())
-                throw new ServerException("Unable to write file " + restartFile.getAbsolutePath());
+            log.info("Launching the restart");
+            new Exec().fork(new File(commandFile.getParent(),"restart.out") , commandFile.getAbsolutePath());
         } catch (IOException e) {
-            throw new ServerException("Unable to write file " + restartFile.getAbsolutePath());
+            throwServerException(session, log, e);
         }
     }
 
