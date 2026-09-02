@@ -97,6 +97,15 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         return findByUsername(username, false);
     }
 
+    private User afterLoad(User user, boolean initialize) throws PersistenceException {
+        if (initialize)
+            user = initialize(user);
+
+        Map<String, Object> dictionary = new HashMap<>();
+        invokeListenersAfterLoad(user, dictionary);
+        return user;
+    }
+
     @Override
     public User findByUsername(String username, boolean initialize) throws PersistenceException {
         if (StringUtils.isEmpty(username))
@@ -104,10 +113,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         User user = findByWhere("_entity.username = :username", Map.of(USERNAME, username), null, null).stream()
                 .findFirst().orElse(null);
-        if (initialize)
-            return initialize(user);
-        else
-            return user;
+        return afterLoad(user, initialize);
     }
 
     @Override
@@ -122,10 +128,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         User user = findByWhere("lower(_entity.username) = :username", Map.of(USERNAME, username.toLowerCase()), null,
                 null).stream().findFirst().orElse(null);
-        if (initialize)
-            return initialize(user);
-        else
-            return user;
+        return afterLoad(user, initialize);
     }
 
     @Override
@@ -140,10 +143,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
                         Tenant.DEFAULT_NAME.equals(tenantName) ? ADMIN
                                 : "%s%s".formatted(ADMIN, StringUtils.capitalize(tenantName))),
                 null, null).stream().findFirst().orElse(null);
-        if (initialize)
-            return initialize(user);
-        else
-            return user;
+        return afterLoad(user, initialize);
     }
 
     @Override
@@ -229,6 +229,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     }
 
     @Override
+    public User findById(long id) throws PersistenceException {
+        User user = super.findById(id);
+        return afterLoad(user, false);
+    }
+
+    @Override
     public void store(User user) throws PasswordAlreadyUsedException, PersistenceException {
         store(user, null);
     }
@@ -258,7 +264,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         Map<String, Object> dictionary = new HashMap<>();
 
-        invokeListenersBefore(user, transaction, dictionary);
+        invokeListenersBeforeSave(user, transaction, dictionary);
 
         if (newUser) {
             user.setCreation(new Date());
@@ -304,7 +310,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         // Save the password history to track the password change
         recordPasswordChange(user, transaction, passwordChanged);
 
-        invokeListenersAfter(user, transaction, dictionary);
+        invokeListenersAfterSave(user, transaction, dictionary);
 
         saveHistory(user, transaction, newUser);
 
@@ -568,12 +574,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         }
     }
 
-    private void invokeListenersAfter(User user, UserHistory transaction, Map<String, Object> dictionary)
+    private void invokeListenersAfterSave(User user, UserHistory transaction, Map<String, Object> dictionary)
             throws AuthenticationException {
         log.debug("Invoke listeners after store");
         for (UserListener listener : listeners)
             try {
-                listener.afterStore(user, transaction, dictionary);
+                listener.afterSave(user, transaction, dictionary);
             } catch (AuthenticationException ae) {
                 throw ae;
             } catch (PersistenceException e) {
@@ -581,12 +587,27 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             }
     }
 
-    private void invokeListenersBefore(User user, UserHistory transaction, Map<String, Object> dictionary)
+    private void invokeListenersAfterLoad(User user, Map<String, Object> dictionary) throws AuthenticationException {
+        if (user == null)
+            return;
+
+        log.debug("Invoke listeners after load");
+        for (UserListener listener : listeners)
+            try {
+                listener.afterLoad(user, dictionary);
+            } catch (AuthenticationException ae) {
+                throw ae;
+            } catch (PersistenceException e) {
+                log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
+            }
+    }
+
+    private void invokeListenersBeforeSave(User user, UserHistory transaction, Map<String, Object> dictionary)
             throws AuthenticationException {
         log.debug("Invoke listeners before store");
         for (UserListener listener : listeners)
             try {
-                listener.beforeStore(user, transaction, dictionary);
+                listener.beforeSave(user, transaction, dictionary);
             } catch (AuthenticationException ae) {
                 throw ae;
             } catch (PersistenceException e) {
@@ -718,8 +739,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         if (!user.isEnabled())
             return true;
 
-        int maxInactiveDays = config.getInt(
-                "%s.security.user.maxinactivity".formatted(TenantDAO.get().getTenantName(user.getTenantId())), -1);
+        int maxInactiveDays = config.getTenantInt(TenantDAO.get().getTenantName(user.getTenantId()),
+                "security.user.maxinactivity", -1);
         if (user.getMaxInactivity() != null)
             maxInactiveDays = user.getMaxInactivity();
         if (maxInactiveDays <= 0)
@@ -729,12 +750,14 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         // Take the most recent session or in absence of sessions, take the
         // last enabled date as last interaction
-        Date lastInteraction = queryForList("select max(ld_lastrenew) from ld_session where ld_username = :username",
-                Map.of(USERNAME, user.getUsername()), Date.class, null).stream().findFirst().orElse(user.getLastEnabled());
+        Date lastInteraction = Optional
+                .ofNullable(queryForObject("select max(ld_lastrenew) from ld_session where ld_username = :username",
+                        Map.of(USERNAME, user.getUsername()), Date.class))
+                .orElse(user.getLastEnabled());
 
         // In case of not last interaction, we consider the creation date
         lastInteraction = Optional.ofNullable(lastInteraction).orElse(user.getCreation());
-        
+
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(lastInteraction);
         calendar.set(Calendar.MILLISECOND, 0);

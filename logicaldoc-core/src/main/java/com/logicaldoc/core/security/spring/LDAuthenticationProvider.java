@@ -129,11 +129,11 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
         } catch (com.logicaldoc.core.security.authentication.AuthenticationException ae) {
             throw new CredentialsExpiredException(ae.getMessage() != null
                     ? String.format("Security checks failed for user %s - %s", username, ae.getMessage())
-                    : "badcredentials");
+                    : "badcredentials", ae);
         } catch (Exception e) {
             throw new CredentialsExpiredException(e.getMessage() != null
                     ? String.format("Security checks failed for user %s - %s", username, e.getMessage())
-                    : "badcredentials");
+                    : "badcredentials", e);
         }
     }
 

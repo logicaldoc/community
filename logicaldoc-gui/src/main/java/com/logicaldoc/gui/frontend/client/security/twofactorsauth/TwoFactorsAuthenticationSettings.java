@@ -69,7 +69,13 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
         allowTrustedDevices.setWrapTitle(false);
         allowTrustedDevices.setRequired(true);
 
-        form.setFields(enable2fa, allowTrustedDevices);
+        TextItem include = ItemFactory.newTextItem("include", "2fagroupinclude", settings.get("groups.includes"));
+        include.setHint(I18N.message("valuescommaseparated"));
+
+        TextItem exclude = ItemFactory.newTextItem("exclude", "2fagroupexclude", settings.get("groups.excludes"));
+        exclude.setHint(I18N.message("valuescommaseparated"));
+
+        form.setFields(enable2fa, allowTrustedDevices, include, exclude);
 
         /*
          * EmailAuthenticator section
@@ -190,6 +196,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
             final List<GUIParameter> params = new ArrayList<>();
             params.add(new GUIParameter(tenant + TWOFA + "enabled", vm.getValueAsString("enable2fa")));
             params.add(new GUIParameter(tenant + TWOFA + "allowtrusted", vm.getValueAsString("allowtrusted2fa")));
+            params.add(new GUIParameter(tenant + TWOFA + "groups.includes", vm.getValueAsString("include")));
+            params.add(new GUIParameter(tenant + TWOFA + "groups.excludes", vm.getValueAsString("exclude")));
             params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED,
                     vm.getValueAsString("enableGoolge")));
             params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_YUBIKEY + ENABLED,

@@ -333,13 +333,22 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             if (user == null)
                 throw new ServerException(String.format("User %s not found", userId));
 
+            User requestor = null;
+
+            // Session may not exist in case the user is required to change the
+            // password at login screen
+            Session session = SessionManager.get().getSession(getThreadLocalRequest());
+            if (session != null)
+                requestor = session.getUser();
+            else
+                requestor = userDao.findById(requestorUserId, true);
+
             /*
              * A non admin user cannot change the password of other users
              */
-            Session session = validateSession();
-            if (session.getUserId() != userId && !MenuDAO.get().isReadAllowed(Menu.ACCESS_CONTROL, session.getUserId()))
-                throw new PermissionException(String.format("User %s not allowed to change the password of user %s",
-                        session.getUsername(), user.getUsername()));
+            if (requestor.getId() != userId && !MenuDAO.get().isReadAllowed(Menu.ACCESS_CONTROL, requestor.getId()))
+                throw new PermissionException(
+                        String.format("User %s not allowed to change the password of user %s", requestor, user));
 
             if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword()))
                 throw new ServerException("Wrong old passord");
@@ -541,9 +550,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 guiUser.setDocumentsQuota(user.getDocumentsQuota());
                 guiUser.setDocuments(SequenceDAO.get().getCurrentValue("userdocs", user.getId(), user.getTenantId()));
                 guiUser.setQuotaThreshold(user.getQuotaThreshold());
-                
+
                 guiUser.setTenant(getTenant(user.getTenantId()));
-                
+
                 ContextProperties config = Context.get().getConfig();
                 guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(guiUser.getTenant().getName()), 12));
 
