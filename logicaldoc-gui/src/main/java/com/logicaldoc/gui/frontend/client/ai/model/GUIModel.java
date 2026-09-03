@@ -324,7 +324,7 @@ public class GUIModel implements Serializable {
     }
 
     public boolean isTrainable() {
-        return "neural".equals(type) || ("embedder".equals(type) && "paragraphvectors".equals(embedderType));
+        return getTraining() != null && getTraining().isTrainable();
     }
 
     public GUIUpdater getUpdater() {
