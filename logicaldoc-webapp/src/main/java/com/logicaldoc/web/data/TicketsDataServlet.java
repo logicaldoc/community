@@ -31,7 +31,11 @@ public class TicketsDataServlet extends AbstractDataServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+    protected void service(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Session session,
+            Integer max,
             Locale locale) throws PersistenceException, IOException {
 
         PrintWriter writer = response.getWriter();
@@ -39,16 +43,18 @@ public class TicketsDataServlet extends AbstractDataServlet {
 
         TicketDAO dao = TicketDAO.get();
         String query = """
- select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix, 
- A.ld_enabled, B.ld_filename, B.ld_folderid, A.ld_views, A.ld_maxviews, A.ld_type, A.ld_password 
- from ld_ticket as A, ld_document as B 
-where A.ld_deleted = 0 
-  and (A.ld_type = %d or A.ld_type = %d)
-  and A.ld_tenantid = %d
-  and B.ld_deleted = 0 
-  and A.ld_docid = B.ld_id 
-order by A.ld_creation desc
-""".formatted(Ticket.DOWNLOAD, Ticket.VIEW, session.getTenantId());
+                                select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix,
+                                       A.ld_enabled, B.ld_filename, B.ld_folderid, A.ld_views, A.ld_maxviews, A.ld_type, A.ld_password, A.ld_userid,
+                                       A.ld_username, A.ld_targetuserid, A.ld_targetusername
+                                  from ld_ticket as A
+                       left outer join ld_document as B
+                                    on A.ld_docid = B.ld_id
+                                 where A.ld_deleted = 0
+                                   and A.ld_type in (%d, %d, %d)
+                                   and A.ld_tenantid = %d
+                              order by A.ld_creation desc
+                               """
+                .formatted(Ticket.DOWNLOAD, Ticket.VIEW, Ticket.SUPPORT, session.getTenantId());
 
         DateFormat df = getDateFormat();
         dao.queryForResultSet(query, null, max != null ? max : 100, rows -> {
@@ -63,9 +69,9 @@ order by A.ld_creation desc
     }
 
     private void printTicket(PrintWriter writer, ResultSet rows, DateFormat df) throws SQLException {
-        Integer count = rows.getInt(6);
-        Integer maxCount = rows.getInt(7);
-        Integer maxViews = rows.getInt(13);
+        int count = rows.getInt(6);
+        int maxCount = rows.getInt(7);
+        int maxViews = rows.getInt(13);
         Date creation = rows.getDate(4);
         Date expired = rows.getDate(5);
         boolean enabled = rows.getInt(9) == 1;
@@ -84,21 +90,24 @@ order by A.ld_creation desc
         writer.print(String.format("<expired>%s</expired>", df.format(expired)));
 
         writer.print(String.format("<count>%d</count>", count));
-        if (maxCount != null)
-            writer.print(String.format("<maxCount>%d</maxCount>", maxCount));
+        writer.print(String.format("<maxCount>%d</maxCount>", maxCount));
 
         writer.print(String.format("<views>%d</views>", rows.getInt(12)));
-        if (maxViews != null)
-            writer.print(String.format("<maxViews>%d</maxViews>", maxViews));
+        writer.print(String.format("<maxViews>%d</maxViews>", maxViews));
         if (StringUtils.isNotEmpty(suffix))
             writer.print(String.format("<suffix><![CDATA[%s]]></suffix>", suffix));
         writer.print(String.format("<eenabled>%b</eenabled>", enabled));
         writer.print(String.format("<valid>%b</valid>", isValidTicket(count, maxCount, expired, enabled)));
-        writer.print(String.format("<filename><![CDATA[%s]]></filename>", fileName));
+        writer.print(String.format("<filename><![CDATA[%s]]></filename>", StringUtils.defaultString(fileName)));
         writer.print(String.format("<icon>%s</icon>",
                 FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(fileName)))));
         writer.print(String.format("<folderId>%d</folderId>", rows.getLong(11)));
         writer.print(String.format("<password>%b</password>", rows.getObject(15) != null));
+
+        writer.print(String.format("<creatorId>%d</creatorId>", rows.getLong(16)));
+        writer.print(String.format("<creator>%s</creator>", StringUtils.defaultString(rows.getString(17))));
+        writer.print(String.format("<targetUserId>%d</targetUserId>", rows.getLong(18)));
+        writer.print(String.format("<targetUser>%s</targetUser>", StringUtils.defaultString(rows.getString(19))));
         writer.print("</ticket>");
     }
 

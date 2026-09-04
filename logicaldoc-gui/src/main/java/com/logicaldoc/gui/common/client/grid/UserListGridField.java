@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -35,6 +36,7 @@ public class UserListGridField extends ColoredListGridField {
 		setCellFormatter(new AvatarCellFormatter(16));
 		setCellAlign(Alignment.LEFT);
 		setAutoFitWidth(true);
+		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 	}
 
 	public UserListGridField(String name, String avatarFieldName, String title) {
@@ -45,6 +47,7 @@ public class UserListGridField extends ColoredListGridField {
 		setCellFormatter(new AvatarCellFormatter(16));
 		setCellAlign(Alignment.LEFT);
 		setAutoFitWidth(true);
+		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 	}
 
 	public UserListGridField(String name, String avatarFieldName) {
@@ -60,6 +63,8 @@ public class UserListGridField extends ColoredListGridField {
 	public UserListGridField(boolean avoidCaching) {
 		this();
 		this.avoidCaching = avoidCaching;
+		setAutoFitWidth(true);
+        setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 	}
 
 	public boolean isDisplayAvatar() {

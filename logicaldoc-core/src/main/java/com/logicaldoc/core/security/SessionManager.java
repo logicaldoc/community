@@ -27,6 +27,10 @@ import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserEvent;
+import com.logicaldoc.core.security.user.UserHistory;
+import com.logicaldoc.core.security.user.UserHistoryDAO;
+import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.spring.Context;
 
@@ -161,11 +165,26 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
             if (user == null)
                 return null;
             else {
-                return createSession(user, key, client);
+                Session session = createSession(user, key, client);
+                if (TicketDAO.get().isSupportTicket(username))
+                    recordSupportSession(username, session);
+                return session;
             }
         } catch (AuthenticationException e) {
             LoginThrottle.recordFailure(username, key, client, e);
             throw e;
+        }
+    }
+
+    private void recordSupportSession(String username, Session session) {
+        UserHistory history = new UserHistory();
+        history.setSession(session);
+        history.setEvent(UserEvent.SUPPORT);
+        history.setComment("ticket: %s".formatted(username));
+        try {
+            UserHistoryDAO.get().store(history);
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -749,7 +768,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
                             session.setExpired();
                         } catch (PersistenceException e) {
                             log.warn(e.getMessage(), e);
-                         }
+                        }
                         saveSession(session);
                     }
                 }

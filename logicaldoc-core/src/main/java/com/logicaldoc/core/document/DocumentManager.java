@@ -1793,7 +1793,7 @@ public class DocumentManager {
             throw new PermissionException(transaction.getUsername(), "Document %s".formatted(document),
                     Permission.DOWNLOAD);
 
-        ticket.setUserId(transaction.getUserId());
+        ticket.setUser(transaction.getUser());
 
         Calendar cal = Calendar.getInstance();
         if (ticket.getExpired() != null) {

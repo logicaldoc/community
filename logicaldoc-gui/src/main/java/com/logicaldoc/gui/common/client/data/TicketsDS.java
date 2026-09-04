@@ -15,39 +15,44 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class TicketsDS extends DataSource {
 
-	public TicketsDS(Integer max) {
-		setTitleField("ticketId");
-		setRecordXPath("/list/ticket");
+    public TicketsDS(Integer max) {
+        setTitleField("ticketId");
+        setRecordXPath("/list/ticket");
 
-		DataSourceTextField id = new DataSourceTextField("id");
-		id.setPrimaryKey(true);
-		id.setHidden(true);
-		id.setRequired(true);
-		DataSourceTextField ticketId = new DataSourceTextField("ticketId");
-		DataSourceTextField docId = new DataSourceTextField("docId");
-		DataSourceTextField folderId = new DataSourceTextField("folderId");
-		DataSourceDateTimeField creation = new DataSourceDateTimeField("creation");
-		DataSourceDateTimeField expired = new DataSourceDateTimeField("expired");
-		DataSourceIntegerField count = new DataSourceIntegerField("count");
-		DataSourceIntegerField views = new DataSourceIntegerField("views");
-		DataSourceIntegerField maxCount = new DataSourceIntegerField("maxCount");
-		DataSourceIntegerField maxViews = new DataSourceIntegerField("maxViews");
-		DataSourceTextField suffix = new DataSourceTextField("suffix");
-		DataSourceBooleanField valid = new DataSourceBooleanField("valid");
-		DataSourceTextField fileName = new DataSourceTextField("filename");
-		DataSourceIntegerField type = new DataSourceIntegerField("type");
-		DataSourceImageField icon = new DataSourceImageField("icon");
-		icon.setHidden(true);
-		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
-		DataSourceBooleanField password = new DataSourceBooleanField("password");
+        DataSourceTextField id = new DataSourceTextField("id");
+        id.setPrimaryKey(true);
+        id.setHidden(true);
+        id.setRequired(true);
+        DataSourceTextField ticketId = new DataSourceTextField("ticketId");
+        DataSourceTextField docId = new DataSourceTextField("docId");
+        DataSourceTextField folderId = new DataSourceTextField("folderId");
+        DataSourceDateTimeField creation = new DataSourceDateTimeField("creation");
+        DataSourceDateTimeField expired = new DataSourceDateTimeField("expired");
+        DataSourceIntegerField count = new DataSourceIntegerField("count");
+        DataSourceIntegerField views = new DataSourceIntegerField("views");
+        DataSourceIntegerField maxCount = new DataSourceIntegerField("maxCount");
+        DataSourceIntegerField maxViews = new DataSourceIntegerField("maxViews");
+        DataSourceTextField suffix = new DataSourceTextField("suffix");
+        DataSourceBooleanField valid = new DataSourceBooleanField("valid");
+        DataSourceTextField fileName = new DataSourceTextField("filename");
+        DataSourceIntegerField type = new DataSourceIntegerField("type");
+        DataSourceImageField icon = new DataSourceImageField("icon");
+        icon.setHidden(true);
+        DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
+        DataSourceBooleanField password = new DataSourceBooleanField("password");
+        DataSourceImageField creatorId = new DataSourceImageField("creatorId", "", 60);
+        DataSourceTextField creator = new DataSourceTextField("creator");
+        DataSourceImageField targetUserId = new DataSourceImageField("targetUserId", "", 60);
+        targetUserId.setHidden(true);
+        DataSourceTextField targetUser = new DataSourceTextField("targetUser");
+        
+        setFields(id, enabled, password, ticketId, type, docId, creation, creatorId, creator, expired, count, maxCount, views,
+                maxViews, suffix, valid, icon, fileName, folderId, targetUserId, targetUser);
+        setClientOnly(true);
 
-		setFields(id, enabled, password, ticketId, type, docId, creation, expired, count, maxCount, views, maxViews, suffix,
-				valid, icon, fileName, folderId);
-		setClientOnly(true);
-
-		String url = "data/tickets.xml?1=1";
-		if (max != null)
-			url += "&max=" + max;
-		setDataURL(url);
-	}
+        String url = "data/tickets.xml?1=1";
+        if (max != null)
+            url += "&max=" + max;
+        setDataURL(url);
+    }
 }

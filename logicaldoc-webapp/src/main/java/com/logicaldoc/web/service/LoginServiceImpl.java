@@ -108,7 +108,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
             Ticket ticket = new Ticket();
             ticket.setTicketId(ticketid);
             ticket.setDocId(0L);
-            ticket.setUserId(user.getId());
+            ticket.setUser(user);
             ticket.setTenantId(user.getTenantId());
             ticket.setType(Ticket.PSW_RECOVERY);
             Calendar cal = Calendar.getInstance();

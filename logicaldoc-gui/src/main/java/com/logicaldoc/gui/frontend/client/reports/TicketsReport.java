@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
 import com.logicaldoc.gui.common.client.util.DocUtil;
@@ -43,265 +44,300 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class TicketsReport extends ReportPanel {
 
-	private static final String PASSWORD = "password";
+    private static final String PASSWORD = "password";
 
-	private static final String DOC_ID = "docId";
+    private static final String DOC_ID = "docId";
 
-	private static final String VALID = "valid";
+    private static final String VALID = "valid";
 
-	private static final String ENABLED = "eenabled";
+    private static final String ENABLED = "eenabled";
 
-	private SpinnerItem max;
+    private static final String GUI_AVATAR_SHOWINGRIDS = "gui.avatar.showingrids";
 
-	public TicketsReport() {
-		super("tickets", "showntickets");
-	}
+    private SpinnerItem max;
 
-	@Override
-	protected void fillToolBar(ToolStrip toolStrip) {
-		max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
-		max.setHint(I18N.message("elements"));
-		max.setShowTitle(false);
-		max.setStep(10);
-		max.addChangedHandler(event -> refresh());
+    public TicketsReport() {
+        super("tickets", "showntickets");
+    }
 
-		ToolStripButton display = new ToolStripButton();
-		display.setTitle(I18N.message("display"));
-		display.addClickHandler(click -> {
-			if (Boolean.TRUE.equals(max.validate()))
-				refresh();
-		});
-		toolStrip.addButton(display);
-		toolStrip.addFormItem(max);
-	}
+    @Override
+    protected void fillToolBar(ToolStrip toolStrip) {
+        max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
+        max.setHint(I18N.message("elements"));
+        max.setShowTitle(false);
+        max.setStep(10);
+        max.addChangedHandler(event -> refresh());
 
-	@Override
-	protected void prepareListGrid() {
-		ListGridField id = new IdListGridField();
+        ToolStripButton display = new ToolStripButton();
+        display.setTitle(I18N.message("display"));
+        display.addClickHandler(click -> {
+            if (Boolean.TRUE.equals(max.validate()))
+                refresh();
+        });
+        toolStrip.addButton(display);
+        toolStrip.addFormItem(max);
+    }
 
-		ListGridField enabled = new EnabledListGridField();
+    @Override
+    protected void prepareListGrid() {
+        ListGridField id = new IdListGridField();
 
-		ListGridField ticketId = new ListGridField("ticketId", I18N.message("ticket"), 210);
-		ticketId.setAlign(Alignment.CENTER);
-		ticketId.setCanFilter(true);
-		ticketId.setCanGroupBy(false);
+        ListGridField enabled = new EnabledListGridField();
 
-		ListGridField type = new ListGridField("type", I18N.message("type"));
-		type.setAutoFitWidth(true);
-		type.setAlign(Alignment.CENTER);
-		type.setCanFilter(true);
-		type.setCanGroupBy(false);
-		type.setCellFormatter(
-				(value, rcrd, rowNum, colNum) -> I18N.message("0".equals(value.toString()) ? "download" : "view"));
+        ListGridField ticketId = new ListGridField("ticketId", I18N.message("ticket"), 210);
+        ticketId.setAlign(Alignment.CENTER);
+        ticketId.setCanFilter(true);
+        ticketId.setCanGroupBy(false);
 
-		ListGridField creation = new DateListGridField("creation", "createdon", DateCellFormatter.FORMAT_LONG);
-		creation.setCanGroupBy(false);
+        ListGridField type = new ListGridField("type", I18N.message("type"));
+        type.setAutoFitWidth(true);
+        type.setAlign(Alignment.CENTER);
+        type.setCanFilter(true);
+        type.setCanGroupBy(false);
+        type.setCellFormatter((value, rcrd, rowNum, colNum) -> {
+            if ("0".equals(value.toString()))
+                return I18N.message("download");
+            else if ("2".equals(value.toString()))
+                return I18N.message("view");
+            else if ("3".equals(value.toString()))
+                return I18N.message("support");
+            else
+                return "";
+        });
 
-		ListGridField expired = new DateListGridField("expired", "expireson", DateCellFormatter.FORMAT_LONG);
-		expired.setCanGroupBy(false);
+        ListGridField creation = new DateListGridField("creation", "createdon", DateCellFormatter.FORMAT_LONG);
+        creation.setCanGroupBy(false);
 
-		FileNameListGridField fileName = new FileNameListGridField();
-		fileName.setWidth(200);
-		fileName.setCanFilter(true);
+        ListGridField expired = new DateListGridField("expired", "expireson", DateCellFormatter.FORMAT_LONG);
+        expired.setCanGroupBy(false);
 
-		ListGridField count = new ListGridField("count", I18N.message("downloads"), 80);
-		count.setAlign(Alignment.CENTER);
-		count.setCanFilter(false);
-		count.setCanGroupBy(false);
+        FileNameListGridField fileName = new FileNameListGridField();
+        fileName.setWidth(200);
+        fileName.setCanFilter(true);
 
-		ListGridField maxCount = new ListGridField("maxCount", I18N.message("maxdownloads"), 100);
-		maxCount.setAlign(Alignment.CENTER);
-		maxCount.setCanFilter(false);
-		maxCount.setCanGroupBy(false);
+        ListGridField count = new ListGridField("count", I18N.message("downloads"), 80);
+        count.setAlign(Alignment.CENTER);
+        count.setCanFilter(false);
+        count.setCanGroupBy(false);
 
-		ListGridField views = new ListGridField("views", I18N.message("views"), 80);
-		views.setAlign(Alignment.CENTER);
-		views.setCanFilter(false);
-		views.setCanGroupBy(false);
+        ListGridField maxCount = new ListGridField("maxCount", I18N.message("maxdownloads"), 100);
+        maxCount.setAlign(Alignment.CENTER);
+        maxCount.setCanFilter(false);
+        maxCount.setCanGroupBy(false);
 
-		ListGridField maxViews = new ListGridField("maxViews", I18N.message("maxviews"), 100);
-		maxViews.setAlign(Alignment.CENTER);
-		maxViews.setCanFilter(false);
-		maxViews.setCanGroupBy(false);
+        ListGridField views = new ListGridField("views", I18N.message("views"), 80);
+        views.setAlign(Alignment.CENTER);
+        views.setCanFilter(false);
+        views.setCanGroupBy(false);
 
-		ListGridField password = new ListGridField(PASSWORD, I18N.message(PASSWORD));
-		password.setAlign(Alignment.CENTER);
-		password.setCanEdit(false);
+        ListGridField maxViews = new ListGridField("maxViews", I18N.message("maxviews"), 100);
+        maxViews.setAlign(Alignment.CENTER);
+        maxViews.setCanFilter(false);
+        maxViews.setCanGroupBy(false);
 
-		list.addDoubleClickHandler(click -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+        ListGridField password = new ListGridField(PASSWORD, I18N.message(PASSWORD));
+        password.setAlign(Alignment.CENTER);
+        password.setCanEdit(false);
 
-		list.setFields(id, enabled, ticketId, type, count, maxCount, views, maxViews, password, creation, expired,
-				fileName);
-	}
+        ListGridField creator = new UserListGridField("creator", "creatorId", "creator",
+                Session.get().getConfigAsBoolean(GUI_AVATAR_SHOWINGRIDS));
+        creator.setCanFilter(true);
+        creator.setCanSort(true);
 
-	@Override
-	protected RefreshableListGrid createListGrid() {
-		return new RefreshableListGrid() {
-			@Override
-			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(VALID))
-						|| Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED))) {
-					return Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)) ? "color: #888888;"
-							: "color: red;" + " font-style: italic;";
-				} else {
-					return super.getCellCSSText(rec, rowNum, colNum);
-				}
-			}
-		};
-	}
+        ListGridField loginAs = new UserListGridField("targetUser", "targetUserId", "loginas",
+                Session.get().getConfigAsBoolean(GUI_AVATAR_SHOWINGRIDS));
+        loginAs.setCanFilter(true);
+        loginAs.setCanSort(true);
+        loginAs.setHidden(true);
 
-	@Override
-	protected void refresh() {
-		int maxElements = max.getValueAsInteger();
-		list.refresh(new TicketsDS(maxElements));
-	}
+        list.addDoubleClickHandler(click -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
-	@Override
-	protected void showContextMenu() {
-		final ListGridRecord rec = list.getSelectedRecord();
+        list.setFields(id, enabled, ticketId, type, count, maxCount, views, maxViews, password, creation, creator,
+                expired, fileName, loginAs);
 
-		Menu contextMenu = new Menu();
-		MenuItem preview = new MenuItem();
-		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(click -> {
-			long id = Long.parseLong(rec.getAttribute(DOC_ID));
-			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<GUIDocument>() {
-				@Override
-				public void handleSuccess(GUIDocument doc) {
-					new PreviewPopup(doc).show();
-				}
-			});
-		});
-		preview.setEnabled(
-				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+        list.addCellDoubleClickHandler(dblClick -> {
+            ListGridField field = list.getField(dblClick.getColNum());
+            LD.askForValue(field.getTitle(), field.getTitle(),
+                    dblClick.getRecord().getAttributeAsString(field.getName()), value -> {
+                        // Nothing to do
+                    });
+            dblClick.cancel();
+        });
+    }
 
-		MenuItem download = new MenuItem();
-		download.setTitle(I18N.message("download"));
-		download.addClickHandler(
-				click -> WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + rec.getAttribute(DOC_ID)));
+    @Override
+    protected RefreshableListGrid createListGrid() {
+        return new RefreshableListGrid() {
+            @Override
+            protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+                if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(VALID))
+                        || Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED))) {
+                    return Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)) ? "color: #888888;"
+                            : "color: red;" + " font-style: italic;";
+                } else {
+                    return super.getCellCSSText(rec, rowNum, colNum);
+                }
+            }
+        };
+    }
 
-		MenuItem ticketURL = new MenuItem();
-		ticketURL.setTitle(I18N.message("ticketurl"));
-		ticketURL.addClickHandler((MenuItemClickEvent event) -> {
-			String ticketId = rec.getAttributeAsString("ticketId");
-			String type = rec.getAttributeAsString("type");
+    @Override
+    protected void refresh() {
+        int maxElements = max.getValueAsInteger();
+        list.refresh(new TicketsDS(maxElements));
+    }
 
-			new TicketDisplay(ticketId, sampleTicketUrl(Session.get().getConfig("server.url"), ticketId, type),
-					sampleTicketUrl(Util.contextPath(), ticketId, type)).show();
-		});
+    @Override
+    protected void showContextMenu() {
+        final ListGridRecord rec = list.getSelectedRecord();
 
-		MenuItem openInFolder = new MenuItem();
-		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(
-				event -> DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
-						Long.parseLong(rec.getAttributeAsString(DOC_ID))));
+        boolean supportTicket = "3".equals(rec.getAttributeAsString("type"));
 
-		MenuItem enable = new MenuItem();
-		enable.setTitle(I18N.message("enable"));
-		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
-		enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						rec.setAttribute(ENABLED, true);
-						rec.setAttribute(VALID, true);
-						list.refreshRow(list.getRecordIndex(rec));
-					}
-				}));
+        Menu contextMenu = new Menu();
+        MenuItem preview = new MenuItem();
+        preview.setTitle(I18N.message("preview"));
+        preview.addClickHandler(click -> {
+            long id = Long.parseLong(rec.getAttribute(DOC_ID));
+            DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<GUIDocument>() {
+                @Override
+                public void handleSuccess(GUIDocument doc) {
+                    new PreviewPopup(doc).show();
+                }
+            });
+        });
+        preview.setEnabled(
+                com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
-		MenuItem disable = new MenuItem();
-		disable.setTitle(I18N.message("disable"));
-		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
-		disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						rec.setAttribute(ENABLED, false);
-						rec.setAttribute(VALID, false);
-						list.refreshRow(list.getRecordIndex(rec));
-					}
-				}));
+        MenuItem download = new MenuItem();
+        download.setTitle(I18N.message("download"));
+        download.addClickHandler(
+                click -> WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + rec.getAttribute(DOC_ID)));
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), choice -> {
-			if (Boolean.TRUE.equals(choice))
-				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						list.removeSelectedData();
-						list.deselectAllRecords();
-					}
-				});
-		}));
+        MenuItem ticketURL = new MenuItem();
+        ticketURL.setTitle(I18N.message("ticketurl"));
+        ticketURL.addClickHandler((MenuItemClickEvent event) -> {
+            String ticketId = rec.getAttributeAsString("ticketId");
+            String type = rec.getAttributeAsString("type");
 
-		MenuItem setPassword = new MenuItem();
-		setPassword.setTitle(I18N.message("setpassword"));
-		setPassword.addClickHandler(click -> LD.askForValue(I18N.message("question"), I18N.message("confirmdelete"),
-				null, ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD, null, true), psw -> 
-					DocumentService.Instance.get().setTicketPassword(rec.getAttributeAsLong("id"), psw,
-							new DefaultAsyncCallback<>() {
-								@Override
-								public void handleSuccess(List<String> result) {
-									if (result.isEmpty())  {
-										list.getSelectedRecord().setAttribute(PASSWORD, true);
-										list.invalidateRecordComponents();
-										list.refreshRecordComponent(list.getRecordIndex(list.getSelectedRecord()));
-										list.refreshFields();
-									} else {
-										SC.warn(result.toString().replace('[', ' ').replace(']', ' '));
-									}
-								}
-							})
-				));
+            new TicketDisplay(ticketId, sampleTicketUrl(Session.get().getConfig("server.url"), ticketId, type),
+                    sampleTicketUrl(Util.contextPath(), ticketId, type)).show();
+        });
 
-		MenuItem unsetPassword = new MenuItem();
-		unsetPassword.setTitle(I18N.message("unsetpassword"));
-		unsetPassword.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(PASSWORD));
-		unsetPassword.addClickHandler(click -> DocumentService.Instance.get()
-				.setTicketPassword(rec.getAttributeAsLong("id"), null, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(List<String> result) {
-						list.getSelectedRecord().setAttribute(PASSWORD, false);
-						list.invalidateRecordComponents();
-						list.refreshRecordComponent(list.getRecordIndex(list.getSelectedRecord()));
-						list.refreshFields();
-					}
-				}));
+        MenuItem openInFolder = new MenuItem();
+        openInFolder.setTitle(I18N.message("openinfolder"));
+        openInFolder.addClickHandler(
+                event -> DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+                        Long.parseLong(rec.getAttributeAsString(DOC_ID))));
 
-		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {
-			ticketURL.setEnabled(false);
-			download.setEnabled(false);
-			preview.setEnabled(false);
-			openInFolder.setEnabled(false);
-			enable.setEnabled(false);
-			disable.setEnabled(false);
-			delete.setEnabled(false);
-			setPassword.setEnabled(false);
-		}		
+        MenuItem enable = new MenuItem();
+        enable.setTitle(I18N.message("enable"));
+        enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
+        enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        rec.setAttribute(ENABLED, true);
+                        rec.setAttribute(VALID, true);
+                        list.refreshRow(list.getRecordIndex(rec));
+                    }
+                }));
 
-		contextMenu.setItems(enable, disable, ticketURL, download, preview, openInFolder, new MenuItemSeparator(),
-				setPassword, unsetPassword, new MenuItemSeparator(), delete);
-		contextMenu.showContextMenu();
-	}
+        MenuItem disable = new MenuItem();
+        disable.setTitle(I18N.message("disable"));
+        disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
+        disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        rec.setAttribute(ENABLED, false);
+                        rec.setAttribute(VALID, false);
+                        list.refreshRow(list.getRecordIndex(rec));
+                    }
+                }));
 
-	private String sampleTicketUrl(String urlBase, String ticketId, String type) {
-		if (!urlBase.endsWith("/"))
-			urlBase += "/";
-		if ("2".equals(type))
-			urlBase += "view/" + ticketId;
-		else
-			urlBase += "download-ticket?ticketId=" + ticketId;
-		return urlBase;
-	}
+        MenuItem delete = new MenuItem();
+        delete.setTitle(I18N.message("ddelete"));
+        delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), choice -> {
+            if (Boolean.TRUE.equals(choice))
+                DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        list.removeSelectedData();
+                        list.deselectAllRecords();
+                    }
+                });
+        }));
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+        MenuItem setPassword = new MenuItem();
+        setPassword.setTitle(I18N.message("setpassword"));
+        setPassword.addClickHandler(click -> LD.askForValue(I18N.message("question"), I18N.message("confirmdelete"),
+                null, ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD, null, true),
+                psw -> DocumentService.Instance.get().setTicketPassword(rec.getAttributeAsLong("id"), psw,
+                        new DefaultAsyncCallback<>() {
+                            @Override
+                            public void handleSuccess(List<String> result) {
+                                if (result.isEmpty()) {
+                                    list.getSelectedRecord().setAttribute(PASSWORD, true);
+                                    list.invalidateRecordComponents();
+                                    list.refreshRecordComponent(list.getRecordIndex(list.getSelectedRecord()));
+                                    list.refreshFields();
+                                } else {
+                                    SC.warn(result.toString().replace('[', ' ').replace(']', ' '));
+                                }
+                            }
+                        })));
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+        MenuItem unsetPassword = new MenuItem();
+        unsetPassword.setTitle(I18N.message("unsetpassword"));
+        unsetPassword.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(PASSWORD));
+        unsetPassword.addClickHandler(click -> DocumentService.Instance.get()
+                .setTicketPassword(rec.getAttributeAsLong("id"), null, new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(List<String> result) {
+                        list.getSelectedRecord().setAttribute(PASSWORD, false);
+                        list.invalidateRecordComponents();
+                        list.refreshRecordComponent(list.getRecordIndex(list.getSelectedRecord()));
+                        list.refreshFields();
+                    }
+                }));
+
+        if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {
+            ticketURL.setEnabled(false);
+            download.setEnabled(false);
+            preview.setEnabled(false);
+            openInFolder.setEnabled(false);
+            enable.setEnabled(false);
+            disable.setEnabled(false);
+            delete.setEnabled(false);
+            setPassword.setEnabled(false);
+        }
+
+        if (supportTicket)
+            contextMenu.setItems(enable, disable, new MenuItemSeparator(), delete);
+        else
+            contextMenu.setItems(enable, disable, ticketURL, download, preview, openInFolder, new MenuItemSeparator(),
+                    setPassword, unsetPassword, new MenuItemSeparator(), delete);
+
+        contextMenu.showContextMenu();
+    }
+
+    private String sampleTicketUrl(String urlBase, String ticketId, String type) {
+        if (!urlBase.endsWith("/"))
+            urlBase += "/";
+        if ("2".equals(type))
+            urlBase += "view/" + ticketId;
+        else
+            urlBase += "download-ticket?ticketId=" + ticketId;
+        return urlBase;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
