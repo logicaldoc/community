@@ -24,6 +24,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
+import com.logicaldoc.gui.frontend.client.document.summary.SummaryDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -46,318 +47,326 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class VersionsPanel extends DocumentDetailTab {
 
-	private static final String DOWNLOAD = "download";
+    private static final String DOWNLOAD = "download";
 
-	private static final String VERSION = "version";
+    private static final String VERSION = "version";
 
-	private static final String PERMALINK = "permalink";
+    private static final String PERMALINK = "permalink";
 
-	private static final String FILE_VERSION = "fileVersion";
+    private static final String FILE_VERSION = "fileVersion";
 
-	private RefreshableListGrid list = null;
+    private RefreshableListGrid list = null;
 
-	public VersionsPanel(final GUIDocument document) {
-		super(document, null);
-	}
+    public VersionsPanel(final GUIDocument document) {
+        super(document, null);
+    }
 
-	@Override
-	protected void onDraw() {
-		ListGridField id = new IdListGridField();
-		ListGridField user = new UserListGridField("user", "userId", "user");
-		ListGridField event = new ColoredListGridField("event", 200);
-		ListGridField version = new ColoredListGridField(VERSION, 70);
-		ListGridField fileVersion = new ColoredListGridField(FILE_VERSION, I18N.message("fileversion"), 70);
-		ListGridField revision = new ColoredListGridField("revision", I18N.message("revision"), 70);
-		ListGridField date = new DateListGridField("date", "date");
-		ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"));
-		FileNameListGridField fileName = new FileNameListGridField();
+    @Override
+    protected void onDraw() {
+        ListGridField id = new IdListGridField();
+        ListGridField user = new UserListGridField("user", "userId", "user");
+        ListGridField event = new ColoredListGridField("event", 200);
+        ListGridField version = new ColoredListGridField(VERSION, 70);
+        ListGridField fileVersion = new ColoredListGridField(FILE_VERSION, I18N.message("fileversion"), 70);
+        ListGridField revision = new ColoredListGridField("revision", I18N.message("revision"), 70);
+        ListGridField date = new DateListGridField("date", "date");
+        ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"));
+        FileNameListGridField fileName = new FileNameListGridField();
 
-		ListGridField type = new ColoredListGridField("type", 55);
-		type.setType(ListGridFieldType.TEXT);
-		type.setAlign(Alignment.CENTER);
-		type.setHidden(true);
+        ListGridField type = new ColoredListGridField("type", 55);
+        type.setType(ListGridFieldType.TEXT);
+        type.setAlign(Alignment.CENTER);
+        type.setHidden(true);
 
-		ListGridField permalink = preparePermalink();
+        ListGridField permalink = preparePermalink();
 
-		ListGridField wfStatus = prepareWorkflow();
+        ListGridField wfStatus = prepareWorkflow();
 
-		list = new RefreshableListGrid(
-				new VersionsDS(document.getId(), null, Session.get().getConfigAsInt("gui.maxversions")));
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setCanFreezeFields(true);
-		list.setAutoFetchData(true);
-		if (document.getFolder().isDownload())
-			list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, permalink, wfStatus,
-					comment);
-		else
-			list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, comment);
+        list = new RefreshableListGrid(
+                new VersionsDS(document.getId(), null, Session.get().getConfigAsInt("gui.maxversions")));
+        list.setEmptyMessage(I18N.message("notitemstoshow"));
+        list.setCanFreezeFields(true);
+        list.setAutoFetchData(true);
+        if (document.getFolder().isDownload())
+            list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, permalink, wfStatus,
+                    comment);
+        else
+            list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, comment);
 
-		addListHandlers();
+        addListHandlers();
 
-		VLayout container = new VLayout();
-		container.setMembersMargin(3);
-		container.addMember(list);
+        VLayout container = new VLayout();
+        container.setMembersMargin(3);
+        container.addMember(list);
 
-		ToolStrip buttons = prepareButtons();
+        ToolStrip buttons = prepareButtons();
 
-		container.addMember(buttons);
-		addMember(container);
-	}
+        container.addMember(buttons);
+        addMember(container);
+    }
 
-	private ToolStrip prepareButtons() {
-		ToolStrip buttons = new ToolStrip();
-		buttons.setWidth100();
+    private ToolStrip prepareButtons() {
+        ToolStrip buttons = new ToolStrip();
+        buttons.setWidth100();
 
-		SpinnerItem maxItem = ItemFactory.newSpinnerItem("max", "display",
-				Session.get().getConfigAsInt("gui.maxversions"), 1, (Integer) null);
-		maxItem.setWidth(70);
-		maxItem.setStep(20);
-		maxItem.setSaveOnEnter(true);
-		maxItem.setImplicitSave(true);
-		maxItem.setHint(I18N.message("elements"));
-		buttons.addFormItem(maxItem);
-		maxItem.addChangedHandler(evnt -> list
-				.refresh(new VersionsDS(document.getId(), null, Integer.parseInt(maxItem.getValueAsString()))));
+        SpinnerItem maxItem = ItemFactory.newSpinnerItem("max", "display",
+                Session.get().getConfigAsInt("gui.maxversions"), 1, (Integer) null);
+        maxItem.setWidth(70);
+        maxItem.setStep(20);
+        maxItem.setSaveOnEnter(true);
+        maxItem.setImplicitSave(true);
+        maxItem.setHint(I18N.message("elements"));
+        buttons.addFormItem(maxItem);
+        maxItem.addChangedHandler(evnt -> list
+                .refresh(new VersionsDS(document.getId(), null, Integer.parseInt(maxItem.getValueAsString()))));
 
-		ToolStripButton export = new ToolStripButton(I18N.message("export"));
-		export.addClickHandler(clkEvent -> GridUtil.exportCSV(list, true));
+        ToolStripButton export = new ToolStripButton(I18N.message("export"));
+        export.addClickHandler(clkEvent -> GridUtil.exportCSV(list, true));
 
-		ToolStripButton print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(printEvent -> GridUtil.print(list));
+        ToolStripButton print = new ToolStripButton(I18N.message("print"));
+        print.addClickHandler(printEvent -> GridUtil.print(list));
 
-		buttons.addButton(export);
-		buttons.addButton(print);
-		return buttons;
-	}
+        buttons.addButton(export);
+        buttons.addButton(print);
+        return buttons;
+    }
 
-	private void addListHandlers() {
-		list.addCellDoubleClickHandler(clickEvent -> {
-			ListGridRecord rec = clickEvent.getRecord();
-			if (FolderController.get().getCurrentFolder().isDownload()
-					&& DOWNLOAD.equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-				onDownload(document, rec);
-			else
-				onPreview(document, rec);
-		});
+    private void addListHandlers() {
+        list.addCellDoubleClickHandler(clickEvent -> {
+            ListGridRecord rec = clickEvent.getRecord();
+            if (FolderController.get().getCurrentFolder().isDownload()
+                    && DOWNLOAD.equals(Session.get().getInfo().getConfig("gui.doubleclick")))
+                onDownload(document, rec);
+            else
+                onPreview(document, rec);
+        });
 
-		list.addCellContextClickHandler(contextClickEvent -> {
-			ListGridField field = list.getField(contextClickEvent.getColNum());
-			if (!PERMALINK.equals(field.getName())) {
-				prepareContextMenu().showContextMenu();
-				contextClickEvent.cancel();
-			}
-		});
-	}
+        list.addCellContextClickHandler(contextClickEvent -> {
+            ListGridField field = list.getField(contextClickEvent.getColNum());
+            if (!PERMALINK.equals(field.getName())) {
+                prepareContextMenu().showContextMenu();
+                contextClickEvent.cancel();
+            }
+        });
+    }
 
-	private ListGridField prepareWorkflow() {
-		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 150);
-		wfStatus.setHidden(false);
-		wfStatus.setCanFilter(true);
-		wfStatus.setCanSort(true);
-		wfStatus.setAlign(Alignment.LEFT);
-		wfStatus.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
-			String display = rec.getAttributeAsString("workflowStatusDisplay");
-			if (display != null && !display.isEmpty())
-				return "<span style='color: " + display + ";'>" + value + "</span>";
-			else
-				return value != null ? value.toString() : "";
-		});
-		return wfStatus;
-	}
+    private ListGridField prepareWorkflow() {
+        ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 150);
+        wfStatus.setHidden(false);
+        wfStatus.setCanFilter(true);
+        wfStatus.setCanSort(true);
+        wfStatus.setAlign(Alignment.LEFT);
+        wfStatus.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+            String display = rec.getAttributeAsString("workflowStatusDisplay");
+            if (display != null && !display.isEmpty())
+                return "<span style='color: " + display + ";'>" + value + "</span>";
+            else
+                return value != null ? value.toString() : "";
+        });
+        return wfStatus;
+    }
 
-	private ListGridField preparePermalink() {
-		ListGridField permalink = new ColoredListGridField(PERMALINK, I18N.message(PERMALINK), 90);
-		permalink.setAlign(Alignment.CENTER);
-		permalink.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
-			long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
-			String fileVer = rec.getAttributeAsString(FILE_VERSION);
-			String downloadUrl = Util.downloadURL(docId, fileVer);
-			return "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message(DOWNLOAD) + "</a>";
-		});
-		return permalink;
-	}
+    private ListGridField preparePermalink() {
+        ListGridField permalink = new ColoredListGridField(PERMALINK, I18N.message(PERMALINK), 90);
+        permalink.setAlign(Alignment.CENTER);
+        permalink.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+            long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
+            String fileVer = rec.getAttributeAsString(FILE_VERSION);
+            String downloadUrl = Util.downloadURL(docId, fileVer);
+            return "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message(DOWNLOAD) + "</a>";
+        });
+        return permalink;
+    }
 
-	protected void onDownload(final GUIDocument document, ListGridRecord rec) {
-		if (document.getFolder().isDownload())
-			DocUtil.download(document.getDocRef() != null ? document.getDocRef() : document.getId(),
-					rec.getAttribute(FILE_VERSION));
-	}
+    protected void onDownload(final GUIDocument document, ListGridRecord rec) {
+        if (document.getFolder().isDownload())
+            DocUtil.download(document.getDocRef() != null ? document.getDocRef() : document.getId(),
+                    rec.getAttribute(FILE_VERSION));
+    }
 
-	protected void onPreview(final GUIDocument document, ListGridRecord rec) {
-		GUIVersion version = new GUIVersion();
-		version.setId(document.getId());
-		version.setFolder(document.getFolder());
-		version.setDocId(document.getId());
-		version.setId(document.getId());
-		version.setVersion(rec.getAttribute(VERSION));
-		version.setFileVersion(rec.getAttribute(FILE_VERSION));
-		version.setType(rec.getAttribute("type"));
-		version.setFileName(rec.getAttribute("filename"));
-		version.setFileSize(document.getFileSize());
-		PreviewPopup iv = new PreviewPopup(version);
-		iv.show();
-	}
+    protected void onPreview(final GUIDocument document, ListGridRecord rec) {
+        GUIVersion version = new GUIVersion();
+        version.setId(document.getId());
+        version.setFolder(document.getFolder());
+        version.setDocId(document.getId());
+        version.setId(document.getId());
+        version.setVersion(rec.getAttribute(VERSION));
+        version.setFileVersion(rec.getAttribute(FILE_VERSION));
+        version.setType(rec.getAttribute("type"));
+        version.setFileName(rec.getAttribute("filename"));
+        version.setFileSize(document.getFileSize());
+        PreviewPopup iv = new PreviewPopup(version);
+        iv.show();
+    }
 
-	/**
-	 * Prepares the context menu.
-	 */
-	private Menu prepareContextMenu() {
-		final ListGridRecord[] selection = list.getSelectedRecords();
+    /**
+     * Prepares the context menu.
+     */
+    private Menu prepareContextMenu() {
+        final ListGridRecord[] selection = list.getSelectedRecords();
 
-		Menu contextMenu = new Menu();
+        Menu contextMenu = new Menu();
 
-		MenuItem showMetadata = prepareShowMetadataItem(selection);
+        MenuItem showMetadata = prepareShowMetadataItem(selection);
 
-		MenuItem compareMetadata = prepareCompareMetadataItem(selection);
+        MenuItem compareMetadata = prepareCompareMetadataItem(selection);
 
-		MenuItem compareContent = prepareCompareContentMenuItem(selection);
+        MenuItem compareContent = prepareCompareContentMenuItem(selection);
 
-		MenuItem download = new MenuItem();
-		download.setTitle(I18N.message(DOWNLOAD));
-		download.addClickHandler((MenuItemClickEvent downloadEvent) -> onDownload(document, selection[0]));
-		download.setEnabled(document.getFolder().isDownload());
+        MenuItem download = new MenuItem();
+        download.setTitle(I18N.message(DOWNLOAD));
+        download.addClickHandler((MenuItemClickEvent downloadEvent) -> onDownload(document, selection[0]));
+        download.setEnabled(document.getFolder().isDownload());
 
-		MenuItem preview = new MenuItem();
-		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler((MenuItemClickEvent previewEvent) -> onPreview(document, selection[0]));
-		preview.setEnabled(
-				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+        MenuItem preview = new MenuItem();
+        preview.setTitle(I18N.message("preview"));
+        preview.addClickHandler((MenuItemClickEvent previewEvent) -> onPreview(document, selection[0]));
+        preview.setEnabled(
+                com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
-		MenuItem promote = preparePromoteMenuItem(selection);
+        MenuItem summary = new MenuItem();
+        summary.setTitle(I18N.message("summary"));
+        summary.addClickHandler(
+                event -> new SummaryDialog(document, selection[0].getAttributeAsString(FILE_VERSION)).show());
+        summary.setEnabled(
+                com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
-		MenuItem delete = prepareDeleteMenuItem(selection);
+        MenuItem promote = preparePromoteMenuItem(selection);
 
-		MenuItem replaceFile = new MenuItem();
-		replaceFile.setTitle(I18N.message("replacefile"));
-		replaceFile.addClickHandler((MenuItemClickEvent replaceFileEvent) -> new ReplaceVersionFile(document,
-				selection[0].getAttributeAsString(FILE_VERSION)).show());
+        MenuItem delete = prepareDeleteMenuItem(selection);
 
-		MenuItem notes = new MenuItem();
-		notes.setTitle(I18N.message("notes"));
-		notes.addClickHandler((MenuItemClickEvent notesEvent) -> new VersionNotesWindow(document,
-				selection[0].getAttributeAsString(FILE_VERSION)).show());
+        MenuItem replaceFile = new MenuItem();
+        replaceFile.setTitle(I18N.message("replacefile"));
+        replaceFile.addClickHandler((MenuItemClickEvent replaceFileEvent) -> new ReplaceVersionFile(document,
+                selection[0].getAttributeAsString(FILE_VERSION)).show());
 
-		compareMetadata.setEnabled(selection != null && selection.length == 2);
-		compareContent.setEnabled(Feature.enabled(Feature.COMPARISON) && (selection != null && selection.length == 2));
-		delete.setEnabled(deleteEnabled && selection != null && selection.length > 0);
-		replaceFile.setEnabled(updateEnabled && selection != null && selection.length == 1);
-		promote.setEnabled(updateEnabled && selection != null && selection.length == 1);
+        MenuItem notes = new MenuItem();
+        notes.setTitle(I18N.message("notes"));
+        notes.addClickHandler((MenuItemClickEvent notesEvent) -> new VersionNotesWindow(document,
+                selection[0].getAttributeAsString(FILE_VERSION)).show());
 
-		if (selection == null || selection.length < 1) {
-			preview.setEnabled(false);
-			download.setEnabled(false);
-			delete.setEnabled(false);
-			replaceFile.setEnabled(false);
-			promote.setEnabled(false);
-			showMetadata.setEnabled(false);
-			compareMetadata.setEnabled(false);
-			compareContent.setEnabled(false);
-			notes.setEnabled(false);
-		}
+        compareMetadata.setEnabled(selection != null && selection.length == 2);
+        compareContent.setEnabled(Feature.enabled(Feature.COMPARISON) && (selection != null && selection.length == 2));
+        delete.setEnabled(deleteEnabled && selection != null && selection.length > 0);
+        replaceFile.setEnabled(updateEnabled && selection != null && selection.length == 1);
+        promote.setEnabled(updateEnabled && selection != null && selection.length == 1);
 
-		if (Feature.visible(Feature.COMPARISON))
-			contextMenu.setItems(preview, download, notes, showMetadata, compareMetadata, compareContent,
-					new MenuItemSeparator(), delete, promote, replaceFile);
-		else
-			contextMenu.setItems(preview, download, notes, showMetadata, compareMetadata, new MenuItemSeparator(),
-					delete, promote, replaceFile);
+        if (selection == null || selection.length < 1) {
+            preview.setEnabled(false);
+            download.setEnabled(false);
+            summary.setEnabled(false);
+            delete.setEnabled(false);
+            replaceFile.setEnabled(false);
+            promote.setEnabled(false);
+            showMetadata.setEnabled(false);
+            compareMetadata.setEnabled(false);
+            compareContent.setEnabled(false);
+            notes.setEnabled(false);
+        }
 
-		return contextMenu;
-	}
+        if (Feature.visible(Feature.COMPARISON))
+            contextMenu.setItems(preview, download, summary, notes, showMetadata, compareMetadata, compareContent,
+                    new MenuItemSeparator(), delete, promote, replaceFile);
+        else
+            contextMenu.setItems(preview, download, summary, notes, showMetadata, compareMetadata, new MenuItemSeparator(),
+                    delete, promote, replaceFile);
 
-	private MenuItem prepareDeleteMenuItem(final ListGridRecord[] selection) {
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
-				I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						DocumentService.Instance.get().deleteVersions(GridUtil.getIds(selection),
-								new DefaultAsyncCallback<>() {
-									@Override
-									public void handleSuccess(GUIDocument result) {
-										if (result != null) {
-											document.setVersion(result.getVersion());
-											document.setFileVersion(result.getFileVersion());
-											DocumentController.get().modified(result);
-											DocumentController.get().selected(result);
-											list.removeSelectedData();
-										}
-									}
-								});
-					}
-				}));
-		return delete;
-	}
+        return contextMenu;
+    }
 
-	private MenuItem preparePromoteMenuItem(final ListGridRecord[] selection) {
-		MenuItem promote = new MenuItem();
-		promote.setTitle(I18N.message("promote"));
-		promote.addClickHandler((MenuItemClickEvent promoteEvent) -> LD.ask(I18N.message("question"),
-				I18N.message("promotequestion"), (Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						LD.contactingServer();
-						DocumentService.Instance.get().promoteVersion(document.getId(),
-								selection[0].getAttributeAsString(VERSION), new DefaultAsyncCallback<>() {
-									@Override
-									public void handleSuccess(GUIDocument document) {
-										DocumentController.get().checkedIn(document);
-										destroy();
-									}
-								});
-					}
-				}));
-		return promote;
-	}
+    private MenuItem prepareDeleteMenuItem(final ListGridRecord[] selection) {
+        MenuItem delete = new MenuItem();
+        delete.setTitle(I18N.message("ddelete"));
+        delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
+                I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
+                    if (Boolean.TRUE.equals(value)) {
+                        DocumentService.Instance.get().deleteVersions(GridUtil.getIds(selection),
+                                new DefaultAsyncCallback<>() {
+                                    @Override
+                                    public void handleSuccess(GUIDocument result) {
+                                        if (result != null) {
+                                            document.setVersion(result.getVersion());
+                                            document.setFileVersion(result.getFileVersion());
+                                            DocumentController.get().modified(result);
+                                            DocumentController.get().selected(result);
+                                            list.removeSelectedData();
+                                        }
+                                    }
+                                });
+                    }
+                }));
+        return delete;
+    }
 
-	private MenuItem prepareCompareContentMenuItem(final ListGridRecord[] selection) {
-		MenuItem compareContent = new MenuItem();
-		compareContent.setTitle(I18N.message("comparecontent"));
-		compareContent.addClickHandler(compareContentEvent -> DocumentService.Instance.get().getVersionsById(
-				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(List<GUIVersion> versions) {
-						new ComparisonWindow(versions.get(0), versions.get(1)).show();
-					}
-				}));
-		return compareContent;
-	}
+    private MenuItem preparePromoteMenuItem(final ListGridRecord[] selection) {
+        MenuItem promote = new MenuItem();
+        promote.setTitle(I18N.message("promote"));
+        promote.addClickHandler((MenuItemClickEvent promoteEvent) -> LD.ask(I18N.message("question"),
+                I18N.message("promotequestion"), (Boolean yes) -> {
+                    if (Boolean.TRUE.equals(yes)) {
+                        LD.contactingServer();
+                        DocumentService.Instance.get().promoteVersion(document.getId(),
+                                selection[0].getAttributeAsString(VERSION), new DefaultAsyncCallback<>() {
+                                    @Override
+                                    public void handleSuccess(GUIDocument document) {
+                                        DocumentController.get().checkedIn(document);
+                                        destroy();
+                                    }
+                                });
+                    }
+                }));
+        return promote;
+    }
 
-	private MenuItem prepareCompareMetadataItem(final ListGridRecord[] selection) {
-		MenuItem compareMetadata = new MenuItem();
-		compareMetadata.setTitle(I18N.message("comparemetadata"));
-		compareMetadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
-				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(List<GUIVersion> result) {
-						new MetadataDiff(result.get(0), result.get(1)).show();
-					}
-				}));
-		return compareMetadata;
-	}
+    private MenuItem prepareCompareContentMenuItem(final ListGridRecord[] selection) {
+        MenuItem compareContent = new MenuItem();
+        compareContent.setTitle(I18N.message("comparecontent"));
+        compareContent.addClickHandler(compareContentEvent -> DocumentService.Instance.get().getVersionsById(
+                Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(List<GUIVersion> versions) {
+                        new ComparisonWindow(versions.get(0), versions.get(1)).show();
+                    }
+                }));
+        return compareContent;
+    }
 
-	private MenuItem prepareShowMetadataItem(final ListGridRecord[] selection) {
-		MenuItem metadata = new MenuItem();
-		metadata.setTitle(I18N.message("mmetadata"));
-		metadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
-				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[0].getAttribute("id")),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(List<GUIVersion> result) {
-						new VersionMetadata(result.get(0)).show();
-					}
-				}));
-		return metadata;
-	}
+    private MenuItem prepareCompareMetadataItem(final ListGridRecord[] selection) {
+        MenuItem compareMetadata = new MenuItem();
+        compareMetadata.setTitle(I18N.message("comparemetadata"));
+        compareMetadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
+                Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(List<GUIVersion> result) {
+                        new MetadataDiff(result.get(0), result.get(1)).show();
+                    }
+                }));
+        return compareMetadata;
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    private MenuItem prepareShowMetadataItem(final ListGridRecord[] selection) {
+        MenuItem metadata = new MenuItem();
+        metadata.setTitle(I18N.message("mmetadata"));
+        metadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
+                Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[0].getAttribute("id")),
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(List<GUIVersion> result) {
+                        new VersionMetadata(result.get(0)).show();
+                    }
+                }));
+        return metadata;
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

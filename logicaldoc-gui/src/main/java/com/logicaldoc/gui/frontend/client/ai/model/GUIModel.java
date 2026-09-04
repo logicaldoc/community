@@ -15,7 +15,7 @@ public class GUIModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final List<String> NOT_TRAINABLE_TYPES = Arrays.asList("zeroshot", "language", "yolo");
+    private static final List<String> NOT_TRAINABLE_TYPES = Arrays.asList("zeroshot", "language", "yolo", "miniembedder");
 
     private long id = 0;
 

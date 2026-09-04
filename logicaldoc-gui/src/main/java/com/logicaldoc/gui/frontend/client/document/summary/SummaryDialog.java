@@ -1,11 +1,13 @@
 package com.logicaldoc.gui.frontend.client.document.summary;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.automation.HtmlItemEditor;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -46,36 +48,55 @@ public class SummaryDialog extends Window {
 
     private String summary;
 
+    private GUIAccessControlEntry ace;
+
+    private final boolean readOnly;
+
     public SummaryDialog(GUIDocument document) {
         this(document, null);
     }
 
     public SummaryDialog(GUIDocument document, String fileVersion) {
+
         this.document = document;
         this.fileVersion = fileVersion;
 
+        this.readOnly = fileVersion != null && !fileVersion.equals(document.getFileVersion());
+
         setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+
         setTitle(I18N.message("summary"));
+
         setWidth100();
         setHeight100();
-
         setCanDragResize(true);
         setIsModal(true);
         setShowModalMask(true);
         centerInPage();
 
-        DocumentService.Instance.get().getSummary(document.getId(),
-                fileVersion != null ? fileVersion : document.getFileVersion(), new DefaultAsyncCallback<>() {
+        DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(document.getId()),
+                new DefaultAsyncCallback<>() {
 
                     @Override
-                    public void handleSuccess(String result) {
+                    public void handleSuccess(GUIAccessControlEntry ace) {
 
-                        summary = result;
+                        SummaryDialog.this.ace = ace;
 
-                        if (summary == null || summary.trim().isEmpty())
-                            summary = "";
+                        DocumentService.Instance.get().getSummary(document.getId(),
+                                fileVersion != null ? fileVersion : document.getFileVersion(),
+                                new DefaultAsyncCallback<>() {
 
-                        initGUI();
+                                    @Override
+                                    public void handleSuccess(String result) {
+
+                                        summary = result;
+
+                                        if (summary == null || summary.trim().isEmpty())
+                                            summary = "";
+
+                                        initGUI();
+                                    }
+                                });
                     }
                 });
     }
@@ -105,9 +126,9 @@ public class SummaryDialog extends Window {
         edit.setTitle(I18N.message("edit"));
         edit.addClickHandler(event -> onEdit());
 
-        ToolStripButton cofirm = new ToolStripButton();
-        cofirm.setTitle(I18N.message("confirm"));
-        cofirm.addClickHandler(event -> onConfirm());
+        ToolStripButton save = new ToolStripButton();
+        save.setTitle(I18N.message("save"));
+        save.addClickHandler(event -> onConfirm());
 
         ToolStripButton close = new ToolStripButton();
         close.setTitle(I18N.message("close"));
@@ -179,7 +200,7 @@ public class SummaryDialog extends Window {
         toolStrip.addSeparator();
         toolStrip.addButton(generate);
         toolStrip.addButton(edit);
-        toolStrip.addButton(cofirm);
+        toolStrip.addButton(save);
         toolStrip.addButton(close);
 
         html = new HTMLFlow();
@@ -187,7 +208,8 @@ public class SummaryDialog extends Window {
         html.setWidth100();
         html.setHeight100();
 
-        addItem(toolStrip);
+        if (ace.isWrite() && !readOnly)
+            addItem(toolStrip);
         addItem(html);
     }
 

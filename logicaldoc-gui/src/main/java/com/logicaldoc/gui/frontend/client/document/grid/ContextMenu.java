@@ -241,7 +241,6 @@ public class ContextMenu extends Menu {
         readingRequest.setTitle(I18N.message("requestreading"));
         readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
 
-        // TODO
         summary = new MenuItem(I18N.message("summary"));
         summary.addClickHandler(click -> new SummaryDialog(selection.get(0)).show());
 
@@ -310,6 +309,9 @@ public class ContextMenu extends Menu {
             boolean justOneSelected,
             boolean immutablesInSelection) {
         preview.setEnabled(someSelection
+                && com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW)
+                && allowedPermissions.isPreview());
+        summary.setEnabled(someSelection
                 && com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW)
                 && allowedPermissions.isPreview());
         cut.setEnabled(someSelection && !immutablesInSelection
