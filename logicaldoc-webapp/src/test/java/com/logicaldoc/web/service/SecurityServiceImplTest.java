@@ -46,6 +46,7 @@ import com.logicaldoc.gui.common.client.beans.GUIWorkingTime;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractWPTestCase;
 import com.logicaldoc.web.UploadServlet;
@@ -486,13 +487,13 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
         String password = testSubject.generatePassword();
         String tenant = "default";
 
-        final int pwdSize = config.getInt(SecurityServiceImpl.PASSWORD_SIZE.formatted(tenant), 8);
-        final int pwdUpperCase = config.getInt(SecurityServiceImpl.PASSWORD_UPPERCASE.formatted(tenant), 2);
-        final int pwdLowerCase = config.getInt(SecurityServiceImpl.PASSWORD_LOWERCASE.formatted(tenant), 2);
-        final int pwdDigit = config.getInt(SecurityServiceImpl.PASSWORD_DIGIT.formatted(tenant), 1);
-        final int pwdSpecial = config.getInt(SecurityServiceImpl.PASSWORD_SPECIAL.formatted(tenant), 1);
-        final int pwdSequence = config.getInt(SecurityServiceImpl.PASSWORD_SEQUENCE.formatted(tenant), 4);
-        final int pwdOccurrence = config.getInt(SecurityServiceImpl.PASSWORD_OCCURRENCE.formatted(tenant), 3);
+        final int pwdSize = config.getTenantInt(tenant, PasswordGenerator.PASSWORD_SIZE, 8);
+        final int pwdUpperCase = config.getTenantInt(tenant, PasswordGenerator.PASSWORD_UPPERCASE, 2);
+        final int pwdLowerCase = config.getTenantInt(tenant, PasswordGenerator.PASSWORD_LOWERCASE, 2);
+        final int pwdDigit = config.getTenantInt(tenant, PasswordGenerator.PASSWORD_DIGIT, 1);
+        final int pwdSpecial = config.getTenantInt(tenant, PasswordGenerator.PASSWORD_SPECIAL, 1);
+        final int pwdSequence = config.getTenantInt(tenant, PasswordGenerator.PASSWORD_SEQUENCE, 4);
+        final int pwdOccurrence = config.getTenantInt(tenant, PasswordGenerator.PASSWORD_OCCURRENCE, 3);
 
         List<String> errors = testSubject.validatePassword(password, pwdSize, pwdUpperCase, pwdLowerCase, pwdDigit,
                 pwdSpecial, pwdSequence, pwdOccurrence);

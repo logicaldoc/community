@@ -242,6 +242,8 @@ public class Menu {
     public static final long USERS = 1897;
     
     public static final long GROUPS = 1898;
+
+    public static final long SUPPORT_TICKET = 3040;
     
 	private static Set<Long> menus = new HashSet<>();
 

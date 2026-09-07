@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -48,6 +49,12 @@ public class UserUtil {
     private static final Logger log = LoggerFactory.getLogger(UserUtil.class);
 
     private UserUtil() {
+    }
+
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        User user = new User();
+        user.setDecodedPassword(args[0]);
+        System.out.println(user.getPassword());
     }
 
     /**

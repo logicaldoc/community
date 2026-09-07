@@ -41,14 +41,13 @@ public class ContextProperties extends AdvancedProperties {
     private File file;
 
     private File overrideFile;
-    
+
     private AdvancedProperties overrideProperties = new AdvancedProperties();
 
     private static final Logger log = LoggerFactory.getLogger(ContextProperties.class);
 
     protected int maxBackups = 10;
 
-    
     public ContextProperties(int maxBackups) throws IOException {
         this();
         this.maxBackups = maxBackups;
@@ -295,7 +294,7 @@ public class ContextProperties extends AdvancedProperties {
 
     @Override
     public String getProperty(String property) {
-        if(overrideProperties!=null && overrideProperties.containsKey(property))
+        if (overrideProperties != null && overrideProperties.containsKey(property))
             return overrideProperties.getProperty(property);
         else
             return super.getProperty(property);
@@ -303,7 +302,7 @@ public class ContextProperties extends AdvancedProperties {
 
     @Override
     public String getProperty(String property, String defaultValue) {
-        if(overrideProperties!=null && overrideProperties.containsKey(property))
+        if (overrideProperties != null && overrideProperties.containsKey(property))
             return overrideProperties.getProperty(property, defaultValue);
         else
             return super.getProperty(property, defaultValue);

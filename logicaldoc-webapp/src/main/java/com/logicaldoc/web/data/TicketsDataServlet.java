@@ -16,6 +16,7 @@ import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -72,8 +73,8 @@ public class TicketsDataServlet extends AbstractDataServlet {
         int count = rows.getInt(6);
         int maxCount = rows.getInt(7);
         int maxViews = rows.getInt(13);
-        Date creation = rows.getDate(4);
-        Date expired = rows.getDate(5);
+        Date creation = SqlUtil.getColumnDateValue(rows.getTimestamp(4)); 
+        Date expired = SqlUtil.getColumnDateValue(rows.getTimestamp(5)); 
         boolean enabled = rows.getInt(9) == 1;
         String fileName = rows.getString(10);
         String suffix = rows.getString(8);

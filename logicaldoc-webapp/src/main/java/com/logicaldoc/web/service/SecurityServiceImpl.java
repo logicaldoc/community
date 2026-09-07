@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -116,29 +117,15 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
     private static final String COOKIES_SAMESITE = "cookies.samesite";
 
-    private static final String ANONYMOUS_USER = "%s.anonymous.user";
+    private static final String ANONYMOUS_USER = "anonymous.user";
 
-    private static final String SECURITY_PREVIEW_CONTENTCHECK = "%s.security.preview.contentcheck";
+    private static final String SECURITY_PREVIEW_CONTENTCHECK = "security.preview.contentcheck";
 
-    private static final String ANONYMOUS_KEY = "%s.anonymous.key";
+    private static final String ANONYMOUS_KEY = "anonymous.key";
 
-    private static final String ANONYMOUS_ENABLED = "%s.anonymous.enabled";
+    private static final String ANONYMOUS_ENABLED = "anonymous.enabled";
 
-    private static final String GUI_SAVELOGIN = "%s.gui.savelogin";
-
-    static final String PASSWORD_OCCURRENCE = "%s.password.occurrence";
-
-    static final String PASSWORD_SEQUENCE = "%s.password.sequence";
-
-    static final String PASSWORD_SPECIAL = "%s.password.special";
-
-    static final String PASSWORD_DIGIT = "%s.password.digit";
-
-    static final String PASSWORD_LOWERCASE = "%s.password.lowercase";
-
-    static final String PASSWORD_UPPERCASE = "%s.password.uppercase";
-
-    static final String PASSWORD_SIZE = "%s.password.size";
+    private static final String GUI_SAVELOGIN = "gui.savelogin";
 
     private static final String ADMIN = "admin";
 
@@ -282,7 +269,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             session.getDictionary().put(USER, user);
 
             ContextProperties config = Context.get().getConfig();
-            guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(session.getTenantName()), 12));
+            guiUser.setPasswordMinLenght(
+                    config.getTenantInt(session.getTenantName(), PasswordGenerator.PASSWORD_SIZE, 12));
 
             return guiSession;
         } catch (PersistenceException | AutomationException e) {
@@ -554,7 +542,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 guiUser.setTenant(getTenant(user.getTenantId()));
 
                 ContextProperties config = Context.get().getConfig();
-                guiUser.setPasswordMinLenght(config.getInt(PASSWORD_SIZE.formatted(guiUser.getTenant().getName()), 12));
+                guiUser.setPasswordMinLenght(
+                        config.getTenantInt(guiUser.getTenant().getName(), PasswordGenerator.PASSWORD_SIZE, 12));
 
                 loadDashlets(guiUser);
 
@@ -735,17 +724,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                     return guiUser;
                 }
 
-                String tenant = session.getTenantName();
-
                 // Generate an initial password(that must be changed)
-                ContextProperties config = Context.get().getConfig();
-                decodedPassword = PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
-                        config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
-                        config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),
-                        config.getInt(PASSWORD_DIGIT.formatted(tenant), 1),
-                        config.getInt(PASSWORD_SPECIAL.formatted(tenant), 1),
-                        config.getInt(PASSWORD_SEQUENCE.formatted(tenant), 4),
-                        config.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
+                decodedPassword = PasswordGenerator.generate(session.getTenantName());
                 user.setDecodedPassword(decodedPassword);
                 user.setPasswordExpired(true);
                 user.setPasswordChanged(new Date());
@@ -1042,56 +1022,49 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         GUISecuritySettings securitySettings = new GUISecuritySettings();
 
         UserDAO userDao = UserDAO.get();
-        ContextProperties pbean = Context.get().getConfig();
+        ContextProperties config = Context.get().getConfig();
 
         String tenant = session.getTenantName();
-        securitySettings.setPwdExpiration(pbean.getInt("%s.password.ttl".formatted(tenant), 90));
-        securitySettings.setPwdSize(pbean.getInt(PASSWORD_SIZE.formatted(tenant), 8));
-        securitySettings.setPwdLowerCase(pbean.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2));
-        securitySettings.setPwdUpperCase(pbean.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2));
-        securitySettings.setPwdDigit(pbean.getInt(PASSWORD_DIGIT.formatted(tenant), 1));
-        securitySettings.setPwdSpecial(pbean.getInt(PASSWORD_SPECIAL.formatted(tenant), 1));
-        securitySettings.setPwdSequence(pbean.getInt(PASSWORD_SEQUENCE.formatted(tenant), 3));
-        securitySettings.setPwdOccurrence(pbean.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
-        securitySettings.setPwdEnforceHistory(pbean.getInt("%s.password.enforcehistory".formatted(tenant), 3));
-        securitySettings.setPwdCheckLogin(pbean.getBoolean("%s.password.checklogin".formatted(tenant), false));
+        securitySettings.setPwdExpiration(config.getTenantInt(tenant, "password.ttl", 90));
+        securitySettings.setPwdSize(config.getTenantInt(tenant, PasswordGenerator.PASSWORD_SIZE, 8));
+        securitySettings.setPwdLowerCase(config.getTenantInt(tenant, PasswordGenerator.PASSWORD_LOWERCASE, 2));
+        securitySettings.setPwdUpperCase(config.getTenantInt(tenant, PasswordGenerator.PASSWORD_UPPERCASE, 2));
+        securitySettings.setPwdDigit(config.getTenantInt(tenant, PasswordGenerator.PASSWORD_DIGIT, 1));
+        securitySettings.setPwdSpecial(config.getTenantInt(tenant, PasswordGenerator.PASSWORD_SPECIAL, 1));
+        securitySettings.setPwdSequence(config.getTenantInt(tenant, PasswordGenerator.PASSWORD_SEQUENCE, 3));
+        securitySettings.setPwdOccurrence(config.getTenantInt(tenant, PasswordGenerator.PASSWORD_OCCURRENCE, 3));
+        securitySettings.setPwdEnforceHistory(config.getTenantInt(tenant, "password.enforcehistory", 3));
+        securitySettings.setPwdCheckLogin(config.getTenantBoolean(tenant, "password.checklogin", false));
 
-        securitySettings.setMaxInactivity(pbean.getInt("%s.security.user.maxinactivity".formatted(tenant)));
-        if (StringUtils.isNotEmpty(pbean.getProperty(GUI_SAVELOGIN.formatted(tenant))))
-            securitySettings.setSaveLogin("true".equals(pbean.getProperty(GUI_SAVELOGIN.formatted(tenant))));
-        securitySettings.setIgnoreLoginCase("true".equals(pbean.getProperty("login.ignorecase")));
-        securitySettings.setAllowSidInRequest(pbean.getBoolean("security.acceptsid", false));
-        securitySettings.setAllowClientId(pbean.getBoolean("security.useclientid", true));
-        if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))))
-            securitySettings
-                    .setEnableAnonymousLogin("true".equals(pbean.getProperty(ANONYMOUS_ENABLED.formatted(tenant))));
-        if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant))))
-            securitySettings.setAnonymousKey(pbean.getProperty(ANONYMOUS_KEY.formatted(tenant)));
-        if (StringUtils.isNotEmpty(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)))) {
+        securitySettings.setMaxInactivity(config.getTenantInt(tenant, "security.user.maxinactivity"));
+        securitySettings.setSaveLogin(config.getTenantBoolean(tenant, GUI_SAVELOGIN, false));
+        securitySettings.setIgnoreLoginCase(config.getBoolean("login.ignorecase", false));
+        securitySettings.setAllowSidInRequest(config.getBoolean("security.acceptsid", false));
+        securitySettings.setAllowClientId(config.getBoolean("security.useclientid", true));
+        securitySettings.setEnableAnonymousLogin(config.getTenantBoolean(tenant, ANONYMOUS_ENABLED, false));
+        securitySettings.setAnonymousKey(config.getTenantString(tenant, ANONYMOUS_KEY));
+        if (StringUtils.isNotEmpty(config.getTenantString(tenant, ANONYMOUS_USER))) {
             try {
-                User user = userDao.findByUsername(pbean.getProperty(ANONYMOUS_USER.formatted(tenant)));
+                User user = userDao.findByUsername(config.getTenantString(tenant, ANONYMOUS_USER));
                 if (user != null)
                     securitySettings.setAnonymousUser(getUser(user.getId()));
             } catch (PersistenceException e) {
                 log.warn(e.getMessage(), e);
             }
         }
-        if (StringUtils.isNotEmpty(pbean.getProperty(SSL_REQUIRED)))
-            securitySettings.setForceSsl("true".equals(pbean.getProperty(SSL_REQUIRED)));
-        if (StringUtils.isNotEmpty(pbean.getProperty(COOKIES_SECURE)))
-            securitySettings.setCookiesSecure("true".equals(pbean.getProperty(COOKIES_SECURE)));
-        securitySettings.setCookiesSameSite(pbean.getProperty(COOKIES_SAMESITE, "unset"));
 
-        securitySettings.setAlertNewDevice(pbean.getBoolean("%s.alertnewdevice".formatted(tenant), true));
-
-        securitySettings.setGeolocationEnabled(pbean.getBoolean("security.geolocation.enabled", true));
-        securitySettings.setGeolocationCache(pbean.getBoolean("security.geolocation.cache", false));
-        securitySettings.setGeolocationKey(pbean.getProperty(SECURITY_GEOLOCATION_APIKEY));
+        securitySettings.setForceSsl(config.getBoolean(SSL_REQUIRED, false));
+        securitySettings.setCookiesSecure(config.getBoolean(COOKIES_SECURE, true));
+        securitySettings.setCookiesSameSite(config.getProperty(COOKIES_SAMESITE, "unset"));
+        securitySettings.setAlertNewDevice(config.getTenantBoolean(tenant, "alertnewdevice", true));
+        securitySettings.setGeolocationEnabled(config.getBoolean("security.geolocation.enabled", true));
+        securitySettings.setGeolocationCache(config.getBoolean("security.geolocation.cache", false));
+        securitySettings.setGeolocationKey(config.getProperty(SECURITY_GEOLOCATION_APIKEY));
         securitySettings.setGeolocationDbVer(Geolocation.get().getDatabaseVersion());
 
-        securitySettings.setContentSecurityPolicy(pbean.getProperty(SECURITY_CSP));
+        securitySettings.setContentSecurityPolicy(config.getProperty(SECURITY_CSP));
 
-        securitySettings.setPreviewContentCheck(pbean.getBoolean(SECURITY_PREVIEW_CONTENTCHECK, true));
+        securitySettings.setPreviewContentCheck(config.getTenantBoolean(tenant, SECURITY_PREVIEW_CONTENTCHECK, true));
 
         log.debug("Security settings data loaded successfully.");
 
@@ -1144,29 +1117,32 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         }
 
         String tenant = session.getTenantName();
-        conf.setProperty("%s.password.ttl".formatted(tenant), Integer.toString(settings.getPwdExpiration()));
-        conf.setProperty("%s.security.user.maxinactivity".formatted(tenant),
+        conf.setTenantProperty(tenant, "password.ttl", Integer.toString(settings.getPwdExpiration()));
+        conf.setTenantProperty(tenant, "security.user.maxinactivity",
                 settings.getMaxInactivity() == null || settings.getMaxInactivity().intValue() <= 0 ? ""
                         : Integer.toString(settings.getMaxInactivity()));
-        conf.setProperty("%s.password.enforcehistory".formatted(tenant),
-                Integer.toString(settings.getPwdEnforceHistory()));
-        conf.setProperty("%s.password.checklogin".formatted(tenant), Boolean.toString(settings.isPwdCheckLogin()));
-        conf.setProperty(PASSWORD_SIZE.formatted(tenant), Integer.toString(settings.getPwdSize()));
-        conf.setProperty(PASSWORD_LOWERCASE.formatted(tenant), Integer.toString(settings.getPwdLowerCase()));
-        conf.setProperty(PASSWORD_UPPERCASE.formatted(tenant), Integer.toString(settings.getPwdUpperCase()));
-        conf.setProperty(PASSWORD_DIGIT.formatted(tenant), Integer.toString(settings.getPwdDigit()));
-        conf.setProperty(PASSWORD_SPECIAL.formatted(tenant), Integer.toString(settings.getPwdSpecial()));
-        conf.setProperty(PASSWORD_SEQUENCE.formatted(tenant), Integer.toString(settings.getPwdSequence()));
-        conf.setProperty(PASSWORD_OCCURRENCE.formatted(tenant), Integer.toString(settings.getPwdOccurrence()));
-        conf.setProperty(GUI_SAVELOGIN.formatted(tenant), Boolean.toString(settings.isSaveLogin()));
-        conf.setProperty("%s.alertnewdevice".formatted(tenant), Boolean.toString(settings.isAlertNewDevice()));
-        conf.setProperty(ANONYMOUS_ENABLED.formatted(tenant), Boolean.toString(settings.isEnableAnonymousLogin()));
-        conf.setProperty(ANONYMOUS_KEY.formatted(tenant), settings.getAnonymousKey().trim());
-        conf.setProperty(SECURITY_PREVIEW_CONTENTCHECK.formatted(tenant),
+        conf.setTenantProperty(tenant, "password.enforcehistory", Integer.toString(settings.getPwdEnforceHistory()));
+        conf.setTenantProperty(tenant, "password.checklogin", Boolean.toString(settings.isPwdCheckLogin()));
+        conf.setTenantProperty(tenant, PasswordGenerator.PASSWORD_SIZE, Integer.toString(settings.getPwdSize()));
+        conf.setTenantProperty(tenant, PasswordGenerator.PASSWORD_LOWERCASE,
+                Integer.toString(settings.getPwdLowerCase()));
+        conf.setTenantProperty(tenant, PasswordGenerator.PASSWORD_UPPERCASE,
+                Integer.toString(settings.getPwdUpperCase()));
+        conf.setTenantProperty(tenant, PasswordGenerator.PASSWORD_DIGIT, Integer.toString(settings.getPwdDigit()));
+        conf.setTenantProperty(tenant, PasswordGenerator.PASSWORD_SPECIAL, Integer.toString(settings.getPwdSpecial()));
+        conf.setTenantProperty(tenant, PasswordGenerator.PASSWORD_SEQUENCE,
+                Integer.toString(settings.getPwdSequence()));
+        conf.setTenantProperty(tenant, PasswordGenerator.PASSWORD_OCCURRENCE,
+                Integer.toString(settings.getPwdOccurrence()));
+        conf.setTenantProperty(tenant, GUI_SAVELOGIN, Boolean.toString(settings.isSaveLogin()));
+        conf.setTenantProperty(tenant, "alertnewdevice", Boolean.toString(settings.isAlertNewDevice()));
+        conf.setTenantProperty(tenant, ANONYMOUS_ENABLED, Boolean.toString(settings.isEnableAnonymousLogin()));
+        conf.setTenantProperty(tenant, ANONYMOUS_KEY, settings.getAnonymousKey().trim());
+        conf.setTenantProperty(tenant, SECURITY_PREVIEW_CONTENTCHECK,
                 Boolean.toString(settings.isPreviewContentCheck()));
 
         if (settings.getAnonymousUser() != null)
-            conf.setProperty(ANONYMOUS_USER.formatted(tenant), settings.getAnonymousUser().getUsername());
+            conf.setTenantProperty(tenant, ANONYMOUS_USER, settings.getAnonymousUser().getUsername());
 
         try {
             conf.write();
@@ -1181,7 +1157,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             throws PermissionException, PersistenceException {
         MenuDAO mdao = MenuDAO.get();
         if (!mdao.isReadAllowed(Menu.ACCESS_CONTROL, session.getUserId()))
-            throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
+            throw new PermissionException(session.getUsername(), "Menu %s".formatted(menu.getName()), Permission.READ);
 
         GroupDAO gdao = GroupDAO.get();
 
@@ -1228,9 +1204,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         try {
             Menu menu = dao.findById(menuId);
             if (menu == null)
-                throw new ServerException("Unexisting menu identified by " + menuId);
+                throw new ServerException("Unexisting menu identified by %d".formatted(menuId));
             if (menu.getType() == Menu.TYPE_DEFAULT)
-                throw new PermissionException("Cannot delete legacy menu " + menuId);
+                throw new PermissionException("Cannot delete legacy menu %d".formatted(menuId));
             dao.delete(menuId);
         } catch (PermissionException | PersistenceException | ServerException e) {
             throwServerException(session, log, e);
@@ -1697,17 +1673,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     @Override
     public String generatePassword() throws InvalidSessionServerException {
         Session session = validateSession();
-        String tenant = session.getTenantName();
-
-        // Generate an initial password(that must be changed)
-        ContextProperties config = Context.get().getConfig();
-        return PasswordGenerator.generate(config.getInt(PASSWORD_SIZE.formatted(tenant), 8),
-                config.getInt(PASSWORD_UPPERCASE.formatted(tenant), 2),
-                config.getInt(PASSWORD_LOWERCASE.formatted(tenant), 2),
-                config.getInt(PASSWORD_DIGIT.formatted(tenant), 1),
-                config.getInt(PASSWORD_SPECIAL.formatted(tenant), 1),
-                config.getInt(PASSWORD_SEQUENCE.formatted(tenant), 4),
-                config.getInt(PASSWORD_OCCURRENCE.formatted(tenant), 3));
+        return PasswordGenerator.generate(session.getTenantName());
     }
 
     @Override
@@ -1826,5 +1792,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         } catch (PersistenceException e) {
             throwServerException(session, log, e);
         }
+    }
+
+    @Override
+    public List<String> createSupportTicket(long userId, int expireMinutes) throws ServerException {
+        validateSession();
+        return Arrays.asList("", "");
     }
 }

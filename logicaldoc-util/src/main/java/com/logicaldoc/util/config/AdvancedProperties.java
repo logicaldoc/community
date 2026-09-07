@@ -11,7 +11,8 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * An {@link OrderedProperties} that also adds more method to deal with properties of different type
+ * An {@link OrderedProperties} that also adds more method to deal with
+ * properties of different type
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.3.1
@@ -22,7 +23,7 @@ public class AdvancedProperties extends OrderedProperties {
     private static final long serialVersionUID = 1L;
 
     static final String BASE64_PREFIX = "_b64_";
-    
+
     /**
      * It takes a value and expands the variables referenced in it. You can
      * reference whatever setting in the main configuration file or by using the
@@ -86,7 +87,7 @@ public class AdvancedProperties extends OrderedProperties {
         String value = getProperty(property, defaultValue);
         if (value == null)
             return null;
-    
+
         if (value.startsWith(BASE64_PREFIX))
             value = new String(Base64.getDecoder().decode(value.substring(BASE64_PREFIX.length())),
                     StandardCharsets.UTF_8);
@@ -162,6 +163,20 @@ public class AdvancedProperties extends OrderedProperties {
     }
 
     /**
+     * Same as {@link AdvancedProperties}.setProperty but with tenant
+     * specification
+     * 
+     * @param tenant name of the tenant
+     * @param key name of the setting
+     * @param value value of the setting
+     * 
+     * @return created value
+     */
+    public synchronized Object setTenantProperty(String tenant, String key, String value) {
+        return this.setProperty("%s.%s".formatted(tenant, key), value);
+    }
+
+    /**
      * Same as setProperty but the value gets encoded Base64 first
      * 
      * @param key name of the setting
@@ -172,6 +187,20 @@ public class AdvancedProperties extends OrderedProperties {
     public synchronized Object setPropertyEncoded(String key, String value) {
         return super.setProperty(key,
                 BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * Same as {@link AdvancedProperties}.setPropertyEncoded but with tenant
+     * specification
+     * 
+     * @param tenant name of the tenant
+     * @param key name of the setting
+     * @param value value of the setting
+     * 
+     * @return created value
+     */
+    public synchronized Object setTenantPropertyEncoded(String tenant, String key, String value) {
+        return this.setPropertyEncoded("%s.%s".formatted(tenant, key), value);
     }
 
     /**

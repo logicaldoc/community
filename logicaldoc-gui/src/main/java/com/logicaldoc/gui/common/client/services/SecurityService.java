@@ -483,6 +483,18 @@ public interface SecurityService extends RemoteService {
 	 */
 	void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds) throws ServerException;
 
+	/**
+	 * Creates a new support ticket
+	 * 
+	 * @param userId The user that will be logged in when using the ticket
+	 * @param expireMinutes Minutes after which the ticket expires
+	 * 
+	 * @return Ticket identifier and password
+	 * 
+	 * @throws ServerException generic error
+	 */
+	public List<String> createSupportTicket(long userId, int expireMinutes) throws ServerException;
+	
 	public static class Instance {
 		private static SecurityServiceAsync inst;
 

@@ -11,6 +11,7 @@ import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.security.group.GroupsPanel;
 import com.logicaldoc.gui.frontend.client.security.ldap.LDAPServersPanel;
 import com.logicaldoc.gui.frontend.client.security.saml.SamlPanel;
+import com.logicaldoc.gui.frontend.client.security.support.SupportTicketPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationSettings;
 import com.logicaldoc.gui.frontend.client.security.user.UsersPanel;
 import com.smartgwt.client.types.Overflow;
@@ -31,7 +32,7 @@ public class AccessControlMenu extends VLayout {
         setOverflow(Overflow.AUTO);
 
         addGroupsButton();
-        
+
         addUsersButton();
 
         addSecurityButton();
@@ -47,6 +48,8 @@ public class AccessControlMenu extends VLayout {
         addExtAuthButton();
 
         addSamlButton();
+
+        addSupportTicket();
     }
 
     private void addSecurityButton() {
@@ -95,6 +98,15 @@ public class AccessControlMenu extends VLayout {
             if (!Feature.enabled(Feature.SINGLE_SIGNON) || Session.get().isDemo())
                 setFeatureDisabled(saml);
         }
+    }
+
+    private void addSupportTicket() {
+        Button button = new Button("<span style='color: red;'>" + I18N.message("supportticket") + "</span>");
+        button.setWidth100();
+        button.setHeight(25);
+        button.addClickHandler(click -> AdminScreen.get().setContent(new SupportTicketPanel()));
+        if (Menu.enabled(Menu.SUPPORT_TICKET) && Feature.enabled(Feature.SUPPORT_TICKET))
+            addMember(button);
     }
 
     private void setFeatureDisabled(Button button) {

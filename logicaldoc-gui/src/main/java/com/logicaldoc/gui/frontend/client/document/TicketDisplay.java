@@ -15,7 +15,7 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
- * Displays a created download ticket details
+ * Displays a created download/view ticket details
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.5

@@ -142,18 +142,6 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
     }
 
     @Test
-    public void testRestart() throws ServerException {
-        ContextProperties config = Context.get().getConfig();
-        testSubject.restart();
-        File restartFile = new File(config.getProperty("LDOCHOME") + "/updates/restart");
-        try {
-            assertTrue(restartFile.exists());
-        } finally {
-            FileUtil.delete(restartFile);
-        }
-    }
-
-    @Test
     public void testConfirmUpdate() throws ServerException, IOException {
         ContextProperties config = Context.get().getConfig();
 

@@ -14,93 +14,120 @@ import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 public interface SecurityServiceAsync {
 
-	void logout(AsyncCallback<Void> callback);
+    void logout(AsyncCallback<Void> callback);
 
-	void changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword, boolean notify,
-			AsyncCallback<GUIValue> callback);
+    void changePassword(
+            Long requestorUserId,
+            long userId,
+            String oldPassword,
+            String newPassword,
+            boolean notify,
+            AsyncCallback<GUIValue> callback);
 
-	void deleteUser(long userId, AsyncCallback<Void> callback);
+    void deleteUser(long userId, AsyncCallback<Void> callback);
 
-	void saveUser(GUIUser user, GUIInfo info, AsyncCallback<GUIUser> callback);
+    void saveUser(GUIUser user, GUIInfo info, AsyncCallback<GUIUser> callback);
 
-	void getUser(long userId, AsyncCallback<GUIUser> callback);
+    void getUser(long userId, AsyncCallback<GUIUser> callback);
 
-	void getGroup(long groupId, AsyncCallback<GUIGroup> callback);
+    void getGroup(long groupId, AsyncCallback<GUIGroup> callback);
 
-	void deleteGroup(long groupId, AsyncCallback<Void> callback);
+    void deleteGroup(long groupId, AsyncCallback<Void> callback);
 
-	void saveGroup(GUIGroup group, AsyncCallback<GUIGroup> callback);
+    void saveGroup(GUIGroup group, AsyncCallback<GUIGroup> callback);
 
-	void removeFromGroup(long groupId, List<Long> docIds, AsyncCallback<Void> callback);
+    void removeFromGroup(long groupId, List<Long> docIds, AsyncCallback<Void> callback);
 
-	void addUserToGroup(long groupId, long userId, AsyncCallback<Void> callback);
+    void addUserToGroup(long groupId, long userId, AsyncCallback<Void> callback);
 
-	void loadSettings(AsyncCallback<GUISecuritySettings> callback);
+    void loadSettings(AsyncCallback<GUISecuritySettings> callback);
 
-	void saveSettings(GUISecuritySettings settings, AsyncCallback<Boolean> callback);
+    void saveSettings(GUISecuritySettings settings, AsyncCallback<Boolean> callback);
 
-	void kill(String sid, AsyncCallback<Void> callback);
+    void kill(String sid, AsyncCallback<Void> callback);
 
-	void saveProfile(GUIUser user, AsyncCallback<GUIUser> callback);
+    void saveProfile(GUIUser user, AsyncCallback<GUIUser> callback);
 
-	void saveACL(GUIMenu menu, AsyncCallback<Void> callback);
+    void saveACL(GUIMenu menu, AsyncCallback<Void> callback);
 
-	void getMenu(long id, String locale, AsyncCallback<GUIMenu> callback);
+    void getMenu(long id, String locale, AsyncCallback<GUIMenu> callback);
 
-	void searchUsers(String username, String groupId, AsyncCallback<List<GUIUser>> callback);
+    void searchUsers(String username, String groupId, AsyncCallback<List<GUIUser>> callback);
 
-	void getSession(String locale, String sid, AsyncCallback<GUISession> callback);
+    void getSession(String locale, String sid, AsyncCallback<GUISession> callback);
 
-	void loadBlockedEntities(AsyncCallback<List<GUISequence>> callback);
+    void loadBlockedEntities(AsyncCallback<List<GUISequence>> callback);
 
-	void removeBlockedEntities(List<Long> id, AsyncCallback<Void> callback);
+    void removeBlockedEntities(List<Long> id, AsyncCallback<Void> callback);
 
-	void saveInterfaceSettings(GUIUser user, AsyncCallback<GUIUser> callback);
+    void saveInterfaceSettings(GUIUser user, AsyncCallback<GUIUser> callback);
 
-	void replicateUsersSettings(long masterUserId, List<Long> userIds, boolean gui, boolean groups,
-			AsyncCallback<Void> callback);
+    void replicateUsersSettings(
+            long masterUserId,
+            List<Long> userIds,
+            boolean gui,
+            boolean groups,
+            AsyncCallback<Void> callback);
 
-	void deleteMenu(long menuId, AsyncCallback<Void> callback);
+    void deleteMenu(long menuId, AsyncCallback<Void> callback);
 
-	void getMenus(long parentId, String locale, boolean enabledOnly, AsyncCallback<List<GUIMenu>> callback);
+    void getMenus(long parentId, String locale, boolean enabledOnly, AsyncCallback<List<GUIMenu>> callback);
 
-	void saveMenus(List<GUIMenu> menus, String locale, AsyncCallback<Void> callback);
+    void saveMenus(List<GUIMenu> menus, String locale, AsyncCallback<Void> callback);
 
-	void saveMenu(GUIMenu menu, String locale, AsyncCallback<GUIMenu> callback);
+    void saveMenu(GUIMenu menu, String locale, AsyncCallback<GUIMenu> callback);
 
-	void trustDevice(String label, AsyncCallback<String> callback);
+    void trustDevice(String label, AsyncCallback<String> callback);
 
-	void isTrustedDevice(String device, AsyncCallback<Boolean> callback);
+    void isTrustedDevice(String device, AsyncCallback<Boolean> callback);
 
-	void deleteTrustedDevices(List<Long> deviceIds, AsyncCallback<Void> callback);
+    void deleteTrustedDevices(List<Long> deviceIds, AsyncCallback<Void> callback);
 
-	void syncGeolocationDB(String key, AsyncCallback<String> callback);
+    void syncGeolocationDB(String key, AsyncCallback<String> callback);
 
-	void saveAvatar(long userId, AsyncCallback<Void> callback);
+    void saveAvatar(long userId, AsyncCallback<Void> callback);
 
-	void resetAvatar(long userId, AsyncCallback<Void> callback);
+    void resetAvatar(long userId, AsyncCallback<Void> callback);
 
-	void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);
+    void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);
 
-	void changeStatus(long userId, boolean enabled, AsyncCallback<Void> callback);
+    void changeStatus(long userId, boolean enabled, AsyncCallback<Void> callback);
 
-	void updateDeviceLabel(long deviceId, String label, AsyncCallback<Void> callback);
+    void updateDeviceLabel(long deviceId, String label, AsyncCallback<Void> callback);
 
-	void generatePassword(AsyncCallback<String> callback);
+    void generatePassword(AsyncCallback<String> callback);
 
-	void generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
-			int maxSequenceSize, int maxOccurrences, AsyncCallback<String> callback);
+    void generatePassword2(
+            int length,
+            int uppercaseChars,
+            int lowercaseChars,
+            int digits,
+            int specialChars,
+            int maxSequenceSize,
+            int maxOccurrences,
+            AsyncCallback<String> callback);
 
-	void validatePassword(String password, int length, int uppercaseChars, int lowercaseChars, int digits,
-			int specialChars, int maxSequenceSize, int maxOccurrences, AsyncCallback<List<String>> callback);
+    void validatePassword(
+            String password,
+            int length,
+            int uppercaseChars,
+            int lowercaseChars,
+            int digits,
+            int specialChars,
+            int maxSequenceSize,
+            int maxOccurrences,
+            AsyncCallback<List<String>> callback);
 
-	void createApiKey(String name, AsyncCallback<String> callback);
+    void createApiKey(String name, AsyncCallback<String> callback);
 
-	void updateApiKey(long keyId, String name, AsyncCallback<Void> callback);
+    void updateApiKey(long keyId, String name, AsyncCallback<Void> callback);
 
-	void deleteApiKey(long keyId, AsyncCallback<Void> callback);
+    void deleteApiKey(long keyId, AsyncCallback<Void> callback);
 
-	void deleteImpersonifiers(List<String> usernames, AsyncCallback<Void> callback);
+    void deleteImpersonifiers(List<String> usernames, AsyncCallback<Void> callback);
 
-	void addImpersonifier(String username, AsyncCallback<Void> callback);
+    void addImpersonifier(String username, AsyncCallback<Void> callback);
+
+    void createSupportTicket(long userId, int expireMinutes, AsyncCallback<List<String>> callback);
+
 }

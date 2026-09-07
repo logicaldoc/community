@@ -76,6 +76,9 @@ public class SqlUtil {
      * @return The date value
      */
     public static Date getColumnDateValue(Object value) {
+        if(value==null)
+            return null;
+        
         Date date=null;
         if (value instanceof Date dt)
             date = dt;
