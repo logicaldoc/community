@@ -87,6 +87,7 @@ public class Profile extends Window {
         detailsForm.setNumCols(3);
         detailsForm.setTitleOrientation(TitleOrientation.TOP);
 
+        StaticTextItem username = ItemFactory.newStaticTextItem("username", user.getUsername());
         TextItem firstName = ItemFactory.newTextItem("firstname", user.getFirstName());
         firstName.setRequired(true);
         TextItem lastName = ItemFactory.newTextItem("lastname", user.getName());
@@ -111,15 +112,16 @@ public class Profile extends Window {
         ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector(TIMEZONE, user.getTimeZone());
         timeZone.setEndRow(true);
 
-        StaticTextItem quota = ItemFactory.newStaticTextItem("quota", "maxquota", Util.formatSizeW7(user.getStorageQuota()));
+        StaticTextItem quota = ItemFactory.newStaticTextItem("quota", "maxquota",
+                Util.formatSizeW7(user.getStorageQuota()));
         quota.setWrap(false);
 
         StaticTextItem quotaCount = ItemFactory.newStaticTextItem("quotaCount", "quota",
                 Util.formatSizeW7(user.getStorage()));
         quotaCount.setWrap(false);
 
-        detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell, whatsapp,
-                company, department, organizationalUnit, building, timeZone, quotaCount, quota);
+        detailsForm.setFields(username, firstName, lastName, language, address, postalCode, city, country, state, phone,
+                cell, whatsapp, company, department, organizationalUnit, building, timeZone, quotaCount, quota);
 
         HLayout detailsPanel = new HLayout();
         detailsPanel.setMembers(detailsForm, new UserAvatar(user.getId()));
@@ -294,8 +296,13 @@ public class Profile extends Window {
         addItem(tabs);
     }
 
-    private void onSave(final GUIUser user, final DynamicForm detailsForm, final DynamicForm guiForm,
-            final DynamicForm emailForm, final DynamicForm emailForm2, final TabSet tabs) {
+    private void onSave(
+            final GUIUser user,
+            final DynamicForm detailsForm,
+            final DynamicForm guiForm,
+            final DynamicForm emailForm,
+            final DynamicForm emailForm2,
+            final TabSet tabs) {
         if (!validate(detailsForm, guiForm, emailForm, emailForm2, tabs))
             return;
 
@@ -393,8 +400,12 @@ public class Profile extends Window {
         });
     }
 
-    private boolean validate(final DynamicForm detailsForm, final DynamicForm guiForm, final DynamicForm emailForm,
-            final DynamicForm emailForm2, final TabSet tabs) {
+    private boolean validate(
+            final DynamicForm detailsForm,
+            final DynamicForm guiForm,
+            final DynamicForm emailForm,
+            final DynamicForm emailForm2,
+            final TabSet tabs) {
         vm.validate();
 
         if (!detailsForm.validate())
