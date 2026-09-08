@@ -171,11 +171,11 @@ public interface DocumentServiceAsync {
             Collection<String> types,
             AsyncCallback<Void> callback);
 
-    void deleteTicket(long ticketId, AsyncCallback<Void> callback);
+    void deleteTickets(List<Long> ticketIds, AsyncCallback<Void> callback);
 
-    void enableTicket(long ticketId, AsyncCallback<Void> callback);
+    void enableTickets(List<Long> ticketIds, AsyncCallback<Void> callback);
 
-    void disableTicket(long ticketId, AsyncCallback<Void> callback);
+    void disableTickets(List<Long> ticketIds, AsyncCallback<Void> callback);
 
     void enforceFilesIntoFolderStore(long folderId, AsyncCallback<Void> callback);
 

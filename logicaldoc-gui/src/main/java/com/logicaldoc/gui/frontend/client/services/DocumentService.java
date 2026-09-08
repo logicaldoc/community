@@ -362,11 +362,11 @@ public interface DocumentService extends RemoteService {
      */
     public List<String> setTicketPassword(long ticketId, String password) throws ServerException;
 
-    public void deleteTicket(long ticketId) throws ServerException;
+    public void deleteTickets(List<Long> ticketIds) throws ServerException;
 
-    public void enableTicket(long ticketId) throws ServerException;
+    public void enableTickets(List<Long> ticketIds) throws ServerException;
 
-    public void disableTicket(long ticketId) throws ServerException;
+    public void disableTickets(List<Long> ticketIds) throws ServerException;
 
     /**
      * Indexes the given set of documents

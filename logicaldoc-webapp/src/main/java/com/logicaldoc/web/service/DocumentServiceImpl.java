@@ -2935,40 +2935,45 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
     }
 
     @Override
-    public void deleteTicket(long ticketId) throws ServerException {
+    public void deleteTickets(List<Long> ticketIds) throws ServerException {
         Session session = validateSession();
 
         TicketDAO dao = TicketDAO.get();
         try {
-            dao.delete(ticketId);
+            for (Long ticketId : ticketIds)
+                dao.delete(ticketId);
         } catch (PersistenceException e) {
             throwServerException(session, log, e);
         }
     }
 
     @Override
-    public void enableTicket(long ticketId) throws ServerException {
+    public void enableTickets(List<Long> ticketIds) throws ServerException {
         Session session = validateSession();
 
         TicketDAO dao = TicketDAO.get();
         try {
-            Ticket ticket = dao.findById(ticketId);
-            ticket.setEnabled(true);
-            dao.store(ticket);
+            for (Long ticketId : ticketIds) {
+                Ticket ticket = dao.findById(ticketId);
+                ticket.setEnabled(true);
+                dao.store(ticket);
+            }
         } catch (PersistenceException e) {
             throwServerException(session, log, e);
         }
     }
 
     @Override
-    public void disableTicket(long ticketId) throws ServerException {
+    public void disableTickets(List<Long> ticketIds) throws ServerException {
         Session session = validateSession();
 
         TicketDAO dao = TicketDAO.get();
         try {
-            Ticket ticket = dao.findById(ticketId);
-            ticket.setEnabled(false);
-            dao.store(ticket);
+            for (Long ticketId : ticketIds) {
+                Ticket ticket = dao.findById(ticketId);
+                ticket.setEnabled(false);
+                dao.store(ticket);
+            }
         } catch (PersistenceException e) {
             throwServerException(session, log, e);
         }

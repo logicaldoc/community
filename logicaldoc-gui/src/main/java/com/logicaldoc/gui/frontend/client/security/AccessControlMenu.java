@@ -105,7 +105,8 @@ public class AccessControlMenu extends VLayout {
         button.setWidth100();
         button.setHeight(25);
         button.addClickHandler(click -> AdminScreen.get().setContent(new SupportTicketPanel()));
-        if (Menu.enabled(Menu.SUPPORT_TICKET) && Feature.enabled(Feature.SUPPORT_TICKET))
+        if (Menu.enabled(Menu.SUPPORT_TICKET) && Feature.enabled(Feature.SUPPORT_TICKET)
+                && Session.get().getConfigAsBoolean("security.support.enabled", true))
             addMember(button);
     }
 

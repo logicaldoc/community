@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -191,6 +192,10 @@ public class TicketsReport extends ReportPanel {
     protected void showContextMenu() {
         final ListGridRecord rec = list.getSelectedRecord();
 
+        List<Long> selectedIds = new ArrayList<>();
+        for (ListGridRecord rc : list.getSelectedRecords())
+            selectedIds.add(rc.getAttributeAsLong("id"));
+
         boolean supportTicket = "3".equals(rec.getAttributeAsString("type"));
 
         Menu contextMenu = new Menu();
@@ -232,8 +237,8 @@ public class TicketsReport extends ReportPanel {
         MenuItem enable = new MenuItem();
         enable.setTitle(I18N.message("enable"));
         enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
-        enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
-                new DefaultAsyncCallback<>() {
+        enable.addClickHandler(
+                event -> DocumentService.Instance.get().enableTickets(selectedIds, new DefaultAsyncCallback<>() {
                     @Override
                     public void handleSuccess(Void result) {
                         rec.setAttribute(ENABLED, true);
@@ -245,8 +250,8 @@ public class TicketsReport extends ReportPanel {
         MenuItem disable = new MenuItem();
         disable.setTitle(I18N.message("disable"));
         disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
-        disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
-                new DefaultAsyncCallback<>() {
+        disable.addClickHandler(
+                event -> DocumentService.Instance.get().disableTickets(selectedIds, new DefaultAsyncCallback<>() {
                     @Override
                     public void handleSuccess(Void result) {
                         rec.setAttribute(ENABLED, false);
@@ -259,7 +264,7 @@ public class TicketsReport extends ReportPanel {
         delete.setTitle(I18N.message("ddelete"));
         delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), choice -> {
             if (Boolean.TRUE.equals(choice))
-                DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+                DocumentService.Instance.get().deleteTickets(selectedIds, new DefaultAsyncCallback<>() {
                     @Override
                     public void handleSuccess(Void result) {
                         list.removeSelectedData();
@@ -306,9 +311,6 @@ public class TicketsReport extends ReportPanel {
             download.setEnabled(false);
             preview.setEnabled(false);
             openInFolder.setEnabled(false);
-            enable.setEnabled(false);
-            disable.setEnabled(false);
-            delete.setEnabled(false);
             setPassword.setEnabled(false);
         }
 

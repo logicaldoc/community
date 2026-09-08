@@ -272,15 +272,15 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         assertEquals(5L, t.getDocId());
         assertTrue(t.isEnabled());
 
-        testSubject.disableTicket(t.getId());
+        testSubject.disableTickets(List.of(t.getId()));
         t = tDao.findByTicketId(ticket.get(0));
         assertFalse(t.isEnabled());
 
-        testSubject.enableTicket(t.getId());
+        testSubject.enableTickets(List.of(t.getId()));
         t = tDao.findByTicketId(ticket.get(0));
         assertTrue(t.isEnabled());
 
-        testSubject.deleteTicket(t.getId());
+        testSubject.deleteTickets(List.of(t.getId()));
         t = tDao.findByTicketId(ticket.get(0));
         assertNull(t);
     }

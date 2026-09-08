@@ -28,358 +28,362 @@ import com.smartgwt.client.util.SC;
  * @since 6.0
  */
 public class Session implements DocumentObserver {
-	private static Session instance;
+    private static Session instance;
 
-	private GUIInfo info;
+    private GUIInfo info;
 
-	private GUISession guiSession;
+    private GUISession guiSession;
 
-	private Long hiliteDocId;
+    private Long hiliteDocId;
 
-	private Set<SessionObserver> sessionObservers = new HashSet<>();
+    private Set<SessionObserver> sessionObservers = new HashSet<>();
 
-	private Timer timer;
+    private Timer timer;
 
-	private boolean showThumbnail = true;
+    private boolean showThumbnail = true;
 
-	private int missedPingCount = 0;
+    private int missedPingCount = 0;
 
-	// Flag indicating that the system is installing a update or patch
-	private boolean updating;
+    // Flag indicating that the system is installing a update or patch
+    private boolean updating;
 
-	public static Session get() {
-		if (instance == null)
-			instance = new Session();
-		return instance;
-	}
+    public static Session get() {
+        if (instance == null)
+            instance = new Session();
+        return instance;
+    }
 
-	public boolean isDemo() {
-		return "demo".equals(info.getRunLevel());
-	}
+    public boolean isDemo() {
+        return "demo".equals(info.getRunLevel());
+    }
 
-	public boolean isDevel() {
-		return "devel".equals(info.getRunLevel());
-	}
+    public boolean isDevel() {
+        return "devel".equals(info.getRunLevel());
+    }
 
-	public String getSid() {
-		if (guiSession != null)
-			return guiSession.getSid();
-		else
-			return null;
-	}
+    public String getSid() {
+        if (guiSession != null)
+            return guiSession.getSid();
+        else
+            return null;
+    }
 
-	public String getIncomingMessage() {
-		if (guiSession != null)
-			return guiSession.getWelcomeMessage();
-		else
-			return null;
-	}
-
-	public boolean isFolderPagination() {
-		return getConfigAsBoolean("gui.folder.pagination");
-	}
-
-	public void close() {
-		guiSession = null;
-		sessionObservers.clear();
-		if (timer != null)
-			timer.cancel();
-		Util.uninstallCloseWindowAlert();
-	}
-
-	public GUIUser getUser() {
-		return guiSession.getUser();
-	}
-
-	public void setUser(GUIUser user) {
-		guiSession.setUser(user);
-		I18N.init(user);
-	}
-
-	public void init(final GUISession session) {
-		InfoService.Instance.get().getSessionInfo(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				SC.warn(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(List<GUIParameter> parameters) {
-				Session.get().guiSession = session;
-				Session.get().info = session.getInfo();
-
-				I18N.init(session.getUser());
-
-				Menu.init(session.getUser());
-
-				if (!session.isLoggedIn())
-					return;
-
-				notifyUserLoggedIn(session);
-
-				GUIUser user = getUser();
-				boolean validSession = updateStatusIconCountsAndSessionValid(parameters, user);
-
-				UserController.get().changed(user);
-
-				if (!validSession)
-					onInvalidSession();
-
-				Util.installCloseWindowAlert();
-
-				setupPingTimer(session);
-			}
-
-			private boolean updateStatusIconCountsAndSessionValid(List<GUIParameter> parameters, GUIUser user) {
-				boolean validSession = false;
-				for (GUIParameter parameter : parameters) {
-					if (parameter.getName().equals("messages"))
-						user.setMessages(Integer.parseInt(parameter.getValue()));
-					else if (parameter.getName().equals("workflows"))
-						user.setTasks(Integer.parseInt(parameter.getValue()));
-					else if (parameter.getName().equals("events"))
-						user.setUpcomingEvents(Integer.parseInt(parameter.getValue()));
-					else if (parameter.getName().equals("valid"))
-						validSession = Boolean.parseBoolean(parameter.getValue());
-
-				}
-
-				return validSession;
-			}
-		});
-	}
-
-	private void setupPingTimer(final GUISession session) {
-		if (session.getInfo().getSessionHeartbeat() <= 0)
-			return;
-
-		/*
-		 * Create the timer that synchronizes the session info
-		 */
-		timer = new Timer() {
-			public void run() {
-				InfoService.Instance.get().ping(new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						missedPingCount++;
-						if (missedPingCount >= 3)
-							onInvalidSession();
-					}
-
-					@Override
-					public void onSuccess(Boolean active) {
-						missedPingCount = 0;
-						if (Boolean.FALSE.equals(active))
-							onInvalidSession();
-					}
-				});
-			}
-		};
-
-		timer.scheduleRepeating(session.getInfo().getSessionHeartbeat() * 1000);
-	}
-
-	private void notifyUserLoggedIn(final GUISession session) {
-		for (SessionObserver listener : sessionObservers)
-			listener.onUserLoggedIn(session.getUser());
-	}
-
-	public void onInvalidSession() {
-		timer.cancel();
-		Util.uninstallCloseWindowAlert();
-		if (!isUpdating())
-			SessionTimeout.get().show();
-	}
-
-	public void addObserver(SessionObserver observer) {
-		sessionObservers.add(observer);
-	}
-
-	public void removeObserver(SessionObserver observer) {
-		sessionObservers.remove(observer);
-	}
-
-	public GUIInfo getInfo() {
-		return info;
-	}
-
-	public void setInfo(GUIInfo info) {
-		this.info = info;
-	}
-
-	public GUISession getSession() {
-		return guiSession;
-	}
-
-	public void setSession(GUISession session) {
-		this.guiSession = session;
-	}
-
-	public String getTenantName() {
-		return info.getTenant().getName();
-	}
-
-	public long getTenantId() {
-		return info.getTenant().getId();
-	}
-
-	public boolean isDefaultTenant() {
-		return info.getTenant().getId() == Constants.TENANT_DEFAULTID;
-	}
-
-	/**
-	 * Checks if the current user belongs to the <b>admin</b> group
-	 * 
-	 * @return true if the current user belongs to the <b>admin</b> group
-	 */
-	public boolean isAdmin() {
-		return getUser() != null && getUser().isMemberOf(Constants.GROUP_ADMIN);
-	}
-
-	public String getConfig(String name) {
-		if (info != null)
-			return info.getConfig(name);
-		else
-			return null;
-	}
-
-	public String getTenantConfig(String name) {
-		String val = getConfig(getTenantName() + "." + name);
-		if (val == null)
-			val = getConfig(name);
-		return val;
-	}
-
-	public int getConfigAsInt(String name) {
-		return Integer.parseInt(getConfig(name) != null ? getConfig(name) : "0");
-	}
-
-	public long getConfigAsLong(String name) {
-		return Long.parseLong(getConfig(name) != null ? getConfig(name) : "0");
-	}
-
-	public boolean getConfigAsBoolean(String name) {
-		return Boolean.parseBoolean(getConfig(name) != null ? getConfig(name) : "0");
-	}
-
-	public boolean getTenantConfigAsBoolean(String name) {
-		return Boolean.parseBoolean(getTenantConfig(name));
-	}
-
-	public void setConfig(String name, String value) {
-		info.setConfig(name, value);
-	}
-
-	public void updateConfig(List<GUIParameter> params) {
-		for (GUIParameter param : params) {
-			setConfig(param.getName(), param.getValue());
-		}
-	}
-
-	public boolean isServerPushEnabled() {
-		return Session.get().getConfigAsBoolean("gui.serverpush");
-	}
-
-	public boolean isShowThumbnail() {
-		return showThumbnail;
-	}
-
-	public void setShowThumbnail(boolean showThumbnail) {
-		this.showThumbnail = showThumbnail;
-	}
-
-	public void logout() {
-		if (Session.get().getSession().isSingleSignOn() && Session.get().getConfigAsBoolean("saml.slo.enabled")) {
-			Session.get().close();
-			Util.redirect(GWT.getHostPageBaseURL() + "saml/logout");
-		} else {
-			SecurityService.Instance.get().logout(new DefaultAsyncCallback<>() {
-				@Override
-				public void handleSuccess(Void result) {
-					CookiesManager.removeSid();
-
-					try {
-						String tenant = Session.get().getUser().getTenant().getName();
-						Session.get().close();
-						Util.redirectToLoginUrl(tenant);
-					} catch (Exception t) {
-						// Nothing to do
-					}
-				}
-			});
-		}
-	}
-
-	@Override
-	public void onDocumentSelected(GUIDocument document) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentModified(GUIDocument document) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentStored(GUIDocument document) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentCheckedIn(GUIDocument document) {
-		getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() - 1);
-	}
-
-	@Override
-	public void onDocumentCheckedOut(GUIDocument document) {
-		getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() + 1);
-	}
-
-	@Override
-	public void onDocumentsDeleted(List<GUIDocument> documents) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentMoved(GUIDocument document) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentLocked(GUIDocument document) {
-		getUser().setLockedDocs(Session.get().getUser().getLockedDocs() + 1);
-	}
-
-	@Override
-	public void onDocumentUnlocked(GUIDocument document) {
-		getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
-	}
-
-	@Override
-	public void onDocumentBeginEditing(GUIDocument document) {
-		// Nothing to do
-	}
-
-	@Override
-	public void onDocumentCancelEditing(GUIDocument document) {
-		// Nothing to do
-	}
-
-	public Long getHiliteDocId() {
-		return hiliteDocId;
-	}
-
-	public void setHiliteDocId(Long hiliteDocId) {
-		this.hiliteDocId = hiliteDocId;
-	}
-
-	public boolean isUpdating() {
-		return updating;
-	}
-
-	public void setUpdating(boolean updating) {
-		this.updating = updating;
-	}
+    public String getIncomingMessage() {
+        if (guiSession != null)
+            return guiSession.getWelcomeMessage();
+        else
+            return null;
+    }
+
+    public boolean isFolderPagination() {
+        return getConfigAsBoolean("gui.folder.pagination");
+    }
+
+    public void close() {
+        guiSession = null;
+        sessionObservers.clear();
+        if (timer != null)
+            timer.cancel();
+        Util.uninstallCloseWindowAlert();
+    }
+
+    public GUIUser getUser() {
+        return guiSession.getUser();
+    }
+
+    public void setUser(GUIUser user) {
+        guiSession.setUser(user);
+        I18N.init(user);
+    }
+
+    public void init(final GUISession session) {
+        InfoService.Instance.get().getSessionInfo(new AsyncCallback<>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                SC.warn(caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<GUIParameter> parameters) {
+                Session.get().guiSession = session;
+                Session.get().info = session.getInfo();
+
+                I18N.init(session.getUser());
+
+                Menu.init(session.getUser());
+
+                if (!session.isLoggedIn())
+                    return;
+
+                notifyUserLoggedIn(session);
+
+                GUIUser user = getUser();
+                boolean validSession = updateStatusIconCountsAndSessionValid(parameters, user);
+
+                UserController.get().changed(user);
+
+                if (!validSession)
+                    onInvalidSession();
+
+                Util.installCloseWindowAlert();
+
+                setupPingTimer(session);
+            }
+
+            private boolean updateStatusIconCountsAndSessionValid(List<GUIParameter> parameters, GUIUser user) {
+                boolean validSession = false;
+                for (GUIParameter parameter : parameters) {
+                    if (parameter.getName().equals("messages"))
+                        user.setMessages(Integer.parseInt(parameter.getValue()));
+                    else if (parameter.getName().equals("workflows"))
+                        user.setTasks(Integer.parseInt(parameter.getValue()));
+                    else if (parameter.getName().equals("events"))
+                        user.setUpcomingEvents(Integer.parseInt(parameter.getValue()));
+                    else if (parameter.getName().equals("valid"))
+                        validSession = Boolean.parseBoolean(parameter.getValue());
+
+                }
+
+                return validSession;
+            }
+        });
+    }
+
+    private void setupPingTimer(final GUISession session) {
+        if (session.getInfo().getSessionHeartbeat() <= 0)
+            return;
+
+        /*
+         * Create the timer that synchronizes the session info
+         */
+        timer = new Timer() {
+            public void run() {
+                InfoService.Instance.get().ping(new AsyncCallback<>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        missedPingCount++;
+                        if (missedPingCount >= 3)
+                            onInvalidSession();
+                    }
+
+                    @Override
+                    public void onSuccess(Boolean active) {
+                        missedPingCount = 0;
+                        if (Boolean.FALSE.equals(active))
+                            onInvalidSession();
+                    }
+                });
+            }
+        };
+
+        timer.scheduleRepeating(session.getInfo().getSessionHeartbeat() * 1000);
+    }
+
+    private void notifyUserLoggedIn(final GUISession session) {
+        for (SessionObserver listener : sessionObservers)
+            listener.onUserLoggedIn(session.getUser());
+    }
+
+    public void onInvalidSession() {
+        timer.cancel();
+        Util.uninstallCloseWindowAlert();
+        if (!isUpdating())
+            SessionTimeout.get().show();
+    }
+
+    public void addObserver(SessionObserver observer) {
+        sessionObservers.add(observer);
+    }
+
+    public void removeObserver(SessionObserver observer) {
+        sessionObservers.remove(observer);
+    }
+
+    public GUIInfo getInfo() {
+        return info;
+    }
+
+    public void setInfo(GUIInfo info) {
+        this.info = info;
+    }
+
+    public GUISession getSession() {
+        return guiSession;
+    }
+
+    public void setSession(GUISession session) {
+        this.guiSession = session;
+    }
+
+    public String getTenantName() {
+        return info.getTenant().getName();
+    }
+
+    public long getTenantId() {
+        return info.getTenant().getId();
+    }
+
+    public boolean isDefaultTenant() {
+        return info.getTenant().getId() == Constants.TENANT_DEFAULTID;
+    }
+
+    /**
+     * Checks if the current user belongs to the <b>admin</b> group
+     * 
+     * @return true if the current user belongs to the <b>admin</b> group
+     */
+    public boolean isAdmin() {
+        return getUser() != null && getUser().isMemberOf(Constants.GROUP_ADMIN);
+    }
+
+    public String getConfig(String name) {
+        if (info != null)
+            return info.getConfig(name);
+        else
+            return null;
+    }
+
+    public String getTenantConfig(String name) {
+        String val = getConfig(getTenantName() + "." + name);
+        if (val == null)
+            val = getConfig(name);
+        return val;
+    }
+
+    public int getConfigAsInt(String name) {
+        return Integer.parseInt(getConfig(name) != null ? getConfig(name) : "0");
+    }
+
+    public long getConfigAsLong(String name) {
+        return Long.parseLong(getConfig(name) != null ? getConfig(name) : "0");
+    }
+
+    public boolean getConfigAsBoolean(String name, boolean defaultValue) {
+        return getConfig(name) != null ? Boolean.parseBoolean(getConfig(name)) : defaultValue;
+    }
+
+    public boolean getConfigAsBoolean(String name) {
+        return Boolean.parseBoolean(getConfig(name) != null ? getConfig(name) : "0");
+    }
+
+    public boolean getTenantConfigAsBoolean(String name) {
+        return Boolean.parseBoolean(getTenantConfig(name));
+    }
+
+    public void setConfig(String name, String value) {
+        info.setConfig(name, value);
+    }
+
+    public void updateConfig(List<GUIParameter> params) {
+        for (GUIParameter param : params) {
+            setConfig(param.getName(), param.getValue());
+        }
+    }
+
+    public boolean isServerPushEnabled() {
+        return Session.get().getConfigAsBoolean("gui.serverpush");
+    }
+
+    public boolean isShowThumbnail() {
+        return showThumbnail;
+    }
+
+    public void setShowThumbnail(boolean showThumbnail) {
+        this.showThumbnail = showThumbnail;
+    }
+
+    public void logout() {
+        if (Session.get().getSession().isSingleSignOn() && Session.get().getConfigAsBoolean("saml.slo.enabled")) {
+            Session.get().close();
+            Util.redirect(GWT.getHostPageBaseURL() + "saml/logout");
+        } else {
+            SecurityService.Instance.get().logout(new DefaultAsyncCallback<>() {
+                @Override
+                public void handleSuccess(Void result) {
+                    CookiesManager.removeSid();
+
+                    try {
+                        String tenant = Session.get().getUser().getTenant().getName();
+                        Session.get().close();
+                        Util.redirectToLoginUrl(tenant);
+                    } catch (Exception t) {
+                        // Nothing to do
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onDocumentSelected(GUIDocument document) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentModified(GUIDocument document) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentStored(GUIDocument document) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentCheckedIn(GUIDocument document) {
+        getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() - 1);
+    }
+
+    @Override
+    public void onDocumentCheckedOut(GUIDocument document) {
+        getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() + 1);
+    }
+
+    @Override
+    public void onDocumentsDeleted(List<GUIDocument> documents) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentMoved(GUIDocument document) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentLocked(GUIDocument document) {
+        getUser().setLockedDocs(Session.get().getUser().getLockedDocs() + 1);
+    }
+
+    @Override
+    public void onDocumentUnlocked(GUIDocument document) {
+        getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
+    }
+
+    @Override
+    public void onDocumentBeginEditing(GUIDocument document) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onDocumentCancelEditing(GUIDocument document) {
+        // Nothing to do
+    }
+
+    public Long getHiliteDocId() {
+        return hiliteDocId;
+    }
+
+    public void setHiliteDocId(Long hiliteDocId) {
+        this.hiliteDocId = hiliteDocId;
+    }
+
+    public boolean isUpdating() {
+        return updating;
+    }
+
+    public void setUpdating(boolean updating) {
+        this.updating = updating;
+    }
 
 }
