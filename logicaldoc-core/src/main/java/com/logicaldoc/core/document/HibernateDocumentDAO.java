@@ -337,13 +337,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             // Save the document
             saveOrUpdate(doc);
 
-            if (doc.getDeleted() == 0 && doc.getId() != 0L) {
-                // Take the document again in order to retrieve the updated
-                // persisted instance.
-                doc = findById(doc.getId());
-                doc = initialize(doc);
-            }
-
             doc.setModified(false);
 
             log.debug("Invoke listeners after store");
@@ -363,6 +356,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             // Perhaps some listeners may have modified the document
             if (doc.isModified())
                 saveOrUpdate(doc);
+
             saveDocumentHistory(doc, transaction, dictionary);
 
             /**
@@ -485,13 +479,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     }
 
     private void setFolder(Document doc) throws PersistenceException {
-        if (doc.getFolder().getFoldRef() != null) {
-            Folder fld = folderDAO.findById(doc.getFolder().getFoldRef(), true);
-            if (fld == null)
-                throw new PersistenceException(
-                        String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
-            doc.setFolder(folderDAO.initialize(fld));
-        }
+        Folder fld = folderDAO.findFolder(doc.getFolder().getId(), true);
+        if (fld == null)
+            throw new PersistenceException(
+                    String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
+        doc.setFolder(fld);
     }
 
     private void setTags(Document doc) {

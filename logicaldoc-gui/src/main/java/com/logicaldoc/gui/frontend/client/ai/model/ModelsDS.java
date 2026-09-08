@@ -46,8 +46,10 @@ public class ModelsDS extends DataSource {
 		DataSourceBooleanField training = new DataSourceBooleanField("training");
 		DataSourceDateTimeField evaluated = new DataSourceDateTimeField("evaluated");
 		DataSourceBooleanField evaluation = new DataSourceBooleanField("evaluation");
+		DataSourceBooleanField trainable = new DataSourceBooleanField("trainable");
+		trainable.setHidden(true);
 
-		setFields(id, name, label, training, trained, description, typeField, evaluated, evaluation);
+		setFields(id, name, label, training, trained, description, typeField, evaluated, evaluation, trainable);
 		setClientOnly(true);
 
 		String url = "data/ai.xml?object=model";

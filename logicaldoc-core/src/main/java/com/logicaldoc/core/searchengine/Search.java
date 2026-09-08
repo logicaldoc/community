@@ -532,7 +532,7 @@ public abstract class Search {
                     hit.setContent(master.getContent());
                     hit.setSummary(master.getSummary());
                 }
-                hit.setDocRefType(rs.getString(33));
+                hit.setDocRefType(rs.getString(32));
             }
             hit.setType(rs.getString(4));
             hit.setVersion(rs.getString(5));

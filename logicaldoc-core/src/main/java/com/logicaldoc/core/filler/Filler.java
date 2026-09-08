@@ -21,7 +21,6 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.parser.ParsingException;
@@ -424,15 +423,12 @@ public abstract class Filler extends PersistentObject {
             StringBuilder explication) throws PersistenceException, IOException, FeatureDisabledException,
             ParsingException, SearchException, AutomationException {
 
-        if (document.getIndexingStatus().equals(IndexingStatus.TO_INDEX)) {
-            DocumentManager.get().index(document.getId(), null, new DocumentHistory(transaction));
-            document.setIndexingStatus(IndexingStatus.INDEXED);
-        }
-
         Hit hit = SearchEngine.get().getHit(document.getId());
         String extractedContent = hit != null ? hit.getContent() : "";
-        if (StringUtils.isBlank(extractedContent))
-            throw new ParsingException("Cannot extract any content from document %s".formatted(document));
+        if (StringUtils.isBlank(extractedContent)) {
+            log.debug("Document {} not already indexed, trying to extract the texts now", document);
+            extractedContent = DocumentManager.get().parseDocument(document, document.getFileVersion());
+        }
 
         if (log.isDebugEnabled())
             log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));

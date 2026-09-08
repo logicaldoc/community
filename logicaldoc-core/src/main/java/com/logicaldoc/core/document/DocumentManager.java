@@ -655,8 +655,15 @@ public class DocumentManager {
                 parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
             }
 
+            log.info("Before addHit: local={}, database={}", doc.getRecordVersion(),
+                    documentDAO.findById(docId, true).getRecordVersion());
+
             // This may take time
             addHit(doc, cont);
+
+            log.info("After addHit: local={}, database={}", doc.getRecordVersion(),
+                    documentDAO.findById(docId, true).getRecordVersion());
+
         } catch (PersistenceException | ParsingException e) {
             recordIndexingError(transaction, doc, e);
             throw e;
@@ -1034,6 +1041,7 @@ public class DocumentManager {
 
             // Create the record
             transaction.setEvent(DocumentEvent.STORED);
+
             documentDAO.store(docVO, transaction);
 
             /* store the document into filesystem */
@@ -1058,26 +1066,34 @@ public class DocumentManager {
             throws IOException, PersistenceException {
 
         store.store(file, StoreResource.builder().document(doc).newEntry(newDocument).build());
-
         transaction.setFile(file);
-
-        Document document = documentDAO.findById(doc.getId(), true);
 
         Map<String, Object> dictionary = new HashMap<>();
         dictionary.put("newdoc", newDocument);
 
-        // afterFileStore(doc, transaction, newDocument);
+        for (DocumentListener listener : DocumentListenerManager.get().getListeners()) {
+            log.info("Before listener {}: document={}, recordVersion={}", listener.getClass().getName(), doc.getId(),
+                    doc.getRecordVersion());
 
-        for (DocumentListener listener : DocumentListenerManager.get().getListeners())
-            listener.afterFileStore(document, transaction, dictionary);
-
-        if (StringUtils.isEmpty(document.getLanguage())) {
-            document.setLanguage("en");
-            document.setModified(true);
+            listener.afterFileStore(doc, transaction, dictionary);
         }
 
-        if (document.isModified())
-            documentDAO.store(document);
+        if (StringUtils.isEmpty(doc.getLanguage())) {
+            doc.setLanguage("en");
+            doc.setModified(true);
+        }
+
+        if (doc.isModified()) {
+            /*
+             * We are sure that the filler machinery does not save the document
+             * this the recordVersion is left untouched, but we sporadically
+             * checked out that the recordVersion may have changed by other
+             * threads, so for better resilience, we manually pick up from the
+             * database the current recordVersion
+             */
+            doc.setRecordVersion(DocumentDAO.get().recordVersion(doc));
+            documentDAO.store(doc);
+        }
     }
 
     /**
@@ -1536,23 +1552,18 @@ public class DocumentManager {
     }
 
     /**
-     * Utility method used to declare that:
-     * <ol>
-     * <li>the document must be taken into consideration by the indexer (status
-     * = {@link IndexingStatus#TO_INDEX} .</li>
-     * <li>the document must be taken into consideration by the indexer for the
-     * metadata only(status = {@link IndexingStatus#TO_INDEX_METADATA}.</li>
-     * <li>the document must not be taken into consideration by the indexer
-     * (status = {@link IndexingStatus#SKIP}). If the document was previously
-     * indexed it is removed from the index.</li>
-     * </ol>
+     * Utility method used to declare that: <ol> <li>the document must be taken
+     * into consideration by the indexer (status =
+     * {@link IndexingStatus#TO_INDEX} .</li> <li>the document must be taken
+     * into consideration by the indexer for the metadata only(status =
+     * {@link IndexingStatus#TO_INDEX_METADATA}.</li> <li>the document must not
+     * be taken into consideration by the indexer (status =
+     * {@link IndexingStatus#SKIP}). If the document was previously indexed it
+     * is removed from the index.</li> </ol>
      * 
-     * Status:
-     * <ol>
-     * <li>{@link IndexingStatus#TO_INDEX}</li>
+     * Status: <ol> <li>{@link IndexingStatus#TO_INDEX}</li>
      * <li>{@link IndexingStatus#TO_INDEX_METADATA}</li>
-     * <li>{@link IndexingStatus#SKIP}</li>
-     * </ol>
+     * <li>{@link IndexingStatus#SKIP}</li> </ol>
      * 
      * @param doc The document for which will be changed the indexer status.
      * @param status The new document indexer status.

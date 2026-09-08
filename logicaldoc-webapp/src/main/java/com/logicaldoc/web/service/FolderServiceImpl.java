@@ -162,7 +162,11 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
     }
 
     public GUIFolder fromFolder(Folder folder, boolean computePath) throws PersistenceException {
-        folder = FolderDAO.get().initialize(folder);
+        if (folder.getId() != 0L)
+            folder = FolderDAO.get().findById(folder.getId(), true);
+
+        if (folder == null)
+            return null;
 
         GUIFolder guiFolder = new GUIFolder();
         guiFolder.setId(folder.getId());

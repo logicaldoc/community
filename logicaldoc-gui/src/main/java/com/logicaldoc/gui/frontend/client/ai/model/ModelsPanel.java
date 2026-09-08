@@ -69,8 +69,6 @@ public class ModelsPanel extends VLayout {
 
     private static final String NEURAL = "neural";
 
-    private static final String EMBEDDER = "embedder";
-
     protected Layout detailsContainer;
 
     protected RefreshableListGrid list;
@@ -233,8 +231,6 @@ public class ModelsPanel extends VLayout {
 
         String type = selection[0].getAttributeAsString(TYPE);
 
-        boolean trainable = NEURAL.equals(type) || EMBEDDER.equals(type);
-
         boolean queryable = "summarizer".equals(type) || selection[0].getAttribute(TRAINED) != null;
 
         Long selectedModelId = selection[0].getAttributeAsLong("id");
@@ -319,7 +315,7 @@ public class ModelsPanel extends VLayout {
                     public void handleSuccess(GUIModel mdl) {
                         refresh();
                     }
-                })));     
+                })));
 
         MenuItem export = new MenuItem();
         export.setTitle(I18N.message("export"));
@@ -330,7 +326,7 @@ public class ModelsPanel extends VLayout {
         iimport.addClickHandler(
                 click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-        if (trainable) {
+        if (selection[0].getAttributeAsBoolean("trainable")) {
             contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(),
                     clone, iimport, export, new MenuItemSeparator(), delete);
         } else {

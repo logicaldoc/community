@@ -126,22 +126,23 @@ public class SearchTool {
                 hitsIdsCondition.append(" ) )");
             }
 
-            // Find real documents
+         // Find real documents
             StringBuilder richQuery = new StringBuilder(
                     """
-                             select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified,
-                                    A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable
-                                    A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type
-                                    A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing
-                                    A.ld_stoppublishing, A.ld_published, FOLD.ld_name, A.ld_folderid, A.ld_tgs tags,
-                                    A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, A.ld_stamped, A.ld_password,
-                                    A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color
-                               from ld_document A
-                               join ld_folder FOLD on A.ld_folderid = FOLD.ld_id
-                    left outer join ld_template C on A.ld_templateid = C.ld_id
-                              where A.ld_deleted = 0
-                                and A.ld_tenantid =
-                                """);
+                       select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified,
+                              A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable,
+                              A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type,
+                              A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing,
+                              A.ld_stoppublishing, A.ld_published, FOLD.ld_name, A.ld_folderid, A.ld_tgs tags,
+                              A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, A.ld_stamped, A.ld_password,
+                              A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color, A.ld_lastnote, A.ld_revision
+                         from ld_document A
+                         join ld_folder FOLD on A.ld_folderid = FOLD.ld_id
+                    left join ld_template C on A.ld_templateid = C.ld_id
+                        where A.ld_deleted = 0
+                          and A.ld_tenantid =
+                      """);
+
             richQuery.append(Long.toString(tenantId));
             richQuery.append(hitsIdsCondition.toString());
 
