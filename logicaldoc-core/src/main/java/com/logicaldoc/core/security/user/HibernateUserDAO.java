@@ -33,6 +33,7 @@ import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
+import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -257,8 +258,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
         sanitize(user);
 
-        if (user.getType() == UserType.SYSTEM)
-            user.setType(UserType.DEFAULT);
+        if (user.getType() == Type.SYSTEM)
+            user.setType(Type.DEFAULT);
 
         enforceReadOnlyUserGroups(user);
 
@@ -786,13 +787,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
     @Override
     public long countRegularUsers(Long tenantId) throws PersistenceException {
         return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted=0 %s".formatted(
-                UserType.DEFAULT.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
+                Type.DEFAULT.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
     }
 
     @Override
     public long countReadonlyUsers(Long tenantId) throws PersistenceException {
         return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted=0 %s".formatted(
-                UserType.READONLY.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
+                Type.READONLY.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
     }
 
     @Override

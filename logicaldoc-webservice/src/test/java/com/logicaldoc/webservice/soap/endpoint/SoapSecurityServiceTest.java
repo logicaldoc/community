@@ -19,8 +19,8 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
@@ -147,7 +147,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
         wsUserTest.setUsername("lavhaze");
         wsUserTest.setPassword(PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2));
         wsUserTest.setFirstName("Lavender");
-        wsUserTest.setType(UserType.SYSTEM.ordinal());
+        wsUserTest.setType(Type.SYSTEM.ordinal());
 
         try {
             securityServiceImpl.storeUser("", wsUserTest);

@@ -40,6 +40,10 @@ import jakarta.persistence.Transient;
 @Cacheable
 public class User extends PersistentObject implements Serializable {
 
+    public enum Type {
+        DEFAULT, SYSTEM, READONLY;
+    }
+
     private static final Logger log = LoggerFactory.getLogger(User.class);
 
     public static final long USERID_ADMIN = 1;
@@ -50,7 +54,7 @@ public class User extends PersistentObject implements Serializable {
 
     @Column(name = "ld_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    private UserType type = UserType.DEFAULT;
+    private Type type = Type.DEFAULT;
 
     @Column(name = "ld_source", nullable = false)
     @Enumerated(EnumType.ORDINAL)
@@ -318,16 +322,16 @@ public class User extends PersistentObject implements Serializable {
         this.company = company;
     }
 
-    public UserType getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(UserType type) {
+    public void setType(Type type) {
         this.type = type;
     }
 
     public void setType(int type) {
-        this.type = UserType.values()[type];
+        this.type = Type.values()[type];
     }
 
     public String getRepass() {
@@ -817,7 +821,7 @@ public class User extends PersistentObject implements Serializable {
     }
 
     public boolean isReadonly() {
-        return type == UserType.READONLY;
+        return type == Type.READONLY;
     }
 
     public String getDocsGrid() {

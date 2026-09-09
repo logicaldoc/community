@@ -19,8 +19,8 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.security.user.UserType;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -68,7 +68,7 @@ public class UsersDataServlet extends AbstractDataServlet {
          */
         UserDAO userDao = UserDAO.get();
         for (User user : userDao.initialize(users)) {
-            if (user.getType() == UserType.SYSTEM || (skipdisabled && !user.isEnabled()))
+            if (user.getType() == Type.SYSTEM || (skipdisabled && !user.isEnabled()))
                 continue;
             printUser(writer, user);
         }

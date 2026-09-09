@@ -15,7 +15,7 @@ import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserSource;
-import com.logicaldoc.core.security.user.UserType;
+import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.spring.Context;
 
@@ -94,7 +94,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
             throw new AccountNotFoundException(this);
 
         // Check the type
-        if (user.getType() != UserType.DEFAULT && user.getType() != UserType.READONLY)
+        if (user.getType() != Type.DEFAULT && user.getType() != Type.READONLY)
             throw new AccountTypeNotAllowedException();
 
         try {

@@ -18,10 +18,10 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
-import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.webservice.AbstractService;
@@ -75,7 +75,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		UserDAO dao = UserDAO.get();
 		if (StringUtils.isEmpty(group)) {
 			for (User usr : dao.findAll(user.getTenantId())) {
-				if (usr.getType() != UserType.SYSTEM)
+				if (usr.getType() != Type.SYSTEM)
 					users.add(WSUser.fromUser(usr));
 			}
 		} else {
@@ -83,7 +83,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			Group grp = gDao.findByName(group, user.getTenantId());
 			grp = gDao.initialize(grp);
 			for (User usr : grp.getUsers()) {
-				if (usr.getType() != UserType.SYSTEM)
+				if (usr.getType() != Type.SYSTEM)
 					users.add(WSUser.fromUser(usr));
 			}
 		}
@@ -122,7 +122,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			if (wsUser.getId() != 0) {
 				usr = dao.findById(wsUser.getId(), true);
-				if (usr.getType() == UserType.SYSTEM)
+				if (usr.getType() == Type.SYSTEM)
 					throw new PermissionException(
 							"You cannot edit user with id %d because it is a system user".formatted(usr.getId()));
 
@@ -263,7 +263,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		try {
 			UserDAO dao = UserDAO.get();
 			User usr = dao.findById(userId);
-			if (usr.getType() == UserType.SYSTEM) {
+			if (usr.getType() == Type.SYSTEM) {
 				throw new PermissionException(
 						"You cannot delete user with id " + usr.getId() + " because it is a system user");
 			}

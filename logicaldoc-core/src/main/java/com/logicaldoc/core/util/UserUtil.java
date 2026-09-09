@@ -18,8 +18,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.imaging.ImageUtil;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
@@ -179,7 +179,7 @@ public class UserUtil {
                 user.setAvatar(DEFAULT_AVATAR_IMAGE);
             }
 
-            if (user.getType() != UserType.SYSTEM) {
+            if (user.getType() != Type.SYSTEM) {
                 userDao.store(user);
             } else {
                 userDao.jdbcUpdate("update ld_user set ld_avatar = :avatar where ld_username = :username",
