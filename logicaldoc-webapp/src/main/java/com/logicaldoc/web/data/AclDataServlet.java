@@ -20,7 +20,7 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
-import com.logicaldoc.core.security.user.GroupType;
+import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.UserDAO;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -130,13 +130,13 @@ public class AclDataServlet extends AbstractDataServlet {
                 String groupName = rows.getString(2);
                 int groupType = rows.getInt(3);
                 long userId = 0L;
-                if (groupType == GroupType.USER.ordinal() && groupName != null)
+                if (groupType == Group.Type.USER.ordinal() && groupName != null)
                     userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
                 writer.print(ACE);
                 writer.print(String.format(ENTITY_ID, groupId));
 
-                if (groupType == GroupType.DEFAULT.ordinal()) {
+                if (groupType == Group.Type.DEFAULT.ordinal()) {
                     writer.print(String.format(ENTITY, groupName));
                     writer.print(AVATAR_GROUP_AVATAR);
                 } else {
@@ -255,13 +255,13 @@ public class AclDataServlet extends AbstractDataServlet {
                 String groupName = rows.getString(2);
                 int groupType = rows.getInt(3);
                 long userId = 0L;
-                if (groupType == GroupType.USER.ordinal() && groupName != null)
+                if (groupType == Group.Type.USER.ordinal() && groupName != null)
                     userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
                 writer.print(ACE);
                 writer.print(String.format(ENTITY_ID, groupId));
 
-                if (groupType == GroupType.DEFAULT.ordinal()) {
+                if (groupType == Group.Type.DEFAULT.ordinal()) {
                     writer.print(String.format(ENTITY, groupName));
                     writer.print(AVATAR_GROUP_AVATAR);
                 } else {
@@ -307,13 +307,13 @@ public class AclDataServlet extends AbstractDataServlet {
                 String groupName = rows.getString(2);
                 int groupType = rows.getInt(3);
                 long userId = 0L;
-                if (groupType == GroupType.USER.ordinal() && groupName != null)
+                if (groupType == Group.Type.USER.ordinal() && groupName != null)
                     userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
                 writer.print(ACE);
                 writer.print(String.format(ENTITY_ID, groupId));
 
-                if (groupType == GroupType.DEFAULT.ordinal()) {
+                if (groupType == Group.Type.DEFAULT.ordinal()) {
                     writer.print(String.format(ENTITY, groupName));
                     writer.print(AVATAR_GROUP_AVATAR);
                 } else {
@@ -340,14 +340,14 @@ public class AclDataServlet extends AbstractDataServlet {
         String groupName = set.getString(2);
         int groupType = set.getInt(3);
         long userId = 0L;
-        if (groupType == GroupType.USER.ordinal() && groupName != null)
+        if (groupType == Group.Type.USER.ordinal() && groupName != null)
             userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
         writer.print(ACE);
 
         writer.print(String.format(ENTITY_ID, groupId));
 
-        if (groupType == GroupType.DEFAULT.ordinal()) {
+        if (groupType == Group.Type.DEFAULT.ordinal()) {
             writer.print(String.format(ENTITY, groupName));
             writer.print(AVATAR_GROUP_AVATAR);
         } else {

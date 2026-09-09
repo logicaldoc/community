@@ -10,8 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
-import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.sql.SqlUtil;
 
@@ -41,7 +41,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
                         where A.deleted = 0 
                           and A.type = %d
                           and A.tenantId = %d
-                       """.formatted(GroupType.DEFAULT.ordinal(), session.getTenantId());
+                       """.formatted(Group.Type.DEFAULT.ordinal(), session.getTenantId());
 
 		List<?> records = GroupDAO.get().findByQuery(query, (Map<String, Object>) null, null);
 

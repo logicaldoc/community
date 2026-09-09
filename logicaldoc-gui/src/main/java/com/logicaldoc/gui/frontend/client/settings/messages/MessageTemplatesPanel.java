@@ -80,7 +80,7 @@ public class MessageTemplatesPanel extends VLayout {
             LD.askForValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item, value -> {
                 ListGridRecord rec = new ListGridRecord();
                 rec.setAttribute("id", "-1");
-                rec.setAttribute("type", "user");
+                rec.setAttribute("type", "USER");
                 rec.setAttribute("name", value);
                 list.getRecordList().addAt(rec, 0);
                 list.startEditing(0);

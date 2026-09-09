@@ -17,7 +17,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
-import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -112,8 +111,9 @@ public class UsersDataServlet extends AbstractDataServlet {
         if (user.getUserGroup() != null)
             writer.print(String.format("<usergroup><![CDATA[%s]]></usergroup>", user.getUserGroup().getId()));
 
-        writer.print(String.format("<groups><![CDATA[%s]]></groups>", user.getGroups().stream()
-                .filter(g -> g.getType() == GroupType.DEFAULT).map(Group::getName).collect(Collectors.joining(", "))));
+        writer.print(String.format("<groups><![CDATA[%s]]></groups>",
+                user.getGroups().stream().filter(g -> g.getType().equals(Group.Type.DEFAULT)).map(Group::getName)
+                        .collect(Collectors.joining(", "))));
         writer.print(String.format("<avatar>%d</avatar>", user.getId()));
         writer.print(String.format("<sfa>%s</sfa>", StringUtils.defaultString(user.getSecondFactor())));
 

@@ -53,7 +53,6 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
-import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -1336,7 +1335,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             if (group == null)
                 continue;
 
-            if (group.getType() == GroupType.DEFAULT) {
+            if (group.getType().equals(Group.Type.DEFAULT)) {
                 ace.setLabel(group.getName());
                 ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
             } else {

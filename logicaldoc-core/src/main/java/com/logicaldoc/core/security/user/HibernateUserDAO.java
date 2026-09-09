@@ -388,7 +388,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         if (grp == null) {
             grp = new Group();
             grp.setName(userGroupName);
-            grp.setType(GroupType.USER);
+            grp.setType(Group.Type.USER);
             grp.setTenantId(user.getTenantId());
             groupDAO.store(grp);
         }

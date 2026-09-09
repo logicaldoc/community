@@ -36,6 +36,10 @@ import jakarta.persistence.Transient;
 @Cacheable
 public class Group extends PersistentObject implements Serializable {
 
+    public enum Type {
+        DEFAULT, USER;
+    }
+    
 	private static final long serialVersionUID = 2L;
 
 	private static final Logger log = LoggerFactory.getLogger(Group.class);
@@ -61,7 +65,7 @@ public class Group extends PersistentObject implements Serializable {
 
 	@Column(name = "ld_type", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
-	private GroupType type = GroupType.DEFAULT;
+	private Type type = Type.DEFAULT;
 
 	/**
 	 * Not persistent
@@ -69,16 +73,16 @@ public class Group extends PersistentObject implements Serializable {
 	@Transient
 	private Set<User> users = new HashSet<>();
 
-	public GroupType getType() {
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(GroupType type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
 	public void setType(int type) {
-		this.type = GroupType.values()[type];
+		this.type = Type.values()[type];
 	}
 
 	public Set<User> getUsers() {
@@ -122,7 +126,7 @@ public class Group extends PersistentObject implements Serializable {
 	}
 
 	public boolean isUserGroup() {
-		return type == GroupType.USER;
+		return type == Type.USER;
 	}
 
 	/**
