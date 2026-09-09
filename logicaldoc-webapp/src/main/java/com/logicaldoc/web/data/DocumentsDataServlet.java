@@ -125,7 +125,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
         List<Long> bookmarks = dao.queryForList(
                 "select ld_docid from ld_bookmark where ld_type = %d and ld_deleted = 0 and ld_userid = %d"
-                        .formatted(Bookmark.TYPE_DOCUMENT, session.getUserId()),
+                        .formatted(Bookmark.Type.DOCUMENT.ordinal(), session.getUserId()),
                 Long.class);
 
         // The list of documents to be returned

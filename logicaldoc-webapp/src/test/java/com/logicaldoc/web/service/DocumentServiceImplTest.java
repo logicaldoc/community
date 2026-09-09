@@ -1271,12 +1271,12 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         testSubject.deleteBookmarks(List.of(bookmark.getId()));
 
         // Add bookmarks on folders
-        testSubject.addBookmarks(List.of(6L, 7L), Bookmark.TYPE_FOLDER);
+        testSubject.addBookmarks(List.of(6L, 7L), Bookmark.Type.FOLDER.ordinal());
 
         // Add bookmarks on non existent documents
         boolean exceptionHappened = false;
         try {
-            testSubject.addBookmarks(List.of(21L, 22L), Bookmark.TYPE_DOCUMENT);
+            testSubject.addBookmarks(List.of(21L, 22L), Bookmark.Type.DOCUMENT.ordinal());
         } catch (ServerException e) {
             exceptionHappened = true;
         }

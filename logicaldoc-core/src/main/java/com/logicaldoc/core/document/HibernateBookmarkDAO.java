@@ -33,25 +33,25 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
     @Override
     public Bookmark findByUserIdAndDocId(long userId, long docId) throws PersistenceException {
         return findByWhere("_entity.userId = %d and _entity.targetId = %d and _entity.type = %d".formatted(userId, docId,
-                Bookmark.TYPE_DOCUMENT), null, null).stream().findFirst().orElse(null);
+                Bookmark.Type.DOCUMENT.ordinal()), null, null).stream().findFirst().orElse(null);
     }
 
     @Override
     public Bookmark findByUserIdAndFolderId(long userId, long folderId) throws PersistenceException {
         return findByWhere("_entity.userId = %d and _entity.targetId = %d and _entity.type = %d".formatted(userId,
-                folderId, Bookmark.TYPE_FOLDER), null, null).stream().findFirst().orElse(null);
+                folderId, Bookmark.Type.FOLDER.ordinal()), null, null).stream().findFirst().orElse(null);
     }
 
     @Override
     public List<Long> findBookmarkedDocs(long userId) throws PersistenceException {
         return queryForList("select ld_docid from ld_bookmark where ld_type = %d and ld_deleted = 0 and ld_userid = %d"
-                .formatted(Bookmark.TYPE_DOCUMENT, userId), Long.class);
+                .formatted(Bookmark.Type.DOCUMENT.ordinal(), userId), Long.class);
     }
 
     @Override
     public boolean isDocBookmarkedByUser(long docId, long userId) throws PersistenceException {
         String sql = "select count(ld_docid) from ld_bookmark where ld_type = %d and ld_deleted = 0 and ld_userid = %d and ld_docid = %d"
-                .formatted(Bookmark.TYPE_DOCUMENT, userId, docId);
+                .formatted(Bookmark.Type.DOCUMENT.ordinal(), userId, docId);
         try {
             return queryForInt(sql) > 0;
         } catch (Exception t) {

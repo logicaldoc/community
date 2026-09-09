@@ -32,7 +32,7 @@ public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 		
 		WSBookmark bookmark=new WSBookmark();
 		bookmark.setTargetId(1L);
-		bookmark.setType(Bookmark.TYPE_DOCUMENT);
+		bookmark.setType(Bookmark.Type.DOCUMENT.ordinal());
 		bookmark.setFileType("pdf");
 		bookmark.setTitle("test.pdf");
 		
@@ -41,7 +41,7 @@ public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 		
 		bookmark=new WSBookmark();
 		bookmark.setTargetId(4L);
-		bookmark.setType(Bookmark.TYPE_FOLDER);
+		bookmark.setType(Bookmark.Type.FOLDER.ordinal());
 		bookmark.setFileType("folder");
 		bookmark.setTitle("test");
 		
@@ -61,7 +61,7 @@ public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 		
 		WSBookmark bookmark=new WSBookmark();
 		bookmark.setTargetId(1L);
-		bookmark.setType(Bookmark.TYPE_DOCUMENT);
+		bookmark.setType(Bookmark.Type.DOCUMENT.ordinal());
 		bookmark.setFileType("pdf");
 		bookmark.setTitle("test.pdf");
 		

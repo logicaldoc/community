@@ -974,13 +974,13 @@ public class ResourceServiceImpl implements ResourceService {
 
 			Bookmark bmark = new Bookmark();
 			if (resource.isFolder()) {
-				bmark.setType(Bookmark.TYPE_FOLDER);
+				bmark.setType(Bookmark.Type.FOLDER);
 				bmark.setTitle(resource.getName());
 				bmark.setFileType("folder");
 				bmark.setUserId(user.getId());
 				bmark.setTargetId(Long.parseLong(resource.getID()));
 			} else {
-				bmark.setType(Bookmark.TYPE_DOCUMENT);
+				bmark.setType(Bookmark.Type.DOCUMENT);
 				bmark.setTitle(resource.getName());
 				// get the file extension
 				String fileType = FilenameUtils.getExtension(resource.getName());

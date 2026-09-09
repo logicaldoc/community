@@ -25,147 +25,147 @@ import com.logicaldoc.webservice.soap.BookmarkService;
  */
 public class SoapBookmarkService extends AbstractService implements BookmarkService {
 
-	@Override
-	public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
-		checkObjectAvailability(sid, bookmark);
-		return storeBookmark(bookmark, user);
-	}
+    @Override
+    public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
+        checkObjectAvailability(sid, bookmark);
+        return storeBookmark(bookmark, user);
+    }
 
-	private void checkObjectAvailability(String sid, WSBookmark bookmark) throws AuthenticationException,
-			PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
-		if (bookmark.getType() == Bookmark.TYPE_DOCUMENT) {
-			checkDocumentAvailable(sid, bookmark.getTargetId());
-		} else {
-			checkFolderAvailable(sid, bookmark.getTargetId());
-		}
-	}
+    private void checkObjectAvailability(String sid, WSBookmark bookmark) throws AuthenticationException,
+            PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
+        if (bookmark.getType() == Bookmark.Type.DOCUMENT.ordinal()) {
+            checkDocumentAvailable(sid, bookmark.getTargetId());
+        } else {
+            checkFolderAvailable(sid, bookmark.getTargetId());
+        }
+    }
 
-	private WSFolder checkFolderAvailable(String sid, long folderId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		SoapFolderService folderService = new SoapFolderService();
-		folderService.setValidateSession(isValidateSession());
-		WSFolder folder = folderService.getFolder(sid, folderId);
-		if (folder == null)
-			throw new PermissionException("Folder " + folderId + " not found or not accessible");
-		else
-			return folder;
-	}
+    private WSFolder checkFolderAvailable(String sid, long folderId)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        SoapFolderService folderService = new SoapFolderService();
+        folderService.setValidateSession(isValidateSession());
+        WSFolder folder = folderService.getFolder(sid, folderId);
+        if (folder == null)
+            throw new PermissionException("Folder %d not found or not accessible".formatted(folderId));
+        else
+            return folder;
+    }
 
-	private WSDocument checkDocumentAvailable(String sid, long docId) throws PermissionException,
-			AuthenticationException, WebserviceException, PersistenceException, UnexistingResourceException {
-		SoapDocumentService docService = new SoapDocumentService();
-		docService.setValidateSession(isValidateSession());
-		return docService.getDocument(sid, docId);
-	}
+    private WSDocument checkDocumentAvailable(String sid, long docId) throws PermissionException,
+            AuthenticationException, WebserviceException, PersistenceException, UnexistingResourceException {
+        SoapDocumentService docService = new SoapDocumentService();
+        docService.setValidateSession(isValidateSession());
+        return docService.getDocument(sid, docId);
+    }
 
-	private WSBookmark storeBookmark(WSBookmark bookmark, User user) throws PersistenceException {
-		BookmarkDAO bDao = BookmarkDAO.get();
+    private WSBookmark storeBookmark(WSBookmark wsBookmark, User user) throws PersistenceException {
+        BookmarkDAO dao = BookmarkDAO.get();
 
-		Bookmark bmark = null;
-		if (bookmark.getType() == Bookmark.TYPE_DOCUMENT)
-			bmark = bDao.findByUserIdAndDocId(user.getId(), bookmark.getTargetId());
-		else
-			bmark = bDao.findByUserIdAndFolderId(user.getId(), bookmark.getTargetId());
+        Bookmark bookmark = null;
+        if (wsBookmark.getType() == Bookmark.Type.DOCUMENT.ordinal())
+            bookmark = dao.findByUserIdAndDocId(user.getId(), wsBookmark.getTargetId());
+        else
+            bookmark = dao.findByUserIdAndFolderId(user.getId(), wsBookmark.getTargetId());
 
-		if (bmark == null)
-			bmark = new Bookmark();
-		bmark.setDescription(bookmark.getDescription());
-		bmark.setTitle(bookmark.getTitle());
-		bmark.setFileType(bookmark.getFileType());
-		bmark.setPosition(bookmark.getPosition());
-		bmark.setTenantId(user.getTenantId());
-		bmark.setTargetId(bookmark.getTargetId());
-		bmark.setType(bookmark.getType());
-		bmark.setUserId(user.getId());
+        if (bookmark == null)
+            bookmark = new Bookmark();
+        bookmark.setDescription(wsBookmark.getDescription());
+        bookmark.setTitle(wsBookmark.getTitle());
+        bookmark.setFileType(wsBookmark.getFileType());
+        bookmark.setPosition(wsBookmark.getPosition());
+        bookmark.setTenantId(user.getTenantId());
+        bookmark.setTargetId(wsBookmark.getTargetId());
+        bookmark.setType(Bookmark.Type.values()[wsBookmark.getType()]);
+        bookmark.setUserId(user.getId());
 
-		bDao.store(bmark);
+        dao.store(bookmark);
 
-		return WSBookmark.fromBookmark(bmark);
-	}
+        return WSBookmark.fromBookmark(bookmark);
+    }
 
-	@Override
-	public WSBookmark bookmarkDocument(String sid, long docId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, UnexistingResourceException {
-		User user = validateSession(sid);
+    @Override
+    public WSBookmark bookmarkDocument(String sid, long docId) throws AuthenticationException, WebserviceException,
+            PersistenceException, PermissionException, UnexistingResourceException {
+        User user = validateSession(sid);
 
-		WSDocument doc = checkDocumentAvailable(sid, docId);
+        WSDocument doc = checkDocumentAvailable(sid, docId);
 
-		BookmarkDAO bDao = BookmarkDAO.get();
-		Bookmark bmark = bDao.findByUserIdAndDocId(user.getId(), docId);
-		if (bmark == null) {
-			bmark = new Bookmark();
-			bmark.setType(Bookmark.TYPE_DOCUMENT);
-			bmark.setFileType(doc.getFileName());
-			bmark.setFileType(doc.getType());
-			bmark.setUserId(user.getId());
-			bmark.setTargetId(docId);
-			bDao.store(bmark);
-		}
+        BookmarkDAO bDao = BookmarkDAO.get();
+        Bookmark bmark = bDao.findByUserIdAndDocId(user.getId(), docId);
+        if (bmark == null) {
+            bmark = new Bookmark();
+            bmark.setType(Bookmark.Type.DOCUMENT);
+            bmark.setFileType(doc.getFileName());
+            bmark.setFileType(doc.getType());
+            bmark.setUserId(user.getId());
+            bmark.setTargetId(docId);
+            bDao.store(bmark);
+        }
 
-		return WSBookmark.fromBookmark(bmark);
-	}
+        return WSBookmark.fromBookmark(bmark);
+    }
 
-	@Override
-	public WSBookmark bookmarkFolder(String sid, long folderId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		checkFolderAvailable(sid, folderId);
-		User user = validateSession(sid);
+    @Override
+    public WSBookmark bookmarkFolder(String sid, long folderId)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        checkFolderAvailable(sid, folderId);
+        User user = validateSession(sid);
 
-		WSFolder folder = checkFolderAvailable(sid, folderId);
+        WSFolder folder = checkFolderAvailable(sid, folderId);
 
-		BookmarkDAO bDao = BookmarkDAO.get();
-		Bookmark bmark = bDao.findByUserIdAndDocId(user.getId(), folderId);
-		if (bmark == null) {
-			bmark = new Bookmark();
-			bmark.setType(Bookmark.TYPE_DOCUMENT);
-			bmark.setTitle(folder.getName());
-			bmark.setFileType("folder");
-			bmark.setUserId(user.getId());
-			bmark.setTargetId(folderId);
-			bDao.store(bmark);
-		}
+        BookmarkDAO dao = BookmarkDAO.get();
+        Bookmark bookmark = dao.findByUserIdAndDocId(user.getId(), folderId);
+        if (bookmark == null) {
+            bookmark = new Bookmark();
+            bookmark.setType(Bookmark.Type.DOCUMENT);
+            bookmark.setTitle(folder.getName());
+            bookmark.setFileType("folder");
+            bookmark.setUserId(user.getId());
+            bookmark.setTargetId(folderId);
+            dao.store(bookmark);
+        }
 
-		return WSBookmark.fromBookmark(bmark);
-	}
+        return WSBookmark.fromBookmark(bookmark);
+    }
 
-	@Override
-	public List<WSBookmark> getBookmarks(String sid)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		List<Bookmark> list = BookmarkDAO.get().findByUserId(user.getId());
-		List<WSBookmark> wsBookmarks = new ArrayList<>();
-		for (Bookmark bookmark : list)
-			wsBookmarks.add(WSBookmark.fromBookmark(bookmark));
-		return wsBookmarks;
-	}
+    @Override
+    public List<WSBookmark> getBookmarks(String sid)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        List<Bookmark> list = BookmarkDAO.get().findByUserId(user.getId());
+        List<WSBookmark> wsBookmarks = new ArrayList<>();
+        for (Bookmark bookmark : list)
+            wsBookmarks.add(WSBookmark.fromBookmark(bookmark));
+        return wsBookmarks;
+    }
 
-	@Override
-	public void deleteBookmark(String sid, long bookmarkId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		Bookmark bookmark = BookmarkDAO.get().findById(bookmarkId);
-		if (bookmark == null || bookmark.getUserId() != user.getId())
-			throw new WebserviceException("Bookmark " + bookmarkId + " not found or not accessible");
-		BookmarkDAO.get().delete(bookmarkId);
-	}
+    @Override
+    public void deleteBookmark(String sid, long bookmarkId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        Bookmark bookmark = BookmarkDAO.get().findById(bookmarkId);
+        if (bookmark == null || bookmark.getUserId() != user.getId())
+            throw new WebserviceException("Bookmark " + bookmarkId + " not found or not accessible");
+        BookmarkDAO.get().delete(bookmarkId);
+    }
 
-	@Override
-	public void unbookmarkDocument(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		Bookmark bookmark = BookmarkDAO.get().findByUserIdAndDocId(user.getId(), docId);
-		if (bookmark != null)
-			deleteBookmark(sid, bookmark.getId());
-	}
+    @Override
+    public void unbookmarkDocument(String sid, long docId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        Bookmark bookmark = BookmarkDAO.get().findByUserIdAndDocId(user.getId(), docId);
+        if (bookmark != null)
+            deleteBookmark(sid, bookmark.getId());
+    }
 
-	@Override
-	public void unbookmarkFolder(String sid, long folderId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-		Bookmark bookmark = BookmarkDAO.get().findByUserIdAndFolderId(user.getId(), folderId);
-		if (bookmark != null)
-			deleteBookmark(sid, bookmark.getId());
-	}
+    @Override
+    public void unbookmarkFolder(String sid, long folderId)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
+        Bookmark bookmark = BookmarkDAO.get().findByUserIdAndFolderId(user.getId(), folderId);
+        if (bookmark != null)
+            deleteBookmark(sid, bookmark.getId());
+    }
 }

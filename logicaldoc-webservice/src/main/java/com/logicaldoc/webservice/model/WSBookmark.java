@@ -32,7 +32,7 @@ public class WSBookmark {
 	private String fileType;
 
 	@WSDoc(description = "<b>0</b> = document,  <b>1</b> = folder")
-	private int type = Bookmark.TYPE_DOCUMENT;
+	private int type = Bookmark.Type.DOCUMENT.ordinal();
 
 	public Bookmark toBookmark() {
 		Bookmark bookmark = new Bookmark();
@@ -42,7 +42,7 @@ public class WSBookmark {
 		bookmark.setPosition(getPosition());
 		bookmark.setTargetId(getTargetId());
 		bookmark.setUserId(getUserId());
-		bookmark.setType(getType());
+		bookmark.setType(Bookmark.Type.values()[getType()]);
 		bookmark.setTitle(getTitle());
 		bookmark.setFileType(getFileType());
 
@@ -57,7 +57,7 @@ public class WSBookmark {
 		wsBookmark.setPosition(bookmark.getPosition());
 		wsBookmark.setTargetId(bookmark.getTargetId());
 		wsBookmark.setUserId(bookmark.getUserId());
-		wsBookmark.setType(bookmark.getType());
+		wsBookmark.setType(bookmark.getType().ordinal());
 		wsBookmark.setTitle(bookmark.getTitle());
 		wsBookmark.setFileType(bookmark.getFileType());
 		return wsBookmark;

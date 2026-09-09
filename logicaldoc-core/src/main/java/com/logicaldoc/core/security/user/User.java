@@ -46,7 +46,7 @@ public class User extends PersistentObject implements Serializable {
 
     public static final long USERID_SYSTEM = -1010;
 
-    private static final long serialVersionUID = 8093874904302301982L;
+    private static final long serialVersionUID = 8093874904302301983L;
 
     @Column(name = "ld_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)

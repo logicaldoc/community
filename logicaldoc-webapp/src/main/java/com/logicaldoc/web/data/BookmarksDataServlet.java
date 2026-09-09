@@ -46,7 +46,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
                          from Bookmark A, Document B 
                         where A.type = %d and A.deleted = 0 and B.deleted = 0 
                           and A.targetId = B.id and A.userId = %d
-                       """.formatted(Bookmark.TYPE_DOCUMENT, session.getUserId());
+                       """.formatted(Bookmark.Type.DOCUMENT.ordinal(), session.getUserId());
 		records.addAll(dao.findByQuery(query, (Map<String, Object>) null, null));
 
 		/*
@@ -56,7 +56,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
                 select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, A.targetId, B.color
                   from Bookmark A, Folder B where A.targetId = B.id and A.type = %d and A.deleted = 0 
                    and A.userId = %d
-                """.formatted(Bookmark.TYPE_FOLDER, session.getUserId());
+                """.formatted(Bookmark.Type.FOLDER.ordinal(), session.getUserId());
 		records.addAll(dao.findByQuery(query, (Map<String, Object>) null, null));
 
 		/*

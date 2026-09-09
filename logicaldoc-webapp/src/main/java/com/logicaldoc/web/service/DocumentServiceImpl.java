@@ -176,11 +176,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                 } else {
                     bookmark = new Bookmark();
                     bookmark.setTenantId(session.getTenantId());
-                    bookmark.setType(type);
+                    bookmark.setType(Bookmark.Type.values()[type]);
                     bookmark.setTargetId(id);
                     bookmark.setUserId(session.getUserId());
 
-                    if (type == Bookmark.TYPE_DOCUMENT) {
+                    if (type == Bookmark.Type.DOCUMENT.ordinal()) {
                         Document doc = dao.findById(id);
                         if (doc == null)
                             throw new ServerException("Unexisting document %d".formatted(id));

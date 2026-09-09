@@ -11,6 +11,8 @@ import com.logicaldoc.core.util.IconSelector;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 /**
@@ -28,10 +30,10 @@ public class Bookmark extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final int TYPE_DOCUMENT = 0;
-
-	public static final int TYPE_FOLDER = 1;
-
+	public enum Type {
+	    DOCUMENT, FOLDER;
+	}
+	
 	@Column(name = "ld_userid", nullable = false)
 	private long userId;
 
@@ -51,8 +53,9 @@ public class Bookmark extends PersistentObject {
 	@Column(name = "ld_filetype", length = 40)
 	private String fileType;
 
-	@Column(name = "ld_type", nullable = false)
-	private int type = TYPE_DOCUMENT;
+    @Column(name = "ld_type", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+	private Type type = Type.DOCUMENT;
 
 	public long getUserId() {
 		return userId;
@@ -133,11 +136,11 @@ public class Bookmark extends PersistentObject {
 		}
 	}
 
-	public int getType() {
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(int type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
@@ -146,7 +149,7 @@ public class Bookmark extends PersistentObject {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
-		result = prime * result + type;
+		result = prime * result + type.ordinal();
 		result = prime * result + (int) (userId ^ (userId >>> 32));
 		return result;
 	}
