@@ -49,12 +49,12 @@ public class QueryStringFilter extends GenericFilterBean {
         /*
          * If we are NOT on the login page and there is no authentication
          * context, then we redirect to login page replicating the query string
-         * of the original request
+         * of the original request. Also DO NOT operate in case of anonymous login
          */
         if (baseUris.stream().anyMatch(baseUri -> request.getRequestURI().startsWith(baseUri))
                 && (SecurityContextHolder.getContext().getAuthentication() == null
                         || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
-                && StringUtils.isNotEmpty(queryString)) {
+                && StringUtils.isNotEmpty(queryString) && !"login".equals(request.getParameter("anonymous"))) {
 
             String redirectUrl = "%s?%s".formatted(loginPage, queryString);
 

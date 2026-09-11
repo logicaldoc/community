@@ -218,7 +218,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
                 template.setLanguage(t.getLanguage());
                 template.setSubject(t.getSubject());
                 template.setBody(t.getBody());
-                template.setType(MessageTemplate.Type.valueOf(t.getType()));
+                template.setType(MessageTemplate.Type.valueOf(t.getType().toUpperCase()));
                 template.setFooter(t.getFooter());
                 template.setButtons(t.getButtons());
 
