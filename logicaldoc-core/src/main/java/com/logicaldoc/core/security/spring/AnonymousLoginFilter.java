@@ -87,7 +87,8 @@ public class AnonymousLoginFilter extends GenericFilterBean {
                     sc.setAuthentication(auth);
                 }
             } catch (AuthenticationException ae) {
-                // Noting to do
+                if (log.isDebugEnabled())
+                    log.debug(ae.getMessage(), ae);
             } catch (Exception t) {
                 log.error(t.getMessage(), t);
             }

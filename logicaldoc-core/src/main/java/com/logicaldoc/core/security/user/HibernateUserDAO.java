@@ -13,9 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
@@ -756,8 +758,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
                         Map.of(USERNAME, user.getUsername()), Date.class))
                 .orElse(user.getLastEnabled());
 
-        // In case of not last interaction, we consider the creation date
-        lastInteraction = Optional.ofNullable(lastInteraction).orElse(user.getCreation());
+        Date mostRecentUserDate = Stream.of(user.getLastEnabled(), user.getCreation(), lastInteraction)
+                .filter(Objects::nonNull).max(Date::compareTo).orElse(new Date());
 
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(lastInteraction);
@@ -776,7 +778,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         calendar.add(Calendar.DAY_OF_MONTH, -maxInactiveDays);
         Date date = calendar.getTime();
 
-        return (lastInteraction.before(date));
+        return (mostRecentUserDate.before(date));
     }
 
     @Override
