@@ -61,5 +61,12 @@ public interface AIServiceAsync {
 
     void markUnembeddable(List<Long> docIds, AsyncCallback<Void> callback);
 
-    void summarize(long docId, String fileVersion, Long modelId, String modelSpec, AsyncCallback<String> callback);
+    void summarize(
+            long docId,
+            String fileVersion,
+            Long modelId,
+            Integer sentences,
+            Double mmrlambda,
+            String modelSpec,
+            AsyncCallback<String> callback);
 }

@@ -283,6 +283,9 @@ public interface AIService extends RemoteService {
      * @param fileVersion optional file version
      * @param modelId identifier of the local summarizer model, or {@code null}
      *        to use ChatGPT
+     * @param sentences optional sentences number of sentences in case of
+     *        summarizer model
+     * @param mmrlambda optional MMR lambda in case of logicaldoc model
      * @param modelSpec ChatGPT model specification (for example "gpt-5") when
      *        using ChatGPT, otherwise {@code null}
      *
@@ -290,8 +293,14 @@ public interface AIService extends RemoteService {
      *
      * @throws ServerException an error happened in the server application
      */
-    public String summarize(long docId, String fileVersion, Long modelId, String modelSpec) throws ServerException;
-    
+    public String summarize(
+            long docId,
+            String fileVersion,
+            Long modelId,
+            Integer sentences,
+            Double mmrlambda,
+            String modelSpec) throws ServerException;
+
     public static class Instance {
         private static AIServiceAsync inst;
 

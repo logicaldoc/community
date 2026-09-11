@@ -67,7 +67,7 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 
     @Override
     public void cleanOldHistories(int ttl) throws PersistenceException {
-        log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_history"));
+        log.debug("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_history"));
     }
 
     @Override

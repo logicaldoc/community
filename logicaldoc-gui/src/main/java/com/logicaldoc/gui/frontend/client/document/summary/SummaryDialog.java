@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.document.summary;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
@@ -14,14 +13,17 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
-import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
+import com.logicaldoc.gui.frontend.client.ai.model.ModelsDS;
 import com.logicaldoc.gui.frontend.client.services.ChatGPTService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.form.fields.DoubleItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -39,6 +41,10 @@ public class SummaryDialog extends Window {
     private SelectItem modelSelector;
 
     private TextItem chatGPTModel;
+
+    private SpinnerItem sentencesItem;
+
+    private DoubleItem mmrlambdaItem;
 
     private GUIDocument document;
 
@@ -73,7 +79,11 @@ public class SummaryDialog extends Window {
         setIsModal(true);
         setShowModalMask(true);
         centerInPage();
+    }
 
+    @Override
+    protected void onDraw() {
+        LD.contactingServer();
         DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(document.getId()),
                 new DefaultAsyncCallback<>() {
 
@@ -88,12 +98,9 @@ public class SummaryDialog extends Window {
 
                                     @Override
                                     public void handleSuccess(String result) {
-
                                         summary = result;
-
                                         if (summary == null || summary.trim().isEmpty())
                                             summary = "";
-
                                         initGUI();
                                     }
                                 });
@@ -118,9 +125,9 @@ public class SummaryDialog extends Window {
         toolStrip.setWidth100();
         toolStrip.addSpacer(2);
 
-        ToolStripButton generate = new ToolStripButton();
-        generate.setTitle(I18N.message("generate"));
-        generate.addClickHandler(event -> onGenerate());
+        ToolStripButton summarize = new ToolStripButton();
+        summarize.setTitle(I18N.message("summarize"));
+        summarize.addClickHandler(event -> onSummarize());
 
         ToolStripButton edit = new ToolStripButton();
         edit.setTitle(I18N.message("edit"));
@@ -147,7 +154,17 @@ public class SummaryDialog extends Window {
         modelSelector = ItemFactory.newSelectItem("model");
         modelSelector.setValueField("id");
         modelSelector.setDisplayField("name");
-        modelSelector.setRequired(false);
+        modelSelector.setOptionDataSource(new ModelsDS("summarizer"));
+        modelSelector.addDataArrivedHandler(dataArrived -> modelSelector
+                .setValue(dataArrived.getData().get(dataArrived.getStartRow()).getAttributeAsString("id")));
+
+        sentencesItem = ItemFactory.newSpinnerItem("sentences", 5);
+        sentencesItem.setMin(5);
+        sentencesItem.setStep(5);
+        sentencesItem.setWrapTitle(false);
+
+        mmrlambdaItem = ItemFactory.newDoubleItem("mmrlambda", 0.7);
+        mmrlambdaItem.setWrapTitle(false);
 
         chatGPTModel = ItemFactory.newTextItem("model", "model");
         chatGPTModel.setVisible(false);
@@ -156,40 +173,20 @@ public class SummaryDialog extends Window {
 
             @Override
             public void handleSuccess(List<GUIValue> settings) {
-
                 String model = GUIValue.getValue("model", settings);
-
-                if (model != null && !model.trim().isEmpty())
-                    chatGPTModel.setValue(model);
+                chatGPTModel.setValue(model != null ? model : "gpt-4o");
             }
         });
 
-        // Load all available summarizer models
-        AIService.Instance.get().getModels(new DefaultAsyncCallback<>() {
+        engine.addChangedHandler(changed -> {
 
-            @Override
-            public void handleSuccess(List<GUIModel> models) {
+            boolean logicaldocEngineSelected = "logicaldoc".equals(changed.getValue());
 
-                LinkedHashMap<String, String> values = new LinkedHashMap<>();
-
-                for (GUIModel model : models) {
-                    if ("summarizer".equals(model.getType()))
-                        values.put(Long.toString(model.getId()), model.getName());
-                }
-
-                modelSelector.setValueMap(values);
-
-                if (!values.isEmpty())
-                    modelSelector.setValue(values.keySet().iterator().next());
-            }
-        });
-
-        engine.addChangedHandler(event -> {
-
-            boolean logicalDoc = "logicaldoc".equals(event.getValue());
-
-            modelSelector.setVisible(logicalDoc);
-            chatGPTModel.setVisible(!logicalDoc);
+            modelSelector.setVisible(logicaldocEngineSelected);
+            modelSelector.setRequired(logicaldocEngineSelected);
+            sentencesItem.setVisible(logicaldocEngineSelected);
+            mmrlambdaItem.setVisible(logicaldocEngineSelected);
+            chatGPTModel.setVisible(!logicaldocEngineSelected);
 
             toolStrip.markForRedraw();
         });
@@ -197,8 +194,10 @@ public class SummaryDialog extends Window {
         toolStrip.addFormItem(engine);
         toolStrip.addFormItem(modelSelector);
         toolStrip.addFormItem(chatGPTModel);
+        toolStrip.addFormItem(sentencesItem);
+        toolStrip.addFormItem(mmrlambdaItem);
         toolStrip.addSeparator();
-        toolStrip.addButton(generate);
+        toolStrip.addButton(summarize);
         toolStrip.addButton(edit);
         toolStrip.addButton(save);
         toolStrip.addButton(close);
@@ -213,22 +212,26 @@ public class SummaryDialog extends Window {
         addItem(html);
     }
 
-    private void onGenerate() {
+    private void onSummarize() {
+        Integer sentences = sentencesItem.getValueAsInteger();
+        Double lambda = mmrlambdaItem.getValueAsDouble();
 
         Long modelId = null;
         String modelSpec = null;
-
         if ("logicaldoc".equals(engine.getValueAsString())) {
-
-            if (modelSelector.getValue() != null)
+            if (modelSelector.getValue() != null) {
                 modelId = Long.valueOf(modelSelector.getValueAsString());
+            } else {
+                SC.warn(I18N.message("selectamodel"));
+                return;
+            }
+
         } else
             modelSpec = chatGPTModel.getValueAsString();
 
         LD.contactingServer();
-
-        AIService.Instance.get().summarize(document.getId(), document.getFileVersion(), modelId, modelSpec,
-                new DefaultAsyncCallback<>() {
+        AIService.Instance.get().summarize(document.getId(), document.getFileVersion(), modelId, sentences, lambda,
+                modelSpec, new DefaultAsyncCallback<>() {
 
                     @Override
                     public void handleSuccess(String result) {

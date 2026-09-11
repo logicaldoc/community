@@ -158,7 +158,7 @@ public class UpdatePanel extends VLayout {
     }
 
     private void onUpdateUnavailable() {
-        Label label = new Label(I18N.message("updatepackagenotfound"));
+        Label label = new Label(I18N.message("isuptodate", Session.get().getInfo().getBranding().getProduct()));
         label.setPadding(10);
         label.setWrap(false);
         label.setIcon("[SKIN]/actions/accept.png");

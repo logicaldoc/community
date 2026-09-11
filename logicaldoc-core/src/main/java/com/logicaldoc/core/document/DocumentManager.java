@@ -416,9 +416,7 @@ public class DocumentManager {
 
             document = documentDAO.findById(document.getId(), true);
 
-            DocumentFuture elaboration = new DocumentFuture(document, saveVersionAsync(version, document));
-
-            debug("Stored version {}", version.getVersion());
+            debug("Created version {}", version.getVersion());
             debug("Invoke listeners after checkin");
             for (DocumentListener listener : listenerManager.getListeners())
                 listener.afterCheckin(document, transaction, dictionary);
@@ -429,7 +427,7 @@ public class DocumentManager {
             if (!document.getFileVersion().equals(oldFileVersion))
                 documentNoteDAO.copyAnnotations(document.getId(), oldFileVersion, document.getFileVersion());
 
-            return elaboration;
+            return new DocumentFuture(document, saveVersionAsync(version, document));
         }
     }
 

@@ -52,7 +52,7 @@ public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory
 
     @Override
     public void cleanOldHistories(int ttl) throws PersistenceException {
-        log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_folder_history"));
+        log.debug("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_folder_history"));
     }
 
     @Override

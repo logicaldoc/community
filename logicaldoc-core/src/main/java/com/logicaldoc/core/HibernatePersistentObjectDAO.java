@@ -351,8 +351,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
             initializeEntity(mergedEntity);
             return mergedEntity;
         } catch (RuntimeException e) {
-            if (log.isTraceEnabled())
-                log.trace(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return entity;
         }
     }

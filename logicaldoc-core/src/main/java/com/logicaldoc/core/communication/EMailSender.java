@@ -698,7 +698,7 @@ public class EMailSender {
             transaction.setUser(userDao.findByUsername("_system"));
 
             DocumentManager.get().create(emlFile, emailDocument, transaction);
-            log.debug("Historycizes the email with subject '{}' sent to {}", email.getSubject(),
+            log.debug("Historycized the email with subject '{}' sent to {}", email.getSubject(),
                     email.getAllRecipientsEmails());
         } catch (Exception t) {
             log.warn("Cannot historycize the email with subject '{}' sent to {}", email.getSubject(),

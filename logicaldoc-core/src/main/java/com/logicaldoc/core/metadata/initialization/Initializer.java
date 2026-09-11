@@ -55,7 +55,7 @@ public class Initializer {
         setUser(transaction);
 
         try {
-            template = TemplateDAO.get().initialize(template);
+            template = TemplateDAO.get().findById(template.getId(), true);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

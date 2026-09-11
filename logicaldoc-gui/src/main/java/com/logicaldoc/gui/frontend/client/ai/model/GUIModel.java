@@ -15,7 +15,8 @@ public class GUIModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final List<String> NOT_TRAINABLE_TYPES = Arrays.asList("zeroshot", "language", "yolo", "miniembedder");
+    private static final List<String> NOT_TRAINABLE_TYPES = Arrays.asList("zeroshot", "language", "yolo",
+            "miniembedder");
 
     private long id = 0;
 
@@ -81,10 +82,6 @@ public class GUIModel implements Serializable {
     private GUIChunking chunking = new GUIChunking();
 
     private List<GUIFeatureDescriptor> featureDescriptors = new ArrayList<>();
-
-    private int summarySentences = 5;
-
-    private double mmrLambda = 0.7;
 
     public GUIModel(long id, String name) {
         super();
@@ -397,21 +394,5 @@ public class GUIModel implements Serializable {
 
     public void setThreshold(double threshold) {
         this.threshold = threshold;
-    }
-
-    public int getSummarySentences() {
-        return summarySentences;
-    }
-
-    public void setSummarySentences(int summarySentences) {
-        this.summarySentences = summarySentences;
-    }
-
-    public double getMmrLambda() {
-        return mmrLambda;
-    }
-
-    public void setMmrLambda(double mmrLambda) {
-        this.mmrLambda = mmrLambda;
     }
 }
