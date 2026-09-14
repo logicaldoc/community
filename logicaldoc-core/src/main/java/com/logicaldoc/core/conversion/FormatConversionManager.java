@@ -297,7 +297,7 @@ public class FormatConversionManager {
                 transaction.setComment("format: %s".formatted(FileUtil.getExtension(out.getName())));
                 DocumentDAO dao = DocumentDAO.get();
                 try {
-                    document = dao.initialize(doc);
+                    doc = dao.initialize(doc);
                     dao.store(doc, transaction);
                 } catch (PersistenceException e) {
                     log.warn(e.getMessage(), e);
