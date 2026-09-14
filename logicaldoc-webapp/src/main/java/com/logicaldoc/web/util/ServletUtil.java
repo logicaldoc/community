@@ -126,7 +126,7 @@ public class ServletUtil {
         Session session = validateSession(request);
         MenuDAO dao = MenuDAO.get();
         if (!dao.isReadAllowed(menuId, session.getUserId())) {
-            String message = "User " + session.getUsername() + " cannot access the menu " + menuId;
+            String message = "User %s cannot access the menu %d".formatted(session.getUsername(), menuId);
             throw new ServletException(message);
         }
         return session;
@@ -234,8 +234,6 @@ public class ServletUtil {
             User user) throws IOException, ServletException, PersistenceException {
 
         Session session = getSession(request, sid);
-
-        user = initializeUser(user);
 
         Document document = getDocument(resource.getDocId(), user);
         if (document.getId() != resource.getDocId())
@@ -679,7 +677,6 @@ public class ServletUtil {
 
         setContentDisposition(request, response, doc.getFileName() + ".txt");
 
-        user = initializeUser(user);
         if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
             throw new FileNotFoundException("Document not published");
 
