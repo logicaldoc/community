@@ -208,6 +208,7 @@ public class SamplersPanel extends VLayout {
 		rec.setAttribute("name", sampler.getName());
 		rec.setAttribute(LABEL, sampler.getLabel() != null ? sampler.getLabel() : sampler.getName());
 		rec.setAttribute(DESCRIPTION, sampler.getDescription());
+		rec.setAttribute("type", sampler.getType());
 		list.refreshRow(list.getRecordIndex(rec));
 
 	}
