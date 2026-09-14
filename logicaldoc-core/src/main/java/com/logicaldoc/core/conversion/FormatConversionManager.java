@@ -159,9 +159,9 @@ public class FormatConversionManager {
             return;
         }
 
-        FormatConverter converter = getConverter(fileName, "pdf");
-        if (converter == null)
-            return;
+//        FormatConverter converter = getConverter(fileName, "pdf");
+//        if (converter == null)
+//            return;
 
         // Prepare I/O files
         File src = null;
@@ -173,12 +173,23 @@ public class FormatConversionManager {
                 throw new IOException(
                         String.format("Unexisting source file,  document: %s - %s", document.getId(), fileName));
 
-            converter.convert(sid, document, src, dest);
+            DocumentHistory transaction = new DocumentHistory();
+            if (StringUtils.isNotEmpty(sid))
+                transaction.setSession(SessionManager.get().get(sid));
+            transaction.setDocument(document);
+            transaction.setFileVersion(fileVersion);
+            convertToFile(document, fileVersion, dest, transaction);
+
+//            converter.convert(sid, document, src, dest);
 
             if (dest == null || dest.length() == 0)
                 throw new IOException(
-                        String.format("The converter %s was unable to convert as pdf the document: %s - %s",
-                                converter.getClass().getSimpleName(), document.getId(), fileName));
+                        String.format("The converter was unable to convert as pdf the document: %s", document));
+
+//            if (dest == null || dest.length() == 0)
+//                throw new IOException(
+//                        String.format("The converter %s was unable to convert as pdf the document: %s - %s",
+//                                converter.getClass().getSimpleName(), document.getId(), fileName));
 
             store.store(dest, resource);
         } finally {
@@ -250,7 +261,7 @@ public class FormatConversionManager {
     /**
      * Converts a document and writes the content of the conversion into a file.
      * 
-     * @param document The document to be processed
+     * @param document The document(or version) to be processed
      * @param fileVersion The file version(optional)
      * @param out the target file, the extension of this filename is used to
      *        detect the output format
@@ -259,7 +270,7 @@ public class FormatConversionManager {
      * @throws IOException if an error happens during the conversion
      * @throws PersistenceException Error in the data layer
      */
-    public void convertToFile(Document document, String fileVersion, File out, DocumentHistory transaction)
+    public void convertToFile(AbstractDocument document, String fileVersion, File out, DocumentHistory transaction)
             throws IOException, PersistenceException {
         String fileName = DocUtil.getFileName(document, fileVersion);
         FormatConverter converter = getConverter(fileName, out.getName());
@@ -281,13 +292,13 @@ public class FormatConversionManager {
                 throw new IOException(String.format("The converter %s was unable to convert document: %s",
                         converter.getClass().getSimpleName(), "%d - %s".formatted(document.getId(), fileName)));
 
-            if (transaction != null) {
+            if (transaction != null && document instanceof Document doc) {
                 transaction.setEvent(DocumentEvent.CONVERTED);
                 transaction.setComment("format: %s".formatted(FileUtil.getExtension(out.getName())));
                 DocumentDAO dao = DocumentDAO.get();
                 try {
-                    document = dao.initialize(document);
-                    dao.store(document, transaction);
+                    document = dao.initialize(doc);
+                    dao.store(doc, transaction);
                 } catch (PersistenceException e) {
                     log.warn(e.getMessage(), e);
                 }
