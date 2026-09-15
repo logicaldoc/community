@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -494,9 +495,9 @@ public class Exec {
      */
     public void fork(File outputFile, String... commandLine) throws IOException {
         checkAllowed(List.of(commandLine));
-        
-        log.info("Fork command {}", commandLine.toString());
-        
+
+        log.info("Fork command {}", Arrays.toString(commandLine));
+
         ProcessBuilder pb = new ProcessBuilder(commandLine);
 
         if (outputFile == null)

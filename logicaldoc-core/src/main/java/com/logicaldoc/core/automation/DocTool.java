@@ -181,8 +181,6 @@ public class DocTool {
 
             ticket = DocumentManager.get().createTicket(ticket, transaction);
 
-            System.out.println(ticket);
-
             return ticket.getUrl();
         } catch (PermissionException | PersistenceException e) {
             log.error(e.getMessage(), e);

@@ -426,24 +426,33 @@ public abstract class Filler extends PersistentObject {
         Hit hit = SearchEngine.get().getHit(document.getId());
         String extractedContent = hit != null ? hit.getContent() : "";
         if (StringUtils.isBlank(extractedContent)) {
-            log.debug("Document {} not already indexed, trying to extract the texts now", document);
+            log.debug("Document {} not already indexed, " + "trying to extract the text now", document);
             extractedContent = DocumentManager.get().parseDocument(document, document.getFileVersion());
         }
 
         if (log.isDebugEnabled())
-            log.debug("Filling documnent {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
+            log.debug("Filling document {} using text {}", document, StringUtils.abbreviate(extractedContent, 150));
 
-        FillResult out = fill(document, extractedContent, transaction, dictionary, explication);
-        document = out.document();
+        FillResult result = fill(document, extractedContent, transaction, dictionary, explication);
+
+        if (result == null)
+            throw new IllegalStateException(
+                    "Filler %s returned no result for document %d".formatted(name, document.getId()));
+
+        Document filledDocument = result.document();
+
+        if (filledDocument == null)
+            throw new IllegalStateException("Filler %s returned a result without a document".formatted(name));
 
         Value<String> filledValue = new Value<>();
+
         if (StringUtils.isNotEmpty(automation)) {
             Automation script = new Automation("Filler-%s".formatted(name), null, getTenantId());
-            script.evaluate(automation, Map.of("filler", this, "document", document, "transaction", transaction,
+            script.evaluate(automation, Map.of("filler", this, "document", filledDocument, "transaction", transaction,
                     "fillerDictionary", dictionary, "value", filledValue));
         }
 
-        return new FillResult(out.document(), StringUtils.defaultIfEmpty(filledValue.getValue(), out.content()));
+        return new FillResult(filledDocument, StringUtils.defaultIfEmpty(filledValue.getValue(), result.content()));
     }
 
     protected boolean mustOverwrite(History transaction) {

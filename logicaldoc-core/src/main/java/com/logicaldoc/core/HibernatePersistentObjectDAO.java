@@ -266,7 +266,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
             if (dbRecordVersion == 0L)
                 return entity.getRecordVersion();
             else
-               return dbRecordVersion;
+                return dbRecordVersion;
         } else
             return obj.getRecordVersion();
     }
@@ -366,8 +366,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
     /**
      * Concrete implementations must put here their custom initialization of the
-     * persistent objeft. This default implementation uses the reflection to detect
-     * all the collections and all fields of type {@link PersistentObject} to initialize them.
+     * persistent objeft. This default implementation uses the reflection to
+     * detect all the collections and all fields of type
+     * {@link PersistentObject} to initialize them.
      * 
      * @param entity The entity to initialize
      * 
@@ -378,17 +379,12 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
         while (clazz != null && clazz != Object.class) {
             for (Field field : clazz.getDeclaredFields()) {
-
-                Class<?> type = field.getType();
-
-                boolean isCollection = Collection.class.isAssignableFrom(type);
-                boolean isMap = Map.class.isAssignableFrom(type);
-                boolean isPersistentObject = PersistentObject.class.isAssignableFrom(type);
-
-                if (isCollection || isMap || isPersistentObject) {
+                if (requiresInitialization(field)) {
                     if (log.isTraceEnabled())
                         log.trace("Trying to initialize attribute {} of {}", field.getName(), entity);
-                    field.setAccessible(true); // allow access to private fields
+
+                    field.setAccessible(true);
+
                     try {
                         Object value = field.get(entity);
                         Hibernate.initialize(value);
@@ -398,8 +394,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
                 }
             }
 
-            clazz = clazz.getSuperclass(); // walk inheritance chain
+            clazz = clazz.getSuperclass();
         }
+    }
+
+    private static boolean requiresInitialization(Field field) {
+        Class<?> type = field.getType();
+        return Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
+                || PersistentObject.class.isAssignableFrom(type);
     }
 
     protected Session getCurrentSession() {

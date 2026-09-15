@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +31,8 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 
     // Instance under test
     private UserHistoryDAO testSubject;
+
+    private static final Date FUTURE_DATE = Date.from(Instant.parse("2100-01-01T00:00:00Z"));
 
     @Before
     @Override
@@ -64,7 +67,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
         assertEquals(1, histories.size());
         assertEquals("data test 02", histories.get(0).getEvent());
 
-        histories = testSubject.findByUserIdAndEvent(1L, "data test 02", new Date());
+        histories = testSubject.findByUserIdAndEvent(1L, "data test 02", FUTURE_DATE);
         assertTrue(histories.isEmpty());
 
         // Try with unexisting user

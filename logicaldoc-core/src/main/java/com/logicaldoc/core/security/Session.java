@@ -105,8 +105,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
     @Column(name = "ld_tenantid", nullable = false)
     private long tenantId;
 
-    @Column(name = "ld_status", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_status", nullable = false) @Enumerated(EnumType.ORDINAL)
     private SessionStatus status = SessionStatus.OPEN;
 
     @Embedded
@@ -273,10 +272,12 @@ public class Session extends PersistentObject implements Comparable<Session> {
                 boolean newDevice = device.getId() == 0L;
                 DeviceDAO.get().store(device);
                 client.setDevice(device);
-                history.setDevice(client.getDevice().toString());
-                if (client.getGeolocation() != null)
-                    history.setGeolocation(client.getGeolocation().toString());
-                UserHistoryDAO.get().store(history);
+                if (history != null) {
+                    history.setDevice(device.toString());
+                    if (client.getGeolocation() != null)
+                        history.setGeolocation(client.getGeolocation().toString());
+                    UserHistoryDAO.get().store(history);
+                }
 
                 // Send an email alert to the user in case of new device
                 if (newDevice
@@ -356,8 +357,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
         UserHistory history = null;
         try {
             // Add a user history entry
-            history = UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN, historyComment, sid,
-                    client);
+            history = UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGIN, historyComment, sid, client);
 
             // Update the last login into the DB
 
