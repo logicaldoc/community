@@ -73,7 +73,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 
 		writer.print("<bookmark>");
 		writer.print(String.format("<id>%d</id>", SqlUtil.getColumnLongValue(cols[0])));
-		if (cols[7].toString().equals("0"))
+		if (cols[7].toString().equals(Bookmark.Type.DOCUMENT.name()))
 			writer.print(
 					String.format("<icon>%s</icon>", FileUtil.getBaseName(IconSelector.selectIcon((String) cols[1]))));
 		else

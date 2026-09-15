@@ -82,7 +82,7 @@ public class BookmarksPanel extends VLayout {
 					false, new DefaultAsyncCallback<>() {
 						@Override
 						public void handleSuccess(GUIFolder folder) {
-							showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
+							showContextMenu(folder, rec.getAttributeAsString("type").equals("DOCUMENT"));
 						}
 					});
 			event.cancel();
@@ -166,7 +166,7 @@ public class BookmarksPanel extends VLayout {
 
 	private void onBookmarkSelected() {
 		ListGridRecord rec = list.getSelectedRecord();
-		if (rec.getAttributeAsString("type").equals("0"))
+		if (rec.getAttributeAsString("type").equals("DOCUMENT"))
 			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"), rec.getAttributeAsLong(TARGET_ID));
 		else
 			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(TARGET_ID), null);

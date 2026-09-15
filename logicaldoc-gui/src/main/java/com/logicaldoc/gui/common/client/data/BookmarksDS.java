@@ -26,7 +26,7 @@ public class BookmarksDS extends DataSource {
 		DataSourceTextField userId = new DataSourceTextField("userId");
 		DataSourceTextField targetId = new DataSourceTextField("targetId");
 		DataSourceTextField folderId = new DataSourceTextField("folderId");
-		DataSourceIntegerField type = new DataSourceIntegerField("type");
+		DataSourceTextField type = new DataSourceTextField("type");
 		type.setHidden(true);
 
 		setFields(id, name, description, icon, userId, targetId, position, folderId, type);
