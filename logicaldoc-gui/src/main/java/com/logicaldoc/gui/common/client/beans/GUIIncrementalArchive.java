@@ -23,8 +23,6 @@ public class GUIIncrementalArchive implements Serializable {
 
 	private GUIFolder folder;
 
-	private int type = GUIArchive.TYPE_DEFAULT;
-
 	private List<GUITemplate> templates = new ArrayList<>();
 
 	public GUIIncrementalArchive() {
@@ -56,15 +54,7 @@ public class GUIIncrementalArchive implements Serializable {
 	public void setFolder(GUIFolder folder) {
 		this.folder = folder;
 	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
+	
 	public List<GUITemplate> getTemplates() {
 		return templates;
 	}

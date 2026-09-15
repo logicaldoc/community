@@ -35,269 +35,245 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ExportArchivesList extends VLayout {
 
-	private static final String STATUS = "status";
+    private static final String STATUS = "status";
 
-	protected Layout detailsContainer;
+    protected Layout detailsContainer;
 
-	protected RefreshableListGrid list;
+    protected RefreshableListGrid list;
 
-	protected Canvas details = SELECT_ELEMENT;
+    protected Canvas details = SELECT_ELEMENT;
 
-	static final Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
+    static final Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
 
-	protected int archivesType = GUIArchive.TYPE_DEFAULT;
+    protected boolean showHistory = false;
 
-	protected boolean showHistory = false;
+    public ExportArchivesList(boolean showHistory) {
+        setWidth100();
+        this.showHistory = showHistory;
+    }
 
-	public ExportArchivesList(int archivesType, boolean showHistory) {
-		setWidth100();
-		this.archivesType = archivesType;
-		this.showHistory = showHistory;
-	}
+    @Override
+    public void onDraw() {
+        final InfoPanel infoPanel = new InfoPanel("");
 
-	@Override
-	public void onDraw() {
-		final InfoPanel infoPanel = new InfoPanel("");
+        VLayout listing = new VLayout();
+        detailsContainer = new VLayout();
+        details = SELECT_ELEMENT;
 
-		VLayout listing = new VLayout();
-		detailsContainer = new VLayout();
-		details = SELECT_ELEMENT;
+        // Initialize the listing panel
+        listing.setAlign(Alignment.CENTER);
+        listing.setHeight("60%");
+        listing.setShowResizeBar(true);
 
-		// Initialize the listing panel
-		listing.setAlign(Alignment.CENTER);
-		listing.setHeight("60%");
-		listing.setShowResizeBar(true);
+        ListGridField id = new IdListGridField();
 
-		ListGridField id = new IdListGridField();
+        ListGridField name = new ListGridField("name", I18N.message("name"), 250);
+        name.setCanFilter(true);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"), 250);
-		name.setCanFilter(true);
+        ListGridField description = new ListGridField("description", I18N.message("description"), 250);
+        description.setCanFilter(true);
+        description.setHidden(true);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"), 250);
-		description.setCanFilter(true);
-		description.setHidden(true);
-		
-		ListGridField type = new ListGridField("type", I18N.message("type"), 130);
-		type.setHidden(true);
-		ListGridField typeLabel = new ListGridField("typelabel", I18N.message("type"), 130);
-		typeLabel.setCanFilter(false);
+        ListGridField type = new ListGridField("type", I18N.message("type"), 130);
+        type.setHidden(true);
+        ListGridField typeLabel = new ListGridField("typelabel", I18N.message("type"), 130);
+        typeLabel.setCanFilter(false);
 
-		ListGridField status = new ArchiveStatusListGridField();
+        ListGridField status = new ArchiveStatusListGridField();
 
-		ListGridField created = new DateListGridField("created", "createdon");
+        ListGridField created = new DateListGridField("created", "createdon");
 
-		ListGridField creator = new ListGridField("creator", I18N.message("creator"), 110);
-		creator.setCanFilter(true);
-		ListGridField closer = new ListGridField("closer", I18N.message("closedby"), 110);
-		closer.setCanFilter(true);
+        ListGridField creator = new ListGridField("creator", I18N.message("creator"), 110);
+        creator.setCanFilter(true);
+        ListGridField closer = new ListGridField("closer", I18N.message("closedby"), 110);
+        closer.setCanFilter(true);
 
-		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
-		size.setCanFilter(false);
+        ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
+        size.setCanFilter(false);
 
-		ListGridField aosManager = new ListGridField("aosmanager", I18N.message("aosmanager"), 110);
-		aosManager.setCanFilter(true);
+        ListGridField pathOnServer = new ListGridField("pathonserver", I18N.message("pathonserver"));
+        pathOnServer.setCanFilter(false);
 
-		ListGridField pathOnServer = new ListGridField("pathonserver", I18N.message("pathonserver"));
-		pathOnServer.setCanFilter(false);
+        list = new RefreshableListGrid();
+        list.setEmptyMessage(I18N.message("notitemstoshow"));
+        list.setShowAllRecords(true);
+        list.setAutoFetchData(true);
+        list.setWidth100();
+        list.setHeight100();
+        list.setSelectionType(SelectionStyle.SINGLE);
+        list.setShowRecordComponents(true);
+        list.setShowRecordComponentsByCell(true);
+        list.setCanFreezeFields(true);
+        list.setFilterOnKeypress(true);
+        list.setShowFilterEditor(true);
+        list.setFields(id, created, name, description, size, status, creator, closer, pathOnServer);
+        list.setDataSource(new ArchivesDS(GUIArchive.MODE_EXPORT, null, Session.get().getUser().getId()));
 
-		list = new RefreshableListGrid();
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setShowAllRecords(true);
-		list.setAutoFetchData(true);
-		list.setWidth100();
-		list.setHeight100();
-		if (this.archivesType == GUIArchive.TYPE_STORE)
-			list.setFields(id, created, name, description, size, status, creator, closer, aosManager, pathOnServer);
-		else
-			list.setFields(id, created, name, description, size, status, creator, closer, pathOnServer);
-		list.setSelectionType(SelectionStyle.SINGLE);
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setCanFreezeFields(true);
-		list.setFilterOnKeypress(true);
-		list.setShowFilterEditor(true);
-		if (this.archivesType == GUIArchive.TYPE_STORE && this.showHistory)
-			list.setDataSource(new ArchivesDS(GUIArchive.MODE_EXPORT, this.archivesType, GUIArchive.STATUS_FINALIZED,
-					Session.get().getUser().getId()));
-		else
-			list.setDataSource(
-					new ArchivesDS(GUIArchive.MODE_EXPORT, this.archivesType, null, Session.get().getUser().getId()));
+        if (!showHistory)
+            listing.addMember(infoPanel);
+        listing.addMember(list);
 
-		if (!showHistory)
-			listing.addMember(infoPanel);
-		listing.addMember(list);
+        ToolStrip toolStrip = new ToolStrip();
+        toolStrip.setHeight(20);
+        toolStrip.setWidth100();
+        toolStrip.addSpacer(2);
 
-		ToolStrip toolStrip = new ToolStrip();
-		toolStrip.setHeight(20);
-		toolStrip.setWidth100();
-		toolStrip.addSpacer(2);
+        ToolStripButton refresh = new ToolStripButton();
+        refresh.setTitle(I18N.message("refresh"));
+        toolStrip.addButton(refresh);
+        refresh.addClickHandler(event -> refresh());
 
-		ToolStripButton refresh = new ToolStripButton();
-		refresh.setTitle(I18N.message("refresh"));
-		toolStrip.addButton(refresh);
-		refresh.addClickHandler(event -> refresh());
+        ToolStripButton addArchive = new ToolStripButton();
+        addArchive.setTitle(I18N.message("addarchive"));
+        addArchive.addClickHandler(event -> {
+            onAddingArchive();
+            event.cancel();
+        });
+        toolStrip.addButton(addArchive);
 
-		ToolStripButton addArchive = new ToolStripButton();
-		addArchive.setTitle(I18N.message("addarchive"));
-		addArchive.addClickHandler(event -> {
-			onAddingArchive();
-			event.cancel();
-		});
-		toolStrip.addButton(addArchive);
+        list.addCellContextClickHandler(event -> {
+            showContextMenu();
+            event.cancel();
+        });
 
-		list.addCellContextClickHandler(event -> {
-			showContextMenu();
-			event.cancel();
-		});
+        list.addSelectionChangedHandler(event -> {
+            ListGridRecord rec = list.getSelectedRecord();
+            try {
+                showDetails(rec.getAttributeAsLong("id"), GUIArchive.STATUS_OPEN != rec.getAttributeAsInt(STATUS));
+            } catch (Exception t) {
+                // Nothing to do
+            }
+        });
 
-		list.addSelectionChangedHandler(event -> {
-			ListGridRecord rec = list.getSelectedRecord();
-			try {
-				showDetails(rec.getAttributeAsLong("id"), GUIArchive.STATUS_OPEN != rec.getAttributeAsInt(STATUS));
-			} catch (Exception t) {
-				// Nothing to do
-			}
-		});
+        list.addDataArrivedHandler(event -> infoPanel.setMessage(I18N.message("showarchives", Integer.toString(list.getTotalRows()))));
 
-		list.addDataArrivedHandler(event -> infoPanel.setMessage(I18N.message("showarchives",
-				Integer.toString(list.getTotalRows()), Session.get().getConfig("conf.exportdir"))));
+        detailsContainer.setAlign(Alignment.CENTER);
+        detailsContainer.addMember(details);
 
-		detailsContainer.setAlign(Alignment.CENTER);
-		detailsContainer.addMember(details);
+        if (!showHistory)
+            setMembers(toolStrip, listing, detailsContainer);
+        else
+            setMembers(listing, detailsContainer);
+    }
 
-		if (!showHistory)
-			setMembers(toolStrip, listing, detailsContainer);
-		else
-			setMembers(listing, detailsContainer);
-	}
+    protected void showContextMenu() {
+        Menu contextMenu = new Menu();
 
-	protected void showContextMenu() {
-		Menu contextMenu = new Menu();
+        final ListGridRecord rec = list.getSelectedRecord();
+        final long id = rec.getAttributeAsLong("id");
 
-		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = rec.getAttributeAsLong("id");
+        MenuItem delete = new MenuItem();
+        delete.setTitle(I18N.message("ddelete"));
+        delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+            if (Boolean.TRUE.equals(confirm)) {
+                ImpexService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        list.removeSelectedData();
+                        list.deselectAllRecords();
+                        showDetails(null, true);
+                    }
+                });
+            }
+        }));
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
-			if (Boolean.TRUE.equals(confirm)) {
-				ImpexService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						list.removeSelectedData();
-						list.deselectAllRecords();
-						showDetails(null, true);
-					}
-				});
-			}
-		}));
+        MenuItem open = new MenuItem();
+        open.setTitle(I18N.message("open"));
+        open.addClickHandler(event -> openArchive(rec));
 
-		MenuItem open = new MenuItem();
-		open.setTitle(I18N.message("open"));
-		open.addClickHandler(event -> openArchive(rec));
+        MenuItem close = new MenuItem();
+        close.setTitle(I18N.message("close"));
+        close.addClickHandler(
+                event -> LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), confirm -> {
+                    if (Boolean.TRUE.equals(confirm)) {
+                        onClosingArchive(rec);
+                    }
+                }));
 
-		MenuItem close = new MenuItem();
-		close.setTitle(I18N.message("close"));
-		close.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), confirm -> {
-					if (Boolean.TRUE.equals(confirm)) {
-						onClosingArchive(rec);
-					}
-				}));
+        if (GUIArchive.STATUS_OPEN != rec.getAttributeAsInt(STATUS))
+            close.setEnabled(false);
 
-		if (GUIArchive.STATUS_OPEN != rec.getAttributeAsInt(STATUS))
-			close.setEnabled(false);
+        if (GUIArchive.STATUS_ERROR != rec.getAttributeAsInt(STATUS))
+            open.setEnabled(false);
 
-		if (GUIArchive.STATUS_ERROR != rec.getAttributeAsInt(STATUS))
-			open.setEnabled(false);
+        contextMenu.setItems(close, open, new MenuItemSeparator(), delete);
+        addUsefulMenuItem(contextMenu);
+        contextMenu.showContextMenu();
+    }
 
-		contextMenu.setItems(close, open, new MenuItemSeparator(), delete);
-		addUsefulMenuItem(contextMenu);
-		contextMenu.showContextMenu();
-	}
+    public void showDetails(Long archiveId, boolean readonly) {
+        if (details != null)
+            detailsContainer.removeMember(details);
+        if (archiveId != null)
+            details = new ArchiveDetailsPanel(this, archiveId, readonly);
+        else
+            details = SELECT_ELEMENT;
+        detailsContainer.addMember(details);
+    }
 
-	public void showDetails(Long archiveId, boolean readonly) {
-		if (details != null)
-			detailsContainer.removeMember(details);
-		if (archiveId != null)
-			details = new ArchiveDetailsPanel(this, archiveId, readonly);
-		else
-			details = SELECT_ELEMENT;
-		detailsContainer.addMember(details);
-	}
+    public ListGrid getList() {
+        return list;
+    }
 
-	public ListGrid getList() {
-		return list;
-	}
+    protected void closeArchive(final ListGridRecord rec) {
+        ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_CLOSED,
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        rec.setAttribute(STATUS, GUIArchive.STATUS_CLOSED);
+                        list.refreshRow(list.getRecordIndex(rec));
+                        showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
+                    }
+                });
+    }
 
-	protected void closeArchive(final ListGridRecord rec) {
-		ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_CLOSED,
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						rec.setAttribute(STATUS, GUIArchive.STATUS_CLOSED);
-						list.refreshRow(list.getRecordIndex(rec));
-						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
-					}
-				});
-	}
+    protected void onAddingArchive() {
+        ArchiveDialog dialog = new ArchiveDialog(ExportArchivesList.this);
+        dialog.show();
+    }
 
-	public int getArchivesType() {
-		return archivesType;
-	}
+    /**
+     * This method is used only by the classes that extend this class.
+     */
+    protected Menu addUsefulMenuItem(Menu contextMenu) {
+        return contextMenu;
+    }
 
-	protected void onAddingArchive() {
-		ArchiveDialog dialog = new ArchiveDialog(ExportArchivesList.this);
-		dialog.show();
-	}
+    protected void onClosingArchive(final ListGridRecord rec) {
+        closeArchive(rec);
+    }
 
-	/**
-	 * This method is used only by the classes that extend this class.
-	 */
-	protected Menu addUsefulMenuItem(Menu contextMenu) {
-		return contextMenu;
-	}
+    protected void openArchive(final ListGridRecord rec) {
+        ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_OPEN,
+                new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        rec.setAttribute(STATUS, GUIArchive.STATUS_OPEN);
+                        list.refreshRow(list.getRecordIndex(rec));
+                        showDetails(rec.getAttributeAsLong("id"), true);
+                    }
+                });
+    }
 
-	protected void onClosingArchive(final ListGridRecord rec) {
-		closeArchive(rec);
-	}
+    public void refresh(boolean showHistory) {
+        this.showHistory = showHistory;
+        refresh();
+    }
 
-	protected void openArchive(final ListGridRecord rec) {
-		ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_OPEN,
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						rec.setAttribute(STATUS, GUIArchive.STATUS_OPEN);
-						list.refreshRow(list.getRecordIndex(rec));
-						showDetails(rec.getAttributeAsLong("id"), true);
-					}
-				});
-	}
+    public void refresh() {
+        list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, null, Session.get().getUser().getId()));
+        detailsContainer.removeMembers(detailsContainer.getMembers());
+        details = SELECT_ELEMENT;
+        detailsContainer.setMembers(details);
+    }
 
-	public void refresh(int archivesType, boolean showHistory) {
-		this.archivesType = archivesType;
-		this.showHistory = showHistory;
-		refresh();
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
 
-	public void refresh() {
-		if (archivesType == GUIArchive.TYPE_STORE && showHistory)
-			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, GUIArchive.STATUS_FINALIZED,
-					Session.get().getUser().getId()));
-		else
-			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, null, Session.get().getUser().getId()));
-		detailsContainer.removeMembers(detailsContainer.getMembers());
-		details = SELECT_ELEMENT;
-		detailsContainer.setMembers(details);
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

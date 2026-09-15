@@ -55,7 +55,6 @@ public class ArchiveDialog extends Window {
 		save.addClickHandler(event -> {
 			if (form.validate()) {
 				GUIArchive archive = new GUIArchive();
-				archive.setType(archivesPanel.getArchivesType());
 				archive.setName(form.getValueAsString("name"));
 				archive.setDescription(form.getValueAsString("description"));
 				archive.setCreatorId(Session.get().getUser().getId());
@@ -69,7 +68,7 @@ public class ArchiveDialog extends Window {
 						// We can reload the archives list with the saved
 						// archive, because all archives of the same list
 						// have the same type
-						archivesPanel.refresh(result.getType(), false);
+						archivesPanel.refresh(false);
 					}
 				});
 			}

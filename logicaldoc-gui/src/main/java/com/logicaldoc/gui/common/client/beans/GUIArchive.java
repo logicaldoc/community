@@ -10,248 +10,226 @@ import java.util.Date;
  * @since 6.0
  */
 public class GUIArchive implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private long id = 0;
+    private long id = 0;
 
-	public static final int STATUS_OPEN = 0;
+    public static final int STATUS_OPEN = 0;
 
-	public static final int STATUS_READY_TO_IMPORT = 0;
+    public static final int STATUS_READY_TO_IMPORT = 0;
 
-	public static final int STATUS_CLOSED = 1;
+    public static final int STATUS_CLOSED = 1;
 
-	public static final int STATUS_FINALIZED = 2;
+    public static final int STATUS_FINALIZED = 2;
 
-	public static final int STATUS_READYTOSIGN = 3;
+    public static final int STATUS_READYTOSIGN = 3;
 
-	public static final int STATUS_ERROR = 4;
+    public static final int STATUS_ERROR = 4;
 
-	public static final int TYPE_DEFAULT = 0;
+    public static final int MODE_IMPORT = 0;
 
-	public static final int TYPE_STORE = 1;
+    public static final int MODE_EXPORT = 1;
 
-	public static final int MODE_IMPORT = 0;
+    public static final int CUSTOMID_NOT_IMPORT = 0;
 
-	public static final int MODE_EXPORT = 1;
+    public static final int CUSTOMID_IMPORT_AND_NEW_RELEASE = 1;
 
-	public static final int CUSTOMID_NOT_IMPORT = 0;
+    public static final int CUSTOMID_IMPORT_AND_NEW_SUBVERSION = 2;
 
-	public static final int CUSTOMID_IMPORT_AND_NEW_RELEASE = 1;
+    public static final int CUSTOMID_IMPORT_AND_NEW_DOCUMENT = 3;
 
-	public static final int CUSTOMID_IMPORT_AND_NEW_SUBVERSION = 2;
+    private String name = "";
 
-	public static final int CUSTOMID_IMPORT_AND_NEW_DOCUMENT = 3;
+    private String description = "";
 
-	private String name = "";
+    private Date creation = new Date();
 
-	private String description = "";
+    private long size = 0;
 
-	private Date creation = new Date();
+    private long creatorId;
 
-	private long size = 0;
+    private String creatorName = "";
 
-	private long creatorId;
+    private Long closerId;
 
-	private String creatorName = "";
+    private String closerName = "";
 
-	private Long closerId;
+    private Date closure;
 
-	private String closerName = "";
+    private int status = STATUS_OPEN;
 
-	private Date closure;
+    private int mode = MODE_IMPORT;
 
-	private int status = STATUS_OPEN;
+    private boolean importTemplate = true;
 
-	private int type = TYPE_DEFAULT;
+    private int importCustomId = 0;
 
-	private int mode = MODE_IMPORT;
+    /**
+     * The archive name. Also alternative identifier.
+     * 
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 
-	private boolean importTemplate = true;
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	private int importCustomId = 0;
+    /**
+     * The archive description
+     * 
+     * @return description of the archive
+     */
+    public String getDescription() {
+        return description;
+    }
 
-	/**
-	 * The archive name. Also alternative identifier.
-	 * 
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * The archive's creation date
+     * 
+     * @return the date when the archive was created
+     */
+    public Date getCreation() {
+        return creation;
+    }
 
-	/**
-	 * The archive description
-	 * 
-	 * @return description of the archive
-	 */
-	public String getDescription() {
-		return description;
-	}
+    public void setCreation(Date creation) {
+        this.creation = creation;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /**
+     * The archive status
+     * 
+     * @see #STATUS_OPEN
+     * @see #STATUS_CLOSED
+     * @see #STATUS_FINALIZED
+     * @see #STATUS_READYTOSIGN
+     * @see #STATUS_ERROR
+     * 
+     * @return the status
+     */
+    public int getStatus() {
+        return status;
+    }
 
-	/**
-	 * The archive's creation date
-	 * 
-	 * @return the date when the archive was created
-	 */
-	public Date getCreation() {
-		return creation;
-	}
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
-	public void setCreation(Date creation) {
-		this.creation = creation;
-	}
+    /**
+     * Archive dimension in bytes, that is the sum of sizes of all document plus
+     * the size of all metadata files
+     * 
+     * @return the total size in bytes
+     */
+    public long getSize() {
+        return size;
+    }
 
-	/**
-	 * The archive status
-	 * 
-	 * @see #STATUS_OPEN
-	 * @see #STATUS_CLOSED
-	 * @see #STATUS_FINALIZED
-	 * @see #STATUS_READYTOSIGN
-	 * @see #STATUS_ERROR
-	 * 
-	 * @return the status
-	 */
-	public int getStatus() {
-		return status;
-	}
+    public void setSize(long size) {
+        this.size = size;
+    }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    /**
+     * The archive creator id
+     * 
+     * @return identifier of the creator
+     */
+    public long getCreatorId() {
+        return creatorId;
+    }
 
-	/**
-	 * Archive dimension in bytes, that is the sum of sizes of all document plus
-	 * the size of all metadata files
-	 * 
-	 * @return the total size in bytes
-	 */
-	public long getSize() {
-		return size;
-	}
+    public void setCreatorId(long creatorId) {
+        this.creatorId = creatorId;
+    }
 
-	public void setSize(long size) {
-		this.size = size;
-	}
+    /**
+     * The archive creator name
+     * 
+     * @return name of the creator
+     */
+    public String getCreatorName() {
+        return creatorName;
+    }
 
-	/**
-	 * The archive type
-	 * 
-	 * @see #TYPE_DEFAULT
-	 * @see #TYPE_STORE
-	 * 
-	 * @return the type
-	 */
-	public int getType() {
-		return type;
-	}
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
+    }
 
-	public void setType(int type) {
-		this.type = type;
-	}
+    /**
+     * The archive closer id
+     * 
+     * @return identifier of the user that closed the archive
+     */
+    public Long getCloserId() {
+        return closerId;
+    }
 
-	/**
-	 * The archive creator id
-	 * 
-	 * @return identifier of the creator
-	 */
-	public long getCreatorId() {
-		return creatorId;
-	}
+    public void setCloserId(Long closerId) {
+        this.closerId = closerId;
+    }
 
-	public void setCreatorId(long creatorId) {
-		this.creatorId = creatorId;
-	}
+    /**
+     * The archive closer name
+     * 
+     * @return name of the user that closed the archive
+     */
+    public String getCloserName() {
+        return closerName;
+    }
 
-	/**
-	 * The archive creator name
-	 * 
-	 * @return name of the creator
-	 */
-	public String getCreatorName() {
-		return creatorName;
-	}
+    public void setCloserName(String closerName) {
+        this.closerName = closerName;
+    }
 
-	public void setCreatorName(String creatorName) {
-		this.creatorName = creatorName;
-	}
+    /**
+     * The archive's closure date
+     * 
+     * @return the date when the archive has been closed
+     */
+    public Date getClosure() {
+        return closure;
+    }
 
-	/**
-	 * The archive closer id
-	 * 
-	 * @return identifier of the user that closed the archive
-	 */
-	public Long getCloserId() {
-		return closerId;
-	}
+    public void setClosure(Date closure) {
+        this.closure = closure;
+    }
 
-	public void setCloserId(Long closerId) {
-		this.closerId = closerId;
-	}
+    public int getMode() {
+        return mode;
+    }
 
-	/**
-	 * The archive closer name
-	 * 
-	 * @return name of the user that closed the archive
-	 */
-	public String getCloserName() {
-		return closerName;
-	}
+    public void setMode(int mode) {
+        this.mode = mode;
+    }
 
-	public void setCloserName(String closerName) {
-		this.closerName = closerName;
-	}
+    public boolean isImportTemplate() {
+        return importTemplate;
+    }
 
-	/**
-	 * The archive's closure date
-	 * 
-	 * @return the date when the archive has been closed
-	 */
-	public Date getClosure() {
-		return closure;
-	}
+    public void setImportTemplate(boolean importTemplate) {
+        this.importTemplate = importTemplate;
+    }
 
-	public void setClosure(Date closure) {
-		this.closure = closure;
-	}
+    public int getImportCustomId() {
+        return importCustomId;
+    }
 
-	public int getMode() {
-		return mode;
-	}
+    public void setImportCustomId(int importCustomId) {
+        this.importCustomId = importCustomId;
+    }
 
-	public void setMode(int mode) {
-		this.mode = mode;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public boolean isImportTemplate() {
-		return importTemplate;
-	}
-
-	public void setImportTemplate(boolean importTemplate) {
-		this.importTemplate = importTemplate;
-	}
-
-	public int getImportCustomId() {
-		return importCustomId;
-	}
-
-	public void setImportCustomId(int importCustomId) {
-		this.importCustomId = importCustomId;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 }

@@ -13,22 +13,22 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 6.0
  */
 public class IncrementalArchivesDS extends DataSource {
-	public IncrementalArchivesDS(int archivesType) {
-		setTitleField("name");
-		setRecordXPath("/list/archive");
+    public IncrementalArchivesDS() {
+        setTitleField("name");
+        setRecordXPath("/list/archive");
 
-		DataSourceTextField id = new DataSourceTextField("id");
-		id.setPrimaryKey(true);
-		id.setHidden(true);
-		id.setRequired(true);
+        DataSourceTextField id = new DataSourceTextField("id");
+        id.setPrimaryKey(true);
+        id.setHidden(true);
+        id.setRequired(true);
 
-		DataSourceTextField prefix = new DataSourceTextField("prefix");
-		DataSourceTextField type = new DataSourceTextField("type");
-		DataSourceTextField typelabel = new DataSourceTextField("typelabel");
-		DataSourceIntegerField frequency = new DataSourceIntegerField("frequency");
+        DataSourceTextField prefix = new DataSourceTextField("prefix");
+        DataSourceTextField type = new DataSourceTextField("type");
+        DataSourceTextField typelabel = new DataSourceTextField("typelabel");
+        DataSourceIntegerField frequency = new DataSourceIntegerField("frequency");
 
-		setFields(id, prefix, type, typelabel, frequency);
-		setClientOnly(true);
-		setDataURL("data/incrementalarchives.xml?locale=" + I18N.getLocale() + "&type=" + archivesType);
-	}
+        setFields(id, prefix, type, typelabel, frequency);
+        setClientOnly(true);
+        setDataURL("data/incrementalarchives.xml?locale=" + I18N.getLocale());
+    }
 }

@@ -2455,7 +2455,7 @@ public class ItemFactory {
         item.setDisplayField("name");
         item.setPickListWidth(300);
         item.setPickListFields(name, description);
-        item.setOptionDataSource(new ArchivesDS(mode, null, status, null));
+        item.setOptionDataSource(new ArchivesDS(mode, status, null));
         if (!Feature.enabled(Feature.IMPEX))
             item.setDisabled(true);
         return item;
