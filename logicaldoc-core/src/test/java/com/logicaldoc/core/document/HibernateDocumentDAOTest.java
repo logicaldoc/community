@@ -776,20 +776,20 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         assertEquals(6L, testSubject.countUserDocuments(1L, false, false));
         assertEquals(0L, testSubject.countUserDocuments(99L, false, false));
     }
-    
+
     @Test
     public void testCountPages() throws PersistenceException {
         assertEquals(45L, testSubject.countPages(null, true, false));
         assertEquals(30L, testSubject.countPages(Tenant.DEFAULT_ID, false, false));
     }
-    
+
     @Test
     public void testCountUserPages() throws PersistenceException {
         assertEquals(45L, testSubject.countUserPages(null, true, false));
         assertEquals(30L, testSubject.countUserPages(1L, false, false));
         assertEquals(0L, testSubject.countUserPages(99L, false, false));
     }
-    
+
     @Test
     public void testCountByIndexed() throws PersistenceException {
         assertEquals(2L, testSubject.countByIndexed(IndexingStatus.TO_INDEX));
@@ -906,7 +906,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testCleanExpiredTransactions() throws PersistenceException, InterruptedException {
+    public void testCleanExpiredTransactions() throws PersistenceException {
         Document doc = testSubject.findById(1L, true);
         assertNotNull(doc);
         doc.setTransactionId("transaction");

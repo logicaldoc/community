@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Session;
@@ -23,10 +22,9 @@ import com.logicaldoc.web.service.SecurityServiceImpl;
 
 /**
  * Abstract test case for the web-application dependent modules. This class
- * initialises a test database and prepares the spring test context.
- * <p>
- * All LogicalDOC's tests must extend this test case in order to find a ready
- * and accessible database.
+ * initialises a test database and prepares the spring test context. <p> All
+ * LogicalDOC's tests must extend this test case in order to find a ready and
+ * accessible database.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2.1
@@ -53,7 +51,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
         assertNotNull(SessionManager.get().get(guiSession.getSid()));
     }
 
-    protected void prepareSession(String username, String password) throws ServerException, PersistenceException {
+    protected void prepareSession(String username, String password) throws ServerException {
         guiSession = new GUISession();
         Client client = new Client("xyz", "192.168.2.231", "ghost");
         Device device = new Device();

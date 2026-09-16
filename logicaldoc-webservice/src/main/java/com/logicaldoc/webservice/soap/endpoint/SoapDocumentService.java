@@ -453,7 +453,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
         transaction.setComment("");
         transaction.setUser(user);
 
-        Document movedDoc =  DocumentManager.get().moveToFolder(doc, folder, transaction).getDocument();
+        Document movedDoc = DocumentManager.get().moveToFolder(doc, folder, transaction).getDocument();
         return getDoc(movedDoc.getId());
     }
 
@@ -598,8 +598,10 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
         // Retain just those files accessible by the user that also matches the
         // file name
-        docs = docDao
-                .initialize(docs.stream().filter(doc -> mustList(doc, user, fileName)).collect(Collectors.toList()));
+        List<Document> filteredDocs = docs.stream().filter(doc -> mustList(doc, user, fileName))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        docs = docDao.initialize(filteredDocs);
 
         // In case of pagination, extract just the wanted page
         if (max != null && page != null && max < docs.size())

@@ -490,22 +490,21 @@ public class PatchPanel extends VLayout {
                 confirmPatchButton.setVisible(false);
                 download.setVisible(false);
 
-                LD.ask(CONFIRMPATCH, "askexecutepackage", "applynow", "applybymself", null, runImmediately -> {
-                    UpdateService.Instance.get().confirmPatch(patch.getFile(), runImmediately,
-                            new DefaultAsyncCallback<>() {
-                                @Override
-                                public void handleSuccess(String path) {
-                                    if (Boolean.TRUE.equals(runImmediately)) {
-                                        Session.get().setUpdating(true);
-                                        cancel.setVisible(false);
-                                        switchLogView(patch);
-                                        lastConfirmed = new Date();
-                                    } else {
-                                        LD.prompt(I18N.message("openshelandexecute", path));
+                LD.ask(CONFIRMPATCH, "askexecutepackage", "applynow", "applybmyself", null,
+                        runImmediately -> UpdateService.Instance.get().confirmPatch(patch.getFile(), runImmediately,
+                                new DefaultAsyncCallback<>() {
+                                    @Override
+                                    public void handleSuccess(String path) {
+                                        if (Boolean.TRUE.equals(runImmediately)) {
+                                            Session.get().setUpdating(true);
+                                            cancel.setVisible(false);
+                                            switchLogView(patch);
+                                            lastConfirmed = new Date();
+                                        } else {
+                                            LD.prompt(I18N.message("openshelandexecute", path));
+                                        }
                                     }
-                                }
-                            });
-                });
+                                }));
             }
         });
     }

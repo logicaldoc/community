@@ -399,21 +399,20 @@ public class UpdatePanel extends VLayout {
                 confirmUpdateButton.setVisible(false);
                 download.setVisible(false);
 
-                LD.ask(CONFIRMUPDATE, "askexecutepackage", "applynow", "applybymself", null, runImmediately -> {
-                    UpdateService.Instance.get().confirmUpdate(updateFileName, runImmediately,
-                            new DefaultAsyncCallback<>() {
-                                @Override
-                                public void handleSuccess(String command) {
-                                    if (Boolean.TRUE.equals(runImmediately)) {
-                                        Session.get().setUpdating(true);
-                                        switchLogView();
-                                        lastConfirmed = new Date();
-                                    } else {
-                                        LD.prompt(I18N.message("openshelandexecute", command));
+                LD.ask(CONFIRMUPDATE, "askexecutepackage", "applynow", "applybymself", null,
+                        runImmediately -> UpdateService.Instance.get().confirmUpdate(updateFileName, runImmediately,
+                                new DefaultAsyncCallback<>() {
+                                    @Override
+                                    public void handleSuccess(String command) {
+                                        if (Boolean.TRUE.equals(runImmediately)) {
+                                            Session.get().setUpdating(true);
+                                            switchLogView();
+                                            lastConfirmed = new Date();
+                                        } else {
+                                            LD.prompt(I18N.message("openshelandexecute", command));
+                                        }
                                     }
-                                }
-                            });
-                });
+                                }));
             }
         });
     }

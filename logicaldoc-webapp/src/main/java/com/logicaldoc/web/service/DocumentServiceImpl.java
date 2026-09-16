@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -1172,7 +1173,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
     public void restore(List<Long> docIds, long folderId) throws ServerException {
         Session session = validateSession();
 
-        for (Long docId : docIds.stream().filter(id -> id != null).toList()) {
+        for (Long docId : docIds.stream().filter(Objects::nonNull).toList()) {
             DocumentHistory transaction = new DocumentHistory();
             transaction.setSession(session);
 

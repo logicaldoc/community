@@ -325,7 +325,7 @@ public class ModelsPanel extends VLayout {
         iimport.addClickHandler(
                 click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-        if (selection[0].getAttributeAsBoolean("trainable")) {
+        if (Boolean.TRUE.equals(selection[0].getAttributeAsBoolean("trainable"))) {
             contextMenu.setItems(query, new MenuItemSeparator(), train, stopTraining, evaluate, new MenuItemSeparator(),
                     clone, iimport, export, new MenuItemSeparator(), delete);
         } else {

@@ -432,7 +432,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
                                     doc.getId()));
     }
 
-    private void copyFolderMetadata(Document doc) throws PersistenceException {
+    private void copyFolderMetadata(Document doc) {
         if (doc.getFolder().getTemplate() != null)
             copyFolderExtendedAttributes(doc);
 
@@ -447,7 +447,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             doc.setFillMode(FillMode.ALL);
     }
 
-    private void copyFolderExtendedAttributes(Document doc) throws PersistenceException {
+    private void copyFolderExtendedAttributes(Document doc) {
         Folder folder = doc.getFolder();
         if (doc.getTemplate() == null || doc.getTemplate().equals(folder.getTemplate())) {
             doc.setTemplate(folder.getTemplate());
@@ -932,10 +932,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         if (!includeDeleted)
             query.append(" and ld_deleted = 0 ");
     }
-    
+
     /**
-     * Takes care of including / excluding archived status conditions in the given
-     * query
+     * Takes care of including / excluding archived status conditions in the
+     * given query
      * 
      * @param query the query being prepared
      * @param includeArchived true if we want to also get archived records, thus

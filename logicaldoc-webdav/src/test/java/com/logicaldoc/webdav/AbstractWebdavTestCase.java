@@ -9,15 +9,12 @@ import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
-import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
@@ -27,71 +24,67 @@ import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * Abstract test case for the Webdav module. This class initialises a test
- * database and prepares the spring test context.
- * <p>
- * All LogicalDOC's tests must extend this test case in order to find a ready
- * and accessible database.
+ * database and prepares the spring test context. <p> All LogicalDOC's tests
+ * must extend this test case in order to find a ready and accessible database.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.3
  */
 public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 
-	protected File repositoryDir = new File(tempDir, "repository");
+    protected File repositoryDir = new File(tempDir, "repository");
 
-	protected Session session;
+    protected Session session;
 
-	protected WebdavSession davSession;
+    protected WebdavSession davSession;
 
-	protected MockServletSession servletSession = new MockServletSession();
+    protected MockServletSession servletSession = new MockServletSession();
 
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		prepareRepository();
-		prepareSession("admin", "admin");
-		assertNotNull(session);
-	}
+        prepareRepository();
+        prepareSession("admin", "admin");
+        assertNotNull(session);
+    }
 
-	protected void prepareSession(String username, String password) throws PersistenceException {
-		UserDAO userDao = UserDAO.get();
+    protected void prepareSession(String username, String password) {
+        Client client = new Client("xyz", "192.168.2.13", "ghost");
+        Device device = new Device();
+        device.setBrowser("Firefox");
+        device.setBrowserVersion("18");
+        device.setOperativeSystem("Windows");
+        client.setDevice(device);
+        session = SessionManager.get().newSession(username, password, null, client);
 
-		Client client = new Client("xyz", "192.168.2.13", "ghost");
-		Device device = new Device();
-		device.setBrowser("Firefox");
-		device.setBrowserVersion("18");
-		device.setOperativeSystem("Windows");
-		client.setDevice(device);
-		session = SessionManager.get().newSession(username, password, null, client);
-		
-		LDAuthenticationToken token = new LDAuthenticationToken(username);
-		token.setSid(session.getSid());
-		SecurityContextHolder.getContext().setAuthentication(token);
+        LDAuthenticationToken token = new LDAuthenticationToken(username);
+        token.setSid(session.getSid());
+        SecurityContextHolder.getContext().setAuthentication(token);
 
-		LDDeferredSecurityContext.bindServletSession(session.getSid(), servletSession);
+        LDDeferredSecurityContext.bindServletSession(session.getSid(), servletSession);
 
-		davSession = new DavSessionImpl();
-		davSession.putObject("id", session.getUserId());
-		davSession.putObject("sid", session.getSid());
-	}
+        davSession = new DavSessionImpl();
+        davSession.putObject("id", session.getUserId());
+        davSession.putObject("sid", session.getSid());
+    }
 
-	private void prepareRepository() throws IOException {
-		repositoryDir.mkdirs();
-		repositoryDir.mkdir();
+    private void prepareRepository() throws IOException {
+        repositoryDir.mkdirs();
+        repositoryDir.mkdir();
 
-		File file3 = new File(repositoryDir.getPath() + "/docs/1/doc/1.0");
-		file3.getParentFile().mkdirs();
-		FileUtil.copyResource("pdf1.pdf", file3);
+        File file3 = new File(repositoryDir.getPath() + "/docs/1/doc/1.0");
+        file3.getParentFile().mkdirs();
+        FileUtil.copyResource("pdf1.pdf", file3);
 
-		File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
-		file5.getParentFile().mkdirs();
-		FileUtil.copyResource("pdf2.pdf", file5);
-		FileUtil.copyResource("pdf2.pdf", new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
-	}
+        File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
+        file5.getParentFile().mkdirs();
+        FileUtil.copyResource("pdf2.pdf", file5);
+        FileUtil.copyResource("pdf2.pdf", new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
+    }
 
-	@Override
-	protected List<String> getDatabaseScripts() {
-		return List.of("sql/logicaldoc-core.sql", "data.sql");
-	}
+    @Override
+    protected List<String> getDatabaseScripts() {
+        return List.of("sql/logicaldoc-core.sql", "data.sql");
+    }
 }

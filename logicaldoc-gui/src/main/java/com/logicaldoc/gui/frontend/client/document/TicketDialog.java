@@ -159,11 +159,6 @@ public class TicketDialog extends Window {
                 suffix, expireHours, date, maxDownloads, maxViews, password, new DefaultAsyncCallback<>() {
 
                     @Override
-                    public void onFailure(Throwable caught) {
-                        super.onFailure(caught);
-                    }
-
-                    @Override
                     public void handleSuccess(List<String> ret) {
                         if (ret.get(0).contains("passwordweek")) {
                             List<String> errors = new ArrayList<>();
