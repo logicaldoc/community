@@ -174,12 +174,12 @@ public class Ticket extends PersistentObject {
 
     public boolean isTicketExpired() {
         return !enabled || (expired != null && new Date().getTime() > expired.getTime())
-                || (maxCount != null && maxCount > 0 && count >= maxCount);
+                || (maxCount != null && maxCount >= 0 && count >= maxCount);
     }
 
     public boolean isTicketViewExpired() {
         return !enabled || (expired != null && new Date().getTime() > expired.getTime())
-                || (maxViews != null && maxViews > 0 && views >= maxViews);
+                || (maxViews != null && maxViews >= 0 && views >= maxViews);
     }
 
     public boolean checkPassword(String password) {
