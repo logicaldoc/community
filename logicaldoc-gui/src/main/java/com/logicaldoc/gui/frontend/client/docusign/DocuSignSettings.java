@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.docusign;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocuSignSettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
@@ -23,96 +22,103 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class DocuSignSettings extends Window {
 
-	private DynamicForm form = new DynamicForm();
+    private static final String ACCOUNTID = "accountid";
 
-	private GUIDocuSignSettings settings;
+    private static final String SECRETKEY = "secretkey";
 
-	public DocuSignSettings() {
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("docusign"));
-		setCanDragResize(true);
-		setIsModal(true);
-		setShowModalMask(true);
-		centerInPage();
-		setPadding(2);
-		setAutoSize(true);
+    private static final String INTEGRATIONKEY = "integrationkey";
 
-		DocuSignService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
+    private DynamicForm form = new DynamicForm();
 
-			@Override
-			public void handleSuccess(GUIDocuSignSettings settings) {
-				DocuSignSettings.this.settings = settings;
-				initGui();
-			}
+    private GUIDocuSignSettings settings;
 
-		});
-	}
+    public DocuSignSettings() {
+        setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+        setTitle(I18N.message("docusign"));
+        setCanDragResize(true);
+        setIsModal(true);
+        setShowModalMask(true);
+        centerInPage();
+        setPadding(2);
+        setAutoSize(true);
 
-	private void initGui() {
-		TextItem accountId = ItemFactory.newTextItem("accountid", settings.getAccountId());
-		accountId.setRequired(true);
-		accountId.setWidth(300);
+        DocuSignService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 
-		TextItem integrationKey = ItemFactory.newPasswordItemPreventAutocomplete("integrationkey", "integrationkey", settings.getIntegrationKey());
-		integrationKey.setRequired(true);
-		integrationKey.setWidth(300);
+            @Override
+            public void handleSuccess(GUIDocuSignSettings settings) {
+                DocuSignSettings.this.settings = settings;
+                initGui();
+            }
 
-		TextItem secretKey = ItemFactory.newPasswordItemPreventAutocomplete("secretkey", "secretkey", settings.getSecretKey());
-		secretKey.setRequired(true);
-		secretKey.setWidth(300);
+        });
+    }
 
-		SelectItem authBaseUrl = ItemFactory.newSelectItem("authbaseurl");
-		authBaseUrl.setValue(settings.getAuthBaseUrl());
-		authBaseUrl.setRequired(true);
-		authBaseUrl.setValueMap("https://account.docusign.com", "https://account-d.docusign.com");
-		authBaseUrl.setWidth(300);
+    private void initGui() {
+        TextItem accountId = ItemFactory.newTextItem(ACCOUNTID, settings.getAccountId());
+        accountId.setRequired(true);
+        accountId.setWidth(300);
 
-		TextItem accountBaseUrl = ItemFactory.newTextItem("accountbaseurl", settings.getApiBaseUrl());
-		accountBaseUrl.setRequired(true);
-		accountBaseUrl.setWidth(300);
+        TextItem integrationKey = ItemFactory.newPasswordItemPreventAutocomplete(INTEGRATIONKEY,
+                settings.getIntegrationKey());
+        integrationKey.setRequired(true);
+        integrationKey.setWidth(300);
 
-		TextItem callbackUrl = ItemFactory.newTextItem("callbackurl", settings.getCallbackUrl());
-		callbackUrl.setRequired(false);
-		callbackUrl.setDisabled(true);
-		callbackUrl.setWidth(300);
+        TextItem secretKey = ItemFactory.newPasswordItemPreventAutocomplete(SECRETKEY, settings.getSecretKey());
+        secretKey.setRequired(true);
+        secretKey.setWidth(300);
 
-		ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
-		authorize.setAutoFit(true);
+        SelectItem authBaseUrl = ItemFactory.newSelectItem("authbaseurl");
+        authBaseUrl.setValue(settings.getAuthBaseUrl());
+        authBaseUrl.setRequired(true);
+        authBaseUrl.setValueMap("https://account.docusign.com", "https://account-d.docusign.com");
+        authBaseUrl.setWidth(300);
 
-		authorize.addClickHandler(event -> onAuthorize());
+        TextItem accountBaseUrl = ItemFactory.newTextItem("accountbaseurl", settings.getApiBaseUrl());
+        accountBaseUrl.setRequired(true);
+        accountBaseUrl.setWidth(300);
 
-		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setFields(authBaseUrl, accountBaseUrl, callbackUrl, accountId, integrationKey, secretKey, authorize);
+        TextItem callbackUrl = ItemFactory.newTextItem("callbackurl", settings.getCallbackUrl());
+        callbackUrl.setRequired(false);
+        callbackUrl.setDisabled(true);
+        callbackUrl.setWidth(300);
 
-		addItem(form);
-	}
+        ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
+        authorize.setAutoFit(true);
 
-	public void onAuthorize() {
-		if (!form.validate())
-			return;
+        authorize.addClickHandler(event -> onAuthorize());
 
-		settings.setAccountId(form.getValueAsString("accountid"));
-		settings.setAuthBaseUrl(form.getValueAsString("authbaseurl"));
-		settings.setApiBaseUrl(form.getValueAsString("accountbaseurl"));
-		settings.setIntegrationKey(form.getValueAsString("integrationkey"));
-		settings.setSecretKey(form.getValueAsString("secretkey"));
+        form.setTitleOrientation(TitleOrientation.TOP);
+        form.setFields(authBaseUrl, accountBaseUrl, callbackUrl, accountId, integrationKey, secretKey, authorize);
 
-		DocuSignService.Instance.get().authorize(settings, new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(String authorizationUrl) {
-			    WindowUtils.openUrl(authorizationUrl, "_blank", null);
-				destroy();
-			}
-		});
-	}
+        addItem(form);
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    public void onAuthorize() {
+        if (!form.validate())
+            return;
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+        settings.setAccountId(form.getValueAsString(ACCOUNTID));
+        settings.setAuthBaseUrl(form.getValueAsString("authbaseurl"));
+        settings.setApiBaseUrl(form.getValueAsString("accountbaseurl"));
+        settings.setIntegrationKey(form.getValueAsString(INTEGRATIONKEY));
+        settings.setSecretKey(form.getValueAsString(SECRETKEY));
+
+        DocuSignService.Instance.get().authorize(settings, new DefaultAsyncCallback<>() {
+            @Override
+            public void handleSuccess(String authorizationUrl) {
+                WindowUtils.openUrl(authorizationUrl, "_blank", null);
+                destroy();
+            }
+        });
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

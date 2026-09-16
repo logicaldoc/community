@@ -120,13 +120,19 @@ public class UserQuotaPanel extends HLayout {
             else
                 user.setSessionsQuota(null);
 
-            if (form.getValueAsString(QUOTA_THRESHOLD) == null)
-                user.setQuotaThreshold(null);
-            else
-                user.setQuotaThreshold(Integer.parseInt(form.getValueAsString(QUOTA_THRESHOLD)));
+            updateQuotaThreshold();
 
         }
         return !form.hasErrors();
+    }
+
+    private void updateQuotaThreshold() {
+        String value = form.getValueAsString(QUOTA_THRESHOLD);
+
+        if (value == null)
+            user.setQuotaThreshold(null);
+        else
+            user.setQuotaThreshold(Integer.parseInt(value));
     }
 
     @Override

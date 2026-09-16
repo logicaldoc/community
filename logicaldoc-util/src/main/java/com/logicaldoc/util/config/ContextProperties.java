@@ -151,7 +151,7 @@ public class ContextProperties extends AdvancedProperties {
                 load(fis);
             }
         } catch (IOException e) {
-            throw new IOException("Unable to read from %s".formatted(file.getPath()), e);
+            throw new IOException(UNABLE_TO_READ_FROM.formatted(file.getPath()), e);
         }
 
         overrideFile = detectOverrideFile();

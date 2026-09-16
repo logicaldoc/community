@@ -409,7 +409,7 @@ public class ModelsPanel extends VLayout {
         SelectItem type = ItemFactory.newSelectItem(TYPE);
         type.setOptionDataSource(new ModelTypesDS());
         type.setValueField("value");
-        type.setDisplayField("label");
+        type.setDisplayField(LABEL);
         type.setRequired(true);
 
         LD.askForValue("addmodel", TYPE, null, type, new ValueCallback() {

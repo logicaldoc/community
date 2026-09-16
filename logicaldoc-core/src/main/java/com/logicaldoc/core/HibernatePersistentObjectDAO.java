@@ -1,6 +1,8 @@
 package com.logicaldoc.core;
 
-import java.lang.reflect.Field;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -350,7 +352,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
             T mergedEntity = merge(entity);
             initializeEntity(mergedEntity);
             return mergedEntity;
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | IntrospectionException e) {
             log.error(e.getMessage(), e);
             return entity;
         }
@@ -373,33 +375,31 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
      * @param entity The entity to initialize
      * 
      * @throws PersistenceException Error in initializing the collections
+     * @throws IntrospectionException Something in the entity hierarchy cannot be introspected.
      */
-    protected void initializeEntity(T entity) throws PersistenceException {
+    protected void initializeEntity(T entity) throws PersistenceException, IntrospectionException {
         Class<?> clazz = entity.getClass();
 
         while (clazz != null && clazz != Object.class) {
-            for (Field field : clazz.getDeclaredFields()) {
-                if (requiresInitialization(field)) {
-                    if (log.isTraceEnabled())
-                        log.trace("Trying to initialize attribute {} of {}", field.getName(), entity);
-
-                    field.setAccessible(true);
-
-                    try {
-                        Object value = field.get(entity);
-                        Hibernate.initialize(value);
-                    } catch (Exception e) {
-                        log.warn("Cannot initialize attribute {} of {}", field.getName(), entity);
+            for (PropertyDescriptor pd : Introspector.getBeanInfo(clazz).getPropertyDescriptors()) {
+                try {
+                    if (requiresInitialization(pd.getPropertyType())) {
+                        Object value = null;
+                        if (pd.getReadMethod() != null) {
+                            value = pd.getReadMethod().invoke(entity);
+                            if (value != null)
+                                Hibernate.initialize(value);
+                        }
                     }
+                } catch (Exception e) {
+                    log.warn("Cannot initialize attribute {} of {}", pd.getName(), entity);
                 }
             }
-
             clazz = clazz.getSuperclass();
         }
     }
 
-    private static boolean requiresInitialization(Field field) {
-        Class<?> type = field.getType();
+    private static boolean requiresInitialization(Class<?> type) {
         return Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
                 || PersistentObject.class.isAssignableFrom(type);
     }

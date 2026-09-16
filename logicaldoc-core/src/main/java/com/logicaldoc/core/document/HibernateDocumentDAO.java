@@ -909,8 +909,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         StringBuilder query = new StringBuilder(
                 "select sum(ld_filesize) from ld_version where ld_version = ld_fileversion ");
 
-        if (!computeDeleted)
-            query.append(" and ld_deleted = 0 ");
+        appendDeletedCondition(query, computeDeleted);
 
         if (userId != null)
             query.append(" and ld_publisherid = %d".formatted(userId));
@@ -921,15 +920,39 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         return queryForLong(query.toString());
     }
 
+    /**
+     * Takes care of including / excluding deletion conditions in the given
+     * query
+     * 
+     * @param query the query being prepared
+     * @param includeDeleted true if we want to also get deleted records, thus
+     *        without deletetion condition
+     */
+    private void appendDeletedCondition(StringBuilder query, boolean includeDeleted) {
+        if (!includeDeleted)
+            query.append(" and ld_deleted = 0 ");
+    }
+    
+    /**
+     * Takes care of including / excluding archived status conditions in the given
+     * query
+     * 
+     * @param query the query being prepared
+     * @param includeArchived true if we want to also get archived records, thus
+     *        without status condition
+     */
+    private void appenArchivedCondition(StringBuilder query, boolean includeArchived) {
+        if (!includeArchived)
+            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+    }
+
     @Override
     public long count(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException {
-        StringBuilder query = new StringBuilder("select count(*) from ld_document where 1=1 ");
+        StringBuilder query = new StringBuilder("select count(*) from ld_document where 1 = 1 ");
 
-        if (!computeDeleted)
-            query.append(" and ld_deleted = 0 ");
+        appendDeletedCondition(query, computeDeleted);
 
-        if (!computeArchived)
-            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+        appenArchivedCondition(query, computeArchived);
 
         if (tenantId != null)
             query.append(AND_LD_TENANTID_D.formatted(tenantId));
@@ -940,13 +963,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     @Override
     public long countUserDocuments(Long userId, boolean computeDeleted, boolean computeArchived)
             throws PersistenceException {
-        StringBuilder query = new StringBuilder("select count(distinct(ld_id)) from ld_document where 1=1 ");
+        StringBuilder query = new StringBuilder("select count(distinct(ld_id)) from ld_document where 1 = 1 ");
 
-        if (!computeDeleted)
-            query.append(" and ld_deleted = 0 ");
+        appendDeletedCondition(query, computeDeleted);
 
-        if (!computeArchived)
-            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+        appenArchivedCondition(query, computeArchived);
 
         if (userId != null)
             query.append(" and (ld_publisherid = %d or ld_creatorid = %d)".formatted(userId, userId));
@@ -959,11 +980,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     public long countPages(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException {
         StringBuilder query = new StringBuilder("select sum(ld_pages) from ld_document where 1 = 1 ");
 
-        if (!computeDeleted)
-            query.append(" and ld_deleted = 0 ");
+        appendDeletedCondition(query, computeDeleted);
 
-        if (!computeArchived)
-            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+        appenArchivedCondition(query, computeArchived);
 
         if (tenantId != null)
             query.append(AND_LD_TENANTID_D.formatted(tenantId));
@@ -976,11 +995,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             throws PersistenceException {
         StringBuilder query = new StringBuilder("select sum(ld_pages) from ld_document where 1 = 1 ");
 
-        if (!computeDeleted)
-            query.append(" and ld_deleted = 0 ");
+        appendDeletedCondition(query, computeDeleted);
 
-        if (!computeArchived)
-            query.append(" and not ld_status = %d".formatted(DocumentStatus.ARCHIVED.ordinal()));
+        appenArchivedCondition(query, computeArchived);
 
         if (userId != null)
             query.append(" and (ld_publisherid = %d or ld_creatorid = %d)".formatted(userId, userId));

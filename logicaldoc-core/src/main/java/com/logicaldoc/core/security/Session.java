@@ -221,7 +221,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
     @SuppressWarnings("unused")
     private Session() {
-        // Just o avoid standard constructor
+        // Just to avoid the standard constructor
     }
 
     Session(User user, String key, Client client) {
@@ -235,11 +235,13 @@ public class Session extends PersistentObject implements Comparable<Session> {
         this.user = user;
         this.username = user.getUsername();
         this.impersonator = user.getImpersonator();
+
         try {
             setDecodedKey(key);
         } catch (NoSuchAlgorithmException e) {
             log.warn("Cannot save the key", e);
         }
+
         this.client = client;
         this.node = SystemInfo.get().getInstallationId();
         this.setLastRenew(getCreation());
@@ -252,59 +254,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
         UserHistory history = saveLoginEvent(user, client);
 
-        /*
-         * Add / update the device in the DB
-         */
-        if (client != null && client.getDevice() != null) {
-            client.getDevice().setUserId(user.getId());
-            client.getDevice().setUsername(user.getFullName());
-
-            Device device = DeviceDAO.get().findByDevice(client.getDevice());
-            if (device == null)
-                device = client.getDevice();
-
-            device.setUserId(user.getId());
-            device.setUsername(user.getFullName());
-            device.setLastLogin(getCreation());
-            device.setIp(client.getAddress());
-
-            try {
-                boolean newDevice = device.getId() == 0L;
-                DeviceDAO.get().store(device);
-                client.setDevice(device);
-                if (history != null) {
-                    history.setDevice(device.toString());
-                    if (client.getGeolocation() != null)
-                        history.setGeolocation(client.getGeolocation().toString());
-                    UserHistoryDAO.get().store(history);
-                }
-
-                // Send an email alert to the user in case of new device
-                if (newDevice
-                        && Context.get().getConfig().getBoolean("%s.alertnewdevice".formatted(tenantName), true)) {
-                    Map<String, Object> dictionaryMap = new HashMap<>();
-                    dictionaryMap.put("user", user);
-                    dictionaryMap.put("device", device);
-                    dictionaryMap.put("client", client);
-                    dictionaryMap.put("location", client.getGeolocation());
-                    dictionaryMap.put("event", history);
-
-                    EMail email = new EMail();
-                    email.setTenantId(tenantId);
-                    email.setHtml(true);
-                    email.setLocale(user.getLocale());
-                    Recipient recipient = new Recipient();
-                    recipient.setAddress(user.getEmail());
-                    recipient.setName(user.getFullName());
-                    recipient.setMode(Recipient.Mode.TO);
-                    email.getRecipients().add(recipient);
-
-                    EMailSender.get().sendAsync(email, "newdevice", dictionaryMap);
-                }
-            } catch (PersistenceException e) {
-                log.warn("Cannot record the device {}", device);
-            }
-        }
+        addOrUpdateDevice(user, client, history);
 
         log.info("Session {} has been started", getSid());
         logInfo("Session started");
@@ -324,6 +274,86 @@ public class Session extends PersistentObject implements Comparable<Session> {
         this.setLastRenew(other.lastRenew);
         this.setClient(other.client);
         this.impersonator = other.impersonator;
+    }
+
+    private void addOrUpdateDevice(User user, Client client, UserHistory history) {
+
+        if (client == null)
+            return;
+
+        Device clientDevice = client.getDevice();
+
+        if (clientDevice == null)
+            return;
+
+        clientDevice.setUserId(user.getId());
+        clientDevice.setUsername(user.getFullName());
+
+        Device device = DeviceDAO.get().findByDevice(clientDevice);
+
+        if (device == null)
+            device = clientDevice;
+
+        device.setUserId(user.getId());
+        device.setUsername(user.getFullName());
+        device.setLastLogin(getCreation());
+        device.setIp(client.getAddress());
+
+        try {
+            boolean newDevice = device.getId() == 0L;
+
+            DeviceDAO.get().store(device);
+            client.setDevice(device);
+
+            updateLoginHistory(history, client, device);
+
+            if (newDevice && isNewDeviceAlertEnabled())
+                sendNewDeviceAlert(user, client, device, history);
+
+        } catch (PersistenceException e) {
+            log.warn("Cannot record the device {}", device, e);
+        }
+    }
+
+    private void updateLoginHistory(UserHistory history, Client client, Device device) throws PersistenceException {
+
+        if (history == null)
+            return;
+
+        history.setDevice(device.toString());
+
+        if (client.getGeolocation() != null)
+            history.setGeolocation(client.getGeolocation().toString());
+
+        UserHistoryDAO.get().store(history);
+    }
+
+    private boolean isNewDeviceAlertEnabled() {
+        return Context.get().getConfig().getBoolean("%s.alertnewdevice".formatted(tenantName), true);
+    }
+
+    private void sendNewDeviceAlert(User user, Client client, Device device, UserHistory history) {
+
+        Map<String, Object> dictionaryMap = new HashMap<>();
+        dictionaryMap.put("user", user);
+        dictionaryMap.put("device", device);
+        dictionaryMap.put("client", client);
+        dictionaryMap.put("location", client.getGeolocation());
+        dictionaryMap.put("event", history);
+
+        EMail email = new EMail();
+        email.setTenantId(tenantId);
+        email.setHtml(true);
+        email.setLocale(user.getLocale());
+
+        Recipient recipient = new Recipient();
+        recipient.setAddress(user.getEmail());
+        recipient.setName(user.getFullName());
+        recipient.setMode(Recipient.Mode.TO);
+
+        email.getRecipients().add(recipient);
+
+        EMailSender.get().sendAsync(email, "newdevice", dictionaryMap);
     }
 
     private UserHistory saveLoginEvent(User user, Client client) {

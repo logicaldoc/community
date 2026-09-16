@@ -152,7 +152,7 @@ public class TenantQuotaPanel extends HLayout {
                 REGULAR_USERS_QUOTA, Util.formatLong(tenant.getRegularUsersQuota()));
         regularUsersSystemQuota.setVisible(tenant.isSystem());
         StaticTextItem readonlyUsersSystemQuota = ItemFactory.newStaticTextItem("sys" + READONLY_USERS_QUOTA,
-                "readonlyusersquota", Util.formatLong(tenant.getReadonlyUsersQuota()));
+                READONLY_USERS_QUOTA, Util.formatLong(tenant.getReadonlyUsersQuota()));
         readonlyUsersSystemQuota.setVisible(tenant.isSystem());
         StaticTextItem sessionsSystemQuota = ItemFactory.newStaticTextItem("sys" + SESSIONS_QUOTA, SESSIONS_QUOTA,
                 Util.formatLong(tenant.getSessionsQuota()));
@@ -214,8 +214,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareStampsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(STAMPS_QUOTA, tenant.getStampsQuota(),
-                tenant.getStamps());
+        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(STAMPS_QUOTA, tenant.getStampsQuota(), tenant.getStamps());
         return applyQuotaItemVisibility(item);
     }
 
@@ -226,8 +225,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem prepareFormsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(FORMS_QUOTA, tenant.getFormsQuota(),
-                tenant.getForms());
+        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(FORMS_QUOTA, tenant.getFormsQuota(), tenant.getForms());
         return applyQuotaItemVisibility(item);
     }
 
@@ -245,7 +243,7 @@ public class TenantQuotaPanel extends HLayout {
 
     private SpinnerItem prepareStorageQuotaItem() {
         SpinnerItem item = ItemFactory.newQuotaSpinnerItem(STORAGE_QUOTA, tenant.getStorageQuota(),
-                tenant.getStorage());    
+                tenant.getStorage());
         item.setHint("MB " + I18N.message("usedhint", Util.formatSizeW7(tenant.getStorage())));
         item.setStep(1024);
         return applyQuotaItemVisibility(item);

@@ -67,6 +67,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     private static final String POSITION = "position";
 
+    private static final String LISTENER_ERROR = "Error in listener {}";
+
     @Resource(name = "genericDAO")
     private GenericDAO genericDAO;
 
@@ -586,7 +588,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             } catch (AuthenticationException ae) {
                 throw ae;
             } catch (PersistenceException e) {
-                log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
+                log.warn(LISTENER_ERROR, listener.getClass().getSimpleName(), e);
             }
     }
 
@@ -601,7 +603,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             } catch (AuthenticationException ae) {
                 throw ae;
             } catch (PersistenceException e) {
-                log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
+                log.warn(LISTENER_ERROR, listener.getClass().getSimpleName(), e);
             }
     }
 
@@ -614,7 +616,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             } catch (AuthenticationException ae) {
                 throw ae;
             } catch (PersistenceException e) {
-                log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
+                log.warn(LISTENER_ERROR, listener.getClass().getSimpleName(), e);
             }
     }
 

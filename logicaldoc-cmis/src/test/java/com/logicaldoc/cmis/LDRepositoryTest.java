@@ -693,7 +693,6 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         Document document = ddao.findById(1L);
         assertEquals(5, document.getFolder().getId());
 
-        Folder folder = fdao.findById(5L, true);
         testSubject.moveObject(null, stringHolder, "fld.4", null);
 
         document = ddao.findById(1L);

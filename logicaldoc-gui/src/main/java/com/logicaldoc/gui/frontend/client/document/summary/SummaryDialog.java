@@ -36,6 +36,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class SummaryDialog extends Window {
 
+    private static final String MODEL = "model";
+
+    private static final String LOGICALDOC = "logicaldoc";
+
     private RadioGroupItem engine;
 
     private SelectItem modelSelector;
@@ -144,14 +148,14 @@ public class SummaryDialog extends Window {
         engine = ItemFactory.newRadioGroup("engine", "engine");
 
         HashMap<String, String> engineOptions = new HashMap<>();
-        engineOptions.put("logicaldoc", "logicaldoc");
+        engineOptions.put(LOGICALDOC, LOGICALDOC);
         engineOptions.put("chatgpt", "chatgpt");
 
         engine.setValueMap(engineOptions);
-        engine.setValue("logicaldoc");
+        engine.setValue(LOGICALDOC);
         engine.setWrap(false);
 
-        modelSelector = ItemFactory.newSelectItem("model");
+        modelSelector = ItemFactory.newSelectItem(MODEL);
         modelSelector.setValueField("id");
         modelSelector.setDisplayField("name");
         modelSelector.setOptionDataSource(new ModelsDS("summarizer"));
@@ -166,21 +170,21 @@ public class SummaryDialog extends Window {
         mmrlambdaItem = ItemFactory.newDoubleItem("mmrlambda", 0.7);
         mmrlambdaItem.setWrapTitle(false);
 
-        chatGPTModel = ItemFactory.newTextItem("model", "model");
+        chatGPTModel = ItemFactory.newTextItem(MODEL, MODEL);
         chatGPTModel.setVisible(false);
 
         ChatGPTService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 
             @Override
             public void handleSuccess(List<GUIValue> settings) {
-                String model = GUIValue.getValue("model", settings);
+                String model = GUIValue.getValue(MODEL, settings);
                 chatGPTModel.setValue(model != null ? model : "gpt-4o");
             }
         });
 
         engine.addChangedHandler(changed -> {
 
-            boolean logicaldocEngineSelected = "logicaldoc".equals(changed.getValue());
+            boolean logicaldocEngineSelected = LOGICALDOC.equals(changed.getValue());
 
             modelSelector.setVisible(logicaldocEngineSelected);
             modelSelector.setRequired(logicaldocEngineSelected);
@@ -218,7 +222,7 @@ public class SummaryDialog extends Window {
 
         Long modelId = null;
         String modelSpec = null;
-        if ("logicaldoc".equals(engine.getValueAsString())) {
+        if (LOGICALDOC.equals(engine.getValueAsString())) {
             if (modelSelector.getValue() != null) {
                 modelId = Long.valueOf(modelSelector.getValueAsString());
             } else {

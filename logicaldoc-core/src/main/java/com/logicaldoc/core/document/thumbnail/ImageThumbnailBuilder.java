@@ -42,7 +42,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
                 List.of("-compress", "JPEG", "-quality", Integer.toString(quality), "-resize", "x%d".formatted(size)));
 
         log.debug("Executing: {}", arguments);
-      
+
         new ImageConverter().convert(src, dest, arguments, null);
 
         if (!dest.exists() || dest.length() == 0) {
@@ -69,9 +69,5 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 
         if (dest.length() < 1)
             throw new IOException("Empty thumbnail image");
-    }
-
-    public void convert(File src, File dest, Integer size, Integer quality) {
-
     }
 }

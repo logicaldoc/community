@@ -1716,6 +1716,10 @@ public class ItemFactory {
         });
         return showPassword;
     }
+    
+    public static PasswordItem newPasswordItemPreventAutocomplete(String name, String value) {
+        return newPasswordItemPreventAutocomplete(name, name, value);
+    }
 
     public static PasswordItem newPasswordItemPreventAutocomplete(String name, String title, String value) {
         PasswordItem password = newPasswordItem(name, title, value);

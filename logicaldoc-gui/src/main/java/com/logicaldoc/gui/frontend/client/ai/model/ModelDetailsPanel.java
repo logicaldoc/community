@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -119,35 +120,11 @@ public class ModelDetailsPanel extends VLayout {
         /*
          * Prepare the standard properties tab
          */
-        if (propertiesPanel != null) {
-            propertiesPanel.destroy();
-            if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
-                propertiesTabPanel.removeMember(propertiesPanel);
-        }
-
-        if (trainingPanel != null) {
-            trainingPanel.destroy();
-            if (Boolean.TRUE.equals(trainingTabPanel.contains(trainingPanel)))
-                propertiesTabPanel.removeMember(trainingPanel);
-        }
-
-        if (historyPanel != null) {
-            historyPanel.destroy();
-            if (Boolean.TRUE.equals(historyTabPanel.contains(historyPanel)))
-                historyTabPanel.removeMember(historyPanel);
-        }
-
-        if (evaluationPanel != null) {
-            evaluationPanel.destroy();
-            if (Boolean.TRUE.equals(evaluationTabPanel.contains(evaluationPanel)))
-                evaluationTabPanel.removeMember(evaluationPanel);
-        }
-
-        if (statsPanel != null) {
-            statsPanel.destroy();
-            if (Boolean.TRUE.equals(statsTabPanel.contains(statsPanel)))
-                statsTabPanel.removeMember(statsPanel);
-        }
+        destroyPanel(propertiesTabPanel, propertiesPanel);
+        destroyPanel(trainingTabPanel, trainingPanel);
+        destroyPanel(historyTabPanel, historyPanel);
+        destroyPanel(evaluationTabPanel, evaluationPanel);
+        destroyPanel(statsTabPanel, statsPanel);
 
         propertiesPanel = new ModelProperties(model, event -> onModified());
         propertiesTabPanel.addMember(propertiesPanel);
@@ -162,11 +139,20 @@ public class ModelDetailsPanel extends VLayout {
         statsTabPanel.addMember(statsPanel);
 
         toggleEvaluationTab();
-
         toggleTrainingTab();
 
         historyPanel = new ModelHistoryPanel(model.getId());
         historyTabPanel.addMember(historyPanel);
+    }
+
+    private void destroyPanel(Layout container, Canvas panel) {
+        if (panel == null)
+            return;
+
+        panel.destroy();
+
+        if (Boolean.TRUE.equals(container.contains(panel)))
+            container.removeMember(panel);
     }
 
     protected void toggleEvaluationTab() {

@@ -159,10 +159,7 @@ public class FormatConversionManager {
             return;
         }
 
-//        FormatConverter converter = getConverter(fileName, "pdf");
-//        if (converter == null)
-//            return;
-
+        
         // Prepare I/O files
         File src = null;
         File dest = FileUtil.createTempFile("conversion", ".pdf");
@@ -180,16 +177,9 @@ public class FormatConversionManager {
             transaction.setFileVersion(fileVersion);
             convertToFile(document, fileVersion, dest, transaction);
 
-//            converter.convert(sid, document, src, dest);
-
             if (dest == null || dest.length() == 0)
                 throw new IOException(
                         String.format("The converter was unable to convert as pdf the document: %s", document));
-
-//            if (dest == null || dest.length() == 0)
-//                throw new IOException(
-//                        String.format("The converter %s was unable to convert as pdf the document: %s - %s",
-//                                converter.getClass().getSimpleName(), document.getId(), fileName));
 
             store.store(dest, resource);
         } finally {

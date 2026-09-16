@@ -308,12 +308,13 @@ public class ContextMenu extends Menu {
             boolean moreSelected,
             boolean justOneSelected,
             boolean immutablesInSelection) {
-        preview.setEnabled(someSelection
+
+        boolean previewEnabled = someSelection
                 && com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW)
-                && allowedPermissions.isPreview());
-        summary.setEnabled(someSelection
-                && com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW)
-                && allowedPermissions.isPreview());
+                && allowedPermissions.isPreview();
+
+        preview.setEnabled(previewEnabled);
+        summary.setEnabled(previewEnabled);
         cut.setEnabled(someSelection && !immutablesInSelection
                 && checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && allowedPermissions.isMove());
 

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.PropertySource;
 
+import com.logicaldoc.util.config.AdvancedProperties;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
@@ -59,7 +60,7 @@ public class DatabasePropertySource extends PropertySource<String> {
 
                     // Loop through the result set
                     while (rs.next())
-                        return ContextProperties.replaceVariables(rs.getString(1));
+                        return AdvancedProperties.replaceVariables(rs.getString(1));
                     return null;
                 }
             }
