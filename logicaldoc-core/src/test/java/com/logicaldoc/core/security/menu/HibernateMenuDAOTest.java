@@ -144,7 +144,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testFindByUserId() throws PersistenceException {
+    public void testFindByUserId() {
         List<Menu> menus = testSubject.findByUserId(1, 2, false);
         assertNotNull(menus);
         assertEquals(9, menus.size());

@@ -78,11 +78,6 @@ public class SupportTicketPanel extends AdminPanel {
                 Integer.parseInt(form.getValueAsString(MINUTES)), new DefaultAsyncCallback<>() {
 
                     @Override
-                    public void onFailure(Throwable caught) {
-                        super.onFailure(caught);
-                    }
-
-                    @Override
                     public void handleSuccess(List<String> ret) {
                         new SupportTicketDisplay(ret.get(0), ret.get(1)).show();
                     }

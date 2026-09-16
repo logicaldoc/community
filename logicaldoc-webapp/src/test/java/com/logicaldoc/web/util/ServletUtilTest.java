@@ -97,7 +97,7 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
 
     @Test
     public void testCheckMenu()
-            throws InvalidSessionException, ServletException, PersistenceException, ServerException {
+            throws InvalidSessionException, ServletException, ServerException {
         Session session = ServletUtil.checkMenu(mockRequest, 3L);
         assertNotNull(session);
 

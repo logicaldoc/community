@@ -89,7 +89,7 @@ public interface TicketDAO extends PersistentObjectDAO<Ticket> {
      * 
      * @return If the ticketId is a support ticket
      */
-    default public boolean isSupportTicket(String ticketId) {
+    public default boolean isSupportTicket(String ticketId) {
         try {
             return TicketDAO.get().queryForInt(
                     "select count(*) from ld_ticket where ld_enabled = 1 and ld_deleted = 0 and ld_type = :type and ld_ticketid = :id",

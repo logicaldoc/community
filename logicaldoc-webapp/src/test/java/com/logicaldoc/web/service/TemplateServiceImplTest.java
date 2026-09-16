@@ -36,137 +36,137 @@ import com.logicaldoc.web.AbstractWPTestCase;
 
 public class TemplateServiceImplTest extends AbstractWPTestCase {
 
-	// Instance under test
-	private TemplateServiceImpl testSubject = new TemplateServiceImpl();
+    // Instance under test
+    private TemplateServiceImpl testSubject = new TemplateServiceImpl();
 
-	private TemplateDAO templateDao;
+    private TemplateDAO templateDao;
 
-	@Before
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
-		templateDao = TemplateDAO.get();
-	}
+    @Before
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
+        templateDao = TemplateDAO.get();
+    }
 
-	@Test
-	public void testDelete() throws ServerException, PersistenceException {
-		assertNull(templateDao.findById(99L));
-		testSubject.delete(99L);
-		assertNull(templateDao.findById(99L));
+    @Test
+    public void testDelete() throws ServerException, PersistenceException {
+        assertNull(templateDao.findById(99L));
+        testSubject.delete(99L);
+        assertNull(templateDao.findById(99L));
 
-		assertNotNull(templateDao.findById(-1L));
-		testSubject.delete(-1L);
-		assertNull(templateDao.findById(-1L));
-	}
+        assertNotNull(templateDao.findById(-1L));
+        testSubject.delete(-1L);
+        assertNull(templateDao.findById(-1L));
+    }
 
-	@Test
-	public void testCountDocuments() throws ServerException {
-		assertEquals(0L, testSubject.countDocuments(-1L));
-		assertEquals(0L, testSubject.countDocuments(99L));
-	}
+    @Test
+    public void testCountDocuments() throws ServerException {
+        assertEquals(0L, testSubject.countDocuments(-1L));
+        assertEquals(0L, testSubject.countDocuments(99L));
+    }
 
-	@Test
-	public void testClone() throws ServerException, PersistenceException {
-		GUITemplate cloned = testSubject.clone(-1L, "cloned");
-		assertNotNull(cloned);
+    @Test
+    public void testClone() throws ServerException, PersistenceException {
+        GUITemplate cloned = testSubject.clone(-1L, "cloned");
+        assertNotNull(cloned);
 
-		Template t1 = templateDao.findById(-1L, true);
-		Template t2 = templateDao.findById(cloned.getId(), true);
-		assertEquals("cloned", t2.getName());
-		assertEquals(t1.getAttributes(), t2.getAttributes());
-	}
+        Template t1 = templateDao.findById(-1L, true);
+        Template t2 = templateDao.findById(cloned.getId(), true);
+        assertEquals("cloned", t2.getName());
+        assertEquals(t1.getAttributes(), t2.getAttributes());
+    }
 
-	@Test
-	public void testSave() throws ServerException, PersistenceException {
-		GUITemplate template = testSubject.getTemplate(5);
-		assertNotNull(template);
-		assertEquals("test1", template.getName());
-		assertEquals("test1_desc", template.getDescription());
+    @Test
+    public void testSave() throws ServerException {
+        GUITemplate template = testSubject.getTemplate(5);
+        assertNotNull(template);
+        assertEquals("test1", template.getName());
+        assertEquals("test1_desc", template.getDescription());
 
-		template.setName("pippo");
-		template.setDescription("paperino");
-		template.getAccessControlList()
-				.add(new GUIAccessControlEntry(4L, Permission.READ.name(), Permission.WRITE.name()));
+        template.setName("pippo");
+        template.setDescription("paperino");
+        template.getAccessControlList()
+                .add(new GUIAccessControlEntry(4L, Permission.READ.name(), Permission.WRITE.name()));
 
-		testSubject.save(template);
+        testSubject.save(template);
 
-		prepareSession("author", "admin");
+        prepareSession("author", "admin");
 
-		template = testSubject.getTemplate(5);
-		assertNotNull(template);
-		assertEquals("pippo", template.getName());
-		assertEquals("paperino", template.getDescription());
-		assertEquals(1, template.getAttributes().size());
-		assertEquals("attr1", template.getAttributes().get(0).getName());
-		assertEquals("val1", template.getAttributes().get(0).getStringValue());
+        template = testSubject.getTemplate(5);
+        assertNotNull(template);
+        assertEquals("pippo", template.getName());
+        assertEquals("paperino", template.getDescription());
+        assertEquals(1, template.getAttributes().size());
+        assertEquals("attr1", template.getAttributes().get(0).getName());
+        assertEquals("val1", template.getAttributes().get(0).getStringValue());
 
-		template = testSubject.getTemplate(-1L);
-		template.setId(0L);
-		template.setName("newTemplate");
-		template.getAccessControlList().clear();
-		testSubject.save(template);
-		template = testSubject.getTemplate(template.getId());
-		assertNotNull(template);
-		assertEquals("newTemplate", template.getName());
-	}
+        template = testSubject.getTemplate(-1L);
+        template.setId(0L);
+        template.setName("newTemplate");
+        template.getAccessControlList().clear();
+        testSubject.save(template);
+        template = testSubject.getTemplate(template.getId());
+        assertNotNull(template);
+        assertEquals("newTemplate", template.getName());
+    }
 
-	@Test
-	public void testGetTemplate() throws ServerException {
-		GUITemplate template = testSubject.getTemplate(6);
-		assertNotNull(template);
-		assertEquals("test2", template.getName());
-		assertEquals("test2_desc", template.getDescription());
+    @Test
+    public void testGetTemplate() throws ServerException {
+        GUITemplate template = testSubject.getTemplate(6);
+        assertNotNull(template);
+        assertEquals("test2", template.getName());
+        assertEquals("test2_desc", template.getDescription());
 
-		template = testSubject.getTemplate(8);
-		assertNull(template);
-	}
+        template = testSubject.getTemplate(8);
+        assertNull(template);
+    }
 
-	@Test
-	public void testGetAttributes() throws ServerException, PersistenceException, PermissionException,
-			IllegalAccessException, InvocationTargetException {
-		DocumentDAO documentDao = DocumentDAO.get();
-		FolderDAO folderDao = FolderDAO.get();
+    @Test
+    public void testGetAttributes() throws ServerException, PersistenceException, PermissionException,
+            IllegalAccessException, InvocationTargetException {
+        DocumentDAO documentDao = DocumentDAO.get();
+        FolderDAO folderDao = FolderDAO.get();
 
-		Template template = templateDao.findById(-1L);
+        Template template = templateDao.findById(-1L);
 
-		Folder folder = folderDao.findById(Folder.DEFAULTWORKSPACEID, true);
-		folder.setTemplate(template);
-		folderDao.store(folder);
+        Folder folder = folderDao.findById(Folder.DEFAULTWORKSPACEID, true);
+        folder.setTemplate(template);
+        folderDao.store(folder);
 
-		Document document = new Document();
-		document.setFileName("test.pdf");
-		document.setFolder(folder);
-		document.setTemplate(template);
+        Document document = new Document();
+        document.setFileName("test.pdf");
+        document.setFolder(folder);
+        document.setTemplate(template);
 
-		for (FolderAccessControlEntry fAce : folder.getAccessControlList()) {
-			DocumentAccessControlEntry dAce = new DocumentAccessControlEntry();
-			BeanUtils.copyProperties(dAce, fAce);
-			document.getAccessControlList().add(dAce);
-		}
+        for (FolderAccessControlEntry fAce : folder.getAccessControlList()) {
+            DocumentAccessControlEntry dAce = new DocumentAccessControlEntry();
+            BeanUtils.copyProperties(dAce, fAce);
+            document.getAccessControlList().add(dAce);
+        }
 
-		document.setValues("multi", List.of("a", "b", "c"));
-		documentDao.store(document);
+        document.setValues("multi", List.of("a", "b", "c"));
+        documentDao.store(document);
 
-		List<GUIAttribute> extAttr = testSubject.getAttributes(template.getId(), null);
-		assertEquals(9, extAttr.size());
+        List<GUIAttribute> extAttr = testSubject.getAttributes(template.getId(), null);
+        assertEquals(9, extAttr.size());
 
-		extAttr = testSubject.getAttributes(template.getId(),
-				new FolderServiceImpl().getFolder(session, folder.getId()));
-		assertEquals(9, extAttr.size());
+        extAttr = testSubject.getAttributes(template.getId(),
+                new FolderServiceImpl().getFolder(session, folder.getId()));
+        assertEquals(9, extAttr.size());
 
-		extAttr = testSubject.getAttributes(template.getId(),
-				new DocumentServiceImpl().getDocument(session, document.getId()));
-		assertEquals(11, extAttr.size());
+        extAttr = testSubject.getAttributes(template.getId(),
+                new DocumentServiceImpl().getDocument(session, document.getId()));
+        assertEquals(11, extAttr.size());
 
-		GUIForm form = new GUIForm();
-		form.setTemplateId(template.getId());
+        GUIForm form = new GUIForm();
+        form.setTemplateId(template.getId());
 
-		testSubject.getAttributes(template.getId(), form);
+        testSubject.getAttributes(template.getId(), form);
 
-		Map<String, Object> params = new HashMap<>();
-		params.put("templateId", template.getId());
+        Map<String, Object> params = new HashMap<>();
+        params.put("templateId", template.getId());
 
-		assertEquals(9L, templateDao
-				.queryForLong("select count(*) from ld_template_ext WHERE ld_templateid = :templateId", params));
-	}
+        assertEquals(9L, templateDao
+                .queryForLong("select count(*) from ld_template_ext WHERE ld_templateid = :templateId", params));
+    }
 }

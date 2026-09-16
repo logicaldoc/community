@@ -537,7 +537,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
     }
 
     @Test
-    public void testAddDocuments() throws ServerException, IOException, PersistenceException {
+    public void testAddDocuments() throws ServerException, IOException {
         GUIDocument doc = testSubject.getById(7);
         doc.setId(0L);
         doc.setCustomId(null);
@@ -1646,7 +1646,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
     }
 
     @Test
-    public void testGetEnabledPermissions() throws PersistenceException, ServerException {
+    public void testGetEnabledPermissions() throws ServerException {
         GUIAccessControlEntry permissions = testSubject.getAllowedPermissions(List.of(2L, 3L, 4L));
         for (Permission permission : Permission.all())
             assertTrue("Does not allow " + permission.name(),

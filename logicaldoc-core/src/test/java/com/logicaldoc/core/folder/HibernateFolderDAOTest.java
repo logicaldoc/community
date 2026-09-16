@@ -1891,7 +1891,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
     }
 
     @Test
-    public void testCompareTo() throws PersistenceException {
+    public void testCompareTo() {
         Folder folder1 = new Folder("FolderABC");
         folder1.setPosition(1);
         folder1.setPathExtended("/logicaldoc-core/target");

@@ -51,7 +51,7 @@ public class MessageServiceImplTest extends AbstractWPTestCase {
     }
 
     @Test
-    public void testLoadTemplates() throws ServerException, PersistenceException {
+    public void testLoadTemplates() throws ServerException {
         List<GUIMessageTemplate> templates = testSubject.loadTemplates("en", "SYSTEM");
         assertEquals(6, templates.size());
 
@@ -61,12 +61,11 @@ public class MessageServiceImplTest extends AbstractWPTestCase {
         templates = testSubject.loadTemplates("en", "WHATSAPP");
         assertTrue(templates.isEmpty());
 
-        
         templates = testSubject.loadTemplates("en", null);
         assertEquals(8, templates.size());
-        
+
         try {
-            templates = testSubject.loadTemplates("en", "UNEXISTING");
+            testSubject.loadTemplates("en", "UNEXISTING");
             fail("No exception in case of unexisting type?");
         } catch (ServerException ex) {
             // all ok

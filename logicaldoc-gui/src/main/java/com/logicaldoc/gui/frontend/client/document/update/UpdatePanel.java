@@ -170,9 +170,7 @@ public class UpdatePanel extends VLayout {
         propertiesPanel = new UpdateStandardPropertiesPanel(document);
         propertiesTabPanel.addMember(propertiesPanel);
 
-        ChangedHandler templateChangedHandler = event -> {
-            capturePanel.refresh();
-        };
+        ChangedHandler templateChangedHandler = event -> capturePanel.refresh();
 
         ChangedHandler nothingToDo = event -> {
             // Nothing to do

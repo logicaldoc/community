@@ -246,9 +246,7 @@ public class SummaryDialog extends Window {
     }
 
     private void onEdit() {
-        new HtmlItemEditor(html, event -> {
-            summary = html.getContents();
-        }).show();
+        new HtmlItemEditor(html, event -> summary = html.getContents()).show();
     }
 
     @Override

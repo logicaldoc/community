@@ -509,7 +509,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
                 transaction);
         if (model != null) {
             model.setId(createdFolder.getId());
-            createdFolder = folderDao.initialize(createdFolder);
+            folderDao.initialize(createdFolder);
             save(model);
         }
     }

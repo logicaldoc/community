@@ -27,9 +27,10 @@ public class LastModifiedInterceptor implements Interceptor {
             Object[] previousState,
             String[] propertyNames,
             Type[] propertyTypes) {
+
         boolean modified = Interceptor.super.onFlushDirty(entity, id, currentState, previousState, propertyNames,
                 propertyTypes);
-        return modified || onSave(entity, id, currentState, propertyNames, propertyTypes);
+        return modified || updateLastModified(entity, currentState, propertyNames);
     }
 
     @Override
@@ -39,8 +40,9 @@ public class LastModifiedInterceptor implements Interceptor {
             Object[] currentState,
             String[] propertyNames,
             Type[] propertyTypes) {
+
         Interceptor.super.onInsert(entity, id, currentState, propertyNames, propertyTypes);
-        onSave(entity, id, currentState, propertyNames, propertyTypes);
+        updateLastModified(entity, currentState, propertyNames);
     }
 
     @Override
@@ -50,19 +52,8 @@ public class LastModifiedInterceptor implements Interceptor {
             Object[] currentState,
             String[] propertyNames,
             Type[] propertyTypes) {
-        return onSave(entity, id, currentState, propertyNames, propertyTypes);
-    }
 
-    @Override
-    public boolean onSave(
-            Object entity,
-            Object id,
-            Object[] currentState,
-            String[] propertyNames,
-            Type[] propertyTypes) {
-        if (entity instanceof PersistentObject)
-            return setValue(currentState, propertyNames, "lastModified", new Date());
-        return false;
+        return updateLastModified(entity, currentState, propertyNames);
     }
 
     @Override
@@ -72,16 +63,25 @@ public class LastModifiedInterceptor implements Interceptor {
             Object[] currentState,
             String[] propertyNames,
             Type[] propertyTypes) {
+
         Interceptor.super.onUpdate(entity, id, currentState, propertyNames, propertyTypes);
-        onSave(entity, id, currentState, propertyNames, propertyTypes);
+        updateLastModified(entity, currentState, propertyNames);
+    }
+
+    private boolean updateLastModified(Object entity, Object[] currentState, String[] propertyNames) {
+        if (entity instanceof PersistentObject)
+            return setValue(currentState, propertyNames, "lastModified", new Date());
+        return false;
     }
 
     protected boolean setValue(Object[] currentState, String[] propertyNames, String propertyToSet, Object value) {
         int index = Arrays.asList(propertyNames).indexOf(propertyToSet);
+
         if (index >= 0) {
             currentState[index] = value;
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 }
