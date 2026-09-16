@@ -37,295 +37,301 @@ import jakarta.servlet.http.HttpSession;
 
 public class TicketDownload extends HttpServlet {
 
-	private static final String TICKET_ID = "ticketId";
+    private static final String TICKET_ID = "ticketId";
 
-	private static final long serialVersionUID = 9088160958327454062L;
+    private static final long serialVersionUID = 9088160958327454062L;
 
-	private static final Logger log = LoggerFactory.getLogger(TicketDownload.class);
+    private static final Logger log = LoggerFactory.getLogger(TicketDownload.class);
 
-	/**
-	 * Constructor of the object.
-	 */
-	public TicketDownload() {
-		super();
-	}
+    /**
+     * Constructor of the object.
+     */
+    public TicketDownload() {
+        super();
+    }
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		Ticket ticket = null;
-		try {
-			ticket = TicketDownload.getTicket(request);
+    /**
+     * The doGet method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to get.
+     * 
+     * @param request the request send by the client to the server
+     * @param response the response send by the server to the client
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Ticket ticket = TicketDownload.getTicket(request);
 
-			Document document = getDocument(ticket);
+            Document document = getDocument(ticket);
 
-			if (ticket.isTicketExpired() && !isPreviewDownload(ticket.getTicketId(), request, document))
-				throw new IOException("Expired ticket");
+            if (ticket.isTicketExpired() && !isPreviewDownload(ticket.getTicketId(), request, document))
+                throw new IOException("Expired ticket");
 
-			String suffix = getSuffix(ticket, document, request);
+            String suffix = getSuffix(ticket, document, request);
 
-			String tenantName = TenantDAO.get().getTenantName(ticket.getTenantId());
+            String tenantName = TenantDAO.get().getTenantName(ticket.getTenantId());
 
-			String behavior = request.getParameter("behavior");
-			if (behavior == null)
-				behavior = Context.get().getConfig().getTenantProperty(tenantName, "downloadticket.behavior", "download");
-			request.setAttribute("open", Boolean.toString("display".equals(behavior)));
+            String behavior = request.getParameter("behavior");
+            if (behavior == null)
+                behavior = Context.get().getConfig().getTenantProperty(tenantName, "downloadticket.behavior",
+                        "download");
+            request.setAttribute("open", Boolean.toString("display".equals(behavior)));
 
-			if (!TicketDownload.checkPassword(request, response, ticket))
-				return;
+            if (!TicketDownload.checkPassword(request, response, ticket))
+                return;
 
-			downloadDocument(request, response, document, null, suffix, ticket.getTicketId());
+            downloadDocument(request, response, document, null, suffix, ticket.getTicketId());
 
-			if (isPreviewDownload(ticket.getTicketId(), request, document)) {
-				request.getSession().removeAttribute(getPreviewAttributeName(ticket.getTicketId()));
+            ticket = TicketDAO.get().findById(ticket.getId());
 
-				/**
-				 * The user may resize the view panel that will trigger a reload
-				 * so we must mark the read in the session and count it just the
-				 * first time
-				 */
-				String viewMarker = "ticketviewed-%s".formatted(ticket.getTicketId());
-				if (request.getSession().getAttribute(viewMarker) == null) {
-					ticket.setViews(ticket.getViews() + 1);
-					request.getSession().setAttribute(viewMarker, true);
-				}
-				if (isHtml(document))
-					suffix = "safe.html";
-			} else {
-				increaseDownloadCount(request, ticket, document);
-			}
+            if (isPreviewDownload(ticket.getTicketId(), request, document)) {
+                request.getSession().removeAttribute(getPreviewAttributeName(ticket.getTicketId()));
 
-			TicketDAO.get().store(ticket);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+                /**
+                 * The user may resize the view panel that will trigger a reload
+                 * so we must mark the read in the session and count it just the
+                 * first time
+                 */
+                String viewMarker = "ticketviewed-%s".formatted(ticket.getTicketId());
+                if (request.getSession().getAttribute(viewMarker) == null) {
+                    ticket.setViews(ticket.getViews() + 1);
+                    request.getSession().setAttribute(viewMarker, true);
+                }
+                if (isHtml(document))
+                    suffix = "safe.html";
+            } else {
+                increaseDownloadCount(request, ticket, document);
+            }
 
-			try (PrintWriter out = response.getWriter();) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ticket %s not authorized: %s"
-						.formatted(ticket.getTicketId(), StringUtils.defaultString(e.getMessage())));
-			} catch (Exception t) {
-				// Nothing to do
-			}
-		}
-	}
+            TicketDAO.get().store(ticket);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
 
-	public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response)
-			throws IOException, PersistenceException {
-		return checkPassword(request, response, getTicket(request));
-	}
+            try (PrintWriter out = response.getWriter();) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ticket %s not authorized: %s"
+                        .formatted(getTicketId(request), StringUtils.defaultString(e.getMessage())));
+            } catch (Exception t) {
+                // Nothing to do
+            }
+        }
+    }
 
-	public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response, Ticket ticket)
-			throws IOException {
-		if (StringUtils.isNotEmpty(ticket.getPassword())) {
-			String password = getPasswordInRequest(request);
-			if (StringUtils.isNotEmpty(password)) {
-				try {
-					if (!CryptUtil.encryptSHA256(password).equals(ticket.getPassword()))
-						throw new IOException("Wrong password");
-				} catch (NoSuchAlgorithmException e) {
-					throw new IOException(e);
-				}
-			} else {
-				response.setHeader("WWW-Authenticate", "Basic realm=\"Ticket " + ticket.getTicketId() + "\"");
-				response.sendError(401, "Unauthorized");
-				return false;
-			}
-		}
-		return true;
-	}
+    public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, PersistenceException {
+        return checkPassword(request, response, getTicket(request));
+    }
 
-	private static String getPasswordInRequest(HttpServletRequest request) {
-		String authorization = request.getHeader("Authorization");
-		if (authorization != null && authorization.toLowerCase().startsWith("basic")) {
-			String base64Credentials = authorization.substring("Basic".length()).trim();
-			byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
-			String credentials = new String(credDecoded, StandardCharsets.UTF_8);
-			// credentials = username:password
-			String[] values = credentials.split(":", 2);
-			return values[1];
-		} else {
-			return request.getParameter("password");
-		}
-	}
+    public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response, Ticket ticket)
+            throws IOException {
+        if (StringUtils.isNotEmpty(ticket.getPassword())) {
+            String password = getPasswordInRequest(request);
+            if (StringUtils.isNotEmpty(password)) {
+                try {
+                    if (!CryptUtil.encryptSHA256(password).equals(ticket.getPassword()))
+                        throw new IOException("Wrong password");
+                } catch (NoSuchAlgorithmException e) {
+                    throw new IOException(e);
+                }
+            } else {
+                response.setHeader("WWW-Authenticate", "Basic realm=\"Ticket " + ticket.getTicketId() + "\"");
+                response.sendError(401, "Unauthorized");
+                return false;
+            }
+        }
+        return true;
+    }
 
-	private boolean isHtml(Document document) {
-		return document.getFileName().toLowerCase().endsWith(".html")
-				|| document.getFileName().toLowerCase().endsWith(".htm")
-				|| document.getFileName().toLowerCase().endsWith(".xhtml");
-	}
+    private static String getPasswordInRequest(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.toLowerCase().startsWith("basic")) {
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+            // credentials = username:password
+            String[] values = credentials.split(":", 2);
+            return values[1];
+        } else {
+            return request.getParameter("password");
+        }
+    }
 
-	private void increaseDownloadCount(HttpServletRequest request, Ticket ticket, Document document) {
-		if (!((document.getFileName().toLowerCase().endsWith(".dcm") || isHtml(document))
-				&& "preview".equals(request.getParameter("control"))))
-			ticket.setCount(ticket.getCount() + 1);
-	}
+    private boolean isHtml(Document document) {
+        return document.getFileName().toLowerCase().endsWith(".html")
+                || document.getFileName().toLowerCase().endsWith(".htm")
+                || document.getFileName().toLowerCase().endsWith(".xhtml");
+    }
 
-	private boolean isPreviewDownload(String ticketId, HttpServletRequest request, Document document) {
-		return (request.getSession() != null
-				&& request.getSession().getAttribute(getPreviewAttributeName(ticketId)) != null)
-				|| ((isHtml(document) || com.logicaldoc.gui.common.client.util.Util.isMediaFile(document.getFileName()))
-						&& "preview".equals(request.getParameter("control")));
+    private void increaseDownloadCount(HttpServletRequest request, Ticket ticket, Document document) {
+        if (!((document.getFileName().toLowerCase().endsWith(".dcm") || isHtml(document))
+                && "preview".equals(request.getParameter("control"))))
+            ticket.setCount(ticket.getCount() + 1);
+    }
 
-	}
+    private boolean isPreviewDownload(String ticketId, HttpServletRequest request, Document document) {
+        return (request.getSession() != null
+                && request.getSession().getAttribute(getPreviewAttributeName(ticketId)) != null)
+                || ((isHtml(document) || com.logicaldoc.gui.common.client.util.Util.isMediaFile(document.getFileName()))
+                        && "preview".equals(request.getParameter("control")));
 
-	protected String getPreviewAttributeName(String ticketId) {
-		return "preview-" + ticketId;
-	}
+    }
 
-	private String getSuffix(Ticket ticket, Document document, HttpServletRequest request)
-			throws IOException, PersistenceException {
-		String suffix = ticket.getSuffix();
-		if (request.getParameter("suffix") != null)
-			suffix = request.getParameter("suffix");
+    protected String getPreviewAttributeName(String ticketId) {
+        return "preview-" + ticketId;
+    }
 
-		if ("pdf".equals(suffix))
-			suffix = "conversion.pdf";
-		if ("conversion.pdf".equals(suffix)) {
-			FormatConversionManager.get().convertToPdf(document, null);
-			if ("pdf".equalsIgnoreCase(FileUtil.getExtension(document.getFileName())))
-				suffix = null;
-		}
-		return suffix;
-	}
+    private String getSuffix(Ticket ticket, Document document, HttpServletRequest request)
+            throws IOException, PersistenceException {
+        String suffix = ticket.getSuffix();
+        if (request.getParameter("suffix") != null)
+            suffix = request.getParameter("suffix");
 
-	private Document getDocument(Ticket ticket) throws PersistenceException, IOException {
-		DocumentDAO docDao = DocumentDAO.get();
-		Document doc = docDao.findById(ticket.getDocId());
-		if (doc.getDocRef() != null)
-			doc = docDao.findById(doc.getDocRef());
-		if (!doc.isPublishing())
-			throw new IOException("Document not published");
-		return doc;
-	}
+        if ("pdf".equals(suffix))
+            suffix = "conversion.pdf";
+        if ("conversion.pdf".equals(suffix)) {
+            FormatConversionManager.get().convertToPdf(document, null);
+            if ("pdf".equalsIgnoreCase(FileUtil.getExtension(document.getFileName())))
+                suffix = null;
+        }
+        return suffix;
+    }
 
-	private static Ticket getTicket(HttpServletRequest request) throws PersistenceException {
-		TicketDAO tktDao = TicketDAO.get();
-		Ticket ticket = tktDao.findByTicketId(getTicketId(request));
-		if (ticket == null || ticket.getDocId() == 0L)
-			throw new PersistenceException("Unexisting ticket");
-		return ticket;
-	}
+    private Document getDocument(Ticket ticket) throws PersistenceException, IOException {
+        DocumentDAO docDao = DocumentDAO.get();
+        Document doc = docDao.findById(ticket.getDocId());
+        if (doc.getDocRef() != null)
+            doc = docDao.findById(doc.getDocRef());
+        if (!doc.isPublishing())
+            throw new IOException("Document not published");
+        return doc;
+    }
 
-	private static String getTicketId(HttpServletRequest request) {
-		String ticketId = request.getParameter(TICKET_ID);
-		if (StringUtils.isEmpty(ticketId)) {
-			ticketId = (String) request.getAttribute(TICKET_ID);
-		}
+    private static Ticket getTicket(HttpServletRequest request) throws PersistenceException {
+        Ticket ticket = TicketDAO.get().findByTicketId(getTicketId(request));
+        if (ticket == null || ticket.getDocId() == 0L)
+            throw new PersistenceException("Unexisting ticket");
+        return ticket;
+    }
 
-		if (StringUtils.isEmpty(ticketId)) {
-			HttpSession session = request.getSession();
-			ticketId = (String) session.getAttribute(TICKET_ID);
-		}
+    private static String getTicketId(HttpServletRequest request) {
+        String ticketId = request.getParameter(TICKET_ID);
+        if (StringUtils.isEmpty(ticketId)) {
+            ticketId = (String) request.getAttribute(TICKET_ID);
+        }
 
-		log.debug("Ticket ticketId={}", ticketId);
-		return ticketId;
-	}
+        if (StringUtils.isEmpty(ticketId)) {
+            HttpSession session = request.getSession();
+            ticketId = (String) session.getAttribute(TICKET_ID);
+        }
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 */
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			response.setContentType("text/html");
+        log.debug("Ticket ticketId={}", ticketId);
+        return ticketId;
+    }
 
-			try (PrintWriter out = response.getWriter()) {
-				out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
-				out.println("<HTML>");
-				out.println("  <HEAD><TITLE>Download Ticket Action</TITLE></HEAD>");
-				out.println("  <BODY>");
-				out.print("    This is ");
-				out.print(this.getClass());
-				out.println(", using the POST method");
-				out.println("  </BODY>");
-				out.println("</HTML>");
-			}
-		} catch (Exception t) {
-			// Nothing to do
-		}
-	}
+    /**
+     * The doPost method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to
+     * post.
+     * 
+     * @param request the request send by the client to the server
+     * @param response the response send by the server to the client
+     */
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            response.setContentType("text/html");
 
-	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Document document,
-			String fileVersion, String suffix, String ticket) throws IOException, PersistenceException {
+            try (PrintWriter out = response.getWriter()) {
+                out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
+                out.println("<HTML>");
+                out.println("  <HEAD><TITLE>Download Ticket Action</TITLE></HEAD>");
+                out.println("  <BODY>");
+                out.print("    This is ");
+                out.print(this.getClass());
+                out.println(", using the POST method");
+                out.println("  </BODY>");
+                out.println("</HTML>");
+            }
+        } catch (Exception t) {
+            // Nothing to do
+        }
+    }
 
-		/*
-		 * In case the client asks for a safe version of the HTML content
-		 */
-		DownloadServlet.processSafeHtml(suffix, null, document);
+    private void downloadDocument(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Document document,
+            String fileVersion,
+            String suffix,
+            String ticket) throws IOException, PersistenceException {
 
-		StoreResource resource = StoreResource.builder().document(document).fileVersion(fileVersion).suffix(suffix)
-				.build();
+        /*
+         * In case the client asks for a safe version of the HTML content
+         */
+        DownloadServlet.processSafeHtml(suffix, null, document);
 
-		OutputStream os = null;
-		try (InputStream is = Store.get().getStream(resource)) {
-			String filename = document.getFileName();
-			if (suffix != null && suffix.contains("pdf"))
-				filename = document.getFileName() + ".pdf";
+        StoreResource resource = StoreResource.builder().document(document).fileVersion(fileVersion).suffix(suffix)
+                .build();
 
-			long size = Store.get().size(resource);
+        OutputStream os = null;
+        try (InputStream is = Store.get().getStream(resource)) {
+            String filename = document.getFileName();
+            if (suffix != null && suffix.contains("pdf"))
+                filename = document.getFileName() + ".pdf";
 
-			// get the mimetype
-			String mimetype = MimeType.getByFilename(filename);
-			// it seems everything is fine, so we can now start writing to the
-			// response object
-			response.setContentType(mimetype);
-			ServletUtil.setContentDisposition(request, response, filename);
+            long size = Store.get().size(resource);
 
-			// Chrome and Safary need these headers to allow to skip backwards
-			// or
-			// forwards multimedia contents
-			response.setHeader("Accept-Ranges", "bytes");
-			response.setHeader("Content-Length", Long.toString(size));
+            // get the mimetype
+            String mimetype = MimeType.getByFilename(filename);
+            // it seems everything is fine, so we can now start writing to the
+            // response object
+            response.setContentType(mimetype);
+            ServletUtil.setContentDisposition(request, response, filename);
 
-			os = response.getOutputStream();
+            // Chrome and Safary need these headers to allow to skip backwards
+            // or
+            // forwards multimedia contents
+            response.setHeader("Accept-Ranges", "bytes");
+            response.setHeader("Content-Length", Long.toString(size));
 
-			int letter = 0;
-			while ((letter = is.read()) != -1) {
-				os.write(letter);
-			}
-		} catch (IOException ioe) {
-			log.error("Cannot open the stream {} {} {} of for ticket {}", document, fileVersion, suffix, ticket);
-			throw ioe;
-		} finally {
-			try {
-				if (os != null) {
-					os.flush();
-					os.close();
-				}
-			} catch (Exception t) {
-				// Nothing to do
-			}
-		}
+            os = response.getOutputStream();
 
-		// Add an history entry to track the download of the document
-		DocumentHistory history = new DocumentHistory();
-		history.setDocument(document);
+            int letter = 0;
+            while ((letter = is.read()) != -1) {
+                os.write(letter);
+            }
+        } catch (IOException ioe) {
+            log.error("Cannot open the stream {} {} {} of for ticket {}", document, fileVersion, suffix, ticket);
+            throw ioe;
+        } finally {
+            try {
+                if (os != null) {
+                    os.flush();
+                    os.close();
+                }
+            } catch (Exception t) {
+                // Nothing to do
+            }
+        }
 
-		FolderDAO fdao = FolderDAO.get();
-		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
-		history.setEvent(
-				isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED : DocumentEvent.DOWNLOADED);
-		history.setFilename(document.getFileName());
-		history.setFolderId(document.getFolder().getId());
-		history.setComment("Ticket %s".formatted(ticket));
+        // Add an history entry to track the download of the document
+        DocumentHistory history = new DocumentHistory();
+        history.setDocument(document);
 
-		DocumentDAO ddao = DocumentDAO.get();
-		try {
-			ddao.saveDocumentHistory(document, history);
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-		}
-	}
+        FolderDAO fdao = FolderDAO.get();
+        history.setPath(fdao.computePathExtended(document.getFolder().getId()));
+        history.setEvent(
+                isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED : DocumentEvent.DOWNLOADED);
+        history.setFilename(document.getFileName());
+        history.setFolderId(document.getFolder().getId());
+        history.setComment("Ticket %s".formatted(ticket));
+
+        DocumentDAO ddao = DocumentDAO.get();
+        try {
+            ddao.saveDocumentHistory(document, history);
+        } catch (PersistenceException e) {
+            log.warn(e.getMessage(), e);
+        }
+    }
 }
