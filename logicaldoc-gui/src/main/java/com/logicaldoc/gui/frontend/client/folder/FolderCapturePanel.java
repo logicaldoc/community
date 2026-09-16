@@ -35,10 +35,10 @@ public class FolderCapturePanel extends FolderDetailTab {
         setWidth100();
         setHeight100();
         setMembersMargin(20);
-        refresh(folder.getTemplateId());
+        refresh();
     }
 
-    public void refresh(Long documentTemplateId) {
+    public void refresh() {
         vm.clearValues();
         vm.clearErrors(false);
 

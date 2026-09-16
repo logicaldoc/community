@@ -23,6 +23,8 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
  */
 public class SupportTicketPanel extends AdminPanel {
 
+    private static final String MINUTES = "minutes";
+
     private DynamicForm form;
 
     public SupportTicketPanel() {
@@ -42,28 +44,29 @@ public class SupportTicketPanel extends AdminPanel {
         form.setAlign(Alignment.LEFT);
         form.setNumCols(2);
 
-        SpinnerItem minutesItem = ItemFactory.newSpinnerItem("minutes", I18N.message("expiresin"), 30);
+        SpinnerItem minutesItem = ItemFactory.newSpinnerItem(MINUTES, I18N.message("expiresin"), 30);
         minutesItem.setWrapTitle(false);
         minutesItem.setRequired(true);
         minutesItem.setDefaultValue(30);
         minutesItem.setMin(30);
         minutesItem.setStep(10);
-        minutesItem.setHint(I18N.message("minutes"));
+        minutesItem.setHint(I18N.message(MINUTES));
 
         UserSelector user = new UserSelector("user", "usertoimpersonate", null, false, true);
         user.setValue(1);
-        user.setRequired(true); 
-                
+        user.setRequired(true);
+
         StaticTextItem info = ItemFactory.newStaticTextItem("info", I18N.message("supportticketinfo"));
         info.setColSpan(2);
         info.setShowTitle(false);
         info.setTitleOrientation(TitleOrientation.TOP);
-        
-        StaticTextItem disclaimer = ItemFactory.newStaticTextItem("disclaimer", I18N.message("supportticketdisclaimer"));
+
+        StaticTextItem disclaimer = ItemFactory.newStaticTextItem("disclaimer",
+                I18N.message("supportticketdisclaimer"));
         disclaimer.setColSpan(2);
         disclaimer.setShowTitle(false);
         disclaimer.setTitleOrientation(TitleOrientation.TOP);
-        
+
         form.setItems(info, disclaimer, minutesItem, user);
     }
 
@@ -72,7 +75,7 @@ public class SupportTicketPanel extends AdminPanel {
             return;
 
         SecurityService.Instance.get().createSupportTicket(Long.parseLong(form.getValueAsString("user")),
-                Integer.parseInt(form.getValueAsString("minutes")), new DefaultAsyncCallback<>() {
+                Integer.parseInt(form.getValueAsString(MINUTES)), new DefaultAsyncCallback<>() {
 
                     @Override
                     public void onFailure(Throwable caught) {

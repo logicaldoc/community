@@ -592,7 +592,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
         }
         ChangedHandler templateChangedHandler = (ChangedEvent event) -> {
             if (capturePanel != null)
-                capturePanel.refresh(document.getTemplateId());
+                capturePanel.refresh();
         };
         try {
             extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, changeHandler,

@@ -59,6 +59,8 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
  */
 public class PatchPanel extends VLayout {
 
+    private static final String CONFIRMPATCH = "confirmpatch";
+
     private static final String LOCAL = "local";
 
     private static final String DESCRIPTION = "description";
@@ -86,7 +88,7 @@ public class PatchPanel extends VLayout {
 
     private IButton deleteButton = new IButton(I18N.message("ddelete"));
 
-    private IButton confirmPatch = new IButton(I18N.message("confirmpatch"));
+    private IButton confirmPatchButton = new IButton(I18N.message(CONFIRMPATCH));
 
     private IButton upload = new IButton(I18N.message("uploadpatch"));
 
@@ -326,9 +328,9 @@ public class PatchPanel extends VLayout {
         bar.setVisible(!patch.isLocal());
         layout.addMember(bar);
 
-        confirmPatch.setAutoFit(true);
-        confirmPatch.setVisible(patch.isLocal());
-        confirmPatch.addClickHandler(event -> onConfirm(patch));
+        confirmPatchButton.setAutoFit(true);
+        confirmPatchButton.setVisible(patch.isLocal());
+        confirmPatchButton.addClickHandler(event -> onConfirm(patch));
 
         cancel.setAutoFit(true);
         cancel.addClickHandler(event -> showList());
@@ -354,7 +356,7 @@ public class PatchPanel extends VLayout {
 
                         @Override
                         public void handleSuccess(Void arg) {
-                            confirmPatch.setVisible(false);
+                            confirmPatchButton.setVisible(false);
 
                             new Timer() {
                                 public void run() {
@@ -365,7 +367,7 @@ public class PatchPanel extends VLayout {
 
                                             if (status.get(1) == 100) {
                                                 download.setDisabled(false);
-                                                confirmPatch.setVisible(true);
+                                                confirmPatchButton.setVisible(true);
                                                 deleteButton.setVisible(true);
                                                 displayNotes(fileName);
                                             } else
@@ -380,7 +382,7 @@ public class PatchPanel extends VLayout {
 
         HLayout buttonCanvas = new HLayout();
         buttonCanvas.setMembersMargin(6);
-        buttonCanvas.setMembers(cancel, download, confirmPatch, deleteButton);
+        buttonCanvas.setMembers(cancel, download, confirmPatchButton, deleteButton);
 
         layout.addMember(buttonCanvas);
 
@@ -483,12 +485,12 @@ public class PatchPanel extends VLayout {
     }
 
     private void onConfirm(GUIPatch patch) {
-        SC.ask(I18N.message("confirmpatch"), I18N.message("confirmpatchquestion"), choice -> {
+        SC.ask(I18N.message(CONFIRMPATCH), I18N.message("confirmpatchquestion"), choice -> {
             if (Boolean.TRUE.equals(choice)) {
-                confirmPatch.setVisible(false);
+                confirmPatchButton.setVisible(false);
                 download.setVisible(false);
 
-                LD.ask("confirmpatch", "askexecutepackage", "applynow", "applybymself", null, runImmediately -> {
+                LD.ask(CONFIRMPATCH, "askexecutepackage", "applynow", "applybymself", null, runImmediately -> {
                     UpdateService.Instance.get().confirmPatch(patch.getFile(), runImmediately,
                             new DefaultAsyncCallback<>() {
                                 @Override

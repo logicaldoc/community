@@ -367,35 +367,50 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
     }
 
     /**
-     * Concrete implementations must put here their custom initialization of the
-     * persistent objeft. This default implementation uses the reflection to
-     * detect all the collections and all fields of type
-     * {@link PersistentObject} to initialize them.
-     * 
-     * @param entity The entity to initialize
-     * 
-     * @throws PersistenceException Error in initializing the collections
-     * @throws IntrospectionException Something in the entity hierarchy cannot be introspected.
+     * Concrete implementations may override this method to provide custom
+     * initialization of the persistent object. The default implementation
+     * inspects JavaBean properties across the class hierarchy and initializes
+     * collections, maps, and properties of type {@link PersistentObject}.
+     * Individual property initialization failures are logged without
+     * interrupting the remaining initialization.
+     *
+     * @param entity the entity to initialize
+     * @throws PersistenceException if custom initialization encounters a
+     *         persistence error
+     * @throws IntrospectionException if the entity hierarchy cannot be
+     *         introspected
      */
     protected void initializeEntity(T entity) throws PersistenceException, IntrospectionException {
         Class<?> clazz = entity.getClass();
 
         while (clazz != null && clazz != Object.class) {
             for (PropertyDescriptor pd : Introspector.getBeanInfo(clazz).getPropertyDescriptors()) {
-                try {
-                    if (requiresInitialization(pd.getPropertyType())) {
-                        Object value = null;
-                        if (pd.getReadMethod() != null) {
-                            value = pd.getReadMethod().invoke(entity);
-                            if (value != null)
-                                Hibernate.initialize(value);
-                        }
-                    }
-                } catch (Exception e) {
-                    log.warn("Cannot initialize attribute {} of {}", pd.getName(), entity);
-                }
+                initializeProperty(entity, pd);
             }
+
             clazz = clazz.getSuperclass();
+        }
+    }
+
+    /**
+     * Initializes an eligible property through its getter using Hibernate.
+     * Properties without a getter or with a null value are skipped.
+     * Initialization failures are logged without being propagated.
+     *
+     * @param entity the entity containing the property
+     * @param pd the descriptor of the property to initialize
+     */
+    private void initializeProperty(T entity, PropertyDescriptor pd) {
+        try {
+            if (requiresInitialization(pd.getPropertyType()) && pd.getReadMethod() != null) {
+
+                Object value = pd.getReadMethod().invoke(entity);
+
+                if (value != null)
+                    Hibernate.initialize(value);
+            }
+        } catch (Exception e) {
+            log.warn("Cannot initialize attribute {} of {}", pd.getName(), entity);
         }
     }
 

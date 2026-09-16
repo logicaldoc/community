@@ -829,16 +829,19 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
     public Folder findWorkspace(long folderId, boolean initialize) throws PersistenceException {
         Folder folder = findById(folderId, initialize);
 
-        if (folder != null && folder.isWorkspace())
+        if (folder != null && folder.isWorkspace()) {
             return folder;
-        else {
+        } else {
             List<Folder> parents = findParents(folderId);
+
             for (Folder parent : parents) {
-                if (!SLASH.equals(parent.getName()) && parent.isWorkspace())
-                    if (initialize)
+                if (!SLASH.equals(parent.getName()) && parent.isWorkspace()) {
+                    if (initialize) {
                         return initialize(parent);
-                    else
+                    } else {
                         return parent;
+                    }
+                }
             }
         }
 
@@ -2363,7 +2366,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
         for (Folder folder : foldersInSource) {
             // Move only non-clashing folders
             if (findByNameAndParentId(folder.getName(), target.getId()).isEmpty())
-                folder = move(folder, target, new FolderHistory(transaction));
+                move(folder, target, new FolderHistory(transaction));
         }
 
         /*

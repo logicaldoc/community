@@ -44,6 +44,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class UpdatePanel extends VLayout {
 
+    private static final String CONFIRMUPDATE = "confirmupdate";
+
     private static final long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
 
     // Shows the install notes panel
@@ -53,7 +55,7 @@ public class UpdatePanel extends VLayout {
 
     private IButton upload;
 
-    private IButton confirmUpdate;
+    private IButton confirmUpdateButton;
 
     private IButton delete;
 
@@ -83,7 +85,7 @@ public class UpdatePanel extends VLayout {
         upload.setAutoFit(true);
         upload.addClickHandler(event -> new UpdateUploader(this).show());
 
-        confirmUpdate = new IButton(I18N.message("confirmupdate"));
+        confirmUpdateButton = new IButton(I18N.message(CONFIRMUPDATE));
 
         delete = new IButton(I18N.message("ddelete"));
 
@@ -197,8 +199,8 @@ public class UpdatePanel extends VLayout {
         bar.setVertical(false);
         bar.setLength(300);
 
-        confirmUpdate.setAutoFit(true);
-        confirmUpdate.addClickHandler(click -> onConfirm());
+        confirmUpdateButton.setAutoFit(true);
+        confirmUpdateButton.addClickHandler(click -> onConfirm());
 
         delete.setAutoFit(true);
         delete.addClickHandler(click -> onDelete());
@@ -219,7 +221,7 @@ public class UpdatePanel extends VLayout {
 
                         @Override
                         public void handleSuccess(Void arg) {
-                            confirmUpdate.setVisible(false);
+                            confirmUpdateButton.setVisible(false);
 
                             new Timer() {
                                 public void run() {
@@ -242,7 +244,7 @@ public class UpdatePanel extends VLayout {
 
         boolean uploadFileAlreadyAvailableLocally = Util.getValue("updateFile", parameters) != null;
         download.setVisible(!uploadFileAlreadyAvailableLocally);
-        confirmUpdate.setVisible(uploadFileAlreadyAvailableLocally);
+        confirmUpdateButton.setVisible(uploadFileAlreadyAvailableLocally);
 
         VLayout layout = new VLayout(4);
         layout.setWidth100();
@@ -254,7 +256,7 @@ public class UpdatePanel extends VLayout {
 
         HLayout buttonCanvas = new HLayout();
         buttonCanvas.setMembersMargin(6);
-        buttonCanvas.setMembers(download, upload, confirmUpdate, delete);
+        buttonCanvas.setMembers(download, upload, confirmUpdateButton, delete);
         layout.addMember(buttonCanvas);
 
         if (uploadFileAlreadyAvailableLocally)
@@ -265,7 +267,7 @@ public class UpdatePanel extends VLayout {
 
     private void onUpdatePackageLocallyAvailable(String fileName) {
         download.setVisible(false);
-        confirmUpdate.setVisible(true);
+        confirmUpdateButton.setVisible(true);
         displayNotes(fileName);
     }
 
@@ -392,12 +394,12 @@ public class UpdatePanel extends VLayout {
     }
 
     private void onConfirm() {
-        SC.ask(I18N.message("confirmupdate"), I18N.message("confirmupdatequestion"), choice -> {
+        SC.ask(I18N.message(CONFIRMUPDATE), I18N.message("confirmupdatequestion"), choice -> {
             if (Boolean.TRUE.equals(choice)) {
-                confirmUpdate.setVisible(false);
+                confirmUpdateButton.setVisible(false);
                 download.setVisible(false);
 
-                LD.ask("confirmupdate", "askexecutepackage", "applynow", "applybymself", null, runImmediately -> {
+                LD.ask(CONFIRMUPDATE, "askexecutepackage", "applynow", "applybymself", null, runImmediately -> {
                     UpdateService.Instance.get().confirmUpdate(updateFileName, runImmediately,
                             new DefaultAsyncCallback<>() {
                                 @Override

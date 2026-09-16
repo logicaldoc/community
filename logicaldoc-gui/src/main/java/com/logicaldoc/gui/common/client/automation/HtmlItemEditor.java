@@ -34,16 +34,16 @@ public class HtmlItemEditor extends Window {
     public HtmlItemEditor(HTMLFlow flow, ChangedHandler handler) {
         this.flow = flow;
         this.handler = handler;
-        init();
+        initializeWindow();
     }
 
     public HtmlItemEditor(FormItem item, ChangedHandler handler) {
         this.item = item;
         this.handler = handler;
-        init();
+        initializeWindow();
     }
 
-    private void init() {
+    private void initializeWindow() {
         HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> onClose());
 
         setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);

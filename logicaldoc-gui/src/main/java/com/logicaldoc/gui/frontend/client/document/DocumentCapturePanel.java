@@ -42,10 +42,10 @@ public class DocumentCapturePanel extends DocumentDetailTab {
         setHeight100();
         setMembersMargin(20);
         this.processButton = processButton;
-        refresh(document.getTemplateId());
+        refresh();
     }
 
-    public void refresh(Long documentTemplateId) {
+    public void refresh() {
         vm.clearValues();
         vm.clearErrors(false);
 

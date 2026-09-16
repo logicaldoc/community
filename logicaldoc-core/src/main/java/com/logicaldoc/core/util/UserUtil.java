@@ -54,7 +54,6 @@ public class UserUtil {
     public static void main(String[] args) throws NoSuchAlgorithmException {
         User user = new User();
         user.setDecodedPassword(args[0]);
-        System.out.println(user.getPassword());
     }
 
     /**

@@ -28,10 +28,8 @@ import com.logicaldoc.util.spring.Context;
 
 /**
  * Abstract test case for the Core module. This class initializes a test
- * database and prepares the spring test context.
- * <p>
- * All LogicalDOC's tests must extend this test case in order to find a ready
- * and accessible database.
+ * database and prepares the spring test context. <p> All LogicalDOC's tests
+ * must extend this test case in order to find a ready and accessible database.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
@@ -116,7 +114,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
         session = SessionManager.get().newSession(username, password, null, client);
         if (session != null) {
             User user = userDao.findByUsernameIgnoreCase(username);
-            user = userDao.initialize(user);
+            userDao.initialize(user);
             LDAuthenticationToken token = new LDAuthenticationToken(username);
             token.setSid(session.getSid());
             SecurityContextHolder.getContext().setAuthentication(token);

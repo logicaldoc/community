@@ -226,7 +226,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         count = testSubject.countPagesInTree(4L);
         assertEquals(0, count);
     }
-    
+
     @Test
     public void testCountDocs() throws PersistenceException {
         long count = testSubject.countDocs(6L);
@@ -340,7 +340,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         testSubject.copy(source, target, null, false, "inherit", tr);
 
         Folder folder = testSubject.findByPathExtended("/Default/target/pippo/pluto", Tenant.DEFAULT_ID);
-        target = testSubject.initialize(target);
         assertNotNull(folder);
         folder = testSubject.initialize(folder);
         assertEquals("email", folder.getTemplate().getName());
@@ -1627,7 +1626,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         assertEquals(1200L, folder.getSecurityRef().longValue());
         assertEquals(1201L, folder.getParentId());
 
-        // Now we make the root inherit from default workspace 
+        // Now we make the root inherit from default workspace
         testSubject.updateSecurityRef(1200L, 5L, transaction);
         folder = testSubject.findById(1200L);
         assertEquals(5L, folder.getSecurityRef().longValue());
@@ -1795,7 +1794,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
         target = testSubject.findByPathExtended("/Default/Target/Pippo", 1L);
         assertNotNull(target);
-        
+
         target = testSubject.findByPathExtended("/Default/Target/Pluto", 1L);
         assertNotNull(target);
 
@@ -1870,7 +1869,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
         Folder folder = testSubject.findById(1200, true);
         assertNull(folder.getFillerId());
         testSubject.store(folder);
-        folder = testSubject.findById(1200);
+        testSubject.findById(1200);
 
         TemplateDAO tDao = TemplateDAO.get();
         folder = testSubject.findById(1200, true);

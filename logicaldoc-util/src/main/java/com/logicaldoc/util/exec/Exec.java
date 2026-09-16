@@ -496,7 +496,8 @@ public class Exec {
     public void fork(File outputFile, String... commandLine) throws IOException {
         checkAllowed(List.of(commandLine));
 
-        log.info("Fork command {}", Arrays.toString(commandLine));
+        if (log.isDebugEnabled())
+            log.debug("Fork command {}", Arrays.toString(commandLine));
 
         ProcessBuilder pb = new ProcessBuilder(commandLine);
 

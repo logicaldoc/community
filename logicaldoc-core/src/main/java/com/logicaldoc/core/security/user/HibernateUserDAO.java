@@ -769,7 +769,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.HOUR, 0);
-        lastInteraction = calendar.getTime();
+        calendar.getTime();
 
         calendar.setTime(new Date());
         calendar.set(Calendar.MILLISECOND, 0);

@@ -25,7 +25,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -412,14 +411,10 @@ public class ModelsPanel extends VLayout {
         type.setDisplayField(LABEL);
         type.setRequired(true);
 
-        LD.askForValue("addmodel", TYPE, null, type, new ValueCallback() {
-
-            @Override
-            public void execute(String value) {
-                GUIModel model = new GUIModel();
-                model.setType(value);
-                showModelDetails(model);
-            }
+        LD.askForValue("addmodel", TYPE, null, type, value -> {
+            GUIModel model = new GUIModel();
+            model.setType(value);
+            showModelDetails(model);
         });
     }
 

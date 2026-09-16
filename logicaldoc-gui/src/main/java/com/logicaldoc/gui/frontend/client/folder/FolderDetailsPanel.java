@@ -407,7 +407,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
         }
 
         ChangedHandler templateChangedHandler = (ChangedEvent templateChangeEvent) -> {
-            capturePanel.refresh(folder.getTemplateId());
+            capturePanel.refresh();
         };
         extendedPropertiesPanel = new FolderExtendedPropertiesPanel(folder, changeHandler, templateChangedHandler);
         if (Feature.enabled(Feature.TEMPLATE))

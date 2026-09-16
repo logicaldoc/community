@@ -157,7 +157,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             hiliteDoc = findDocumentsByFilters(request, session, locale, maxRecords, page, documentsInCurrentPage,
                     extendedAttributes, extendedAttributesSpec, extendedAttributesValues);
         }
-        
+
         if (hiliteDoc != null)
             printDocument(writer, hiliteDoc, hiliteDoc, bookmarks, extendedAttributes, extendedAttributesValues,
                     session.getTenantName());
@@ -407,7 +407,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
         Long hiliteDocId = getHiliteDocId(request);
 
-        return retrieveHiliteDoc(documentsInCurrentPage, folderId, hiliteDocId);
+        return retrieveHiliteDoc(documentsInCurrentPage, hiliteDocId);
     }
 
     private List<Document> exeucuteQuery(
@@ -636,8 +636,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             documents.add(doc);
     }
 
-    private Document retrieveHiliteDoc(List<Document> documentRecords, Long folderId, Long hiliteDocId)
-            throws PersistenceException {
+    private Document retrieveHiliteDoc(List<Document> documentRecords, Long hiliteDocId) throws PersistenceException {
         Document hiliteDoc = null;
 
         // Always add the hilight doc as first element of the collection

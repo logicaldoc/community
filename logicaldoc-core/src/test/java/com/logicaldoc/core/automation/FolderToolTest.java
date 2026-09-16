@@ -14,92 +14,96 @@ import com.logicaldoc.core.security.Tenant;
 
 public class FolderToolTest extends AbstractCoreTestCase {
 
-	// instance under test
-	private FolderTool testSubject = new FolderTool();
+    // instance under test
+    private FolderTool testSubject = new FolderTool();
 
-	@Test
-	public void testDisplayUrl()  {
-		String result = testSubject.displayUrl(Tenant.DEFAULT_ID, 6L);
-		assertEquals("http://localhost:8080/display?tenant=default&folderId=6", result);
+    @Test
+    public void testDisplayUrl() {
+        String result = testSubject.displayUrl(Tenant.DEFAULT_ID, 6L);
+        assertEquals("http://localhost:8080/display?tenant=default&folderId=6", result);
 
-		Folder fold = new Folder();
-		fold.setId(6L);
-		result = testSubject.displayUrl(fold);
-		assertEquals("http://localhost:8080/display?tenant=default&folderId=6", result);
+        Folder fold = new Folder();
+        fold.setId(6L);
+        result = testSubject.displayUrl(fold);
+        assertEquals("http://localhost:8080/display?tenant=default&folderId=6", result);
 
-		FolderHistory hist = new FolderHistory();
-		hist.setFolder(fold);
-		hist.setFolderId(6L);
-		result = testSubject.displayUrl(hist);
-		assertEquals("http://localhost:8080/display?tenant=default&folderId=6", result);
-	}
+        FolderHistory hist = new FolderHistory();
+        hist.setFolder(fold);
+        hist.setFolderId(6L);
+        result = testSubject.displayUrl(hist);
+        assertEquals("http://localhost:8080/display?tenant=default&folderId=6", result);
+    }
 
-	@Test
-	public void testGetPath() throws PersistenceException  {
-		String result = testSubject.getPath(6L);
-		assertEquals("/Workspace X/folder6", result);
-	}
+    @Test
+    public void testGetPath() throws PersistenceException {
+        String result = testSubject.getPath(6L);
+        assertEquals("/Workspace X/folder6", result);
+    }
 
-	@Test
-	public void testFindByPath()  {
-		Folder result = testSubject.findByPath("/Workspace X/folder6");
-		assertNotNull(result);
-		assertEquals(6L, result.getId());
-	}
+    @Test
+    public void testFindByPath() {
+        Folder result = testSubject.findByPath("/Workspace X/folder6");
+        assertNotNull(result);
+        assertEquals(6L, result.getId());
+    }
 
-	@Test
-	public void testFindById()  {
-		Folder result = testSubject.findById(6L);
-		assertNotNull(result);
-		assertEquals(6L, result.getId());
-		assertEquals("folder6", result.getName());
-	}
+    @Test
+    public void testFindById() {
+        Folder result = testSubject.findById(6L);
+        assertNotNull(result);
+        assertEquals(6L, result.getId());
+        assertEquals("folder6", result.getName());
+    }
 
-	@Test
-	public void testStore()  {
-		Folder folder = new Folder();
-		folder.setParentId(6L);
-		folder.setName("newfolder");
+    @Test
+    public void testStore() {
+        Folder folder = new Folder();
+        folder.setParentId(6L);
+        folder.setName("newfolder");
 
-		testSubject.store(folder, "admin");
-		Folder result = testSubject.findByPath("/Workspace X/folder6/newfolder");
-		result = testSubject.initialize(folder);
-		assertNotNull(result);
-		assertEquals("newfolder", result.getName());
-	}
+        testSubject.store(folder, "admin");
+        Folder result = testSubject.findByPath("/Workspace X/folder6/newfolder");
 
-	@Test
-	public void testDelete() throws PersistenceException  {
-		Folder folder = testSubject.findById(6L);
-		assertNotNull(folder);
+        assertNotNull(result);
 
-		testSubject.delete(6L, "admin");
-		folder = testSubject.findById(6L);
-		assertNull(folder);
-	}
+        result = testSubject.initialize(result);
 
-	@Test
-	public void testMove() throws PersistenceException  {
-		Folder folder = testSubject.findById(1202L);
-		assertNotNull(folder);
-		assertEquals("xyz", folder.getName());
-		testSubject.move(folder, "/Workspace X/folder6", "admin");
+        assertNotNull(result);
+        assertEquals("newfolder", result.getName());
+    }
 
-		Folder movedFolder = testSubject.findByPath("/Workspace X/folder6/xyz");
-		assertEquals(folder, movedFolder);
-	}
+    @Test
+    public void testDelete() throws PersistenceException {
+        Folder folder = testSubject.findById(6L);
+        assertNotNull(folder);
 
-	@Test
-	public void testCopy() throws PersistenceException  {
-		Folder folder = testSubject.findById(1202L);
-		Folder copied = testSubject.copy(folder, "/Workspace X/folder6", true, "inherit", "admin");
-		Folder movedFolder = testSubject.findByPath("/Workspace X/folder6/xyz");
-		assertEquals(copied, movedFolder);
-	}
+        testSubject.delete(6L, "admin");
+        folder = testSubject.findById(6L);
+        assertNull(folder);
+    }
 
-	@Test
-	public void testMerge() throws PersistenceException  {
-	    Folder root = testSubject.findById(5L);
+    @Test
+    public void testMove() throws PersistenceException {
+        Folder folder = testSubject.findById(1202L);
+        assertNotNull(folder);
+        assertEquals("xyz", folder.getName());
+        testSubject.move(folder, "/Workspace X/folder6", "admin");
+
+        Folder movedFolder = testSubject.findByPath("/Workspace X/folder6/xyz");
+        assertEquals(folder, movedFolder);
+    }
+
+    @Test
+    public void testCopy() throws PersistenceException {
+        Folder folder = testSubject.findById(1202L);
+        Folder copied = testSubject.copy(folder, "/Workspace X/folder6", true, "inherit", "admin");
+        Folder movedFolder = testSubject.findByPath("/Workspace X/folder6/xyz");
+        assertEquals(copied, movedFolder);
+    }
+
+    @Test
+    public void testMerge() throws PersistenceException {
+        Folder root = testSubject.findById(5L);
         testSubject.createPath(root, "/Default/Target/Pippo", "admin");
         testSubject.createPath(root, "/Default/Target/Pluto", "admin");
         testSubject.createPath(root, "/Default/Target/Pluto/Paperino", "admin");
@@ -111,30 +115,30 @@ public class FolderToolTest extends AbstractCoreTestCase {
         testSubject.createPath(root, "/Default/Source/Pluto/Paperina", "admin");
         testSubject.createPath(root, "/Default/Source/Pollo/ABC", "admin");
         testSubject.createPath(root, "/Default/Source/Pollo/DEF", "admin");
-	    
+
         Folder target = testSubject.findByPath("/Default/Target", 1L);
         assertNotNull(target);
         Folder source = testSubject.findByPath("/Default/Source", 1L);
         assertNotNull(source);
-        
-		testSubject.merge(source, target, "admin");
-		
-		assertNotNull(testSubject.findByPath("/Default/Target/Pluto"));
-	}
 
-	@Test
-	public void testCreatePath() throws PersistenceException  {
-		Folder folder = testSubject.findById(6L);
-		assertNotNull(folder);
+        testSubject.merge(source, target, "admin");
 
-		Folder path = testSubject.createPath(folder, "/Workspace X/folder6/abc", "admin");
-		assertNotNull(path);
-		assertEquals("abc", path.getName());
-		assertEquals("/Workspace X/folder6/abc", testSubject.getPath(path.getId()));
+        assertNotNull(testSubject.findByPath("/Default/Target/Pluto"));
+    }
 
-		path = testSubject.createPath(folder, "123/def", "admin");
-		assertNotNull(path);
-		assertEquals("def", path.getName());
-		assertEquals("/Workspace X/folder6/123/def", testSubject.getPath(path.getId()));
-	}
+    @Test
+    public void testCreatePath() throws PersistenceException {
+        Folder folder = testSubject.findById(6L);
+        assertNotNull(folder);
+
+        Folder path = testSubject.createPath(folder, "/Workspace X/folder6/abc", "admin");
+        assertNotNull(path);
+        assertEquals("abc", path.getName());
+        assertEquals("/Workspace X/folder6/abc", testSubject.getPath(path.getId()));
+
+        path = testSubject.createPath(folder, "123/def", "admin");
+        assertNotNull(path);
+        assertEquals("def", path.getName());
+        assertEquals("/Workspace X/folder6/123/def", testSubject.getPath(path.getId()));
+    }
 }

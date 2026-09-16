@@ -28,8 +28,7 @@ public class AdvancedProperties extends OrderedProperties {
      * It takes a value and expands the variables referenced in it. You can
      * reference whatever setting in the main configuration file or by using the
      * <code>env.</code> prefix you may reference whatever environment
-     * variable.<br>
-     * Eg., suppose a main configuration file like this:
+     * variable.<br> Eg., suppose a main configuration file like this:
      * 
      * <pre>
      *   default.avatar.size = 144
@@ -41,13 +40,10 @@ public class AdvancedProperties extends OrderedProperties {
      * DB_PASSWORD = abcd
      * </pre>
      * 
-     * Then:
-     * <ul>
-     * <li>the value <code>${default.avatar.size}</code> will be expanded to
-     * <code>144</code></li>
-     * <li>the value <code>${env.DB_PASSWORD}</code> will be expanded to
-     * <code>abcd</code></li>
-     * </ul>
+     * Then: <ul> <li>the value <code>${default.avatar.size}</code> will be
+     * expanded to <code>144</code></li> <li>the value
+     * <code>${env.DB_PASSWORD}</code> will be expanded to
+     * <code>abcd</code></li> </ul>
      * 
      * @param value The string to evaluate
      * 
@@ -173,7 +169,7 @@ public class AdvancedProperties extends OrderedProperties {
      * @return created value
      */
     public synchronized Object setTenantProperty(String tenant, String key, String value) {
-        return this.setProperty("%s.%s".formatted(tenant, key), value);
+        return this.setProperty(fullKey(tenant, key), value);
     }
 
     /**
@@ -200,7 +196,7 @@ public class AdvancedProperties extends OrderedProperties {
      * @return created value
      */
     public synchronized Object setTenantPropertyEncoded(String tenant, String key, String value) {
-        return this.setPropertyEncoded("%s.%s".formatted(tenant, key), value);
+        return this.setPropertyEncoded(fullKey(tenant, key), value);
     }
 
     /**
