@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -31,228 +33,270 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
-	private DocumentNoteDAO testSubject;
+    private DocumentNoteDAO testSubject;
 
-	private FolderDAO folderDao;
+    private FolderDAO folderDao;
 
-	private DocumentDAO docDao;
+    private DocumentDAO docDao;
 
-	private DocumentHistoryDAO historyDao;
+    private DocumentHistoryDAO historyDao;
 
-	@Before
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Before
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		testSubject = DocumentNoteDAO.get();
-		folderDao = FolderDAO.get();
-		docDao = DocumentDAO.get();
-		historyDao = DocumentHistoryDAO.get();
-	}
+        testSubject = DocumentNoteDAO.get();
+        folderDao = FolderDAO.get();
+        docDao = DocumentDAO.get();
+        historyDao = DocumentHistoryDAO.get();
+    }
 
-	@Test
-	public void testFindByDocId() throws PersistenceException {
-		List<DocumentNote> notes = testSubject.findByDocId(1L, User.USERID_ADMIN, null);
-		assertNotNull(notes);
-		assertEquals(2, notes.size());
-		DocumentNote note = notes.get(0);
-		assertEquals("message for note 1", note.getMessage());
-		assertNotNull(notes.toString());
+    @Test
+    public void testFindByDocId() throws PersistenceException {
+        List<DocumentNote> notes = testSubject.findByDocId(1L, User.USERID_ADMIN, null);
+        assertNotNull(notes);
+        assertEquals(2, notes.size());
+        DocumentNote note = notes.get(0);
+        assertEquals("message for note 1", note.getMessage());
+        assertNotNull(notes.toString());
 
-		assertNotSame(0, note.hashCode());
+        assertNotSame(0, note.hashCode());
 
-		// No ACL so whatever user can access all the notes
-		notes = testSubject.findByDocId(1L, 4L, null);
-		assertNotNull(notes);
-		assertEquals(2, notes.size());
+        // No ACL so whatever user can access all the notes
+        notes = testSubject.findByDocId(1L, 4L, null);
+        assertNotNull(notes);
+        assertEquals(2, notes.size());
 
-		// No give read access to just user 3
-		note = notes.getFirst();
-		note = testSubject.initialize(note);
-		note.addAccessControlEntry(new NoteAccessControlEntry(-3L));
-		testSubject.store(note);
+        // No give read access to just user 3
+        note = notes.getFirst();
+        note = testSubject.initialize(note);
+        note.addAccessControlEntry(new NoteAccessControlEntry(-3L));
+        testSubject.store(note);
 
-		// User 4 cannot access the protected note anymore
-		notes = testSubject.findByDocId(1L, 4L, null);
-		assertNotNull(notes);
-		assertEquals(1, notes.size());
+        // User 4 cannot access the protected note anymore
+        notes = testSubject.findByDocId(1L, 4L, null);
+        assertNotNull(notes);
+        assertEquals(1, notes.size());
 
-		// User 3 can access the note
-		notes = testSubject.findByDocId(1L, 3L, null);
-		assertNotNull(notes);
-		assertEquals(2, notes.size());
+        // User 3 can access the note
+        notes = testSubject.findByDocId(1L, 3L, null);
+        assertNotNull(notes);
+        assertEquals(2, notes.size());
 
-		// Administrator can access all the notes
-		notes = testSubject.findByDocId(1L, User.USERID_ADMIN, null);
-		assertNotNull(notes);
-		assertEquals(2, notes.size());
-	}
+        // Administrator can access all the notes
+        notes = testSubject.findByDocId(1L, User.USERID_ADMIN, null);
+        assertNotNull(notes);
+        assertEquals(2, notes.size());
+    }
 
-	@SuppressWarnings("unlikely-arg-type")
-	@Test
-	public void testEquals() throws PersistenceException {
-		DocumentNote note1 = testSubject.findById(1);
-		assertNotNull(note1);
+    @SuppressWarnings("unlikely-arg-type")
+    @Test
+    public void testEquals() throws PersistenceException {
+        DocumentNote note1 = testSubject.findById(1);
+        assertNotNull(note1);
 
-		DocumentNote note2 = testSubject.findById(2);
-		assertNotNull(note2);
+        DocumentNote note2 = testSubject.findById(2);
+        assertNotNull(note2);
 
-		String notANote = "Not a DocumentNote";
+        String notANote = "Not a DocumentNote";
 
-		assertEquals(false, note1.equals(note2));
+        assertEquals(false, note1.equals(note2));
 
-		note2.setId(note1.getId());
-		assertEquals(false, note1.equals(note2));
+        note2.setId(note1.getId());
+        assertEquals(false, note1.equals(note2));
 
-		note1.setDate(null);
-		assertEquals(false, note1.equals(note2));
+        note1.setDate(null);
+        assertEquals(false, note1.equals(note2));
 
-		note1.setDate(new Date());
-		assertNotSame(note1, note2);
-		assertEquals(false, note1.equals(note2));
+        note1.setDate(new Date());
+        assertNotSame(note1, note2);
+        assertEquals(false, note1.equals(note2));
 
-		assertEquals(note1, note1);
+        assertEquals(note1, note1);
 
-		DocumentNote nullNote = null;
-		assertEquals(false, note1.equals(nullNote));
-		assertEquals(false, note1.equals(new Object()));
-		assertEquals(false, note1.equals(notANote));
+        DocumentNote nullNote = null;
+        assertEquals(false, note1.equals(nullNote));
+        assertEquals(false, note1.equals(new Object()));
+        assertEquals(false, note1.equals(notANote));
 
-		note1 = testSubject.findById(1);
-		note2 = testSubject.findById(2);
-		assertEquals(note1.getDate(), note2.getDate());
+        note1 = testSubject.findById(1);
+        note2 = testSubject.findById(2);
+        assertEquals(note1.getDate(), note2.getDate());
 
-		note2.setDate(null);
-		assertEquals(false, note1.getDate().equals(note2.getDate()));
-		assertEquals(false, note1.equals(note2));
+        note2.setDate(null);
+        assertEquals(false, note1.getDate().equals(note2.getDate()));
+        assertEquals(false, note1.equals(note2));
 
-		note1 = testSubject.findById(1);
-		note2 = testSubject.findById(2);
-		note2.setFileVersion(null);
-		assertEquals(false, note1.getFileVersion().equals(note2.getFileVersion()));
-		assertEquals(false, note1.equals(note2));
-	}
+        note1 = testSubject.findById(1);
+        note2 = testSubject.findById(2);
+        note2.setFileVersion(null);
+        assertEquals(false, note1.getFileVersion().equals(note2.getFileVersion()));
+        assertEquals(false, note1.equals(note2));
+    }
 
-	@Test
-	public void testFindByDocIdAndType() throws PersistenceException {
-		List<DocumentNote> notes = testSubject.findByDocIdAndType(1L, User.USERID_ADMIN, null, "x");
-		assertNotNull(notes);
-		assertEquals(1, notes.size());
-		DocumentNote note = notes.get(0);
-		assertEquals("message for note 2", note.getMessage());
+    @Test
+    public void testFindByDocIdAndType() throws PersistenceException {
+        List<DocumentNote> notes = testSubject.findByDocIdAndType(1L, User.USERID_ADMIN, null, "x");
+        assertNotNull(notes);
+        assertEquals(1, notes.size());
+        DocumentNote note = notes.get(0);
+        assertEquals("message for note 2", note.getMessage());
 
-		notes = testSubject.findByDocIdAndType(3L, User.USERID_ADMIN, "1.3", "x");
-		assertNotNull(notes);
-	}
+        notes = testSubject.findByDocIdAndType(3L, User.USERID_ADMIN, "1.3", "x");
+        assertNotNull(notes);
+    }
 
-	@Test
-	public void testCopyAnnotations() throws PersistenceException {
-		assertTrue(testSubject.findByDocId(4L, User.USERID_ADMIN, "2.0").isEmpty());
-		testSubject.copyAnnotations(3L, "1.0", "2.0");
-		assertEquals(1, testSubject.findByDocId(3L, User.USERID_ADMIN, "2.0").size());
-	}
+    @Test
+    public void testCopyAnnotations() throws PersistenceException {
+        assertTrue(testSubject.findByDocId(4L, User.USERID_ADMIN, "2.0").isEmpty());
+        testSubject.copyAnnotations(3L, "1.0", "2.0");
+        assertEquals(1, testSubject.findByDocId(3L, User.USERID_ADMIN, "2.0").size());
+    }
 
-	@Test
-	public void testSecurity() throws PersistenceException {
-		DocumentNote note = new DocumentNote();
-		note.setFileName("documentNoteTest");
-		note.setDocId(1L);
-		note.setUserId(5L);
-		note.setMessage("test note");
+    @Test
+    public void testSecurity() throws PersistenceException {
+        DocumentNote note = new DocumentNote();
+        note.setFileName("documentNoteTest");
+        note.setDocId(1L);
+        note.setUserId(5L);
+        note.setMessage("test note");
 
-		NoteAccessControlEntry ace = new NoteAccessControlEntry();
-		ace.setGroupId(-2L);
-		note.addAccessControlEntry(ace);
-		testSubject.store(note);
+        NoteAccessControlEntry ace = new NoteAccessControlEntry();
+        ace.setGroupId(-2L);
+        note.addAccessControlEntry(ace);
+        testSubject.store(note);
 
-		assertTrue(testSubject.isWriteAllowed(note.getId(), User.USERID_ADMIN));
-		assertTrue(testSubject.isWriteAllowed(note.getId(), 5L));
-		assertTrue(testSubject.isReadAllowed(note.getId(), 2L));
-		assertFalse(testSubject.isWriteAllowed(note.getId(), 2L));
-		assertTrue(testSubject.isReadAllowed(note.getId(), 3L));
-		assertFalse(testSubject.isWriteAllowed(note.getId(), 4L));
+        assertTrue(testSubject.isWriteAllowed(note.getId(), User.USERID_ADMIN));
+        assertTrue(testSubject.isWriteAllowed(note.getId(), 5L));
+        assertTrue(testSubject.isReadAllowed(note.getId(), 2L));
+        assertFalse(testSubject.isWriteAllowed(note.getId(), 2L));
+        assertTrue(testSubject.isReadAllowed(note.getId(), 3L));
+        assertFalse(testSubject.isWriteAllowed(note.getId(), 4L));
 
-		assertEquals(Permission.all(), testSubject.getAllowedPermissions(note.getId(), User.USERID_ADMIN));
-		assertEquals(Permission.all(), testSubject.getAllowedPermissions(note.getId(), 5L));
-		assertFalse(
-				testSubject.getAllowedPermissions(note.getId(), 2L).stream().anyMatch(p -> p.equals(Permission.WRITE)));
-		assertTrue(
-				testSubject.getAllowedPermissions(note.getId(), 2L).stream().anyMatch(p -> p.equals(Permission.READ)));
-		assertTrue(testSubject.getAllowedPermissions(note.getId(), 4L).isEmpty());
-	}
+        assertEquals(Permission.all(), testSubject.getAllowedPermissions(note.getId(), User.USERID_ADMIN));
+        assertEquals(Permission.all(), testSubject.getAllowedPermissions(note.getId(), 5L));
+        assertFalse(
+                testSubject.getAllowedPermissions(note.getId(), 2L).stream().anyMatch(p -> p.equals(Permission.WRITE)));
+        assertTrue(
+                testSubject.getAllowedPermissions(note.getId(), 2L).stream().anyMatch(p -> p.equals(Permission.READ)));
+        assertTrue(testSubject.getAllowedPermissions(note.getId(), 4L).isEmpty());
+    }
 
-	@Test
-	public void testStore() throws PersistenceException {
-		DocumentNote note = new DocumentNote();
-		note.setFileName("documentNoteTest");
-		// non-existent docId
-		note.setDocId(999777L);
-		try {
-			testSubject.store(note);
-		} catch (PersistenceException e) {
-			// catch exception
-		}
+    @Test
+    public void testStore() throws PersistenceException {
+        DocumentNote note = new DocumentNote();
+        note.setFileName("documentNoteTest");
+        // non-existent docId
+        note.setDocId(999777L);
+        try {
+            testSubject.store(note);
+        } catch (PersistenceException e) {
+            // catch exception
+        }
 
-		note.setDocId(1L);
-		testSubject.store(note);
-		assertNotEquals(0L, note.getId());
-		note = testSubject.findById(note.getId(), true);
-		assertNotNull(note);
+        note.setDocId(1L);
+        testSubject.store(note);
+        assertNotEquals(0L, note.getId());
+        note = testSubject.findById(note.getId(), true);
+        assertNotNull(note);
 
-		assertEquals(3, note.getAccessControlList().size());
-		
-		NoteAccessControlEntry ace = new NoteAccessControlEntry();
-		ace.setGroupId(-4L);
-		note.addAccessControlEntry(ace);
-		testSubject.store(note);
+        assertEquals(3, note.getAccessControlList().size());
 
-		note = testSubject.findById(note.getId(), true);
-		assertEquals(4, note.getAccessControlList().size());
+        NoteAccessControlEntry ace = new NoteAccessControlEntry();
+        ace.setGroupId(-4L);
+        note.addAccessControlEntry(ace);
+        testSubject.store(note);
 
-		// fileVersion() == null
-		Folder folder = folderDao.findById(6);
-		Document doc = new Document();
-		doc.setFileName("testDoc");
-		doc.setFolder(folder);
-		doc.setVersion(null);
-		docDao.store(doc);
+        note = testSubject.findById(note.getId(), true);
+        assertEquals(4, note.getAccessControlList().size());
 
-		note = new DocumentNote();
-		note.setFileName("noteTest");
-		note.setDocId(doc.getId());
-		testSubject.store(note);
-		assertNotNull(note);
-		assertEquals(null, note.getFileVersion());
+        // fileVersion() == null
+        Folder folder = folderDao.findById(6);
+        Document doc = new Document();
+        doc.setFileName("testDoc");
+        doc.setFolder(folder);
+        doc.setVersion(null);
+        docDao.store(doc);
 
-		// test overridden store method with DocumentNote and DocumentHistory
-		// parameters
-		DocumentHistory history = historyDao.findById(1L);
-		assertNotNull(history);
+        note = new DocumentNote();
+        note.setFileName("noteTest");
+        note.setDocId(doc.getId());
+        testSubject.store(note);
+        assertNotNull(note);
+        assertEquals(null, note.getFileVersion());
 
-		testSubject.store(note, history);
-	}
+        // test overridden store method with DocumentNote and DocumentHistory
+        // parameters
+        DocumentHistory history = historyDao.findById(1L);
+        assertNotNull(history);
 
-	@Test
-	public void testFindByUserId() throws PersistenceException {
-		List<DocumentNote> notes = testSubject.findByUserId(1L);
-		assertNotNull(notes);
-	}
+        testSubject.store(note, history);
+    }
 
-	@Test
-	public void testDelete() throws PersistenceException {
-		Folder folder = folderDao.findById(6);
-		Document doc = new Document();
-		doc.setFileName("testDoc");
-		doc.setFolder(folder);
-		doc.setIndexingStatus(IndexingStatus.INDEXED);
-		docDao.store(doc);
+    @Test
+    public void testFindByUserId() throws PersistenceException {
+        List<DocumentNote> notes = testSubject.findByUserId(1L);
+        assertNotNull(notes);
+    }
 
-		DocumentNote note = new DocumentNote();
-		note.setFileName("noteTest");
-		note.setDocId(doc.getId());
-		testSubject.store(note);
-		assertNotNull(note);
+    @Test
+    public void testDelete() throws PersistenceException {
+        Folder folder = folderDao.findById(6);
+        Document doc = new Document();
+        doc.setFileName("testDoc");
+        doc.setFolder(folder);
+        doc.setIndexingStatus(IndexingStatus.INDEXED);
+        docDao.store(doc);
 
-		testSubject.delete(note.getId(), 1);
-	}
+        DocumentNote note = new DocumentNote();
+        note.setFileName("noteTest");
+        note.setDocId(doc.getId());
+        testSubject.store(note);
+        assertNotNull(note);
+
+        testSubject.delete(note.getId(), 1);
+    }
+
+    @Test
+    public void testgetAllowedPermissons() throws PersistenceException {
+
+        long allowedUserId = 2L;
+        long deniedUserId = 4L;
+
+        // Verify that neither user is an administrator.
+        assertFalse(UserDAO.get().findById(allowedUserId, true).isAdmin());
+        assertFalse(UserDAO.get().findById(deniedUserId, true).isAdmin());
+
+        DocumentNote note = new DocumentNote();
+        note.setFileName("adminNoteTest");
+        note.setDocId(1L);
+        note.setUserId(User.USERID_ADMIN);
+        note.setMessage("Admin note with restricted access");
+
+        // Group of user 2: grant all permissions.
+        NoteAccessControlEntry ace = new NoteAccessControlEntry(-2L);
+        ace.grantPermissions(Permission.all());
+        note.addAccessControlEntry(ace);
+
+        testSubject.store(note);
+
+        long noteId = note.getId();
+        assertNotEquals(0L, noteId);
+
+        // Authorized non-admin user.
+        assertEquals(Set.of(Permission.READ, Permission.WRITE, Permission.SECURITY, Permission.DELETE),
+                testSubject.getAllowedPermissions(noteId, allowedUserId));
+
+        assertTrue(testSubject.isReadAllowed(noteId, allowedUserId));
+        assertTrue(testSubject.isWriteAllowed(noteId, allowedUserId));
+        assertTrue(testSubject.findByDocId(1L, allowedUserId, null).stream().anyMatch(n -> n.getId() == noteId));
+
+        // Unauthorized non-admin user.
+        assertTrue(testSubject.getAllowedPermissions(noteId, deniedUserId).isEmpty());
+
+        assertFalse(testSubject.isReadAllowed(noteId, deniedUserId));
+        assertFalse(testSubject.isWriteAllowed(noteId, deniedUserId));
+        assertFalse(testSubject.findByDocId(1L, deniedUserId, null).stream().anyMatch(n -> n.getId() == noteId));
+    }
 }
