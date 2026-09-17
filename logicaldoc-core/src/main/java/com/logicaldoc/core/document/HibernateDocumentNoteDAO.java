@@ -283,25 +283,20 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
         if (user.isAdmin() || note.getUserId() == userId)
             return Permission.all();
 
-        StringBuilder query = new StringBuilder(
-                """
-                select ld_read as LDREAD, ld_write as LDWRITE, ld_delete as LDDELETE, ld_security as LDSECURITY 
-                  from ld_note_acl 
-                 where ld_noteid =
-                """);
-        query.append(Long.toString(noteId));
-        query.append("""
-                     and ld_groupid in (select ld_groupid 
-                                          from ld_usergroup 
-                                         where ld_userid =
-                     """);
-        query.append(Long.toString(userId));
-        query.append(")");
+        String query = """
+                       select ld_read as LDREAD, ld_write as LDWRITE, ld_delete as LDDELETE, ld_security as LDSECURITY
+                         from ld_note_acl
+                        where ld_noteid = %d
+                          and ld_groupid in (select ld_groupid
+                                               from ld_usergroup
+                                              where ld_userid = %d)
+                            """.formatted(noteId, userId);
 
         Map<String, Permission> permissionColumn = Map.of("LDWRITE", Permission.WRITE, "LDREAD", Permission.READ,
                 "LDDELETE", Permission.DELETE, "LDSECURITY", Permission.SECURITY);
 
         Set<Permission> permissions = new HashSet<>();
+
         queryForResultSet(query.toString(), null, null, rows -> {
             while (rows.next()) {
                 for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
