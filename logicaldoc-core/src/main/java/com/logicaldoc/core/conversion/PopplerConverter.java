@@ -110,8 +110,7 @@ public class PopplerConverter extends AbstractFormatConverter {
                 default -> "application/octet-stream";
             };
 
-            // Replace src="file.png" with src="data:image/png;base64,...."
-            String replacement = "src=\"data:" + mime + ";base64," + base64 + "\"";
+            String replacement = "src=\"data:%s;base64,%s\"".formatted(mime, base64);
             matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
         }
 

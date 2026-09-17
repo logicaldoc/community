@@ -147,7 +147,7 @@ public class Dropbox {
         if (basePath.endsWith("/"))
             basePath = basePath.substring(0, basePath.length() - 1);
         if (!basePath.startsWith("/"))
-            basePath = "/" + basePath;
+            basePath = "/%s".formatted(basePath);
         if (basePath.equals("/"))
             basePath = "";
         treeList(basePath, files);
@@ -186,7 +186,7 @@ public class Dropbox {
     public boolean uploadFile(File inputFile, String path) throws IOException {
         try (FileInputStream stream = new FileInputStream(inputFile);) {
             if (!path.startsWith("/"))
-                path = "/" + path;
+                path = "/%s".formatted(path);
             FileMetadata uploadedFile = client.files().upload(path).uploadAndFinish(stream);
             return uploadedFile != null;
         } catch (DbxException e) {

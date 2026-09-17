@@ -426,7 +426,7 @@ public abstract class Filler extends PersistentObject {
         Hit hit = SearchEngine.get().getHit(document.getId());
         String extractedContent = hit != null ? hit.getContent() : "";
         if (StringUtils.isBlank(extractedContent)) {
-            log.debug("Document {} not already indexed, " + "trying to extract the text now", document);
+            log.debug("Document {} not already indexed, trying to extract the text now", document);
             extractedContent = DocumentManager.get().parseDocument(document, document.getFileVersion());
         }
 
