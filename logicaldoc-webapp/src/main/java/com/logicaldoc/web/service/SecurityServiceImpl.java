@@ -1337,12 +1337,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
             if (group.getType().equals(Group.Type.DEFAULT)) {
                 ace.setLabel(group.getName());
-                ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
+                ace.setName("%s: %s".formatted(I18N.message("group", LocaleUtil.toLocale(locale)), group.getName()));
             } else {
                 User user = udao.findByGroup(group.getId()).iterator().next();
                 ace.setLabel(user.getUsername());
-                ace.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
-                        + user.getUsername() + ")");
+                ace.setName("%s: %s (%s)".formatted(I18N.message("user", LocaleUtil.toLocale(locale)), user.getFullName(), user.getUsername()));
             }
 
             acl.add(ace);
@@ -1362,11 +1361,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 "select A.ld_id, A.ld_username, A.ld_name, A.ld_firstname from ld_user A ");
         if (StringUtils.isNotEmpty(groupId))
             query.append(", ld_usergroup B");
-        query.append(" where A.ld_deleted=0 and A.ld_type=" + Type.DEFAULT.ordinal());
+        query.append(" where A.ld_deleted = 0 and A.ld_type = %d".formatted(Type.DEFAULT.ordinal()));
         if (StringUtils.isNotEmpty(username))
-            query.append(" and A.ld_username like '%" + SqlUtil.doubleQuotes(username) + "%'");
+            query.append(" and A.ld_username like '%%%s%%'".formatted(SqlUtil.doubleQuotes(username)));
         if (StringUtils.isNotEmpty(groupId))
-            query.append(" and A.ld_id=B.ld_userid and B.ld_groupid=" + Long.parseLong(groupId));
+            query.append(" and A.ld_id = B.ld_userid and B.ld_groupid = %s".formatted(groupId));
 
         try {
             return userDao.query(query.toString(), new RowMapper<>() {
@@ -1404,28 +1403,24 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         params.put("oldestDate", oldestDate);
         params.put("max", max);
 
-        final String NAME_CONDITION = "_entity.name like '";
-        final String MORE_CONDITIONS = "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate";
+        final String query = "_entity.name like '%s%%' and _entity.value >= :max and _entity.lastModified >= :oldestDate";
 
         SequenceDAO dao = SequenceDAO.get();
         try {
             if (max > 0)
-                seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_USERNAME + MORE_CONDITIONS, params,
-                        null, null));
+                seqs.addAll(dao.findByWhere(query.formatted(LoginThrottle.LOGINFAIL_USERNAME), params, null, null));
 
             max = config.getInt("throttle.ip.max", 0);
             cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, -config.getInt("throttle.ip.wait", 0));
             if (max > 0)
-                seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_IP + MORE_CONDITIONS, params, null,
-                        null));
+                seqs.addAll(dao.findByWhere(query.formatted(LoginThrottle.LOGINFAIL_IP), params, null, null));
 
             max = config.getInt("throttle.apikey.max", 0);
             cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, -config.getInt("throttle.apikey.wait", 0));
             if (max > 0)
-                seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_APIKEY + MORE_CONDITIONS, params,
-                        null, null));
+                seqs.addAll(dao.findByWhere(query.formatted(LoginThrottle.LOGINFAIL_APIKEY), params, null, null));
 
             ArrayList<GUISequence> ret = new ArrayList<>();
             for (Sequence seq : seqs) {
