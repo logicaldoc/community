@@ -61,6 +61,10 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
          * In case of new note without any ACL, we force all those users/groups
          * declared at folder level or document level
          */
+        log.info("NOTE BEFORE: id={}, creator={}, docId={}, acl={}", note.getId(), note.getUserId(), note.getDocId(),
+                note.getAccessControlList());
+
+        log.info("DOCUMENT ACL: {}", doc.getAccessControlList());
         if (note.getId() == 0L && note.getAccessControlList().isEmpty()) {
             if (CollectionUtils.isNotEmpty(doc.getAccessControlList())) {
                 note.getAccessControlList().addAll(doc.getAccessControlList().stream().map(NoteAccessControlEntry::new)
@@ -77,6 +81,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
                 }
             }
         }
+        log.info("NOTE AFTER: id={}, creator={}, acl={}", note.getId(), note.getUserId(), note.getAccessControlList());
 
         super.store(note);
 
@@ -169,13 +174,10 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
     }
 
     /**
-     * Filters the results using the user:
-     * <ol>
-     * <li>notes created by the specified user</li>
-     * <li>notes where the user is one of the participants</li>
-     * <li>notes without any ACL</li>
-     * <li>for admin users no filter at all</li>
-     * </ol>
+     * Filters the results using the user: <ol> <li>notes created by the
+     * specified user</li> <li>notes where the user is one of the
+     * participants</li> <li>notes without any ACL</li> <li>for admin users no
+     * filter at all</li> </ol>
      * 
      * @param userId identifier of the current user
      * @param notes list of notes to filter
@@ -196,6 +198,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
             } else {
                 Set<Long> userGroups = user.getGroups().stream().map(Group::getId).collect(Collectors.toSet());
                 notes = initialize(notes);
+
                 return notes.stream()
                         .filter(note -> note.getUserId() == userId || note.getAccessControlList().isEmpty()
                                 || note.getAccessControlEntries(userGroups).stream().anyMatch(ace -> ace.isRead()))
@@ -265,25 +268,20 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
         if (user.isAdmin() || note.getUserId() == userId)
             return Permission.all();
 
-        StringBuilder query = new StringBuilder(
-                """
-                select ld_read as LDREAD, ld_write as LDWRITE, ld_delete as LDDELETE, ld_security as LDSECURITY
-                  from ld_note_acl
-                 where ld_noteid =
-                """);
-        query.append(Long.toString(noteId));
-        query.append("""
-                     and ld_groupid in (select ld_groupid
-                                          from ld_usergroup
-                                         where ld_userid =
-                     """);
-        query.append(Long.toString(userId));
-        query.append(")");
+        String query = """
+                       select ld_read as LDREAD, ld_write as LDWRITE, ld_delete as LDDELETE, ld_security as LDSECURITY
+                         from ld_note_acl
+                        where ld_noteid = %d
+                          and ld_groupid in (select ld_groupid
+                                               from ld_usergroup
+                                              where ld_userid = %d)
+                            """.formatted(noteId, userId);
 
         Map<String, Permission> permissionColumn = Map.of("LDWRITE", Permission.WRITE, "LDREAD", Permission.READ,
                 "LDDELETE", Permission.DELETE, "LDSECURITY", Permission.SECURITY);
 
         Set<Permission> permissions = new HashSet<>();
+
         queryForResultSet(query.toString(), null, null, rows -> {
             while (rows.next()) {
                 for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
