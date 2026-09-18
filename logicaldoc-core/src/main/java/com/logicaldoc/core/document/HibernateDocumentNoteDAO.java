@@ -282,7 +282,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
         Set<Permission> permissions = new HashSet<>();
 
-        queryForResultSet(query.toString(), null, null, rows -> {
+        queryForResultSet(query, null, null, rows -> {
             while (rows.next()) {
                 for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
                     String column = entry.getKey();

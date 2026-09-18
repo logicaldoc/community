@@ -3,6 +3,7 @@ package com.logicaldoc.core.automation;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -284,7 +285,7 @@ public class DocTool {
     public void store(Document doc, String username) {
         DocumentHistory transaction = new DocumentHistory();
         transaction.setDocument(doc);
-        transaction.setDate(new Date());
+        transaction.setDate(Date.from(Instant.now()));
         transaction.setUser(new SecurityTool().getUser(username));
         store(doc, transaction);
     }
@@ -301,7 +302,7 @@ public class DocTool {
     public Document create(Document doc, File file, String username) {
         DocumentHistory transaction = new DocumentHistory();
         transaction.setDocument(doc);
-        transaction.setDate(new Date());
+        transaction.setDate(Date.from(Instant.now()));
         transaction.setUser(new SecurityTool().getUser(username));
 
         try {
@@ -342,7 +343,7 @@ public class DocTool {
 
         DocumentHistory transaction = new DocumentHistory();
         transaction.setDocument(doc);
-        transaction.setDate(new Date());
+        transaction.setDate(Date.from(Instant.now()));
         transaction.setUser(user);
 
         try {
@@ -860,7 +861,7 @@ public class DocTool {
         note.setDocId(doc.getId());
         note.setUserId(user.getId());
         note.setUsername(user.getUsername());
-        note.setDate(new Date());
+        note.setDate(Date.from(Instant.now()));
         note.setMessage(text);
         note.setFileName(doc.getFileName());
         note.setFileVersion(doc.getFileVersion());

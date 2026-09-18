@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -42,286 +43,280 @@ import com.logicaldoc.util.spring.Context;
  */
 public class Automation {
 
-	public static final String SYSTEM_DICTIONARY = "systemDictionary";
+    public static final String SYSTEM_DICTIONARY = "systemDictionary";
 
-	public static final String CURRENT_DATE = "CURRENT_DATE";
+    public static final String CURRENT_DATE = "CURRENT_DATE";
 
-	public static final String PRODUCT = "product";
+    public static final String PRODUCT = "product";
 
-	public static final String LOCALE = "locale";
+    public static final String LOCALE = "locale";
 
-	public static final String SERVER_URL = "serverUrl";
+    public static final String SERVER_URL = "serverUrl";
 
-	public static final String TENANT_ID = "tenantId";
+    public static final String TENANT_ID = "tenantId";
 
-	public static final String DICTIONARY = "dictionary";
+    public static final String DICTIONARY = "dictionary";
 
-	public static final String KEYS = "keys";
+    public static final String KEYS = "keys";
 
-	public static final String CONTEXT = "context";
+    public static final String CONTEXT = "context";
 
-	public static final String PARAMETERS = "parameters";
+    public static final String PARAMETERS = "parameters";
 
-	public static final String PARAMETERS_NAMES = "parametersnames";
+    public static final String PARAMETERS_NAMES = "parametersnames";
 
-	private static final Logger log = LoggerFactory.getLogger(Automation.class);
+    private static final Logger log = LoggerFactory.getLogger(Automation.class);
 
-	private String logTag = "AutomationEngine";
+    private String logTag = "AutomationEngine";
 
-	private Locale automationLocale = Locale.ENGLISH;
+    private Locale automationLocale = Locale.ENGLISH;
 
-	private long tenantId = Tenant.DEFAULT_ID;
+    private long tenantId = Tenant.DEFAULT_ID;
 
-	/**
-	 * A transient and system-wide dictionary used to store keys among
-	 * automation executions
-	 */
-	private static final Map<String, Object> systemDictionary = new ConcurrentHashMap<>();
+    /**
+     * A transient and system-wide dictionary used to store keys among
+     * automation executions
+     */
+    private static final Map<String, Object> systemDictionary = new ConcurrentHashMap<>();
 
-	public static synchronized void initialize() {
-		if (RuntimeSingleton.isInitialized())
-			return;
+    public static synchronized void initialize() {
+        if (RuntimeSingleton.isInitialized())
+            return;
 
-		Properties settings = null;
-		try (InputStream is = ResourceUtil.getInputStream("automation.properties")) {
-			if (is != null) {
-				settings = new Properties();
-				settings.load(is);
-			}
-		} catch (Exception e) {
-			log.debug(e.getMessage(), e);
-			settings = null;
-		}
+        Properties settings = null;
+        try (InputStream is = ResourceUtil.getInputStream("automation.properties")) {
+            if (is != null) {
+                settings = new Properties();
+                settings.load(is);
+            }
+        } catch (Exception e) {
+            log.debug(e.getMessage(), e);
+            settings = null;
+        }
 
-		try {
-			if (settings != null) {
-				RuntimeSingleton.init(settings);
-				log.info("Automation initialized with settings taken from automation.properties");
-			} else {
-				RuntimeSingleton.init();
-				log.info("Automation initialized with default settings");
-			}
-		} catch (Exception e) {
-			log.error("Unable to initialize the automation engine", e);
-		}
-	}
+        try {
+            if (settings != null) {
+                RuntimeSingleton.init(settings);
+                log.info("Automation initialized with settings taken from automation.properties");
+            } else {
+                RuntimeSingleton.init();
+                log.info("Automation initialized with default settings");
+            }
+        } catch (Exception e) {
+            log.error("Unable to initialize the automation engine", e);
+        }
+    }
 
-	public Automation() {
-		super();
-	}
+    public Automation() {
+        super();
+    }
 
-	public Automation(String logTag) {
-		super();
-		this.logTag = logTag;
-	}
+    public Automation(String logTag) {
+        super();
+        this.logTag = logTag;
+    }
 
-	public Automation(String logTag, Locale locale, long tenantId) {
-		super();
-		this.logTag = logTag;
-		this.automationLocale = locale;
-		this.tenantId = tenantId;
-	}
+    public Automation(String logTag, Locale locale, long tenantId) {
+        super();
+        this.logTag = logTag;
+        this.automationLocale = locale;
+        this.tenantId = tenantId;
+    }
 
-	/**
-	 * Prepares the dictionary for the automation's execution. All the classes
-	 * marked with @AutomationDictionary will be added and the keys of
-	 * customDictionary will be merged. Moreover, these additional keys will be
-	 * included.
-	 * 
-	 * <ol>
-	 * <li>product: name of the product</li>
-	 * <li>locale: the default locale</li>
-	 * <li>nl: the new line</li>
-	 * <li>CURRENT_DATE: the actual date</li>
-	 * <li>tenantId</li>
-	 * <li>dictionary: the map of all the variables</li>
-	 * <li>serverUrl</li>
-	 * <li>tenantId</li>
-	 * </ol>
-	 * 
-	 * @param clientDictionary Custom keys provided by the client
-	 * 
-	 * @return The complete dictionary to use
-	 */
-	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
-		if (clientDictionary == null)
-			clientDictionary = new ConcurrentHashMap<>();
-		HashMap<String, Object> dictionary = new HashMap<>();
+    /**
+     * Prepares the dictionary for the automation's execution. All the classes
+     * marked with @AutomationDictionary will be added and the keys of
+     * customDictionary will be merged. Moreover, these additional keys will be
+     * included.
+     * 
+     * <ol> <li>product: name of the product</li> <li>locale: the default
+     * locale</li> <li>nl: the new line</li> <li>CURRENT_DATE: the actual
+     * date</li> <li>tenantId</li> <li>dictionary: the map of all the
+     * variables</li> <li>serverUrl</li> <li>tenantId</li> </ol>
+     * 
+     * @param clientDictionary Custom keys provided by the client
+     * 
+     * @return The complete dictionary to use
+     */
+    private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
+        if (clientDictionary == null)
+            clientDictionary = new ConcurrentHashMap<>();
+        HashMap<String, Object> dictionary = new HashMap<>();
 
-		/*
-		 * Scan the classpath to add all the @AutomationDictionary classes
-		 */
-		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
-		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
-			String beanClassName = bd.getBeanClassName();
+        /*
+         * Scan the classpath to add all the @AutomationDictionary classes
+         */
+        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
+        for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
+            String beanClassName = bd.getBeanClassName();
 
-			try {
-				Class<?> beanClass = Class.forName(beanClassName);
+            try {
+                Class<?> beanClass = Class.forName(beanClassName);
 
-				String key = beanClass.getSimpleName();
-				AutomationDictionary annotation = beanClass.getAnnotation(AutomationDictionary.class);
-				if (annotation != null && StringUtils.isNotEmpty(annotation.key()))
-					key = annotation.key();
+                String key = beanClass.getSimpleName();
+                AutomationDictionary annotation = beanClass.getAnnotation(AutomationDictionary.class);
+                if (annotation != null && StringUtils.isNotEmpty(annotation.key()))
+                    key = annotation.key();
 
-				Object instance = beanClass.getDeclaredConstructor().newInstance();
-				dictionary.put(key, instance);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
+                Object instance = beanClass.getDeclaredConstructor().newInstance();
+                dictionary.put(key, instance);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
 
-		/*
-		 * Add some standard entries
-		 */
+        /*
+         * Add some standard entries
+         */
 
-		// The product name
-		dictionary.put(PRODUCT, SystemInfo.get(tenantId).getProduct());
+        // The product name
+        dictionary.put(PRODUCT, SystemInfo.get(tenantId).getProduct());
 
-		// This is needed to handle new lines
-		dictionary.put("nl", "\n");
+        // This is needed to handle new lines
+        dictionary.put("nl", "\n");
 
-		// The tenant ID
-		if (!dictionary.containsKey(TENANT_ID))
-			dictionary.put(TENANT_ID, this.tenantId);
+        // The tenant ID
+        if (!dictionary.containsKey(TENANT_ID))
+            dictionary.put(TENANT_ID, this.tenantId);
 
-		// This is the locale
-		if (!clientDictionary.containsKey(LOCALE))
-			clientDictionary.put(LOCALE, this.automationLocale != null ? this.automationLocale : Locale.ENGLISH);
+        // This is the locale
+        if (!clientDictionary.containsKey(LOCALE))
+            clientDictionary.put(LOCALE, this.automationLocale != null ? this.automationLocale : Locale.ENGLISH);
 
-		// This is needed to format dates
-		AutomationDateTool dateTool = new AutomationDateTool(
-				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
-				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_datelong"),
-				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
-		dictionary.put("DateTool", dateTool);
+        // This is needed to format dates
+        AutomationDateTool dateTool = new AutomationDateTool(
+                I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
+                I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_datelong"),
+                I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
+        dictionary.put("DateTool", dateTool);
 
-		// Put the current date
-		dictionary.put(CURRENT_DATE, new Date());
+        // Put the current date
+        dictionary.put(CURRENT_DATE, Date.from(Instant.now()));
 
-		// Localized messages map
-		dictionary.put("I18N", new I18NTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE))));
+        // Localized messages map
+        dictionary.put("I18N", new I18NTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE))));
 
-		putServerUrl(clientDictionary);
+        putServerUrl(clientDictionary);
 
-		// Put the system dictionary
-		dictionary.put(SYSTEM_DICTIONARY, systemDictionary);
+        // Put the system dictionary
+        dictionary.put(SYSTEM_DICTIONARY, systemDictionary);
 
-		/*
-		 * Merge the client dictionary
-		 */
-		mergeDictionary(dictionary, clientDictionary);
+        /*
+         * Merge the client dictionary
+         */
+        mergeDictionary(dictionary, clientDictionary);
 
-		// Put some static classes
-		dictionary.put(Paths.class.getSimpleName(), Paths.class);
-		dictionary.put(Math.class.getSimpleName(), Math.class);
+        // Put some static classes
+        dictionary.put(Paths.class.getSimpleName(), Paths.class);
+        dictionary.put(Math.class.getSimpleName(), Math.class);
 
-		// Put a copy of all the keys(if we would traverse the keyset of the
-		// dictionary we would get concurrent modification exception
-		Set<String> keySet = dictionary.keySet().stream().collect(Collectors.toSet());
-		dictionary.put(KEYS, keySet);
+        // Put a copy of all the keys(if we would traverse the keyset of the
+        // dictionary we would get concurrent modification exception
+        Set<String> keySet = dictionary.keySet().stream().collect(Collectors.toSet());
+        dictionary.put(KEYS, keySet);
 
-		// Add a reference to the dictionary itself
-		dictionary.put(DICTIONARY, dictionary);
+        // Add a reference to the dictionary itself
+        dictionary.put(DICTIONARY, dictionary);
 
-		// Put the application context
-		if (Context.get() != null)
-			dictionary.put(CONTEXT, Context.get());
+        // Put the application context
+        if (Context.get() != null)
+            dictionary.put(CONTEXT, Context.get());
 
-		return dictionary;
-	}
+        return dictionary;
+    }
 
-	private void mergeDictionary(HashMap<String, Object> dictionary, Map<String, Object> clientDictionary) {
-		if (clientDictionary != null && !clientDictionary.isEmpty()) {
-			for (Map.Entry<String, Object> entry : clientDictionary.entrySet()) {
-				if (entry.getKey() != null && entry.getValue() != null)
-					dictionary.put(entry.getKey(), entry.getValue());
-			}
-		}
-	}
+    private void mergeDictionary(HashMap<String, Object> dictionary, Map<String, Object> clientDictionary) {
+        if (clientDictionary != null && !clientDictionary.isEmpty()) {
+            for (Map.Entry<String, Object> entry : clientDictionary.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null)
+                    dictionary.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
 
-	private void putServerUrl(Map<String, Object> clientDictionary) {
-		if (Context.get() != null)
-			clientDictionary.put(SERVER_URL, Context.get().getConfig().get("server.url"));
-		else
-			try {
-				clientDictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));
-			} catch (IOException e) {
-				// Nothing to do
-			}
-	}
+    private void putServerUrl(Map<String, Object> clientDictionary) {
+        if (Context.get() != null)
+            clientDictionary.put(SERVER_URL, Context.get().getConfig().get("server.url"));
+        else
+            try {
+                clientDictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));
+            } catch (IOException e) {
+                // Nothing to do
+            }
+    }
 
-	private VelocityContext prepareContext(Map<String, Object> extendedDictionary) {
-		initialize();
-		VelocityContext context = new VelocityContext();
-		if (extendedDictionary != null)
-			context = new VelocityContext(extendedDictionary);
-		return context;
-	}
+    private VelocityContext prepareContext(Map<String, Object> extendedDictionary) {
+        initialize();
+        VelocityContext context = new VelocityContext();
+        if (extendedDictionary != null)
+            context = new VelocityContext(extendedDictionary);
+        return context;
+    }
 
-	/**
-	 * Evaluate a given expression. The given dictionary will be integrated by
-	 * {@link Automation#prepareDictionary(Map)}:
-	 * 
-	 * @param expression The string expression to process
-	 * @param clientDictionary The dictionary to use
-	 * 
-	 * @return The processed result
-	 * 
-	 * @throws AutomationException the script has been evaluated but produced an
-	 *         error
-	 */
-	public String evaluate(String expression, Map<String, Object> clientDictionary) throws AutomationException {
-		StringWriter writer = new StringWriter();
-		evaluate(expression, clientDictionary, writer);
-		return writer.toString();
-	}
+    /**
+     * Evaluate a given expression. The given dictionary will be integrated by
+     * {@link Automation#prepareDictionary(Map)}:
+     * 
+     * @param expression The string expression to process
+     * @param clientDictionary The dictionary to use
+     * 
+     * @return The processed result
+     * 
+     * @throws AutomationException the script has been evaluated but produced an
+     *         error
+     */
+    public String evaluate(String expression, Map<String, Object> clientDictionary) throws AutomationException {
+        StringWriter writer = new StringWriter();
+        evaluate(expression, clientDictionary, writer);
+        return writer.toString();
+    }
 
-	/**
-	 * Evaluate a given expression. The given dictionary will be integrated by
-	 * {@link Automation#prepareDictionary(Map)}
-	 * 
-	 * @param clientDictionary dictionary to be passed to the engine
-	 * @param reader the reader on the automation code
-	 * @param writer the writer that will receive the output
-	 * 
-	 * @throws IOException cannot read from reader
-	 * @throws AutomationException the script has been evaluated but produced an
-	 *         error
-	 */
-	public void evaluate(Map<String, Object> clientDictionary, Reader reader, Writer writer)
-			throws IOException, AutomationException {
-		String expression = IOUtils.toString(reader);
-		evaluate(expression, clientDictionary, writer);
-	}
+    /**
+     * Evaluate a given expression. The given dictionary will be integrated by
+     * {@link Automation#prepareDictionary(Map)}
+     * 
+     * @param clientDictionary dictionary to be passed to the engine
+     * @param reader the reader on the automation code
+     * @param writer the writer that will receive the output
+     * 
+     * @throws IOException cannot read from reader
+     * @throws AutomationException the script has been evaluated but produced an
+     *         error
+     */
+    public void evaluate(Map<String, Object> clientDictionary, Reader reader, Writer writer)
+            throws IOException, AutomationException {
+        String expression = IOUtils.toString(reader);
+        evaluate(expression, clientDictionary, writer);
+    }
 
-	private void evaluate(String expression, Map<String, Object> clientDictionary, Writer writer)
-			throws AutomationException {
-		forbidRuntimeUsage(expression);
+    private void evaluate(String expression, Map<String, Object> clientDictionary, Writer writer)
+            throws AutomationException {
+        forbidRuntimeUsage(expression);
 
-		try {
-			// Better to use a mutable shallow copy of the client dictionaty
-			// because we may receive an unmodifiable client dictionary
-			VelocityContext context = prepareContext(
-					prepareDictionary(clientDictionary != null ? new HashMap<>(clientDictionary) : null));
-			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
-		} catch (Exception e) {
-			throw new AutomationException(expression, e);
-		}
-	}
+        try {
+            // Better to use a mutable shallow copy of the client dictionaty
+            // because we may receive an unmodifiable client dictionary
+            VelocityContext context = prepareContext(
+                    prepareDictionary(clientDictionary != null ? new HashMap<>(clientDictionary) : null));
+            Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
+        } catch (Exception e) {
+            throw new AutomationException(expression, e);
+        }
+    }
 
-	private void forbidRuntimeUsage(String expression) throws ForbiddenCodeException {
-		if (expression.contains("java.lang.Runtime")) {
-			throw new ForbiddenCodeException(expression);
-		} else {
-			Pattern runtimePattern = Pattern.compile("\\.\\s*(getRuntime|runtime)", Pattern.DOTALL);
-			Matcher m = runtimePattern.matcher(expression);
-			if (m.find()) {
-				String snippet = expression.substring(Math.max(0, m.start() - 50),
-						Math.min(expression.length() - 1, m.end() + 50));
-				log.error("Detected possible suspicious access to java.lang.Runtime: {}", snippet);
-				throw new ForbiddenCodeException(snippet, expression);
-			}
-		}
-	}
+    private void forbidRuntimeUsage(String expression) throws ForbiddenCodeException {
+        if (expression.contains("java.lang.Runtime")) {
+            throw new ForbiddenCodeException(expression);
+        } else {
+            Pattern runtimePattern = Pattern.compile("\\.\\s*(getRuntime|runtime)", Pattern.DOTALL);
+            Matcher m = runtimePattern.matcher(expression);
+            if (m.find()) {
+                String snippet = expression.substring(Math.max(0, m.start() - 50),
+                        Math.min(expression.length() - 1, m.end() + 50));
+                log.error("Detected possible suspicious access to java.lang.Runtime: {}", snippet);
+                throw new ForbiddenCodeException(snippet, expression);
+            }
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.logicaldoc.core.automation;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -82,7 +83,11 @@ public class MailTool {
      * @throws PersistenceException Error in the data layer
      * 
      */
-    public void sendDocuments(Collection<Document> documents, String from, Collection<String> to, String subject,
+    public void sendDocuments(
+            Collection<Document> documents,
+            String from,
+            Collection<String> to,
+            String subject,
             String message) throws IOException, MessagingException, PersistenceException {
         if (documents == null || documents.isEmpty())
             return;
@@ -261,10 +266,10 @@ public class MailTool {
         SystemMessage m = new SystemMessage();
         m.setTenantId(user.getTenantId());
         m.setAuthor(user.getUsername());
-        m.setSentDate(new Date());
+        m.setSentDate(Date.from(Instant.now()));
         m.setStatus(SystemMessage.STATUS_NEW);
         m.setType(Message.Type.SYSTEM);
-        m.setLastNotified(new Date());
+        m.setLastNotified(Date.from(Instant.now()));
         m.setMessageText(message);
         m.setSubject(subject);
         Recipient rec = new Recipient();

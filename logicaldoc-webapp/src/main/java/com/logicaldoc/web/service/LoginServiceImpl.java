@@ -1,7 +1,7 @@
 package com.logicaldoc.web.service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -87,8 +87,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
             // Retrieve the reason for the last login failure
             List<UserHistory> failures = UserHistoryDAO.get().findByUserIdAndEvent(user.getId(),
-                    UserEvent.LOGIN_FAILED.toString(),
-                    Date.from(LocalDateTime.now().minusMinutes(5).atZone(ZoneOffset.systemDefault()).toInstant()));
+                    UserEvent.LOGIN_FAILED.toString(), Date.from(LocalDateTime.now(ZoneId.systemDefault())
+                            .minusMinutes(5).atZone(ZoneId.systemDefault()).toInstant()));
             if (failures != null && !failures.isEmpty())
                 usr.setLastLoginFailureReason(failures.getLast().getComment());
 

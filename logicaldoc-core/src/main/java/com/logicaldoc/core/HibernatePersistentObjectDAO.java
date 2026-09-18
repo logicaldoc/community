@@ -10,11 +10,11 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -706,11 +706,12 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
      * @throws PersistenceException error at database level
      */
     protected int cleanOldRecords(int ttl, String tableName, String dateColumn) throws PersistenceException {
+
         int updates = 0;
+
         if (ttl > 0) {
-            Date today = new Date();
-            GregorianCalendar oldestDate = new GregorianCalendar();
-            oldestDate.add(Calendar.DAY_OF_MONTH, -ttl);
+            ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+            ZonedDateTime oldestDate = now.minusDays(ttl);
 
             updates = jdbcUpdate("""
                                  update %s
@@ -719,10 +720,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
                                   where ld_deleted = 0
                                     and %s < :oldestDate
                                  """.formatted(tableName, dateColumn),
-                    Map.of("today", today, "oldestDate", oldestDate.getTime()));
+                    Map.of("today", Date.from(now.toInstant()), "oldestDate", Date.from(oldestDate.toInstant())));
 
             log.info("Removed {} old rows from table {}", updates, tableName);
         }
+
         return updates;
     }
 

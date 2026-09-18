@@ -1,5 +1,6 @@
 package com.logicaldoc.core;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -68,12 +69,6 @@ public class LastModifiedInterceptor implements Interceptor {
         updateLastModified(entity, currentState, propertyNames);
     }
 
-    private boolean updateLastModified(Object entity, Object[] currentState, String[] propertyNames) {
-        if (entity instanceof PersistentObject)
-            return setValue(currentState, propertyNames, "lastModified", new Date());
-        return false;
-    }
-
     protected boolean setValue(Object[] currentState, String[] propertyNames, String propertyToSet, Object value) {
         int index = Arrays.asList(propertyNames).indexOf(propertyToSet);
 
@@ -83,5 +78,13 @@ public class LastModifiedInterceptor implements Interceptor {
         } else {
             return false;
         }
+    }
+
+    private boolean updateLastModified(Object entity, Object[] currentState, String[] propertyNames) {
+
+        if (entity instanceof PersistentObject)
+            return setValue(currentState, propertyNames, "lastModified", Date.from(Instant.now()));
+
+        return false;
     }
 }

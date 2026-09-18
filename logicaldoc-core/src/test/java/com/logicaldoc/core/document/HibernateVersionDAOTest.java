@@ -131,8 +131,10 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
         Set<String> actualFileVersions = versions.stream().map(Version::getFileVersion).collect(Collectors.toSet());
         List<StoreResource> currentResourceFiles = store.listResources(doc.getId(), null).stream()
                 .filter(r -> !r.name().contains("-")).toList();
-        for (StoreResource resource : currentResourceFiles)
-            assertTrue(actualFileVersions.contains(resource.name()));
+        for (StoreResource resource : currentResourceFiles) {
+            assertTrue("Unexpected resource: %s; retained file versions: %s".formatted(resource.name(),
+                    actualFileVersions), actualFileVersions.contains(resource.name()));
+        }
 
         // Now reset all versions
         testSubject.deleteAll(versions);
