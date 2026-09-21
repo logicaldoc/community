@@ -402,7 +402,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
      */
     private void initializeProperty(T entity, PropertyDescriptor pd) {
         try {
-            if (requiresInitialization(pd.getPropertyType()) && pd.getReadMethod() != null) {
+            if (requiresInitialization(pd) && pd.getReadMethod() != null) {
 
                 Object value = pd.getReadMethod().invoke(entity);
 
@@ -410,13 +410,19 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
                     Hibernate.initialize(value);
             }
         } catch (Exception e) {
-            log.warn("Cannot initialize attribute {} of {}", pd.getName(), entity);
+            log.warn("Cannot initialize attribute {} of {} ({})", pd.getName(), entity, entity.getClass().getName());
+//            if (log.isDebugEnabled())
+                log.warn(e.getMessage(), e);
         }
     }
 
-    private static boolean requiresInitialization(Class<?> type) {
-        return Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
-                || PersistentObject.class.isAssignableFrom(type);
+    private static boolean requiresInitialization(PropertyDescriptor pd) {
+        List<String> skip = List.of("attributeAtPosition");
+        String name = pd.getName();
+        Class<?> type = pd.getPropertyType();
+
+        return !skip.contains(name) && (Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
+                || PersistentObject.class.isAssignableFrom(type));
     }
 
     protected Session getCurrentSession() {
