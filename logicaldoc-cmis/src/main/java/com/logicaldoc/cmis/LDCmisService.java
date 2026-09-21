@@ -3,9 +3,9 @@ package com.logicaldoc.cmis;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -663,13 +663,13 @@ public class LDCmisService extends AbstractCmisService {
             Boolean includeAcl,
             BigInteger maxItems,
             ExtensionsData extension) {
+
         log.debug("getContentChanges {} | {} | {}", changeLogToken.getValue(), filter,
-                Instant.ofEpochMilli(Long.parseLong(changeLogToken.getValue())));
+                new Date(Long.parseLong(changeLogToken.getValue())));
 
         validateSession();
 
-        return getRepository().getContentChanges(changeLogToken,
-                maxItems != null ? (int) maxItems.doubleValue() : 2000);
+        return getRepository().getContentChanges(changeLogToken, maxItems != null ? maxItems.intValue() : 2000);
     }
 
     @Override
