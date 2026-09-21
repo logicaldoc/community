@@ -191,12 +191,18 @@ public class Exec {
         final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]),
                 env != null ? env.toArray(new String[0]) : null, dir);
 
+        String command = String.join(" ", commandLine);
+
+        new Thread(new StreamEater(streamLogPrefix(errPrefix, command), process.getErrorStream())).start();
+
+        new Thread(new StreamEater(streamLogPrefix(outPrefix, command), process.getInputStream())).start();
+
         if (timeout > 0) {
             ExecutorService service = Executors.newSingleThreadExecutor();
             try {
-                Callable<Integer> call = new CallableProcess(process);
-                Future<Integer> future = service.submit(call);
+                Future<Integer> future = service.submit(new CallableProcess(process));
                 exit = future.get(timeout, TimeUnit.SECONDS);
+
                 if (log.isDebugEnabled())
                     log.debug("{} returned {}", commandLine.get(0), exit);
             } catch (InterruptedException e) {
@@ -213,28 +219,13 @@ public class Exec {
             }
         }
 
-        String commandForLog = "(%s)".formatted(commandForLog(commandLine.stream().collect(Collectors.joining(" "))));
-
-        StreamEater errEater = new StreamEater("%s %s".formatted(errPrefix, commandForLog), process.getErrorStream());
-
-        StreamEater outEater = new StreamEater("%s %s".formatted(outPrefix, commandForLog), process.getInputStream());
-
-        new Thread(errEater).start();
-
-        new Thread(outEater).start();
-
         try {
             exit = process.waitFor();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        try {
-            process.destroy();
-        } catch (Exception t) {
-            // Nothing to do
-        }
-
+        process.destroy();
         return exit;
     }
 
@@ -336,17 +327,13 @@ public class Exec {
         final Process process = Runtime.getRuntime().exec(commandLine.split(" "),
                 env != null ? env.toArray(new String[0]) : null, dir);
 
-        String commandForLog = "(%s)".formatted(commandForLog(commandLine));
-        StreamEater errEater = new StreamEater("%s %s".formatted(errPrefix, commandForLog), process.getErrorStream());
+        StreamEater errEater = new StreamEater(streamLogPrefix(errPrefix, commandLine), process.getErrorStream());
 
-        StreamEater outEater = new StreamEater("%s %s".formatted(outPrefix, commandForLog), process.getInputStream(),
+        StreamEater outEater = new StreamEater(streamLogPrefix(outPrefix, commandLine), process.getInputStream(),
                 buffer);
 
-        Thread a = new Thread(errEater);
-        a.start();
-
-        Thread b = new Thread(outEater);
-        b.start();
+        new Thread(errEater).start();
+        new Thread(outEater).start();
 
         if (timeout > 0) {
             ExecutorService service = Executors.newSingleThreadExecutor();
@@ -592,5 +579,9 @@ public class Exec {
             } catch (IOException e) {
                 // Nothing to do
             }
+    }
+
+    private String streamLogPrefix(String prefix, String commandLine) {
+        return "%s (%s)".formatted(prefix, commandForLog(commandLine));
     }
 }

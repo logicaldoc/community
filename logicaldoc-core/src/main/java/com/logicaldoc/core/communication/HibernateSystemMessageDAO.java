@@ -2,6 +2,7 @@ package com.logicaldoc.core.communication;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -126,8 +127,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
         List<SystemMessage> out = new ArrayList<>();
 
         Iterator<SystemMessage> iter = coll.iterator();
-        Date date = new Date();
-        long time = date.getTime();
+        long time = Instant.now().toEpochMilli();
 
         while (iter.hasNext()) {
             SystemMessage sm = iter.next();
