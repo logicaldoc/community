@@ -411,18 +411,15 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
             }
         } catch (Exception e) {
             log.warn("Cannot initialize attribute {} of {} ({})", pd.getName(), entity, entity.getClass().getName());
-//            if (log.isDebugEnabled())
-                log.warn(e.getMessage(), e);
+            if (log.isDebugEnabled())
+                log.debug(e.getMessage(), e);
         }
     }
 
     private static boolean requiresInitialization(PropertyDescriptor pd) {
-        List<String> skip = List.of("attributeAtPosition");
-        String name = pd.getName();
         Class<?> type = pd.getPropertyType();
-
-        return !skip.contains(name) && (Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
-                || PersistentObject.class.isAssignableFrom(type));
+        return Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
+                || PersistentObject.class.isAssignableFrom(type);
     }
 
     protected Session getCurrentSession() {

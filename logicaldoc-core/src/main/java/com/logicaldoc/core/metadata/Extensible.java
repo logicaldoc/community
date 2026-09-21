@@ -43,7 +43,7 @@ public interface Extensible {
 
 	public void removeAttribute(String name);
 
-	public Attribute getAttributeAtPosition(int position);
+	public Attribute attributeAtPosition(int position);
 
 	public List<Attribute> setValues(String name, List<Object> values);
 

@@ -94,7 +94,7 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
     }
 
     @Override
-    public Attribute getAttributeAtPosition(int position) {
+    public Attribute attributeAtPosition(int position) {
         if (position < 0)
             return null;
         List<Attribute> attrs = new ArrayList<>(getAttributes().values());

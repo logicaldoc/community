@@ -144,7 +144,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
     }
 
     @Override
-    public Attribute getAttributeAtPosition(int position) {
+    public Attribute attributeAtPosition(int position) {
         if (position < 0)
             return null;
         List<Attribute> attrs = new ArrayList<>(getTemplateAttributes().values());
