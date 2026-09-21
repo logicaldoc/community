@@ -1,6 +1,7 @@
 package com.logicaldoc.core;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 import org.hibernate.annotations.SQLRestriction;
@@ -46,10 +47,10 @@ public abstract class PersistentObject implements Serializable {
 	private int deleted = 0;
 
 	@Column(name = "ld_lastmodified", nullable = false, columnDefinition = "DATETIME(3)")
-	private Date lastModified = new Date();
+	private Date lastModified = Date.from(Instant.now());
 
 	@Column(name = "ld_creation", nullable = false, columnDefinition = "DATETIME(3)")
-	private Date creation = new Date();
+	private Date creation = Date.from(Instant.now());
 
 	@Version
 	@Column(name = "ld_recordversion", nullable = false)

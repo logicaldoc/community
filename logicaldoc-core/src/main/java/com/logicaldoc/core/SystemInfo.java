@@ -2,6 +2,7 @@ package com.logicaldoc.core;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -66,7 +67,7 @@ public class SystemInfo {
 
     protected long tenantId = Tenant.DEFAULT_ID;
 
-    protected Date date = new Date();
+    protected Date date = Date.from(Instant.now());
 
     /**
      * Deducted server's host name
@@ -104,8 +105,8 @@ public class SystemInfo {
                 @SuppressWarnings("unchecked")
                 Object tmp = clazz.getDeclaredConstructor().newInstance();
                 if (!(tmp instanceof SystemInfo))
-                    throw new ClassNotFoundException(
-                            "The specified info %s doesn't implement %s interface".formatted(className, SystemInfo.class.getSimpleName()));
+                    throw new ClassNotFoundException("The specified info %s doesn't implement %s interface"
+                            .formatted(className, SystemInfo.class.getSimpleName()));
 
                 info = (SystemInfo) tmp;
                 info.setTenantId(tenantId);

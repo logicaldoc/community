@@ -10,6 +10,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -215,7 +216,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
     public void store(T entity) throws PersistenceException {
         if (!checkStoringAspect())
             return;
-        entity.setLastModified(new java.util.Date());
+        entity.setLastModified(Date.from(Instant.now()));
 
         // Save the entity
         try {

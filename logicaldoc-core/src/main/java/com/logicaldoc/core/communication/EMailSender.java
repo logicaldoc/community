@@ -7,9 +7,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -639,14 +638,11 @@ public class EMailSender {
             Folder folder = saveFolder;
 
             if (foldering == FOLDERING_YEAR) {
-                DateFormat df = new SimpleDateFormat("yyyy");
-                folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
+                folder = folderDao.createPath(saveFolder, formatSentDate(email, "yyyy"), true, null);
             } else if (foldering == FOLDERING_MONTH) {
-                DateFormat df = new SimpleDateFormat("yyyy/MM");
-                folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
+                folder = folderDao.createPath(saveFolder, formatSentDate(email, "yyyy/MM"), true, null);
             } else if (foldering == FOLDERING_DAY) {
-                DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-                folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
+                folder = folderDao.createPath(saveFolder, formatSentDate(email, "yyyy/MM/dd"), true, null);
             }
 
             Document emailDocument = new Document();
@@ -683,8 +679,7 @@ public class EMailSender {
                 attributes.put("sendername", ext);
 
                 ext = new Attribute();
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                ext.setStringValue(df.format(email.getSentDate()));
+                ext.setStringValue(formatSentDate(email, "yyyy-MM-dd HH:mm:ss"));
                 attributes.put("sentdate", ext);
 
                 ext = new Attribute();
@@ -771,5 +766,10 @@ public class EMailSender {
 
     public void setClientTenant(String clientTenant) {
         this.clientTenant = clientTenant;
+    }
+
+    private String formatSentDate(EMail email, String pattern) {
+        return DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.systemDefault())
+                .format(Instant.ofEpochMilli(email.getSentDate().getTime()));
     }
 }
