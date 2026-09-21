@@ -14,240 +14,240 @@ import java.io.InputStream;
  */
 public class LimitedInputStream extends FilterInputStream {
 
-	private long left;
+    private long left;
 
-	private long mark = -1;
+    private long mark = -1;
 
-	public LimitedInputStream(InputStream in, long limit) {
-		super(in);
-		
-		if (in == null)
-			throw new IllegalArgumentException("no input stream");
-		if (limit < 0)
-			throw new IndexOutOfBoundsException("negative limit");
-		
-		left = limit;
-	}
+    public LimitedInputStream(InputStream in, long limit) {
+        super(in);
 
-	@Override
-	public int available() throws IOException {
-		return (int) Math.min(in.available(), left);
-	}
+        if (in == null)
+            throw new IllegalArgumentException("no input stream");
+        if (limit < 0)
+            throw new IndexOutOfBoundsException("negative limit");
 
-	// it's okay to mark even if mark isn't supported, as reset won't work
-	@Override
-	public synchronized void mark(int readLimit) {
-		in.mark(readLimit);
-		mark = left;
-	}
+        left = limit;
+    }
 
-	@Override
-	public int read() throws IOException {
-		if (left == 0) {
-			return -1;
-		}
+    @Override
+    public int available() throws IOException {
+        return (int) Math.min(in.available(), left);
+    }
 
-		int result = in.read();
-		if (result != -1) {
-			--left;
-		}
-		return result;
-	}
+    // it's okay to mark even if mark isn't supported, as reset won't work
+    @Override
+    public synchronized void mark(int readLimit) {
+        in.mark(readLimit);
+        mark = left;
+    }
 
-	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
-		if (left == 0) {
-			return -1;
-		}
+    @Override
+    public int read() throws IOException {
+        if (left == 0) {
+            return -1;
+        }
 
-		len = (int) Math.min(len, left);
-		int result = in.read(b, off, len);
-		if (result != -1) {
-			left -= result;
-		}
-		return result;
-	}
+        int result = in.read();
+        if (result != -1) {
+            --left;
+        }
+        return result;
+    }
 
-	@Override
-	public synchronized void reset() throws IOException {
-		if (!in.markSupported()) {
-			throw new IOException("Mark not supported");
-		}
-		if (mark == -1) {
-			throw new IOException("Mark not set");
-		}
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (left == 0) {
+            return -1;
+        }
 
-		in.reset();
-		left = mark;
-	}
+        len = (int) Math.min(len, left);
+        int result = in.read(b, off, len);
+        if (result != -1) {
+            left -= result;
+        }
+        return result;
+    }
 
-	@Override
-	public long skip(long n) throws IOException {
-		n = Math.min(n, left);
-		long skipped = in.skip(n);
-		left -= skipped;
-		return skipped;
-	}
+    @Override
+    public synchronized void reset() throws IOException {
+        if (!in.markSupported()) {
+            throw new IOException("Mark not supported");
+        }
+        if (mark == -1) {
+            throw new IOException("Mark not set");
+        }
 
-	/**
-	 * Attempts to read enough bytes from the stream to fill the given byte
-	 * array, with the same behavior as {@link DataInput#readFully(byte[])}.
-	 * Does not close the stream.
-	 *
-	 * @param in the input stream to read from.
-	 * @param b the buffer into which the data is read.
-	 * @throws EOFException if this stream reaches the end before reading all
-	 *         the bytes.
-	 * @throws IOException if an I/O error occurs.
-	 */
-	public static void readFully(InputStream in, byte[] b) throws IOException {
-		readFully(in, b, 0, b.length);
-	}
+        in.reset();
+        left = mark;
+    }
 
-	/**
-	 * Attempts to read {@code len} bytes from the stream into the given array
-	 * starting at {@code off}, with the same behavior as
-	 * {@link DataInput#readFully(byte[], int, int)}. Does not close the stream.
-	 *
-	 * @param in the input stream to read from.
-	 * @param b the buffer into which the data is read.
-	 * @param off an int specifying the offset into the data.
-	 * @param len an int specifying the number of bytes to read.
-	 * @throws EOFException if this stream reaches the end before reading all
-	 *         the bytes.
-	 * @throws IOException if an I/O error occurs.
-	 */
-	public static void readFully(InputStream in, byte[] b, int off, int len) throws IOException {
-		int read = read(in, b, off, len);
-		if (read != len) {
-			throw new EOFException(
-					"reached end of stream after reading " + read + " bytes; " + len + " bytes expected");
-		}
-	}
+    @Override
+    public long skip(long n) throws IOException {
+        n = Math.min(n, left);
+        long skipped = in.skip(n);
+        left -= skipped;
+        return skipped;
+    }
 
-	/**
-	 * Discards {@code n} bytes of data from the input stream. This method will
-	 * block until the full amount has been skipped. Does not close the stream.
-	 *
-	 * @param in the input stream to read from
-	 * @param n the number of bytes to skip
-	 * @throws EOFException if this stream reaches the end before skipping all
-	 *         the bytes
-	 * @throws IOException if an I/O error occurs, or the stream does not
-	 *         support skipping
-	 */
-	public static void skipFully(InputStream in, long n) throws IOException {
-		long skipped = skipUpTo(in, n);
-		if (skipped < n) {
-			throw new EOFException(
-					"reached end of stream after skipping " + skipped + " bytes; " + n + " bytes expected");
-		}
-	}
+    /**
+     * Attempts to read enough bytes from the stream to fill the given byte
+     * array, with the same behavior as {@link DataInput#readFully(byte[])}.
+     * Does not close the stream.
+     *
+     * @param in the input stream to read from.
+     * @param b the buffer into which the data is read.
+     * @throws EOFException if this stream reaches the end before reading all
+     *         the bytes.
+     * @throws IOException if an I/O error occurs.
+     */
+    public static void readFully(InputStream in, byte[] b) throws IOException {
+        readFully(in, b, 0, b.length);
+    }
 
-	/**
-	 * Discards up to {@code n} bytes of data from the input stream. This method
-	 * will block until either the full amount has been skipped or until the end
-	 * of the stream is reached, whichever happens first. Returns the total
-	 * number of bytes skipped.
-	 * 
-	 * @param in the input stream to treat
-	 * @param n index of the byte to skip to
-	 * 
-	 * @throws IOException raised in case the stream did not allow the skip
-	 * 
-	 * @return the total number of skipped bytes
-	 */
-	static long skipUpTo(InputStream in, final long n) throws IOException {
-		long totalSkipped = 0;
-		byte[] buf = createBuffer();
+    /**
+     * Attempts to read {@code len} bytes from the stream into the given array
+     * starting at {@code off}, with the same behavior as
+     * {@link DataInput#readFully(byte[], int, int)}. Does not close the stream.
+     *
+     * @param in the input stream to read from.
+     * @param b the buffer into which the data is read.
+     * @param off an int specifying the offset into the data.
+     * @param len an int specifying the number of bytes to read.
+     * @throws EOFException if this stream reaches the end before reading all
+     *         the bytes.
+     * @throws IOException if an I/O error occurs.
+     */
+    public static void readFully(InputStream in, byte[] b, int off, int len) throws IOException {
+        int read = read(in, b, off, len);
+        if (read != len) {
+            throw new EOFException(
+                    "reached end of stream after reading %d bytes; %d bytes expected".formatted(read, len));
+        }
+    }
 
-		while (totalSkipped < n) {
-			long remaining = n - totalSkipped;
-			long skipped = skipSafely(in, remaining);
+    /**
+     * Discards {@code n} bytes of data from the input stream. This method will
+     * block until the full amount has been skipped. Does not close the stream.
+     *
+     * @param in the input stream to read from
+     * @param n the number of bytes to skip
+     * @throws EOFException if this stream reaches the end before skipping all
+     *         the bytes
+     * @throws IOException if an I/O error occurs, or the stream does not
+     *         support skipping
+     */
+    public static void skipFully(InputStream in, long n) throws IOException {
+        long skipped = skipUpTo(in, n);
+        if (skipped < n) {
+            throw new EOFException(
+                    "reached end of stream after skipping %d bytes; %d bytes expected".formatted(skipped, n));
+        }
+    }
 
-			if (skipped == 0) {
-				// Do a buffered read since skipSafely could return 0
-				// repeatedly, for example if
-				// in.available() always returns 0 (the default).
-				int skip = (int) Math.min(remaining, buf.length);
-				if ((skipped = in.read(buf, 0, skip)) == -1) {
-					// Reached EOF
-					break;
-				}
-			}
+    /**
+     * Discards up to {@code n} bytes of data from the input stream. This method
+     * will block until either the full amount has been skipped or until the end
+     * of the stream is reached, whichever happens first. Returns the total
+     * number of bytes skipped.
+     * 
+     * @param in the input stream to treat
+     * @param n index of the byte to skip to
+     * 
+     * @throws IOException raised in case the stream did not allow the skip
+     * 
+     * @return the total number of skipped bytes
+     */
+    static long skipUpTo(InputStream in, final long n) throws IOException {
+        long totalSkipped = 0;
+        byte[] buf = createBuffer();
 
-			totalSkipped += skipped;
-		}
+        while (totalSkipped < n) {
+            long remaining = n - totalSkipped;
+            long skipped = skipSafely(in, remaining);
 
-		return totalSkipped;
-	}
+            if (skipped == 0) {
+                // Do a buffered read since skipSafely could return 0
+                // repeatedly, for example if
+                // in.available() always returns 0 (the default).
+                int skip = (int) Math.min(remaining, buf.length);
+                if ((skipped = in.read(buf, 0, skip)) == -1) {
+                    // Reached EOF
+                    break;
+                }
+            }
 
-	/**
-	 * Attempts to skip up to {@code n} bytes from the given input stream, but
-	 * not more than {@code in.available()} bytes. This prevents
-	 * {@code FileInputStream} from skipping more bytes than actually remain in
-	 * the file, something that it
-	 * {@linkplain java.io.FileInputStream#skip(long) specifies} it can do in
-	 * its Javadoc despite the fact that it is violating the contract of
-	 * {@code InputStream.skip()}.
-	 */
-	private static long skipSafely(InputStream in, long n) throws IOException {
-		int available = in.available();
-		return available == 0 ? 0 : in.skip(Math.min(available, n));
-	}
+            totalSkipped += skipped;
+        }
 
-	/**
-	 * Reads some bytes from an input stream and stores them into the buffer
-	 * array {@code b}. This method blocks until {@code len} bytes of input data
-	 * have been read into the array, or end of file is detected. The number of
-	 * bytes read is returned, possibly zero. Does not close the stream.
-	 *
-	 * <p>
-	 * A caller can detect EOF if the number of bytes read is less than
-	 * {@code len}. All subsequent calls on the same stream will return zero.
-	 *
-	 * <p>
-	 * If {@code b} is null, a {@code NullPointerException} is thrown. If
-	 * {@code off} is negative, or {@code len} is negative, or {@code off+len}
-	 * is greater than the length of the array {@code b}, then an
-	 * {@code IndexOutOfBoundsException} is thrown. If {@code len} is zero, then
-	 * no bytes are read. Otherwise, the first byte read is stored into element
-	 * {@code b[off]}, the next one into {@code b[off+1]}, and so on. The number
-	 * of bytes read is, at most, equal to {@code len}.
-	 *
-	 * @param in the input stream to read from
-	 * @param b the buffer into which the data is read
-	 * @param off an int specifying the offset into the data
-	 * @param len an int specifying the number of bytes to read
-	 * @return the number of bytes read
-	 * @throws IOException if an I/O error occurs
-	 */
-	// Sometimes you don't care how many bytes you actually read, I guess.
-	// (You know that it's either going to read len bytes or stop at EOF.)
-	public static int read(InputStream in, byte[] b, int off, int len) throws IOException {
-		
-		if (in == null)
-			throw new IndexOutOfBoundsException("no input stream has been specified");
-		if (b == null)
-			throw new IndexOutOfBoundsException("no bytes have been specified");
-		if (len < 0)
-			throw new IndexOutOfBoundsException("len is negative");
-		
-		int total = 0;
-		while (total < len) {
-			int result = in.read(b, off + total, len - total);
-			if (result == -1) {
-				break;
-			}
-			total += result;
-		}
-		return total;
-	}
+        return totalSkipped;
+    }
 
-	/**
-	 * Creates a new byte array for buffering reads or writes.
-	 */
-	private static byte[] createBuffer() {
-		return new byte[8192];
-	}
+    /**
+     * Attempts to skip up to {@code n} bytes from the given input stream, but
+     * not more than {@code in.available()} bytes. This prevents
+     * {@code FileInputStream} from skipping more bytes than actually remain in
+     * the file, something that it
+     * {@linkplain java.io.FileInputStream#skip(long) specifies} it can do in
+     * its Javadoc despite the fact that it is violating the contract of
+     * {@code InputStream.skip()}.
+     */
+    private static long skipSafely(InputStream in, long n) throws IOException {
+        int available = in.available();
+        return available == 0 ? 0 : in.skip(Math.min(available, n));
+    }
+
+    /**
+     * Reads some bytes from an input stream and stores them into the buffer
+     * array {@code b}. This method blocks until {@code len} bytes of input data
+     * have been read into the array, or end of file is detected. The number of
+     * bytes read is returned, possibly zero. Does not close the stream.
+     *
+     * <p>
+     * A caller can detect EOF if the number of bytes read is less than
+     * {@code len}. All subsequent calls on the same stream will return zero.
+     *
+     * <p>
+     * If {@code b} is null, a {@code NullPointerException} is thrown. If
+     * {@code off} is negative, or {@code len} is negative, or {@code off+len}
+     * is greater than the length of the array {@code b}, then an
+     * {@code IndexOutOfBoundsException} is thrown. If {@code len} is zero, then
+     * no bytes are read. Otherwise, the first byte read is stored into element
+     * {@code b[off]}, the next one into {@code b[off+1]}, and so on. The number
+     * of bytes read is, at most, equal to {@code len}.
+     *
+     * @param in the input stream to read from
+     * @param b the buffer into which the data is read
+     * @param off an int specifying the offset into the data
+     * @param len an int specifying the number of bytes to read
+     * @return the number of bytes read
+     * @throws IOException if an I/O error occurs
+     */
+    // Sometimes you don't care how many bytes you actually read, I guess.
+    // (You know that it's either going to read len bytes or stop at EOF.)
+    public static int read(InputStream in, byte[] b, int off, int len) throws IOException {
+
+        if (in == null)
+            throw new IndexOutOfBoundsException("no input stream has been specified");
+        if (b == null)
+            throw new IndexOutOfBoundsException("no bytes have been specified");
+        if (len < 0)
+            throw new IndexOutOfBoundsException("len is negative");
+
+        int total = 0;
+        while (total < len) {
+            int result = in.read(b, off + total, len - total);
+            if (result == -1) {
+                break;
+            }
+            total += result;
+        }
+        return total;
+    }
+
+    /**
+     * Creates a new byte array for buffering reads or writes.
+     */
+    private static byte[] createBuffer() {
+        return new byte[8192];
+    }
 }

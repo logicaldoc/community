@@ -52,7 +52,7 @@ public class LogConfigurator {
 	}
 
 	public String getProperty(String name) {
-		Element elem = xml.findElement("//Property[@name='" + name + "']");
+		Element elem = xml.findElement("//Property[@name='%s']".formatted(name));
 		if (elem != null)
 			return elem.getTextTrim();
 		else
@@ -226,7 +226,7 @@ public class LogConfigurator {
 	public void setLogger(String name, boolean additivity, String level, List<String> appenders,
 			List<String> appenderLevels) {
 		// Check logger existence
-		Element logger = xml.findElement("//Logger[@name='" + name + "']");
+		Element logger = xml.findElement("//Logger[@name='%s']".formatted(name));
 		if (logger == null) {
 			logger = new Element("Logger");
 			logger.setAttribute("name", name);
@@ -257,7 +257,7 @@ public class LogConfigurator {
 	 */
 	public void removeLogger(String name) {
 		// Check logger existence
-		Element logger = xml.findElement("//Logger[@name='" + name + "']");
+		Element logger = xml.findElement("//Logger[@name='%s']".formatted(name));
 		if (logger != null) {
 			// Place the new logger just before the root category
 			Element loggers = xml.findElement(LOGGERS);

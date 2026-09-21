@@ -49,7 +49,7 @@ public class StringEncrypter {
             } else if (encryptionScheme.equals(DES_ENCRYPTION_SCHEME)) {
                 keySpec = new DESKeySpec(keyAsBytes);
             } else {
-                throw new IllegalArgumentException("Encryption scheme not supported: " + encryptionScheme);
+                throw new IllegalArgumentException("Encryption scheme not supported: %s".formatted(encryptionScheme));
             }
             keyFactory = SecretKeyFactory.getInstance(encryptionScheme);
             cipher = Cipher.getInstance(encryptionScheme);

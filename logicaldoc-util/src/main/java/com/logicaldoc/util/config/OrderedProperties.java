@@ -40,11 +40,11 @@ public class OrderedProperties extends Properties {
 
 		// write the header
 		DataOutputStream dataoutputstream = new DataOutputStream(out);
-		dataoutputstream.writeBytes("#" + header + "\n");
+		dataoutputstream.writeBytes("#%s\n".formatted(header));
 
 		// write the date/time
 		Date now = new Date();
-		dataoutputstream.writeBytes("#" + now + "\n");
+		dataoutputstream.writeBytes("#%s\n".formatted(now));
 
 		// now, loop through and write out the properties
 		String oneline;
@@ -56,7 +56,7 @@ public class OrderedProperties extends Properties {
 			thevalue = super.getProperty(thekey);
 			thevalue = doubleSlash(thevalue);
 
-			oneline = thekey + "=" + thevalue + "\n";
+			oneline =  "%s=%s\n".formatted(thekey, thevalue);
 			dataoutputstream.writeBytes(oneline);
 		}
 

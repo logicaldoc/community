@@ -30,7 +30,7 @@ public class FileUtilTest {
             String x = Integer.toString(i);
             String result = IntStream.iterate(0, j -> j + 3).limit((int) Math.ceil(x.length() / 3.0))
                     .mapToObj(j -> x.substring(j, Math.min(j + 3, x.length()))).collect(Collectors.joining("/"));
-            File dir = new File(root.getPath() + "/" + result);
+            File dir = new File("%s/%s".formatted(root.getPath(), result));
             dir.mkdirs();
             dir.mkdir();
 
@@ -53,7 +53,7 @@ public class FileUtilTest {
         int total = 1000;
 
         for (int i = 0; i < total; i++) {
-            File outFile = new File(root + "/" + Integer.toString(i));
+            File outFile = new File("%s/%s".formatted(root.getAbsolutePath(), Integer.toString(i)));
             FileUtil.writeFile(ResourceUtil.getInputStream("kofax.rar"), outFile.getPath());
             assertTrue(outFile.length() > 0);
             assertEquals(new File("src/test/resources/kofax.rar").length(), outFile.length());

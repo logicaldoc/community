@@ -21,78 +21,79 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class ContextPropertiesTest {
 
-	@Test
-	public void testWrite() throws IOException {
-		File abcFile = new File("target/abc1.properties");
-		ContextProperties contextProperties = new ContextProperties(abcFile);
+    @Test
+    public void testWrite() throws IOException {
+        File abcFile = new File("target/abc1.properties");
+        ContextProperties contextProperties = new ContextProperties(abcFile);
 
-		contextProperties.setProperty("test", "value");
+        contextProperties.setProperty("test", "value");
 
-		contextProperties.write();
+        contextProperties.write();
 
-		assertEquals("value", contextProperties.getProperty("test"));
-	}
+        assertEquals("value", contextProperties.getProperty("test"));
+    }
 
-	@Test
-	public void testSetAndGetProperty() throws IOException {
-		File abcFile = new File("target/abc.properties");
-		ContextProperties contextProperties = new ContextProperties(abcFile);
+    @Test
+    public void testSetAndGetProperty() throws IOException {
+        File abcFile = new File("target/abc.properties");
+        ContextProperties contextProperties = new ContextProperties(abcFile);
 
-		// testing implicit encoding and decoding in setProperty and getPoperty
-		// (ContextProperties class)
-		contextProperties.setProperty("propA", "pippo");
-		contextProperties.setProperty("propB", """
-									pippo
-									pluto
-									paperino""");
-		contextProperties.setProperty("propC",
-				"_b64_IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu");
+        // testing implicit encoding and decoding in setProperty and getPoperty
+        // (ContextProperties class)
+        contextProperties.setProperty("propA", "pippo");
+        contextProperties.setProperty("propB", """
+                                               pippo
+                                               pluto
+                                               paperino""");
+        contextProperties.setProperty("propC",
+                "_b64_IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu");
 
-		contextProperties.setProperty("emptyKey", "");
+        contextProperties.setProperty("emptyKey", "");
 
-		contextProperties.setPropertyEncoded("encoded", "pippoplutopaperino");
-		
-		contextProperties.write();
+        contextProperties.setPropertyEncoded("encoded", "pippoplutopaperino");
 
-		assertEquals("pippo", contextProperties.getString("propA"));
-		assertEquals("pippo\npluto\npaperino", contextProperties.getString("propB"));
-		assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.", contextProperties.getString("propC"));
-		assertEquals("", contextProperties.getString("emptyKey"));
-		assertEquals("pippoplutopaperino",  contextProperties.getString("encoded"));
-		assertEquals("_b64_cGlwcG9wbHV0b3BhcGVyaW5v",  contextProperties.getProperty("encoded"));
-		
-		Properties properties = new Properties();
-		try (FileReader reader = new FileReader(abcFile)) {
-			properties.load(reader);
-		} finally {
-			FileUtil.delete(abcFile);
-		}
+        contextProperties.write();
 
-		// testing explicit encoding and decoding (Properties class)
-		assertEquals("pippo", properties.getProperty("propA"));
-		assertEquals("_b64_" + Base64.getEncoder().encodeToString("""
-									pippo
-									pluto
-									paperino""".getBytes()), properties.getProperty("propB"));
-		assertEquals("_b64_IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu",
-				properties.getProperty("propC"));
+        assertEquals("pippo", contextProperties.getString("propA"));
+        assertEquals("pippo\npluto\npaperino", contextProperties.getString("propB"));
+        assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.", contextProperties.getString("propC"));
+        assertEquals("", contextProperties.getString("emptyKey"));
+        assertEquals("pippoplutopaperino", contextProperties.getString("encoded"));
+        assertEquals("_b64_cGlwcG9wbHV0b3BhcGVyaW5v", contextProperties.getProperty("encoded"));
 
-		String decodedValue = new String(
-				Base64.getDecoder()
-						.decode("IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu"),
-				StandardCharsets.UTF_8);
-		assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.", decodedValue);
+        Properties properties = new Properties();
+        try (FileReader reader = new FileReader(abcFile)) {
+            properties.load(reader);
+        } finally {
+            FileUtil.delete(abcFile);
+        }
 
-		assertEquals("_b64_cGlwcG8KcGx1dG8KcGFwZXJpbm8=", properties.getProperty("propB"));
+        // testing explicit encoding and decoding (Properties class)
+        assertEquals("pippo", properties.getProperty("propA"));
+        assertEquals("_b64_%s".formatted(Base64.getEncoder().encodeToString("""
+                                                                            pippo
+                                                                            pluto
+                                                                            paperino""".getBytes())),
+                properties.getProperty("propB"));
+        assertEquals("_b64_IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu",
+                properties.getProperty("propC"));
 
-		assertEquals("", contextProperties.getProperty("emptyKey"));
+        String decodedValue = new String(
+                Base64.getDecoder()
+                        .decode("IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu"),
+                StandardCharsets.UTF_8);
+        assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.", decodedValue);
 
-		// no encoding in properties.setProperty
-		String multiLineValue = """
-                pippo
-                pluto
-                paperino""";
-		properties.setProperty("propB", multiLineValue);
-		assertEquals(multiLineValue, properties.getProperty("propB"));
-	}
+        assertEquals("_b64_cGlwcG8KcGx1dG8KcGFwZXJpbm8=", properties.getProperty("propB"));
+
+        assertEquals("", contextProperties.getProperty("emptyKey"));
+
+        // no encoding in properties.setProperty
+        String multiLineValue = """
+                                pippo
+                                pluto
+                                paperino""";
+        properties.setProperty("propB", multiLineValue);
+        assertEquals(multiLineValue, properties.getProperty("propB"));
+    }
 }

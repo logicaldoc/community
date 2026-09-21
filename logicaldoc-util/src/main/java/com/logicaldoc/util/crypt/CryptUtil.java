@@ -59,7 +59,7 @@ public class CryptUtil {
             } else if (encryptionScheme.equals(DES_ENCRYPTION_SCHEME)) {
                 keySpec = new DESKeySpec(keyAsBytes);
             } else {
-                throw new IllegalArgumentException("Encryption scheme not supported: " + encryptionScheme);
+                throw new IllegalArgumentException("Encryption scheme not supported: %s".formatted(encryptionScheme));
             }
             keyFactory = SecretKeyFactory.getInstance(encryptionScheme);
             cipher = Cipher.getInstance(encryptionScheme);
@@ -81,7 +81,7 @@ public class CryptUtil {
             FileUtil.delete(outputFile);
             boolean created = outputFile.createNewFile();
             if (!created)
-                throw new IOException("Cannot create file " + outputFile.getAbsolutePath());
+                throw new IOException("Cannot create file %s".formatted(outputFile.getAbsolutePath()));
             FileUtils.writeByteArrayToFile(outputFile, encryptedContent);
         } catch (InvalidKeyException | InvalidKeySpecException | IllegalBlockSizeException | BadPaddingException
                 | IOException e) {
@@ -102,7 +102,7 @@ public class CryptUtil {
             FileUtil.delete(outputFile);
             boolean created = outputFile.createNewFile();
             if (!created)
-                throw new IOException("Cannot create file " + outputFile.getAbsolutePath());
+                throw new IOException("Cannot create file %s".formatted(outputFile.getAbsolutePath()));
             FileUtils.writeByteArrayToFile(outputFile, clearContent);
         } catch (InvalidKeyException | InvalidKeySpecException | IllegalBlockSizeException | BadPaddingException
                 | IOException e) {

@@ -151,7 +151,7 @@ public class IOUtil {
             if (statusCode != HttpServletResponse.SC_OK) { // checking status
                                                            // code
                 connection.disconnect();
-                throw new IOException("Document editing service returned status: " + statusCode);
+                throw new IOException("Document editing service returned status: %d".formatted(statusCode));
             }
 
             if (stream == null)

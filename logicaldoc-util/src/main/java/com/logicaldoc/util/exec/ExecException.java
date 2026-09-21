@@ -7,13 +7,13 @@ package com.logicaldoc.util.exec;
  * @since 8.8.5
  */
 public class ExecException extends Exception {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public ExecException(String command) {
-		this(command, null);
-	}
+    public ExecException(String command) {
+        this(command, null);
+    }
 
-	public ExecException(String command, Throwable cause) {
-		super("Failed to launch java program: " + command, cause);
-	}
+    public ExecException(String command, Throwable cause) {
+        super("Failed to launch java program: %s".formatted(command), cause);
+    }
 }

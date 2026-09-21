@@ -37,7 +37,7 @@ public class JavaLauncher {
         // get a jvm to execute with
         String jvm = findJVM();
 
-        StringBuilder strClasspath = new StringBuilder("." + File.pathSeparator + classpath);
+        StringBuilder strClasspath = new StringBuilder(".%s%s".formatted(File.pathSeparator, classpath));
 
         // combine all the arguments into 1 array.
         String[] allArguments = new String[properties.length + jvmargs.length];
@@ -54,7 +54,7 @@ public class JavaLauncher {
         System.arraycopy(allArguments, 0, command, 1, allArguments.length);
 
         command[allArguments.length + 2] = "-classpath";
-        command[allArguments.length + 3] = "\"" + strClasspath + "\"";
+        command[allArguments.length + 3] = "\"%s\"".formatted(strClasspath);
         command[allArguments.length + 4] = mainClass;
 
         // combine to printable string for debugging
@@ -171,7 +171,7 @@ public class JavaLauncher {
         }
 
         // add binary folders
-        return jvm + File.separator + "bin" + File.separator + "java";
+        return "%s%sbin%sjava".formatted(jvm, File.separator, File.separator);
     }
 
     /**

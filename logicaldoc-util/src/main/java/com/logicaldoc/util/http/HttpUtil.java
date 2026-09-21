@@ -69,7 +69,7 @@ public class HttpUtil {
 
 		// The port must be an integer
 		try {
-			proxy[1] = "" + Integer.parseInt(proxy[1]);
+			proxy[1] = Integer.toString(Integer.parseInt(proxy[1]));
 		} catch (Exception t) {
 			proxy[1] = "0";
 		}

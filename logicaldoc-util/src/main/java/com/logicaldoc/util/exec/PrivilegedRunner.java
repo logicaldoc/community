@@ -21,89 +21,89 @@ import com.logicaldoc.util.io.ResourceUtil;
  */
 public class PrivilegedRunner {
 
-	private static final String OS_NAME = "os.name";
+    private static final String OS_NAME = "os.name";
 
-	private static final Logger logger = Logger.getLogger(PrivilegedRunner.class.getName());
+    private static final Logger logger = Logger.getLogger(PrivilegedRunner.class.getName());
 
-	public int executeWithElevatedRights(String command) throws IOException, InterruptedException {
-		ProcessBuilder builder = new ProcessBuilder(getElevator(command));
+    public int executeWithElevatedRights(String command) throws IOException, InterruptedException {
+        ProcessBuilder builder = new ProcessBuilder(getElevator(command));
 
-		if (logger.isLoggable(Level.INFO)) {
-			logger.info("Relaunching: " + builder.command());
-		}
-		Process process = builder.start();
-		return process.waitFor();
-	}
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Relaunching: %s".formatted(builder.command()));
+        }
+        Process process = builder.start();
+        return process.waitFor();
+    }
 
-	protected List<String> getElevator(String command) throws IOException {
-		List<String> elevator = new ArrayList<>();
+    protected List<String> getElevator(String command) throws IOException {
+        List<String> elevator = new ArrayList<>();
 
-		if (isMac()) {
-			elevator.add(extractMacElevator().getCanonicalPath());
-			elevator.add(command);
-		} else if (isUnix()) {
-			elevator.add("xterm");
-			elevator.add("-title");
-			elevator.add("LogicalDOC");
-			elevator.add("-e");
-			elevator.add("sudo");
-			elevator.add(command);
-		} else if (isWindows()) {
-			elevator.add("wscript");
-			elevator.add(extractVistaElevator().getCanonicalPath());
-			elevator.add(command);
-		}
+        if (isMac()) {
+            elevator.add(extractMacElevator().getCanonicalPath());
+            elevator.add(command);
+        } else if (isUnix()) {
+            elevator.add("xterm");
+            elevator.add("-title");
+            elevator.add("LogicalDOC");
+            elevator.add("-e");
+            elevator.add("sudo");
+            elevator.add(command);
+        } else if (isWindows()) {
+            elevator.add("wscript");
+            elevator.add(extractVistaElevator().getCanonicalPath());
+            elevator.add(command);
+        }
 
-		return elevator;
-	}
+        return elevator;
+    }
 
-	protected File extractVistaElevator() throws IOException {
-		File elevator = new File(FileUtil.tempDir(), "Elevator.js");
+    protected File extractVistaElevator() throws IOException {
+        File elevator = new File(FileUtil.tempDir(), "Elevator.js");
 
-		try (FileOutputStream out = new FileOutputStream(elevator);
-				InputStream in = getClass().getResourceAsStream("/com/logicaldoc/util/exec/windows/elevate.js")) {
-			copyStream(out, in);
-		}
+        try (FileOutputStream out = new FileOutputStream(elevator);
+                InputStream in = getClass().getResourceAsStream("/com/logicaldoc/util/exec/windows/elevate.js")) {
+            copyStream(out, in);
+        }
 
-		elevator.deleteOnExit();
-		return elevator;
-	}
+        elevator.deleteOnExit();
+        return elevator;
+    }
 
-	protected File extractMacElevator() throws IOException {
-		File elevator = new File(FileUtil.tempDir(), "Elevator");
+    protected File extractMacElevator() throws IOException {
+        File elevator = new File(FileUtil.tempDir(), "Elevator");
 
-		try (FileOutputStream out = new FileOutputStream(elevator);
-				InputStream in = ResourceUtil
-						.getInputStream("com/logicaldoc/util/exec/mac/run-with-privileges-on-osx");) {
-			copyStream(out, in);
-		}
+        try (FileOutputStream out = new FileOutputStream(elevator);
+                InputStream in = ResourceUtil
+                        .getInputStream("com/logicaldoc/util/exec/mac/run-with-privileges-on-osx");) {
+            copyStream(out, in);
+        }
 
-		if (!elevator.setExecutable(true))
-			throw new IOException("Failed to set execute permission on %s".formatted(elevator.getAbsolutePath()));
+        if (!elevator.setExecutable(true))
+            throw new IOException("Failed to set execute permission on %s".formatted(elevator.getAbsolutePath()));
 
-		elevator.deleteOnExit();
-		return elevator;
-	}
+        elevator.deleteOnExit();
+        return elevator;
+    }
 
-	private void copyStream(OutputStream out, InputStream in) throws IOException {
-		byte[] buffer = new byte[1024];
-		int bytesRead;
-		while ((bytesRead = in.read(buffer)) >= 0) {
-			out.write(buffer, 0, bytesRead);
-		}
-	}
+    private void copyStream(OutputStream out, InputStream in) throws IOException {
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = in.read(buffer)) >= 0) {
+            out.write(buffer, 0, bytesRead);
+        }
+    }
 
-	public static boolean isWindows() {
-		return System.getProperty(OS_NAME).toLowerCase().indexOf("win") >= 0;
-	}
+    public static boolean isWindows() {
+        return System.getProperty(OS_NAME).toLowerCase().indexOf("win") >= 0;
+    }
 
-	public static boolean isMac() {
-		return (System.getProperty(OS_NAME).toLowerCase().indexOf("mac") >= 0);
-	}
+    public static boolean isMac() {
+        return (System.getProperty(OS_NAME).toLowerCase().indexOf("mac") >= 0);
+    }
 
-	public static boolean isUnix() {
-		return (System.getProperty(OS_NAME).toLowerCase().indexOf("nix") >= 0
-				|| System.getProperty(OS_NAME).toLowerCase().indexOf("nux") >= 0
-				|| System.getProperty(OS_NAME).toLowerCase().indexOf("aix") >= 0);
-	}
+    public static boolean isUnix() {
+        return (System.getProperty(OS_NAME).toLowerCase().indexOf("nix") >= 0
+                || System.getProperty(OS_NAME).toLowerCase().indexOf("nux") >= 0
+                || System.getProperty(OS_NAME).toLowerCase().indexOf("aix") >= 0);
+    }
 }

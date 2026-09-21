@@ -336,7 +336,7 @@ public class AdvancedProperties extends OrderedProperties {
     public void replicateTenantSettings(String tenant) {
         Map<String, String> defaultProps = getTenantProperties("default");
         for (String prop : defaultProps.keySet()) {
-            String tenantProp = tenant + "." + prop;
+            String tenantProp = "%s.%s".formatted(tenant, prop);
             if (!containsKey(tenantProp))
                 setProperty(tenantProp, getProperty("default.%s".formatted(prop)));
         }

@@ -213,11 +213,11 @@ public class Exec {
             }
         }
 
-        String commandForLog = " (" + commandForLog(commandLine.stream().collect(Collectors.joining(" "))) + ")";
+        String commandForLog = "(%s)".formatted(commandForLog(commandLine.stream().collect(Collectors.joining(" "))));
 
-        StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
+        StreamEater errEater = new StreamEater("%s %s".formatted(errPrefix, commandForLog), process.getErrorStream());
 
-        StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream());
+        StreamEater outEater = new StreamEater("%s %s".formatted(outPrefix, commandForLog), process.getInputStream());
 
         new Thread(errEater).start();
 
@@ -302,7 +302,7 @@ public class Exec {
         if (commandLine.length() <= 60)
             return commandLine;
         else
-            return StringUtils.left(commandLine, 30) + "..." + StringUtils.right(commandLine, 30);
+            return "%s...%s".formatted(StringUtils.left(commandLine, 30), StringUtils.right(commandLine, 30));
     }
 
     /**
@@ -336,10 +336,11 @@ public class Exec {
         final Process process = Runtime.getRuntime().exec(commandLine.split(" "),
                 env != null ? env.toArray(new String[0]) : null, dir);
 
-        String commandForLog = " (" + commandForLog(commandLine) + ")";
-        StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
+        String commandForLog = "(%s)".formatted(commandForLog(commandLine));
+        StreamEater errEater = new StreamEater("%s %s".formatted(errPrefix, commandForLog), process.getErrorStream());
 
-        StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream(), buffer);
+        StreamEater outEater = new StreamEater("%s %s".formatted(outPrefix, commandForLog), process.getInputStream(),
+                buffer);
 
         Thread a = new Thread(errEater);
         a.start();
@@ -545,7 +546,7 @@ public class Exec {
         }
 
         if (!allowed)
-            throw new IOException("Command " + commandLine + " is not allowed. Add it to allowed-commands.txt.");
+            throw new IOException("Command %s is not allowed. Add it to allowed-commands.txt.".formatted(commandLine));
     }
 
     /**

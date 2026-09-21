@@ -693,7 +693,7 @@ public class FileUtil {
                 FileUtils.forceDelete(merged);
                 boolean renamed = tmp.renameTo(merged);
                 if (!renamed)
-                    throw new IOException("Cannot rename file to " + merged.getAbsolutePath());
+                    throw new IOException("Cannot rename file to %s".formatted(merged.getAbsolutePath()));
 
                 created = tmp.createNewFile();
                 if (!created)

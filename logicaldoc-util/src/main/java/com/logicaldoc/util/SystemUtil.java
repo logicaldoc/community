@@ -14,93 +14,93 @@ import java.util.Map;
  */
 public class SystemUtil {
 
-	private SystemUtil() {
-		throw new IllegalStateException("Utility class");
-	}
+    private SystemUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
-	public static String printEnvironment() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(printSystemEnvironment());
-		sb.append("\n\n");
-		sb.append(printJavaEnvironment());
-		return sb.toString();
-	}
+    public static String printEnvironment() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(printSystemEnvironment());
+        sb.append("\n\n");
+        sb.append(printJavaEnvironment());
+        return sb.toString();
+    }
 
-	public static String printStackTrace() {
-		StringBuilder sb = new StringBuilder();
-		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-		for (StackTraceElement element : elements) {
-			if ((element.getClassName().equals(Thread.class.getName())
-					&& element.getMethodName().equals("getStackTrace"))
-					|| (element.getClassName().equals(SystemUtil.class.getName())
-							&& element.getMethodName().equals("printStackTrace")))
-				continue;
-			sb.append(element.getClassName());
-			sb.append(".");
-			sb.append(element.getMethodName());
-			sb.append("(");
-			sb.append(element.getLineNumber());
-			sb.append(")\n");
-		}
-		return sb.toString();
-	}
+    public static String printStackTrace() {
+        StringBuilder sb = new StringBuilder();
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : elements) {
+            if ((element.getClassName().equals(Thread.class.getName())
+                    && element.getMethodName().equals("getStackTrace"))
+                    || (element.getClassName().equals(SystemUtil.class.getName())
+                            && element.getMethodName().equals("printStackTrace")))
+                continue;
+            sb.append(element.getClassName());
+            sb.append(".");
+            sb.append(element.getMethodName());
+            sb.append("(");
+            sb.append(element.getLineNumber());
+            sb.append(")\n");
+        }
+        return sb.toString();
+    }
 
-	public static String printSystemEnvironment() {
-		StringBuilder sb = new StringBuilder();
-		Map<String, String> env = System.getenv();
+    public static String printSystemEnvironment() {
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> env = System.getenv();
 
-		for (Map.Entry<String, String> entry : env.entrySet()) {
-			if (!sb.isEmpty())
-				sb.append("\n");
-			sb.append(entry.getKey());
-			sb.append("=");
-			sb.append(entry.getValue());
-		}
-		return "#System Environment\n#" + new Date() + "\n" + sb.toString();
-	}
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            if (!sb.isEmpty())
+                sb.append("\n");
+            sb.append(entry.getKey());
+            sb.append("=");
+            sb.append(entry.getValue());
+        }
+        return "#System Environment\n#%s\n%s".formatted(new Date(), sb.toString());
+    }
 
-	public static String printJavaEnvironment() {
-		StringWriter writer = new StringWriter();
-		try {
-			System.getProperties().store(new PrintWriter(writer), "Java Environment");
-			return writer.getBuffer().toString();
-		} catch (IOException e) {
-			// Nothing to do
-		}
-		return "";
-	}
+    public static String printJavaEnvironment() {
+        StringWriter writer = new StringWriter();
+        try {
+            System.getProperties().store(new PrintWriter(writer), "Java Environment");
+            return writer.getBuffer().toString();
+        } catch (IOException e) {
+            // Nothing to do
+        }
+        return "";
+    }
 
-	public static boolean isWindows() {
-		return osName().contains("windows");
-	}
+    public static boolean isWindows() {
+        return osName().contains("windows");
+    }
 
-	private static String osName() {
-		return System.getProperty("os.name").toLowerCase();
-	}
+    private static String osName() {
+        return System.getProperty("os.name").toLowerCase();
+    }
 
-	public static boolean isMac() {
-		return (osName().contains("mac"));
-	}
+    public static boolean isMac() {
+        return (osName().contains("mac"));
+    }
 
-	public static boolean isUnix() {
-		return (osName().contains("nix") || osName().contains("nux") || osName().contains("aix"));
-	}
+    public static boolean isUnix() {
+        return (osName().contains("nix") || osName().contains("nux") || osName().contains("aix"));
+    }
 
-	public static boolean isSolaris() {
-		return (osName().contains("sunos"));
-	}
+    public static boolean isSolaris() {
+        return (osName().contains("sunos"));
+    }
 
-	public static String getOS() {
-		if (isWindows()) {
-			return "win";
-		} else if (isMac()) {
-			return "osx";
-		} else if (isUnix()) {
-			return "uni";
-		} else if (isSolaris()) {
-			return "sol";
-		} else {
-			return "err";
-		}
-	}
+    public static String getOS() {
+        if (isWindows()) {
+            return "win";
+        } else if (isMac()) {
+            return "osx";
+        } else if (isUnix()) {
+            return "uni";
+        } else if (isSolaris()) {
+            return "sol";
+        } else {
+            return "err";
+        }
+    }
 }

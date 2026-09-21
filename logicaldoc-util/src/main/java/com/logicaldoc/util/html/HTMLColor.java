@@ -61,7 +61,7 @@ public class HTMLColor {
 		if (null == color) {
 			throw new IllegalArgumentException("NULL_COLOR_PARAMETER_ERROR_2");
 		}
-		return "#" + Integer.toHexString(color.getRGB()).substring(2).toUpperCase();
+		return "#%s".formatted(Integer.toHexString(color.getRGB()).substring(2).toUpperCase());
 	}
 
 }

@@ -85,7 +85,7 @@ public class DBInit {
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			log.error("Failed to execute " + sql, e);
+			log.error("Failed to execute %s".formatted(sql), e);
 			try {
 				if (con != null)
 					con.close();

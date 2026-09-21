@@ -40,7 +40,7 @@ public class TagUtil {
             return coll;
 
         if (!words.contains(","))
-            words = "," + words + ",";
+            words = ",%s,".formatted(words);
 
         // Replace the escapes \, in _comma_ in order to include those
         // tags with

@@ -41,540 +41,540 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
  */
 public class ZipUtil implements Closeable {
 
-	private static final String ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES = "Zip file %s looks like a Zip Bomb Attack: can lead to inodes exhaustion of the system and is over the maximum allowed of %d";
-
-	private static final String ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE = "Zip file %s looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s";
-
-	private String fileNameCharset = "UTF-8";
-
-	private static final Logger log = LoggerFactory.getLogger(ZipUtil.class);
-
-	/**
-	 * Maximum number of entries in the compressed archive, config parameter
-	 * zip.maxentires
-	 */
-	private int maxEntries = 100000;
-
-	/**
-	 * Maximum size of the uncompressed contents of the compressed archive,
-	 * config parameter zip.maxsize
-	 */
-	private int maxSize = 1024 * 1024 * 1024; // 1 GB
-
-	/**
-	 * Maximum compression ratio, config parameter zip.maxratio
-	 */
-	private double maxCompressionRatio = 30D;
-
-	private ZipFile zFile;
-
-	public ZipUtil() {
-		try {
-			maxEntries = Context.get().getConfig().getInt("zip.maxentries", 100000);
-			maxSize = Context.get().getConfig().getInt("zip.maxsize", 1024) * 1024 * 1024;
-			maxCompressionRatio = Context.get().getConfig().getDouble("zip.maxratio", 30D);
-		} catch (Exception t) {
-			// Nothing to do
-		}
-	}
-
-	public ZipUtil(String charset) {
-		this();
-		this.fileNameCharset = charset;
-	}
-
-	public List<ZipEntry> listZipEntries(File zipFile) {
-		List<ZipEntry> files = new ArrayList<>();
-
-		try (java.util.zip.ZipFile archiveFile = new java.util.zip.ZipFile(zipFile)) {
-			if (zipFile.length() > maxSize)
-				throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE, zipFile.length(),
-						FileUtil.getDisplaySize(maxSize, "en")));
-
-			Enumeration<? extends ZipEntry> e = archiveFile.entries();
-			while (e.hasMoreElements()) {
-				ZipEntry zipEntry = e.nextElement();
-				files.add(zipEntry);
-
-				if (files.size() > maxEntries)
-					throw new IOException(
-							String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES, zipFile.getName(), maxEntries));
-			}
-			files.sort((entry1, entry2) -> entry1.getName().compareTo(entry2.getName()));
-		} catch (Exception e) {
-			logError(e.getMessage());
-		}
-
-		return files;
-	}
-
-	public List<String> listEntries(File zipFile) {
-		List<String> files = new ArrayList<>();
-		try (ZipFile archiveFile = new ZipFile(zipFile);) {
-			setCharset(archiveFile);
-
-			List<FileHeader> fileHeaders = archiveFile.getFileHeaders();
-			for (FileHeader fileHeader : fileHeaders) {
-				files.add(fileHeader.getFileName());
-			}
-
-		} catch (Exception e) {
-			logError(e.getMessage());
-		}
-		return files;
-	}
-
-	/**
-	 * This method extracts all entries of a zip-file.
-	 * 
-	 * @param zipFile the zip-file
-	 * @param target the target folder
-	 * 
-	 * @return Number of extracted entries
-	 * 
-	 * @throws IOException Error unpacking the zip
-	 */
-	public int unzip(File zipFile, File target) throws IOException {
-		return unzip(new FileInputStream(zipFile), target);
-	}
-
-	/**
-	 * This method extracts all entries of a zip-file.
-	 * 
-	 * @param zipStream the zip contents
-	 * @param target the target folder
-	 * 
-	 * @return Number of extracted entries
-	 * 
-	 * @throws IOException Error unpacking the zip
-	 */
-	public int unzip(InputStream zipStream, File target) throws IOException {
-		target.mkdirs();
-
-		int totalSizeArchive = 0;
-		int totalEntryArchive = 0;
-
-		LocalFileHeader localFileHeader;
-		int readLen;
-		byte[] readBuffer = new byte[4096];
-
-		try (net.lingala.zip4j.io.inputstream.ZipInputStream zipInputStream = new net.lingala.zip4j.io.inputstream.ZipInputStream(
-				zipStream)) {
-			while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-				File extractedFile = new File(target, localFileHeader.getFileName());
-				if (localFileHeader.isDirectory()) {
-					extractedFile.mkdirs();
-				} else {
-					try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(extractedFile))) {
-						while ((readLen = zipInputStream.read(readBuffer)) != -1) {
-							outputStream.write(readBuffer, 0, readLen);
-							totalSizeArchive += readLen;
-						}
-					}
-				}
-
-				totalEntryArchive++;
-
-				if (totalSizeArchive > maxSize)
-					throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE, zipStream,
-							FileUtil.getDisplaySize(maxSize, "en")));
-
-				if (totalEntryArchive > maxEntries)
-					throw new IOException(
-							String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES, zipStream, maxEntries));
-			}
-		}
-
-		return totalEntryArchive;
-	}
-
-	/**
-	 * Extracts a specific entry inside a given zip stream
-	 * 
-	 * @param input the stream of the zip file
-	 * @param entry name of the entry to extract
-	 * @param target the file where to store the entry
-	 * 
-	 * @return number of written bytes
-	 * 
-	 * @throws IOException Error unpacking the zip
-	 */
-	public long unzip(InputStream input, String entry, File target) throws IOException {
-		int totalSizeEntry = 0;
-		try (ZipInputStream zis = new ZipInputStream(input);
-				BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(target));) {
-			ZipEntry ze = zis.getNextEntry();
-			while (ze != null) {
-				if (ze.getName().equals(entry)) {
-					int nBytes = -1;
-					byte[] buffer = new byte[4096];
-
-					while ((nBytes = zis.read(buffer)) > 0) {
-						bos.write(buffer, 0, nBytes);
-						totalSizeEntry += nBytes;
-
-						double compressionRatio = totalSizeEntry / (double) ze.getCompressedSize();
-						if (compressionRatio > maxCompressionRatio)
-							throw new IOException(String.format(
-									"Zip file looks like a Zip Bomb Attack: ratio between compressed and uncompressed data %f is highly suspicious and is over the maximum allowed of %f",
-									compressionRatio, maxCompressionRatio));
-						if (totalSizeEntry > maxSize)
-							throw new IOException(String.format(
-									"Zip file looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
-									FileUtil.getDisplaySize(maxSize, "en")));
-					}
-
-					bos.flush();
-					break;
-				}
-
-				ze = zis.getNextEntry();
-			}
-		}
-		return totalSizeEntry;
-	}
-
-	/**
-	 * This method extracts a specific entry of a zip-file.
-	 *
-	 * https://github.com/srikanth-lingala/zip4j
-	 * 
-	 * @param zipFile File to read inside it
-	 * @param entry The entry to be read
-	 * @param target The extracted file
-	 * 
-	 * @return number of written bytes
-	 * @throws IOException Error extracting the zip
-	 */
-	public long unzip(File zipFile, String entry, File target) throws IOException {
-		if (entry.startsWith("/"))
-			entry = entry.substring(1);
-
-		ZipFile archiveFile = new ZipFile(zipFile);
-		setCharset(archiveFile);
-		FileHeader header = archiveFile.getFileHeader(entry);
-
-		try (InputStream is = archiveFile.getInputStream(header);
-				BufferedInputStream bis = new BufferedInputStream(is);
-				FileOutputStream fos = new FileOutputStream(target);
-				BufferedOutputStream bos = new BufferedOutputStream(fos);) {
-
-			int nBytes = -1;
-			byte[] buffer = new byte[4096];
-			int totalSizeEntry = 0;
-
-			while ((nBytes = is.read(buffer)) > 0) {
-				bos.write(buffer, 0, nBytes);
-				totalSizeEntry += nBytes;
-
-				double compressionRatio = totalSizeEntry / (double) header.getCompressedSize();
-				if (compressionRatio > maxCompressionRatio)
-					throw new IOException(String.format(
-							"Zip file %s looks like a Zip Bomb Attack: ratio between compressed and uncompressed data %f is highly suspicious and is over the maximum allowed of %f",
-							zipFile.getAbsolutePath(), compressionRatio, maxCompressionRatio));
-				if (totalSizeEntry > maxSize)
-					throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
-							zipFile.getAbsolutePath(), FileUtil.getDisplaySize(maxSize, "en")));
-			}
-
-			bos.flush();
-			return totalSizeEntry;
-		} finally {
-			archiveFile.close();
-		}
-	}
-
-	/**
-	 * Read the entry inside the file zip resource.
-	 * 
-	 * @param zipFile File to read inside it
-	 * @param entry The entry to be read
-	 * 
-	 * @return The bytes of the entry
-	 */
-	public byte[] getEntryBytes(File zipFile, String entry) {
-		if (entry.startsWith("/"))
-			entry = entry.substring(1);
-
-		InputStream entryStream = null;
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipFile archiveFile = new ZipFile(zipFile);) {
-
-			setCharset(archiveFile);
-			FileHeader header = archiveFile.getFileHeader(entry);
-
-			entryStream = archiveFile.getInputStream(header);
-			IOUtils.copy(entryStream, baos);
-			baos.flush();
-			return baos.toByteArray();
-		} catch (Exception e) {
-			logError(e.getMessage());
-			return new byte[0];
-		} finally {
-			try {
-				if (entryStream != null)
-					entryStream.close();
-			} catch (Exception e) {
-				// Nothing to do
-			}
-		}
-	}
-
-	private void setCharset(ZipFile zipFile) {
-		if (fileNameCharset != null && !"auto".equals(fileNameCharset))
-			zipFile.setCharset(Charset.forName(fileNameCharset));
-	}
-
-	/**
-	 * Read the entry inside the file zip resource.
-	 * 
-	 * @param zipFile File to read inside it
-	 * @param entry The entry to be read
-	 * @return The stream of the entry
-	 */
-	public InputStream getEntryStream(File zipFile, String entry) {
-		if (entry.startsWith("/"))
-			entry = entry.substring(1);
-
-		try {
-			zFile = new ZipFile(zipFile);
-			setCharset(zFile);
-			FileHeader header = zFile.getFileHeader(entry);
-			return zFile.getInputStream(header);
-		} catch (Exception e) {
-			logError(e.getMessage());
-			return null;
-		}
-	}
-
-	@Override
-	public void close() {
-		if (zFile != null)
-			try {
-				zFile.close();
-				zFile = null;
-			} catch (IOException e) {
-				log.error(e.getMessage());
-			}
-	}
-
-	public String getEntryContent(File zip, String entry) throws IOException {
-		try (InputStream is = getEntryStream(zip, entry)) {
-			return IOUtil.readStream(is);
-		}
-	}
-
-	private static void logError(String message) {
-		Logger logger = LoggerFactory.getLogger(ZipUtil.class);
-		logger.error(message);
-	}
-
-	public static void addEntry(File zip, String entry, InputStream content) {
-		try (ZipFile zipFile = new ZipFile(zip)) {
-			// read war.zip and write to
-
-			ZipParameters parameters = new ZipParameters();
-			parameters.setCompressionMethod(CompressionMethod.DEFLATE);
-			// this would be the name of the file for this entry in the zip file
-			parameters.setFileNameInZip(entry);
-
-			// Creates a new entry in the zip file and adds the content to the
-			// zip file
-			zipFile.addStream(content, parameters);
-		} catch (Exception e) {
-			logError(e.getMessage());
-		}
-	}
-
-	private void zipDir(File zipDir, ZipOutputStream zos, File startZipDir) {
-		try {
-			// get a listing of the directory content
-			File[] dirList = zipDir.listFiles();
-			byte[] readBuffer = new byte[2156];
-			int bytesIn = 0;
-			// loop through dirList, and zip the files
-			for (int i = 0; i < dirList.length; i++) {
-				File f = dirList[i];
-				if (f.isDirectory()) {
-					// if the File object is a directory, call this
-					// function again to add its content recursively
-					zipDir(f, zos, startZipDir);
-					// loop again
-					continue;
-				}
-
-				// if we reached here, the File object f was not a directory
-				// create a FileInputStream on top of f
-
-				try (FileInputStream fis = new FileInputStream(f);) {
-					// create a new zip entry
-					String path = f.getPath();
-					if (!path.equals(startZipDir.getPath()))
-						path = path.substring(startZipDir.getPath().length());
-					if (path.startsWith(File.separator))
-						path = path.substring(1);
-					ZipEntry anEntry = new ZipEntry(path);
-					// place the zip entry in the ZipOutputStream object
-					zos.putNextEntry(anEntry);
-					// now write the content of the file to the ZipOutputStream
-					while ((bytesIn = fis.read(readBuffer)) != -1) {
-						zos.write(readBuffer, 0, bytesIn);
-					}
-				}
-			}
-		} catch (Exception e) {
-			logError(e.getMessage());
-		}
-	}
-
-	/**
-	 * Compress a single file
-	 * 
-	 * @param src The source file
-	 * @param dest The destination archive file
-	 */
-	public void zipFile(File src, File dest) {
-		try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dest));
-				FileInputStream fis = new FileInputStream(src);) {
-			// create a new zip entry
-			ZipEntry anEntry = new ZipEntry(src.getName());
-			// place the zip entry in the ZipOutputStream object
-			zos.putNextEntry(anEntry);
-
-			byte[] readBuffer = new byte[2156];
-			int bytesIn = 0;
-
-			// now write the content of the file to the ZipOutputStream
-			while ((bytesIn = fis.read(readBuffer)) != -1) {
-				zos.write(readBuffer, 0, bytesIn);
-			}
-			// close the stream
-			zos.flush();
-		} catch (Exception e) {
-			logError(e.getMessage());
-		}
-	}
-
-	/**
-	 * Zips a folder into a .zip archive
-	 * 
-	 * @param inFolder the folder to compress
-	 * @param outFile the zip file
-	 */
-	public void zipFolder(File inFolder, File outFile) {
-		try {
-			// create a ZipOutputStream to zip the data to
-			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(outFile));
-			// assuming that there is a directory named inFolder (If there
-			// isn't create one) in the same directory as the one the code
-			// runs from,
-			// call the zipDir method
-			zipDir(inFolder, zos, inFolder);
-			// close the stream
-			zos.flush();
-			zos.close();
-		} catch (Exception e) {
-			logError(e.getMessage());
-		}
-	}
-
-	public String getFileNameCharset() {
-		return fileNameCharset;
-	}
-
-	public void setFileNameCharset(String fileNameCharset) {
-		this.fileNameCharset = fileNameCharset;
-	}
-
-	/**
-	 * Gunzips and Untars a given .tar.gz file
-	 * 
-	 * @param tarGzFile the .tar.gz file
-	 * @param targetDir the target folder to unpack to
-	 * 
-	 * @throws IOException An error processing the GZip or Tar
-	 */
-	public void unGZipUnTar(File tarGzFile, File targetDir) throws IOException {
-		File tarFile = null;
-		try {
-			/*
-			 * Ungzip file to extract TAR file.
-			 */
-			tarFile = FileUtil.createTempFile("ungizp", ".tar");
-			unGZip(tarGzFile, tarFile);
-
-			/*
-			 * Untar extracted TAR file
-			 */
-			try (FileInputStream tarIs = new FileInputStream(tarFile);
-					BufferedInputStream tarBIS = new BufferedInputStream(tarIs);
-					TarArchiveInputStream archive = new TarArchiveInputStream(tarBIS)) {
-
-				TarArchiveEntry entry;
-				while ((entry = archive.getNextEntry()) != null) {
-					File file = new File(targetDir + "/" + entry.getName());
-					if (!entry.isFile()) {
-						file.mkdirs();
-						file.mkdir();
-					} else {
-						try (FileOutputStream fos = new FileOutputStream(file)) {
-							IOUtils.copy(archive, fos);
-							fos.flush();
-						}
-					}
-				}
-			}
-		} finally {
-			if (tarFile != null && tarFile.exists())
-				FileUtil.delete(tarFile);
-		}
-	}
-
-	/**
-	 * UnGunzips a given .gz file
-	 * 
-	 * @param gzFile the .gz file
-	 * @param targetFile the target file to unpack to
-	 *
-	 * @return size of the written file
-	 * 
-	 * @throws IOException Error processing the GZip
-	 */
-	public long unGZip(File gzFile, File targetFile) throws IOException {
-		return unGZip(new FileInputStream(gzFile), targetFile);
-	}
-
-	/**
-	 * UnGunzips a given .gz stream
-	 * 
-	 * @param is the .gz stream
-	 * 
-	 * @param target the target file to unpack to
-	 * 
-	 * @return size of the written file
-	 * 
-	 * @throws IOException Error processing the GZip
-	 */
-	public long unGZip(InputStream is, File target) throws IOException {
-		try (GzipCompressorInputStream archive = new GzipCompressorInputStream(new BufferedInputStream(is));
-				FileOutputStream fos = new FileOutputStream(target);
-				BufferedOutputStream bos = new BufferedOutputStream(fos);) {
-
-			int nBytes = -1;
-			byte[] buffer = new byte[4096];
-			int totalSizeEntry = 0;
-
-			while ((nBytes = archive.read(buffer)) > 0) {
-				bos.write(buffer, 0, nBytes);
-				totalSizeEntry += nBytes;
-
-				if (totalSizeEntry > maxSize)
-					throw new IOException(String.format(
-							"GZip file looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
-							FileUtil.getDisplaySize(maxSize, "en")));
-			}
-
-			bos.flush();
-			return totalSizeEntry;
-		}
-	}
+    private static final String ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES = "Zip file %s looks like a Zip Bomb Attack: can lead to inodes exhaustion of the system and is over the maximum allowed of %d";
+
+    private static final String ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE = "Zip file %s looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s";
+
+    private String fileNameCharset = "UTF-8";
+
+    private static final Logger log = LoggerFactory.getLogger(ZipUtil.class);
+
+    /**
+     * Maximum number of entries in the compressed archive, config parameter
+     * zip.maxentires
+     */
+    private int maxEntries = 100000;
+
+    /**
+     * Maximum size of the uncompressed contents of the compressed archive,
+     * config parameter zip.maxsize
+     */
+    private int maxSize = 1024 * 1024 * 1024; // 1 GB
+
+    /**
+     * Maximum compression ratio, config parameter zip.maxratio
+     */
+    private double maxCompressionRatio = 30D;
+
+    private ZipFile zFile;
+
+    public ZipUtil() {
+        try {
+            maxEntries = Context.get().getConfig().getInt("zip.maxentries", 100000);
+            maxSize = Context.get().getConfig().getInt("zip.maxsize", 1024) * 1024 * 1024;
+            maxCompressionRatio = Context.get().getConfig().getDouble("zip.maxratio", 30D);
+        } catch (Exception t) {
+            // Nothing to do
+        }
+    }
+
+    public ZipUtil(String charset) {
+        this();
+        this.fileNameCharset = charset;
+    }
+
+    public List<ZipEntry> listZipEntries(File zipFile) {
+        List<ZipEntry> files = new ArrayList<>();
+
+        try (java.util.zip.ZipFile archiveFile = new java.util.zip.ZipFile(zipFile)) {
+            if (zipFile.length() > maxSize)
+                throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE, zipFile.length(),
+                        FileUtil.getDisplaySize(maxSize, "en")));
+
+            Enumeration<? extends ZipEntry> e = archiveFile.entries();
+            while (e.hasMoreElements()) {
+                ZipEntry zipEntry = e.nextElement();
+                files.add(zipEntry);
+
+                if (files.size() > maxEntries)
+                    throw new IOException(
+                            String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES, zipFile.getName(), maxEntries));
+            }
+            files.sort((entry1, entry2) -> entry1.getName().compareTo(entry2.getName()));
+        } catch (Exception e) {
+            logError(e.getMessage());
+        }
+
+        return files;
+    }
+
+    public List<String> listEntries(File zipFile) {
+        List<String> files = new ArrayList<>();
+        try (ZipFile archiveFile = new ZipFile(zipFile);) {
+            setCharset(archiveFile);
+
+            List<FileHeader> fileHeaders = archiveFile.getFileHeaders();
+            for (FileHeader fileHeader : fileHeaders) {
+                files.add(fileHeader.getFileName());
+            }
+
+        } catch (Exception e) {
+            logError(e.getMessage());
+        }
+        return files;
+    }
+
+    /**
+     * This method extracts all entries of a zip-file.
+     * 
+     * @param zipFile the zip-file
+     * @param target the target folder
+     * 
+     * @return Number of extracted entries
+     * 
+     * @throws IOException Error unpacking the zip
+     */
+    public int unzip(File zipFile, File target) throws IOException {
+        return unzip(new FileInputStream(zipFile), target);
+    }
+
+    /**
+     * This method extracts all entries of a zip-file.
+     * 
+     * @param zipStream the zip contents
+     * @param target the target folder
+     * 
+     * @return Number of extracted entries
+     * 
+     * @throws IOException Error unpacking the zip
+     */
+    public int unzip(InputStream zipStream, File target) throws IOException {
+        target.mkdirs();
+
+        int totalSizeArchive = 0;
+        int totalEntryArchive = 0;
+
+        LocalFileHeader localFileHeader;
+        int readLen;
+        byte[] readBuffer = new byte[4096];
+
+        try (net.lingala.zip4j.io.inputstream.ZipInputStream zipInputStream = new net.lingala.zip4j.io.inputstream.ZipInputStream(
+                zipStream)) {
+            while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
+                File extractedFile = new File(target, localFileHeader.getFileName());
+                if (localFileHeader.isDirectory()) {
+                    extractedFile.mkdirs();
+                } else {
+                    try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(extractedFile))) {
+                        while ((readLen = zipInputStream.read(readBuffer)) != -1) {
+                            outputStream.write(readBuffer, 0, readLen);
+                            totalSizeArchive += readLen;
+                        }
+                    }
+                }
+
+                totalEntryArchive++;
+
+                if (totalSizeArchive > maxSize)
+                    throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE, zipStream,
+                            FileUtil.getDisplaySize(maxSize, "en")));
+
+                if (totalEntryArchive > maxEntries)
+                    throw new IOException(
+                            String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES, zipStream, maxEntries));
+            }
+        }
+
+        return totalEntryArchive;
+    }
+
+    /**
+     * Extracts a specific entry inside a given zip stream
+     * 
+     * @param input the stream of the zip file
+     * @param entry name of the entry to extract
+     * @param target the file where to store the entry
+     * 
+     * @return number of written bytes
+     * 
+     * @throws IOException Error unpacking the zip
+     */
+    public long unzip(InputStream input, String entry, File target) throws IOException {
+        int totalSizeEntry = 0;
+        try (ZipInputStream zis = new ZipInputStream(input);
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(target));) {
+            ZipEntry ze = zis.getNextEntry();
+            while (ze != null) {
+                if (ze.getName().equals(entry)) {
+                    int nBytes = -1;
+                    byte[] buffer = new byte[4096];
+
+                    while ((nBytes = zis.read(buffer)) > 0) {
+                        bos.write(buffer, 0, nBytes);
+                        totalSizeEntry += nBytes;
+
+                        double compressionRatio = totalSizeEntry / (double) ze.getCompressedSize();
+                        if (compressionRatio > maxCompressionRatio)
+                            throw new IOException(String.format(
+                                    "Zip file looks like a Zip Bomb Attack: ratio between compressed and uncompressed data %f is highly suspicious and is over the maximum allowed of %f",
+                                    compressionRatio, maxCompressionRatio));
+                        if (totalSizeEntry > maxSize)
+                            throw new IOException(String.format(
+                                    "Zip file looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
+                                    FileUtil.getDisplaySize(maxSize, "en")));
+                    }
+
+                    bos.flush();
+                    break;
+                }
+
+                ze = zis.getNextEntry();
+            }
+        }
+        return totalSizeEntry;
+    }
+
+    /**
+     * This method extracts a specific entry of a zip-file.
+     *
+     * https://github.com/srikanth-lingala/zip4j
+     * 
+     * @param zipFile File to read inside it
+     * @param entry The entry to be read
+     * @param target The extracted file
+     * 
+     * @return number of written bytes
+     * @throws IOException Error extracting the zip
+     */
+    public long unzip(File zipFile, String entry, File target) throws IOException {
+        if (entry.startsWith("/"))
+            entry = entry.substring(1);
+
+        ZipFile archiveFile = new ZipFile(zipFile);
+        setCharset(archiveFile);
+        FileHeader header = archiveFile.getFileHeader(entry);
+
+        try (InputStream is = archiveFile.getInputStream(header);
+                BufferedInputStream bis = new BufferedInputStream(is);
+                FileOutputStream fos = new FileOutputStream(target);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);) {
+
+            int nBytes = -1;
+            byte[] buffer = new byte[4096];
+            int totalSizeEntry = 0;
+
+            while ((nBytes = is.read(buffer)) > 0) {
+                bos.write(buffer, 0, nBytes);
+                totalSizeEntry += nBytes;
+
+                double compressionRatio = totalSizeEntry / (double) header.getCompressedSize();
+                if (compressionRatio > maxCompressionRatio)
+                    throw new IOException(String.format(
+                            "Zip file %s looks like a Zip Bomb Attack: ratio between compressed and uncompressed data %f is highly suspicious and is over the maximum allowed of %f",
+                            zipFile.getAbsolutePath(), compressionRatio, maxCompressionRatio));
+                if (totalSizeEntry > maxSize)
+                    throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
+                            zipFile.getAbsolutePath(), FileUtil.getDisplaySize(maxSize, "en")));
+            }
+
+            bos.flush();
+            return totalSizeEntry;
+        } finally {
+            archiveFile.close();
+        }
+    }
+
+    /**
+     * Read the entry inside the file zip resource.
+     * 
+     * @param zipFile File to read inside it
+     * @param entry The entry to be read
+     * 
+     * @return The bytes of the entry
+     */
+    public byte[] getEntryBytes(File zipFile, String entry) {
+        if (entry.startsWith("/"))
+            entry = entry.substring(1);
+
+        InputStream entryStream = null;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipFile archiveFile = new ZipFile(zipFile);) {
+
+            setCharset(archiveFile);
+            FileHeader header = archiveFile.getFileHeader(entry);
+
+            entryStream = archiveFile.getInputStream(header);
+            IOUtils.copy(entryStream, baos);
+            baos.flush();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            logError(e.getMessage());
+            return new byte[0];
+        } finally {
+            try {
+                if (entryStream != null)
+                    entryStream.close();
+            } catch (Exception e) {
+                // Nothing to do
+            }
+        }
+    }
+
+    private void setCharset(ZipFile zipFile) {
+        if (fileNameCharset != null && !"auto".equals(fileNameCharset))
+            zipFile.setCharset(Charset.forName(fileNameCharset));
+    }
+
+    /**
+     * Read the entry inside the file zip resource.
+     * 
+     * @param zipFile File to read inside it
+     * @param entry The entry to be read
+     * @return The stream of the entry
+     */
+    public InputStream getEntryStream(File zipFile, String entry) {
+        if (entry.startsWith("/"))
+            entry = entry.substring(1);
+
+        try {
+            zFile = new ZipFile(zipFile);
+            setCharset(zFile);
+            FileHeader header = zFile.getFileHeader(entry);
+            return zFile.getInputStream(header);
+        } catch (Exception e) {
+            logError(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public void close() {
+        if (zFile != null)
+            try {
+                zFile.close();
+                zFile = null;
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+    }
+
+    public String getEntryContent(File zip, String entry) throws IOException {
+        try (InputStream is = getEntryStream(zip, entry)) {
+            return IOUtil.readStream(is);
+        }
+    }
+
+    private static void logError(String message) {
+        Logger logger = LoggerFactory.getLogger(ZipUtil.class);
+        logger.error(message);
+    }
+
+    public static void addEntry(File zip, String entry, InputStream content) {
+        try (ZipFile zipFile = new ZipFile(zip)) {
+            // read war.zip and write to
+
+            ZipParameters parameters = new ZipParameters();
+            parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+            // this would be the name of the file for this entry in the zip file
+            parameters.setFileNameInZip(entry);
+
+            // Creates a new entry in the zip file and adds the content to the
+            // zip file
+            zipFile.addStream(content, parameters);
+        } catch (Exception e) {
+            logError(e.getMessage());
+        }
+    }
+
+    private void zipDir(File zipDir, ZipOutputStream zos, File startZipDir) {
+        try {
+            // get a listing of the directory content
+            File[] dirList = zipDir.listFiles();
+            byte[] readBuffer = new byte[2156];
+            int bytesIn = 0;
+            // loop through dirList, and zip the files
+            for (int i = 0; i < dirList.length; i++) {
+                File f = dirList[i];
+                if (f.isDirectory()) {
+                    // if the File object is a directory, call this
+                    // function again to add its content recursively
+                    zipDir(f, zos, startZipDir);
+                    // loop again
+                    continue;
+                }
+
+                // if we reached here, the File object f was not a directory
+                // create a FileInputStream on top of f
+
+                try (FileInputStream fis = new FileInputStream(f);) {
+                    // create a new zip entry
+                    String path = f.getPath();
+                    if (!path.equals(startZipDir.getPath()))
+                        path = path.substring(startZipDir.getPath().length());
+                    if (path.startsWith(File.separator))
+                        path = path.substring(1);
+                    ZipEntry anEntry = new ZipEntry(path);
+                    // place the zip entry in the ZipOutputStream object
+                    zos.putNextEntry(anEntry);
+                    // now write the content of the file to the ZipOutputStream
+                    while ((bytesIn = fis.read(readBuffer)) != -1) {
+                        zos.write(readBuffer, 0, bytesIn);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logError(e.getMessage());
+        }
+    }
+
+    /**
+     * Compress a single file
+     * 
+     * @param src The source file
+     * @param dest The destination archive file
+     */
+    public void zipFile(File src, File dest) {
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dest));
+                FileInputStream fis = new FileInputStream(src);) {
+            // create a new zip entry
+            ZipEntry anEntry = new ZipEntry(src.getName());
+            // place the zip entry in the ZipOutputStream object
+            zos.putNextEntry(anEntry);
+
+            byte[] readBuffer = new byte[2156];
+            int bytesIn = 0;
+
+            // now write the content of the file to the ZipOutputStream
+            while ((bytesIn = fis.read(readBuffer)) != -1) {
+                zos.write(readBuffer, 0, bytesIn);
+            }
+            // close the stream
+            zos.flush();
+        } catch (Exception e) {
+            logError(e.getMessage());
+        }
+    }
+
+    /**
+     * Zips a folder into a .zip archive
+     * 
+     * @param inFolder the folder to compress
+     * @param outFile the zip file
+     */
+    public void zipFolder(File inFolder, File outFile) {
+        try {
+            // create a ZipOutputStream to zip the data to
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(outFile));
+            // assuming that there is a directory named inFolder (If there
+            // isn't create one) in the same directory as the one the code
+            // runs from,
+            // call the zipDir method
+            zipDir(inFolder, zos, inFolder);
+            // close the stream
+            zos.flush();
+            zos.close();
+        } catch (Exception e) {
+            logError(e.getMessage());
+        }
+    }
+
+    public String getFileNameCharset() {
+        return fileNameCharset;
+    }
+
+    public void setFileNameCharset(String fileNameCharset) {
+        this.fileNameCharset = fileNameCharset;
+    }
+
+    /**
+     * Gunzips and Untars a given .tar.gz file
+     * 
+     * @param tarGzFile the .tar.gz file
+     * @param targetDir the target folder to unpack to
+     * 
+     * @throws IOException An error processing the GZip or Tar
+     */
+    public void unGZipUnTar(File tarGzFile, File targetDir) throws IOException {
+        File tarFile = null;
+        try {
+            /*
+             * Ungzip file to extract TAR file.
+             */
+            tarFile = FileUtil.createTempFile("ungizp", ".tar");
+            unGZip(tarGzFile, tarFile);
+
+            /*
+             * Untar extracted TAR file
+             */
+            try (FileInputStream tarIs = new FileInputStream(tarFile);
+                    BufferedInputStream tarBIS = new BufferedInputStream(tarIs);
+                    TarArchiveInputStream archive = new TarArchiveInputStream(tarBIS)) {
+
+                TarArchiveEntry entry;
+                while ((entry = archive.getNextEntry()) != null) {
+                    File file = new File("%s/%s".formatted(targetDir.getAbsoluteFile(), entry.getName()));
+                    if (!entry.isFile()) {
+                        file.mkdirs();
+                        file.mkdir();
+                    } else {
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            IOUtils.copy(archive, fos);
+                            fos.flush();
+                        }
+                    }
+                }
+            }
+        } finally {
+            if (tarFile != null && tarFile.exists())
+                FileUtil.delete(tarFile);
+        }
+    }
+
+    /**
+     * UnGunzips a given .gz file
+     * 
+     * @param gzFile the .gz file
+     * @param targetFile the target file to unpack to
+     *
+     * @return size of the written file
+     * 
+     * @throws IOException Error processing the GZip
+     */
+    public long unGZip(File gzFile, File targetFile) throws IOException {
+        return unGZip(new FileInputStream(gzFile), targetFile);
+    }
+
+    /**
+     * UnGunzips a given .gz stream
+     * 
+     * @param is the .gz stream
+     * 
+     * @param target the target file to unpack to
+     * 
+     * @return size of the written file
+     * 
+     * @throws IOException Error processing the GZip
+     */
+    public long unGZip(InputStream is, File target) throws IOException {
+        try (GzipCompressorInputStream archive = new GzipCompressorInputStream(new BufferedInputStream(is));
+                FileOutputStream fos = new FileOutputStream(target);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);) {
+
+            int nBytes = -1;
+            byte[] buffer = new byte[4096];
+            int totalSizeEntry = 0;
+
+            while ((nBytes = archive.read(buffer)) > 0) {
+                bos.write(buffer, 0, nBytes);
+                totalSizeEntry += nBytes;
+
+                if (totalSizeEntry > maxSize)
+                    throw new IOException(String.format(
+                            "GZip file looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
+                            FileUtil.getDisplaySize(maxSize, "en")));
+            }
+
+            bos.flush();
+            return totalSizeEntry;
+        }
+    }
 }

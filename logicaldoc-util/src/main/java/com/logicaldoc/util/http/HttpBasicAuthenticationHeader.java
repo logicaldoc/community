@@ -26,7 +26,7 @@ public class HttpBasicAuthenticationHeader {
 	}
 
 	public static String createEncodedText(final String username, final String password) {
-		final String pair = username + ":" + password;
+		final String pair = "%s:%s".formatted(username, password);
 		final byte[] encodedBytes = org.apache.commons.codec.binary.Base64.encodeBase64(pair.getBytes());
 		return new String(encodedBytes);
 	}
