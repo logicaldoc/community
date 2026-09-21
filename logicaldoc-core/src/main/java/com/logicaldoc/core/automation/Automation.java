@@ -6,7 +6,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -192,7 +191,7 @@ public class Automation {
         dictionary.put("DateTool", dateTool);
 
         // Put the current date
-        dictionary.put(CURRENT_DATE, Date.from(Instant.now()));
+        dictionary.put(CURRENT_DATE, new Date());
 
         // Localized messages map
         dictionary.put("I18N", new I18NTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE))));

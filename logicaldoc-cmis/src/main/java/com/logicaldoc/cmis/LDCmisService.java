@@ -2,6 +2,7 @@ package com.logicaldoc.cmis;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -186,7 +187,7 @@ public class LDCmisService extends AbstractCmisService {
         query.append(DocumentEvent.DELETED);
         query.append("')");
 
-        Instant latestDate = historyDao.queryForObject(query.toString(), Instant.class);
+        Timestamp latestDate = historyDao.queryForObject(query.toString(), Timestamp.class);
 
         StringBuilder query2 = new StringBuilder(
                 "SELECT MAX(ld_date) FROM ld_folder_history WHERE ld_deleted=0 AND ld_tenantid=");
@@ -201,31 +202,27 @@ public class LDCmisService extends AbstractCmisService {
         query2.append(FolderEvent.DELETED);
         query2.append("')");
 
-        Instant latestFolderDate = historyDao.queryForObject(query2.toString(), Instant.class);
+        Timestamp latestFolderDate = historyDao.queryForObject(query2.toString(), Timestamp.class);
 
         if (latestDate == null && latestFolderDate == null) {
             return "0";
         } else {
-            log.debug("latestDate epoch millis: {}", latestDate != null ? latestDate.toEpochMilli() : "");
-            log.debug("latestFolderDate epoch millis: {}",
-                    latestFolderDate != null ? latestFolderDate.toEpochMilli() : "");
+            log.debug("latestDate.getTime(): {}", latestDate != null ? latestDate.getTime() : "");
+            log.debug("latestFolderDate.getTime(): {}", latestFolderDate != null ? latestFolderDate.getTime() : "");
+            Timestamp myDate = getLatestTimestamp(latestDate, latestFolderDate);
 
-            Instant myDate = getLatestInstant(latestDate, latestFolderDate);
-
-            log.debug("myDate epoch millis: {}", myDate.toEpochMilli());
-
-            return Long.toString(myDate.toEpochMilli());
+            log.debug("myDate.getTime(): {}", myDate.getTime());
+            return Long.toString(myDate.getTime());
         }
     }
 
-    private Instant getLatestInstant(Instant date1, Instant date2) {
+    private Timestamp getLatestTimestamp(Timestamp date1, Timestamp date2) {
         if (date1 != null && date2 == null)
             return date1;
         if (date1 == null && date2 != null)
             return date2;
-        if (date1 != null && date1.isAfter(date2))
+        if (date1 != null && date1.after(date2))
             return date1;
-
         return date2;
     }
 

@@ -2,10 +2,6 @@ package com.logicaldoc.core.automation;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -205,8 +201,9 @@ public class AutomationDateTool extends org.apache.velocity.tools.generic.DateTo
         if (date == null)
             return "";
 
-        return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(ZoneOffset.UTC)
-                .format(Instant.ofEpochMilli(date.getTime()));
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return df.format(date);
     }
 
     /**
@@ -220,8 +217,8 @@ public class AutomationDateTool extends org.apache.velocity.tools.generic.DateTo
         if (date == null)
             return "";
 
-        return DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
-                .format(Instant.ofEpochMilli(date.getTime()));
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        return df.format(date);
     }
 
     /**
@@ -323,7 +320,7 @@ public class AutomationDateTool extends org.apache.velocity.tools.generic.DateTo
      * @return the current time
      */
     public Date currentTime() {
-        return Date.from(Instant.now());
+        return new Date();
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.logicaldoc.web.service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -86,9 +84,11 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
             usr.setPasswordMinLenght(config.getTenantInt(tenant.getName(), "password.size", 6));
 
             // Retrieve the reason for the last login failure
+            Calendar fiveMinutesAgo = Calendar.getInstance();
+            fiveMinutesAgo.add(Calendar.MINUTE, -5);
+
             List<UserHistory> failures = UserHistoryDAO.get().findByUserIdAndEvent(user.getId(),
-                    UserEvent.LOGIN_FAILED.toString(), Date.from(LocalDateTime.now(ZoneId.systemDefault())
-                            .minusMinutes(5).atZone(ZoneId.systemDefault()).toInstant()));
+                    UserEvent.LOGIN_FAILED.toString(), fiveMinutesAgo.getTime());
             if (failures != null && !failures.isEmpty())
                 usr.setLastLoginFailureReason(failures.getLast().getComment());
 

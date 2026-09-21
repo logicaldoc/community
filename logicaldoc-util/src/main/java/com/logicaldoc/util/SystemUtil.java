@@ -56,7 +56,7 @@ public class SystemUtil {
             sb.append("=");
             sb.append(entry.getValue());
         }
-        return "#System Environment\n#%s\n%s".formatted(new Date(), sb.toString());
+        return "#System Environment%n#%s%n%s".formatted(new Date(), sb.toString());
     }
 
     public static String printJavaEnvironment() {

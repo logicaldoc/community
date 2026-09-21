@@ -7,16 +7,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -57,6 +56,7 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MailDateFormat;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
@@ -359,11 +359,11 @@ public class EMailSender {
 
         message.setContent(multipartMessage);
 
-        Instant sentAt = Instant.now();
-        String dateHeader = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC).format(sentAt);
-
-        message.setHeader("Date", dateHeader);
-        Date now = Date.from(sentAt);
+        MailDateFormat formatter = new MailDateFormat();
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
+                                                            // for outgoing mail
+        Date now = new Date();
+        message.setHeader("Date", formatter.format(now));
 
         boolean noSend = false;
         try {
@@ -638,11 +638,14 @@ public class EMailSender {
             Folder folder = saveFolder;
 
             if (foldering == FOLDERING_YEAR) {
-                folder = folderDao.createPath(saveFolder, formatSentDate(email, "yyyy"), true, null);
+                DateFormat df = new SimpleDateFormat("yyyy");
+                folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
             } else if (foldering == FOLDERING_MONTH) {
-                folder = folderDao.createPath(saveFolder, formatSentDate(email, "yyyy/MM"), true, null);
+                DateFormat df = new SimpleDateFormat("yyyy/MM");
+                folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
             } else if (foldering == FOLDERING_DAY) {
-                folder = folderDao.createPath(saveFolder, formatSentDate(email, "yyyy/MM/dd"), true, null);
+                DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+                folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
             }
 
             Document emailDocument = new Document();
@@ -679,7 +682,8 @@ public class EMailSender {
                 attributes.put("sendername", ext);
 
                 ext = new Attribute();
-                ext.setStringValue(formatSentDate(email, "yyyy-MM-dd HH:mm:ss"));
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                ext.setStringValue(df.format(email.getSentDate()));
                 attributes.put("sentdate", ext);
 
                 ext = new Attribute();
@@ -766,10 +770,5 @@ public class EMailSender {
 
     public void setClientTenant(String clientTenant) {
         this.clientTenant = clientTenant;
-    }
-
-    private String formatSentDate(EMail email, String pattern) {
-        return DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.systemDefault())
-                .format(Instant.ofEpochMilli(email.getSentDate().getTime()));
     }
 }

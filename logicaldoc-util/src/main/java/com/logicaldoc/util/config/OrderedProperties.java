@@ -20,84 +20,77 @@ import java.util.TreeSet;
  */
 public class OrderedProperties extends Properties {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public synchronized Enumeration<Object> keys() {
-		return Collections.enumeration(new TreeSet<Object>(super.keySet()));
-	}
+    @Override
+    public synchronized Enumeration<Object> keys() {
+        return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+    }
 
-	/**
-	 * Overrides the original store() method and sorts the output
-	 * 
-	 * @param out a FileOutPutStream to send the output to
-	 * @param header a textual header for the top of the file
-	 * @exception IOException when things go wrong
-	 */
-	@Override
-	public void store(OutputStream out, String header) throws IOException {
-		List<String> keys = getKeys();
+    /**
+     * Overrides the original store() method and sorts the output
+     * 
+     * @param out a FileOutPutStream to send the output to
+     * @param header a textual header for the top of the file
+     * @exception IOException when things go wrong
+     */
+    @Override
+    public void store(OutputStream out, String header) throws IOException {
+        List<String> keys = getKeys();
 
-		// write the header
-		DataOutputStream dataoutputstream = new DataOutputStream(out);
-		dataoutputstream.writeBytes("#%s\n".formatted(header));
+        // Write the header
+        DataOutputStream dataOutputStream = new DataOutputStream(out);
+        dataOutputStream.writeBytes("#%s%n".formatted(header));
 
-		// write the date/time
-		Date now = new Date();
-		dataoutputstream.writeBytes("#%s\n".formatted(now));
+        // Write the date/time
+        Date now = new Date();
+        dataOutputStream.writeBytes("#%s%n".formatted(now));
 
-		// now, loop through and write out the properties
-		String oneline;
-		String thekey;
-		String thevalue;
+        // Write the properties
+        for (String key : keys) {
+            String value = doubleSlash(super.getProperty(key));
+            String line = "%s=%s%n".formatted(key, value);
+            dataOutputStream.writeBytes(line);
+        }
 
-		for (int i = 0; i < keys.size(); i++) {
-			thekey = keys.get(i);
-			thevalue = super.getProperty(thekey);
-			thevalue = doubleSlash(thevalue);
+        dataOutputStream.flush();
+        dataOutputStream.close();
+    }
 
-			oneline =  "%s=%s\n".formatted(thekey, thevalue);
-			dataoutputstream.writeBytes(oneline);
-		}
+    /**
+     * Private method to double slash paths
+     * 
+     * @param orig the string to double slash
+     * @return a double-slashed string
+     */
+    private String doubleSlash(String orig) {
+        StringBuilder buf = new StringBuilder();
 
-		dataoutputstream.flush();
-		dataoutputstream.close();
-	}
+        for (int i = 0; i < orig.length(); i++) {
+            if (orig.charAt(i) == '\\') {
+                buf.append("\\\\");
+            } else {
+                buf.append(orig.charAt(i));
+            }
+        }
 
-	/**
-	 * Private method to double slash paths
-	 * 
-	 * @param orig the string to double slash
-	 * @return a double-slashed string
-	 */
-	private String doubleSlash(String orig) {
-		StringBuilder buf = new StringBuilder();
+        return buf.toString();
+    }
 
-		for (int i = 0; i < orig.length(); i++) {
-			if (orig.charAt(i) == '\\') {
-				buf.append("\\\\");
-			} else {
-				buf.append(orig.charAt(i));
-			}
-		}
+    /**
+     * All the keys but alphabetically ordered
+     * 
+     * @return the ordered collection of all the keys
+     */
+    public List<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<>();
 
-		return buf.toString();
-	}
+        for (Object key : keySet())
+            keys.add(key.toString());
 
-	/**
-	 * All the keys but alphabetically ordered
-	 * 
-	 * @return the ordered collection of all the keys
-	 */
-	public List<String> getKeys() {
-		ArrayList<String> keys = new ArrayList<>();
+        // sort them
+        Collections.sort(keys);
 
-		for (Object key : keySet())
-			keys.add(key.toString());
-
-		// sort them
-		Collections.sort(keys);
-
-		return keys;
-	}
+        return keys;
+    }
 }

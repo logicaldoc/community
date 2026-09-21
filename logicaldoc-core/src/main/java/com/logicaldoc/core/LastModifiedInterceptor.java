@@ -1,6 +1,5 @@
 package com.logicaldoc.core;
 
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -16,9 +15,7 @@ import org.hibernate.type.Type;
  */
 public class LastModifiedInterceptor implements Interceptor {
 
-    public LastModifiedInterceptor() {
-        super();
-    }
+    private static final String LAST_MODIFIED = "lastModified";
 
     @Override
     public boolean onFlushDirty(
@@ -31,7 +28,10 @@ public class LastModifiedInterceptor implements Interceptor {
 
         boolean modified = Interceptor.super.onFlushDirty(entity, id, currentState, previousState, propertyNames,
                 propertyTypes);
-        return modified || updateLastModified(entity, currentState, propertyNames);
+
+        boolean lastModifiedUpdated = updateLastModified(entity, currentState, propertyNames);
+
+        return modified || lastModifiedUpdated;
     }
 
     @Override
@@ -43,6 +43,7 @@ public class LastModifiedInterceptor implements Interceptor {
             Type[] propertyTypes) {
 
         Interceptor.super.onInsert(entity, id, currentState, propertyNames, propertyTypes);
+
         updateLastModified(entity, currentState, propertyNames);
     }
 
@@ -66,25 +67,23 @@ public class LastModifiedInterceptor implements Interceptor {
             Type[] propertyTypes) {
 
         Interceptor.super.onUpdate(entity, id, currentState, propertyNames, propertyTypes);
+
         updateLastModified(entity, currentState, propertyNames);
     }
 
     protected boolean setValue(Object[] currentState, String[] propertyNames, String propertyToSet, Object value) {
+
         int index = Arrays.asList(propertyNames).indexOf(propertyToSet);
 
-        if (index >= 0) {
-            currentState[index] = value;
-            return true;
-        } else {
+        if (index < 0)
             return false;
-        }
+
+        currentState[index] = value;
+        return true;
     }
 
     private boolean updateLastModified(Object entity, Object[] currentState, String[] propertyNames) {
 
-        if (entity instanceof PersistentObject)
-            return setValue(currentState, propertyNames, "lastModified", Date.from(Instant.now()));
-
-        return false;
+        return entity instanceof PersistentObject && setValue(currentState, propertyNames, LAST_MODIFIED, new Date());
     }
 }

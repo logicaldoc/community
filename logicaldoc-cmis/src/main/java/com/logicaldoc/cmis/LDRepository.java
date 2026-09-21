@@ -8,17 +8,14 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -29,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -2014,7 +2012,7 @@ public class LDRepository {
          * Fill the extended attributes but only if we are not dealing with a
          * search hit
          */
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         addPropertyString(result, typeId, filter, TypeManager.PROP_TEMPLATE, template.getName());
 
         if (doc instanceof Document document)
@@ -2034,8 +2032,7 @@ public class LDRepository {
                         stringValue = Long.toString(attribute.getIntValue());
                         break;
                     case Attribute.TYPE_DATE:
-                        stringValue = df.format(
-                                attribute.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                        stringValue = df.format(attribute.getDateValue());
                         break;
                     case Attribute.TYPE_DOUBLE:
                         stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue().toString() : null;
@@ -2302,18 +2299,16 @@ public class LDRepository {
     }
 
     private void updateDocumentDateValue(AbstractDocument doc, String attributeName, String stringValue) {
-        if (StringUtils.isNotEmpty(stringValue)) {
+        if (StringUtils.isNotEmpty(stringValue))
             try {
-                LocalDate date = LocalDate.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
-
-                doc.setValue(attributeName, Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-            } catch (DateTimeParseException e) {
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                doc.setValue(attributeName, df.parse(stringValue));
+            } catch (ParseException e) {
                 log.error("Invalid date {}", stringValue);
                 doc.setValue(attributeName, (Date) null);
             }
-        } else {
+        else
             doc.setValue(attributeName, (Date) null);
-        }
     }
 
     private void updateDocumentBooleanValue(AbstractDocument doc, String attributeName, String stringValue) {
@@ -2646,9 +2641,11 @@ public class LDRepository {
      * Converts milliseconds into a calendar object.
      */
     private static GregorianCalendar millisToCalendar(long millis) {
-        long roundedMillis = (long) (Math.ceil(millis / 1000D) * 1000D);
+        GregorianCalendar result = new GregorianCalendar();
+        result.setTimeZone(TimeZone.getTimeZone("GMT"));
+        result.setTimeInMillis((long) (Math.ceil(millis / 1000D) * 1000D));
 
-        return GregorianCalendar.from(Instant.ofEpochMilli(roundedMillis).atZone(ZoneOffset.UTC));
+        return result;
     }
 
     /**
@@ -2907,7 +2904,8 @@ public class LDRepository {
         complex.addAll(odsFolders);
 
         // sort the content of list complex by date
-        complex.sort(Comparator.comparing(object -> object.getChangeEventInfo().getChangeTime().toInstant()));
+        Collections.sort(complex, (o1, o2) -> o1.getChangeEventInfo().getChangeTime().getTime()
+                .compareTo(o2.getChangeEventInfo().getChangeTime().getTime()));
 
         boolean hasMoreItems = complex.size() > max;
         if (hasMoreItems)
@@ -2915,20 +2913,17 @@ public class LDRepository {
 
         ol.setObjects(complex);
 
-        Instant latestChange = null;
-
+        Date date = null;
         if (!complex.isEmpty()) {
             ol.setNumItems(BigInteger.valueOf(-1));
             ol.setHasMoreItems(Boolean.valueOf(hasMoreItems));
-
-            latestChange = complex.get(complex.size() - 1).getChangeEventInfo().getChangeTime().toInstant();
+            date = complex.get(complex.size() - 1).getChangeEventInfo().getChangeTime().getTime();
         } else {
             ol.setHasMoreItems(Boolean.FALSE);
             ol.setNumItems(BigInteger.ZERO);
         }
 
-        String latestChangeLogToken = latestChange == null ? null : Long.toString(latestChange.toEpochMilli());
-
+        String latestChangeLogToken = date == null ? null : String.valueOf(date.getTime());
         debug("latestChangeLogToken %s".formatted(latestChangeLogToken));
         changeLogToken.setValue(latestChangeLogToken);
 
@@ -2940,7 +2935,7 @@ public class LDRepository {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("tenantId", getRoot().getTenantId());
-            params.put("minDate", Date.from(Instant.ofEpochMilli(minDate)));
+            params.put("minDate", new Date(minDate));
 
             entries = historyDao.findByWhere(
                     " _entity.tenantId = :tenantId and _entity.date >= :minDate and _entity.event in ('%s')"
@@ -2952,7 +2947,7 @@ public class LDRepository {
         }
 
         List<ObjectData> ods = new ArrayList<>(entries.size());
-
+        Date date = null;
         for (DocumentHistory logEntry : entries) {
             ObjectDataImpl od = new ObjectDataImpl();
             ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
@@ -2974,8 +2969,9 @@ public class LDRepository {
             cei.setChangeType(changeType);
 
             // change time
-            GregorianCalendar changeTime = GregorianCalendar
-                    .from(logEntry.getDate().toInstant().atZone(ZoneId.systemDefault()));
+            GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
+            date = logEntry.getDate();
+            changeTime.setTime(date);
             cei.setChangeTime(changeTime);
             od.setChangeEventInfo(cei);
 
@@ -2994,7 +2990,7 @@ public class LDRepository {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("tenantId", getRoot().getTenantId());
-            params.put("minDate", Date.from(Instant.ofEpochMilli(minDate)));
+            params.put("minDate", new Date(minDate));
 
             entries = folderHistoryDao
                     .findByWhere(
@@ -3007,7 +3003,7 @@ public class LDRepository {
         }
 
         List<ObjectData> ods = new ArrayList<>(entries.size());
-
+        Date date = null;
         for (FolderHistory logEntry : entries) {
             ObjectDataImpl od = new ObjectDataImpl();
             ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
@@ -3027,8 +3023,9 @@ public class LDRepository {
             cei.setChangeType(changeType);
 
             // change time
-            GregorianCalendar changeTime = GregorianCalendar
-                    .from(logEntry.getDate().toInstant().atZone(ZoneId.systemDefault()));
+            GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
+            date = logEntry.getDate();
+            changeTime.setTime(date);
             cei.setChangeTime(changeTime);
             od.setChangeEventInfo(cei);
 

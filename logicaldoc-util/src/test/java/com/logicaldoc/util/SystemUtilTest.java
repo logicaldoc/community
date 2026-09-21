@@ -7,36 +7,40 @@ import org.junit.Test;
 
 public class SystemUtilTest {
 
-	@Test
-	public void testPrintEnvironment() {
-		assertTrue(SystemUtil.printEnvironment().contains("java.version"));
-	}
+    @Test
+    public void testPrintEnvironment() {
+        String output = SystemUtil.printEnvironment();
+        String separator = System.lineSeparator();
 
-	@Test
-	public void testPrintStackTrace() {
-		assertTrue(SystemUtil.printStackTrace().contains(SystemUtilTest.class.getName()));
-	}
+        assertTrue(output.contains("java.version"));
+        assertTrue(output.startsWith("#System Environment" + separator + "#"));
+    }
 
-	@Test
-	public void testGetOS() {
-		String originalOsName = System.getProperty("os.name");
-		try {
-			System.setProperty("os.name", "windows");
-			assertEquals("win", SystemUtil.getOS());
+    @Test
+    public void testPrintStackTrace() {
+        assertTrue(SystemUtil.printStackTrace().contains(SystemUtilTest.class.getName()));
+    }
 
-			System.setProperty("os.name", "macintosh");
-			assertEquals("osx", SystemUtil.getOS());
+    @Test
+    public void testGetOS() {
+        String originalOsName = System.getProperty("os.name");
+        try {
+            System.setProperty("os.name", "windows");
+            assertEquals("win", SystemUtil.getOS());
 
-			System.setProperty("os.name", "sunos");
-			assertEquals("sol", SystemUtil.getOS());
+            System.setProperty("os.name", "macintosh");
+            assertEquals("osx", SystemUtil.getOS());
 
-			System.setProperty("os.name", "Unix");
-			assertEquals("uni", SystemUtil.getOS());
+            System.setProperty("os.name", "sunos");
+            assertEquals("sol", SystemUtil.getOS());
 
-			System.setProperty("os.name", "unknown");
-			assertEquals("err", SystemUtil.getOS());
-		} finally {
-			System.setProperty("os.name", originalOsName);
-		}
-	}
+            System.setProperty("os.name", "Unix");
+            assertEquals("uni", SystemUtil.getOS());
+
+            System.setProperty("os.name", "unknown");
+            assertEquals("err", SystemUtil.getOS());
+        } finally {
+            System.setProperty("os.name", originalOsName);
+        }
+    }
 }

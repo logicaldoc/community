@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +131,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 
         while (iter.hasNext()) {
             SystemMessage sm = iter.next();
-            long sentdate = Instant.now().toEpochMilli();
+            long sentdate = new Date().getTime();
             long timespan = sm.getDateScope();
             timespan = timespan * 86400000;
             sentdate += timespan;

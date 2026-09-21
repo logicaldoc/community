@@ -53,12 +53,10 @@ public abstract class Message extends PersistentObject {
     @Transient
     private Date receivedDate = new Date();
 
-    @Column(name = "ld_type", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_type", nullable = false) @Enumerated(EnumType.ORDINAL)
     private Type type = Type.SYSTEM;
 
-    @ElementCollection
-    @CollectionTable(name = "ld_recipient", joinColumns = @JoinColumn(name = "ld_messageid"))
+    @ElementCollection @CollectionTable(name = "ld_recipient", joinColumns = @JoinColumn(name = "ld_messageid"))
     private Set<Recipient> recipients = new HashSet<>();
 
     /**
