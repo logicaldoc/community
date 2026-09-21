@@ -223,7 +223,7 @@ create table ld_tenant (ld_id number(19,0) not null, ld_lastmodified timestamp n
                         ld_email varchar(255), ld_telephone varchar(255), ld_formsquota number(19,0),
                         ld_usersquota number(19,0), ld_sessionsquota number(19,0), ld_documentsquota number(19,0), ld_workflowsquota number(19,0),
                         ld_storagequota number(19,0), ld_type int not null, ld_creation timestamp,
-                        ld_qthreshold int, ld_qrecipients varchar(1000), ld_rousersquota number(19,0), ld_maxreports number(19,0),
+                        ld_qthreshold int, ld_qrecipients varchar(1000), ld_rousersquota number(19,0), ld_reportsquota number(19,0),
                         ld_apicallsquota number(19,0), ld_pagesquota number(19,0), ld_ticketsquota number(19,0), ld_stampsquota number(19,0), ld_importfoldersquota number(19,0), 
                         ld_emailaccountsquota number(19,0), primary key (ld_id));     
 create table ld_sequence (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion number(19,0) not null,

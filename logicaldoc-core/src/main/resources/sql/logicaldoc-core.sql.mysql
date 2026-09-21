@@ -217,7 +217,7 @@ create table ld_tenant (ld_id bigint not null, ld_lastmodified datetime not null
                         ld_email varchar(255), ld_telephone varchar(255), ld_formsquota bigint,
                         ld_usersquota bigint, ld_sessionsquota int, ld_documentsquota bigint, ld_workflowsquota bigint,
                         ld_storagequota bigint, ld_type int not null, ld_creation datetime,
-                        ld_qthreshold bigint, ld_qrecipients varchar(1000), ld_rousersquota bigint, ld_maxreports bigint,
+                        ld_qthreshold bigint, ld_qrecipients varchar(1000), ld_rousersquota bigint, ld_reportsquota bigint,
                         ld_apicallsquota bigint, ld_ticketsquota bigint, ld_stampsquota bigint, ld_importfoldersquota bigint, 
                         ld_emailaccountsquota bigint, ld_pagesquota bigint, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_sequence (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
