@@ -20,6 +20,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.web.util.ServletUtil;
@@ -40,16 +41,23 @@ public class SessionsDataServlet extends AbstractDataServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+    protected void service(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Session session,
+            Integer max,
             Locale locale) throws PersistenceException, IOException {
 
         if (request.getParameter("kill") != null) {
-            // Kill a specific session
-            SessionManager.get().kill(request.getParameter("kill"));
-            if (log.isDebugEnabled())
-                log.debug("Killed session {}", request.getParameter("kill"));
-            PrintWriter writer = response.getWriter();
-            writer.println("ok");
+            // Check if the user can administer the sessions
+            if (MenuDAO.get().isReadAllowed(Menu.ADMIN_SESSIONS, session.getUserId())) {
+                // Kill a specific session
+                SessionManager.get().kill(request.getParameter("kill"));
+                if (log.isDebugEnabled())
+                    log.debug("Killed session {}", request.getParameter("kill"));
+                PrintWriter writer = response.getWriter();
+                writer.println("ok");
+            }
         } else {
             String node = request.getParameter("node");
             SessionStatus status = request.getParameter("status") != null
@@ -80,7 +88,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
              * The current user must be enabled to see the sessions.
              */
             MenuDAO mDao = MenuDAO.get();
-            boolean showSid = currentUser == null || mDao.isReadAllowed(Menu.ADMIN_SESSIONS, currentUser.getId());
+
+            boolean showSid = currentUser != null && mDao.isReadAllowed(Menu.ADMIN_SESSIONS, currentUser.getId());
 
             PrintWriter writer = response.getWriter();
             if (!csvFormat)
@@ -90,8 +99,14 @@ public class SessionsDataServlet extends AbstractDataServlet {
         }
     }
 
-    private void printSessions(Locale locale, SessionStatus status, List<Session> sessions, boolean csvFormat,
-            String tenant, boolean showSid, PrintWriter writer) {
+    private void printSessions(
+            Locale locale,
+            SessionStatus status,
+            List<Session> sessions,
+            boolean csvFormat,
+            String tenant,
+            boolean showSid,
+            PrintWriter writer) {
 
         for (Session session : sessions) {
             if ((tenant != null && !tenant.equals(session.getTenantName()))
@@ -153,31 +168,32 @@ public class SessionsDataServlet extends AbstractDataServlet {
     }
 
     private void printSessionXml(PrintWriter writer, Session session, Locale locale, boolean showSid) {
-		DateFormat df = getDateFormat();
+        DateFormat df = getDateFormat();
 
-		writer.print("<session>");
-		writer.print(String.format("<sid><![CDATA[%s]]></sid>", showSid ? session.getSid() : "--"));
-		writer.print(String.format("<key><![CDATA[%s]]></key>", StringUtils.defaultString(session.getKeyLabel())));
-		printSessionStatusXml(session, locale, showSid, writer);
+        writer.print("<session>");
+        writer.print(String.format("<sid><![CDATA[%s]]></sid>", showSid ? session.getSid() : "--"));
+        writer.print(String.format("<key><![CDATA[%s]]></key>", StringUtils.defaultString(session.getKeyLabel())));
+        printSessionStatusXml(session, locale, showSid, writer);
 
-		writer.print(String.format("<username><![CDATA[%s]]></username>", showSid ? session.getUsername() : ""));
-		writer.print(String.format("<impersonator><![CDATA[%s]]></impersonator>",
-				showSid ? StringUtils.defaultString(session.getImpersonator()) : ""));
-		writer.print(String.format("<node><![CDATA[%s]]></node>", showSid ? session.getNode() : ""));
+        writer.print(String.format("<username><![CDATA[%s]]></username>", showSid ? session.getUsername() : ""));
+        writer.print(String.format("<impersonator><![CDATA[%s]]></impersonator>",
+                showSid ? StringUtils.defaultString(session.getImpersonator()) : ""));
+        writer.print(String.format("<node><![CDATA[%s]]></node>", showSid ? session.getNode() : ""));
 
-		final Serializable client = session.getClient() != null ? session.getClient() : "";
-		writer.print(String.format("<client><![CDATA[%s]]></client>", showSid ? client : ""));
-		writer.print(String.format("<tenant><![CDATA[%s]]></tenant>", session.getTenantName()));
-		writer.print(String.format("<created>%s</created>", df.format(session.getCreation())));
-		if (session.getFinished() != null)
-			writer.print(String.format("<finished>%s</finished>", df.format(session.getCreation())));
-		writer.print(String.format("<duration>%s</duration>", TimeDiff.printDuration(session.getDuration())));
-		if (SessionManager.get().get(session.getSid()) != null)
-			writer.print(String.format("<renew>%s</renew>", df.format(SessionManager.get().get(session.getSid()).getLastRenew())));
-		else
-			writer.print(String.format("<renew>%s</renew>", df.format(session.getLastRenew())));
-		writer.print("</session>");
-	}
+        final Serializable client = session.getClient() != null ? session.getClient() : "";
+        writer.print(String.format("<client><![CDATA[%s]]></client>", showSid ? client : ""));
+        writer.print(String.format("<tenant><![CDATA[%s]]></tenant>", session.getTenantName()));
+        writer.print(String.format("<created>%s</created>", df.format(session.getCreation())));
+        if (session.getFinished() != null)
+            writer.print(String.format("<finished>%s</finished>", df.format(session.getCreation())));
+        writer.print(String.format("<duration>%s</duration>", TimeDiff.printDuration(session.getDuration())));
+        if (SessionManager.get().get(session.getSid()) != null)
+            writer.print(String.format("<renew>%s</renew>",
+                    df.format(SessionManager.get().get(session.getSid()).getLastRenew())));
+        else
+            writer.print(String.format("<renew>%s</renew>", df.format(session.getLastRenew())));
+        writer.print("</session>");
+    }
 
     private void printSessionStatusXml(Session session, Locale locale, boolean showSid, PrintWriter writer) {
         writer.print(String.format("<status>%s</status>", showSid ? session.getStatus() : ""));
@@ -193,7 +209,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
         }
     }
 
-    private User getCurrentUser(HttpServletRequest request, Session currentSession) {
+    private User getCurrentUser(HttpServletRequest request, Session currentSession) throws PersistenceException {
         User currentUser = null;
         if (currentSession != null)
             currentUser = currentSession.getUser();
@@ -203,6 +219,10 @@ public class SessionsDataServlet extends AbstractDataServlet {
             } catch (Exception t) {
                 // Nothing to do
             }
+
+        if (currentUser == null && request.getUserPrincipal() != null)
+            currentUser = UserDAO.get().findByUsername(request.getUserPrincipal().getName());
+
         return currentUser;
     }
 

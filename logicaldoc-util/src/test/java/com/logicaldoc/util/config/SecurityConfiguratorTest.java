@@ -1,5 +1,7 @@
 package com.logicaldoc.util.config;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -17,18 +19,29 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class SecurityConfiguratorTest {
 
-	File contextSecurityXml = new File("target/context-security.xml");
+    private SecurityConfigurator testSubject;
 
-	@Before
-	public void setUp() throws IOException {
-		FileUtil.copyResource("context-security.xml", contextSecurityXml);
-	}
+    @Before
+    public void setUp() throws IOException {
+        File contextSecurityXml = new File("target/context-security.xml");
+        FileUtil.copyResource("context-security.xml", contextSecurityXml);
+        testSubject = new SecurityConfigurator(contextSecurityXml.getPath());
+    }
 
-	@Test
-	public void testGetContentSecurityPolicy() {
-		SecurityConfigurator config = new SecurityConfigurator(contextSecurityXml.getPath());
-		String policies = config.getContentSecurityPolicy();
-		Assert.assertNotNull(policies);
-		Assert.assertTrue(policies.startsWith("default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self'"));
-	}
+    @Test
+    public void testGetContentSecurityPolicy() {
+        String policies = testSubject.getContentSecurityPolicy();
+        Assert.assertNotNull(policies);
+        Assert.assertTrue(policies.startsWith("default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self'"));
+    }
+
+    @Test
+    public void testSetInterceptUrl() {
+        testSubject.setInterceptUrlBefore(null, "/download/**", "/data/wfattributeoptions.xml", "permitAll()");
+        assertEquals("permitAll()", testSubject.getAccess(null, "/data/wfattributeoptions.xml"));
+
+        assertEquals("isAuthenticated()", testSubject.getAccess(null, "/mobile.jsp"));
+        testSubject.setInterceptUrlAfter(null, "/mobile.jsp", "/mobile.jsp", "permitAll()");
+        assertEquals("permitAll()", testSubject.getAccess(null, "/mobile.jsp"));
+    }
 }

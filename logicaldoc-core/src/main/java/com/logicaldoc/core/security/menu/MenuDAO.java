@@ -118,12 +118,12 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	/**
 	 * This method is looking up for read rights for a menu and an user
 	 * 
-	 * @param id ID of the menu
+	 * @param menuId ID of the menu
 	 * @param userId ID of the user
 	 * 
 	 * @return if the user can access the menu
 	 */
-	public boolean isReadAllowed(long id, long userId);
+	public boolean isReadAllowed(long menuId, long userId);
 
 	/**
 	 * This method selects only the menu text from a menu

@@ -152,6 +152,8 @@
         <security:intercept-url pattern="/mobile.jsp" access="isAuthenticated()" />
         <security:intercept-url pattern="/mobile/**" access="isAuthenticated()" />
         <security:intercept-url pattern="/download/**" access="isAuthenticated()" />
+        <security:intercept-url pattern="/wk-event" access="isAuthenticated()" />
+        <security:intercept-url pattern="/data/**" access="isAuthenticated()" />
         <security:intercept-url pattern="/**" access="permitAll()"/>
         
         <security:form-login login-page="/login.jsp"

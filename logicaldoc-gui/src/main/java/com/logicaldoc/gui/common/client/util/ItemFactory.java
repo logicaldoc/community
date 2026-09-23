@@ -114,8 +114,6 @@ import com.smartgwt.client.widgets.form.fields.TimeItem;
 import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.EditorEnterEvent;
-import com.smartgwt.client.widgets.form.fields.events.EditorExitEvent;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 import com.smartgwt.client.widgets.form.validator.IsFloatValidator;
@@ -1649,12 +1647,12 @@ public class ItemFactory {
 
         // When the user clicks on the item, preemptively load all the
         // options to correctly do text completion
-        item.addEditorEnterHandler((EditorEnterEvent event) -> options.fetchData(new Criteria()));
+        item.addEditorEnterHandler(enter -> options.fetchData(new Criteria()));
 
         // When the user ends the editing, restore the initial value if
         // he does not select an existing option
-        item.addEditorExitHandler((EditorExitEvent event) -> {
-            String val = event.getValue() != null ? event.getValue().toString() : null;
+        item.addEditorExitHandler(exit -> {
+            String val = exit.getValue() != null ? exit.getValue().toString() : null;
             Record[] records = options.getCacheData();
             boolean found = false;
             if (records != null)
@@ -1665,7 +1663,7 @@ public class ItemFactory {
                     }
                 }
             if (!found)
-                event.getItem().setValue(initialValue);
+                exit.getItem().setValue(initialValue);
         });
 
         if (!att.isMandatory())
@@ -1716,7 +1714,7 @@ public class ItemFactory {
         });
         return showPassword;
     }
-    
+
     public static PasswordItem newPasswordItemPreventAutocomplete(String name, String value) {
         return newPasswordItemPreventAutocomplete(name, name, value);
     }
