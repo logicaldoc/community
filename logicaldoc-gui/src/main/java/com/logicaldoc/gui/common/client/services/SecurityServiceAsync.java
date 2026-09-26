@@ -128,6 +128,6 @@ public interface SecurityServiceAsync {
 
     void addImpersonifier(String username, AsyncCallback<Void> callback);
 
-    void createSupportTicket(long userId, int expireMinutes, AsyncCallback<List<String>> callback);
+    void createAccessTicket(long userId, int expireMinutes, AsyncCallback<List<String>> callback);
 
 }

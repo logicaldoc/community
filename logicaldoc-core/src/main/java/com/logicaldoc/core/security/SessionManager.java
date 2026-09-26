@@ -166,7 +166,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
                 return null;
             else {
                 Session session = createSession(user, key, client);
-                if (TicketDAO.get().isSupportTicket(username))
+                if (TicketDAO.get().isAccessTicket(username))
                     recordSupportSession(username, session);
                 return session;
             }
@@ -179,7 +179,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
     private void recordSupportSession(String username, Session session) {
         UserHistory history = new UserHistory();
         history.setSession(session);
-        history.setEvent(UserEvent.SUPPORT);
+        history.setEvent(UserEvent.ACCESS);
         history.setComment("ticket: %s".formatted(username));
         try {
             UserHistoryDAO.get().store(history);

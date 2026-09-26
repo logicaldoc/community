@@ -493,7 +493,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException generic error
 	 */
-	public List<String> createSupportTicket(long userId, int expireMinutes) throws ServerException;
+	public List<String> createAccessTicket(long userId, int expireMinutes) throws ServerException;
 	
 	public static class Instance {
 		private static SecurityServiceAsync inst;

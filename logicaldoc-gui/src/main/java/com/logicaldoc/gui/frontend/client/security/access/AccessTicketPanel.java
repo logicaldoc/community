@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.security.support;
+package com.logicaldoc.gui.frontend.client.security.access;
 
 import java.util.List;
 
@@ -16,19 +16,19 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 
 /**
- * This popup window is used to get details for the support ticket creation
+ * This popup window is used to get details for the access ticket creation
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.3.1
  */
-public class SupportTicketPanel extends AdminPanel {
+public class AccessTicketPanel extends AdminPanel {
 
     private static final String MINUTES = "minutes";
 
     private DynamicForm form;
 
-    public SupportTicketPanel() {
-        super("supportticket");
+    public AccessTicketPanel() {
+        super("accessticket");
 
         IButton generate = new IButton(I18N.message("generate"));
         generate.addClickHandler(event -> onGenerate());
@@ -56,13 +56,13 @@ public class SupportTicketPanel extends AdminPanel {
         user.setValue(1);
         user.setRequired(true);
 
-        StaticTextItem info = ItemFactory.newStaticTextItem("info", I18N.message("supportticketinfo"));
+        StaticTextItem info = ItemFactory.newStaticTextItem("info", I18N.message("accessticketinfo"));
         info.setColSpan(2);
         info.setShowTitle(false);
         info.setTitleOrientation(TitleOrientation.TOP);
 
         StaticTextItem disclaimer = ItemFactory.newStaticTextItem("disclaimer",
-                I18N.message("supportticketdisclaimer"));
+                I18N.message("accessticketdisclaimer"));
         disclaimer.setColSpan(2);
         disclaimer.setShowTitle(false);
         disclaimer.setTitleOrientation(TitleOrientation.TOP);
@@ -74,12 +74,12 @@ public class SupportTicketPanel extends AdminPanel {
         if (!form.validate())
             return;
 
-        SecurityService.Instance.get().createSupportTicket(Long.parseLong(form.getValueAsString("user")),
+        SecurityService.Instance.get().createAccessTicket(Long.parseLong(form.getValueAsString("user")),
                 Integer.parseInt(form.getValueAsString(MINUTES)), new DefaultAsyncCallback<>() {
 
                     @Override
                     public void handleSuccess(List<String> ret) {
-                        new SupportTicketDisplay(ret.get(0), ret.get(1)).show();
+                        new AccessTicketDisplay(ret.get(0), ret.get(1)).show();
                     }
                 });
     }

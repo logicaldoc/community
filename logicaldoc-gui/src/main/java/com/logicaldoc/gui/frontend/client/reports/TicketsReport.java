@@ -101,7 +101,7 @@ public class TicketsReport extends ReportPanel {
             else if ("2".equals(value.toString()))
                 return I18N.message("view");
             else if ("3".equals(value.toString()))
-                return I18N.message("support");
+                return I18N.message("access");
             else
                 return "";
         });
@@ -196,7 +196,7 @@ public class TicketsReport extends ReportPanel {
         for (ListGridRecord rc : list.getSelectedRecords())
             selectedIds.add(rc.getAttributeAsLong("id"));
 
-        boolean supportTicket = "3".equals(rec.getAttributeAsString("type"));
+        boolean acccessTicket = "3".equals(rec.getAttributeAsString("type"));
 
         Menu contextMenu = new Menu();
         MenuItem preview = new MenuItem();
@@ -314,7 +314,7 @@ public class TicketsReport extends ReportPanel {
             setPassword.setEnabled(false);
         }
 
-        if (supportTicket)
+        if (acccessTicket)
             contextMenu.setItems(enable, disable, new MenuItemSeparator(), delete);
         else
             contextMenu.setItems(enable, disable, ticketURL, download, preview, openInFolder, new MenuItemSeparator(),

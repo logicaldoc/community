@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.security.support;
+package com.logicaldoc.gui.frontend.client.security.access;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -14,16 +14,16 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
- * Displays a created support ticket details
+ * Displays a created access ticket details
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.3.1
  */
-public class SupportTicketDisplay extends DelayedRedrawWindow {
+public class AccessTicketDisplay extends DelayedRedrawWindow {
 
-    public SupportTicketDisplay(String ticketId, String password) {
+    public AccessTicketDisplay(String ticketId, String password) {
         setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-        setTitle(I18N.message("supportticket"));
+        setTitle(I18N.message("accessticket"));
         setCanDragResize(true);
         setIsModal(true);
         setShowModalMask(true);
@@ -42,12 +42,12 @@ public class SupportTicketDisplay extends DelayedRedrawWindow {
         passwordItem.setWrap(false);
         passwordItem.setWrapTitle(false);
 
-        StaticTextItem advice = ItemFactory.newStaticTextItem("advice", I18N.message("supportticketdisplay", ticketId));
+        StaticTextItem advice = ItemFactory.newStaticTextItem("advice", I18N.message("accessticketdisplay", ticketId));
         advice.setColSpan(2);
         advice.setShowTitle(false);
         advice.setTitleOrientation(TitleOrientation.TOP);
 
-        StaticTextItem disclaimer = ItemFactory.newStaticTextItem("disclaimer", I18N.message("supportticketdisclaimer"));
+        StaticTextItem disclaimer = ItemFactory.newStaticTextItem("disclaimer", I18N.message("accessticketdisclaimer"));
         disclaimer.setColSpan(2);
         disclaimer.setShowTitle(false);
         disclaimer.setTitleOrientation(TitleOrientation.TOP);
@@ -55,10 +55,10 @@ public class SupportTicketDisplay extends DelayedRedrawWindow {
         form.setItems(advice, new RowSpacerItem(), ticketIdItem, passwordItem, new RowSpacerItem(), disclaimer);
 
         IButton close = new IButton(I18N.message("close"));
-        close.addClickHandler(event -> SupportTicketDisplay.this.destroy());
+        close.addClickHandler(event -> AccessTicketDisplay.this.destroy());
 
         IButton copy = new IButton(I18N.message("copy"));
-        copy.addClickHandler(event -> Util.copyText("Support Ticket ID: " + ticketId + "\nPassword: " + password));
+        copy.addClickHandler(event -> Util.copyText("Access Ticket ID: " + ticketId + "\nPassword: " + password));
 
         HLayout buttons = new HLayout();
         buttons.setMembersMargin(2);

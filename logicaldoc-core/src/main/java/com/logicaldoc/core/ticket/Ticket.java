@@ -39,7 +39,7 @@ public class Ticket extends PersistentObject {
 
     public static final int VIEW = 2;
 
-    public static final int SUPPORT = 3;
+    public static final int ACCESS = 3;
 
     public static final int WHATSASAPP_AUTH = 4;
 

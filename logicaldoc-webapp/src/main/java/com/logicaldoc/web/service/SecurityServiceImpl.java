@@ -1789,7 +1789,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     }
 
     @Override
-    public List<String> createSupportTicket(long userId, int expireMinutes) throws ServerException {
+    public List<String> createAccessTicket(long userId, int expireMinutes) throws ServerException {
         validateSession();
         return Arrays.asList("", "");
     }

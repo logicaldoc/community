@@ -55,7 +55,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
                                    and A.ld_tenantid = %d
                               order by A.ld_creation desc
                                """
-                .formatted(Ticket.DOWNLOAD, Ticket.VIEW, Ticket.SUPPORT, session.getTenantId());
+                .formatted(Ticket.DOWNLOAD, Ticket.VIEW, Ticket.ACCESS, session.getTenantId());
 
         DateFormat df = getDateFormat();
         dao.queryForResultSet(query, null, max != null ? max : 100, rows -> {

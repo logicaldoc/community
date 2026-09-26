@@ -8,10 +8,10 @@ import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
+import com.logicaldoc.gui.frontend.client.security.access.AccessTicketPanel;
 import com.logicaldoc.gui.frontend.client.security.group.GroupsPanel;
 import com.logicaldoc.gui.frontend.client.security.ldap.LDAPServersPanel;
 import com.logicaldoc.gui.frontend.client.security.saml.SamlPanel;
-import com.logicaldoc.gui.frontend.client.security.support.SupportTicketPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationSettings;
 import com.logicaldoc.gui.frontend.client.security.user.UsersPanel;
 import com.smartgwt.client.types.Overflow;
@@ -49,7 +49,7 @@ public class AccessControlMenu extends VLayout {
 
         addSamlButton();
 
-        addSupportTicket();
+        addAccessTicket();
     }
 
     private void addSecurityButton() {
@@ -100,11 +100,11 @@ public class AccessControlMenu extends VLayout {
         }
     }
 
-    private void addSupportTicket() {
-        Button button = new Button("<span style='color: red;'>" + I18N.message("supportticket") + "</span>");
+    private void addAccessTicket() {
+        Button button = new Button("<span style='color: red;'>" + I18N.message("accessticket") + "</span>");
         button.setWidth100();
         button.setHeight(25);
-        button.addClickHandler(click -> AdminScreen.get().setContent(new SupportTicketPanel()));
+        button.addClickHandler(click -> AdminScreen.get().setContent(new AccessTicketPanel()));
         if (Menu.enabled(Menu.SUPPORT_TICKET) && Feature.enabled(Feature.SUPPORT_TICKET)
                 && Session.get().getConfigAsBoolean("security.support.enabled", true))
             addMember(button);

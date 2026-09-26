@@ -83,17 +83,17 @@ public interface TicketDAO extends PersistentObjectDAO<Ticket> {
     public long countViewOrDownloadTickets(Long tenantId) throws PersistenceException;
 
     /**
-     * Just checks if a given ID refers to a support ticket
+     * Just checks if a given ID refers to an access ticket
      * 
      * @param ticketId the ticket
      * 
-     * @return If the ticketId is a support ticket
+     * @return If the ticketId is an access ticket
      */
-    public default boolean isSupportTicket(String ticketId) {
+    public default boolean isAccessTicket(String ticketId) {
         try {
             return TicketDAO.get().queryForInt(
                     "select count(*) from ld_ticket where ld_enabled = 1 and ld_deleted = 0 and ld_type = :type and ld_ticketid = :id",
-                    Map.of("type", Ticket.SUPPORT, "id", ticketId)) > 0;
+                    Map.of("type", Ticket.ACCESS, "id", ticketId)) > 0;
         } catch (PersistenceException e) {
             LoggerFactory.getLogger(TicketDAO.class).warn(e.getMessage(), e);
             return false;
