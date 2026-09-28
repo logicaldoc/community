@@ -101,7 +101,7 @@ public class AccessControlMenu extends VLayout {
     }
 
     private void addAccessTicket() {
-        Button button = new Button("<span style='color: red;'>" + I18N.message("accessticket") + "</span>");
+        Button button = new Button(I18N.message("accessticket"));
         button.setWidth100();
         button.setHeight(25);
         button.addClickHandler(click -> AdminScreen.get().setContent(new AccessTicketPanel()));
