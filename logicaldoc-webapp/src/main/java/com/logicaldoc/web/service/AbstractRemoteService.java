@@ -33,7 +33,6 @@ import com.logicaldoc.core.security.Session.Log;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.NotifyingThread;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
@@ -211,23 +210,12 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 
     protected User getSessionUser(String sid) throws InvalidSessionServerException {
         Session session = validateSession(sid);
-        User user = (User) session.getDictionary().get(USER);
-        return initUser(user);
-    }
-
-    private User initUser(User user) {
-        try {
-            return UserDAO.get().initialize(user);
-        } catch (PersistenceException e) {
-            log.warn(e.getMessage(), e);
-            return user;
-        }
+        return (User) session.getDictionary().get(USER);
     }
 
     protected User getSessionUser(HttpServletRequest request) throws InvalidSessionServerException {
         Session session = validateSession(request);
-        User user = (User) session.getDictionary().get(USER);
-        return initUser(user);
+        return (User) session.getDictionary().get(USER);
     }
 
     protected <R> R throwServerException(Session session, Logger logger, Throwable throwable) throws ServerException {
