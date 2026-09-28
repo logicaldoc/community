@@ -217,7 +217,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
                     || name.contains(".downloadticket.") || name.startsWith("zonalocr.") || name.endsWith(".charset")
                     || name.startsWith("policy.") || name.startsWith("cookies.") || name.startsWith("saml.")
                     || name.startsWith("history.") || name.startsWith("proxy.") || name.startsWith("ai.")
-                    || name.contains(".ai."))
+                    || name.contains(".ai.") || name.startsWith("encryption."))
                 continue;
 
             sortedSet.add(key.toString());

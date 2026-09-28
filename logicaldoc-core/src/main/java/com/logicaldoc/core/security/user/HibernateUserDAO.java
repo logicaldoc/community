@@ -895,7 +895,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
             log.error(e.getMessage(), e);
         }
 
-        // Manually initialize the collegtion of working times
+        // Manually initialize the collection of working times
         final Set<WorkingTime> workingTimes = user.getWorkingTimes();
         workingTimes.clear();
 

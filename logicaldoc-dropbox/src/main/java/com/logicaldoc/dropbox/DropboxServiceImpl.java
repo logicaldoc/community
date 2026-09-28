@@ -2,6 +2,7 @@ package com.logicaldoc.dropbox;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -103,6 +104,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
             dbox.login();
             String account = dbox.getAccountName();
             saveAccessToken(user, token);
+            
             return account;
         } catch (Exception t) {
             throw new ServerException(t.getMessage(), t);
@@ -379,7 +381,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
         try {
             User user = session.getUser();
             Dropbox dbox = new Dropbox(user.getId());
-            return List.of(dbox.getApiKey(), dbox.getApiSecret());
+            return  Arrays.asList( dbox.getApiKey(), dbox.getApiSecret());
         } catch (Exception t) {
             throw new ServerException(t.getMessage(), t);
         }

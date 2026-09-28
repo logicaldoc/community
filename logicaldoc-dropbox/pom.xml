@@ -138,7 +138,7 @@
 		<dependency>
 			<groupId>com.dropbox.core</groupId>
 			<artifactId>dropbox-core-sdk</artifactId>
-			<version>3.0.4</version>
+			<version>8.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>

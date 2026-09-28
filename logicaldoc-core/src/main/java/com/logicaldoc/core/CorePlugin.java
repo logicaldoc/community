@@ -16,6 +16,7 @@ import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.security.PasswordGenerator;
 
 /**
  * Plugin class for the Core plugin
@@ -25,59 +26,71 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class CorePlugin extends LogicalDOCPlugin {
 
-	protected static final String DEFAULT = "default";
-	
-	private static final Logger log = LoggerFactory.getLogger(CorePlugin.class);
+    protected static final String DEFAULT = "default";
 
-	@Override
-	protected void onStart() throws PluginException {
-		try {
-			ContextProperties pbean = new ContextProperties();
-			if (StringUtils.isEmpty(pbean.getProperty("id"))) {
-				pbean.setProperty("id", UUID.randomUUID().toString());
-				pbean.write();
-			}
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
+    private static final Logger log = LoggerFactory.getLogger(CorePlugin.class);
 
-		// Initialize the IconSelector
-		File dest = new File(getPluginPath());
-		dest = dest.getParentFile().getParentFile().getParentFile();
-		dest = new File("%s/frontend/sc/skins/Tahoe/images/FileIcons".formatted(dest.getAbsolutePath()));
-		File[] icons = dest.listFiles((File dir, String name) -> name.endsWith(".svg"));
-		if (icons != null)
-			for (File icon : icons)
-				IconSelector.getAvailableIcons().add(FilenameUtils.getBaseName(icon.getName().toLowerCase()));
-	}
+    @Override
+    protected void onStart() throws PluginException {
+        // Give a unique identifier to this installation
+        try {
+            ContextProperties config = new ContextProperties();
+            if (StringUtils.isEmpty(config.getProperty("id"))) {
+                config.setProperty("id", UUID.randomUUID().toString());
+                config.write();
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
 
-	@Override
-	public void install() throws PluginException {
-		try {
-			// Enable the aspects in the runlevels
-			ContextProperties pbean = new ContextProperties();
-			for (String aspect : RunLevel.getAspects()) {
-				for (RunLevel level : RunLevel.values())
-					pbean.setProperty("aspect.%s.%s".formatted(aspect, level), "true");
-			}
+        // Generate a random key for encryptions
+        try {
+            ContextProperties config = new ContextProperties();
+            if (StringUtils.isEmpty(config.getProperty("encryption.key"))) {
+                config.setProperty("encryption.key", PasswordGenerator.generate(32, 2, 2, 2, 1, 3, 2));
+                config.write();
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
 
-			pbean.setProperty("threadpool.Email.type", DEFAULT);
-			pbean.setProperty("threadpool.EventCollector.max", "20");
-			pbean.setProperty("threadpool.EventCollector.type", DEFAULT);
-			pbean.setProperty("threadpool.%s.max".formatted(IndexerTask.NAME), "2");
-			pbean.setProperty("threadpool.%s.type".formatted(IndexerTask.NAME), DEFAULT);
+        // Initialize the IconSelector
+        File dest = new File(getPluginPath());
+        dest = dest.getParentFile().getParentFile().getParentFile();
+        dest = new File("%s/frontend/sc/skins/Tahoe/images/FileIcons".formatted(dest.getAbsolutePath()));
+        File[] icons = dest.listFiles((File dir, String name) -> name.endsWith(".svg"));
+        if (icons != null)
+            for (File icon : icons)
+                IconSelector.getAvailableIcons().add(FilenameUtils.getBaseName(icon.getName().toLowerCase()));
+    }
 
-			pbean.write();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
+    @Override
+    public void install() throws PluginException {
+        try {
+            // Enable the aspects in the runlevels
+            ContextProperties pbean = new ContextProperties();
+            for (String aspect : RunLevel.getAspects()) {
+                for (RunLevel level : RunLevel.values())
+                    pbean.setProperty("aspect.%s.%s".formatted(aspect, level), "true");
+            }
 
-		try {
-			addServlet("DashletContent", DashletContent.class, "/data/dashletcontent");
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+            pbean.setProperty("threadpool.Email.type", DEFAULT);
+            pbean.setProperty("threadpool.EventCollector.max", "20");
+            pbean.setProperty("threadpool.EventCollector.type", DEFAULT);
+            pbean.setProperty("threadpool.%s.max".formatted(IndexerTask.NAME), "2");
+            pbean.setProperty("threadpool.%s.type".formatted(IndexerTask.NAME), DEFAULT);
 
-		setRestartRequired();
-	}
+            pbean.write();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        try {
+            addServlet("DashletContent", DashletContent.class, "/data/dashletcontent");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        setRestartRequired();
+    }
 }

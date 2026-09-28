@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
+import com.logicaldoc.util.security.Encrypter.EncryptionException;
 
 /**
  * Test case for {@link Dropbox}

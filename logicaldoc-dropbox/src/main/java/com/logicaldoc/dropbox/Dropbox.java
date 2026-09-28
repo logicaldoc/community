@@ -29,8 +29,8 @@ import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.security.StringEncrypter;
-import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
+import com.logicaldoc.util.security.Encrypter;
+import com.logicaldoc.util.security.Encrypter.EncryptionException;
 
 /**
  * Our Dropbox facade
@@ -40,8 +40,6 @@ import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
  */
 public class Dropbox {
     protected Logger log = LoggerFactory.getLogger(Dropbox.class);
-
-    private static final String SECRET_KEY = "5bNgqYzl80v7OV4p6L/4Hnj2zh93Jh472P,@q}*UTGVRf)0j-ta-8rhMr53rXj1[BQds`ZVIF?Y0'M2dh*Ti-CtS^5jAp9[";
 
     // Get your app key and secret from the Dropbox developers website -
     // https://www.dropbox.com/developers/apps
@@ -114,7 +112,7 @@ public class Dropbox {
             accessToken = authFinish.getAccessToken();
             return accessToken;
         } catch (DbxException e) {
-            log.debug(e.getMessage());
+            log.warn(e.getMessage(), e);
         }
         return null;
     }
@@ -211,17 +209,21 @@ public class Dropbox {
         this.accessToken = accessToken;
     }
 
-    Generic loadSettings() throws PersistenceException, EncryptionException {
+    Generic loadSettings() throws PersistenceException {
         Generic settings = getGeneric();
 
-        StringEncrypter encrypter = new StringEncrypter(StringEncrypter.DES_ENCRYPTION_SCHEME, SECRET_KEY);
-        if (StringUtils.isNotEmpty(settings.getString1()))
-            apiKey = encrypter.decrypt(settings.getString1());
-        if (StringUtils.isNotEmpty(settings.getString2()))
-            apiSecret = encrypter.decrypt(settings.getString2());
-        if (StringUtils.isNotEmpty(settings.getString3()))
-            accessToken = encrypter.decrypt(settings.getString3());
-
+        try {
+            Encrypter encrypter = Encrypter.get();
+            if (StringUtils.isNotEmpty(settings.getString1()))
+                apiKey = encrypter.decrypt(settings.getString1());
+            if (StringUtils.isNotEmpty(settings.getString2()))
+                apiSecret = encrypter.decrypt(settings.getString2());
+            if (StringUtils.isNotEmpty(settings.getString3()))
+                accessToken = encrypter.decrypt(settings.getString3());
+        } catch (EncryptionException e) {
+            log.warn(e.getMessage(), e);
+        }
+        
         return settings;
     }
 
@@ -240,7 +242,7 @@ public class Dropbox {
     void saveSettings() throws PersistenceException, EncryptionException {
         Generic settings = getGeneric();
 
-        StringEncrypter encrypter = new StringEncrypter(StringEncrypter.DES_ENCRYPTION_SCHEME, SECRET_KEY);
+        Encrypter encrypter = Encrypter.get();
         settings.setString1(encrypter.encrypt(apiKey));
         settings.setString2(encrypter.encrypt(apiSecret));
         if (StringUtils.isNotEmpty(accessToken))
