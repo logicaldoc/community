@@ -271,11 +271,13 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
         try {
             List<GUIValue> values = new ArrayList<>();
             for (Object key : config.keySet()) {
-                GUIValue pair = new GUIValue();
                 String keyString = (String) key;
-                pair.setCode(keyString);
-                pair.setValue(config.getProperty(keyString));
-                values.add(pair);
+                if (!(keyString.startsWith("encryption.") || keyString.startsWith("store.encryption."))) {
+                    GUIValue pair = new GUIValue();
+                    pair.setCode(keyString);
+                    pair.setValue(config.getProperty(keyString));
+                    values.add(pair);
+                }
             }
 
             loadGUISettingsFromDB(tenant, values);

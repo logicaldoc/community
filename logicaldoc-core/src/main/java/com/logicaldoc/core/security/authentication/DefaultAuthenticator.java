@@ -13,10 +13,10 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.User.Type;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserSource;
-import com.logicaldoc.core.security.user.User.Type;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
@@ -57,7 +57,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
         // Check the password match with one of the current or legacy algorithm
         String test = null;
         try {
-            test = CryptUtil.encryptSHA256(password);
+            test = Encrypter.encryptSHA256(password);
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
         }

@@ -42,7 +42,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
@@ -854,7 +854,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         testSubject.setPassword(3L, "test", history);
 
         doc = testSubject.findById(3L);
-        assertEquals(CryptUtil.encryptSHA256("test"), doc.getPassword());
+        assertEquals(Encrypter.encryptSHA256("test"), doc.getPassword());
 
         testSubject.unsetPassword(3L, history);
         doc = testSubject.findById(3L);

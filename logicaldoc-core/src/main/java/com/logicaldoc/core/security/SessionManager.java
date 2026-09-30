@@ -31,7 +31,7 @@ import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.core.ticket.TicketDAO;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.PreDestroy;
@@ -544,7 +544,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
                      */
                     final String sessionUserPassword = session.getUser().getPassword();
                     if (StringUtils.isEmpty(sessionUserPassword)
-                            || CryptUtil.encryptSHA256(credentials[1]).equals(sessionUserPassword)) {
+                            || Encrypter.encryptSHA256(credentials[1]).equals(sessionUserPassword)) {
                         return session.getSid();
                     }
                 } catch (NoSuchAlgorithmException e) {
@@ -591,7 +591,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
         try {
             if (StringUtils.isNotEmpty(request.getHeader(HEADER_APIKEY))) {
                 log.debug("Found API Key in header {}", HEADER_APIKEY);
-                String apiKey = CryptUtil.encryptSHA256(request.getHeader(HEADER_APIKEY));
+                String apiKey = Encrypter.encryptSHA256(request.getHeader(HEADER_APIKEY));
                 sid = getSessions().stream().filter(s -> apiKey.equals(s.getKey()) && s.isOpen()).map(Session::getSid)
                         .findFirst().orElse(null);
                 if (StringUtils.isNotEmpty(sid))

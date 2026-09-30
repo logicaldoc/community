@@ -25,7 +25,7 @@ import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.MimeType;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
@@ -128,7 +128,7 @@ public class TicketDownload extends HttpServlet {
             String password = getPasswordInRequest(request);
             if (StringUtils.isNotEmpty(password)) {
                 try {
-                    if (!CryptUtil.encryptSHA256(password).equals(ticket.getPassword()))
+                    if (!Encrypter.encryptSHA256(password).equals(ticket.getPassword()))
                         throw new IOException("Wrong password");
                 } catch (NoSuchAlgorithmException e) {
                     throw new IOException(e);

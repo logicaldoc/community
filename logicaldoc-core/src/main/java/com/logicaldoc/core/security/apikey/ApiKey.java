@@ -6,7 +6,7 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -100,7 +100,7 @@ public class ApiKey extends PersistentObject {
 	public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {
 		if (StringUtils.isNotEmpty(decodedKey)) {
 			this.decodedKey = decodedKey;
-			this.key = CryptUtil.encryptSHA256(decodedKey);
+			this.key = Encrypter.encryptSHA256(decodedKey);
 			this.label = StringUtils.abbreviate(decodedKey, 10)
 					+ (decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "");
 		}

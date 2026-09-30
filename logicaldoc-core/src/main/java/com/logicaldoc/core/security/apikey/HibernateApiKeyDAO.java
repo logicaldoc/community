@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.html.HTMLSanitizer;
 
 import jakarta.transaction.Transactional;
@@ -53,7 +53,7 @@ public class HibernateApiKeyDAO extends HibernatePersistentObjectDAO<ApiKey> imp
 
     @Override
     public ApiKey findByKey(String key) throws PersistenceException, NoSuchAlgorithmException {
-        return findByWhere("_entity.key = :key", Map.of("key", CryptUtil.encryptSHA256(key)), null, null).stream()
+        return findByWhere("_entity.key = :key", Map.of("key", Encrypter.encryptSHA256(key)), null, null).stream()
                 .findFirst().orElse(null);
     }
 

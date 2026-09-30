@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.util.LocaleUtil;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
@@ -492,7 +492,7 @@ public class User extends PersistentObject implements Serializable {
         if (StringUtils.isEmpty(pwd))
             throw new NoSuchAlgorithmException("Password cannot be empty");
         decodedPassword = pwd;
-        password = CryptUtil.encryptSHA256(pwd);
+        password = Encrypter.encryptSHA256(pwd);
         if (StringUtils.isEmpty(password))
             throw new NoSuchAlgorithmException("Password cannot be empty");
     }

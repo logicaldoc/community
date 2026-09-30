@@ -10,8 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.crypt.Encrypter.EncryptionException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.security.Encrypter.EncryptionException;
 
 /**
  * Test case for {@link Dropbox}

@@ -85,7 +85,7 @@ import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.config.WebContextConfigurator;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordGenerator;
@@ -337,7 +337,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 throw new PermissionException(
                         String.format("User %s not allowed to change the password of user %s", requestor, user));
 
-            if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword()))
+            if (oldPassword != null && !Encrypter.encryptSHA256(oldPassword).equals(user.getPassword()))
                 throw new ServerException("Wrong old passord");
 
             UserHistory history = null;

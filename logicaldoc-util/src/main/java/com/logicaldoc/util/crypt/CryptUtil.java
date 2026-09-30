@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -20,14 +19,10 @@ import javax.crypto.spec.DESedeKeySpec;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.bouncycastle.crypto.digests.MD4Digest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.io.FileUtil;
 
 public class CryptUtil {
-    private static final Logger log = LoggerFactory.getLogger(CryptUtil.class);
 
     public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
 
@@ -146,99 +141,6 @@ public class CryptUtil {
             stringBuffer.append((char) bytes[i]);
         }
         return stringBuffer.toString();
-    }
-
-    /**
-     * This method encodes a given string using the SHA-256 algorithm
-     * 
-     * @param original String to encode
-     * 
-     * @return Encoded string
-     * 
-     * @throws NoSuchAlgorithmException Cripting exception
-     */
-    public static String encryptSHA256(String original) throws NoSuchAlgorithmException {
-        StringBuilder copy = new StringBuilder();
-
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
-
-        for (int i = 0; i < digest.length; i++) {
-            copy.append(String.format("%02X", digest[i]));
-        }
-
-        return copy.toString();
-    }
-
-    /**
-     * Converts a string into a MD4 hash.
-     * 
-     * @param original the original string to be encrypted.
-     * @return the returned hash as bytes.
-     */
-    public static String hashMD4(String original) {
-        if (original == null)
-            original = "";
-
-        String copy = "";
-        try {
-            MD4Digest md4 = new MD4Digest();
-            byte[] pwdBytes = original.getBytes();
-            md4.update(pwdBytes, 0, pwdBytes.length);
-            byte[] encPwd = new byte[md4.getDigestSize()];
-            md4.doFinal(encPwd, 0);
-            copy = getHex(encPwd).toLowerCase();
-        } catch (Exception nsae) {
-            log.error(nsae.getMessage());
-        }
-        return copy;
-    }
-
-    /**
-     * Converts a string into a MD4 hash suitable for the NTLM v1 authentication
-     * 
-     * @param original the original string
-     * 
-     * @return the MD4 hash
-     */
-    public static String hashNTLM1(String original) {
-
-        try {
-            if (original == null) {
-                original = "";
-            }
-            MD4Digest md4 = new MD4Digest();
-            int len = original.length();
-            byte[] pwdBytes = new byte[len * 2];
-
-            for (int i = 0; i < len; i++) {
-                char ch = original.charAt(i);
-                pwdBytes[i * 2] = (byte) ch;
-                pwdBytes[i * 2 + 1] = (byte) ((ch >> 8) & 0xFF);
-            }
-
-            md4.update(pwdBytes, 0, pwdBytes.length);
-            byte[] encPwd = new byte[16];
-            md4.doFinal(encPwd, 0);
-
-            return CryptUtil.getHex(encPwd).substring(0, 32);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return null;
-        }
-
-    }
-
-    public static String getHex(byte[] raw) {
-        String hexes = "0123456789ABCDEF";
-        if (raw == null) {
-            return null;
-        }
-        final StringBuilder hex = new StringBuilder(2 * raw.length);
-        for (final byte b : raw) {
-            hex.append(hexes.charAt((b & 0xF0) >> 4)).append(hexes.charAt((b & 0x0F)));
-        }
-        return hex.toString();
     }
 
     public static class EncryptionException extends Exception {

@@ -22,7 +22,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.WorkingTime;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSGroup;
@@ -303,7 +303,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
             if (user == null)
                 throw new WebserviceException("User %d not found".formatted(userId));
 
-            if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword())) {
+            if (oldPassword != null && !Encrypter.encryptSHA256(oldPassword).equals(user.getPassword())) {
                 return 1;
             }
 

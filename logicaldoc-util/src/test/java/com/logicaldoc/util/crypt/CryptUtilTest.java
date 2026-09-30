@@ -51,12 +51,6 @@ public class CryptUtilTest {
 		assertEquals("pippo", testSubject.decrypt(encryptedString));
 
 		assertEquals("A2242EAD55C94C3DEB7CF2340BFEF9D5BCACA22DFE66E646745EE4371C633FC8",
-				CryptUtil.encryptSHA256("pippo"));
-	}
-
-	@Test
-	public void testHash() {
-		assertEquals("1f544b64a50bdb31b2bd9d9ad96ad09d", CryptUtil.hashMD4("pippo"));
-		assertEquals("0EBD3FEBDB972B9D9A164B72F321E341", CryptUtil.hashNTLM1("pippo"));
+				Encrypter.encryptSHA256("pippo"));
 	}
 }

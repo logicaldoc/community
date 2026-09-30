@@ -22,7 +22,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.LocaleUtil;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.io.FileUtil;
 
 import jakarta.persistence.Column;
@@ -736,7 +736,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
     public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
         if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
             decodedPassword = pwd;
-            password = CryptUtil.encryptSHA256(pwd);
+            password = Encrypter.encryptSHA256(pwd);
         } else {
             decodedPassword = null;
             password = null;
@@ -759,7 +759,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
             return true;
 
         try {
-            String test = CryptUtil.encryptSHA256(myPassword);
+            String test = Encrypter.encryptSHA256(myPassword);
             return test.equals(getPassword());
         } catch (Exception t) {
             return false;

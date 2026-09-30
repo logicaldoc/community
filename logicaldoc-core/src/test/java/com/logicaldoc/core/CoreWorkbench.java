@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -23,10 +22,6 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
-import com.logicaldoc.core.runtime.Aspect;
-import com.logicaldoc.core.runtime.AspectDisabledException;
-import com.logicaldoc.core.runtime.Feature;
-import com.logicaldoc.core.runtime.FeatureDisabledException;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;

@@ -1,10 +1,11 @@
-package com.logicaldoc.util.security;
+package com.logicaldoc.util.crypt;
 
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
-import com.logicaldoc.util.security.Encrypter.EncryptionException;
+import com.logicaldoc.util.crypt.Encrypter;
+import com.logicaldoc.util.crypt.Encrypter.EncryptionException;
 
 import junit.framework.TestCase;
 
@@ -28,6 +29,6 @@ public class EncrypterTest extends TestCase {
         String clearString = "ciao mamma";
         String encryptedString = testSubject.encrypt(clearString);
         assertNotEquals(clearString, encryptedString);
-        assertEquals(clearString, testSubject.decrypt("MQ2uHnibhsn/F9k4mljsxw=="));
+        assertEquals(clearString, testSubject.decrypt("lsx218JrxzoVe7WclGb5Lg==:qKz+HmwAUazTFTHI:+m9Z/6sx/8Mr/foLXHLqS8gv1CYlAgbiZf4="));
     }
 }

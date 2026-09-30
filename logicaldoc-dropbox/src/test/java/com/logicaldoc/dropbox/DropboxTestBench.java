@@ -13,7 +13,7 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.Metadata;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.util.security.Encrypter.EncryptionException;
+import com.logicaldoc.util.crypt.Encrypter.EncryptionException;
 
 public class DropboxTestBench {
 

@@ -22,7 +22,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.security.PasswordGenerator;
 
@@ -117,7 +117,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         User user = testSubject.findByUsername("admin", true);
         assertNotNull(user);
         assertEquals("admin", user.getUsername());
-        assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
+        assertEquals(Encrypter.encryptSHA256("admin"), user.getPassword());
         assertEquals("admin@admin.net", user.getEmail());
         assertEquals(2, user.getGroups().size());
 
@@ -170,7 +170,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         assertNotNull(user);
         assertEquals("admin", user.getUsername());
         user.setDecodedPassword("admin");
-        assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
+        assertEquals(Encrypter.encryptSHA256("admin"), user.getPassword());
         assertEquals("admin@admin.net", user.getEmail());
         assertEquals(2, user.getGroups().size());
 
@@ -228,7 +228,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         assertEquals(user, storedUser);
         assertEquals(2, storedUser.getGroups().size());
         assertNotNull(storedUser.getUserGroup());
-        assertEquals(CryptUtil.encryptSHA256(pswd), storedUser.getPassword());
+        assertEquals(Encrypter.encryptSHA256(pswd), storedUser.getPassword());
         assertEquals(1, storedUser.getWorkingTimes().size());
         assertEquals(1, storedUser.getWorkingTimes().iterator().next().getDayOfWeek());
         assertEquals(5, storedUser.getWorkingTimes().iterator().next().getHourStart());

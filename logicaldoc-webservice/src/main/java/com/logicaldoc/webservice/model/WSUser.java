@@ -21,7 +21,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserSource;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.core.sequence.SequenceDAO;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
 
@@ -299,7 +299,7 @@ public class WSUser {
         decodedPassword = passwd;
         password = null;
         if (org.apache.commons.lang.StringUtils.isNotEmpty(passwd))
-            password = CryptUtil.encryptSHA256(passwd);
+            password = Encrypter.encryptSHA256(passwd);
     }
 
     public void setName(String name) {

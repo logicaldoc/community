@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -184,7 +184,7 @@ public class Ticket extends PersistentObject {
 
     public boolean checkPassword(String password) {
         try {
-            return CryptUtil.encryptSHA256(password).equals(getPassword());
+            return Encrypter.encryptSHA256(password).equals(getPassword());
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
             return false;
@@ -306,7 +306,7 @@ public class Ticket extends PersistentObject {
         if (StringUtil.isEmpty(pwd)) {
             password = null;
         } else {
-            password = CryptUtil.encryptSHA256(pwd);
+            password = Encrypter.encryptSHA256(pwd);
         }
     }
 

@@ -16,7 +16,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -109,7 +109,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 		Ticket storedTicket = testSubject.findByTicketId("5");
 		assertNotNull(storedTicket);
 		assertEquals(ticket, storedTicket);
-		assertEquals(CryptUtil.encryptSHA256("1234ABC"), storedTicket.getPassword());
+		assertEquals(Encrypter.encryptSHA256("1234ABC"), storedTicket.getPassword());
 	}
 
 	@Test

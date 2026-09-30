@@ -15,8 +15,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.util.crypt.Encrypter.EncryptionException;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.security.Encrypter.EncryptionException;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

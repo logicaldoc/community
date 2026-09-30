@@ -27,7 +27,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
-import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
@@ -212,7 +212,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
     public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {
         if (StringUtils.isNotEmpty(decodedKey)) {
             this.decodedKey = decodedKey;
-            this.key = CryptUtil.encryptSHA256(decodedKey);
+            this.key = Encrypter.encryptSHA256(decodedKey);
 
             String abbreviation = decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "";
             this.keyLabel = decodedKey.length() < 10 ? "..." : StringUtils.abbreviate(decodedKey, 10) + abbreviation;
