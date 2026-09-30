@@ -36,7 +36,7 @@ public class DropboxTest extends AbstractDropboxTestCase {
     }
 
     @Test
-    public void testSaveSettings() throws PersistenceException, EncryptionException {
+    public void testSaveSettings() throws PersistenceException, EncryptionException, IOException {
         assertNull(testSubject.getApiKey());
         testSubject.setApiKey("apikey");
         testSubject.setApiSecret("apisecret");

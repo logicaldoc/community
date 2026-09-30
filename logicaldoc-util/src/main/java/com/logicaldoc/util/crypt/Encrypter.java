@@ -1,5 +1,6 @@
 package com.logicaldoc.util.crypt;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -20,6 +21,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
 
 /**
@@ -42,7 +44,14 @@ public class Encrypter {
 
     private String encryptionKey;
 
-    public static Encrypter get() {
+    /**
+     * Singleton factory method
+     * 
+     * @return the instance
+     * 
+     * @throws IOException error retrieving the encryption key
+     */
+    public static Encrypter get() throws IOException {
         if (instance == null)
             synchronized (Encrypter.class) {
                 instance = new Encrypter();
@@ -53,9 +62,12 @@ public class Encrypter {
     /**
      * A private constructor that takes the encryption key from the context
      * settings
+     * 
+     * @throws IOException error retrieving the encryption key 
      */
-    private Encrypter() {
-        this(Context.get().getConfig().getString("encryption.key"));
+    private Encrypter() throws IOException {
+        this(Context.get() != null ? Context.get().getConfig().getString("encryption.key")
+                : new ContextProperties().getString("encryption.key"));
     }
 
     /**

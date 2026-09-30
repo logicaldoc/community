@@ -22,8 +22,6 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
-import com.dropbox.core.v2.files.SearchMatch;
-import com.dropbox.core.v2.files.SearchResult;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
@@ -154,13 +152,17 @@ public class Dropbox {
 
     public List<FileMetadata> find(String basePath, String query) throws DbxException {
         List<FileMetadata> list = new ArrayList<>();
-        SearchResult result = client.files().search(basePath, query);
-        List<SearchMatch> matches = result.getMatches();
-        for (SearchMatch searchMatch : matches) {
-            Metadata metadata = searchMatch.getMetadata();
-            if (metadata instanceof FileMetadata fileMetadata)
-                list.add(fileMetadata);
+
+        ListFolderResult result = client.files().listFolder(basePath);
+
+        for (Metadata metadata : result.getEntries()) {
+            if (metadata instanceof FileMetadata fileMetadata) {
+                if (fileMetadata.getName().toLowerCase().contains(query.toLowerCase())) {
+                    list.add(fileMetadata);
+                }
+            }
         }
+
         return list;
     }
 
@@ -220,10 +222,10 @@ public class Dropbox {
                 apiSecret = encrypter.decrypt(settings.getString2());
             if (StringUtils.isNotEmpty(settings.getString3()))
                 accessToken = encrypter.decrypt(settings.getString3());
-        } catch (EncryptionException e) {
+        } catch (EncryptionException | IOException e) {
             log.warn(e.getMessage(), e);
         }
-        
+
         return settings;
     }
 
@@ -239,7 +241,7 @@ public class Dropbox {
         return settings;
     }
 
-    void saveSettings() throws PersistenceException, EncryptionException {
+    void saveSettings() throws PersistenceException, EncryptionException, IOException {
         Generic settings = getGeneric();
 
         Encrypter encrypter = Encrypter.get();
