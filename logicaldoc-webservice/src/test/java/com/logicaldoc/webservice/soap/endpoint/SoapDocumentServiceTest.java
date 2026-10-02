@@ -12,7 +12,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
@@ -23,6 +26,8 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.Version;
+import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.parser.ParsingException;
@@ -33,6 +38,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.security.PasswordGenerator;
@@ -593,5 +599,59 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
         assertTrue(testSubject.unprotect(session.getSid(), 1L, "test"));
         assertFalse(testSubject.unprotect(session.getSid(), 1L, "test2222"));
         assertTrue(testSubject.unprotect(session.getSid(), 1L, "test"));
+    }
+
+    @Test
+    public void testGetVersionsDates() throws AuthenticationException, PersistenceException, PermissionException,
+            UnexistingResourceException, WebserviceException, ParseException {
+
+        VersionDAO versionDao = VersionDAO.get();
+        Version version = versionDao.findByVersion(1L, "testVer02");
+        assertNotNull(version);
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+
+        Date date = format.parse("2026-02-18 17:04:26 +0100");
+        Date creation = format.parse("2025-10-02 09:57:37 +0200");
+        Date lastModified = format.parse("2026-07-29 15:49:25 +0200");
+
+        version.setDate(date);
+        version.setCreation(creation);
+        version.setLastModified(lastModified);
+        versionDao.store(version);
+
+        Version savedVersion = versionDao.findByVersion(1L, "testVer02");
+        Date expectedLastModified = savedVersion.getLastModified();
+        assertNotNull(expectedLastModified);
+
+        List<WSDocument> versions = testSubject.getVersions("", 1L);
+        WSDocument result = versions.stream().filter(v -> "testVer02".equals(v.getVersion())).findFirst().orElseThrow();
+
+        assertEquals(date, format.parse(result.getDate()));
+        assertEquals(creation, format.parse(result.getCreation()));
+        // Il formato della risposta non include i millisecondi.
+        assertEquals(expectedLastModified.getTime() / 1000, format.parse(result.getLastModified()).getTime() / 1000);
+    }
+
+    @Test
+    public void testVersionCreateDates() throws PersistenceException, ParseException {
+        Document doc = docDao.findById(1L, true);
+        assertNotNull(doc);
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+
+        Date date = format.parse("2026-02-18 17:04:26 +0100");
+        Date creation = format.parse("2025-10-02 09:57:37 +0200");
+        Date lastModified = format.parse("2026-07-29 15:49:25 +0200");
+
+        doc.setDate(date);
+        doc.setCreation(creation);
+        doc.setLastModified(lastModified);
+
+        Version version = Version.create(doc, UserDAO.get().findById(1L), "test", DocumentEvent.STORED, false);
+
+        assertEquals(date, version.getDate());
+        assertEquals(creation, version.getCreation());
+        assertEquals(lastModified, version.getLastModified());
     }
 }
