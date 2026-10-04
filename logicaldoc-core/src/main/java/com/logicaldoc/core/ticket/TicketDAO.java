@@ -2,6 +2,7 @@ package com.logicaldoc.core.ticket;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
@@ -91,7 +92,7 @@ public interface TicketDAO extends PersistentObjectDAO<Ticket> {
      */
     public default boolean isAccessTicket(String ticketId) {
         try {
-            return TicketDAO.get().queryForInt(
+            return StringUtils.isNotEmpty(ticketId) && TicketDAO.get().queryForInt(
                     "select count(*) from ld_ticket where ld_enabled = 1 and ld_deleted = 0 and ld_type = :type and ld_ticketid = :id",
                     Map.of("type", Ticket.ACCESS, "id", ticketId)) > 0;
         } catch (PersistenceException e) {
