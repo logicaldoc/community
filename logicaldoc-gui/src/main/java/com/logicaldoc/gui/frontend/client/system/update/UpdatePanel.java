@@ -399,7 +399,7 @@ public class UpdatePanel extends VLayout {
                 confirmUpdateButton.setVisible(false);
                 download.setVisible(false);
 
-                LD.ask(CONFIRMUPDATE, "askexecutepackage", "applynow", "applybymself", null,
+                LD.ask(CONFIRMUPDATE, "askexecutepackage", "applynow", "applybymyself", null,
                         runImmediately -> UpdateService.Instance.get().confirmUpdate(updateFileName, runImmediately,
                                 new DefaultAsyncCallback<>() {
                                     @Override

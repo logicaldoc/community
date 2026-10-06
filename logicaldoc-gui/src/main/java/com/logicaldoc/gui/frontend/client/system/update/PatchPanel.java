@@ -490,7 +490,7 @@ public class PatchPanel extends VLayout {
                 confirmPatchButton.setVisible(false);
                 download.setVisible(false);
 
-                LD.ask(CONFIRMPATCH, "askexecutepackage", "applynow", "applybmyself", null,
+                LD.ask(CONFIRMPATCH, "askexecutepackage", "applynow", "applybymyself", null,
                         runImmediately -> UpdateService.Instance.get().confirmPatch(patch.getFile(), runImmediately,
                                 new DefaultAsyncCallback<>() {
                                     @Override
