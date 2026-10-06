@@ -462,7 +462,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         try {
             for (long folderId : folderIds)
                 copyFolder(session, folderId, targetId, foldersOnly, securityOption, model);
-        } catch (PersistenceException e) {
+        } catch (PersistenceException | SecurityException e) {
             throwServerException(session, log, e);
         }
     }
@@ -487,7 +487,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         // Check destParentId: Must be different from the current folder
         // parentId
         if (destParentFolder.getId() == folderToCopy.getParentId())
-            throw new SecurityException("No Changes");
+            throw new SecurityException("Not Allowed");
 
         // Check destParentId: Must be different from the current folderId
         // A folder cannot be children of herself
