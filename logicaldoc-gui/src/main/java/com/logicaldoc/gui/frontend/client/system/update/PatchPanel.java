@@ -543,9 +543,9 @@ public class PatchPanel extends VLayout {
                                 && !command.isEmpty()) {
                             LD.clearPrompt();
                             ApplicationRestarting.get(I18N.message("patchnotstarted", command)).show();
+                        } else {
+                            scheduleGetStatus(patch);
                         }
-
-                        scheduleGetStatus(patch);
                     }
                 }
             });
