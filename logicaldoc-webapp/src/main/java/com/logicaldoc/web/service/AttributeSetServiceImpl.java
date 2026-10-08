@@ -398,16 +398,26 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
         Session session = validateSession();
         try {
             AttributeSetDAO dao = AttributeSetDAO.get();
-            AttributeSet set = dao.findById(setId);
-            Attribute setAttribute = set.getTemplateAttributes().get(attributeName);
+            AttributeSet set = dao.findById(setId, true);
+
+            if (set == null)
+                return;
+
+            Attribute setAttribute = set.getTemplateAttribute(attributeName);
+            if (setAttribute == null)
+                return;
 
             TemplateDAO templateDao = TemplateDAO.get();
 
-            /*
-             * Update the attributes referenced in the templates
-             */
             List<Template> templates = templateDao.initialize(templateDao.findAll(set.getTenantId()));
+
             for (Template template : templates) {
+                Attribute existing = template.getTemplateAttribute(attributeName);
+
+                // Update only attributes belonging to this AttributeSet
+                if (existing == null || existing.getSetId() != setId)
+                    continue;
+
                 template.getTemplateAttributes().put(attributeName, new Attribute(setAttribute));
                 templateDao.store(template);
             }

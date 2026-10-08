@@ -653,14 +653,8 @@ public class DocumentManager {
                 parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
             }
 
-            log.info("Before addHit: local={}, database={}", doc.getRecordVersion(),
-                    documentDAO.findById(docId, true).getRecordVersion());
-
             // This may take time
             addHit(doc, cont);
-
-            log.info("After addHit: local={}, database={}", doc.getRecordVersion(),
-                    documentDAO.findById(docId, true).getRecordVersion());
 
         } catch (PersistenceException | ParsingException e) {
             recordIndexingError(transaction, doc, e);
