@@ -54,7 +54,7 @@ public class FSStore extends AbstractStore {
 
     @Override
     public void delete(StoreResource resource) {
-        File file = new File(getContainer(resource.getDocId()), resource.name());
+        File file = resolveResourceFile(resource);
         log.info("Deleting stored file {}", file.getAbsolutePath());
         if (FileUtil.delete(file))
             logDeletion(resource.getDocId(), file.getAbsolutePath());
@@ -82,7 +82,7 @@ public class FSStore extends AbstractStore {
 
         File dir = getContainer(resource.getDocId());
         FileUtils.forceMkdir(dir);
-        File dest = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
+        File dest = resolveResourceFile(resource);
         FileUtil.copyFile(file, dest);
 
         checkWriteAfterStore(resource, file.length());
@@ -97,7 +97,7 @@ public class FSStore extends AbstractStore {
 
             File dir = getContainer(resource.getDocId());
             FileUtils.forceMkdir(dir);
-            file = new File(new StringBuilder(dir.getPath()).append("/").append(resource.name()).toString());
+            file = resolveResourceFile(resource);
             FileUtil.writeFile(stream, file.getPath());
 
             checkWriteAfterStore(resource, file.length());
@@ -112,15 +112,13 @@ public class FSStore extends AbstractStore {
 
     @Override
     public void writeToFile(StoreResource resource, File out) throws IOException {
-        File container = getContainer(resource.getDocId());
-        File file = new File(container, resource.name());
+        File file = resolveResourceFile(resource);
         FileUtil.copyFile(file, out);
     }
 
     @Override
     public InputStream getStream(StoreResource resource) throws IOException {
-        File container = getContainer(resource.getDocId());
-        File file = new File(container, resource.name());
+        File file = resolveResourceFile(resource);
 
         try {
             return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
@@ -142,8 +140,7 @@ public class FSStore extends AbstractStore {
 
     @Override
     public byte[] getBytes(StoreResource resource, long start, long length) throws IOException {
-        File container = getContainer(resource.getDocId());
-        File file = new File(container, resource.name());
+        File file = resolveResourceFile(resource);
         return FileUtil.toByteArray(file, start, length);
     }
 
@@ -167,16 +164,12 @@ public class FSStore extends AbstractStore {
 
     @Override
     public long size(StoreResource resource) {
-        File file = getContainer(resource.getDocId());
-        file = new File(file, resource.name());
-        return file.length();
+        return resolveResourceFile(resource).length();
     }
 
     @Override
     public boolean exists(StoreResource resource) {
-        File file = getContainer(resource.getDocId());
-        file = new File(file, resource.name());
-        return file.exists();
+        return resolveResourceFile(resource).exists();
     }
 
     @Override
@@ -187,5 +180,20 @@ public class FSStore extends AbstractStore {
     @Override
     public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Resolves the file of a resource, making sure it is located directly
+     * inside the document's container. Protects against path traversal even if
+     * the resource name was not properly sanitized.
+     *
+     * @param resource The resource
+     * @return The file of the resource
+     * @throws IllegalArgumentException if the resource would be outside the
+     *         container
+     */
+    protected File resolveResourceFile(StoreResource resource) {
+        File file = getContainer(resource.getDocId());
+        return new File(file, resource.name());
     }
 }

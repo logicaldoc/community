@@ -127,7 +127,15 @@ public class StoreResource {
     }
 
     private String sanitizeResourceName(String resourceName) {
-        return resourceName.replace("..", "").replaceAll("[^a-zA-Z0-9\\-\\\\.]", "");
+        // Keep only letters, digits, dots and dashes. No slashes or
+        // backslashes.
+        String sanitized = resourceName.replaceAll("[^a-zA-Z0-9.\\-]", "");
+
+        // Reject anything that could still be interpreted as a path traversal.
+        if (sanitized.isEmpty() || sanitized.equals(".") || sanitized.contains(".."))
+            throw new IllegalArgumentException("Invalid resource name: %s".formatted(resourceName));
+
+        return sanitized;
     }
 
     /**

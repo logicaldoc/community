@@ -515,8 +515,6 @@ public class Exec {
      */
     private static void checkAllowed(String commandLine) throws IOException {
         Set<String> allowedCommands = getAllowedCommands();
-        if (allowedCommands.isEmpty())
-            return;
 
         String cmdLine = commandLine;
         if (cmdLine.startsWith("\""))
