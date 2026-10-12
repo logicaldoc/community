@@ -164,9 +164,10 @@ public class RestDocumentClient extends AbstractRestClient<DocumentService> {
      * @throws PersistenceException Error in the data layer
      * @throws WebserviceException Error in the Webservice layer
      * @throws AuthenticationException Authentication issue
+     * @throws PermissionException User without DELETE permission
      */
     public void deleteVersion(long docId, String version)
-            throws AuthenticationException, WebserviceException, PersistenceException {
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
         proxy.deleteVersion(docId, version);
     }

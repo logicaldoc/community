@@ -179,6 +179,11 @@ public class AbstractService {
         }
     }
 
+    protected void checkDocumentPermission(Permission permission, long userId, long docId)
+            throws PersistenceException, PermissionException {
+        checkDocumentPermission(permission, UserDAO.get().findById(userId, true), docId);
+    }
+
     protected void checkMenu(User user, long menuId) throws PermissionException {
         MenuDAO dao = MenuDAO.get();
         if (!dao.isReadAllowed(menuId, user.getId())) {

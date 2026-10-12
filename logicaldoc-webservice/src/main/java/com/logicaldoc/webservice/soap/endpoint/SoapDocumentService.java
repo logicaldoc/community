@@ -506,10 +506,12 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
     @Override
     public void restore(String sid, long docId, long folderId)
-            throws AuthenticationException, WebserviceException, PersistenceException {
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         User user = validateSession(sid);
         DocumentDAO docDao = DocumentDAO.get();
 
+        checkFolderPermission(Permission.WRITE, user, folderId);
+        
         DocumentHistory transaction = new DocumentHistory();
         transaction.setUser(user);
         transaction.setSessionId(sid);
@@ -812,14 +814,23 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
     }
 
     @Override
-    public void reindex(String sid, long docId, String content)
-            throws ParsingException, AuthenticationException, WebserviceException, PersistenceException {
+    public void reindex(String sid, long docId, String content) throws ParsingException, AuthenticationException,
+            WebserviceException, PersistenceException, PermissionException {
         User user = validateSession(sid);
+
+        checkDocumentPermission(Permission.READ, user, docId);
 
         DocumentHistory transaction = new DocumentHistory();
         transaction.setSessionId(sid);
         transaction.setUser(user);
-        DocumentManager.get().index(docId, content, transaction);
+
+        try {
+            checkDocumentPermission(Permission.WRITE, user, docId);
+            DocumentManager.get().index(docId, content, transaction);
+        } catch (PermissionException pe) {
+            DocumentManager.get().index(docId, null, transaction);
+        }
+
     }
 
     @Override
@@ -936,15 +947,23 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
     @Override
     public void deleteLink(String sid, long id)
-            throws AuthenticationException, WebserviceException, PersistenceException {
-        validateSession(sid);
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+        
+        DocumentLink link = DocumentLinkDAO.get().findById(id);
+        checkDocumentPermission(Permission.WRITE, user, link.getDocument1().getId());
+        checkDocumentPermission(Permission.WRITE, user, link.getDocument2().getId());
+        
         DocumentLinkDAO.get().delete(id);
     }
 
     @Override
     public String getExtractedText(String sid, long docId)
-            throws AuthenticationException, WebserviceException, PersistenceException {
-        validateSession(sid);
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+        
+        checkDocumentPermission(Permission.READ, user, docId);
+        
         return SearchEngine.get().getHit(docId).getContent();
     }
 
@@ -1161,8 +1180,10 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
     @Override
     public String deleteVersion(String sid, long docId, String version)
-            throws AuthenticationException, WebserviceException, PersistenceException {
-        validateSession(sid);
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+        User user = validateSession(sid);
+
+        checkDocumentPermission(Permission.DELETE, user, docId);
 
         Version ver = VersionDAO.get().findByVersion(docId, version);
 

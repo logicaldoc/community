@@ -413,7 +413,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @Parameter(description = "Document ID", required = true)
             long docId,
             @QueryParam("version")
-            String version) throws AuthenticationException, WebserviceException, PersistenceException {
+            String version) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         return super.deleteVersion(sid, docId, version);
     }
@@ -706,7 +706,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
     public void deleteLink(
             @Parameter(description = "ID of the link", required = true)
             @QueryParam("id")
-            long id) throws AuthenticationException, WebserviceException, PersistenceException {
+            long id) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         super.deleteLink(sid, id);
     }
@@ -756,7 +756,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
     public String getExtractedText(
             @QueryParam("docId")
             @Parameter(description = "The document ID", required = true)
-            long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+            long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         return super.getExtractedText(sid, docId);
     }
@@ -852,7 +852,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @FormParam("content")
             @Parameter(description = "Document ID")
             String content)
-            throws AuthenticationException, ParsingException, WebserviceException, PersistenceException {
+            throws AuthenticationException, ParsingException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         super.reindex(sid, docId, content);
     }
@@ -905,7 +905,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
             long docId,
             @QueryParam("folderId")
             @Parameter(description = "Folder ID (target)", required = true)
-            long folderId) throws AuthenticationException, WebserviceException, PersistenceException {
+            long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         super.restore(sid, docId, folderId);
     }

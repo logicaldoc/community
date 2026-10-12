@@ -515,7 +515,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
     }
 
     @Test
-    public void testRestore() throws PersistenceException, AuthenticationException, WebserviceException {
+    public void testRestore() throws PersistenceException, AuthenticationException, WebserviceException, PermissionException {
         assertNull(docDao.findById(4));
         testSubject.restore("", 4, 5);
         assertNotNull(docDao.findById(4));
