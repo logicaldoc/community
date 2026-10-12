@@ -66,6 +66,7 @@ public class LogDownload extends HttpServlet {
 			ServletUtil.checkMenu(request, Menu.LOGS);
 		} catch (Exception t) {
 			ServletUtil.sendError(response, t.getMessage());
+			return;
 		}
 
 		// Avoid resource caching
