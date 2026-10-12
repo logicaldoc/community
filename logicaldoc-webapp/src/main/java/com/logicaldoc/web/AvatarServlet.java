@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
@@ -31,73 +32,76 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class AvatarServlet extends HttpServlet {
 
-	public static final String USER_ID = "userId";
+    public static final String USER_ID = "userId";
 
-	private static final long serialVersionUID = -6956612970433309888L;
+    private static final long serialVersionUID = -6956612970433309888L;
 
-	private static final String DATA_PREFIX = "data:image/";
+    private static final String DATA_PREFIX = "data:image/";
 
-	private static final Logger log = LoggerFactory.getLogger(AvatarServlet.class);
+    private static final Logger log = LoggerFactory.getLogger(AvatarServlet.class);
 
-	/**
-	 * Constructor of the object.
-	 */
-	public AvatarServlet() {
-		super();
-	}
+    /**
+     * Constructor of the object.
+     */
+    public AvatarServlet() {
+        super();
+    }
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
-	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
-			String id = request.getParameter(USER_ID);
-			String content = UserUtil.getAvatarImage(id);
+    /**
+     * The doGet method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to get.
+     * 
+     * @param request the request send by the client to the server
+     * @param response the response send by the server to the client
+     * @throws ServletException if an error occurred
+     * @throws IOException if an error occurred
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            String sid = SessionManager.get().getSessionId(request);
+            String id = request.getParameter(USER_ID);
+            String content = UserUtil.DEFAULT_AVATAR_IMAGE;
+            if (SessionManager.get().isOpen(sid)) {
+                content = UserUtil.getAvatarImage(id);
 
-			if (StringUtils.isEmpty(content)) {
-				User user = UserDAO.get().findById(Long.parseLong(id));
-				UserUtil.generateDefaultAvatar(user);
-				content = user.getAvatar();
-			}
+                if (StringUtils.isEmpty(content)) {
+                    User user = UserDAO.get().findById(Long.parseLong(id));
+                    UserUtil.generateDefaultAvatar(user);
+                    content = user.getAvatar();
+                }
+            }
 
-			String fileName = "avatar-%s.%s".formatted(id, getExtension(content));
+            String fileName = "avatar-%s.%s".formatted(id, getExtension(content));
+            response.setContentType(MimeType.getByFilename(fileName));
+            ServletUtil.setContentDisposition(request, response, fileName);
 
-			response.setContentType(MimeType.getByFilename(fileName));
-			ServletUtil.setContentDisposition(request, response, fileName);
+            writeImage(content, response.getOutputStream());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ServletUtil.sendError(response, e.getMessage());
+        }
+    }
 
-			writeImage(content, response.getOutputStream());
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			ServletUtil.sendError(response, e.getMessage());
-		}
-	}
+    private String getExtension(String content) {
+        String extension = "png";
+        if (content.startsWith(DATA_PREFIX)) {
+            extension = content.substring(content.indexOf('/') + 1, content.indexOf(';') - 1);
+            if (extension.contains("+"))
+                extension = extension.substring(0, extension.indexOf('+'));
+        }
+        return extension;
+    }
 
-	private String getExtension(String content) {
-		String extension = "png";
-		if (content.startsWith(DATA_PREFIX)) {
-			extension = content.substring(content.indexOf('/') + 1, content.indexOf(';') - 1);
-			if (extension.contains("+"))
-				extension = extension.substring(0, extension.indexOf('+'));
-		}
-		return extension;
-	}
+    private void writeImage(String content, OutputStream out) throws IOException {
+        if (content.startsWith(DATA_PREFIX))
+            content = content.substring(content.indexOf(',') + 1);
 
-	private void writeImage(String content, OutputStream out) throws IOException {
-		if (content.startsWith(DATA_PREFIX))
-			content = content.substring(content.indexOf(',') + 1);
-
-		Decoder decoder = Base64.getDecoder();
-		byte[] imageByte = decoder.decode(content);
-		try (ByteArrayInputStream bis = new ByteArrayInputStream(imageByte)) {
-			IOUtils.write(imageByte, out);
-		}
-	}
+        Decoder decoder = Base64.getDecoder();
+        byte[] imageByte = decoder.decode(content);
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(imageByte)) {
+            IOUtils.write(imageByte, out);
+        }
+    }
 }
