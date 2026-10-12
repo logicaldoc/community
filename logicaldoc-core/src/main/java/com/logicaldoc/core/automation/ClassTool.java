@@ -43,8 +43,7 @@ public class ClassTool {
     public Object newInstance(String className)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException,
             InvocationTargetException, NoSuchMethodException, SecurityException {
-        if (className.equals("java.lang.Runtime"))
-            throw new SecurityException("Class java.lang.Runtime is forbidden and cannot be instantiated");
+        checkForbiddenClass(className);
 
         try {
             return Class.forName(className).getDeclaredConstructor().newInstance();
@@ -68,8 +67,7 @@ public class ClassTool {
      * @throws ClassNotFoundException you specified an unexisting class
      */
     public Class<?> forName(String className) throws ClassNotFoundException {
-        if (className.equals("java.lang.Runtime"))
-            throw new SecurityException("Class java.lang.Runtime is forbidden and cannot be instantiated");
+        checkForbiddenClass(className);
 
         try {
             return Class.forName(className);
@@ -78,6 +76,11 @@ public class ClassTool {
             // package
             return Class.forName("com.logicaldoc.%s".formatted(className));
         }
+    }
+
+    private void checkForbiddenClass(String className) {
+        if (className.equals("java.lang.Runtime") || className.equals("java.lang.ProcessBuilder"))
+            throw new SecurityException("Class %s is forbidden and cannot be instantiated".formatted(className));
     }
 
     /**
