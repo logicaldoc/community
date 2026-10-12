@@ -5,12 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -23,10 +24,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.ProcessingInstruction;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 import org.jsoup.Jsoup;
@@ -35,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.AbstractDocument;
-import com.logicaldoc.util.http.UrlUtil;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -73,7 +71,7 @@ public class XMLConverter extends AbstractFormatConverter {
 
                 org.jdom2.Document doc = builder.build(xml);
 
-                String xsltOutFormat = getXsltOutputFormat(document, xslt, xml, builder, doc);
+                String xsltOutFormat = getTrustedXsltOutputFormat(document, xslt, xml, builder, doc);
 
                 if (xsltOutFormat == null) {
                     convertFromTxt(sid, document, dest, destExt, xml);
@@ -93,6 +91,69 @@ public class XMLConverter extends AbstractFormatConverter {
         }
     }
 
+    /**
+     * Only uses server configured, trusted stylesheets. Ignores user supplied
+     * hrefs that point to arbitrary URLs.
+     * 
+     * @param document The document
+     * @param xslt The XSLT file
+     * @param xml The XML file
+     * @param builder the SAX builder
+     * @param domDocument the Dom representation of the XML
+     * 
+     * @return The XSL output format
+     * 
+     * @throws IOException generic I/O error
+     * @throws JDOMException XML error
+     */
+    private String getTrustedXsltOutputFormat(
+            AbstractDocument document,
+            File xslt,
+            File xml,
+            SAXBuilder builder,
+            org.jdom2.Document domDocument) throws IOException, JDOMException {
+
+        String rootElementName = domDocument.getRootElement().getName();
+        String style = getStyleByRootElement(rootElementName);
+        String xsltOutFormat = null;
+
+        if (StringUtils.isNotEmpty(style)) {
+            log.debug("Using trusted stylesheet {} for converting xml file {}", style, document.getFileName());
+            try {
+                // Only allow classpath or local file paths, no http/ftp/jar
+                if (style.startsWith("classpath:")) {
+                    String path = style.substring("classpath:".length());
+                    try (InputStream is = getClass().getResourceAsStream(path)) {
+                        if (is == null)
+                            throw new FileNotFoundException("Classpath stylesheet not found: %s".formatted(path));
+                        FileUtil.writeFile(is, xslt.getAbsolutePath());
+                    }
+                } else if (style.startsWith("file:")) {
+                    File srcXslt = new File(style.substring("file:".length()));
+                    FileUtils.copyFile(srcXslt, xslt);
+                } else {
+                    log.warn("Rejected stylesheet {}: only classpath:/ or file:/ are allowed", style);
+                    return null;
+                }
+
+                // Parse trusted XSLT to detect output method
+                org.jdom2.Document xsltDoc = builder.build(xslt);
+                Element root = xsltDoc.getRootElement();
+                Element outputElem = root.getChild("output", root.getNamespace());
+                if (outputElem != null) {
+                    xsltOutFormat = outputElem.getAttributeValue("method");
+                    if (xsltOutFormat != null) {
+                        xsltOutFormat = xsltOutFormat.toLowerCase();
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Cannot elaborate trusted style sheet {}", style, e);
+            }
+        }
+
+        return xsltOutFormat;
+    }
+
     private void convert(
             String sid,
             AbstractDocument document,
@@ -102,8 +163,18 @@ public class XMLConverter extends AbstractFormatConverter {
             File xml,
             String xsltOutFormat) throws TransformerFactoryConfigurationError, IOException {
         try {
-            // Create transformer factory
+            // Create a 'safe' transformer factory
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+            // Block all external URI resolution from XSLT (document(), imports,
+            // etc.)
+            factory.setURIResolver((href, base) -> {
+                throw new TransformerException("External URI resolution forbidden: %s".formatted(href));
+            });
 
             // Use the factory to create a template containing the
             // xsl file
@@ -181,82 +252,6 @@ public class XMLConverter extends AbstractFormatConverter {
         if (converter == null)
             throw new IOException(String.format("Unable to find a converter from txt to %s", destExt));
         converter.convert(sid, document, xml, dest);
-    }
-
-    private String getXsltOutputFormat(
-            AbstractDocument document,
-            File xslt,
-            File xml,
-            SAXBuilder builder,
-            org.jdom2.Document domDocument) throws IOException, JDOMException, URISyntaxException {
-
-        /*
-         * Search for the XSL declaration
-         */
-        List<Content> contents = domDocument.getContent();
-        boolean containsStyleReference = false;
-        String xsltOutFormat = null;
-        for (Content content : contents) {
-            if (content instanceof ProcessingInstruction pi && "text/xsl".equals(pi.getPseudoAttributeValue("type"))) {
-                containsStyleReference = true;
-
-                // Found a style sheet, download it and check the output
-                // format
-                xsltOutFormat = checkStyleSheet(xslt, builder, pi);
-            }
-        }
-
-        String rootElmentName = domDocument.getRootElement().getName();
-        String style = getStyleByRootElement(rootElmentName);
-        if (StringUtils.isNotEmpty(style)) {
-            log.debug("Force the stylesheet {} for converting xml file {}", style, document.getFileName());
-            try {
-                FileUtils.copyURLToFile(UrlUtil.toURL(style), xslt);
-                xsltOutFormat = "html";
-                String newStyleSpec = "<?xml-stylesheet type=\"text/xsl\" href=\"%s\" ?>".formatted(style);
-                if (containsStyleReference) {
-                    FileUtil.replaceInFile(xml.getAbsolutePath(), "<\\?xml-stylesheet type=\\\"text/xsl\\\".*\\?>",
-                            newStyleSpec);
-                } else {
-                    FileUtil.replaceInFile(xml.getAbsolutePath(),
-                            "<%s".formatted(domDocument.getRootElement().getQualifiedName()),
-                            "%n%s%n<%s".formatted(newStyleSpec, domDocument.getRootElement().getQualifiedName()));
-                }
-            } catch (Exception e) {
-                log.warn("Cannot elaborate the style sheet {}", style, e);
-            }
-        }
-        return xsltOutFormat;
-    }
-
-    /**
-     * Checks a style sheet, downloads it locally and returns the expected
-     * output format
-     * 
-     * @param xslt The file to save the style sheet
-     * @param builder the current SAX builder
-     * @param pi the current processing instruction
-     * 
-     * @return The expected output format
-     * 
-     * @throws IOException Generic I/O error
-     * @throws JDOMException JDOM parsing error
-     * @throws URISyntaxException URL not valid
-     */
-    private String checkStyleSheet(File xslt, SAXBuilder builder, ProcessingInstruction pi)
-            throws IOException, JDOMException, URISyntaxException {
-        String xsltOutFormat = null;
-        try {
-            FileUtils.copyURLToFile(UrlUtil.toURL(pi.getPseudoAttributeValue("href")), xslt);
-            org.jdom2.Document xsltDoc = builder.build(xslt);
-            Element root = xsltDoc.getRootElement();
-            Element outputElem = root.getChild("output", root.getNamespace());
-            if (outputElem != null)
-                xsltOutFormat = outputElem.getAttributeValue("method").toLowerCase();
-        } catch (FileNotFoundException e) {
-            log.warn("Cannot find the referenced style sheet {}", pi.getPseudoAttributeValue("href"));
-        }
-        return xsltOutFormat;
     }
 
     private String getStyleByRootElement(String rootElementName) {

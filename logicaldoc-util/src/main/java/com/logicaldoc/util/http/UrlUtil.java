@@ -96,9 +96,18 @@ public class UrlUtil {
 		return toURL(inputUrl).toString();
 	}
 
-	public static URL toURL(String urlSpec) throws MalformedURLException, URISyntaxException {
-		URI inputUri = new URI(urlSpec.replace("\\", "/"));
-		URI normalizedUri = inputUri.normalize();
-		return normalizedUri.toURL();
-	}
+    public static URL toURL(String urlSpec) throws MalformedURLException, URISyntaxException {
+        URI inputUri = new URI(urlSpec.replace("\\", "/"));
+        
+        String scheme = inputUri.getScheme();
+
+        // Allow only trusted schemes
+        if (scheme == null ||
+            !(scheme.equals("file") || scheme.equals("jar") || scheme.equals("classpath"))) {
+            throw new MalformedURLException("Unsupported or unsafe URL scheme: %s".formatted(scheme));
+        }
+        
+        URI normalizedUri = inputUri.normalize();
+        return normalizedUri.toURL();
+    }
 }
