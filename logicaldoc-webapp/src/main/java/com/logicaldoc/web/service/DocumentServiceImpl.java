@@ -1489,6 +1489,17 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             List<Document> attachedDocs = documentDao
                     .initialize(documentDao.findByIds(guiMail.getDocIds().stream().collect(Collectors.toSet()), null));
 
+            // Maintain the downloadable documents only
+            attachedDocs = attachedDocs.stream()
+                    .filter(d -> {
+                        try {
+                            return documentDao.isDownloadAllowed(d.getId(), session.getUserId());
+                        } catch (PersistenceException e) {
+                            log.warn(e.getMessage(), e);
+                            return false;
+                        }
+                    }).toList();
+            
             /*
              * Subject and email are processed by the scripting engine
              */
