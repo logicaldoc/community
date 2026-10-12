@@ -3,6 +3,7 @@ package com.logicaldoc.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -12,7 +13,10 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.web.util.ServletUtil;
@@ -29,75 +33,110 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class ConvertPdf extends HttpServlet {
 
-	private static final String VERSION = "version";
+    private static final String VERSION = "version";
 
-	private static final String DOCUMENT_ID = "docId";
+    private static final String DOCUMENT_ID = "docId";
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(ConvertPdf.class);
+    private static final Logger log = LoggerFactory.getLogger(ConvertPdf.class);
 
-	/**
-	 * Constructor of the object.
-	 */
-	public ConvertPdf() {
-		super();
-	}
+    /**
+     * Constructor of the object.
+     */
+    public ConvertPdf() {
+        super();
+    }
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			Session session = ServletUtil.validateSession(request);
+    /**
+     * The doGet method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to get.
+     * 
+     * @param request the request send by the client to the server
+     * @param response the response send by the server to the client
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-			DocumentDAO docDao = DocumentDAO.get();
-			VersionDAO versionDao = VersionDAO.get();
+        try {
+            Session session = ServletUtil.validateSession(request);
 
-			long docId = Long.parseLong(request.getParameter(DOCUMENT_ID));
-			Document document = docDao.findById(docId);
-			if (document.getDocRef() != null)
-				document = docDao.findById(document.getDocRef());
+            DocumentDAO docDao = DocumentDAO.get();
+            VersionDAO versionDao = VersionDAO.get();
 
-			if (!document.getFileName().toLowerCase().endsWith(".pdf"))
-				throw new IOException("Unsupported format");
+            long docId = Long.parseLong(request.getParameter(DOCUMENT_ID));
+            Document document = docDao.findById(docId);
 
-			String ver = document.getVersion();
-			if (StringUtils.isNotEmpty(request.getParameter(VERSION)))
-				ver = request.getParameter(VERSION);
-			Version version = versionDao.findByVersion(docId, ver);
+            if (document == null)
+                throw new IOException("Document not available");
 
-			// Download the already stored resource
-			ServletUtil.downloadDocument(request, response, null,
-					StoreResource.builder().docId(document.getId()).fileVersion(version.getFileVersion()).build(),
-					null, session.getUser());
-		} catch (Exception r) {
-			log.error(r.getMessage(), r);
+            // Check read and download permissions on the requested document or
+            // alias.
+            Set<Permission> permissions = docDao.getAllowedPermissions(document.getId(), session.getUserId());
 
-			int letter = 0;
-			try (InputStream is = ResourceUtil.getInputStream("pdf/notavailable.pdf");
-					OutputStream os = response.getOutputStream();) {
-				ServletUtil.setContentDisposition(request, response, "notavailable.pdf");
-				while ((letter = is.read()) != -1)
-					os.write(letter);
-			} catch (Exception e) {
-				log.warn(e.getMessage());
-			}
-		}
-	}
+            if (!permissions.contains(Permission.READ) || !permissions.contains(Permission.DOWNLOAD))
+                throw new IOException("You don't have the READ and DOWNLOAD permissions");
 
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			doGet(request, response);
-		} catch (Exception r) {
-			// Nothing to do
-		}
-	}
+            /*
+             * Resolve the alias, following the existing DownloadServlet
+             * behavior.
+             */
+            if (document.getDocRef() != null)
+                document = docDao.findById(document.getDocRef());
+
+            if (document == null)
+                throw new IOException("Document not available");
+
+            // Check publishing status on the actual document.
+            // Admins and publishers can always access unpublished documents.
+            User user = session.getUser();
+            boolean canSeeUnpublished = user.isMemberOf(Group.GROUP_ADMIN)
+                    || user.getGroups().stream().anyMatch(g -> g.getId() == Group.GROUPID_PUBLISHER);
+
+            if (!canSeeUnpublished && !document.isPublishing())
+                throw new IOException("Document not published");
+
+            // Check password protection on the actual document.
+            if (document.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(document.getId()))
+                throw new IOException("The document is protected by a password");
+
+            if (!document.getFileName().toLowerCase().endsWith(".pdf"))
+                throw new IOException("Unsupported format");
+
+            String ver = document.getVersion();
+            if (StringUtils.isNotEmpty(request.getParameter(VERSION)))
+                ver = request.getParameter(VERSION);
+            Version version = versionDao.findByVersion(document.getId(), ver);
+
+            if (version == null)
+                throw new IOException("Document version not available");
+
+            // Download the already stored resource
+            ServletUtil.downloadDocument(request, response, session.getSid(),
+                    StoreResource.builder().docId(document.getId()).fileVersion(version.getFileVersion()).build(), null,
+                    user);
+        } catch (Exception r) {
+            log.error(r.getMessage(), r);
+
+            int letter = 0;
+            try (InputStream is = ResourceUtil.getInputStream("pdf/notavailable.pdf");
+                    OutputStream os = response.getOutputStream();) {
+                ServletUtil.setContentDisposition(request, response, "notavailable.pdf");
+                while ((letter = is.read()) != -1)
+                    os.write(letter);
+            } catch (Exception e) {
+                log.warn(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            doGet(request, response);
+        } catch (Exception r) {
+            // Nothing to do
+        }
+    }
 }
