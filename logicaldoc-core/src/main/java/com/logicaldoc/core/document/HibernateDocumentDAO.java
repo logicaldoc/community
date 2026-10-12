@@ -665,21 +665,23 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
         StringBuilder query = new StringBuilder("SELECT ld_count, ld_tag from ld_uniquetag where 1 = 1 ");
         if (StringUtils.isNotEmpty(firstLetter))
-            query.append(" and lower(ld_tag) like '%s%%' ".formatted(firstLetter.toLowerCase()));
+            query.append(" and lower(ld_tag) like :tagLike ");
         if (tenantId != null)
             query.append(AND_LD_TENANTID_D.formatted(tenantId));
 
-        query(query.toString(), new RowMapper<Object>() {
+        query(query.toString(), Map.of("tagLike", "%s%%".formatted(firstLetter.toLowerCase())),
+                new RowMapper<Object>() {
 
+        
             @Override
-            public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
-                Long value = rs.getLong(1);
-                String key = rs.getString(2);
-                map.put(key, value);
-                return null;
-            }
+                    public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
+                        Long value = rs.getLong(1);
+                        String key = rs.getString(2);
+                        map.put(key, value);
+                        return null;
+                    }
 
-        }, null);
+                }, null);
 
         return map;
     }
