@@ -444,10 +444,14 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
         if (formId != null)
             query.append(" and A.formId = %d".formatted(formId));
-        if (StringUtils.isNotEmpty(request.getParameter(INDEXED)))
-            query.append(" and A.indexingStatus = %s".formatted(request.getParameter(INDEXED)));
 
         Map<String, Object> params = new HashMap<>();
+        
+        if (StringUtils.isNotEmpty(request.getParameter(INDEXED))) {
+            query.append(" and A.indexingStatus = :indexingStatus");
+            params.put("indexingStatus", request.getParameter(INDEXED));
+        }
+        
         if (filename != null) {
             query.append(" and lower(A.fileName) like :fileName ");
             params.put("fileName", "%%%s%%".formatted(filename.toLowerCase()));
