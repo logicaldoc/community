@@ -228,6 +228,11 @@ public class ZipExport {
         DocumentDAO ddao = DocumentDAO.get();
         Collection<Document> docs = ddao.findByFolder(folder.getId(), null);
 
+        if (!SessionManager.get().isOpen(sid)) {
+            log.warn("Session unexisting or expired");
+            return;
+        }
+
         long userId = SessionManager.get().get(sid).getUserId();
         for (Document document : docs) {
             Document doc = document;
@@ -266,12 +271,13 @@ public class ZipExport {
      * @param path path to store the document in
      * @param document the document
      * @param pdfConversion if the PDF conversion has to be used instead
+     * @param currentUserId Identifier of the current session user
      * @throws PersistenceException Error in the data layer
      */
     private void addDocument(String path, Document document, boolean pdfConversion, long currentUserId)
             throws PersistenceException {
         // Include donloadable documents only
-        if (!DocumentDAO.get().isDownloadAllowed(document.getId(), userId))
+        if (!DocumentDAO.get().isDownloadAllowed(document.getId(), currentUserId))
             return;
 
         StoreResource resource = StoreResource.builder().document(document).build();
