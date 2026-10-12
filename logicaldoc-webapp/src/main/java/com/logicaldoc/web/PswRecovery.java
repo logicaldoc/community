@@ -89,18 +89,16 @@ public class PswRecovery extends HttpServlet {
             Ticket ticket = ticketDao.findByTicketId(ticketId);
 
             if (ticket != null && ticket.getType() == Ticket.PSW_RECOVERY && ticket.getUserId() == userId) {
+                User user = UserDAO.get().findById(userId);
                 if (ticket.isTicketExpired()) {
                     response.getWriter().println("Request has exprired");
                     return;
-                } else {
+                } else if(user!=null) {
                     ticket.setCount(ticket.getCount() + 1);
                     ticket.setEnabled(false);
                     ticketDao.store(ticket);
+                    sendEmail(request, response, tenant, user);
                 }
-
-                User user = UserDAO.get().findById(userId);
-
-                sendEmail(request, response, tenant, user);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
