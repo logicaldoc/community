@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.time.TimeDiff;
 
 /**
@@ -288,10 +287,10 @@ public class FileUtil {
      * @return the enclosed path
      */
     public static String quotePath(String path) {
-        if (SystemUtil.isWindows())
+        if(path.contains(" "))
             return "\"%s\"".formatted(path);
-        else
-            return "'%s'".formatted(path);
+        else 
+            return path;
     }
 
     /**
