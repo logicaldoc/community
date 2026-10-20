@@ -4,14 +4,14 @@
     <artifactId>logicaldoc-parent</artifactId>
     <name>LogicalDOC Parent POM</name>
     <packaging>pom</packaging>
-    <version>115</version>
+    <version>116</version>
     <scm>
         <connection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</connection>
         <developerConnection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</developerConnection>
         <url>http://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</url>
     </scm>
     <properties>
-        <source.level>21</source.level>
+        <source.level>25</source.level>
         <gwt.version>2.12.2</gwt.version>
         <gwt.source.level>17</gwt.source.level>
         <smartgwt.version>14.1p</smartgwt.version>
