@@ -320,6 +320,7 @@ public class ItemFactory {
 
         PasswordItem passwordItem = new PasswordItem();
         passwordItem.setHintStyle("hint");
+        spinnerItem.setWidth(150);
         passwordItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
         passwordItem.setIconHeight(ITEM_ICON_SIZE);
         passwordItem.setIconWidth(ITEM_ICON_SIZE);
