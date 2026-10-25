@@ -632,7 +632,7 @@ public class EMailSender {
             emlFile = FileUtil.createTempFile("emailsender", ".eml");
 
             try (FileOutputStream fos = new FileOutputStream(emlFile);) {
-                message.writeTo(new FileOutputStream(emlFile));
+                message.writeTo(fos);
             }
 
             Folder folder = saveFolder;
