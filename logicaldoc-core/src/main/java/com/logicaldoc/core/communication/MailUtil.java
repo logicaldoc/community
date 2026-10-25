@@ -476,7 +476,7 @@ public class MailUtil {
         if (part.getContentType().equalsIgnoreCase("message/rfc822")) {
             // The part is another email (may happen in case of forwards).
             try (InputStream is = part.getInputStream()) {
-                EMail embeddedEmail = messageToMail(part.getInputStream(), false);
+                EMail embeddedEmail = messageToMail(is, false);
                 fileName =  "%s.eml".formatted(embeddedEmail.getSubject());
             } catch (Exception t) {
                 log.warn(t.getMessage(), t);
