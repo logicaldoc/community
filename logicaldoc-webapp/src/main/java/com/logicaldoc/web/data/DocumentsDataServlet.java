@@ -76,21 +76,21 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
             String key = D_S.formatted(docId, name);
 
-            if (type == Attribute.TYPE_STRING) {
+            if (type == Attribute.Type.STRING.ordinal()) {
                 if (StringUtils.isNotEmpty(rs.getString(8)))
                     extAttributesValues.put(key, rs.getString(8));
                 else
                     extAttributesValues.put(key, rs.getString(4));
-            } else if (type == Attribute.TYPE_INT) {
+            } else if (type == Attribute.Type.INTEGER.ordinal()) {
                 extAttributesValues.put(key, rs.getLong(5));
-            } else if (type == Attribute.TYPE_DOUBLE) {
+            } else if (type == Attribute.Type.DOUBLE.ordinal()) {
                 extAttributesValues.put(key, rs.getDouble(6));
-            } else if (type == Attribute.TYPE_DATE) {
+            } else if (type == Attribute.Type.DATE.ordinal()) {
                 extAttributesValues.put(key, rs.getTimestamp(7));
-            } else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER
-                    || type == Attribute.TYPE_DOCUMENT) {
+            } else if (type == Attribute.Type.USER.ordinal() || type == Attribute.Type.FOLDER.ordinal()
+                    || type == Attribute.Type.DOCUMENT.ordinal()) {
                 extAttributesValues.put(key, rs.getString(4));
-            } else if (type == Attribute.TYPE_BOOLEAN) {
+            } else if (type == Attribute.Type.BOOLEAN.ordinal()) {
                 extAttributesValues.put(key,
                         rs.getLong(5) == 1L ? I18N.message("true", locale) : I18N.message("false", locale));
             }
@@ -446,12 +446,12 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             query.append(" and A.formId = %d".formatted(formId));
 
         Map<String, Object> params = new HashMap<>();
-        
+
         if (StringUtils.isNotEmpty(request.getParameter(INDEXED))) {
             query.append(" and A.indexingStatus = :indexingStatus");
             params.put("indexingStatus", request.getParameter(INDEXED));
         }
-        
+
         if (filename != null) {
             query.append(" and lower(A.fileName) like :fileName ");
             params.put("fileName", "%%%s%%".formatted(filename.toLowerCase()));
@@ -625,8 +625,9 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             String key = D_S.formatted(aliasId, name);
             if (!extendedAttributesValues.containsKey(key) && doc.getValue(name) != null) {
                 Attribute att = doc.getAttribute(name);
-                if (att != null && (att.getType() == Attribute.TYPE_FOLDER || att.getType() == Attribute.TYPE_USER
-                        || att.getType() == Attribute.TYPE_DOCUMENT)) {
+                if (att != null
+                        && (att.getType().equals(Attribute.Type.FOLDER) || att.getType().equals(Attribute.Type.USER)
+                                || att.getType().equals(Attribute.Type.DOCUMENT))) {
                     extendedAttributesValues.put(key, att.getStringValue());
                     doc.setValue(name, att.getStringValue());
                 } else

@@ -97,6 +97,7 @@
                     <excludes>
                         <exclude>**/Mock*.*</exclude>
                         <exclude>com/gargoylesoftware/**</exclude>
+                        <exclude>net/sf/jsqlparser/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

@@ -207,19 +207,18 @@ public class FolderSearch extends Search {
                 criteriaQueryPart.append(criterion.getFieldName());
                 criteriaQueryPart.append("-%') and ");
                 columnName = "C%d.".formatted(joinsCounter);
-                switch (criterion.getType()) {
-                    case Attribute.TYPE_INT, Attribute.TYPE_USER, Attribute.TYPE_FOLDER, Attribute.TYPE_DOCUMENT, Attribute.TYPE_BOOLEAN:
-                        columnName += "ld_intvalue";
-                        break;
-                    case Attribute.TYPE_DOUBLE:
-                        columnName += "ld_doublevalue";
-                        break;
-                    case Attribute.TYPE_DATE:
-                        columnName += "ld_datevalue";
-                        break;
-                    default:
-                        columnName += "ld_stringvalue";
-                        break;
+
+                int type = criterion.getType();
+                if (type == Attribute.Type.INTEGER.ordinal() || type == Attribute.Type.USER.ordinal()
+                        || type == Attribute.Type.FOLDER.ordinal() || type == Attribute.Type.DOCUMENT.ordinal()
+                        || type == Attribute.Type.BOOLEAN.ordinal()) {
+                    columnName += "ld_intvalue";
+                } else if (type == Attribute.Type.DOUBLE.ordinal()) {
+                    columnName += "ld_doublevalue";
+                } else if (type == Attribute.Type.DATE.ordinal()) {
+                    columnName += "ld_datevalue";
+                } else {
+                    columnName += "ld_stringvalue";
                 }
             } else {
                 columnName = getCriterionColumnName(tableAlias, criterion);
@@ -297,35 +296,29 @@ public class FolderSearch extends Search {
             String columnName,
             FolderCriterion criterion,
             Map<String, Object> params) throws PersistenceException {
-        switch (criterion.getType()) {
-            case Attribute.TYPE_INT:
-                appendIntegerCriterion(query, columnName, criterion, params);
-                break;
-            case Attribute.TYPE_FOLDER, Attribute.TYPE_DOCUMENT, Attribute.TYPE_USER, FolderCriterion.TYPE_TEMPLATE:
-                appendFolderOrDocumentOrUserOrTemplateCriterion(query, columnName, criterion, params);
-                break;
-            case Attribute.TYPE_BOOLEAN:
-                appendBooleanCriterion(query, columnName, criterion, params);
-                break;
-            case Attribute.TYPE_DOUBLE:
-                appendDoubleCriterion(query, columnName, criterion, params);
-                break;
-            case Attribute.TYPE_DATE:
-                appendDateCriterion(query, columnName, criterion, params);
-                break;
-            case FolderCriterion.TYPE_LANGUAGE:
-                appendLanguageCriterion(query, columnName, criterion);
-                break;
-            case FolderCriterion.TYPE_FOLDER:
-                appendFolderCriterion(query, tableAlias, columnName, criterion);
-                break;
-            default:
-                if (options.isCaseSensitive()) {
-                    appendStringCriterionCaseSensitive(query, columnName, criterion);
-                } else {
-                    appendStringCriterionCaseInsensitive(query, columnName, criterion);
-                }
-                break;
+
+        int type = criterion.getType();
+        if (type == Attribute.Type.INTEGER.ordinal()) {
+            appendIntegerCriterion(query, columnName, criterion, params);
+        } else if (type == Attribute.Type.FOLDER.ordinal() || type == Attribute.Type.DOCUMENT.ordinal()
+                || type == Attribute.Type.USER.ordinal() || type == FolderCriterion.TYPE_TEMPLATE) {
+            appendFolderOrDocumentOrUserOrTemplateCriterion(query, columnName, criterion, params);
+        } else if (type == Attribute.Type.BOOLEAN.ordinal()) {
+            appendBooleanCriterion(query, columnName, criterion, params);
+        } else if (type == Attribute.Type.DOUBLE.ordinal()) {
+            appendDoubleCriterion(query, columnName, criterion, params);
+        } else if (type == Attribute.Type.DATE.ordinal()) {
+            appendDateCriterion(query, columnName, criterion, params);
+        } else if (type == FolderCriterion.TYPE_LANGUAGE) {
+            appendLanguageCriterion(query, columnName, criterion);
+        } else if (type == FolderCriterion.TYPE_FOLDER) {
+            appendFolderCriterion(query, tableAlias, columnName, criterion);
+        } else {
+            if (options.isCaseSensitive()) {
+                appendStringCriterionCaseSensitive(query, columnName, criterion);
+            } else {
+                appendStringCriterionCaseInsensitive(query, columnName, criterion);
+            }
         }
     }
 

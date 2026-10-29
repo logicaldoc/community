@@ -880,73 +880,73 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         att = new GUIAttribute();
         att.setName("boolean");
         att.setIntValue(1L);
-        att.setType(Attribute.TYPE_BOOLEAN);
+        att.setType(Attribute.Type.BOOLEAN.ordinal());
         doc.addAttribute(att);
         att.setName("boolean2");
         att.setIntValue(null);
-        att.setType(Attribute.TYPE_BOOLEAN);
+        att.setType(Attribute.Type.BOOLEAN.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("user");
         att.setIntValue(1L);
-        att.setType(Attribute.TYPE_USER);
+        att.setType(Attribute.Type.USER.ordinal());
         doc.addAttribute(att);
         att = new GUIAttribute();
         att.setName("user2");
         att.setIntValue(null);
-        att.setType(Attribute.TYPE_USER);
+        att.setType(Attribute.Type.USER.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("folder");
         att.setIntValue(4L);
-        att.setType(Attribute.TYPE_FOLDER);
+        att.setType(Attribute.Type.FOLDER.ordinal());
         doc.addAttribute(att);
         att = new GUIAttribute();
         att.setName("folder2");
         att.setIntValue(null);
-        att.setType(Attribute.TYPE_FOLDER);
+        att.setType(Attribute.Type.FOLDER.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("document");
         att.setIntValue(1L);
-        att.setType(Attribute.TYPE_DOCUMENT);
+        att.setType(Attribute.Type.DOCUMENT.ordinal());
         doc.addAttribute(att);
         att.setName("document2");
         att.setIntValue(null);
-        att.setType(Attribute.TYPE_DOCUMENT);
+        att.setType(Attribute.Type.DOCUMENT.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("integer");
         att.setIntValue(1L);
-        att.setType(Attribute.TYPE_INT);
+        att.setType(Attribute.Type.INTEGER.ordinal());
         doc.addAttribute(att);
         att.setName("integer2");
         att.setIntValue(null);
-        att.setType(Attribute.TYPE_INT);
+        att.setType(Attribute.Type.INTEGER.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("double");
         att.setDoubleValue(1D);
-        att.setType(Attribute.TYPE_DOUBLE);
+        att.setType(Attribute.Type.DOUBLE.ordinal());
         doc.addAttribute(att);
         att.setName("double2");
         att.setDoubleValue(null);
-        att.setType(Attribute.TYPE_DOUBLE);
+        att.setType(Attribute.Type.DOUBLE.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("date");
         att.setDateValue(referenceInstant);
-        att.setType(Attribute.TYPE_DATE);
+        att.setType(Attribute.Type.DATE.ordinal());
         doc.addAttribute(att);
         att.setName("date2");
         att.setDateValue(null);
-        att.setType(Attribute.TYPE_DATE);
+        att.setType(Attribute.Type.DATE.ordinal());
         doc.addAttribute(att);
 
         doc = testSubject.save(doc);
@@ -959,19 +959,19 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         att.setName("string");
         att.setValue("string");
         att.setIntValue(1L);
-        att.setType(Attribute.TYPE_INT);
+        att.setType(Attribute.Type.INTEGER.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("boolean");
         att.setIntValue(1L);
-        att.setType(Attribute.TYPE_INT);
+        att.setType(Attribute.Type.INTEGER.ordinal());
         doc.addAttribute(att);
 
         att = new GUIAttribute();
         att.setName("double");
         att.setIntValue(1L);
-        att.setType(Attribute.TYPE_DATE);
+        att.setType(Attribute.Type.DATE.ordinal());
         doc.addAttribute(att);
 
         doc = testSubject.save(doc);
@@ -986,52 +986,52 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         template.setAttribute("string", attr);
 
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_BOOLEAN);
+        attr.setType(Attribute.Type.BOOLEAN);
         template.setAttribute("boolean", attr);
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_BOOLEAN);
+        attr.setType(Attribute.Type.BOOLEAN);
         template.setAttribute("boolean2", attr);
 
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_INT);
+        attr.setType(Attribute.Type.INTEGER);
         template.setAttribute("integer", attr);
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_INT);
+        attr.setType(Attribute.Type.INTEGER);
         template.setAttribute("integer2", attr);
 
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_DATE);
+        attr.setType(Attribute.Type.DATE);
         template.setAttribute("date", attr);
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_DATE);
+        attr.setType(Attribute.Type.DATE);
         template.setAttribute("date2", attr);
 
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_DOUBLE);
+        attr.setType(Attribute.Type.DOUBLE);
         template.setAttribute("double", attr);
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_DOUBLE);
+        attr.setType(Attribute.Type.DOUBLE);
         template.setAttribute("double2", attr);
 
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_FOLDER);
+        attr.setType(Attribute.Type.FOLDER);
         template.setAttribute("folder", attr);
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_FOLDER);
+        attr.setType(Attribute.Type.FOLDER);
         template.setAttribute("folder2", attr);
 
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_USER);
+        attr.setType(Attribute.Type.USER);
         template.setAttribute("user", attr);
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_USER);
+        attr.setType(Attribute.Type.USER);
         template.setAttribute("user2", attr);
 
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_DOCUMENT);
+        attr.setType(Attribute.Type.DOCUMENT);
         template.setAttribute("document", attr);
         attr = new Attribute();
-        attr.setType(Attribute.TYPE_DOCUMENT);
+        attr.setType(Attribute.Type.DOCUMENT);
         template.setAttribute("document2", attr);
 
         TemplateDAO.get().store(template);

@@ -162,7 +162,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
         att.setMultiple(attribute.isMultiple());
         att.setParent(attribute.getParent());
         att.setDependsOn(attribute.getDependsOn());
-        att.setType(attribute.getType());
+        att.setType(Attribute.Type.values()[attribute.getType()]);
         att.setLabel(attribute.getLabel());
         att.setEditor(attribute.getEditor());
         att.setStringValue(attribute.getStringValue());
@@ -317,7 +317,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
         guiAttribute.setParent(templateExtAttr.getParent());
         guiAttribute.setDependsOn(templateExtAttr.getDependsOn());
         guiAttribute.setStringValues(templateExtAttr.getStringValues());
-        guiAttribute.setType(templateExtAttr.getType());
+        guiAttribute.setType(templateExtAttr.getType().ordinal());
         guiAttribute.setValidation(templateExtAttr.getValidation());
         guiAttribute.setInitialization(templateExtAttr.getInitialization());
 
@@ -481,7 +481,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
                 guiAttribute.setBooleanValue(attribute.getBooleanValue());
                 guiAttribute.setDoubleValue(attribute.getDoubleValue());
                 guiAttribute.setDateValue(fixDateForGUI(attribute.getDateValue()));
-                if (attribute.getType() == Attribute.TYPE_USER)
+                if (attribute.getType().equals(Attribute.Type.USER))
                     guiAttribute.setUsername(attribute.getStringValue());
             } else
                 guiAttribute.setValue(templateExtAttr.getValue());
@@ -491,7 +491,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
         if (guiAttribute.getValue() instanceof Date date)
             guiAttribute.setValue(convertToDate(date));
 
-        guiAttribute.setType(templateExtAttr.getType());
+        guiAttribute.setType(templateExtAttr.getType().ordinal());
         attributes.add(guiAttribute);
 
         addMultipleGuiAttributes(guiAttribute, extensibleObject, attributes);
@@ -500,7 +500,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
     }
 
     private void setGuiAttributeOptions(GUIAttribute guiAttribute, Attribute templateExtAttr, Attribute setExtAttr) {
-        if (templateExtAttr.getType() != Attribute.TYPE_USER && templateExtAttr.getEditor() != Attribute.EDITOR_LISTBOX)
+        if (!templateExtAttr.getType().equals(Attribute.Type.USER)
+                && templateExtAttr.getEditor() != Attribute.EDITOR_LISTBOX)
             return;
 
         String buf = setExtAttr != null ? (String) setExtAttr.getStringValue()
@@ -552,7 +553,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
                     if (valAtt.getValue() instanceof Date date)
                         valAtt.setValue(convertToDate(date));
 
-                    if (valAtt.getType() == Attribute.TYPE_USER)
+                    if (valAtt.getType() == Attribute.Type.USER.ordinal())
                         valAtt.setUsername(valAttribute.getStringValue());
 
                     attributes.add(valAtt);

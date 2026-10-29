@@ -64,7 +64,7 @@ public class FolderCriterion implements Serializable {
 
     private Double doubleValue;
 
-    private int type = Attribute.TYPE_INT;
+    private int type = Attribute.Type.INTEGER.ordinal();
 
     private static Map<String, Integer> typeBinding = new HashMap<>();
 
@@ -75,10 +75,10 @@ public class FolderCriterion implements Serializable {
     private boolean extendedAttribute = false;
 
     static {
-        typeBinding.put("creation", Attribute.TYPE_DATE);
-        typeBinding.put("lastModified", Attribute.TYPE_DATE);
+        typeBinding.put("creation", Attribute.Type.DATE.ordinal());
+        typeBinding.put("lastModified", Attribute.Type.DATE.ordinal());
 
-        typeBinding.put("id", Attribute.TYPE_INT);
+        typeBinding.put("id", Attribute.Type.INTEGER.ordinal());
 
         typeBinding.put("folder", TYPE_FOLDER);
 
@@ -102,7 +102,7 @@ public class FolderCriterion implements Serializable {
             this.type = typeBinding.get(field);
             this.fieldName = field;
         } else {
-            this.type = Attribute.TYPE_STRING;
+            this.type = Attribute.Type.STRING.ordinal();
             this.fieldName = field;
         }
     }
@@ -154,57 +154,45 @@ public class FolderCriterion implements Serializable {
         if (OPERATOR_NULL.equals(operator))
             return false;
 
-        switch (getType()) {
-            case Attribute.TYPE_INT, Attribute.TYPE_BOOLEAN, Attribute.TYPE_USER, TYPE_FOLDER, TYPE_TEMPLATE:
-                return getLongValue() == null;
-            case Attribute.TYPE_DOUBLE:
-                return getDoubleValue() == null;
-            case Attribute.TYPE_DATE:
-                return getDateValue() == null;
-            default:
-                return StringUtils.isEmpty(getStringValue());
-        }
+        if (type == Attribute.Type.STRING.ordinal())
+            return StringUtils.isEmpty(getStringValue());
+        else if (type == Attribute.Type.DOUBLE.ordinal())
+            return getDoubleValue() == null;
+        else if (type == Attribute.Type.DATE.ordinal())
+            return getDateValue() == null;
+        else
+            return getLongValue() == null;
     }
 
     public void setValue(Serializable value) {
         if (value == null)
             return;
 
-        switch (getType()) {
-            case Attribute.TYPE_STRING:
-                if (fieldName.equalsIgnoreCase(FIELD_TAGS))
-                    setStringValue(",%s,".formatted(value));
-                else
-                    setStringValue((String) value);
-                break;
-            case Attribute.TYPE_INT, Attribute.TYPE_FOLDER, Attribute.TYPE_DOCUMENT, Attribute.TYPE_USER, Attribute.TYPE_BOOLEAN:
-                if (value instanceof Integer integer)
-                    setLongValue(integer.longValue());
-                else
-                    setLongValue((Long) value);
-                break;
-            case Attribute.TYPE_DOUBLE:
-                switch (value) {
-                    case Double doubleVal -> setDoubleValue(doubleVal);
-                    case Long longVal -> setDoubleValue(longVal.doubleValue());
-                    case Float floatVal -> setDoubleValue(floatVal.doubleValue());
-                    default -> setDoubleValue(null);
-                }
-                break;
-            case Attribute.TYPE_DATE:
-                setDateValue((Date) value);
-                break;
-            case TYPE_FOLDER:
-                setLongValue((Long) value);
-                break;
-            case TYPE_TEMPLATE:
-                setLongValue((Long) value);
-                break;
-            case TYPE_LANGUAGE:
+        if (type == Attribute.Type.STRING.ordinal()) {
+            if (fieldName.equalsIgnoreCase(FIELD_TAGS))
+                setStringValue(",%s,".formatted(value));
+            else
                 setStringValue((String) value);
-                break;
-            default:
-                // do noting
+        } else if (type == Attribute.Type.INTEGER.ordinal() || type == Attribute.Type.FOLDER.ordinal()
+                || type == Attribute.Type.DOCUMENT.ordinal() || type == Attribute.Type.USER.ordinal()
+                || type == Attribute.Type.BOOLEAN.ordinal()) {
+            if (value instanceof Integer integer)
+                setLongValue(integer.longValue());
+            else
+                setLongValue((Long) value);
+        } else if (type == Attribute.Type.DOUBLE.ordinal()) {
+            switch (value) {
+                case Double doubleVal -> setDoubleValue(doubleVal);
+                case Long longVal -> setDoubleValue(longVal.doubleValue());
+                case Float floatVal -> setDoubleValue(floatVal.doubleValue());
+                default -> setDoubleValue(null);
+            }
+        } else if (type == Attribute.Type.DATE.ordinal()) {
+            setDateValue((Date) value);
+        } else if (type == TYPE_FOLDER || type == TYPE_TEMPLATE) {
+            setLongValue((Long) value);
+        } else if (type == TYPE_LANGUAGE) {
+            setStringValue((String) value);
         }
     }
 

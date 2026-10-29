@@ -151,7 +151,7 @@ public class StandardSearchEngine implements SearchEngine {
                 continue;
 
             // Skip all non-string attributes
-            if ((ext.getType() == Attribute.TYPE_STRING || ext.getType() == Attribute.TYPE_USER)
+            if ((ext.getType().equals(Attribute.Type.STRING) || ext.getType().equals(Attribute.Type.USER))
                     && (StringUtils.isNotEmpty(ext.getStringValue())
                             || StringUtils.isNotEmpty(ext.getStringValues()))) {
 

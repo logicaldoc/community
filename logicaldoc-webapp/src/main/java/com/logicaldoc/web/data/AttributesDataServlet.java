@@ -56,25 +56,25 @@ public class AttributesDataServlet extends AbstractDataServlet {
          */
         if (templateId == null && !extOnly) {
             if (docevent) {
-                printAttibute("date", I18N.message("date", locale), Attribute.TYPE_DATE, writer);
+                printAttibute("date", I18N.message("date", locale), Attribute.Type.DATE, writer);
                 printAttibute("event", I18N.message("event", locale), writer);
                 printAttibute("path", I18N.message("path", locale), writer);
                 printAttibute("reason", I18N.message("reason", locale), writer);
-                printAttibute("user", I18N.message("user", locale), Attribute.TYPE_USER, writer);
+                printAttibute("user", I18N.message("user", locale), Attribute.Type.USER, writer);
             }
 
             printAttibute("customId", I18N.message("customid", locale), writer);
             printAttibute("filename", I18N.message("filename", locale), writer);
             printAttibute("lastModified", I18N.message("lastmodified", locale), writer);
-            printAttibute("user", I18N.message("user", locale), Attribute.TYPE_DATE, writer);
-            printAttibute("created", I18N.message("createdon", locale), Attribute.TYPE_DATE, writer);
-            printAttibute("published", I18N.message("publishedon", locale), Attribute.TYPE_DATE, writer);
+            printAttibute("user", I18N.message("user", locale), Attribute.Type.DATE, writer);
+            printAttibute("created", I18N.message("createdon", locale), Attribute.Type.DATE, writer);
+            printAttibute("published", I18N.message("publishedon", locale), Attribute.Type.DATE, writer);
             printAttibute("fileVersion", I18N.message("fileversion", locale), writer);
             printAttibute("version", I18N.message("version", locale), writer);
             printAttibute("revision", I18N.message("revision", locale), writer);
             printAttibute("type", I18N.message("type", locale), writer);
-            printAttibute("size", I18N.message("size", locale), Attribute.TYPE_INT, writer);
-            printAttibute("pages", I18N.message("pages", locale), Attribute.TYPE_INT, writer);
+            printAttibute("size", I18N.message("size", locale), Attribute.Type.INTEGER, writer);
+            printAttibute("pages", I18N.message("pages", locale), Attribute.Type.INTEGER, writer);
             printAttibute("creator", I18N.message("creator", locale), writer);
             printAttibute("publisher", I18N.message("publisher", locale), writer);
             printAttibute("comment", I18N.message("comment", locale), writer);
@@ -82,14 +82,14 @@ public class AttributesDataServlet extends AbstractDataServlet {
             printAttibute("template", I18N.message("template", locale), writer);
             printAttibute("tags", I18N.message("tags", locale), writer);
             printAttibute("workflowStatus", I18N.message("workflowstatus", locale), writer);
-            printAttibute("startPublishing", I18N.message("startpublishing", locale), Attribute.TYPE_DATE, writer);
-            printAttibute("stopPublishing", I18N.message("stoppublishing", locale), Attribute.TYPE_DATE, writer);
+            printAttibute("startPublishing", I18N.message("startpublishing", locale), Attribute.Type.DATE, writer);
+            printAttibute("stopPublishing", I18N.message("stoppublishing", locale), Attribute.Type.DATE, writer);
             printAttibute("folder", I18N.message("folder", locale), writer);
-            printAttibute("folderId", I18N.message("folderId", locale), Attribute.TYPE_INT, writer);
-            printAttibute("score", I18N.message("score", locale), Attribute.TYPE_INT, writer);
-            printAttibute("rating", I18N.message("rating", locale), Attribute.TYPE_INT, writer);
+            printAttibute("folderId", I18N.message("folderId", locale), Attribute.Type.INTEGER, writer);
+            printAttibute("score", I18N.message("score", locale), Attribute.Type.INTEGER, writer);
+            printAttibute("rating", I18N.message("rating", locale), Attribute.Type.INTEGER, writer);
             printAttibute("language", I18N.message("language", locale), writer);
-            printAttibute("tenantId", I18N.message("tenantId", locale), Attribute.TYPE_INT, writer);
+            printAttibute("tenantId", I18N.message("tenantId", locale), Attribute.Type.INTEGER, writer);
         }
 
         /*
@@ -129,14 +129,14 @@ public class AttributesDataServlet extends AbstractDataServlet {
     }
 
     private void printAttibute(String name, String label, PrintWriter writer) {
-        printAttibute(name, label, Attribute.TYPE_STRING, writer);
+        printAttibute(name, label, Attribute.Type.STRING, writer);
     }
 
-    private void printAttibute(String name, String label, int type, PrintWriter writer) {
+    private void printAttibute(String name, String label, Attribute.Type type, PrintWriter writer) {
         writer.print("<attribute>");
         writer.print(String.format("<name>%s</name>", name));
         writer.print(String.format("<label><![CDATA[%s]]></label>", label));
-        writer.print(String.format("<type>%d</type>", type));
+        writer.print(String.format("<type>%d</type>", type.ordinal()));
         writer.print("</attribute>");
     }
 }

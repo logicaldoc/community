@@ -150,7 +150,7 @@ public class WSUtil {
             wsAttribute.setIntValue(attr.getIntValue());
             wsAttribute.setStringValue(attr.getStringValue());
             wsAttribute.setStringValues(attr.getStringValues());
-            wsAttribute.setType(attr.getType());
+            wsAttribute.setType(attr.getType().ordinal());
             wsAttribute.setDependsOn(attr.getDependsOn());
             attributes.add(wsAttribute);
         }
@@ -286,7 +286,7 @@ public class WSUtil {
                         att.setDoubleValue(wsAtt.getDoubleValue());
                         att.setDateValue(convertStringToDate(wsAtt.getDateValue()));
                         att.setSetId(wsAtt.getSetId());
-                        att.setType(wsAtt.getType());
+                        att.setType(Attribute.Type.values()[wsAtt.getType()]);
                         att.setDependsOn(wsAtt.getDependsOn());
 
                         attrs.put(wsAtt.getName(), att);
@@ -374,7 +374,7 @@ public class WSUtil {
                 wsAttribute.setDateValue(DateUtil.format(attr.getDateValue()));
                 wsAttribute.setEditor(attr.getEditor());
                 wsAttribute.setSetId(attr.getSetId());
-                wsAttribute.setType(attr.getType());
+                wsAttribute.setType(attr.getType().ordinal());
                 wsAttribute.setDependsOn(attr.getDependsOn());
                 wsAttribute.setValidation(attr.getValidation());
                 wsAttribute.setInitialization(attr.getInitialization());
@@ -413,7 +413,7 @@ public class WSUtil {
                 att.setDateValue(convertStringToDate(wsAtt.getStringValue()));
                 att.setEditor(wsAtt.getEditor());
                 att.setSetId(wsAtt.getSetId());
-                att.setType(wsAtt.getType());
+                att.setType(Attribute.Type.values()[wsAtt.getType()]);
                 att.setDependsOn(wsAtt.getDependsOn());
                 att.setValidation(wsAtt.getValidation());
                 att.setInitialization(wsAtt.getInitialization());
@@ -447,7 +447,7 @@ public class WSUtil {
                 att.setParent(wsAtt.getParent());
                 att.setDependsOn(wsAtt.getDependsOn());
                 att.setPosition(wsAtt.getPosition());
-                att.setType(wsAtt.getType());
+                att.setType(Attribute.Type.values()[wsAtt.getType()]);
                 att.setStringValue(wsAtt.getStringValue());
                 att.setIntValue(wsAtt.getIntValue());
                 att.setDoubleValue(wsAtt.getDoubleValue());
@@ -493,28 +493,28 @@ public class WSUtil {
         if (MapUtils.isNotEmpty(sourceTemplate.getAttributes())) {
             attributes = new ArrayList<>();
             for (String name : sourceTemplate.getAttributeNames()) {
-                Attribute attr = sourceTemplate.getTemplateAttribute(name);
-                WSAttribute attribute = new WSAttribute();
-                attribute.setName(name);
-                attribute.setLabel(attr.getLabel());
-                attribute.setMandatory(attr.isMandatory() ? 1 : 0);
-                attribute.setHidden(attr.isHidden() ? 1 : 0);
-                attribute.setReadonly(attr.isReadonly() ? 1 : 0);
-                attribute.setMultiple(attr.isMultiple() ? 1 : 0);
-                attribute.setParent(attr.getParent());
-                attribute.setPosition(attr.getPosition());
-                attribute.setStringValue(attr.getStringValue());
-                attribute.setStringValues(attr.getStringValues());
-                attribute.setIntValue(attr.getIntValue());
-                attribute.setDoubleValue(attr.getDoubleValue());
-                attribute.setDateValue(DateUtil.format(attr.getDateValue()));
-                attribute.setEditor(attr.getEditor());
-                attribute.setSetId(attr.getSetId());
-                attribute.setType(attr.getType());
-                attribute.setDependsOn(attr.getDependsOn());
-                attribute.setValidation(attr.getValidation());
-                attribute.setInitialization(attr.getInitialization());
-                attributes.add(attribute);
+                Attribute attribute = sourceTemplate.getTemplateAttribute(name);
+                WSAttribute wsAttribute = new WSAttribute();
+                wsAttribute.setName(name);
+                wsAttribute.setLabel(attribute.getLabel());
+                wsAttribute.setMandatory(attribute.isMandatory() ? 1 : 0);
+                wsAttribute.setHidden(attribute.isHidden() ? 1 : 0);
+                wsAttribute.setReadonly(attribute.isReadonly() ? 1 : 0);
+                wsAttribute.setMultiple(attribute.isMultiple() ? 1 : 0);
+                wsAttribute.setParent(attribute.getParent());
+                wsAttribute.setPosition(attribute.getPosition());
+                wsAttribute.setStringValue(attribute.getStringValue());
+                wsAttribute.setStringValues(attribute.getStringValues());
+                wsAttribute.setIntValue(attribute.getIntValue());
+                wsAttribute.setDoubleValue(attribute.getDoubleValue());
+                wsAttribute.setDateValue(DateUtil.format(attribute.getDateValue()));
+                wsAttribute.setEditor(attribute.getEditor());
+                wsAttribute.setSetId(attribute.getSetId());
+                wsAttribute.setType(attribute.getType().ordinal());
+                wsAttribute.setDependsOn(attribute.getDependsOn());
+                wsAttribute.setValidation(attribute.getValidation());
+                wsAttribute.setInitialization(attribute.getInitialization());
+                attributes.add(wsAttribute);
             }
             wsTemplate.setAttributes(attributes);
         }

@@ -5,23 +5,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
 
+import com.logicaldoc.util.crypt.Encrypter;
+
 public class UtilWorkbench {
 
 	public static void main(String[] args) throws Exception {
-		String unsafeHtmlContent = "TEST<&#x003c;img src=1 onerror=confirm(document.domain)&#x003e;>TEST2";
-
-		OutputSettings outputSettings = new OutputSettings().indentAmount(0).prettyPrint(false);
-		Safelist whiteList = Safelist.simpleText().preserveRelativeLinks(false);
-
-		String previousSanitized = "";
-		String sanitized = StringEscapeUtils
-				.unescapeHtml(Jsoup.clean(unsafeHtmlContent, "", whiteList, outputSettings));
-		while (!previousSanitized.equals(sanitized)) {
-			previousSanitized = sanitized;
-			sanitized = StringEscapeUtils.unescapeHtml(Jsoup.clean(previousSanitized, "", whiteList, outputSettings));
-		}
-
-		System.out.println(sanitized);
+		System.out.println(Encrypter.get().encryptSHA256("eIZlvHriTOjBJwaGNv.VP4"));
 
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);

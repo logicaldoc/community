@@ -105,7 +105,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
                     attribute.setIntValue(wsAttribute.getIntValue());
                     attribute.setDateValue(AbstractService.convertStringToDate(wsAttribute.getDateValue()));
                     attribute.setDoubleValue(wsAttribute.getDoubleValue());
-                    attribute.setType(wsAttribute.getType());
+                    attribute.setType(Attribute.Type.values()[wsAttribute.getType()]);
                     attribute.setEditor(wsAttribute.getEditor());
                     attribute.setSetId(wsAttribute.getSetId());
                     attribute.setDependsOn(wsAttribute.getDependsOn());
@@ -129,7 +129,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
         Template template = WSUtil.toTemplate(wsTemplate);
         template.setTenantId(user.getTenantId());
         if (wsTemplate.getId() != 0) {
-            template = dao.findById(wsTemplate.getId(),  true);
+            template = dao.findById(wsTemplate.getId(), true);
             template.setName(wsTemplate.getName());
             template.setDescription(wsTemplate.getDescription());
 
@@ -274,7 +274,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
                     attribute.setIntValue(wsAttribute.getIntValue());
                     attribute.setDateValue(AbstractService.convertStringToDate(wsAttribute.getDateValue()));
                     attribute.setDoubleValue(wsAttribute.getDoubleValue());
-                    attribute.setType(wsAttribute.getType());
+                    attribute.setType(Attribute.Type.values()[wsAttribute.getType()]);
                     attribute.setEditor(wsAttribute.getEditor());
                     attribute.setSetId(wsAttribute.getSetId());
                     attribute.setDependsOn(wsAttribute.getDependsOn());

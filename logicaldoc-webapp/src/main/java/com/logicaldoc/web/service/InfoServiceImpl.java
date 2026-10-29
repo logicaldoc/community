@@ -160,7 +160,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
                 guiAtt.setMultiple(att.isMultiple());
                 guiAtt.setPosition(att.getPosition());
                 guiAtt.setSetId(att.getSetId());
-                guiAtt.setType(att.getType());
+                guiAtt.setType(att.getType().ordinal());
                 guiAttributes.add(guiAtt);
             }
             info.setAttributeDefinitions(guiAttributes);

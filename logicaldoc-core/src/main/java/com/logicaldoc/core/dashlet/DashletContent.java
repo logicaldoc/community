@@ -19,6 +19,7 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.infinispan.protostream.descriptors.AnnotationElement.AttributeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -629,25 +630,25 @@ public class DashletContent extends HttpServlet {
         public Long mapRow(ResultSet rs, int row) throws SQLException {
             Long docId = rs.getLong(1);
             String name = rs.getString(2);
-            int type = rs.getInt(3);
+            AttributeType type = AttributeType.values()[rs.getInt(3)];
 
             String key = "%d-%s".formatted(docId, name);
 
-            if (type == Attribute.TYPE_STRING) {
+            if (type.equals(Attribute.Type.STRING)) {
                 if (StringUtils.isNotEmpty(rs.getString(8)))
                     extValues.put(key, rs.getString(8));
                 else
                     extValues.put(key, rs.getString(4));
-            } else if (type == Attribute.TYPE_INT) {
+            } else if (type.equals(Attribute.Type.INTEGER)) {
                 extValues.put(key, rs.getLong(5));
-            } else if (type == Attribute.TYPE_DOUBLE) {
+            } else if (type.equals(Attribute.Type.DOUBLE)) {
                 extValues.put(key, rs.getDouble(6));
-            } else if (type == Attribute.TYPE_DATE) {
+            } else if (type.equals(Attribute.Type.DATE)) {
                 extValues.put(key, rs.getTimestamp(7));
-            } else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER
-                    || type == Attribute.TYPE_DOCUMENT) {
+            } else if (type.equals(Attribute.Type.USER) || type.equals(Attribute.Type.FOLDER)
+                    || type.equals(Attribute.Type.DOCUMENT)) {
                 extValues.put(key, rs.getString(4));
-            } else if (type == Attribute.TYPE_BOOLEAN) {
+            } else if (type.equals(Attribute.Type.BOOLEAN)) {
                 extValues.put(key, rs.getLong(5) == 1L ? I18N.message("true", locale) : I18N.message("false", locale));
             }
 

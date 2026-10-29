@@ -34,7 +34,11 @@ public class LinksDataServlet extends AbstractDataServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+    protected void service(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Session session,
+            Integer max,
             Locale locale) throws PersistenceException, IOException {
 
         Long docId = getDocId(request);
@@ -47,12 +51,13 @@ public class LinksDataServlet extends AbstractDataServlet {
         writer.write("<list>");
 
         DocumentDAO dao = DocumentDAO.get();
-        StringBuilder query = new StringBuilder("""
-                                                select A.id, 0, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, 
-                                                       A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color
-                                                  from DocumentLink A 
-                                                 where A.deleted = 0
-                                                """);
+        StringBuilder query = new StringBuilder(
+                """
+                select A.id, 0, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type,
+                       A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color
+                  from DocumentLink A
+                 where A.deleted = 0
+                """);
         query.append(" and ((A.document1.id = %d)".formatted(parentDocId));
         query.append(" or  (A.document2.id = %d)".formatted(parentDocId));
         query.append(") ");
@@ -79,24 +84,30 @@ public class LinksDataServlet extends AbstractDataServlet {
         writer.write("</list>");
     }
 
-    private void printAttributesOfTypeDocument(Long docId, String parent, Long parentDocId, String tenant,
+    private void printAttributesOfTypeDocument(
+            Long docId,
+            String parent,
+            Long parentDocId,
+            String tenant,
             PrintWriter writer) throws PersistenceException {
         if (!Context.get().getConfig().getBoolean(tenant + ".gui.showdocattrsaslinks", false))
             return;
 
         // Use the stringValue of the attribute to print the filename of the
         // referenced document
-        StringBuilder query = new StringBuilder("""
-                                                select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, E.ld_stringvalue, DOC2.ld_color, E.ld_label
-                                                  from ld_document_ext E, ld_document DOC1, ld_document DOC2 
-                                                 where E.ld_type = %d
-                                                   and DOC1.ld_deleted = 0 
-                                                   and DOC2.ld_deleted = 0 
-                                                   and E.ld_intvalue is not null
-                                                   and DOC1.ld_id = E.ld_docid
-                                                   and DOC2.ld_id = E.ld_intvalue
-                                                   and E.ld_docid = %d
-                                                """.formatted(Attribute.TYPE_DOCUMENT, parentDocId));
+        StringBuilder query = new StringBuilder(
+                """
+                select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, E.ld_stringvalue, DOC2.ld_color, E.ld_label
+                  from ld_document_ext E, ld_document DOC1, ld_document DOC2
+                 where E.ld_type = %d
+                   and DOC1.ld_deleted = 0
+                   and DOC2.ld_deleted = 0
+                   and E.ld_intvalue is not null
+                   and DOC1.ld_id = E.ld_docid
+                   and DOC2.ld_id = E.ld_intvalue
+                   and E.ld_docid = %d
+                """.formatted(
+                        Attribute.Type.DOCUMENT, parentDocId));
 
         if (!docId.equals(parentDocId)) {
             query.append(" and not DOC1.ld_id = %d".formatted(docId));
@@ -104,20 +115,22 @@ public class LinksDataServlet extends AbstractDataServlet {
         }
 
         // Get backward references to current document from referenced ones
-        query.append(""" 
-                     
-                     UNION 
-                     
-                     select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, DOC2.ld_filename, DOC2.ld_color, E.ld_label
-                       from ld_document_ext E, ld_document DOC1, ld_document DOC2 
-                       where E.ld_type = %d
-                         and DOC1.ld_deleted = 0 
-                         and DOC2.ld_deleted = 0 
-                         and E.ld_intvalue is not null
-                         and DOC1.ld_id = E.ld_docid
-                         and DOC2.ld_id = E.ld_intvalue
-                         and E.ld_intvalue = %d
-                      """.formatted(Attribute.TYPE_DOCUMENT, parentDocId));
+        query.append(
+                """
+
+                UNION
+
+                select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, DOC2.ld_filename, DOC2.ld_color, E.ld_label
+                  from ld_document_ext E, ld_document DOC1, ld_document DOC2
+                  where E.ld_type = %d
+                    and DOC1.ld_deleted = 0
+                    and DOC2.ld_deleted = 0
+                    and E.ld_intvalue is not null
+                    and DOC1.ld_id = E.ld_docid
+                    and DOC2.ld_id = E.ld_intvalue
+                    and E.ld_intvalue = %d
+                 """.formatted(
+                        Attribute.Type.DOCUMENT, parentDocId));
         if (!docId.equals(parentDocId)) {
             query.append(" and not DOC1.ld_id = %d".formatted(docId));
             query.append(" and not DOC2.ld_id = %d".formatted(docId));

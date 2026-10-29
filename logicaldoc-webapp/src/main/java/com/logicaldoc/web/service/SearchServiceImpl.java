@@ -142,10 +142,10 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
             ext.setIntValue(e.getIntValue());
             ext.setDoubleValue(e.getDoubleValue());
             ext.setBooleanValue(e.getBooleanValue());
-            ext.setType(e.getType());
+            ext.setType(e.getType().ordinal());
             ext.setParent(e.getParent());
             ext.setStringValues(e.getStringValues());
-            if (e.getType() == Attribute.TYPE_USER)
+            if (e.getType().equals(Attribute.Type.USER))
                 ext.setUsername(ext.getStringValue());
             extList.add(ext);
         }

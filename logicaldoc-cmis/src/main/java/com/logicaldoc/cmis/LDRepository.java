@@ -2028,19 +2028,19 @@ public class LDRepository {
             String stringValue = null;
             if (attribute.getValue() != null)
                 switch (attribute.getType()) {
-                    case Attribute.TYPE_BOOLEAN:
+                    case Attribute.Type.BOOLEAN:
                         stringValue = Long.toString(attribute.getIntValue());
                         break;
-                    case Attribute.TYPE_DATE:
+                    case Attribute.Type.DATE:
                         stringValue = df.format(attribute.getDateValue());
                         break;
-                    case Attribute.TYPE_DOUBLE:
+                    case Attribute.Type.DOUBLE:
                         stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue().toString() : null;
                         break;
-                    case Attribute.TYPE_INT:
+                    case Attribute.Type.INTEGER:
                         stringValue = Long.toString(attribute.getIntValue());
                         break;
-                    case Attribute.TYPE_USER:
+                    case Attribute.Type.USER:
                         stringValue = Long.toString(attribute.getIntValue());
                         break;
                     default:
@@ -2249,22 +2249,22 @@ public class LDRepository {
         Attribute attribute = template.getAttribute(attributeName);
 
         switch (attribute.getType()) {
-            case Attribute.TYPE_BOOLEAN:
+            case Attribute.Type.BOOLEAN:
                 updateDocumentBooleanValue(doc, attributeName, stringValue);
                 break;
-            case Attribute.TYPE_DATE:
+            case Attribute.Type.DATE:
                 updateDocumentDateValue(doc, attributeName, stringValue);
                 break;
-            case Attribute.TYPE_DOUBLE:
+            case Attribute.Type.DOUBLE:
                 updateDocumentDoubleValue(doc, attributeName, stringValue);
                 break;
-            case Attribute.TYPE_INT:
+            case Attribute.Type.INTEGER:
                 updateDocumentIntValue(doc, attributeName, stringValue);
                 break;
-            case Attribute.TYPE_USER:
+            case Attribute.Type.USER:
                 updateDocumentUserValue(doc, attributeName, stringValue);
                 break;
-            case Attribute.TYPE_STRING:
+            case Attribute.Type.STRING:
                 doc.setValue(attributeName, stringValue);
                 break;
             default:

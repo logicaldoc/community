@@ -231,7 +231,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
             try {
                 for (String name : extensibleEntity.getAttributes().keySet()) {
                     Attribute att = extensibleEntity.getAttribute(name);
-                    if (att.isMultiple() && att.getType() == Attribute.TYPE_STRING) {
+                    if (att.isMultiple() && att.getType().equals(Attribute.Type.STRING)) {
                         String vals = extensibleEntity.getValues(name).stream().map(Object::toString)
                                 .collect(Collectors.joining(","));
                         att.setStringValues(vals);

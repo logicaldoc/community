@@ -1069,7 +1069,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             att.setBooleanValue(extAttr.getBooleanValue());
             att.setDoubleValue(extAttr.getDoubleValue());
             att.setDateValue(extAttr.getDateValue());
-            att.setType(extAttr.getType());
+            att.setType(extAttr.getType().ordinal());
             guiVersion.addAttribute(att);
         }
     }
@@ -1345,10 +1345,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                 continue;
 
             Attribute extAttr = new Attribute();
-            int templateType = templateAttribute.getType();
+            Attribute.Type templateType = templateAttribute.getType();
             int extAttrType = attr.getType();
 
-            if (templateType != extAttrType) {
+            if (templateType.ordinal() != extAttrType) {
                 updateAttributeValue1(attr, extAttr, templateType);
             } else {
                 updateAttributeValue2(attr, extAttr, templateType);
@@ -1371,24 +1371,24 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         }
     }
 
-    private static void updateAttributeValue2(GUIAttribute attr, Attribute extAttr, int templateType) {
-        if (templateType == Attribute.TYPE_INT) {
+    private static void updateAttributeValue2(GUIAttribute attr, Attribute extAttr, Attribute.Type templateType) {
+        if (templateType.equals(Attribute.Type.INTEGER)) {
             setIntValue(attr, extAttr);
-        } else if (templateType == Attribute.TYPE_BOOLEAN) {
+        } else if (templateType.equals(Attribute.Type.BOOLEAN)) {
             setBooleanValue(attr, extAttr);
-        } else if (templateType == Attribute.TYPE_DOUBLE) {
+        } else if (templateType.equals(Attribute.Type.DOUBLE)) {
             setDoubleValue(attr, extAttr);
-        } else if (templateType == Attribute.TYPE_DATE) {
+        } else if (templateType.equals(Attribute.Type.DATE)) {
             setDateValue(attr, extAttr);
-        } else if (templateType == Attribute.TYPE_STRING) {
+        } else if (templateType.equals(Attribute.Type.STRING)) {
             setStringValue(attr, extAttr);
-        } else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER
-                || templateType == Attribute.TYPE_DOCUMENT) {
+        } else if (templateType.equals(Attribute.Type.USER) || templateType.equals(Attribute.Type.FOLDER)
+                || templateType.equals(Attribute.Type.DOCUMENT)) {
             setUserValue(attr, extAttr, templateType);
         }
     }
 
-    private static void setUserValue(GUIAttribute attr, Attribute extAttr, int templateType) {
+    private static void setUserValue(GUIAttribute attr, Attribute extAttr, Attribute.Type templateType) {
         if (attr.getValue() != null) {
             extAttr.setIntValue(attr.getIntValue());
             extAttr.setStringValue(attr.getStringValue());
@@ -1434,26 +1434,26 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
             extAttr.setIntValue(null);
     }
 
-    private static void updateAttributeValue1(GUIAttribute attr, Attribute extAttr, int templateType) {
+    private static void updateAttributeValue1(GUIAttribute attr, Attribute extAttr, Attribute.Type templateType) {
         // This check is useful to avoid errors
         // related to the old template
         // attributes keys that remains on the form
         // value manager
-        if (attr.getValue() != null && attr.getValue().toString().trim().isEmpty() && templateType != 0) {
-            if (templateType == Attribute.TYPE_INT || templateType == Attribute.TYPE_BOOLEAN) {
+        if (attr.getValue() != null && attr.getValue().toString().trim().isEmpty() && templateType != null) {
+            if (templateType.equals(Attribute.Type.INTEGER) || templateType.equals(Attribute.Type.BOOLEAN)) {
                 extAttr.setIntValue(null);
-            } else if (templateType == Attribute.TYPE_DOUBLE) {
+            } else if (templateType.equals(Attribute.Type.DOUBLE)) {
                 extAttr.setDoubleValue(null);
-            } else if (templateType == Attribute.TYPE_DATE) {
+            } else if (templateType.equals(Attribute.Type.DATE)) {
                 extAttr.setDateValue(null);
             }
-        } else if (templateType == GUIAttribute.TYPE_DOUBLE) {
+        } else if (templateType.equals(Attribute.Type.DOUBLE)) {
             extAttr.setValue(attr.getValue() != null ? Double.parseDouble(attr.getValue().toString()) : null);
-        } else if (templateType == GUIAttribute.TYPE_INT) {
+        } else if (templateType.equals(Attribute.Type.INTEGER)) {
             extAttr.setValue(attr.getValue() != null ? Long.parseLong(attr.getValue().toString()) : null);
-        } else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
+        } else if (templateType.equals(Attribute.Type.BOOLEAN)) {
             extAttr.setValue(attr.getBooleanValue());
-            extAttr.setType(Attribute.TYPE_BOOLEAN);
+            extAttr.setType(Attribute.Type.BOOLEAN);
         } else if (isComplexType(templateType)) {
             extAttr.setIntValue(attr.getIntValue());
             extAttr.setStringValue(attr.getStringValue());
@@ -1461,9 +1461,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
         }
     }
 
-    private static boolean isComplexType(int attributeType) {
-        return attributeType == GUIAttribute.TYPE_USER || attributeType == GUIAttribute.TYPE_FOLDER
-                || attributeType == GUIAttribute.TYPE_DOCUMENT;
+    private static boolean isComplexType(Attribute.Type attributeType) {
+        return attributeType.equals(Attribute.Type.USER) || attributeType.equals(Attribute.Type.FOLDER)
+                || attributeType.equals(Attribute.Type.DOCUMENT);
     }
 
     @Override
@@ -1490,16 +1490,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
                     .initialize(documentDao.findByIds(guiMail.getDocIds().stream().collect(Collectors.toSet()), null));
 
             // Maintain the downloadable documents only
-            attachedDocs = attachedDocs.stream()
-                    .filter(d -> {
-                        try {
-                            return documentDao.isDownloadAllowed(d.getId(), session.getUserId());
-                        } catch (PersistenceException e) {
-                            log.warn(e.getMessage(), e);
-                            return false;
-                        }
-                    }).toList();
-            
+            attachedDocs = attachedDocs.stream().filter(d -> {
+                try {
+                    return documentDao.isDownloadAllowed(d.getId(), session.getUserId());
+                } catch (PersistenceException e) {
+                    log.warn(e.getMessage(), e);
+                    return false;
+                }
+            }).toList();
+
             /*
              * Subject and email are processed by the scripting engine
              */

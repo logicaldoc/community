@@ -409,7 +409,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
         // Normalize dates
         normalizeDate(att);
 
-        att.setType(templateExtAttr.getType());
+        att.setType(templateExtAttr.getType().ordinal());
 
         if (att.isMultiple() && extensibleObject != null) {
             // Get the other values

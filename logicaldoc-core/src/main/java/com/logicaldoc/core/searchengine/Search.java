@@ -203,7 +203,7 @@ public abstract class Search {
                         ext.setDoubleValue(rs.getDouble(6));
                         ext.setDateValue(rs.getDate(7));
                         ext.setStringValues(rs.getString(8));
-                        ext.setType(rs.getInt(3));
+                        ext.setType(Attribute.Type.values()[rs.getInt(3)]);
                         extAtt.put(D_S.formatted(docId, name), ext);
                         return null;
                     }

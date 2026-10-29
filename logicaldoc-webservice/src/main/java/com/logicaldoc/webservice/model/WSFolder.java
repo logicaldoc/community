@@ -197,7 +197,7 @@ public class WSFolder implements Serializable {
             wsAttribute.setIntValue(attr.getIntValue());
             wsAttribute.setStringValue(attr.getStringValue());
             wsAttribute.setStringValues(attr.getStringValues());
-            wsAttribute.setType(attr.getType());
+            wsAttribute.setType(attr.getType().ordinal());
             wsAttribute.setDependsOn(attr.getDependsOn());
             wsAttributes.add(wsAttribute);
         }
@@ -224,7 +224,7 @@ public class WSFolder implements Serializable {
                     extAttribute.setStringValue(wsAttribute.getStringValue());
                     extAttribute.setDoubleValue(wsAttribute.getDoubleValue());
                     extAttribute.setDateValue(WSUtil.convertStringToDate(wsAttribute.getDateValue()));
-                    extAttribute.setType(wsAttribute.getType());
+                    extAttribute.setType(Attribute.Type.values()[wsAttribute.getType()]);
                     folder.getAttributes().put(wsAttribute.getName(), extAttribute);
                 }
             }

@@ -224,7 +224,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             sb.append(" and ld_status = %d".formatted(status.ordinal()));
 
         try {
-            return query(sb.toString(), (resultSet, col) -> {
+            return query(sb.toString(), (resultSet, _) -> {
                 Document doc = new Document();
                 doc.setId(resultSet.getLong(1));
                 Folder folder = new Folder();
@@ -287,9 +287,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             doc.getAttributes().values().removeIf(Attribute::isSection);
 
             // Count those attributes that reference other documents
-            doc.setDocAttrs((int) doc.getAttributes().values().stream().filter(
-                    a -> a.getType() == Attribute.TYPE_DOCUMENT && a.getIntValue() != null && a.getIntValue() != 0L)
-                    .count());
+            doc.setDocAttrs(
+                    (int) doc.getAttributes().values().stream().filter(a -> a.getType().equals(Attribute.Type.DOCUMENT)
+                            && a.getIntValue() != null && a.getIntValue() != 0L).count());
 
             // Remove any initialization and validation in attributes
             cleanValidationAndInitialization(doc);
@@ -672,8 +672,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         query(query.toString(), Map.of("tagLike", "%s%%".formatted(firstLetter.toLowerCase())),
                 new RowMapper<Object>() {
 
-        
-            @Override
+                    @Override
                     public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
                         Long value = rs.getLong(1);
                         String key = rs.getString(2);
@@ -1519,7 +1518,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
         }
         digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
 
-        return query(digestQuery.toString(), (rs, rowNum) -> rs.getString(1), null);
+        return query(digestQuery.toString(), (rs, _) -> rs.getString(1), null);
 
     }
 
