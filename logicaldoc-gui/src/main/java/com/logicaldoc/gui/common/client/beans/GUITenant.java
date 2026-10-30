@@ -116,6 +116,10 @@ public class GUITenant implements Serializable {
 
     private List<String> quotaAlertRecipients = new ArrayList<>();
 
+    private long quotaAlertFrequency = 24L;
+
+    private boolean quotaAlertReached = false;
+
     public String getName() {
         return name;
     }
@@ -511,5 +515,21 @@ public class GUITenant implements Serializable {
 
     public void setStorage(long storage) {
         this.storage = storage;
+    }
+
+    public long getQuotaAlertFrequency() {
+        return quotaAlertFrequency;
+    }
+
+    public void setQuotaAlertFrequency(long quotaAlertFrequency) {
+        this.quotaAlertFrequency = quotaAlertFrequency;
+    }
+
+    public boolean isQuotaAlertReached() {
+        return quotaAlertReached;
+    }
+
+    public void setQuotaAlertReached(boolean quotaAlertReached) {
+        this.quotaAlertReached = quotaAlertReached;
     }
 }

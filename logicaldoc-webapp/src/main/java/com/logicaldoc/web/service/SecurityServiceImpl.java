@@ -180,6 +180,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         guiTenant.setEmailAccountsQuota(tenant.getEmailAccountsQuota());
         guiTenant.setQuotaThreshold(tenant.getQuotaThreshold());
         guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
+        guiTenant.setQuotaAlertFrequency(Context.get().getConfig().getLong("quota.alert.freq", 24));
+        guiTenant.setQuotaAlertReached(Context.get().getConfig().getBoolean("quota.alert.reached", false));
         guiTenant.setEnabled(tenant.isEnabled());
         guiTenant.setExpire(tenant.getExpire());
 

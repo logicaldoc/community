@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -24,6 +25,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class TenantQuotaPanel extends HLayout {
+
+    private static final String ALERTREACHED = "alertreached";
+
+    private static final String ALERTFREQUENCY = "alertfrequency";
 
     private static final String PAGES_QUOTA = "pagesquota";
 
@@ -138,6 +143,23 @@ public class TenantQuotaPanel extends HLayout {
         if (changedHandler != null)
             quotaThreshold.addChangedHandler(changedHandler);
 
+        SpinnerItem frequency = ItemFactory.newSpinnerItem(ALERTFREQUENCY, ALERTFREQUENCY,
+                tenant.getQuotaAlertFrequency());
+        frequency.setRequired(true);
+        frequency.setDisabled(changedHandler == null);
+        frequency.setMin(1);
+        frequency.setHint(I18N.message("hours").toLowerCase());
+        frequency.setVisible(tenant.isDefault());
+        if (changedHandler != null)
+            frequency.addChangedHandler(changedHandler);
+
+        CheckboxItem reached = ItemFactory.newCheckbox(ALERTREACHED, "alertwhenreached");
+        reached.setValue(tenant.isQuotaAlertReached());
+        reached.setDisabled(changedHandler == null);
+        reached.setVisible(tenant.isDefault());
+        if (changedHandler != null)
+            reached.addChangedHandler(changedHandler);
+
         recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false, false),
                 tenant.getQuotaAlertRecipients().toArray(new String[0]));
         recipients.setDisabled(changedHandler == null);
@@ -197,7 +219,8 @@ public class TenantQuotaPanel extends HLayout {
                 sizeQuota, sizeSystemQuota, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, ticketsQuota,
                 ticketsSystemQuota, workflowsQuota, workflowsSystemQuota, formsSystemQuota, formsQuota,
                 reportsSystemQuota, reportsQuota, stampsSystemQuota, stampsQuota, importFoldersSystemQuota,
-                importFoldersQuota, emailAccountsSystemQuota, emailAccountsQuota, quotaThreshold, recipients);
+                importFoldersQuota, emailAccountsSystemQuota, emailAccountsQuota, quotaThreshold, frequency, reached,
+                recipients);
         addMember(layout);
     }
 
@@ -288,7 +311,7 @@ public class TenantQuotaPanel extends HLayout {
     }
 
     private SpinnerItem applyQuotaItemVisibility(SpinnerItem item) {
-        item.setVisible(!tenant.isSystem());
+        item.setDisabled(tenant.isSystem());
         if (changedHandler != null)
             item.addChangedHandler(changedHandler);
         return item;
@@ -333,6 +356,11 @@ public class TenantQuotaPanel extends HLayout {
 
         setQuotaAlertRecipients();
 
+        if (tenant.isDefault()) {
+            tenant.setQuotaAlertFrequency(Integer.parseInt(values.get(ALERTFREQUENCY).toString()));
+            tenant.setQuotaAlertReached(Boolean.parseBoolean(values.get(ALERTREACHED).toString()));
+        }
+        
         return !vm.hasErrors();
     }
 

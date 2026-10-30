@@ -34,13 +34,6 @@ public class QuotaPanel extends AdminPanel {
 					TenantService.Instance.get().load(Constants.TENANT_SYSTEMID, new DefaultAsyncCallback<>() {
 						@Override
 						public void handleSuccess(GUITenant ten) {
-							Tab system = new Tab();
-							system.setTitle(I18N.message("system"));
-							system.setPane(new TenantQuotaPanel(ten, event -> {
-								// Nothing to do
-							}));
-							tabs.addTab(system);
-							
 							Tab usage = new Tab();
 							usage.setTitle(I18N.message("usage"));
 							usage.setPane(new UsagePanel());
@@ -60,7 +53,7 @@ public class QuotaPanel extends AdminPanel {
 		IButton save = new IButton(I18N.message("save"));
 		save.addClickHandler(click -> {
 			if (tenantQuota.validate())
-				TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
+			    TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 					@Override
 					public void handleSuccess(GUITenant ten) {
 						QuotaPanel.this.tenant = ten;
