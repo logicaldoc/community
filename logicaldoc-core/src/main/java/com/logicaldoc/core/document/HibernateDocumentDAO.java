@@ -663,24 +663,27 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
     public Map<String, Long> findTags(String firstLetter, Long tenantId) throws PersistenceException {
         final Map<String, Long> map = new HashMap<>();
 
+        Map<String, Object> params = new HashMap<>();
         StringBuilder query = new StringBuilder("SELECT ld_count, ld_tag from ld_uniquetag where 1 = 1 ");
-        if (StringUtils.isNotEmpty(firstLetter))
+        if (StringUtils.isNotEmpty(firstLetter)) {
             query.append(" and lower(ld_tag) like :tagLike ");
+            params.put("tagLike", "%s%%".formatted(firstLetter.toLowerCase()));
+        }
+
         if (tenantId != null)
             query.append(AND_LD_TENANTID_D.formatted(tenantId));
 
-        query(query.toString(), Map.of("tagLike", "%s%%".formatted(firstLetter.toLowerCase())),
-                new RowMapper<Object>() {
+        query(query.toString(), params, new RowMapper<Object>() {
 
-                    @Override
-                    public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
-                        Long value = rs.getLong(1);
-                        String key = rs.getString(2);
-                        map.put(key, value);
-                        return null;
-                    }
+            @Override
+            public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
+                Long value = rs.getLong(1);
+                String key = rs.getString(2);
+                map.put(key, value);
+                return null;
+            }
 
-                }, null);
+        }, null);
 
         return map;
     }
