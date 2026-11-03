@@ -54,7 +54,27 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
     private static final Logger log = LoggerFactory.getLogger(LoginServiceImpl.class);
 
     @Override
-    public GUIValue changePassword(long userId, String oldPassword, String newPassword) {
+    public GUIValue changePassword(long userId, String oldPassword, String newPassword) throws ServerException {
+        if (StringUtils.isEmpty(oldPassword)) {
+            log.warn("User {} tried to change the password providing an empty old one", userId);
+            throw new ServerException("error");
+        }
+
+        try {
+            User user = UserDAO.get().findById(userId);
+            if (user == null) {
+                log.warn("Unexisting user {} tried to change the password", userId);
+                throw new ServerException("error");
+            }
+
+            if (!user.isPasswordExpired()) {
+                log.warn("User {} tried to change the password but it was not expired", userId);
+                throw new ServerException("error");
+            }
+        } catch (PersistenceException e) {
+            log.error(e.getMessage(), e);
+        }
+
         SecurityServiceImpl ser = new SecurityServiceImpl();
         return ser.changePassword(userId, userId, oldPassword, newPassword, false);
     }
