@@ -16,74 +16,71 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class ImportFolderAutomationPanel extends ImportFolderDetailsTab {
 
-	private DynamicForm form = new DynamicForm();
+    private DynamicForm form = new DynamicForm();
 
-	private HLayout container = new HLayout();
+    private HLayout container = new HLayout();
 
-	public ImportFolderAutomationPanel(GUIImportFolder importFolder, ChangedHandler changedHandler) {
-		super(importFolder, changedHandler);
-		setWidth100();
-		setHeight100();
-		setMembers(container);
-	}
+    public ImportFolderAutomationPanel(GUIImportFolder importFolder, ChangedHandler changedHandler) {
+        super(importFolder, changedHandler);
+        setWidth100();
+        setHeight100();
+        setMembers(container);
 
-	@Override
-	public void onDraw() {
-		form.clearValues();
-		form.clearErrors(false);
-		form.destroy();
+        form.clearValues();
+        form.clearErrors(false);
+        form.destroy();
 
-		if (Boolean.TRUE.equals(container.contains(form)))
-			container.removeChild(form);
+        if (Boolean.TRUE.equals(container.contains(form)))
+            container.removeChild(form);
 
-		form = new DynamicForm();
-		form.setWidth100();
-		form.setHeight100();
-		form.setNumCols(1);
-		form.setTitleOrientation(TitleOrientation.TOP);
+        form = new DynamicForm();
+        form.setWidth100();
+        form.setHeight100();
+        form.setNumCols(1);
+        form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextAreaItem automationBefore = ItemFactory.newTextAreaItemForAutomation("automationBefore",
-				"whendocumentprocessing", importFolder.getAutomation(), changedHandler, false);
-		automationBefore.setRequired(false);
-		automationBefore.setWidth("*");
-		automationBefore.setHeight("*");
-		automationBefore.addChangedHandler(changedHandler);
+        TextAreaItem automationBefore = ItemFactory.newTextAreaItemForAutomation("automationBefore",
+                "whendocumentprocessing", importFolder.getAutomation(), changedHandler, false);
+        automationBefore.setRequired(false);
+        automationBefore.setWidth("*");
+        automationBefore.setHeight("*");
+        automationBefore.addChangedHandler(changedHandler);
 
-		TextAreaItem automationAfter = ItemFactory.newTextAreaItemForAutomation("automationAfter",
-				"afterdocumentprocessed", importFolder.getAutomationAfter(), changedHandler, false);
-		automationAfter.setRequired(false);
-		automationAfter.setWidth("*");
-		automationAfter.setHeight("*");
-		automationAfter.addChangedHandler(changedHandler);
+        TextAreaItem automationAfter = ItemFactory.newTextAreaItemForAutomation("automationAfter",
+                "afterdocumentprocessed", importFolder.getAutomationAfter(), changedHandler, false);
+        automationAfter.setRequired(false);
+        automationAfter.setWidth("*");
+        automationAfter.setHeight("*");
+        automationAfter.addChangedHandler(changedHandler);
 
-		TextAreaItem automationEnd = ItemFactory.newTextAreaItemForAutomation("automationEnd", "aftercrawlingprocessed",
-				importFolder.getAutomationEnd(), changedHandler, false);
-		automationEnd.setRequired(false);
-		automationEnd.setWidth("*");
-		automationEnd.setHeight("*");
-		automationAfter.addChangedHandler(changedHandler);
+        TextAreaItem automationEnd = ItemFactory.newTextAreaItemForAutomation("automationEnd", "aftercrawlingprocessed",
+                importFolder.getAutomationEnd(), changedHandler, false);
+        automationEnd.setRequired(false);
+        automationEnd.setWidth("*");
+        automationEnd.setHeight("*");
+        automationAfter.addChangedHandler(changedHandler);
 
-		form.setItems(automationBefore, automationAfter, automationEnd);
+        form.setItems(automationBefore, automationAfter, automationEnd);
 
-		container.addMember(form);
-	}
+        container.addMember(form);
+    }
 
-	boolean validate() {
-		if (form.validate()) {
-			importFolder.setAutomation(form.getValueAsString("automationBefore"));
-			importFolder.setAutomationAfter(form.getValueAsString("automationAfter"));
-			importFolder.setAutomationEnd(form.getValueAsString("automationEnd"));
-		}
-		return !form.hasErrors();
-	}
+    boolean validate() {
+        if (form.validate()) {
+            importFolder.setAutomation(form.getValueAsString("automationBefore"));
+            importFolder.setAutomationAfter(form.getValueAsString("automationAfter"));
+            importFolder.setAutomationEnd(form.getValueAsString("automationEnd"));
+        }
+        return !form.hasErrors();
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
