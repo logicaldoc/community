@@ -25,10 +25,7 @@ public class ImportFolderAutomationPanel extends ImportFolderDetailsTab {
 		setWidth100();
 		setHeight100();
 		setMembers(container);
-	}
 
-	@Override
-	public void onDraw() {
 		form.clearValues();
 		form.clearErrors(false);
 		form.destroy();
