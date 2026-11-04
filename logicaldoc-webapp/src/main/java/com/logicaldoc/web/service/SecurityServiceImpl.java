@@ -164,20 +164,33 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
         guiTenant.setState(tenant.getState());
         guiTenant.setStreet(tenant.getStreet());
         guiTenant.setTelephone(tenant.getTelephone());
-        guiTenant.setDocumentsQuota(tenant.getDocumentsQuota());
-        guiTenant.setPagesQuota(tenant.getPagesQuota());
-        guiTenant.setStorageQuota(tenant.getStorageQuota());
-        guiTenant.setSessionsQuota(tenant.getSessionsQuota());
-        guiTenant.setApiCallsQuota(tenant.getApiCallsQuota());
         guiTenant.setRegularUsersQuota(tenant.getRegularUsersQuota());
+        guiTenant.setRegularUsersQuotaThreshold(tenant.getRegularUsersQuotaThreshold());
         guiTenant.setReadonlyUsersQuota(tenant.getReadonlyUsersQuota());
+        guiTenant.setReadonlyUsersQuotaThreshold(tenant.getReadonlyUsersQuotaThreshold());
+        guiTenant.setSessionsQuota(tenant.getSessionsQuota());
+        guiTenant.setSessionsQuotaThreshold(tenant.getSessionsQuotaThreshold());
+        guiTenant.setDocumentsQuota(tenant.getDocumentsQuota());
+        guiTenant.setDocumentsQuotaThreshold(tenant.getDocumentsQuotaThreshold());
+        guiTenant.setPagesQuota(tenant.getPagesQuota());
+        guiTenant.setPagesQuotaThreshold(tenant.getPagesQuotaThreshold());
+        guiTenant.setStorageQuota(tenant.getStorageQuota());
+        guiTenant.setStorageQuotaThreshold(tenant.getStorageQuotaThreshold());
+        guiTenant.setApiCallsQuotaThreshold(tenant.getApiCallsQuotaThreshold());
         guiTenant.setTicketsQuota(tenant.getTicketsQuota());
+        guiTenant.setTicketsQuotaThreshold(tenant.getTicketsQuotaThreshold());
         guiTenant.setWorkflowsQuota(tenant.getWorkflowsQuota());
+        guiTenant.setWorkflowsQuotaThreshold(tenant.getWorkflowsQuotaThreshold());
         guiTenant.setFormsQuota(tenant.getFormsQuota());
+        guiTenant.setFormsQuotaThreshold(tenant.getFormsQuotaThreshold());
         guiTenant.setReportsQuota(tenant.getReportsQuota());
+        guiTenant.setReportsQuotaThreshold(tenant.getReportsQuotaThreshold());
         guiTenant.setStampsQuota(tenant.getStampsQuota());
+        guiTenant.setStampsQuotaThreshold(tenant.getStampsQuotaThreshold());
         guiTenant.setImportFoldersQuota(tenant.getImportFoldersQuota());
+        guiTenant.setImportFoldersQuotaThreshold(tenant.getImportFoldersQuotaThreshold());
         guiTenant.setEmailAccountsQuota(tenant.getEmailAccountsQuota());
+        guiTenant.setEmailAccountsQuotaThreshold(tenant.getEmailAccountsQuotaThreshold());
         guiTenant.setQuotaThreshold(tenant.getQuotaThreshold());
         guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
         guiTenant.setQuotaAlertFrequency(Context.get().getConfig().getLong("quota.alert.freq", 24));
@@ -1343,7 +1356,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             } else {
                 User user = udao.findByGroup(group.getId()).iterator().next();
                 ace.setLabel(user.getUsername());
-                ace.setName("%s: %s (%s)".formatted(I18N.message("user", LocaleUtil.toLocale(locale)), user.getFullName(), user.getUsername()));
+                ace.setName("%s: %s (%s)".formatted(I18N.message("user", LocaleUtil.toLocale(locale)),
+                        user.getFullName(), user.getUsername()));
             }
 
             acl.add(ace);

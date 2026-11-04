@@ -1423,11 +1423,19 @@ public class ItemFactory {
     public static SpinnerItem newQuotaSpinnerItem(String name, Long quota, long usage) {
         SpinnerItem item = ItemFactory.newSpinnerItem(name, quota);
         item.setRequired(false);
-        item.setMin(-1);
+        item.setMin(0);
         item.setStep(1);
         item.setWidth(120);
         item.setHint(I18N.message("usedhint", Util.formatLong(usage)));
         return item;
+    }
+
+    public static SpinnerItem newQuotaAlertThresholdSpinnerItem(String name, Integer threshold) {
+        SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(name, "alertthreshold", threshold);
+        quotaThreshold.setMax(100);
+        quotaThreshold.setMin(0);
+        quotaThreshold.setHint("%");
+        return quotaThreshold;
     }
 
     public static Img newImgIcon(String name) {

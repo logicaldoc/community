@@ -79,17 +79,32 @@ public class Tenant extends PersistentObject implements Serializable {
     @Column(name = "ld_usersquota")
     private Long regularUsersQuota;
 
+    @Column(name = "ld_usersquotathr")
+    private Integer regularUsersQuotaThreshold = null;
+
     @Column(name = "ld_rousersquota")
     private Long readonlyUsersQuota;
+
+    @Column(name = "ld_rousersquotathr")
+    private Integer readonlyUsersQuotaThreshold;
 
     @Column(name = "ld_sessionsquota")
     private Long sessionsQuota;
 
+    @Column(name = "ld_sessionsquotathr")
+    private Integer sessionsQuotaThreshold;
+
     @Column(name = "ld_documentsquota")
     private Long documentsQuota;
 
+    @Column(name = "ld_documentsquotathr")
+    private Integer documentsQuotaThreshold;
+
     @Column(name = "ld_pagesquota")
     private Long pagesQuota;
+
+    @Column(name = "ld_pagesquotathr")
+    private Integer pagesQuotaThreshold;
 
     /**
      * Maximum repository size expressed in MB
@@ -97,33 +112,60 @@ public class Tenant extends PersistentObject implements Serializable {
     @Column(name = "ld_storagequota")
     private Long storageQuota;
 
+    @Column(name = "ld_storagequotathr")
+    private Integer storageQuotaThreshold;
+    
     /**
      * Maximum monthly API calls
      */
     @Column(name = "ld_apicallsquota")
     private Long apiCallsQuota;
 
+    @Column(name = "ld_apicallsquotathr")
+    private Integer apiCallsQuotaThreshold;
+    
     @Column(name = "ld_ticketsquota")
     private Long ticketsQuota;
+    
+    @Column(name = "ld_ticketsquotathr")
+    private Integer ticketsQuotaThreshold;
 
     @Column(name = "ld_workflowsquota")
     private Long workflowsQuota;
+    
+    @Column(name = "ld_workflowsquotathr")
+    private Integer workflowsQuotaThreshold;
 
     @Column(name = "ld_formsquota")
     private Long formsQuota;
+    
+    @Column(name = "ld_formsquotathr")
+    private Integer formsQuotaThreshold;
 
     @Column(name = "ld_reportsquota")
     private Long reportsQuota;
+    
+    @Column(name = "ld_reportsquotathr")
+    private Integer reportsQuotaThreshold;
 
     @Column(name = "ld_stampsquota")
     private Long stampsQuota;
 
+    @Column(name = "ld_stampsquotathr")
+    private Integer stampsQuotaThreshold;
+    
     @Column(name = "ld_importfoldersquota")
     private Long importFoldersQuota;
 
+    @Column(name = "ld_importfoldersquotathr")
+    private Integer importFoldersQuotaThreshold;
+    
     @Column(name = "ld_emailaccountsquota")
     private Long emailAccountsQuota;
 
+    @Column(name = "ld_emailaccountsquotathr")
+    private Integer emailAccountsQuotaThreshold;
+    
     @Column(name = "ld_qthreshold")
     private Integer quotaThreshold = null;
 
@@ -146,21 +188,35 @@ public class Tenant extends PersistentObject implements Serializable {
         this.telephone = source.telephone;
         this.type = source.type;
         this.regularUsersQuota = source.regularUsersQuota;
+        this.regularUsersQuotaThreshold = source.regularUsersQuotaThreshold;
         this.readonlyUsersQuota = source.readonlyUsersQuota;
+        this.readonlyUsersQuotaThreshold = source.readonlyUsersQuotaThreshold;
         this.sessionsQuota = source.sessionsQuota;
+        this.sessionsQuotaThreshold = source.sessionsQuotaThreshold;
         this.documentsQuota = source.documentsQuota;
+        this.documentsQuotaThreshold = source.documentsQuotaThreshold;
         this.pagesQuota = source.pagesQuota;
+        this.pagesQuotaThreshold = source.pagesQuotaThreshold;
+        this.storageQuota = source.storageQuota;
+        this.storageQuotaThreshold = source.storageQuotaThreshold;
+        this.apiCallsQuota = source.apiCallsQuota;
+        this.apiCallsQuotaThreshold = source.apiCallsQuotaThreshold;
+        this.ticketsQuota = source.ticketsQuota;
+        this.ticketsQuotaThreshold = source.ticketsQuotaThreshold;
+        this.workflowsQuota = source.workflowsQuota;
+        this.workflowsQuotaThreshold = source.workflowsQuotaThreshold;
+        this.formsQuota = source.formsQuota;
+        this.formsQuotaThreshold = source.formsQuotaThreshold;
+        this.reportsQuota = source.reportsQuota;
+        this.reportsQuotaThreshold = source.reportsQuotaThreshold;
+        this.stampsQuota = source.stampsQuota;
+        this.stampsQuotaThreshold = source.stampsQuotaThreshold;
+        this.importFoldersQuota = source.importFoldersQuota;
+        this.importFoldersQuotaThreshold = source.importFoldersQuotaThreshold;
+        this.emailAccountsQuota = source.emailAccountsQuota;
+        this.emailAccountsQuotaThreshold = source.emailAccountsQuotaThreshold;        
         this.enabled = source.enabled;
         this.expire = source.expire;
-        this.storageQuota = source.storageQuota;
-        this.apiCallsQuota = source.apiCallsQuota;
-        this.ticketsQuota = source.ticketsQuota;
-        this.workflowsQuota = source.workflowsQuota;
-        this.formsQuota = source.formsQuota;
-        this.reportsQuota = source.reportsQuota;
-        this.stampsQuota = source.stampsQuota;
-        this.importFoldersQuota = source.importFoldersQuota;
-        this.emailAccountsQuota = source.emailAccountsQuota;
         this.quotaThreshold = source.quotaThreshold;
         this.quotaAlertRecipients = source.quotaAlertRecipients;
 
@@ -269,12 +325,28 @@ public class Tenant extends PersistentObject implements Serializable {
         this.regularUsersQuota = regularUsersQuota;
     }
 
+    public Integer getRegularUsersQuotaThreshold() {
+        return regularUsersQuotaThreshold;
+    }
+
+    public void setRegularUsersQuotaThreshold(Integer regularUsersQuotaThreshold) {
+        this.regularUsersQuotaThreshold = regularUsersQuotaThreshold;
+    }
+
     public Long getReadonlyUsersQuota() {
         return readonlyUsersQuota;
     }
 
     public void setReadonlyUsersQuota(Long readonlyUsersQuota) {
         this.readonlyUsersQuota = readonlyUsersQuota;
+    }
+
+    public Integer getReadonlyUsersQuotaThreshold() {
+        return readonlyUsersQuotaThreshold;
+    }
+
+    public void setReadonlyUsersQuotaThreshold(Integer readonlyUsersQuotaThreshold) {
+        this.readonlyUsersQuotaThreshold = readonlyUsersQuotaThreshold;
     }
 
     public Long getSessionsQuota() {
@@ -285,12 +357,28 @@ public class Tenant extends PersistentObject implements Serializable {
         this.sessionsQuota = sessionsQuota;
     }
 
+    public Integer getSessionsQuotaThreshold() {
+        return sessionsQuotaThreshold;
+    }
+
+    public void setSessionsQuotaThreshold(Integer sessionsQuotaThreshold) {
+        this.sessionsQuotaThreshold = sessionsQuotaThreshold;
+    }
+
     public Long getDocumentsQuota() {
         return documentsQuota;
     }
 
     public void setDocumentsQuota(Long documentsQuota) {
         this.documentsQuota = documentsQuota;
+    }
+
+    public Integer getDocumentsQuotaThreshold() {
+        return documentsQuotaThreshold;
+    }
+
+    public void setDocumentsQuotaThreshold(Integer documentsQuotaThreshold) {
+        this.documentsQuotaThreshold = documentsQuotaThreshold;
     }
 
     public Long getStorageQuota() {
@@ -300,6 +388,14 @@ public class Tenant extends PersistentObject implements Serializable {
     public void setStorageQuota(Long storageQuota) {
         this.storageQuota = storageQuota;
     }
+    
+    public Integer getStorageQuotaThreshold() {
+        return storageQuotaThreshold;
+    }
+
+    public void setStorageQuotaThreshold(Integer storageQuotaThreshold) {
+        this.storageQuotaThreshold = storageQuotaThreshold;
+    }
 
     public Long getApiCallsQuota() {
         return apiCallsQuota;
@@ -307,6 +403,14 @@ public class Tenant extends PersistentObject implements Serializable {
 
     public void setApiCallsQuota(Long apiCallsQuota) {
         this.apiCallsQuota = apiCallsQuota;
+    }
+    
+    public Integer getApiCallsQuotaThreshold() {
+        return apiCallsQuotaThreshold;
+    }
+
+    public void setApiCallsQuotaThreshold(Integer apiCallsQuotaThreshold) {
+        this.apiCallsQuotaThreshold = apiCallsQuotaThreshold;
     }
 
     public Long getTicketsQuota() {
@@ -316,6 +420,14 @@ public class Tenant extends PersistentObject implements Serializable {
     public void setTicketsQuota(Long ticketsQuota) {
         this.ticketsQuota = ticketsQuota;
     }
+        
+    public Integer getTicketsQuotaThreshold() {
+        return ticketsQuotaThreshold;
+    }
+
+    public void setTicketsQuotaThreshold(Integer ticketsQuotaThreshold) {
+        this.ticketsQuotaThreshold = ticketsQuotaThreshold;
+    }
 
     public Long getWorkflowsQuota() {
         return workflowsQuota;
@@ -323,6 +435,14 @@ public class Tenant extends PersistentObject implements Serializable {
 
     public void setWorkflowsQuota(Long workflowsQuota) {
         this.workflowsQuota = workflowsQuota;
+    }
+    
+    public Integer getWorkflowsQuotaThreshold() {
+        return workflowsQuotaThreshold;
+    }
+
+    public void setWorkflowsQuotaThreshold(Integer workflowsQuotaThreshold) {
+        this.workflowsQuotaThreshold = workflowsQuotaThreshold;
     }
 
     public Long getFormsQuota() {
@@ -332,6 +452,14 @@ public class Tenant extends PersistentObject implements Serializable {
     public void setFormsQuota(Long formsQuota) {
         this.formsQuota = formsQuota;
     }
+    
+    public Integer getFormsQuotaThreshold() {
+        return formsQuotaThreshold;
+    }
+
+    public void setFormsQuotaThreshold(Integer formsQuotaThreshold) {
+        this.formsQuotaThreshold = formsQuotaThreshold;
+    }
 
     public Long getReportsQuota() {
         return reportsQuota;
@@ -339,6 +467,14 @@ public class Tenant extends PersistentObject implements Serializable {
 
     public void setReportsQuota(Long reportsQuota) {
         this.reportsQuota = reportsQuota;
+    }
+    
+    public Integer getReportsQuotaThreshold() {
+        return reportsQuotaThreshold;
+    }
+
+    public void setReportsQuotaThreshold(Integer reportsQuotaThreshold) {
+        this.reportsQuotaThreshold = reportsQuotaThreshold;
     }
 
     public Long getStampsQuota() {
@@ -348,21 +484,45 @@ public class Tenant extends PersistentObject implements Serializable {
     public void setStampsQuota(Long stampsQuota) {
         this.stampsQuota = stampsQuota;
     }
+    
+    public Integer getStampsQuotaThreshold() {
+        return stampsQuotaThreshold;
+    }
+
+    public void setStampsQuotaThreshold(Integer stampsQuotaThreshold) {
+        this.stampsQuotaThreshold = stampsQuotaThreshold;
+    }
 
     public Long getImportFoldersQuota() {
         return importFoldersQuota;
     }
-
+    
     public void setImportFoldersQuota(Long importFoldersQuota) {
         this.importFoldersQuota = importFoldersQuota;
+    }  
+
+    public Integer getImportFoldersQuotaThreshold() {
+        return importFoldersQuotaThreshold;
     }
 
+    public void setImportFoldersQuotaThreshold(Integer importFoldersQuotaThreshold) {
+        this.importFoldersQuotaThreshold = importFoldersQuotaThreshold;
+    }
+    
     public Long getEmailAccountsQuota() {
         return emailAccountsQuota;
     }
 
     public void setEmailAccountsQuota(Long emailAccountsQuota) {
         this.emailAccountsQuota = emailAccountsQuota;
+    }
+    
+    public Integer getEmailAccountsQuotaThreshold() {
+        return emailAccountsQuotaThreshold;
+    }
+
+    public void setEmailAccountsQuotaThreshold(Integer emailAccountsQuotaThreshold) {
+        this.emailAccountsQuotaThreshold = emailAccountsQuotaThreshold;
     }
 
     public boolean isEnabled() {
@@ -429,13 +589,20 @@ public class Tenant extends PersistentObject implements Serializable {
         setQuotaAlertRecipients(str);
     }
 
-
     public Long getPagesQuota() {
         return pagesQuota;
     }
 
     public void setPagesQuota(Long pagesQuota) {
         this.pagesQuota = pagesQuota;
+    }
+
+    public Integer getPagesQuotaThreshold() {
+        return pagesQuotaThreshold;
+    }
+
+    public void setPagesQuotaThreshold(Integer pagesQuotaThreshold) {
+        this.pagesQuotaThreshold = pagesQuotaThreshold;
     }
 
     @Override

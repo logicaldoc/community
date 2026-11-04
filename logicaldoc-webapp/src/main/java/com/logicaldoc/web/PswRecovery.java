@@ -97,7 +97,7 @@ public class PswRecovery extends HttpServlet {
                     ticket.setCount(ticket.getCount() + 1);
                     ticket.setEnabled(false);
                     ticketDao.store(ticket);
-                    sendEmail(request, response, tenant, user);
+                    resetPasswordAndNotify(request, response, tenant, user);
                 }
             }
         } catch (Exception e) {
@@ -115,7 +115,7 @@ public class PswRecovery extends HttpServlet {
         }
     }
 
-    private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant, User user)
+    private void resetPasswordAndNotify(HttpServletRequest request, HttpServletResponse response, String tenant, User user)
             throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException,
             AutomationException {
 

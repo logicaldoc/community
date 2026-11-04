@@ -29,8 +29,10 @@ public interface LoginService extends RemoteService {
 	 *         is incorrect, 2 if the new password cannot be notified, 3 if the
 	 *         password has been already used, otherwise a positive number
 	 *         grater than 3
+	 *         
+	 * @throws ServerException ServerException error in the server application
 	 */
-	public GUIValue changePassword(long userId, String oldPassword, String newPassword);
+	public GUIValue changePassword(long userId, String oldPassword, String newPassword) throws ServerException;
 
 	/**
 	 * Reset the password for the given email.

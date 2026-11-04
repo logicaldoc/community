@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TenantQuotaPanel extends HLayout {
 
+    private static final String THRESHOLD = "threshold";
+
     private static final String ALERTREACHED = "alertreached";
 
     private static final String ALERTFREQUENCY = "alertfrequency";
@@ -105,36 +107,37 @@ public class TenantQuotaPanel extends HLayout {
 
         layout.addMember(form, 1);
 
-        SpinnerItem regularUsersQuota = prepareRegularUsersQuotaItem();
+        SpinnerItem[] regularUsersQuota = prepareRegularUsersQuotaItems();
 
-        SpinnerItem readonlyUsersQuota = prepareReadonlyUsersQuotaItem();
+        SpinnerItem[] readonlyUsersQuota = prepareReadonlyUsersQuotaItems();
 
-        SpinnerItem sessionsQuota = prepareSessionsQuotaItem();
+        SpinnerItem[] sessionsQuota = prepareSessionsQuotaItems();
 
-        SpinnerItem monthlyApiCallsQuota = prepareMonthlyApiCallsQuotaItem();
+        SpinnerItem[] documentsQuota = prepareDocumentsQuotaItems();
 
-        SpinnerItem documentsQuota = prepareDocumentsQuotaItem();
+        SpinnerItem[] pagesQuota = preparePagesQuotaItems();
 
-        SpinnerItem pagesQuota = preparePagesQuotaItem();
+        SpinnerItem[] storageQuota = prepareStorageQuotaItems();
 
-        SpinnerItem sizeQuota = prepareStorageQuotaItem();
+        SpinnerItem[] monthlyApiCallsQuota = prepareMonthlyApiCallsQuotaItems();
 
-        SpinnerItem ticketsQuota = prepareTicketsQuoteItem();
+        SpinnerItem[] ticketsQuota = prepareTicketsQuoteItems();
 
-        SpinnerItem workflowsQuota = prepareWorkflowQuotaItem();
+        SpinnerItem[] workflowsQuota = prepareWorkflowQuotaItems();
 
-        SpinnerItem formsQuota = prepareFormsQuotaItem();
+        SpinnerItem[] formsQuota = prepareFormsQuotaItems();
 
-        SpinnerItem reportsQuota = prepareReportsQuotaItem();
+        SpinnerItem[] reportsQuota = prepareReportsQuotaItems();
 
-        SpinnerItem stampsQuota = prepareStampsQuotaItem();
+        SpinnerItem[] stampsQuota = prepareStampsQuotaItems();
 
-        SpinnerItem importFoldersQuota = prepareImportFoldersQuotaItem();
+        SpinnerItem[] importFoldersQuota = prepareImportFoldersQuotaItem();
 
-        SpinnerItem emailAccountsQuota = prepareEmailAccountsQuotaItem();
+        SpinnerItem[] emailAccountsQuota = prepareEmailAccountsQuotaItems();
 
         SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(QUOTA_THRESHOLD, "alertthreshold",
                 tenant.getQuotaThreshold());
+        quotaThreshold.setStartRow(true);
         quotaThreshold.setDisabled(changedHandler == null);
         quotaThreshold.setMax(100);
         quotaThreshold.setMin(-1);
@@ -185,10 +188,10 @@ public class TenantQuotaPanel extends HLayout {
         StaticTextItem pagesSystemQuota = ItemFactory.newStaticTextItem("sys" + PAGES_QUOTA, PAGES_QUOTA,
                 Util.formatLong(tenant.getPagesQuota()));
         pagesSystemQuota.setVisible(tenant.isSystem());
-        StaticTextItem sizeSystemQuota = ItemFactory.newStaticTextItem("sys" + STORAGE_QUOTA, STORAGE_QUOTA,
+        StaticTextItem storageSystemQuota = ItemFactory.newStaticTextItem("sys" + STORAGE_QUOTA, STORAGE_QUOTA,
                 tenant.getStorageQuota() != null ? Util.formatSizeW7((double) tenant.getStorageQuota() * 1024D * 1024D)
                         : null);
-        sizeSystemQuota.setVisible(tenant.isSystem());
+        storageSystemQuota.setVisible(tenant.isSystem());
         StaticTextItem monthlyApiCallsSystemQuota = ItemFactory.newStaticTextItem("sys" + MONTHLYAPICALLS_QUOTA,
                 MONTHLYAPICALLS_QUOTA, Util.formatLong(tenant.getApiCallsQuota()));
         monthlyApiCallsSystemQuota.setVisible(tenant.isSystem());
@@ -214,100 +217,159 @@ public class TenantQuotaPanel extends HLayout {
                 EMAILACCOUNTS_QUOTA, Util.formatLong(tenant.getEmailAccountsQuota()));
         emailAccountsSystemQuota.setVisible(tenant.isSystem());
 
-        form.setItems(regularUsersQuota, regularUsersSystemQuota, readonlyUsersQuota, readonlyUsersSystemQuota,
-                sessionsQuota, sessionsSystemQuota, documentsQuota, documentsSystemQuota, pagesQuota, pagesSystemQuota,
-                sizeQuota, sizeSystemQuota, monthlyApiCallsQuota, monthlyApiCallsSystemQuota, ticketsQuota,
-                ticketsSystemQuota, workflowsQuota, workflowsSystemQuota, formsSystemQuota, formsQuota,
-                reportsSystemQuota, reportsQuota, stampsSystemQuota, stampsQuota, importFoldersSystemQuota,
-                importFoldersQuota, emailAccountsSystemQuota, emailAccountsQuota, quotaThreshold, frequency, reached,
-                recipients);
+        form.setItems(regularUsersQuota[0], regularUsersQuota[1], regularUsersSystemQuota, readonlyUsersQuota[0],
+                readonlyUsersQuota[1], readonlyUsersSystemQuota, sessionsQuota[0], sessionsQuota[1],
+                sessionsSystemQuota, documentsQuota[0], documentsQuota[1], documentsSystemQuota, pagesQuota[0],
+                pagesQuota[1], pagesSystemQuota, storageQuota[0], storageQuota[1], storageSystemQuota,
+                monthlyApiCallsQuota[0], monthlyApiCallsQuota[1], monthlyApiCallsSystemQuota, ticketsQuota[0],
+                ticketsQuota[1], ticketsSystemQuota, workflowsQuota[0], workflowsQuota[1], workflowsSystemQuota,
+                formsSystemQuota, formsQuota[0], formsQuota[1], reportsSystemQuota, reportsQuota[0], reportsQuota[1],
+                stampsSystemQuota, stampsQuota[0], stampsQuota[1], importFoldersSystemQuota, importFoldersQuota[0],
+                importFoldersQuota[1], emailAccountsSystemQuota, emailAccountsQuota[0], emailAccountsQuota[1],
+                quotaThreshold, frequency, reached, recipients);
         addMember(layout);
     }
 
-    private SpinnerItem prepareEmailAccountsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(EMAILACCOUNTS_QUOTA, tenant.getEmailAccountsQuota(),
+    private SpinnerItem[] prepareEmailAccountsQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(EMAILACCOUNTS_QUOTA, tenant.getEmailAccountsQuota(),
                 tenant.getEmailAccounts());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(EMAILACCOUNTS_QUOTA + THRESHOLD,
+                tenant.getEmailAccountsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareImportFoldersQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(IMPORTFOLDERS_QUOTA, tenant.getImportFoldersQuota(),
+    private SpinnerItem[] prepareImportFoldersQuotaItem() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(IMPORTFOLDERS_QUOTA, tenant.getImportFoldersQuota(),
                 tenant.getImportFolders());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(IMPORTFOLDERS_QUOTA + THRESHOLD,
+                tenant.getImportFoldersQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareStampsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(STAMPS_QUOTA, tenant.getStampsQuota(), tenant.getStamps());
-        return applyQuotaItemVisibility(item);
+    private SpinnerItem[] prepareStampsQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(STAMPS_QUOTA, tenant.getStampsQuota(), tenant.getStamps());
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(STAMPS_QUOTA + THRESHOLD,
+                tenant.getStampsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareReportsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(REPORTS_QUOTA, tenant.getReportsQuota(),
+    private SpinnerItem[] prepareReportsQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(REPORTS_QUOTA, tenant.getReportsQuota(),
                 tenant.getReports());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(REPORTS_QUOTA + THRESHOLD,
+                tenant.getReportsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareFormsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(FORMS_QUOTA, tenant.getFormsQuota(), tenant.getForms());
-        return applyQuotaItemVisibility(item);
+    private SpinnerItem[] prepareFormsQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(FORMS_QUOTA, tenant.getFormsQuota(), tenant.getForms());
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(FORMS_QUOTA + THRESHOLD,
+                tenant.getFormsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareWorkflowQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(WORKFLOWS_QUOTA, tenant.getWorkflowsQuota(),
+    private SpinnerItem[] prepareWorkflowQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(WORKFLOWS_QUOTA, tenant.getWorkflowsQuota(),
                 tenant.getWorkflows());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(WORKFLOWS_QUOTA + THRESHOLD,
+                tenant.getWorkflowsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareTicketsQuoteItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(TICKETS_QUOTA, tenant.getTicketsQuota(),
+    private SpinnerItem[] prepareTicketsQuoteItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(TICKETS_QUOTA, tenant.getTicketsQuota(),
                 tenant.getTickets());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(TICKETS_QUOTA + THRESHOLD,
+                tenant.getTicketsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareStorageQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(STORAGE_QUOTA, tenant.getStorageQuota(),
+    private SpinnerItem[] prepareStorageQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(STORAGE_QUOTA, tenant.getStorageQuota(),
                 tenant.getStorage());
-        item.setHint("MB " + I18N.message("usedhint", Util.formatSizeW7(tenant.getStorage())));
-        item.setStep(1024);
-        return applyQuotaItemVisibility(item);
+        quota.setHint("MB " + I18N.message("usedhint", Util.formatSizeW7(tenant.getStorage())));
+        quota.setStep(1024);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(STORAGE_QUOTA + THRESHOLD,
+                tenant.getStorageQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareDocumentsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(DOCUMENTS_QUOTA, tenant.getDocumentsQuota(),
+    private SpinnerItem[] prepareDocumentsQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(DOCUMENTS_QUOTA, tenant.getDocumentsQuota(),
                 tenant.getDocuments());
-        item.setStep(1000);
-        return applyQuotaItemVisibility(item);
+        quota.setStep(1000);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(DOCUMENTS_QUOTA + THRESHOLD,
+                tenant.getDocumentsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem preparePagesQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(PAGES_QUOTA, tenant.getPagesQuota(), tenant.getPages());
-        item.setStep(1000);
-        return applyQuotaItemVisibility(item);
+    private SpinnerItem[] preparePagesQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(PAGES_QUOTA, tenant.getPagesQuota(), tenant.getPages());
+        quota.setStep(1000);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(PAGES_QUOTA + THRESHOLD,
+                tenant.getPagesQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareMonthlyApiCallsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(MONTHLYAPICALLS_QUOTA, tenant.getApiCallsQuota(),
+    private SpinnerItem[] prepareMonthlyApiCallsQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(MONTHLYAPICALLS_QUOTA, tenant.getApiCallsQuota(),
                 tenant.getApiCalls());
-        item.setStep(1000);
-        return applyQuotaItemVisibility(item);
+        quota.setStep(1000);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(MONTHLYAPICALLS_QUOTA + THRESHOLD,
+                tenant.getApiCallsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareSessionsQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(SESSIONS_QUOTA, tenant.getSessionsQuota(),
+    private SpinnerItem[] prepareSessionsQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(SESSIONS_QUOTA, tenant.getSessionsQuota(),
                 tenant.getSessions());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(SESSIONS_QUOTA + THRESHOLD,
+                tenant.getSessionsQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareReadonlyUsersQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(READONLY_USERS_QUOTA, tenant.getReadonlyUsersQuota(),
+    private SpinnerItem[] prepareReadonlyUsersQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(READONLY_USERS_QUOTA, tenant.getReadonlyUsersQuota(),
                 tenant.getReadonlyUsers());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(READONLY_USERS_QUOTA + THRESHOLD,
+                tenant.getReadonlyUsersQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
-    private SpinnerItem prepareRegularUsersQuotaItem() {
-        SpinnerItem item = ItemFactory.newQuotaSpinnerItem(REGULAR_USERS_QUOTA, tenant.getRegularUsersQuota(),
+    private SpinnerItem[] prepareRegularUsersQuotaItems() {
+        SpinnerItem quota = ItemFactory.newQuotaSpinnerItem(REGULAR_USERS_QUOTA, tenant.getRegularUsersQuota(),
                 tenant.getRegularUsers());
-        return applyQuotaItemVisibility(item);
+
+        SpinnerItem threshold = ItemFactory.newQuotaAlertThresholdSpinnerItem(REGULAR_USERS_QUOTA + THRESHOLD,
+                tenant.getRegularUsersQuotaThreshold());
+
+        return new SpinnerItem[] { applyQuotaItemVisibility(quota), applyQuotaItemVisibility(threshold) };
     }
 
     private SpinnerItem applyQuotaItemVisibility(SpinnerItem item) {
@@ -327,7 +389,7 @@ public class TenantQuotaPanel extends HLayout {
 
         validatePagesQuota(values);
 
-        validateSizeQuota(values);
+        validateStorageQuota(values);
 
         validateApiCallsQuota(values);
 
@@ -360,7 +422,7 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setQuotaAlertFrequency(Integer.parseInt(values.get(ALERTFREQUENCY).toString()));
             tenant.setQuotaAlertReached(Boolean.parseBoolean(values.get(ALERTREACHED).toString()));
         }
-        
+
         return !vm.hasErrors();
     }
 
@@ -369,6 +431,12 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setEmailAccountsQuota(null);
         else
             tenant.setEmailAccountsQuota(Long.parseLong(values.get(EMAILACCOUNTS_QUOTA).toString()));
+
+        if (values.get(EMAILACCOUNTS_QUOTA + THRESHOLD) == null)
+            tenant.setEmailAccountsQuotaThreshold(null);
+        else
+            tenant.setEmailAccountsQuotaThreshold(
+                    Integer.parseInt(values.get(EMAILACCOUNTS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateImportFoldersQuota(Map<String, Object> values) {
@@ -376,6 +444,12 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setImportFoldersQuota(null);
         else
             tenant.setImportFoldersQuota(Long.parseLong(values.get(IMPORTFOLDERS_QUOTA).toString()));
+
+        if (values.get(IMPORTFOLDERS_QUOTA + THRESHOLD) == null)
+            tenant.setImportFoldersQuotaThreshold(null);
+        else
+            tenant.setImportFoldersQuotaThreshold(
+                    Integer.parseInt(values.get(IMPORTFOLDERS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateStampsQuota(Map<String, Object> values) {
@@ -383,6 +457,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setStampsQuota(null);
         else
             tenant.setStampsQuota(Long.parseLong(values.get(STAMPS_QUOTA).toString()));
+
+        if (values.get(STAMPS_QUOTA + THRESHOLD) == null)
+            tenant.setStampsQuotaThreshold(null);
+        else
+            tenant.setStampsQuotaThreshold(Integer.parseInt(values.get(STAMPS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateReportsQuota(Map<String, Object> values) {
@@ -390,6 +469,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setReportsQuota(null);
         else
             tenant.setReportsQuota(Long.parseLong(values.get(REPORTS_QUOTA).toString()));
+
+        if (values.get(REPORTS_QUOTA + THRESHOLD) == null)
+            tenant.setReportsQuotaThreshold(null);
+        else
+            tenant.setReportsQuotaThreshold(Integer.parseInt(values.get(REPORTS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateFormsQuota(Map<String, Object> values) {
@@ -397,6 +481,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setFormsQuota(null);
         else
             tenant.setFormsQuota(Long.parseLong(values.get(FORMS_QUOTA).toString()));
+
+        if (values.get(FORMS_QUOTA + THRESHOLD) == null)
+            tenant.setFormsQuotaThreshold(null);
+        else
+            tenant.setFormsQuotaThreshold(Integer.parseInt(values.get(FORMS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateWorkflowsQuota(Map<String, Object> values) {
@@ -404,6 +493,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setWorkflowsQuota(null);
         else
             tenant.setWorkflowsQuota(Long.parseLong(values.get(WORKFLOWS_QUOTA).toString()));
+
+        if (values.get(WORKFLOWS_QUOTA + THRESHOLD) == null)
+            tenant.setWorkflowsQuotaThreshold(null);
+        else
+            tenant.setWorkflowsQuotaThreshold(Integer.parseInt(values.get(WORKFLOWS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateTicketsQuota(Map<String, Object> values) {
@@ -411,6 +505,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setTicketsQuota(null);
         else
             tenant.setTicketsQuota(Long.parseLong(values.get(TICKETS_QUOTA).toString()));
+
+        if (values.get(TICKETS_QUOTA + THRESHOLD) == null)
+            tenant.setTicketsQuotaThreshold(null);
+        else
+            tenant.setTicketsQuotaThreshold(Integer.parseInt(values.get(TICKETS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateSessionsQuota(Map<String, Object> values) {
@@ -418,6 +517,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setSessionsQuota(null);
         else
             tenant.setSessionsQuota(Long.parseLong(values.get(SESSIONS_QUOTA).toString()));
+
+        if (values.get(SESSIONS_QUOTA + THRESHOLD) == null)
+            tenant.setSessionsQuotaThreshold(null);
+        else
+            tenant.setSessionsQuotaThreshold(Integer.parseInt(values.get(SESSIONS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateUsersQuota(Map<String, Object> values) {
@@ -426,10 +530,11 @@ public class TenantQuotaPanel extends HLayout {
         else
             tenant.setRegularUsersQuota(Long.parseLong(values.get(REGULAR_USERS_QUOTA).toString()));
 
-        if (values.get(READONLY_USERS_QUOTA) == null)
-            tenant.setReadonlyUsersQuota(null);
+        if (values.get(REGULAR_USERS_QUOTA + THRESHOLD) == null)
+            tenant.setRegularUsersQuotaThreshold(null);
         else
-            tenant.setReadonlyUsersQuota(Long.parseLong(values.get(READONLY_USERS_QUOTA).toString()));
+            tenant.setRegularUsersQuotaThreshold(
+                    Integer.parseInt(values.get(REGULAR_USERS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateApiCallsQuota(Map<String, Object> values) {
@@ -437,13 +542,24 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setApiCallsQuota(null);
         else
             tenant.setApiCallsQuota(Long.parseLong(values.get(MONTHLYAPICALLS_QUOTA).toString()));
+
+        if (values.get(MONTHLYAPICALLS_QUOTA + THRESHOLD) == null)
+            tenant.setApiCallsQuotaThreshold(null);
+        else
+            tenant.setApiCallsQuotaThreshold(
+                    Integer.parseInt(values.get(MONTHLYAPICALLS_QUOTA + THRESHOLD).toString()));
     }
 
-    private void validateSizeQuota(Map<String, Object> values) {
+    private void validateStorageQuota(Map<String, Object> values) {
         if (values.get(STORAGE_QUOTA) == null)
             tenant.setStorageQuota(null);
         else
             tenant.setStorageQuota(Long.parseLong(values.get(STORAGE_QUOTA).toString()));
+
+        if (values.get(STORAGE_QUOTA + THRESHOLD) == null)
+            tenant.setStorageQuotaThreshold(null);
+        else
+            tenant.setStorageQuotaThreshold(Integer.parseInt(values.get(STORAGE_QUOTA + THRESHOLD).toString()));
     }
 
     private void validateDocumentsQuota(Map<String, Object> values) {
@@ -451,6 +567,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setDocumentsQuota(null);
         else
             tenant.setDocumentsQuota(Long.parseLong(values.get(DOCUMENTS_QUOTA).toString()));
+
+        if (values.get(DOCUMENTS_QUOTA + THRESHOLD) == null)
+            tenant.setDocumentsQuotaThreshold(null);
+        else
+            tenant.setDocumentsQuotaThreshold(Integer.parseInt(values.get(DOCUMENTS_QUOTA + THRESHOLD).toString()));
     }
 
     private void validatePagesQuota(Map<String, Object> values) {
@@ -458,6 +579,11 @@ public class TenantQuotaPanel extends HLayout {
             tenant.setPagesQuota(null);
         else
             tenant.setPagesQuota(Long.parseLong(values.get(PAGES_QUOTA).toString()));
+
+        if (values.get(PAGES_QUOTA + THRESHOLD) == null)
+            tenant.setPagesQuotaThreshold(null);
+        else
+            tenant.setPagesQuotaThreshold(Integer.parseInt(values.get(PAGES_QUOTA + THRESHOLD).toString()));
     }
 
     private void setQuotaAlertRecipients() {

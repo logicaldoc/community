@@ -790,13 +790,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
     @Override
     public long countRegularUsers(Long tenantId) throws PersistenceException {
-        return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted=0 %s".formatted(
+        return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted = 0 %s".formatted(
                 Type.DEFAULT.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
     }
 
     @Override
     public long countReadonlyUsers(Long tenantId) throws PersistenceException {
-        return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted=0 %s".formatted(
+        return queryForLong("select count(*) from ld_user where ld_type = %d and ld_deleted = 0 %s".formatted(
                 Type.READONLY.ordinal(), tenantId != null ? " and ld_tenantid = %d".formatted(tenantId) : ""));
     }
 

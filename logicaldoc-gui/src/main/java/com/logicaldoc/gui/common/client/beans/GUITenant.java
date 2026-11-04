@@ -48,36 +48,64 @@ public class GUITenant implements Serializable {
 
     private Long regularUsersQuota;
 
+    private Integer regularUsersQuotaThreshold;
+
     private Long readonlyUsersQuota;
+
+    private Integer readonlyUsersQuotaThreshold;
 
     private Long sessionsQuota;
 
+    private Integer sessionsQuotaThreshold;
+
     private Long documentsQuota;
 
+    private Integer documentsQuotaThreshold;
+
     private Long pagesQuota;
+
+    private Integer pagesQuotaThreshold;
 
     /**
      * Maximum repository size expressed in MB
      */
     private Long storageQuota;
 
+    private Integer storageQuotaThreshold;
+
     private Long apiCallsQuota;
+
+    private Integer apiCallsQuotaThreshold;
 
     private Long ticketsQuota;
 
+    private Integer ticketsQuotaThreshold;
+
     private Long workflowsQuota;
+
+    private Integer workflowsQuotaThreshold;
 
     private Long formsQuota;
 
+    private Integer formsQuotaThreshold;
+
     private Long reportsQuota;
+
+    private Integer reportsQuotaThreshold;
 
     private Long stampsQuota;
 
+    private Integer stampsQuotaThreshold;
+
     private Long importFoldersQuota;
+
+    private Integer importFoldersQuotaThreshold;
 
     private Integer quotaThreshold = null;
 
     private Long emailAccountsQuota;
+
+    private Integer emailAccountsQuotaThreshold;
 
     private boolean enabled = true;
 
@@ -237,12 +265,28 @@ public class GUITenant implements Serializable {
         this.regularUsersQuota = regularUsersQuota;
     }
 
+    public Integer getRegularUsersQuotaThreshold() {
+        return regularUsersQuotaThreshold;
+    }
+
+    public void setRegularUsersQuotaThreshold(Integer regularUsersQuotaThreshold) {
+        this.regularUsersQuotaThreshold = regularUsersQuotaThreshold;
+    }
+
     public Long getSessionsQuota() {
         return sessionsQuota;
     }
 
     public void setSessionsQuota(Long sessionsQuota) {
         this.sessionsQuota = sessionsQuota;
+    }
+
+    public Integer getSessionsQuotaThreshold() {
+        return sessionsQuotaThreshold;
+    }
+
+    public void setSessionsQuotaThreshold(Integer sessionsQuotaThreshold) {
+        this.sessionsQuotaThreshold = sessionsQuotaThreshold;
     }
 
     public Long getDocumentsQuota() {
@@ -253,12 +297,28 @@ public class GUITenant implements Serializable {
         this.documentsQuota = documentsQuota;
     }
 
+    public Integer getDocumentsQuotaThreshold() {
+        return documentsQuotaThreshold;
+    }
+
+    public void setDocumentsQuotaThreshold(Integer documentsQuotaThreshold) {
+        this.documentsQuotaThreshold = documentsQuotaThreshold;
+    }
+
     public Long getStorageQuota() {
         return storageQuota;
     }
 
     public void setStorageQuota(Long storageQuota) {
         this.storageQuota = storageQuota;
+    }
+
+    public Integer getStorageQuotaThreshold() {
+        return storageQuotaThreshold;
+    }
+
+    public void setStorageQuotaThreshold(Integer storageQuotaThreshold) {
+        this.storageQuotaThreshold = storageQuotaThreshold;
     }
 
     public Long getApiCallsQuota() {
@@ -269,12 +329,28 @@ public class GUITenant implements Serializable {
         this.apiCallsQuota = apiCallsQuota;
     }
 
+    public Integer getApiCallsQuotaThreshold() {
+        return apiCallsQuotaThreshold;
+    }
+
+    public void setApiCallsQuotaThreshold(Integer apiCallsQuotaThreshold) {
+        this.apiCallsQuotaThreshold = apiCallsQuotaThreshold;
+    }
+
     public Long getWorkflowsQuota() {
         return workflowsQuota;
     }
 
     public void setWorkflowsQuota(Long workflowsQuota) {
         this.workflowsQuota = workflowsQuota;
+    }
+
+    public Integer getWorkflowsQuotaThreshold() {
+        return workflowsQuotaThreshold;
+    }
+
+    public void setWorkflowsQuotaThreshold(Integer workflowsQuotaThreshold) {
+        this.workflowsQuotaThreshold = workflowsQuotaThreshold;
     }
 
     public long getWorkflows() {
@@ -347,6 +423,14 @@ public class GUITenant implements Serializable {
         this.formsQuota = formsQuota;
     }
 
+    public Integer getFormsQuotaThreshold() {
+        return formsQuotaThreshold;
+    }
+
+    public void setFormsQuotaThreshold(Integer formsQuotaThreshold) {
+        this.formsQuotaThreshold = formsQuotaThreshold;
+    }
+
     public long getForms() {
         return forms;
     }
@@ -371,12 +455,28 @@ public class GUITenant implements Serializable {
         this.reportsQuota = reportsQuota;
     }
 
+    public Integer getReportsQuotaThreshold() {
+        return reportsQuotaThreshold;
+    }
+
+    public void setReportsQuotaThreshold(Integer reportsQuotaThreshold) {
+        this.reportsQuotaThreshold = reportsQuotaThreshold;
+    }
+
     public Long getStampsQuota() {
         return stampsQuota;
     }
 
     public void setStampsQuota(Long stampsQuota) {
         this.stampsQuota = stampsQuota;
+    }
+
+    public Integer getStampsQuotaThreshold() {
+        return stampsQuotaThreshold;
+    }
+
+    public void setStampsQuotaThreshold(Integer stampsQuotaThreshold) {
+        this.stampsQuotaThreshold = stampsQuotaThreshold;
     }
 
     public long getStamps() {
@@ -393,6 +493,14 @@ public class GUITenant implements Serializable {
 
     public void setImportFolders(long importFolders) {
         this.importFolders = importFolders;
+    }
+
+    public Integer getImportFoldersQuotaThreshold() {
+        return importFoldersQuotaThreshold;
+    }
+
+    public void setImportFoldersQuotaThreshold(Integer importFoldersQuotaThreshold) {
+        this.importFoldersQuotaThreshold = importFoldersQuotaThreshold;
     }
 
     public GUIBranding getBranding() {
@@ -437,6 +545,14 @@ public class GUITenant implements Serializable {
         this.readonlyUsersQuota = readonlyUsersQuota;
     }
 
+    public Integer getReadonlyUsersQuotaThreshold() {
+        return readonlyUsersQuotaThreshold;
+    }
+
+    public void setReadonlyUsersQuotaThreshold(Integer readonlyUsersQuotaThreshold) {
+        this.readonlyUsersQuotaThreshold = readonlyUsersQuotaThreshold;
+    }
+
     public long getReadonlyUsers() {
         return readonlyUsers;
     }
@@ -459,6 +575,14 @@ public class GUITenant implements Serializable {
 
     public void setTicketsQuota(Long ticketsQuota) {
         this.ticketsQuota = ticketsQuota;
+    }
+
+    public Integer getTicketsQuotaThreshold() {
+        return ticketsQuotaThreshold;
+    }
+
+    public void setTicketsQuotaThreshold(Integer ticketsQuotaThreshold) {
+        this.ticketsQuotaThreshold = ticketsQuotaThreshold;
     }
 
     public long getTickets() {
@@ -489,6 +613,14 @@ public class GUITenant implements Serializable {
         return emailAccounts;
     }
 
+    public Integer getEmailAccountsQuotaThreshold() {
+        return emailAccountsQuotaThreshold;
+    }
+
+    public void setEmailAccountsQuotaThreshold(Integer emailAccountsQuotaThreshold) {
+        this.emailAccountsQuotaThreshold = emailAccountsQuotaThreshold;
+    }
+
     public void setEmailAccounts(long emailAccounts) {
         this.emailAccounts = emailAccounts;
     }
@@ -507,6 +639,14 @@ public class GUITenant implements Serializable {
 
     public void setPagesQuota(Long pagesQuota) {
         this.pagesQuota = pagesQuota;
+    }
+
+    public Integer getPagesQuotaThreshold() {
+        return pagesQuotaThreshold;
+    }
+
+    public void setPagesQuotaThreshold(Integer pagesQuotaThreshold) {
+        this.pagesQuotaThreshold = pagesQuotaThreshold;
     }
 
     public long getStorage() {
