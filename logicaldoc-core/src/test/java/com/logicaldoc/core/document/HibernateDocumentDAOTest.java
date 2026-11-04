@@ -581,6 +581,19 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         tags = testSubject.findTags(1L);
         assertNotNull(tags);
 
+        // Null and empty firstLetter must both disable the prefix filter. All
+        // tags returned for the tenant
+        Collection<String> expectedTags = testSubject.findTags("", 1L).keySet();
+        Collection<String> allTags = testSubject.findTags(null, 1L).keySet();
+
+        assertNotNull(allTags);
+        assertFalse(allTags.isEmpty());
+        assertTrue(allTags.contains("abc"));
+        assertEquals(new HashSet<>(expectedTags), new HashSet<>(allTags));
+
+        // Tenant filtering must still apply
+        assertTrue(testSubject.findTags(null, 99L).isEmpty());
+
         // testing Tag class methods
         Document doc1 = testSubject.findById(1L, true);
         assertNotNull(doc1);
