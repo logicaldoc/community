@@ -107,7 +107,7 @@ public class LinksDataServlet extends AbstractDataServlet {
                    and DOC2.ld_id = E.ld_intvalue
                    and E.ld_docid = %d
                 """.formatted(
-                        Attribute.Type.DOCUMENT, parentDocId));
+                        Attribute.Type.DOCUMENT.ordinal(), parentDocId));
 
         if (!docId.equals(parentDocId)) {
             query.append(" and not DOC1.ld_id = %d".formatted(docId));
@@ -130,7 +130,7 @@ public class LinksDataServlet extends AbstractDataServlet {
                     and DOC2.ld_id = E.ld_intvalue
                     and E.ld_intvalue = %d
                  """.formatted(
-                        Attribute.Type.DOCUMENT, parentDocId));
+                        Attribute.Type.DOCUMENT.ordinal(), parentDocId));
         if (!docId.equals(parentDocId)) {
             query.append(" and not DOC1.ld_id = %d".formatted(docId));
             query.append(" and not DOC2.ld_id = %d".formatted(docId));
