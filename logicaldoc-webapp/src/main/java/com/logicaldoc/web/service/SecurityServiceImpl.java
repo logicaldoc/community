@@ -696,6 +696,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
             user.setDocumentsQuota(guiUser.getDocumentsQuota());
             user.setStorageQuota(guiUser.getStorageQuota());
             user.setSessionsQuota(guiUser.getSessionsQuota());
+			
+// Alex Aykron 09/11/2026: ld_sessionsquota may be NOT NULL in the database, -1 means no limit
+//user.setSessionsQuota(guiUser.getSessionsQuota() != null ? guiUser.getSessionsQuota() : -1L);
+			
             user.setQuotaThreshold(guiUser.getQuotaThreshold());
             user.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
             user.setKey(guiUser.getKey());
@@ -734,12 +738,19 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
             UserHistory transaction = new UserHistory();
             transaction.setSession(session);
-            transaction.setEvent(UserEvent.UPDATED);
+            transaction.setEvent(UserEvent.UPDATED);		
             userDao.store(user, transaction);
 
             guiUser.setId(user.getId());
 
             user = userDao.findById(user.getId(), true);
+			
+// Alex Aykron 06/11/2026			
+if (user == null) {
+	log.error("Error creating/updating user, createNew: " + createNew);
+	log.error("Cannot reload user after saving, username=" + guiUser.getUsername());
+	throw new PersistenceException("User %s was not saved, check the db.log".formatted(guiUser.getUsername()));	
+}			
 
             user.getImpersonators().clear();
             user.getImpersonators().addAll(guiUser.getImpersonators());

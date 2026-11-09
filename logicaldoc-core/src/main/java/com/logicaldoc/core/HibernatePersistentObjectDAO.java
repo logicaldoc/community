@@ -277,7 +277,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
         try {
             getCurrentSession().flush();
         } catch (Exception e) {
-            // Nothing to do
+            log.error("Error flushing the Hibernate session: {}", e.getMessage(), e);
         }
     }
 
