@@ -89,6 +89,11 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
     }
 
     private void updateLinksCount(long docId) throws PersistenceException {
-        jdbcUpdate("update ld_document set ld_links = (select count(*) from ld_link where ld_deleted = 0 and (ld_docid1 = %d or ld_docid2 = %d)) where ld_id = %d".formatted(docId,docId,docId));
+        int count = queryForInt(
+                "select count(*) from ld_link where ld_deleted = 0 and (ld_docid1 = %d or ld_docid2 = %d)"
+                        .formatted(docId, docId));
+        Document doc = DocumentDAO.get().findById(docId, true);
+        doc.setLinks(count);
+        DocumentDAO.get().store(doc);
     }
 }
