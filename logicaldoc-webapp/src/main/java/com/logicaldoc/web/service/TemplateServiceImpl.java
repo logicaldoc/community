@@ -1,5 +1,7 @@
 package com.logicaldoc.web.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +34,7 @@ import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
@@ -42,6 +45,9 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
+import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.IOUtil;
+import com.logicaldoc.web.UploadServlet;
 
 /**
  * Implementation of the TemplateService
@@ -612,5 +618,67 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
         } else
             currentTemplate = template;
         return currentTemplate;
+    }
+
+    @Override
+    public void importTemplate() throws ServerException {
+        Session session = validateSession();
+
+        /*
+         * It's important then only those users with access to the metadata
+         * administration can import new schema, otherwise an unprivileged user
+         * may upload a set with dangerous options and automations.
+         */
+        checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION_METADATA);
+
+        executeLongRunningOperation("Import Template", () -> {
+            try {
+                Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
+
+                if (uploadedFilesMap != null && uploadedFilesMap.size() > 0) {
+                    File importFile = uploadedFilesMap.values().iterator().next();
+                    log.info("Importing a new template from file {}", importFile.getName());
+                    importFromFile(importFile, session);
+                }
+
+                return null;
+            } catch (Exception e) {
+                return throwServerException(session, log, e);
+            } finally {
+                UploadServlet.cleanUploads(session.getSid());
+            }
+        }, session);
+    }
+
+    private long importFromFile(File file, Session session) throws IOException, PersistenceException {
+        Template template = (Template) IOUtil.deserialize(FileUtil.readFile(file));
+        template.setTenantId(session.getTenantId());
+        template.setCreation(new Date());
+
+        while (TemplateDAO.get().findByName(template.getName(), template.getTenantId()) != null)
+            template.setName("%s-Import".formatted(template.getName()));
+
+        // For each defined attribute, try to assign the most suitable setId
+        String bestAttributeSetQuery = """
+                                          select lower(A.ld_id)
+                                            from ld_attributeset A, ld_attributeset_ext B
+                                           where ld_attsetid = ld_id
+                                             and ld_deleted = 0
+                                             and ld_tenantid = %d
+                                             and B.ld_type = :type
+                                             and B.ld_name = :name;
+                                       """.formatted(template.getTenantId());
+        template.getAttributes().forEach((name, attribute) -> {
+            try {
+                attribute.setSetId(TemplateDAO.get().queryForLong(bestAttributeSetQuery,
+                        Map.of("name", name, "type", attribute.getType().ordinal())));
+            } catch (PersistenceException e) {
+                log.warn(e.getMessage(), e);
+            }
+        });
+
+        TemplateDAO.get().store(template);
+        log.info("Imported template {}", template.getName());
+        return template.getId();
     }
 }

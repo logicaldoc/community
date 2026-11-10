@@ -118,13 +118,11 @@ public class AttributeSetsPanel extends VLayout {
         add.setTitle(I18N.message("addattributeset"));
         add.addClickHandler(event -> onAddAttributeSet());
         toolStrip.addButton(add);
-        
+
         ToolStripButton importButton = new ToolStripButton(I18N.message("iimport"));
-        importButton.addClickHandler(event -> {
-            new AttributeSetUploader(AttributeSetsPanel.this).show();
-        });
+        importButton.addClickHandler(event -> new AttributeSetUploader(AttributeSetsPanel.this).show());
         toolStrip.addButton(importButton);
-        
+
         toolStrip.addFill();
 
         list.addCellContextClickHandler(event -> {

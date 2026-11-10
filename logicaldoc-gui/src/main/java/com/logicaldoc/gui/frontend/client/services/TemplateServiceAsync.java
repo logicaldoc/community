@@ -9,16 +9,20 @@ import com.logicaldoc.gui.common.client.beans.GUITemplate;
 
 public interface TemplateServiceAsync {
 
-	void delete(long templateId, AsyncCallback<Void> callback);
+    void delete(long templateId, AsyncCallback<Void> callback);
 
-	void save(GUITemplate template, AsyncCallback<GUITemplate> callback);
+    void save(GUITemplate template, AsyncCallback<GUITemplate> callback);
 
-	void clone(long templateId, String cloneName, AsyncCallback<GUITemplate> callback);
+    void clone(long templateId, String cloneName, AsyncCallback<GUITemplate> callback);
 
-	void getTemplate(long templateId, AsyncCallback<GUITemplate> callback);
+    void getTemplate(long templateId, AsyncCallback<GUITemplate> callback);
 
-	void countDocuments(long templateId, AsyncCallback<Long> callback);
+    void countDocuments(long templateId, AsyncCallback<Long> callback);
 
-	void getAttributes(long templateId, GUIExtensibleObject extensibleObject,
-			AsyncCallback<List<GUIAttribute>> callback);
+    void getAttributes(
+            long templateId,
+            GUIExtensibleObject extensibleObject,
+            AsyncCallback<List<GUIAttribute>> callback);
+
+    void importTemplate(AsyncCallback<Void> callback);
 }

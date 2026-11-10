@@ -55,7 +55,7 @@ public class AttributeSetsDataServlet extends AbstractDataServlet {
             Locale locale) throws PersistenceException, IOException {
 
         response.setCharacterEncoding("UTF-8");
-
+        
         Long export = null;
         if (request.getParameter("export") != null)
             export = Long.parseLong(request.getParameter("export"));
@@ -64,7 +64,6 @@ public class AttributeSetsDataServlet extends AbstractDataServlet {
             // An export request
             if (!MenuDAO.get().isReadAllowed(Menu.ADMINISTRATION_METADATA, session.getUserId()))
                 new PermissionException("Cannot export attribute set");
-
             response.setContentType("application/zip");
             export(response, export);
         } else {

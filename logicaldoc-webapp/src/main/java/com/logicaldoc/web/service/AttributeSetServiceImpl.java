@@ -468,7 +468,8 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
         try (ZipUtil zip = new ZipUtil()) {
             attributeSet = (AttributeSet) IOUtil.deserialize(zip.getEntryContent(file, "object.xml"));
             attributeSet.setTenantId(session.getTenantId());
-
+            attributeSet.setCreation(new Date());
+            
             while (AttributeSetDAO.get().findByName(attributeSet.getName(), attributeSet.getTenantId()) != null)
                 attributeSet.setName("%s-Import".formatted(attributeSet.getName()));
 
