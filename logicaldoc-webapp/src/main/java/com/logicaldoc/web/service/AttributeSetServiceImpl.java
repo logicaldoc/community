@@ -1,17 +1,20 @@
 package com.logicaldoc.web.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.zip.ZipException;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeOption;
 import com.logicaldoc.core.metadata.AttributeOptionDAO;
@@ -20,12 +23,16 @@ import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.util.csv.CSVFileReader;
+import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.IOUtil;
+import com.logicaldoc.util.io.ZipUtil;
 import com.logicaldoc.web.UploadServlet;
 
 /**
@@ -424,5 +431,86 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
         } catch (Exception t) {
             throwServerException(session, log, t);
         }
+    }
+
+    @Override
+    public void importAttributeSet() throws ServerException {
+        Session session = validateSession();
+
+        /*
+         * It's important then only those users with access to the metadata
+         * administration can import new schema, otherwise an unprivileged user
+         * may upload a set with dangerous options and automations.
+         */
+        checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION_METADATA);
+
+        executeLongRunningOperation("Import Attribute Set", () -> {
+            try {
+                Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
+
+                if (uploadedFilesMap != null && uploadedFilesMap.size() > 0) {
+                    File importFile = uploadedFilesMap.values().iterator().next();
+                    log.info("Importing a new attribute set from file {}", importFile.getName());
+                    importFromFile(importFile, session);
+                }
+
+                return null;
+            } catch (Exception e) {
+                return throwServerException(session, log, e);
+            } finally {
+                UploadServlet.cleanUploads(session.getSid());
+            }
+        }, session);
+    }
+
+    private long importFromFile(File file, Session session) throws ZipException, IOException, PersistenceException {
+        AttributeSet attributeSet;
+        try (ZipUtil zip = new ZipUtil()) {
+            attributeSet = (AttributeSet) IOUtil.deserialize(zip.getEntryContent(file, "object.xml"));
+            attributeSet.setTenantId(session.getTenantId());
+
+            while (AttributeSetDAO.get().findByName(attributeSet.getName(), attributeSet.getTenantId()) != null)
+                attributeSet.setName("%s-Import".formatted(attributeSet.getName()));
+
+            AttributeSetDAO.get().store(attributeSet);
+            log.info("Imported attribute set {}", attributeSet.getName());
+
+            // List the presets and check for options import file
+            attributeSet.getTemplateAttributes().forEach((name, attribute) -> {
+                if (attribute.getEditor() == Attribute.EDITOR_LISTBOX) {
+                    try {
+                        log.info("Importing options of attribute {}", name);
+
+                        // Extract the CSV with the options to import
+                        File csv = FileUtil.createTempFile("import", ".csv");
+                        zip.unzip(file, "%s.csv".formatted(name), csv);
+                        try (CSVFileReader reader = new CSVFileReader(csv.getAbsolutePath())) {
+                            // Skip first row that contains titles
+                            reader.readFields();
+                            AttributeOptionDAO dao = AttributeOptionDAO.get();
+
+                            List<String> fields = reader.readFields();
+                            int position = 0;
+                            while (!fields.isEmpty()) {
+                                AttributeOption option = new AttributeOption(attributeSet.getId(), name,
+                                        fields.getFirst());
+                                option.setCategory(fields.getLast());
+                                option.setPosition(position++);
+                                dao.store(option);
+
+                                fields = reader.readFields();
+                            }
+                        }
+                    } catch (PersistenceException | IOException e) {
+                        log.error(e.getMessage(), e);
+                    }
+
+                    log.info("Imported options of attribute {}", name);
+                }
+            });
+
+        }
+
+        return attributeSet.getId();
     }
 }

@@ -95,6 +95,9 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 
     public static final long SUPPORT_TICKET = 3040;
     
+    public static final long ADMINISTRATION_METADATA = 25;
+    
+    
     @Column(name = "ld_name", length = 255)
     private String name = "";
 
