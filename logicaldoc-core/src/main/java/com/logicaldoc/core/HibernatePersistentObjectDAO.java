@@ -596,9 +596,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
                     ResultSet rs = stmt.executeQuery();) {
                 logStatement(sql, connection);
 
-                if (rs.next())
-                    return rs.getObject(1, requiredType);
-                else
+                if (rs.next()) {
+                    Object obj = rs.getObject(1);
+                    if (obj instanceof Timestamp ts && requiredType.equals(Date.class)) {
+                        return requiredType.getConstructor(Long.TYPE).newInstance(ts.getTime());
+                    } else {
+                        return rs.getObject(1, requiredType);
+                    }
+                } else
                     return null;
             } catch (Exception e) {
                 throw new PersistenceException(e.getMessage(), e);
