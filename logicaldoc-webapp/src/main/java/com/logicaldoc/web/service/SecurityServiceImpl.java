@@ -552,9 +552,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 guiUser.setDocumentsQuota(user.getDocumentsQuota());
                 guiUser.setDocuments(SequenceDAO.get().getCurrentValue("userdocs", user.getId(), user.getTenantId()));
                 guiUser.setQuotaThreshold(user.getQuotaThreshold());
-
                 guiUser.setTenant(getTenant(user.getTenantId()));
-
+                
                 ContextProperties config = Context.get().getConfig();
                 guiUser.setPasswordMinLenght(
                         config.getTenantInt(guiUser.getTenant().getName(), PasswordGenerator.PASSWORD_SIZE, 12));
@@ -1656,28 +1655,35 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
     }
 
     @Override
-    public void changeStatus(long userId, boolean enabled) throws ServerException {
+    public void changeStatus(List<Long> userIds, boolean enabled) throws ServerException {
         checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
         Session session = checkMenu(getThreadLocalRequest(), Menu.ACCESS_CONTROL);
-
-        UserDAO userDao = UserDAO.get();
         try {
-            User user = userDao.findById(userId, true);
-            if (user == null)
-                throw new ServerException(String.format("User %s not found", userId));
-
-            if (!enabled && ADMIN.equals(user.getUsername()))
-                throw new ServerException("Cannot diable the admin user");
-
-            UserHistory transaction = new UserHistory();
-            transaction.setSession(session);
-            transaction.setEvent(enabled ? UserEvent.UPDATED : UserEvent.DISABLED);
-
-            user.setEnabled(enabled);
-            userDao.store(user, transaction);
+            for (Long userId : userIds) {
+                changeStatus(userId, enabled, session);
+            }
         } catch (PersistenceException | ServerException e) {
             throwServerException(session, log, e);
         }
+    }
+
+    private void changeStatus(long userId, boolean enabled, Session session)
+            throws PersistenceException, ServerException {
+        UserDAO userDao = UserDAO.get();
+        User user = userDao.findById(userId, true);
+        if (user == null)
+            throw new ServerException(String.format("User %s not found", userId));
+
+        if (!enabled && ADMIN.equals(user.getUsername()))
+            throw new ServerException("Cannot disable the admin user");
+
+        UserHistory transaction = new UserHistory();
+        transaction.setSession(session);
+        transaction.setEvent(enabled ? UserEvent.UPDATED : UserEvent.DISABLED);
+
+        user.setEnabled(enabled);
+        userDao.store(user, transaction);
+
     }
 
     @Override

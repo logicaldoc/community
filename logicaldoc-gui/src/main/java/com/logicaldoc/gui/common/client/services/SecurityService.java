@@ -95,12 +95,12 @@ public interface SecurityService extends RemoteService {
 	/**
 	 * Changes the status of a user
 	 * 
-	 * @param userId The user Identifier
+	 * @param userIds The user identifiers
 	 * @param enabled If the user must be enabled or not
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void changeStatus(long userId, boolean enabled) throws ServerException;
+	public void changeStatus(List<Long> userIds, boolean enabled) throws ServerException;
 
 	/**
 	 * Logs out the current user
@@ -481,7 +481,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException generic error
 	 */
-	void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds) throws ServerException;
+	public void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds) throws ServerException;
 
 	/**
 	 * Creates a new support ticket
