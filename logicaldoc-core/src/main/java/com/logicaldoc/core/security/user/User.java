@@ -170,7 +170,10 @@ public class User extends PersistentObject implements Serializable {
     private Long storageQuota;
 
     @Column(name = "ld_sessionsquota")
-    private Long sessionsQuota;
+	private Long sessionsQuota;
+	
+// Alex Aykron 09/11/2026: ld_sessionsquota may be NOT NULL in the database, -1 means no limit	
+    //private Long sessionsQuota = -1L;
 
     @Column(name = "ld_pagesquota")
     private Long pagesQuota;
