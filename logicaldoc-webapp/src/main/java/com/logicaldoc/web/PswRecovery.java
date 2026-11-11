@@ -101,6 +101,7 @@ public class PswRecovery extends HttpServlet {
                 }
             }
         } catch (Exception e) {
+            
             log.error(e.getMessage(), e);
 
             writeResponse(response, "Request not correctly processed");
