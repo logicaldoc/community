@@ -89,11 +89,11 @@ public class PswRecovery extends HttpServlet {
             Ticket ticket = ticketDao.findByTicketId(ticketId);
 
             if (ticket != null && ticket.getType() == Ticket.PSW_RECOVERY && ticket.getUserId() == userId) {
-                User user = UserDAO.get().findById(userId);
+                User user = UserDAO.get().findById(userId, true);
                 if (ticket.isTicketExpired()) {
                     response.getWriter().println("Request has exprired");
                     return;
-                } else if(user!=null) {
+                } else if (user != null) {
                     ticket.setCount(ticket.getCount() + 1);
                     ticket.setEnabled(false);
                     ticketDao.store(ticket);
@@ -115,8 +115,11 @@ public class PswRecovery extends HttpServlet {
         }
     }
 
-    private void resetPasswordAndNotify(HttpServletRequest request, HttpServletResponse response, String tenant, User user)
-            throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException,
+    private void resetPasswordAndNotify(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String tenant,
+            User user) throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException,
             AutomationException {
 
         EMail email = new EMail();
