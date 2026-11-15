@@ -324,7 +324,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
         File file = uploadedFilesMap.values().iterator().next();
         List<GUIValue> options = new ArrayList<>();
 
-        try (CSVFileReader reader = new CSVFileReader(file.getPath());) {
+        try (CSVFileReader reader = new CSVFileReader(file.getPath(),';');) {
             List<String> row = reader.readFields();
             if (row != null && "value".equalsIgnoreCase(row.get(0)))
                 row = reader.readFields();
