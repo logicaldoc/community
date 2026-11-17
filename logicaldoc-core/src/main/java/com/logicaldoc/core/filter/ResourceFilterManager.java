@@ -128,7 +128,9 @@ public class ResourceFilterManager implements ResourceFilter {
     }
 
     public List<ResourceFilter> getFilters(String context) {
-        return getFilters().get(context);
+        if (context == null)
+            return List.of();
+        return getFilters().getOrDefault(context.toLowerCase(), List.of());
     }
 
     private Map<String, List<ResourceFilter>> getFilters() {
