@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -37,7 +39,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
     @Column(name = "ld_description", length = 2000)
     private String description;
 
-    @Column(name = "ld_readonly", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_readonly", nullable = false)
     private boolean readonly = false;
 
     @Column(name = "ld_type", nullable = false)

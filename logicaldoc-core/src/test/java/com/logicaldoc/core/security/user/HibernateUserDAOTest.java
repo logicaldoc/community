@@ -16,6 +16,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.mapping.BasicValuedModelPart;
+import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.type.SqlTypes;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,6 +30,7 @@ import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.crypt.Encrypter;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.security.PasswordGenerator;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for <code>HibernateUserDAO</code>
@@ -280,9 +286,9 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
             // Nothing to do
         }
 
-        user = testSubject.findById(1L,true);
+        user = testSubject.findById(1L, true);
         assertFalse(user.isPasswordExpired());
-        user.setDecodedPassword("%s-#é+^".formatted(pswd));
+        user.setDecodedPassword("%s-#ï¿½+^".formatted(pswd));
         user.setPasswordExpired(true);
         testSubject.store(user);
 
@@ -318,5 +324,17 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
         user.setPasswordChanged(lastChange);
         testSubject.store(user);
         assertFalse(testSubject.isPasswordExpired("boss"));
+    }
+
+    @Test
+    public void testEnabledIsBoundAsInteger() {
+        SessionFactoryImplementor sf = Context.get(SessionFactory.class).unwrap(SessionFactoryImplementor.class);
+
+        EntityPersister persister = sf.getMappingMetamodel().getEntityDescriptor(User.class);
+        BasicValuedModelPart enabled = (BasicValuedModelPart) persister.findAttributeMapping("enabled");
+
+        assertEquals("ld_enabled", enabled.getSelectionExpression());
+        assertEquals("User.enabled must be sent as INTEGER, not BOOLEAN", SqlTypes.INTEGER,
+                enabled.getJdbcMapping().getJdbcType().getDefaultSqlTypeCode());
     }
 }

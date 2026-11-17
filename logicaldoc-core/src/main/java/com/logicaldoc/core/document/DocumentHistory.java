@@ -1,5 +1,8 @@
 package com.logicaldoc.core.document;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.logicaldoc.core.history.History;
 
 import jakarta.persistence.Cacheable;
@@ -18,63 +21,63 @@ import jakarta.persistence.Table;
 @Table(name = "ld_history")
 @Cacheable
 public class DocumentHistory extends AbstractDocumentHistory {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Column(name = "ld_color", length = 255)
-	protected String color;
+    @Column(name = "ld_color", length = 255)
+    protected String color;
 
-	@Column(name = "ld_new")
-	private boolean isNew = true;
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_new")
+    private boolean isNew = true;
 
-	public DocumentHistory() {
-		super();
-	}
+    public DocumentHistory() {
+        super();
+    }
 
-	public DocumentHistory(History source) {
-		copyAttributesFrom(source);
-	}
+    public DocumentHistory(History source) {
+        copyAttributesFrom(source);
+    }
 
-	public DocumentHistory(DocumentHistory source) {
-		copyAttributesFrom(source);
-		this.color = source.color;
-		setNew(source.isNew());
-	}
+    public DocumentHistory(DocumentHistory source) {
+        copyAttributesFrom(source);
+        this.color = source.color;
+        setNew(source.isNew());
+    }
 
-	public void setEvent(DocumentEvent event) {
-		this.event = (event != null) ? event.toString() : null;
-	}
+    public void setEvent(DocumentEvent event) {
+        this.event = (event != null) ? event.toString() : null;
+    }
 
-	@Override
-	public void setEvent(String event) {
-		setEvent(DocumentEvent.fromKey(event));
-	}
+    @Override
+    public void setEvent(String event) {
+        setEvent(DocumentEvent.fromKey(event));
+    }
 
-	public DocumentEvent getEventEnum() {
-		if (event == null)
-			return null;
-		return DocumentEvent.fromKey(event);
-	}
+    public DocumentEvent getEventEnum() {
+        if (event == null)
+            return null;
+        return DocumentEvent.fromKey(event);
+    }
 
-	public String getColor() {
-		return color;
-	}
+    public String getColor() {
+        return color;
+    }
 
-	public void setColor(String color) {
-		this.color = color;
-	}
+    public void setColor(String color) {
+        this.color = color;
+    }
 
-	public boolean isNew() {
-		return isNew;
-	}
+    public boolean isNew() {
+        return isNew;
+    }
 
-	public void setNew(boolean isNew) {
-		this.isNew = isNew;
-	}
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
 
-	@Override
-	public void setDocument(AbstractDocument document) {
-		super.setDocument(document);
-		if (document != null)
-			this.color = document.getColor();
-	}
+    @Override
+    public void setDocument(AbstractDocument document) {
+        super.setDocument(document);
+        if (document != null)
+            this.color = document.getColor();
+    }
 }
