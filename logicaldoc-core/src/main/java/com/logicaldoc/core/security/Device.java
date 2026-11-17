@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import com.logicaldoc.core.PersistentObject;
 
@@ -72,7 +74,7 @@ public class Device extends PersistentObject implements Serializable {
     @Column(name = "ld_lastlogin", columnDefinition = "DATETIME(3)")
     private Date lastLogin;
 
-    @Column(name = "ld_trusted", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_trusted", nullable = false)
     private boolean trusted = false;
 
     /**

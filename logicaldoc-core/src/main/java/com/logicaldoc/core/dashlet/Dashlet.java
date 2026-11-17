@@ -1,5 +1,8 @@
 package com.logicaldoc.core.dashlet;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.logicaldoc.core.PersistentObject;
 
 import jakarta.persistence.Cacheable;
@@ -18,153 +21,153 @@ import jakarta.persistence.Table;
 @Cacheable
 public class Dashlet extends PersistentObject {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final String TYPE_DOCEVENT = "docevent";
+    public static final String TYPE_DOCEVENT = "docevent";
 
-	public static final String TYPE_DOCUMENT = "document";
+    public static final String TYPE_DOCUMENT = "document";
 
-	public static final String TYPE_BOOKMARK = "bookmark";
+    public static final String TYPE_BOOKMARK = "bookmark";
 
-	public static final String TYPE_NOTE = "note";
+    public static final String TYPE_NOTE = "note";
 
-	public static final String TYPE_CONTENT = "content";
+    public static final String TYPE_CONTENT = "content";
 
-	@Column(name = "ld_name", length = 255, nullable = false)
-	private String name;
+    @Column(name = "ld_name", length = 255, nullable = false)
+    private String name;
 
-	@Column(name = "ld_title", length = 255, nullable = false)
-	private String title;
+    @Column(name = "ld_title", length = 255, nullable = false)
+    private String title;
 
-	@Column(name = "ld_type", length = 255, nullable = false)
-	private String type = TYPE_DOCEVENT;
+    @Column(name = "ld_type", length = 255, nullable = false)
+    private String type = TYPE_DOCEVENT;
 
-	@Column(name = "ld_max")
-	private Integer max;
+    @Column(name = "ld_max")
+    private Integer max;
 
-	/**
-	 * To mark that it must display just unique records
-	 */
-	@Column(name = "ld_unique", nullable = false)
-	private boolean unique = false;
+    /**
+     * To mark that it must display just unique records
+     */
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_unique", nullable = false)
+    private boolean unique = false;
 
-	@Column(name = "ld_query")
-	private String query;
+    @Column(name = "ld_query")
+    private String query;
 
-	@Column(name = "ld_content")
-	private String content;
+    @Column(name = "ld_content")
+    private String content;
 
-	@Column(name = "ld_columns")
-	private String columns;
+    @Column(name = "ld_columns")
+    private String columns;
 
-	public Dashlet() {
-	}
+    public Dashlet() {
+    }
 
-	public Dashlet(Dashlet source) {
-		super();
-		this.type = source.type;
-		this.query = source.query;
-		this.content = source.content;
-		this.name = source.name;
-		this.title = source.title;
-		this.max = source.max;
-		this.unique = source.unique;
-		this.columns = source.columns;
+    public Dashlet(Dashlet source) {
+        super();
+        this.type = source.type;
+        this.query = source.query;
+        this.content = source.content;
+        this.name = source.name;
+        this.title = source.title;
+        this.max = source.max;
+        this.unique = source.unique;
+        this.columns = source.columns;
 
-		setTenantId(source.getTenantId());
-	}
+        setTenantId(source.getTenantId());
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public String getQuery() {
-		return query;
-	}
+    public String getQuery() {
+        return query;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setQuery(String query) {
-		this.query = query;
-	}
+    public void setQuery(String query) {
+        this.query = query;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public String toString() {
-		return super.toString();
-	}
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public Integer getMax() {
-		return max;
-	}
+    public Integer getMax() {
+        return max;
+    }
 
-	public void setMax(Integer max) {
-		this.max = max;
-	}
+    public void setMax(Integer max) {
+        this.max = max;
+    }
 
-	public String getColumns() {
-		return columns;
-	}
+    public String getColumns() {
+        return columns;
+    }
 
-	public void setColumns(String columns) {
-		this.columns = columns;
-	}
+    public void setColumns(String columns) {
+        this.columns = columns;
+    }
 
-	public boolean isUnique() {
-		return unique;
-	}
+    public boolean isUnique() {
+        return unique;
+    }
 
-	public void setUnique(boolean unique) {
-		this.unique = unique;
-	}
+    public void setUnique(boolean unique) {
+        this.unique = unique;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Dashlet other = (Dashlet) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Dashlet other = (Dashlet) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
 }
