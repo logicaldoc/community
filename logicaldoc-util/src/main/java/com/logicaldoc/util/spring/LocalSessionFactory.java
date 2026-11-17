@@ -31,7 +31,7 @@ public class LocalSessionFactory extends LocalSessionFactoryBean {
 		List<Class<?>> annotatedClasses = new ArrayList<>();
 
 		/*
-		 * Scan the classpath to add all the @AutomationDictionary classes
+		 * Scan the classpath to add all the @Entity classes
 		 */
 		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 		scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
