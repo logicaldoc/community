@@ -149,13 +149,13 @@ public class LogDownload extends HttpServlet {
 			Map<String, Integer> counter = new HashMap<>();
 			for (File file : files) {
 				String baseName = StringUtils.substringBefore(FilenameUtils.getBaseName(file.getName()), ".");
-				counter.computeIfAbsent(baseName, k -> Integer.valueOf(0));
+				counter.computeIfAbsent(baseName, _ -> Integer.valueOf(0));
 
 				// store just the latest logs
 				if (file.length() > 0 && counter.get(baseName) < 10
 						&& !file.getName().toLowerCase().contains(".html")) {
 					writeEntry(out, "logicaldoc/logs/%s".formatted(file.getName()), file);
-					counter.computeIfPresent(baseName, (k, v) -> v + 1);
+					counter.computeIfPresent(baseName, (_, v) -> v + 1);
 				}
 			}
 
@@ -246,12 +246,12 @@ public class LogDownload extends HttpServlet {
 		Map<String, Integer> counter = new HashMap<>();
 		for (File file : files) {
 			String baseName = StringUtils.substringBefore(FilenameUtils.getBaseName(file.getName()), ".");
-			counter.computeIfAbsent(baseName, k -> Integer.valueOf(0));
+			counter.computeIfAbsent(baseName, _ -> Integer.valueOf(0));
 
 			// store just the latest logs
 			if (file.length() > 0 && counter.get(baseName) < 10) {
 				writeEntry(out, "tomcat/logs/%s".formatted(file.getName()), file);
-				counter.computeIfPresent(file.getName(), (k, v) -> v + 1);
+				counter.computeIfPresent(file.getName(), (_, v) -> v + 1);
 			}
 		}
 	}

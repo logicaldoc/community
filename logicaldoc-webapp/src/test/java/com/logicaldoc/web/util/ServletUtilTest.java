@@ -156,9 +156,9 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
     }
 
     @Test
-    public void testGetSelfURL() {
-        String selfUrl = ServletUtil.getSelfURL(mockRequest);
-        assertEquals("null://null", selfUrl);
+    public void testGetFullURL() {
+        String selfUrl = ServletUtil.getFullURL(mockRequest);
+        assertEquals("", selfUrl);
     }
 
     @Test

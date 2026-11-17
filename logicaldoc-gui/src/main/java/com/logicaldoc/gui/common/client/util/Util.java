@@ -135,17 +135,28 @@ public abstract class Util {
         return url;
     }
 
-    public static String downloadURL(long docId, String fileVersion, String suffix, boolean open) {
+    public static String downloadURL(long docId, String fileVersion, Map<String, String> args) {
         String url = contextPath() + "download?docId=" + docId;
         if (fileVersion != null)
             url += AND_FILEVERSION_EQUAL + fileVersion;
-        if (suffix != null)
-            url += "&suffix=" + suffix;
-        if (open)
-            url += "&open=true";
+
+        if (args != null && !args.isEmpty())
+            for (Map.Entry<String, String> entry : args.entrySet()) {
+                url += "&" + entry.getKey() + "=" + entry.getValue();
+            }
+
         return url;
     }
 
+    public static String downloadURL(long docId, String fileVersion, String suffix, boolean open) {
+        HashMap<String, String> args = new HashMap<>();
+        if (suffix != null)
+            args.put("suffix", suffix);
+        if (open)
+            args.put("open", "true");
+        return downloadURL(docId, fileVersion, args);
+    }
+    
     public static String downloadURL(long docId, String fileVersion, boolean open) {
         return downloadURL(docId, fileVersion, null, open);
     }
@@ -580,7 +591,7 @@ public abstract class Util {
 	}-*/;
 
     public static String formatLong(Long number) {
-        if(number==null)
+        if (number == null)
             return null;
 
         NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
@@ -588,17 +599,17 @@ public abstract class Util {
     }
 
     public static String formatInt(Integer number) {
-        if(number==null)
+        if (number == null)
             return null;
-        
+
         NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
         return fmt.format(number).replace(',', I18N.groupingSepator());
     }
 
     public static String formatDouble(Double number) {
-        if(number==null)
+        if (number == null)
             return null;
-        
+
         NumberFormat fmt = NumberFormat.getFormat("#,###.##");
         String str = fmt.format(number);
         str = str.replace(',', '#');
@@ -1048,7 +1059,7 @@ public abstract class Util {
         if (locale != null && !locale.isEmpty()) {
             if (queryString.contains("locale")) {
                 queryString = queryString.replaceAll("locale=[a-zA-Z_]*", "locale=" + locale);
-            } else if(queryString.isEmpty()) {
+            } else if (queryString.isEmpty()) {
                 queryString = QUESTION_LOCALE_EQUAL + locale;
             } else {
                 queryString += AND_LOCALE_EQUAL + locale;
@@ -1133,7 +1144,7 @@ public abstract class Util {
 
     public static void waitForUpAndRunning(String tenant, String locale) {
         final String url = Util.getJavascriptVariable("j_loginurl") + "?tenant=" + tenant + AND_LOCALE_EQUAL + locale;
-        
+
         RequestBuilder checkRequest = new RequestBuilder(RequestBuilder.HEAD, url);
         checkRequest.setCallback(new RequestCallback() {
             @Override

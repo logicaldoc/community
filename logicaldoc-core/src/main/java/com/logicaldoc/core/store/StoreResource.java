@@ -74,6 +74,10 @@ public class StoreResource {
         return suffix;
     }
 
+    public boolean isEmptySuffix() {
+        return StringUtils.isEmpty(suffix);
+    }
+    
     public boolean isNewEntry() {
         return newEntry;
     }

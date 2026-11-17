@@ -148,7 +148,7 @@ public class FSStore extends AbstractStore {
     public List<StoreResource> listResources(long docId, String fileVersion) {
         List<StoreResource> resources = new ArrayList<>();
         File container = getContainer(docId);
-        File[] buf = container.listFiles((dir, name) -> {
+        File[] buf = container.listFiles((_, name) -> {
             if (name.startsWith("."))
                 return false;
             else if (StringUtils.isNotEmpty(fileVersion)) {

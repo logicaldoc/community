@@ -108,7 +108,7 @@ public class TicketDownload extends HttpServlet {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
 
-            try (PrintWriter out = response.getWriter();) {
+            try {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ticket %s not authorized: %s"
                         .formatted(getTicketId(request), StringUtils.defaultString(e.getMessage())));
             } catch (Exception t) {

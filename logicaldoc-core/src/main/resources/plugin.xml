@@ -137,6 +137,11 @@
     <parameter-def id="out" />
     <parameter-def id="class" />
   </extension-point>
+  <extension-point id="ResourceFilter">
+    <parameter-def id="class" />
+    <parameter-def id="context" />
+    <parameter-def id="position" />
+  </extension-point>
   <extension-point id="Search">
     <parameter-def id="type" />
     <parameter-def id="class" />

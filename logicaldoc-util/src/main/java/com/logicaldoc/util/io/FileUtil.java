@@ -14,7 +14,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -287,9 +289,9 @@ public class FileUtil {
      * @return the enclosed path
      */
     public static String quotePath(String path) {
-        if(path.contains(" "))
+        if (path.contains(" "))
             return "\"%s\"".formatted(path);
-        else 
+        else
             return path;
     }
 
@@ -505,6 +507,39 @@ public class FileUtil {
             out.write(content);
         } catch (Exception e) {
             log.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Writes a segment of a file into the ourput stream
+     * 
+     * @param file The source file
+     * @param out The stream that will collect the segment
+     * @param offset The starting point byte
+     * @param length Total number of bytes in the segment
+     * 
+     * @throws IOException Generic I/O error
+     */
+    public static void writeSegment(File file, OutputStream out, long offset, long length) throws IOException {
+        // Channels.newChannel wraps the OutputStream without closing it when
+        // the channel closes,
+        // unless you close the channel explicitly. Avoid putting 'outChannel'
+        // in try-with-resources
+        // if you want the caller to manage closing 'out'.
+        WritableByteChannel outChannel = Channels.newChannel(out);
+
+        try (FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ)) {
+            long position = offset;
+            long remaining = length;
+
+            while (remaining > 0) {
+                long transferred = fileChannel.transferTo(position, remaining, outChannel);
+                if (transferred <= 0) {
+                    break; // Reached End of File (EOF) early
+                }
+                position += transferred;
+                remaining -= transferred;
+            }
         }
     }
 

@@ -131,7 +131,7 @@ public abstract class PluginRegistry {
         Logger console = console();
         console.info("Searching for plugins in {}", pluginDirectory.getAbsolutePath());
 
-        FilenameFilter filter = (dir, fileName) -> (fileName.endsWith(".jar") && fileName.contains("-plugin"));
+        FilenameFilter filter = (_, fileName) -> (fileName.endsWith(".jar") && fileName.contains("-plugin"));
 
         if (!pluginDirectory.isDirectory())
             console.info("No Plugins Found");

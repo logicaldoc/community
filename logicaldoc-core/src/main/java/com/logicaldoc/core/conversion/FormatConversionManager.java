@@ -568,7 +568,7 @@ public class FormatConversionManager {
         for (String i : ins)
             for (String o : outs) {
                 String key = composeKey(i, o);
-                List<FormatConverter> convList = converters.computeIfAbsent(key, k -> new ArrayList<>());
+                List<FormatConverter> convList = converters.computeIfAbsent(key, _ -> new ArrayList<>());
                 if (!convList.contains(cnvrt))
                     convList.add(cnvrt);
             }

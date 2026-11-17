@@ -695,7 +695,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
             sb.append(AND_LD_TENANTID_D.formatted(tenantId));
 
         Map<String, Object> params = new HashMap<>();
-        if (firstLetter != null) {
+        if (StringUtils.isNotEmpty(firstLetter)) {
             sb.append(" and lower(ld_tag) like :tagLike ");
             params.put("tagLike", "%s%%".formatted(firstLetter.toLowerCase()));
         }
