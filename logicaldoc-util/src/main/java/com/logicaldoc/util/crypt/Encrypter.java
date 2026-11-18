@@ -31,7 +31,7 @@ import com.logicaldoc.util.spring.Context;
  */
 public class Encrypter {
 
-    private static final int PBKDF2_ITERATIONS = 65536;
+    private static final int PBKDF2_ITERATIONS = 310_000;
 
     private static final int KEY_LENGTH = 256; // AES-256
 
@@ -41,7 +41,9 @@ public class Encrypter {
 
     private static volatile Encrypter instance;
 
-    private String encryptionKey;
+    private final String encryptionKey;
+    
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     /**
      * Singleton factory method
@@ -95,8 +97,7 @@ public class Encrypter {
         try {
             // Generate salt
             byte[] salt = new byte[SALT_LENGTH];
-            SecureRandom random = new SecureRandom();
-            random.nextBytes(salt);
+            RANDOM.nextBytes(salt);
 
             // Derive AES key from LogicalDOC encryption key
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
@@ -106,7 +107,7 @@ public class Encrypter {
 
             // Generate IV
             byte[] iv = new byte[IV_LENGTH];
-            random.nextBytes(iv);
+            RANDOM.nextBytes(iv);
 
             // AES-GCM encrypt
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
