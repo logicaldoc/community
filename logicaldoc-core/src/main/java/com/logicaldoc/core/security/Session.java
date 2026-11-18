@@ -212,7 +212,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
     public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {
         if (StringUtils.isNotEmpty(decodedKey)) {
             this.decodedKey = decodedKey;
-            this.key = Encrypter.encryptSHA256(decodedKey);
+            this.key = Encrypter.encodeSHA256(decodedKey);
 
             String abbreviation = decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "";
             this.keyLabel = decodedKey.length() < 10 ? "..." : StringUtils.abbreviate(decodedKey, 10) + abbreviation;

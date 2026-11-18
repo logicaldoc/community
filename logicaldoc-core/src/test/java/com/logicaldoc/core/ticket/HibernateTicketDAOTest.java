@@ -109,7 +109,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 		Ticket storedTicket = testSubject.findByTicketId("5");
 		assertNotNull(storedTicket);
 		assertEquals(ticket, storedTicket);
-		assertEquals(Encrypter.encryptSHA256("1234ABC"), storedTicket.getPassword());
+		assertEquals(Encrypter.encodeSHA256("1234ABC"), storedTicket.getPassword());
 	}
 
 	@Test

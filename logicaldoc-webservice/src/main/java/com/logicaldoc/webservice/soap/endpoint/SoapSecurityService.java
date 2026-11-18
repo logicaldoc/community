@@ -303,7 +303,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
             if (user == null)
                 throw new WebserviceException("User %d not found".formatted(userId));
 
-            if (oldPassword != null && !Encrypter.encryptSHA256(oldPassword).equals(user.getPassword())) {
+            if (oldPassword != null && !Encrypter.encodeSHA256(oldPassword).equals(user.getPassword())) {
                 return 1;
             }
 

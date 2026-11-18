@@ -867,7 +867,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
         testSubject.setPassword(3L, "test", history);
 
         doc = testSubject.findById(3L);
-        assertEquals(Encrypter.encryptSHA256("test"), doc.getPassword());
+        assertEquals(Encrypter.encodeSHA256("test"), doc.getPassword());
 
         testSubject.unsetPassword(3L, history);
         doc = testSubject.findById(3L);

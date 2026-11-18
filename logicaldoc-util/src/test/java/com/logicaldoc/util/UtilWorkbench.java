@@ -10,7 +10,7 @@ import com.logicaldoc.util.crypt.Encrypter;
 public class UtilWorkbench {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(Encrypter.get().encryptSHA256("eIZlvHriTOjBJwaGNv.VP4"));
+		System.out.println(Encrypter.get().encodeSHA256("eIZlvHriTOjBJwaGNv.VP4"));
 
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);

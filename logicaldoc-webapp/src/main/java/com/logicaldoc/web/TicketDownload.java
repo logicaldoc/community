@@ -128,7 +128,7 @@ public class TicketDownload extends HttpServlet {
             String password = getPasswordInRequest(request);
             if (StringUtils.isNotEmpty(password)) {
                 try {
-                    if (!Encrypter.encryptSHA256(password).equals(ticket.getPassword()))
+                    if (!Encrypter.encodeSHA256(password).equals(ticket.getPassword()))
                         throw new IOException("Wrong password");
                 } catch (NoSuchAlgorithmException e) {
                     throw new IOException(e);

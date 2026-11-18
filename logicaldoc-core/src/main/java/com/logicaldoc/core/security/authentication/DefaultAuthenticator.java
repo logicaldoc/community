@@ -57,7 +57,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
         // Check the password match with one of the current or legacy algorithm
         String test = null;
         try {
-            test = Encrypter.encryptSHA256(password);
+            test = Encrypter.encodeSHA256(password);
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
         }

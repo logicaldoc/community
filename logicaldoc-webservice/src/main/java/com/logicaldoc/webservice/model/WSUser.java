@@ -299,7 +299,7 @@ public class WSUser {
         decodedPassword = passwd;
         password = null;
         if (org.apache.commons.lang.StringUtils.isNotEmpty(passwd))
-            password = Encrypter.encryptSHA256(passwd);
+            password = Encrypter.encodeSHA256(passwd);
     }
 
     public void setName(String name) {

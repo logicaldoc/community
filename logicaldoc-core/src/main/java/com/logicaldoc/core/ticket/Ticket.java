@@ -186,7 +186,7 @@ public class Ticket extends PersistentObject {
 
     public boolean checkPassword(String password) {
         try {
-            return Encrypter.encryptSHA256(password).equals(getPassword());
+            return Encrypter.encodeSHA256(password).equals(getPassword());
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
             return false;
@@ -308,7 +308,7 @@ public class Ticket extends PersistentObject {
         if (StringUtil.isEmpty(pwd)) {
             password = null;
         } else {
-            password = Encrypter.encryptSHA256(pwd);
+            password = Encrypter.encodeSHA256(pwd);
         }
     }
 

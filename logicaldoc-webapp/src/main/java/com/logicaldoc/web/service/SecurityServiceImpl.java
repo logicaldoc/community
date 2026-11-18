@@ -352,7 +352,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
                 throw new PermissionException(
                         String.format("User %s not allowed to change the password of user %s", requestor, user));
 
-            if (oldPassword != null && !Encrypter.encryptSHA256(oldPassword).equals(user.getPassword()))
+            if (oldPassword != null && !Encrypter.encodeSHA256(oldPassword).equals(user.getPassword()))
                 throw new ServerException("Wrong old passord");
 
             UserHistory history = null;

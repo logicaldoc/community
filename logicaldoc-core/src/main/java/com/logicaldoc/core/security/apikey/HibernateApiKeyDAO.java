@@ -53,7 +53,7 @@ public class HibernateApiKeyDAO extends HibernatePersistentObjectDAO<ApiKey> imp
 
     @Override
     public ApiKey findByKey(String key) throws PersistenceException, NoSuchAlgorithmException {
-        return findByWhere("_entity.key = :key", Map.of("key", Encrypter.encryptSHA256(key)), null, null).stream()
+        return findByWhere("_entity.key = :key", Map.of("key", Encrypter.encodeSHA256(key)), null, null).stream()
                 .findFirst().orElse(null);
     }
 

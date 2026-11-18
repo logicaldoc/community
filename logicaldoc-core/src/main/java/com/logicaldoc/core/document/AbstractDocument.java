@@ -730,7 +730,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
     public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
         if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
             decodedPassword = pwd;
-            password = Encrypter.encryptSHA256(pwd);
+            password = Encrypter.encodeSHA256(pwd);
         } else {
             decodedPassword = null;
             password = null;
@@ -753,7 +753,7 @@ public abstract class AbstractDocument extends Fillable implements Transactional
             return true;
 
         try {
-            String test = Encrypter.encryptSHA256(myPassword);
+            String test = Encrypter.encodeSHA256(myPassword);
             return test.equals(getPassword());
         } catch (Exception t) {
             return false;

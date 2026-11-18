@@ -489,7 +489,7 @@ public class User extends PersistentObject implements Serializable {
         if (StringUtils.isEmpty(pwd))
             throw new NoSuchAlgorithmException("Password cannot be empty");
         decodedPassword = pwd;
-        password = Encrypter.encryptSHA256(pwd);
+        password = Encrypter.encodeSHA256(pwd);
         if (StringUtils.isEmpty(password))
             throw new NoSuchAlgorithmException("Password cannot be empty");
     }

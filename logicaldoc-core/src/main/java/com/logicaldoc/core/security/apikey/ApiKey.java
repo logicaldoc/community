@@ -100,7 +100,7 @@ public class ApiKey extends PersistentObject {
 	public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {
 		if (StringUtils.isNotEmpty(decodedKey)) {
 			this.decodedKey = decodedKey;
-			this.key = Encrypter.encryptSHA256(decodedKey);
+			this.key = Encrypter.encodeSHA256(decodedKey);
 			this.label = StringUtils.abbreviate(decodedKey, 10)
 					+ (decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "");
 		}
