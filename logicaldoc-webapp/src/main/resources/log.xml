@@ -486,6 +486,22 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="StoreEncrypter_WEB" fileName="${root}/storeencrypter.log.html" filePattern="${root}/storeencrypter.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
+    <RollingFile name="StoreEncrypter" fileName="${root}/storeencrypter.log" filePattern="${root}/storeencrypter.log.%i">
+      <PatternLayout>
+        <Pattern>${pattern}</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>    
     <RollingFile name="PathCalculator_WEB" fileName="${root}/pathcalculator_web.log.html" filePattern="${root}/pathcalculator_web.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
@@ -593,6 +609,15 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="Hibernate" immediateFlush="true" fileName="${root}/hibernate.log" filePattern="${root}/hibernate.log.%i">
+      <PatternLayout>
+        <Pattern>%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p %m%n</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
     <Console name="console" target="SYSTEM_OUT">
       <PatternLayout pattern="%m%n" />
     </Console>
@@ -641,7 +666,7 @@
       <AppenderRef ref="STORE_DELETIONS" />
       <AppenderRef ref="STORE_DELETIONS_WEB" />
     </Logger>
-    <Logger name="org.apache.cxf" level="error" additivity="true">
+    <Logger name="org.apache.cxf" level="info" additivity="true">
       <AppenderRef ref="WEBSERVICE" />
       <AppenderRef ref="WEBSERVICE_WEB" />
     </Logger>
@@ -723,6 +748,10 @@
       <AppenderRef ref="Embedder" />
       <AppenderRef ref="Embedder_WEB" />
     </Logger>
+    <Logger name="com.logicaldoc.enterprise.store.StoreEncrypter" level="info" additivity="false">
+      <AppenderRef ref="StoreEncrypter" />
+      <AppenderRef ref="StoreEncrypter_WEB" />
+    </Logger>
     <Logger name="com.logicaldoc.enterprise.diagnosis.SystemDiagnosis" level="info" additivity="false">
       <AppenderRef ref="SystemDiagnosis" />
       <AppenderRef ref="SystemDiagnosis_WEB" />
@@ -787,3 +816,4 @@
     </Root>
   </Loggers>
 </Configuration>
+

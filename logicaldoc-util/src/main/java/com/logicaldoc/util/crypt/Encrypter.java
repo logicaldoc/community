@@ -42,7 +42,7 @@ public class Encrypter {
     private static volatile Encrypter instance;
 
     private final String encryptionKey;
-    
+
     private static final SecureRandom RANDOM = new SecureRandom();
 
     /**
@@ -50,13 +50,17 @@ public class Encrypter {
      * 
      * @return the instance
      * 
-     * @throws IOException error retrieving the encryption key
+     * @throws EncryptionException error retrieving the encryption key
      */
-    public static Encrypter get() throws IOException {
+    public static Encrypter get() throws EncryptionException {
         if (instance == null) {
             synchronized (Encrypter.class) {
                 if (instance == null)
-                    instance = new Encrypter();
+                    try {
+                        instance = new Encrypter();
+                    } catch (Exception e) {
+                        throw new EncryptionException(e);
+                    }
             }
         }
         return instance;
