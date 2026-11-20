@@ -274,8 +274,6 @@ public class ServletUtil {
                 dict.put(param, request.getParameter(param));
             }
             
-            System.out.println("> "+getFullURL(request));
-            
             ResourceFilterManager.get().filter(resource, "download", transaction, targetFilename, targetContent, dict);
         } catch (NoSuchBeanDefinitionException nbe) {
             // It's OK, this means no listener has been configured
