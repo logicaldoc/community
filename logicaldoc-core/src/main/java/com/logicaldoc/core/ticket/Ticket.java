@@ -4,6 +4,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +90,7 @@ public class Ticket extends PersistentObject {
     @Column(name = "ld_maxcount", nullable = true)
     private Integer maxCount;
 
-    @Column(name = "ld_enabled", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_enabled", nullable = false)
     private boolean enabled = true;
 
     @Column(name = "ld_views", nullable = false)
@@ -184,7 +186,7 @@ public class Ticket extends PersistentObject {
 
     public boolean checkPassword(String password) {
         try {
-            return Encrypter.encryptSHA256(password).equals(getPassword());
+            return Encrypter.encodeSHA256(password).equals(getPassword());
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
             return false;
@@ -306,7 +308,7 @@ public class Ticket extends PersistentObject {
         if (StringUtil.isEmpty(pwd)) {
             password = null;
         } else {
-            password = Encrypter.encryptSHA256(pwd);
+            password = Encrypter.encodeSHA256(pwd);
         }
     }
 

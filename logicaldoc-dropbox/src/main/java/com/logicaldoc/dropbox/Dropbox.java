@@ -222,7 +222,7 @@ public class Dropbox {
                 apiSecret = encrypter.decrypt(settings.getString2());
             if (StringUtils.isNotEmpty(settings.getString3()))
                 accessToken = encrypter.decrypt(settings.getString3());
-        } catch (EncryptionException | IOException e) {
+        } catch (EncryptionException e) {
             log.warn(e.getMessage(), e);
         }
 

@@ -544,7 +544,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
                      */
                     final String sessionUserPassword = session.getUser().getPassword();
                     if (StringUtils.isEmpty(sessionUserPassword)
-                            || Encrypter.encryptSHA256(credentials[1]).equals(sessionUserPassword)) {
+                            || Encrypter.encodeSHA256(credentials[1]).equals(sessionUserPassword)) {
                         return session.getSid();
                     }
                 } catch (NoSuchAlgorithmException e) {
@@ -591,7 +591,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
         try {
             if (StringUtils.isNotEmpty(request.getHeader(HEADER_APIKEY))) {
                 log.debug("Found API Key in header {}", HEADER_APIKEY);
-                String apiKey = Encrypter.encryptSHA256(request.getHeader(HEADER_APIKEY));
+                String apiKey = Encrypter.encodeSHA256(request.getHeader(HEADER_APIKEY));
                 sid = getSessions().stream().filter(s -> apiKey.equals(s.getKey()) && s.isOpen()).map(Session::getSid)
                         .findFirst().orElse(null);
                 if (StringUtils.isNotEmpty(sid))

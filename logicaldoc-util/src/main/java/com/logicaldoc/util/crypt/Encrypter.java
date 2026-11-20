@@ -8,7 +8,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -32,7 +31,7 @@ import com.logicaldoc.util.spring.Context;
  */
 public class Encrypter {
 
-    private static final int PBKDF2_ITERATIONS = 65536;
+    private static final int PBKDF2_ITERATIONS = 310_000;
 
     private static final int KEY_LENGTH = 256; // AES-256
 
@@ -40,22 +39,30 @@ public class Encrypter {
 
     private static final int IV_LENGTH = 12;
 
-    private static Encrypter instance;
+    private static volatile Encrypter instance;
 
-    private String encryptionKey;
+    private final String encryptionKey;
+
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     /**
      * Singleton factory method
      * 
      * @return the instance
      * 
-     * @throws IOException error retrieving the encryption key
+     * @throws EncryptionException error retrieving the encryption key
      */
-    public static Encrypter get() throws IOException {
-        if (instance == null)
+    public static Encrypter get() throws EncryptionException {
+        if (instance == null) {
             synchronized (Encrypter.class) {
-                instance = new Encrypter();
+                if (instance == null)
+                    try {
+                        instance = new Encrypter();
+                    } catch (Exception e) {
+                        throw new EncryptionException(e);
+                    }
             }
+        }
         return instance;
     }
 
@@ -63,7 +70,7 @@ public class Encrypter {
      * A private constructor that takes the encryption key from the context
      * settings
      * 
-     * @throws IOException error retrieving the encryption key 
+     * @throws IOException error retrieving the encryption key
      */
     private Encrypter() throws IOException {
         this(Context.get() != null ? Context.get().getConfig().getString("encryption.key")
@@ -90,22 +97,21 @@ public class Encrypter {
      * @throws EncryptionException Error in the encryption machinery
      */
     public String encrypt(String plaintext) throws EncryptionException {
-
+        PBEKeySpec spec = null;
         try {
             // Generate salt
             byte[] salt = new byte[SALT_LENGTH];
-            SecureRandom random = new SecureRandom();
-            random.nextBytes(salt);
+            RANDOM.nextBytes(salt);
 
-            // Derive AES key from LogicalDOC password
+            // Derive AES key from LogicalDOC encryption key
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            KeySpec spec = new PBEKeySpec(encryptionKey.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH);
+            spec = new PBEKeySpec(encryptionKey.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec keySpec = new SecretKeySpec(tmp.getEncoded(), "AES");
 
             // Generate IV
             byte[] iv = new byte[IV_LENGTH];
-            random.nextBytes(iv);
+            RANDOM.nextBytes(iv);
 
             // AES-GCM encrypt
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -120,6 +126,10 @@ public class Encrypter {
         } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException
                 | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
             throw new EncryptionException(e);
+        } finally {
+            // Clear password from memory
+            if (spec != null)
+                spec.clearPassword();
         }
     }
 
@@ -133,6 +143,7 @@ public class Encrypter {
      * @throws EncryptionException Error in the decryption machinery
      */
     public String decrypt(String encoded) throws EncryptionException {
+        PBEKeySpec spec = null;
         try {
             // Split salt | iv | ciphertext
             String[] parts = encoded.split(":");
@@ -145,7 +156,7 @@ public class Encrypter {
 
             // Derive AES key from LogicalDOC password (same salt!)
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            KeySpec spec = new PBEKeySpec(encryptionKey.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH);
+            spec = new PBEKeySpec(encryptionKey.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec keySpec = new SecretKeySpec(tmp.getEncoded(), "AES");
 
@@ -161,6 +172,10 @@ public class Encrypter {
                 | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException
                 | IllegalArgumentException e) {
             throw new EncryptionException(e);
+        } finally {
+            // Clear password from memory
+            if (spec != null)
+                spec.clearPassword();
         }
     }
 
@@ -173,7 +188,7 @@ public class Encrypter {
      * 
      * @throws NoSuchAlgorithmException encrypting exception
      */
-    public static String encryptSHA256(String original) throws NoSuchAlgorithmException {
+    public static String encodeSHA256(String original) throws NoSuchAlgorithmException {
         StringBuilder copy = new StringBuilder();
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");

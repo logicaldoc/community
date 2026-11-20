@@ -11,6 +11,8 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.Tag;
@@ -39,9 +41,8 @@ import jakarta.persistence.Transient;
  * used as an element to build hierarchies. With the AccessControlList you can
  * associate groups to a given folder and grant some permissions. Also setting
  * the recurityRef you can specify another reference folder that contains the
- * security policies.
- * <p>
- * Folders have a type: 0 for standard folders, 1 for workspaces.
+ * security policies. <p> Folders have a type: 0 for standard folders, 1 for
+ * workspaces.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @version 6.0
@@ -95,7 +96,7 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     /**
      * If true, the users cannot change the template of the contained documents
      */
-    @Column(name = "ld_templocked", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_templocked", nullable = false)
     private boolean templateLocked = false;
 
     @Column(name = "ld_deleteuserid")
@@ -104,7 +105,7 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     @Column(name = "ld_deleteuser", length = 255)
     private String deleteUser;
 
-    @Column(name = "ld_hidden", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_hidden", nullable = false)
     private boolean hidden = false;
 
     @Column(name = "ld_documentsquota")
@@ -156,15 +157,10 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
      * The default stores to use for this folder in the nodes(key: nodeId -
      * value: storeId)
      */
-    @ElementCollection
-    @CollectionTable(name = "ld_folder_store", joinColumns = @JoinColumn(name = "ld_folderid"))
-    @MapKeyColumn(name = "ld_nodeid")
-    @Column(name = "ld_storeid")
+    @ElementCollection @CollectionTable(name = "ld_folder_store", joinColumns = @JoinColumn(name = "ld_folderid")) @MapKeyColumn(name = "ld_nodeid") @Column(name = "ld_storeid")
     private Map<String, Integer> stores = new HashMap<>();
 
-    @ElementCollection
-    @CollectionTable(name = "ld_foldertag", joinColumns = @JoinColumn(name = "ld_folderid"))
-    @OrderBy("ld_tag")
+    @ElementCollection @CollectionTable(name = "ld_foldertag", joinColumns = @JoinColumn(name = "ld_folderid")) @OrderBy("ld_tag")
     private Set<Tag> tags = new HashSet<>();
 
     /**
@@ -174,18 +170,13 @@ public class Folder extends Fillable implements Secure<FolderAccessControlEntry>
     @Transient
     private String pathExtended;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "ld_folder_acl", joinColumns = @JoinColumn(name = "ld_folderid"))
+    @ElementCollection(fetch = FetchType.LAZY) @CollectionTable(name = "ld_folder_acl", joinColumns = @JoinColumn(name = "ld_folderid"))
     private Set<FolderAccessControlEntry> accessControlList = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "ld_folder_ext", joinColumns = @JoinColumn(name = "ld_folderid"))
-    @MapKeyColumn(name = "ld_name")
-    @OrderBy("ld_position ASC, ld_name ASC")
+    @ElementCollection(fetch = FetchType.LAZY) @CollectionTable(name = "ld_folder_ext", joinColumns = @JoinColumn(name = "ld_folderid")) @MapKeyColumn(name = "ld_name") @OrderBy("ld_position ASC, ld_name ASC")
     private Map<String, Attribute> attributes = new HashMap<>();
 
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "ld_templateid")
+    @ManyToOne(cascade = CascadeType.DETACH) @JoinColumn(name = "ld_templateid")
     private Template template;
 
     public Folder() {

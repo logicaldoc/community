@@ -34,7 +34,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
 
     private DynamicForm form = new DynamicForm();
 
-    private ValuesManager vm = new ValuesManager();
+    private ValuesManager vm = null;
 
     private boolean update = false;
 
@@ -46,6 +46,10 @@ public class FolderQuotaPanel extends FolderDetailTab {
         setHeight100();
         setMembersMargin(20);
         update = folder.isWorkspace() && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
+    }
+
+    @Override
+    protected void onDraw() {
         refresh();
     }
 
@@ -114,6 +118,9 @@ public class FolderQuotaPanel extends FolderDetailTab {
 
     @Override
     public boolean validate() {
+        if (vm == null)
+            return true;
+
         @SuppressWarnings("unchecked")
         Map<String, Object> values = vm.getValues();
 

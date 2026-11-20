@@ -209,7 +209,7 @@ public class PopplerConverter extends AbstractFormatConverter {
         File root = dest.getParentFile();
 
         File[] children = root.listFiles(
-                (dir, name) -> !name.equals(dest.getName()) && name.startsWith(FileUtil.getBaseName(dest.getName())));
+                (_, name) -> !name.equals(dest.getName()) && name.startsWith(FileUtil.getBaseName(dest.getName())));
 
         List<File> pages = new ArrayList<>(Arrays.asList(children));
 

@@ -91,7 +91,7 @@ public interface SecurityServiceAsync {
 
     void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);
 
-    void changeStatus(long userId, boolean enabled, AsyncCallback<Void> callback);
+    void changeStatus(List<Long> userIds, boolean enabled, AsyncCallback<Void> callback);
 
     void updateDeviceLabel(long deviceId, String label, AsyncCallback<Void> callback);
 

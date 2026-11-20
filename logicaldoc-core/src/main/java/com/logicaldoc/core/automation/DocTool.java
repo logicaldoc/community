@@ -615,7 +615,7 @@ public class DocTool {
      * @param docId The document's identifier
      * @param fileVersion The file version
      * @param suffix the suffix (eg conversion.pdf)
-     * @param outputFile the user in name of which to take this action
+     * @param outputFile Path of the file that will be written
      */
     public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
         try {
@@ -624,6 +624,20 @@ public class DocTool {
                     StoreResource.builder().document(doc).fileVersion(fileVersion).suffix(suffix).build(),
                     new File(outputFile));
         } catch (PersistenceException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Writes a resource in a file in the local file system
+     * 
+     * @param resource The resource to extract
+     * @param outputFile Path of the file that will be written
+     */
+    public void writeToFile(StoreResource resource, String outputFile) {
+        try {
+            Store.get().writeToFile(resource, new File(outputFile));
+        } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
     }

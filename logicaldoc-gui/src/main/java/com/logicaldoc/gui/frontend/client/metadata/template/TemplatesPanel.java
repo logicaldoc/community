@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
@@ -37,230 +38,239 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class TemplatesPanel extends VLayout {
-	private static final String LABEL = "label";
+    private static final String LABEL = "label";
 
-	private static final String DESCRIPTION = "description";
+    private static final String DESCRIPTION = "description";
 
-	protected Layout detailsContainer;
+    protected Layout detailsContainer;
 
-	protected RefreshableListGrid list;
+    protected RefreshableListGrid list;
 
-	protected Canvas details = SELECT_TEMPLATE;
+    protected Canvas details = SELECT_TEMPLATE;
 
-	static final Canvas SELECT_TEMPLATE = new HTMLPanel("&nbsp;" + I18N.message("selecttemplate"));
+    static final Canvas SELECT_TEMPLATE = new HTMLPanel("&nbsp;" + I18N.message("selecttemplate"));
 
-	protected Long templateIdToSelect;
+    protected Long templateIdToSelect;
 
-	public TemplatesPanel() {
-		setWidth100();
-	}
+    public TemplatesPanel() {
+        setWidth100();
+    }
 
-	@Override
-	public void onDraw() {
-		Canvas[] members = getMembers();
-		for (Canvas canvas : members) {
-			removeMember(canvas);
-		}
+    @Override
+    public void onDraw() {
+        Canvas[] members = getMembers();
+        for (Canvas canvas : members) {
+            removeMember(canvas);
+        }
 
-		InfoPanel infoPanel = new InfoPanel("");
+        InfoPanel infoPanel = new InfoPanel("");
 
-		final Layout listing = new VLayout();
-		detailsContainer = new VLayout();
-		details = SELECT_TEMPLATE;
+        final Layout listing = new VLayout();
+        detailsContainer = new VLayout();
+        details = SELECT_TEMPLATE;
 
-		// Initialize the listing panel
-		listing.setAlign(Alignment.CENTER);
-		listing.setHeight("55%");
-		listing.setShowResizeBar(true);
+        // Initialize the listing panel
+        listing.setAlign(Alignment.CENTER);
+        listing.setHeight("55%");
+        listing.setShowResizeBar(true);
 
-		ListGridField id = new IdListGridField();
+        ListGridField id = new IdListGridField();
 
-		ListGridField name = new ListGridField("name", I18N.message("name"), 200);
-		name.setCanFilter(true);
-		name.setCanSort(true);
+        ListGridField name = new ListGridField("name", I18N.message("name"), 200);
+        name.setCanFilter(true);
+        name.setCanSort(true);
 
-		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);
-		label.setCanFilter(true);
-		label.setCanSort(true);
+        ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);
+        label.setCanFilter(true);
+        label.setCanSort(true);
 
-		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 300);
-		description.setCanFilter(true);
-		description.setCanSort(false);
+        ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 300);
+        description.setCanFilter(true);
+        description.setCanSort(false);
 
-		ListGridField typeTemplate = new ListGridField("type", I18N.message("type"), 100);
-		typeTemplate.setHidden(true);
+        ListGridField typeTemplate = new ListGridField("type", I18N.message("type"), 100);
+        typeTemplate.setHidden(true);
 
-		list = new RefreshableListGrid();
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setShowAllRecords(true);
-		list.setAutoFetchData(true);
-		list.setWidth100();
-		list.setHeight100();
-		list.setFields(id, name, label, description);
-		list.setSelectionType(SelectionStyle.SINGLE);
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setCanFreezeFields(true);
-		list.setFilterOnKeypress(true);
-		list.setDataSource(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
-		list.setShowFilterEditor(true);
+        list = new RefreshableListGrid();
+        list.setEmptyMessage(I18N.message("notitemstoshow"));
+        list.setShowAllRecords(true);
+        list.setAutoFetchData(true);
+        list.setWidth100();
+        list.setHeight100();
+        list.setFields(id, name, label, description);
+        list.setSelectionType(SelectionStyle.SINGLE);
+        list.setShowRecordComponents(true);
+        list.setShowRecordComponentsByCell(true);
+        list.setCanFreezeFields(true);
+        list.setFilterOnKeypress(true);
+        list.setDataSource(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
+        list.setShowFilterEditor(true);
 
-		listing.addMember(infoPanel);
-		listing.addMember(list);
+        listing.addMember(infoPanel);
+        listing.addMember(list);
 
-		ToolStrip toolStrip = new ToolStrip();
-		toolStrip.setHeight(20);
-		toolStrip.setWidth100();
-		toolStrip.addSpacer(2);
+        ToolStrip toolStrip = new ToolStrip();
+        toolStrip.setHeight(20);
+        toolStrip.setWidth100();
+        toolStrip.addSpacer(2);
 
-		ToolStripButton add = new ToolStripButton();
-		add.setTitle(I18N.message("addtemplate"));
-		add.addClickHandler(event -> onAddingTemplate());
+        ToolStripButton add = new ToolStripButton(I18N.message("addtemplate"));
+        add.addClickHandler(event -> onAddingTemplate());
 
-		ToolStripButton refresh = new ToolStripButton();
-		refresh.setTitle(I18N.message("refresh"));
-		refresh.addClickHandler(event -> {
-			list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
-			detailsContainer.removeMembers(detailsContainer.getMembers());
-			details = SELECT_TEMPLATE;
-			detailsContainer.setMembers(details);
-		});
+        ToolStripButton importButton = new ToolStripButton(I18N.message("iimport"));
+        importButton.addClickHandler(event -> new TemplateUploader(TemplatesPanel.this).show());
+        
+        ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
+        refresh.addClickHandler(event -> refresh());
 
-		toolStrip.addButton(refresh);
-		toolStrip.addButton(add);
-		toolStrip.addFill();
+        toolStrip.addButton(refresh);
+        toolStrip.addButton(add);
+        toolStrip.addButton(importButton);
+        toolStrip.addFill();
 
-		list.addCellContextClickHandler(event -> {
-			showContextMenu();
-			event.cancel();
-		});
+        list.addCellContextClickHandler(event -> {
+            showContextMenu();
+            event.cancel();
+        });
 
-		list.addSelectionChangedHandler(event -> {
-			Record rec = list.getSelectedRecord();
-			if (rec != null)
-				TemplateService.Instance.get().getTemplate(Long.parseLong(rec.getAttributeAsString("id")),
-						new DefaultAsyncCallback<>() {
-							@Override
-							public void handleSuccess(GUITemplate template) {
-								showTemplateDetails(template);
-							}
-						});
-		});
+        list.addSelectionChangedHandler(event -> {
+            Record rec = list.getSelectedRecord();
+            if (rec != null)
+                TemplateService.Instance.get().getTemplate(Long.parseLong(rec.getAttributeAsString("id")),
+                        new DefaultAsyncCallback<>() {
+                            @Override
+                            public void handleSuccess(GUITemplate template) {
+                                showTemplateDetails(template);
+                            }
+                        });
+        });
 
-		list.addDataArrivedHandler(event -> {
-			infoPanel.setMessage(I18N.message("showtemplates", Integer.toString(list.getTotalRows())));
-			if (templateIdToSelect != null)
-				for (ListGridRecord rec : list.getRecords()) {
-					if (templateIdToSelect.longValue() == rec.getAttributeAsDouble("id").longValue()) {
-						list.scrollToRow(list.getRowNum(rec));
-						list.selectRecord(rec);
-						break;
-					}
-				}
-			templateIdToSelect = null;
-		});
+        list.addDataArrivedHandler(event -> {
+            infoPanel.setMessage(I18N.message("showtemplates", Integer.toString(list.getTotalRows())));
+            if (templateIdToSelect != null)
+                for (ListGridRecord rec : list.getRecords()) {
+                    if (templateIdToSelect.longValue() == rec.getAttributeAsDouble("id").longValue()) {
+                        list.scrollToRow(list.getRowNum(rec));
+                        list.selectRecord(rec);
+                        break;
+                    }
+                }
+            templateIdToSelect = null;
+        });
 
-		detailsContainer.setAlign(Alignment.CENTER);
-		detailsContainer.addMember(details);
+        detailsContainer.setAlign(Alignment.CENTER);
+        detailsContainer.addMember(details);
 
-		setMembers(toolStrip, listing, detailsContainer);
-	}
+        setMembers(toolStrip, listing, detailsContainer);
+    }
 
-	private void showContextMenu() {
-		Menu contextMenu = new Menu();
+    void refresh() {
+        list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
+        detailsContainer.removeMembers(detailsContainer.getMembers());
+        details = SELECT_TEMPLATE;
+        detailsContainer.setMembers(details);
+    }
 
-		final ListGridRecord selectedRecord = list.getSelectedRecord();
-		final long selectedTemplateId = selectedRecord.getAttributeAsLong("id");
+    private void showContextMenu() {
+        Menu contextMenu = new Menu();
 
-		boolean readonly = Boolean.parseBoolean(selectedRecord.getAttributeAsString("readonly"));
+        final ListGridRecord selectedRecord = list.getSelectedRecord();
+        final long selectedTemplateId = selectedRecord.getAttributeAsLong("id");
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-			if (Boolean.TRUE.equals(answer)) {
-				TemplateService.Instance.get().delete(selectedTemplateId, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						list.removeSelectedData();
-						list.deselectAllRecords();
-						showTemplateDetails(null);
-					}
-				});
-			}
-		}));
+        boolean readonly = Boolean.parseBoolean(selectedRecord.getAttributeAsString("readonly"));
 
-		MenuItem clone = new MenuItem();
-		clone.setTitle(I18N.message("clone"));
-		clone.addClickHandler(event -> TemplateService.Instance.get().clone(selectedTemplateId,
-				selectedRecord.getAttribute("name") + "-Clone", new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(GUITemplate templateClone) {
-						list.deselectAllRecords();
-						list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
-						templateIdToSelect = templateClone.getId();
-						showTemplateDetails(templateClone);
-					}
-				}));
+        MenuItem export = new MenuItem();
+        export.setTitle(I18N.message("eexport"));
+        export.addClickHandler(
+                event -> Util.download(Util.contextPath() + "data/templates.xml?export=" + selectedTemplateId));
 
-		if (readonly) {
-			contextMenu.setItems(clone);
-		} else {
-			contextMenu.setItems(clone, new MenuItemSeparator(), delete);
-		}
+        MenuItem delete = new MenuItem();
+        delete.setTitle(I18N.message("ddelete"));
+        delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+            if (Boolean.TRUE.equals(answer)) {
+                TemplateService.Instance.get().delete(selectedTemplateId, new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(Void result) {
+                        list.removeSelectedData();
+                        list.deselectAllRecords();
+                        showTemplateDetails(null);
+                    }
+                });
+            }
+        }));
 
-		contextMenu.showContextMenu();
-	}
+        MenuItem clone = new MenuItem();
+        clone.setTitle(I18N.message("clone"));
+        clone.addClickHandler(event -> TemplateService.Instance.get().clone(selectedTemplateId,
+                selectedRecord.getAttribute("name") + "-Clone", new DefaultAsyncCallback<>() {
+                    @Override
+                    public void handleSuccess(GUITemplate templateClone) {
+                        list.deselectAllRecords();
+                        list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
+                        templateIdToSelect = templateClone.getId();
+                        showTemplateDetails(templateClone);
+                    }
+                }));
 
-	protected void showTemplateDetails(GUITemplate template) {
-		if (!(details instanceof TemplateDetailsPanel)) {
-			detailsContainer.removeMember(details);
-			details = new TemplateDetailsPanel(this);
-			detailsContainer.addMember(details);
-		}
-		((TemplateDetailsPanel) details).setTemplate(template);
-	}
+        if (readonly) {
+            contextMenu.setItems(clone, export);
+        } else {
+            contextMenu.setItems(clone, export, new MenuItemSeparator(), delete);
+        }
 
-	public ListGrid getList() {
-		return list;
-	}
+        contextMenu.showContextMenu();
+    }
 
-	/**
-	 * Updates the selected rec with new data
-	 * 
-	 * @param template the template to update
-	 */
-	public void updateRecord(GUITemplate template) {
-		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, template.getId()));
-		if (rec == null) {
-			rec = new ListGridRecord();
-			// Append a new rec
-			rec.setAttribute("id", template.getId());
-			list.addData(rec);
-			list.selectRecord(rec);
-		}
+    protected void showTemplateDetails(GUITemplate template) {
+        if (!(details instanceof TemplateDetailsPanel)) {
+            detailsContainer.removeMember(details);
+            details = new TemplateDetailsPanel(this);
+            detailsContainer.addMember(details);
+        }
+        ((TemplateDetailsPanel) details).setTemplate(template);
+    }
 
-		rec.setAttribute("readonly", "" + template.isReadonly());
-		rec.setAttribute("name", template.getName());
-		rec.setAttribute(LABEL, template.getLabel() != null ? template.getLabel() : template.getName());
-		rec.setAttribute(DESCRIPTION, template.getDescription());
-		list.refreshRow(list.getRecordIndex(rec));
-	}
+    public ListGrid getList() {
+        return list;
+    }
 
-	protected void onAddingTemplate() {
-		list.deselectAllRecords();
-		GUITemplate newTemplate = new GUITemplate();
-		newTemplate.setPermissions(
-				Arrays.asList(GUIAccessControlEntry.PERMISSION_READ, GUIAccessControlEntry.PERMISSION_WRITE));
-		showTemplateDetails(newTemplate);
-	}
+    /**
+     * Updates the selected rec with new data
+     * 
+     * @param template the template to update
+     */
+    public void updateRecord(GUITemplate template) {
+        Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, template.getId()));
+        if (rec == null) {
+            rec = new ListGridRecord();
+            // Append a new rec
+            rec.setAttribute("id", template.getId());
+            list.addData(rec);
+            list.selectRecord(rec);
+        }
 
-	@Override
-	public boolean equals(Object other) {
-		return super.equals(other);
-	}
+        rec.setAttribute("readonly", "" + template.isReadonly());
+        rec.setAttribute("name", template.getName());
+        rec.setAttribute(LABEL, template.getLabel() != null ? template.getLabel() : template.getName());
+        rec.setAttribute(DESCRIPTION, template.getDescription());
+        list.refreshRow(list.getRecordIndex(rec));
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+    protected void onAddingTemplate() {
+        list.deselectAllRecords();
+        GUITemplate newTemplate = new GUITemplate();
+        newTemplate.setPermissions(
+                Arrays.asList(GUIAccessControlEntry.PERMISSION_READ, GUIAccessControlEntry.PERMISSION_WRITE));
+        showTemplateDetails(newTemplate);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

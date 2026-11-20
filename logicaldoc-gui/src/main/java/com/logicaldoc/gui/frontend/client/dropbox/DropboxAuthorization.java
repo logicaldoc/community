@@ -34,7 +34,7 @@ public class DropboxAuthorization extends Window {
 
 	private DropboxAuthorization() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("googleapi"));
+		setTitle(I18N.message("dropbox"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);

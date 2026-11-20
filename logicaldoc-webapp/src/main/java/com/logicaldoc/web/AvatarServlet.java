@@ -1,6 +1,5 @@
 package com.logicaldoc.web;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Base64;
@@ -100,8 +99,6 @@ public class AvatarServlet extends HttpServlet {
 
         Decoder decoder = Base64.getDecoder();
         byte[] imageByte = decoder.decode(content);
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(imageByte)) {
-            IOUtils.write(imageByte, out);
-        }
+        IOUtils.write(imageByte, out);
     }
 }

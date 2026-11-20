@@ -86,6 +86,13 @@ public interface TemplateService extends RemoteService {
 	public List<GUIAttribute> getAttributes(long templateId, GUIExtensibleObject extensibleObject)
 			throws ServerException;
 
+    /**
+     * Imports a new template previously uploaded
+     * 
+     * @throws ServerException an error happened in the server application
+     */
+    public void importTemplate() throws ServerException;
+	
 	public static class Instance {
 		private static TemplateServiceAsync inst;
 

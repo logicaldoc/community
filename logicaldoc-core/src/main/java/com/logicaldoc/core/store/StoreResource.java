@@ -8,6 +8,7 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Represents a resource inside a {@link Store}
@@ -44,11 +45,17 @@ public class StoreResource {
      */
     public static final String SUFFIX_SUMMARY = "summary.html";
 
+    private String node;
+
+    private int store;
+
     private long docId;
 
     private String fileVersion;
 
     private String suffix;
+
+    private String realName;
 
     /**
      * Indicates this is a resource added for the very first time
@@ -56,10 +63,21 @@ public class StoreResource {
     private boolean newEntry = false;
 
     StoreResource(Builder builder) {
+        this.node = builder.node;
+        this.store = builder.store;
         this.fileVersion = builder.fileVersion;
         this.suffix = builder.suffix;
         this.docId = builder.docId;
         this.newEntry = builder.newEntry;
+        this.realName = builder.realName;
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+    public int getStore() {
+        return store;
     }
 
     public long getDocId() {
@@ -74,8 +92,16 @@ public class StoreResource {
         return suffix;
     }
 
+    public boolean isEmptySuffix() {
+        return StringUtils.isEmpty(suffix);
+    }
+
     public boolean isNewEntry() {
         return newEntry;
+    }
+
+    public String getRealName() {
+        return realName;
     }
 
     /**
@@ -98,6 +124,8 @@ public class StoreResource {
         int result = 1;
         result = prime * result + (int) (docId ^ (docId >>> 32));
         result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
+        result = prime * result + ((node == null) ? 0 : node.hashCode());
+        result = prime * result + store;
         result = prime * result + ((suffix == null) ? 0 : suffix.hashCode());
         return result;
     }
@@ -118,11 +146,18 @@ public class StoreResource {
                 return false;
         } else if (!fileVersion.equals(other.fileVersion))
             return false;
+        if (node == null) {
+            if (other.node != null)
+                return false;
+        } else if (!node.equals(other.node))
+            return false;
+        if (store != other.store)
+            return false;
         if (suffix == null) {
             if (other.suffix != null)
                 return false;
-        } else if (!suffix.equals(other.suffix))
-            return false;
+        } else
+            return suffix.equals(other.suffix);
         return true;
     }
 
@@ -155,6 +190,10 @@ public class StoreResource {
      */
     public static class Builder {
 
+        private String node;
+
+        private int store = 1;
+
         private Long docId;
 
         private String fileVersion;
@@ -163,8 +202,14 @@ public class StoreResource {
 
         private boolean newEntry;
 
+        private String realName;
+
         private Builder() {
-            // Empty
+            try {
+                node = Context.get().getConfig().getString("id");
+            } catch (Exception e) {
+                // maybe the context is not initialized yet
+            }
         }
 
         public Builder fileVersion(String fileVersion) {
@@ -227,20 +272,39 @@ public class StoreResource {
             return this;
         }
 
+        public Builder node(String node) {
+            this.node = node;
+            return this;
+        }
+
+        public Builder store(int store) {
+            this.store = store;
+            return this;
+        }
+
+        public Builder realName(String realName) {
+            this.realName = realName;
+            return this;
+        }
+
         public Builder newEntry(boolean newEntry) {
             this.newEntry = newEntry;
             return this;
         }
 
         public Builder resource(StoreResource res) {
+            this.node = res.node;
+            this.store = res.store;
             this.docId = res.docId;
             this.fileVersion = res.fileVersion;
             this.suffix = res.suffix;
             this.newEntry = res.newEntry;
+            this.realName = res.realName;
             return this;
         }
 
         public Builder name(String name) {
+            realName = name;
             if (name.contains("-")) {
                 fileVersion = name.substring(0, name.indexOf('-')).trim();
                 suffix = name.substring(name.indexOf('-') + 1, name.length()).trim();

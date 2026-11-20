@@ -476,7 +476,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
         User user = userDAO.findById(3L);
         assertTrue(user.isEnabled());
 
-        testSubject.changeStatus(3L, false);
+        testSubject.changeStatus(List.of(3L), false);
         user = userDAO.findById(3L);
         assertFalse(user.isEnabled());
     }

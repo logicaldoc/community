@@ -11,11 +11,15 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
@@ -28,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hsqldb.lib.StringUtil;
 import org.jfree.util.Log;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -35,6 +40,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
+import com.logicaldoc.core.filter.ResourceFilterManager;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Session;
@@ -47,6 +53,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.store.StoreResource;
 import com.logicaldoc.util.MimeType;
+import com.logicaldoc.util.Value;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
@@ -239,26 +246,49 @@ public class ServletUtil {
         if (document.getId() != resource.getDocId())
             resource = StoreResource.builder().resource(resource).docId(document.getId()).build();
 
-        String filename = getFilename(fileName, resource.getSuffix(), document);
-
         Store store = Store.get();
 
         if (!store.exists(resource))
             throw new FileNotFoundException(resource.name());
 
+        String filename = getFilename(fileName, resource.getSuffix(), document);
         if (StringUtils.isNotEmpty(resource.getSuffix()))
-            filename = filename + "." + resource.getSuffix().substring(resource.getSuffix().lastIndexOf('.') + 1);
+            filename = "%s.%s".formatted(filename,
+                    resource.getSuffix().substring(resource.getSuffix().lastIndexOf('.') + 1));
 
-        long length = store.size(resource);
-        String contentType = MimeType.getByFilename(filename);
+        // The content filtered by the filter (if any) and that should be
+        // finally served
+        Value<String> targetFilename = new Value<>(fileName);
+        File targetContent = FileUtil.createTempFile("DownloadFilter", null);
+        
+        try {
+            // Prepare the current transaction information
+            DocumentHistory transaction = new DocumentHistory();
+            transaction.setSession(session);
+            transaction.setDocument(DocumentDAO.get().findById(document.getId(), true));
+
+            // Prepare the dictionary with all request parameters
+            Map<String, Object> dict = new HashMap<>();
+            for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+                String param = e.nextElement();
+                dict.put(param, request.getParameter(param));
+            }
+            
+            ResourceFilterManager.get().filter(resource, "download", transaction, targetFilename, targetContent, dict);
+        } catch (NoSuchBeanDefinitionException nbe) {
+            // It's OK, this means no listener has been configured
+        }
+
+        long length = targetContent.length() > 0L ? targetContent.length() : store.size(resource);
+        String contentType = MimeType.getByFilename(targetFilename.getValue());
         long lastModified = document.getDate().getTime();
-        String eTag = document.getId() + "_" + document.getVersion() + "_" + lastModified;
+        String eTag = "%d_%s_%d".formatted(document.getId(), document.getVersion(), lastModified);
         boolean acceptsGzip = false;
 
         acceptsGzip = getAcceptEncoding(request, resource.getSuffix());
 
         response.setContentType(contentType);
-        setContentDisposition(request, response, filename);
+        setContentDisposition(request, response, targetFilename.getValue());
 
         // Prepare some variables. The full Range represents the complete file.
         Range rangeFull = new Range(0, length - 1, length);
@@ -292,11 +322,14 @@ public class ServletUtil {
             if (gstreamRequired) {
                 // The browser accepts GZIP, so GZIP the content.
                 response.setHeader("Content-Encoding", "gzip");
-                store.writeToStream(resource, output);
+                if (targetContent.length() == 0L)
+                    store.writeToStream(resource, output);
+                else
+                    Files.copy(targetContent.toPath(), output);
             } else if (ranges.size() == 1) {
                 // Return single part of file.
                 Range r = ranges.get(0);
-                response.setHeader(CONTENT_RANGE, "bytes " + r.start + "-" + r.end + "/" + r.total);
+                response.setHeader(CONTENT_RANGE, "bytes %d-%d/%d".formatted(r.start, r.end, r.total));
 
                 if (length == r.length)
                     response.setStatus(HttpServletResponse.SC_OK); // 200.
@@ -304,39 +337,54 @@ public class ServletUtil {
                     response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
                 // Copy single part range.
-                store.writeToStream(resource, output, r.start, r.length);
+                transferSegment(resource, targetContent, r, output);
             } else {
                 // Return multiple parts of file.
-                response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
+                response.setContentType("multipart/byteranges; boundary=%s".formatted(MULTIPART_BOUNDARY));
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
                 // Cast back to ServletOutputStream to get the easy println
                 // methods.
+                @SuppressWarnings("resource")
                 ServletOutputStream sos = (ServletOutputStream) output;
 
                 // Copy multi part range.
-                for (Range r : ranges) {
+                for (Range range : ranges) {
                     // Add multipart boundary and header fields for every
                     // range.
                     sos.println();
-                    sos.println("--" + MULTIPART_BOUNDARY);
-                    sos.println("Content-Type: " + contentType);
-                    sos.println("Content-Range: bytes " + r.start + "-" + r.end + "/" + r.total);
+                    sos.println("--%s".formatted(MULTIPART_BOUNDARY));
+                    sos.println("Content-Type: %s".formatted(contentType));
+                    sos.println("Content-Range: bytes %d-%d/%d".formatted(range.start, range.end, range.total));
 
                     // Copy single part range of multi part range.
-                    store.writeToStream(resource, sos, r.start, r.length);
+                    transferSegment(resource, targetContent, range, output);
 
                     // End with multipart boundary.
                     sos.println();
-                    sos.println("--" + MULTIPART_BOUNDARY + "--");
+                    sos.println("--%s--".formatted(MULTIPART_BOUNDARY));
                 }
             }
+        } finally {
+            FileUtil.delete(targetContent);
         }
 
         /*
          * Save an history only if it is requested the first fragment
          */
         saveHistory(request, sid, resource.getSuffix(), user, session, document, ranges);
+    }
+
+    private static void transferSegment(
+            StoreResource resource,
+            File filteredContent,
+            Range segment,
+            OutputStream output) throws IOException {
+        if (filteredContent.length() == 0L) {
+            Store.get().writeToStream(resource, output, segment.start, segment.length);
+        } else {
+            FileUtil.writeSegment(filteredContent, output, segment.start, segment.length);
+        }
     }
 
     private static List<Range> getRanges(
@@ -358,9 +406,9 @@ public class ServletUtil {
         // then return 416. Impose a max range size in order avoid stack
         // overflow of the Java regex
         if (!StringUtils.left(range, 500).matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
-            response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
-                                                                    // in
-                                                                    // 416.
+            response.setHeader(CONTENT_RANGE, "bytes */%d".formatted(length)); // Required
+            // in
+            // 416.
             return new ArrayList<>();
         }
 
@@ -391,9 +439,9 @@ public class ServletUtil {
             // Check if Range is syntactically valid. If not, then
             // return 416.
             if (start > end) {
-                response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
-                                                                        // in
-                                                                        // 416.
+                response.setHeader(CONTENT_RANGE, "bytes */%d".formatted(length)); // Required
+                // in
+                // 416.
                 return new ArrayList<>();
             }
 
@@ -808,48 +856,19 @@ public class ServletUtil {
         }
     }
 
-    /**
-     * Returns the protocol + the current host + the port (if different than
-     * common ports).
-     *
-     * @param request HttpServletRequest object to be processed
-     *
-     * @return the HOST URL
-     */
-    public static String getSelfURLhost(HttpServletRequest request) {
-        String hostUrl = "";
-        final int serverPort = request.getServerPort();
-        if ((serverPort == 80) || (serverPort == 443) || serverPort == 0) {
-            hostUrl = String.format("%s://%s", request.getScheme(), request.getServerName());
-        } else {
-            hostUrl = String.format("%s://%s:%s", request.getScheme(), request.getServerName(), serverPort);
-        }
-        return hostUrl;
-    }
-
-    /**
-     * Returns the URL of the current context + current view + query
-     *
-     * @param request HttpServletRequest object to be processed
-     *
-     * @return current context + current view + query
-     */
-    public static String getSelfURL(HttpServletRequest request) {
-        String url = getSelfURLhost(request);
-
-        String requestUri = request.getRequestURI();
+    public static String getFullURL(HttpServletRequest request) {
+        if(request.getRequestURL()==null)
+            return "";
+        StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
         String queryString = request.getQueryString();
 
-        if (null != requestUri && !requestUri.isEmpty()) {
-            url += requestUri;
+        if (queryString == null) {
+            return requestURL.toString();
+        } else {
+            return requestURL.append('?').append(queryString).toString();
         }
-
-        if (null != queryString && !queryString.isEmpty()) {
-            url += '?' + queryString;
-        }
-        return url;
     }
-
+    
     /**
      * This class represents a byte range
      */

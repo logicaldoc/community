@@ -1,10 +1,8 @@
 package com.logicaldoc.core.store;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -211,8 +209,7 @@ public abstract class AbstractStore implements Store {
 
     @Override
     public void writeToFile(StoreResource resource, File out) throws IOException {
-        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out, false), DEFAULT_BUFFER_SIZE);
-                InputStream is = getStream(resource);) {
+        try (InputStream is = getStream(resource)) {
             FileUtil.writeFile(is, out.getPath());
         } catch (IOException ioe) {
             throw ioe;

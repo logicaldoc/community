@@ -9,6 +9,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +54,10 @@ public class User extends PersistentObject implements Serializable {
 
     private static final long serialVersionUID = 8093874904302301983L;
 
-    @Column(name = "ld_type", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_type", nullable = false) @Enumerated(EnumType.ORDINAL)
     private Type type = Type.DEFAULT;
 
-    @Column(name = "ld_source", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ld_source", nullable = false) @Enumerated(EnumType.ORDINAL)
     private UserSource source = UserSource.DEFAULT;
 
     @Column(name = "ld_username", length = 255, nullable = false)
@@ -133,13 +133,13 @@ public class User extends PersistentObject implements Serializable {
     @Transient
     private String impersonator = null;
 
-    @Column(name = "ld_enabled", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_enabled", nullable = false)
     private boolean enabled = true;
 
     /**
      * If the users must confirm changes in the legals or not
      */
-    @Column(name = "ld_legals", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_legals", nullable = false)
     private boolean legals = false;
 
     /**
@@ -151,13 +151,13 @@ public class User extends PersistentObject implements Serializable {
     /**
      * If the password expires or not
      */
-    @Column(name = "ld_passwordexpires", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_passwordexpires", nullable = false)
     private boolean passwordExpires = false;
 
     /**
      * If the password already expired
      */
-    @Column(name = "ld_passwordexpired", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_passwordexpired", nullable = false)
     private boolean passwordExpired = false;
 
     /**
@@ -260,17 +260,14 @@ public class User extends PersistentObject implements Serializable {
     /**
      * If the system must forbid the login outside the working time
      */
-    @Column(name = "ld_enforcewrktime", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER) @Column(name = "ld_enforcewrktime", nullable = false)
     private boolean enforceWorkingTime = false;
 
     /**
      * Maximum number of inactivity days after which the account gets disabled.
-     * Possible values are:
-     * <ul>
-     * <li>null: the general setting is used instead</li>
-     * <li>&lt;=0: no checks will be done for this user</li>
-     * <li>&gt;0: number of maximum inactivity days</li>
-     * </ul>
+     * Possible values are: <ul> <li>null: the general setting is used
+     * instead</li> <li>&lt;=0: no checks will be done for this user</li>
+     * <li>&gt;0: number of maximum inactivity days</li> </ul>
      */
     @Column(name = "ld_maxinactivity")
     private Integer maxInactivity;
@@ -492,7 +489,7 @@ public class User extends PersistentObject implements Serializable {
         if (StringUtils.isEmpty(pwd))
             throw new NoSuchAlgorithmException("Password cannot be empty");
         decodedPassword = pwd;
-        password = Encrypter.encryptSHA256(pwd);
+        password = Encrypter.encodeSHA256(pwd);
         if (StringUtils.isEmpty(password))
             throw new NoSuchAlgorithmException("Password cannot be empty");
     }

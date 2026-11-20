@@ -32,7 +32,7 @@ public class OptionsUploader extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadoptions"));
 		setWidth(400);
-		setHeight(125);
+		setHeight(160);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
