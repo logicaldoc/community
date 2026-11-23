@@ -53,7 +53,7 @@ public class ComparisonWindow extends Window {
 		String locale = Session.get().getUser().getLanguage();
 		String url = Util.contextPath() + "prev/index.jsp?docId=" + version1.getDocId() + "&docId1="
 				+ version1.getDocId() + "&fileVersion1=" + version1.getFileVersion() + "&docId2=" + version2.getDocId()
-				+ "&fileVersion2=" + version2.getFileVersion() + "&path=compare" + "&control=ignore&locale=" + locale
+				+ "&fileVersion2=" + version2.getFileVersion() + "&path=compare&control=ignore&locale=" + locale
 				+ "#locale=" + locale.replace('_', '-');
 		contents = "<iframe src='" + url + "' style='border:0px solid white; width:" + (getWidth() - 1) + "px; height:"
 				+ (getHeight() - 1) + "px; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";

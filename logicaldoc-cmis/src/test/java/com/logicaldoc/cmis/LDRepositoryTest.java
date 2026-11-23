@@ -928,14 +928,14 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
     @Test
     public void testHistoryDateParameters() throws PersistenceException {
         DocumentHistory documentEntry = DocumentHistoryDAO.get()
-                .findByWhere("_entity.tenantId = :tenantId " + "and _entity.event = :event",
+                .findByWhere("_entity.tenantId = :tenantId and _entity.event = :event",
                         Map.of("tenantId", testSubject.getRoot().getTenantId(), "event",
                                 DocumentEvent.STORED.toString()),
                         "_entity.date", 1)
                 .stream().findFirst().orElseThrow(() -> new AssertionError("Missing document history fixture"));
 
         FolderHistory folderEntry = FolderHistoryDAO.get()
-                .findByWhere("_entity.tenantId = :tenantId " + "and _entity.event = :event",
+                .findByWhere("_entity.tenantId = :tenantId and _entity.event = :event",
                         Map.of("tenantId", testSubject.getRoot().getTenantId(), "event",
                                 FolderEvent.CREATED.toString()),
                         "_entity.date", 1)
@@ -947,12 +947,12 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
         // An entry at the cutoff must be included.
         assertTrue(testSubject.getDocumentLastChanges(documentTime, 1000).stream().anyMatch(
                 object -> object.getChangeEventInfo().getChangeTime().toInstant().toEpochMilli() == documentTime
-                        && ("doc." + documentEntry.getDocId()).equals(
+                        && ("doc.%d".formatted(documentEntry.getDocId())).equals(
                                 object.getProperties().getProperties().get(PropertyIds.OBJECT_ID).getFirstValue())));
 
         assertTrue(testSubject.getFolderLastChanges(folderTime, 1000).stream()
                 .anyMatch(object -> object.getChangeEventInfo().getChangeTime().toInstant().toEpochMilli() == folderTime
-                        && ("fld." + folderEntry.getFolderId()).equals(
+                        && ("fld.%d".formatted(folderEntry.getFolderId())).equals(
                                 object.getProperties().getProperties().get(PropertyIds.OBJECT_ID).getFirstValue())));
 
         // Entries before the cutoff must be excluded.

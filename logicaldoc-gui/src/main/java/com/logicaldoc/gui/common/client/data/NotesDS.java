@@ -19,10 +19,10 @@ public class NotesDS extends DataSource {
 
 	public NotesDS(Long userIdentifier, Long documentIdentifier, String fileVersion, Integer pageNumber) {
 		prepareFields();
-		setDataURL("data/notes.xml?1=1" + (userIdentifier != null ? "&" + "userId=" + userIdentifier : "")
-				+ (documentIdentifier != null ? "&" + "docId=" + documentIdentifier : "")
-				+ (pageNumber != null ? "&" + "page=" + pageNumber : "")
-				+ (fileVersion != null ? "&" + "fileVersion=" + fileVersion : ""));
+		setDataURL("data/notes.xml?1=1" + (userIdentifier != null ? "&userId=" + userIdentifier : "")
+				+ (documentIdentifier != null ? "&docId=" + documentIdentifier : "")
+				+ (pageNumber != null ? "&page=" + pageNumber : "")
+				+ (fileVersion != null ? "&fileVersion=" + fileVersion : ""));
 	}
 
 	private void prepareFields() {

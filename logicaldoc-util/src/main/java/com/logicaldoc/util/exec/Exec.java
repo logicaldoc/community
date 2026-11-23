@@ -402,7 +402,7 @@ public class Exec {
             }
         }
 
-        String commandForLog = " (" + commandForLog(commandLine) + ")";
+        String commandForLog = " (%s)".formatted(commandForLog(commandLine));
 
         StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
 

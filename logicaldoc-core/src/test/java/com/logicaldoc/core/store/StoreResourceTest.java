@@ -57,7 +57,7 @@ public class StoreResourceTest {
         String[] inputs = { "a/b", "a\\b", "/abs", "\\abs", "c:\\x", "x/y\\z" };
         for (String input : inputs) {
             String name = resource("1.0", input).name();
-            assertFalse("Separator in name: " + name, name.contains("/") || name.contains("\\"));
+            assertFalse("Separator in name: %s".formatted(name), name.contains("/") || name.contains("\\"));
         }
     }
 
@@ -112,14 +112,14 @@ public class StoreResourceTest {
         assertRejected("///", null);
         assertRejected("\\\\", null);
     }
-    
+
     private static StoreResource resource(String fileVersion, String suffix) {
         return StoreResource.builder().docId(1L).fileVersion(fileVersion).suffix(suffix).build();
     }
 
     private static void assertRejected(String fileVersion, String suffix) {
         StoreResource res = resource(fileVersion, suffix);
-        assertThrows("Expected rejection for fileVersion=" + fileVersion + " suffix=" + suffix,
+        assertThrows("Expected rejection for fileVersion=%s suffix=%s".formatted(fileVersion, suffix),
                 IllegalArgumentException.class, res::name);
     }
 }

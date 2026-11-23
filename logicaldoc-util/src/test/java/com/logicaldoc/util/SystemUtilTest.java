@@ -13,7 +13,7 @@ public class SystemUtilTest {
         String separator = System.lineSeparator();
 
         assertTrue(output.contains("java.version"));
-        assertTrue(output.startsWith("#System Environment" + separator + "#"));
+        assertTrue(output.startsWith("#System Environment%s#".formatted(separator)));
     }
 
     @Test

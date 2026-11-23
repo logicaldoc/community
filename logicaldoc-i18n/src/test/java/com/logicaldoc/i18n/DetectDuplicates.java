@@ -41,15 +41,15 @@ public class DetectDuplicates {
                     map.put(key, 1);
             }
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error: %s".formatted(e.getMessage()));
         }
 
-        System.out.println("Inspected a total of " + map.keySet().size() + " keys");
+        System.out.println("Inspected a total of %d keys".formatted(map.keySet().size()));
         System.out.println("Found duplicates: ");
         try {
             for (String key : map.keySet()) {
                 if (map.get(key).intValue() > 1)
-                    System.out.println(key + "(" + map.get(key) + " times)");
+                    System.out.println("%s (%d times)".formatted(key, map.get(key)));
             }
         } catch (Exception t) {
             t.printStackTrace();

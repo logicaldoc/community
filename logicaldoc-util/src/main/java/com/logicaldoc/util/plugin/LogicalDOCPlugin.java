@@ -141,7 +141,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
             try {
                 boolean created = file.createNewFile();
                 if (!created)
-                    throw new IOException("Cannot create new file " + file.getAbsolutePath());
+                    throw new IOException("Cannot create new file %s".formatted(file.getAbsolutePath()));
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }

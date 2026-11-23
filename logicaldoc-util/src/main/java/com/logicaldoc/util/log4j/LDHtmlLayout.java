@@ -296,7 +296,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		appendLs(sbuf, "</head>");
 		appendLs(sbuf, "<body bgcolor=\"#FFFFFF\" topmargin=\"6\" leftmargin=\"6\">");
 		appendLs(sbuf, "<hr size=\"1\" noshade=\"noshade\">");
-		appendLs(sbuf, "Log session start time " + new java.util.Date() + "<br>");
+		appendLs(sbuf, "Log session start time %s<br>".formatted(new java.util.Date()));
 		appendLs(sbuf, "<br>");
 		appendLs(sbuf,
 				"<table cellspacing=\"0\" cellpadding=\"4\" border=\"1\" bordercolor=\"#224466\" width=\"100%\">");

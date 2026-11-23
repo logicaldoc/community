@@ -174,7 +174,7 @@ public class TicketsReport extends ReportPanel {
                 if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(VALID))
                         || Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED))) {
                     return Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)) ? "color: #888888;"
-                            : "color: red;" + " font-style: italic;";
+                            : "color: red; font-style: italic;";
                 } else {
                     return super.getCellCSSText(rec, rowNum, colNum);
                 }

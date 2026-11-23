@@ -27,92 +27,92 @@ import com.logicaldoc.util.MimeType;
  */
 public class HttpUpload {
 
-	private static final Logger log = LoggerFactory.getLogger(HttpUpload.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpUpload.class);
 
-	private static final String UTF_8 = "UTF-8";
+    private static final String UTF_8 = "UTF-8";
 
-	private static final int TIMEOUT = 20;
+    private static final int TIMEOUT = 20;
 
-	private String url;
+    private String url;
 
-	private File file;
+    private File file;
 
-	private String fileName;
+    private String fileName;
 
-	private FileBodyCounter.ProgressListener listener;
+    private FileBodyCounter.ProgressListener listener;
 
-	public void upload() throws IOException {
-		HttpPost filePost = new HttpPost(url);
+    public void upload() throws IOException {
+        HttpPost filePost = new HttpPost(url);
 
-		String f = fileName;
-		if (f == null)
-			f = file.getName();
+        String f = fileName;
+        if (f == null)
+            f = file.getName();
 
-		String name = "LDOC-" + new Date().getTime();
+        String name = "LDOC-%d".formatted(new Date().getTime());
 
-		FileBody filePart = null;
-		if (listener != null)
-			filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name, listener);
-		else
-			filePart = new FileBody(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name);
+        FileBody filePart = null;
+        if (listener != null)
+            filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name, listener);
+        else
+            filePart = new FileBody(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name);
 
-		HttpEntity reqEntity = MultipartEntityBuilder.create().addPart(name, filePart).build();
-		filePost.setEntity(reqEntity);
+        HttpEntity reqEntity = MultipartEntityBuilder.create().addPart(name, filePart).build();
+        filePost.setEntity(reqEntity);
 
-		CloseableHttpClient client = HttpUtil.getNotValidatingClient(TIMEOUT);
-		client.execute(filePost, new StringHttpClientResponseHandler() {
-			@Override
-			public String handleResponse(ClassicHttpResponse response) throws IOException {
-				int status = response.getCode();
-				String respBody = "";
-				HttpEntity rent = response.getEntity();
-				if (rent != null)
-					try {
-						respBody = EntityUtils.toString(rent, UTF_8);
-					} catch (ParseException e) {
-						throw new IOException(e);
-					}
-				if (status == HttpStatus.SC_OK) {
-					log.debug("Upload complete, response: {}", respBody);
-				} else {
-					log.debug("Upload failed, response: {}", status);
-					throw new IOException("" + status);
-				}
+        CloseableHttpClient client = HttpUtil.getNotValidatingClient(TIMEOUT);
+        client.execute(filePost, new StringHttpClientResponseHandler() {
+            @Override
+            public String handleResponse(ClassicHttpResponse response) throws IOException {
+                int status = response.getCode();
+                String respBody = "";
+                HttpEntity rent = response.getEntity();
+                if (rent != null)
+                    try {
+                        respBody = EntityUtils.toString(rent, UTF_8);
+                    } catch (ParseException e) {
+                        throw new IOException(e);
+                    }
+                if (status == HttpStatus.SC_OK) {
+                    log.debug("Upload complete, response: {}", respBody);
+                } else {
+                    log.debug("Upload failed, response: {}", status);
+                    throw new IOException(Integer.toString(status));
+                }
 
-				return respBody;
-			}
-		});
-	}
+                return respBody;
+            }
+        });
+    }
 
-	public String getURL() {
-		return url;
-	}
+    public String getURL() {
+        return url;
+    }
 
-	public void setURL(String url) {
-		this.url = url;
-	}
+    public void setURL(String url) {
+        this.url = url;
+    }
 
-	public File getFile() {
-		return file;
-	}
+    public File getFile() {
+        return file;
+    }
 
-	public void setFile(File file) {
-		this.file = file;
-	}
+    public void setFile(File file) {
+        this.file = file;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public FileBodyCounter.ProgressListener getListener() {
-		return listener;
-	}
+    public FileBodyCounter.ProgressListener getListener() {
+        return listener;
+    }
 
-	public void setListener(FileBodyCounter.ProgressListener listener) {
-		this.listener = listener;
-	}
+    public void setListener(FileBodyCounter.ProgressListener listener) {
+        this.listener = listener;
+    }
 }

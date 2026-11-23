@@ -109,25 +109,27 @@ public class FSStoreTest extends AbstractCoreTestCase {
         StoreResource res = StoreResource.builder().docId(DOC_ID).fileVersion(fileVersion).suffix(suffix).build();
         String input = "fileVersion=%s suffix=%s".formatted(fileVersion, suffix);
 
-        assertThrows("exists: " + input, IllegalArgumentException.class, () -> testSubject.exists(res));
-        assertThrows("size: " + input, IllegalArgumentException.class, () -> testSubject.size(res));
-        assertThrows("getStream: " + input, IllegalArgumentException.class, () -> testSubject.getStream(res));
-        assertThrows("getBytes: " + input, IllegalArgumentException.class, () -> testSubject.getBytes(res, 0, 1));
-        assertThrows("writeToFile: " + input, IllegalArgumentException.class, () -> {
+        assertThrows("exists: %s".formatted(input), IllegalArgumentException.class, () -> testSubject.exists(res));
+        assertThrows("size: %s".formatted(input), IllegalArgumentException.class, () -> testSubject.size(res));
+        assertThrows("getStream: %s".formatted(input), IllegalArgumentException.class,
+                () -> testSubject.getStream(res));
+        assertThrows("getBytes: %s".formatted(input), IllegalArgumentException.class,
+                () -> testSubject.getBytes(res, 0, 1));
+        assertThrows("writeToFile: %s".formatted(input), IllegalArgumentException.class, () -> {
             File out = File.createTempFile("fsstoretest", ".tmp");
             out.deleteOnExit();
             testSubject.writeToFile(res, out);
         });
-        assertThrows("delete: " + input, IllegalArgumentException.class, () -> testSubject.delete(res));
+        assertThrows("delete: %s".formatted(input), IllegalArgumentException.class, () -> testSubject.delete(res));
 
-        assertTrue("Canary must survive: " + input, canary.exists());
+        assertTrue("Canary must survive: %s".formatted(input), canary.exists());
     }
 
     private void assertStaysInContainer(String fileVersion, String suffix) {
         StoreResource res = StoreResource.builder().docId(DOC_ID).fileVersion(fileVersion).suffix(suffix).build();
         String name = res.name();
 
-        assertFalse("Separator in name: " + name, name.contains("/") || name.contains("\\"));
+        assertFalse("Separator in name: %s".formatted(name), name.contains("/") || name.contains("\\"));
         assertEquals(testSubject.getContainer(DOC_ID).getAbsoluteFile(),
                 new File(testSubject.getContainer(DOC_ID), name).getAbsoluteFile().getParentFile());
 
@@ -135,7 +137,7 @@ public class FSStoreTest extends AbstractCoreTestCase {
         // the canary
         assertFalse(testSubject.exists(res));
         testSubject.delete(res);
-        assertTrue("Canary must survive: " + name, canary.exists());
+        assertTrue("Canary must survive: %s".formatted(name), canary.exists());
     }
 
     /**
