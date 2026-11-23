@@ -11,6 +11,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated(since = "9.3.2", forRemoval = true)
 public class ConvertEncryption {
 
     private static final Logger log = LoggerFactory.getLogger(ConvertEncryption.class);

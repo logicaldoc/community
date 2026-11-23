@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.util.io.FileUtil;
 
+@Deprecated(since = "9.3.2", forRemoval = true)
 public class CryptUtil {
 
     public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
