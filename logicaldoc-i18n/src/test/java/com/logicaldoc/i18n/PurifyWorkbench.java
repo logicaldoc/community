@@ -55,7 +55,7 @@ public class PurifyWorkbench {
     private static void writePurifiedRB(ResourceBundle master, String transalatedBundle, Locale locale) {
         ResourceBundle translated = ResourceBundle.getBundle(transalatedBundle, locale);
         if (locale != translated.getLocale()) {
-            System.out.println("Translation for locale: %s, not Found; Skipped".formatted(loacale=);
+            System.out.println("Translation for locale: %s, not Found; Skipped".formatted(locale));
             return;
         }
 
@@ -120,6 +120,6 @@ public class PurifyWorkbench {
             country = st.nextToken();
         if (st.hasMoreTokens())
             variant = st.nextToken();
-        return new Locale(lang, country, variant);
+        return Locale.of(lang, country, variant);
     }
 }
