@@ -106,4 +106,62 @@ public class GUITransition implements Serializable {
 	public void setMinNoteSize(Integer minNoteSize) {
 		this.minNoteSize = minNoteSize;
 	}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((color == null) ? 0 : color.hashCode());
+        result = prime * result + ((minNoteSize == null) ? 0 : minNoteSize.hashCode());
+        result = prime * result + ((onChosen == null) ? 0 : onChosen.hashCode());
+        result = prime * result + ((points == null) ? 0 : points.hashCode());
+        result = prime * result + (requiresNote ? 1231 : 1237);
+        result = prime * result + ((targetState == null) ? 0 : targetState.hashCode());
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        GUITransition other = (GUITransition) obj;
+        if (color == null) {
+            if (other.color != null)
+                return false;
+        } else if (!color.equals(other.color))
+            return false;
+        if (minNoteSize == null) {
+            if (other.minNoteSize != null)
+                return false;
+        } else if (!minNoteSize.equals(other.minNoteSize))
+            return false;
+        if (onChosen == null) {
+            if (other.onChosen != null)
+                return false;
+        } else if (!onChosen.equals(other.onChosen))
+            return false;
+        if (points == null) {
+            if (other.points != null)
+                return false;
+        } else if (!points.equals(other.points))
+            return false;
+        if (requiresNote != other.requiresNote)
+            return false;
+        if (targetState == null) {
+            if (other.targetState != null)
+                return false;
+        } else if (!targetState.equals(other.targetState))
+            return false;
+        if (text == null) {
+            if (other.text != null)
+                return false;
+        } else if (!text.equals(other.text))
+            return false;
+        return true;
+    }
 }
