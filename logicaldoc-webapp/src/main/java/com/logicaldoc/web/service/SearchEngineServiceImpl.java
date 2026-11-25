@@ -88,9 +88,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
             searchEngine.setLanguages("");
             LanguageManager lm = LanguageManager.getInstance();
             List<String> langs = lm.getLanguagesAsString(session.getTenantName());
-            for (String lang : langs) {
-                searchEngine.setLanguages(searchEngine.getLanguages() + "," + lang);
-            }
+            for (String lang : langs)
+                searchEngine.setLanguages("%s,%s".formatted(searchEngine.getLanguages(), lang));
             if (searchEngine.getLanguages().startsWith(","))
                 searchEngine.setLanguages(searchEngine.getLanguages().substring(1));
 
@@ -113,8 +112,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
         Runnable task = () -> {
             try {
-                DocumentDAO.get().jdbcUpdate("update ld_document set ld_indexed=0 where ld_indexed=1 "
-                        + (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""));
+                DocumentDAO.get().jdbcUpdate("update ld_document set ld_indexed = 0 where ld_indexed = 1 %s"
+                        .formatted(!dropIndex ? " and ld_tenantid = %d".formatted(session.getTenantId()) : ""));
             } catch (Exception t) {
                 log.error(t.getMessage(), t);
             }
@@ -178,7 +177,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
                 conf.setProperty("index.dir", searchEngine.getDir());
                 conf.setProperty("index.sorting", searchEngine.getSorting());
                 conf.setProperty("index.sorting.custom", searchEngine.getCustomSorting());
-                conf.setProperty("threadpool.IndexerTask.max", "" + searchEngine.getThreads());
+                conf.setProperty("threadpool.IndexerTask.max", Integer.toString(searchEngine.getThreads()));
             }
 
             conf.write();
@@ -193,7 +192,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
         try {
             ContextProperties conf = Context.get().getConfig();
-            conf.setProperty(session.getTenantName() + ".lang." + language, active ? "enabled" : "disabled");
+            conf.setProperty("%s.lang.%s".formatted(session.getTenantName(), language),
+                    active ? "enabled" : "disabled");
             conf.write();
         } catch (Exception t) {
             throwServerException(session, log, t);
@@ -435,20 +435,21 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
     private void executeEnrichingQuery(Map<Long, Hit> hitsMap) throws SearchException {
         // Find real documents
-        StringBuilder richQuery = new StringBuilder("""
-select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, 
-       A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, 
-       A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, 
-       A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, 
-       A.ld_stoppublishing, A.ld_published, FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, 
-       C.ld_name, A.ld_tenantid, A.ld_docreftype, A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, 
-       A.ld_language, A.ld_pages, A.ld_color 
-  from ld_document A 
-  join ld_folder FOLD on A.ld_folderid = FOLD.ld_id
-  left outer join ld_template C on A.ld_templateid = C.ld_id
- where A.ld_deleted=0 
-   and A.ld_folderid = FOLD.ld_id
-""");
+        StringBuilder richQuery = new StringBuilder(
+                """
+                select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified,
+                       A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable,
+                       A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type,
+                       A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing,
+                       A.ld_stoppublishing, A.ld_published, FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid,
+                       C.ld_name, A.ld_tenantid, A.ld_docreftype, A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp,
+                       A.ld_language, A.ld_pages, A.ld_color
+                  from ld_document A
+                  join ld_folder FOLD on A.ld_folderid = FOLD.ld_id
+                  left outer join ld_template C on A.ld_templateid = C.ld_id
+                 where A.ld_deleted=0
+                   and A.ld_folderid = FOLD.ld_id
+                """);
 
         DocumentDAO dao = DocumentDAO.get();
 
@@ -464,8 +465,8 @@ select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmo
                  * if the sets contain two or more items: (x, 0) IN ((1,0),
                  * (2,0), (3,0), ...):
                  */
-                hitsIdsCondition.append(
-                        " (A.ld_id,0) in (%s)".formatted(CollectionUtil.join(hitsIds, "(%d,0)"::formatted)));
+                hitsIdsCondition
+                        .append(" (A.ld_id,0) in (%s)".formatted(CollectionUtil.join(hitsIds, "(%d,0)"::formatted)));
             } else {
                 hitsIdsCondition.append(" A.ld_id in (%s)".formatted(CollectionUtil.join(hitsIds)));
             }

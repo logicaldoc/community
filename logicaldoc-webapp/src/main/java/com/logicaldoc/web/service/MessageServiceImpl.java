@@ -92,7 +92,12 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
                     sysmess.setAuthor("SYSTEM");
                     sysmess.setRecipients(recipients);
                     sysmess.setSubject("Confirmation");
-                    sysmess.setMessageText("To: " + recipient.getName() + "\nMessage: " + message.getMessageText());
+                    sysmess.setMessageText("""
+                            To: %s
+                            Message: %s
+                            """.formatted(
+                                    recipient.getName(),
+                                    message.getMessageText()));
                     sysmess.setSentDate(date);
                     sysmess.setConfirmation(0);
                     sysmess.setPrio(message.getPrio());

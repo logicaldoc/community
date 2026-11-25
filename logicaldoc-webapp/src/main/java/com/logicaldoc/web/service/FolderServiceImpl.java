@@ -271,22 +271,24 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
         Folder root = dao.findById(folderId);
         String pathPrefix = root.getPath();
 
-        return dao.queryForLong("select count(ld_id) from ld_folder where ld_deleted=0 and (ld_parentid=" + folderId
-                + " or ld_path like '" + pathPrefix + "/%')");
+        return dao.queryForLong(
+                "select count(ld_id) from ld_folder where ld_deleted = 0 and (ld_parentid = :folderId or ld_path like :pathPrefix)",
+                Map.of("folderId", folderId, "pathPrefix", "%s/%%".formatted(pathPrefix)));
     }
 
     private static int countDirectDocs(long folderId) throws PersistenceException {
         FolderDAO dao = FolderDAO.get();
-        return dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid=" + folderId
-                + " and not ld_status=" + DocumentStatus.ARCHIVED.ordinal());
+        return dao.queryForInt(
+                "select count(ld_id) from ld_document where ld_deleted = 0 and ld_folderid = :folderId and not ld_status = :status",
+                Map.of("folderId", folderId, "status", DocumentStatus.ARCHIVED.ordinal()));
     }
 
     private static int countDirectSubfolders(long folderId) throws PersistenceException {
         int count = 0;
         FolderDAO dao = FolderDAO.get();
         count = dao.queryForInt(
-                "select count(ld_id) from ld_folder where not ld_id=ld_parentid and ld_deleted=0 and ld_parentid="
-                        + folderId);
+                "select count(ld_id) from ld_folder where not ld_id = ld_parentid and ld_deleted = 0 and ld_parentid = :folderId",
+                Map.of("folderId", folderId));
         return count;
     }
 
