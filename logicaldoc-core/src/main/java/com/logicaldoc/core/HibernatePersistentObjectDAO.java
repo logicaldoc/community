@@ -276,17 +276,16 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
     protected void flush() {
         try {
             getCurrentSession().flush();
-		} catch (Exception e) {
-			log.error("Error flushing the Hibernate session: {}", e.getMessage(), e);
-			// throw e;
-		}			
-		/*	
-		} catch (RuntimeException e) {
-			log.error("Error flushing the Hibernate session: {}", e.getMessage(), e);
-			throw e;
-		}
-		*/
-	}
+        } catch (Exception e) {
+            log.error("Error flushing the Hibernate session: {}", e.getMessage(), e);
+            // throw e;
+        }
+        /*
+         * } catch (RuntimeException e) {
+         * log.error("Error flushing the Hibernate session: {}", e.getMessage(),
+         * e); throw e; }
+         */
+    }
 
     protected void refresh(Object entity) {
         if (entity == null)
@@ -605,6 +604,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
                 if (rs.next()) {
                     Object obj = rs.getObject(1);
+                    if (obj == null)
+                        return null;
                     if (obj instanceof Timestamp ts && requiredType.equals(Date.class)) {
                         return requiredType.getConstructor(Long.TYPE).newInstance(ts.getTime());
                     } else {
