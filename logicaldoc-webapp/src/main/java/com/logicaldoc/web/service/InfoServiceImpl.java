@@ -103,9 +103,8 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
                 setupReminder.setMessage(getValue(info, "setup.reminder"));
                 HttpServletRequest request = this.getThreadLocalRequest();
                 if (request != null) {
-                    String urlPrefix = request.getScheme() + "://" + request.getServerName() + ":"
-                            + request.getServerPort() + request.getContextPath();
-                    setupReminder.setUrl(urlPrefix + "/setup");
+                    setupReminder.setUrl("%s://%s:%d%s/setup".formatted(request.getScheme(), request.getServerName(),
+                            request.getServerPort(), request.getContextPath()));
                 }
                 alerts.add(setupReminder);
             } else {
@@ -381,9 +380,9 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
             List<GUIParameter> parameters = new ArrayList<>();
 
             GUIParameter messages = new GUIParameter("messages",
-                    "" + messageDao.getUnreadCount(session.getUsername(), Message.Type.SYSTEM));
+                    Integer.toString(messageDao.getUnreadCount(session.getUsername(), Message.Type.SYSTEM)));
             parameters.add(messages);
-            parameters.add(new GUIParameter("valid", "" + SessionManager.get().isOpen(session.getSid())));
+            parameters.add(new GUIParameter("valid", Boolean.toString(SessionManager.get().isOpen(session.getSid()))));
 
             return parameters;
         } catch (Exception t) {

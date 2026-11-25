@@ -131,11 +131,12 @@ public class WSFolder implements Serializable {
     }
 
     public static WSFolder fromFolder(Folder folder) throws PersistenceException {
-        return fromFolder(folder, true);
+        return fromFolder(folder, false);
     }
 
     public static WSFolder fromFolder(Folder folder, boolean withCollections) throws PersistenceException {
-        folder = FolderDAO.get().initialize(folder);
+        if (withCollections && folder.getId() != 0L)
+            folder = FolderDAO.get().findById(folder.getId(), true);
 
         WSFolder wsFolder = new WSFolder();
         wsFolder.setId(folder.getId());

@@ -424,15 +424,14 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
         EMailSender sender = new EMailSender(session.getTenantName());
 
         try {
-            EMail mail;
-            mail = new EMail();
+            EMail mail = new EMail();
             mail.setAccountId(-1);
             mail.setAuthor(config.getProperty(session.getTenantName() + SMTP_SENDER));
             mail.setAuthorAddress(config.getProperty(session.getTenantName() + SMTP_SENDER));
             mail.parseRecipients(email);
             mail.setFolder("outbox");
             mail.setSentDate(new Date());
-            mail.setSubject("Hello from " + SystemInfo.get().getProduct());
+            mail.setSubject("Hello from %s".formatted(SystemInfo.get().getProduct()));
             mail.setMessageText("This is a test email from %s".formatted(SystemInfo.get().getProduct()));
 
             log.info("Sending test email to {}", email);

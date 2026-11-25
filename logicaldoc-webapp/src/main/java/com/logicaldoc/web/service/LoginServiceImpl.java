@@ -161,9 +161,15 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
             email.setUsername(user.getUsername());
 
             HttpServletRequest request = this.getThreadLocalRequest();
-            String urlPrefix = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-                    + request.getContextPath();
-            String address = urlPrefix + "/pswrecovery?ticketId=" + ticketid + "&userId=" + user.getId();
+            String urlPrefix = "%s://%s:%d%s".formatted(
+                    request.getScheme(),
+                    request.getServerName(),
+                    request.getServerPort(),
+                    request.getContextPath());
+            String address = "%s/pswrecovery?ticketId=%s&userId=%d".formatted(
+                    urlPrefix,
+                    ticketid,
+                    user.getId());
 
             /*
              * Prepare the template

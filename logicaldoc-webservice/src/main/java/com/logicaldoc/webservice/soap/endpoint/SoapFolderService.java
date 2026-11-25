@@ -216,10 +216,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
         List<WSFolder> wsFolders = new ArrayList<>();
         for (Folder folder : folders) {
-            if (!folder.isHidden()) {
-                folder = folderDao.initialize(folder);
+            if (!folder.isHidden())
                 wsFolders.add(WSFolder.fromFolder(folder));
-            }
         }
 
         return wsFolders;
