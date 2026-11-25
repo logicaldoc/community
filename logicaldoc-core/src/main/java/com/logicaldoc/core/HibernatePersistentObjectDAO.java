@@ -598,6 +598,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
                 if (rs.next()) {
                     Object obj = rs.getObject(1);
+                    if (obj == null)
+                        return null;
                     if (obj instanceof Timestamp ts && requiredType.equals(Date.class)) {
                         return requiredType.getConstructor(Long.TYPE).newInstance(ts.getTime());
                     } else {

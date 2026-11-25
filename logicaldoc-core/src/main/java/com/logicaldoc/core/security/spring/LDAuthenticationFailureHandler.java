@@ -36,6 +36,8 @@ public class LDAuthenticationFailureHandler implements AuthenticationFailureHand
 
 		String username = request.getParameter("j_username");
 		log.warn("Authentication of {} was unsuccesful due to {}", username, failureReason);
+		log.warn(exception.getMessage(), exception);
+		        
 
 		String normalizedFailureUrl = failureUrl.toString().replace("//", "/");
 		if (normalizedFailureUrl.startsWith("/"))
