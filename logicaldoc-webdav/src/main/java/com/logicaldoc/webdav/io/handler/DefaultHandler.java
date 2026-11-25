@@ -29,223 +29,223 @@ import com.logicaldoc.webdav.resource.service.ResourceService;
  */
 public class DefaultHandler implements IOHandler {
 
-	private static final String CANNOT_EXPORT = ": Cannot export ";
+    private static final String CANNOT_EXPORT = ": Cannot export ";
 
-	private static final String CANNOT_IMPORT = ": Cannot import ";
+    private static final String CANNOT_IMPORT = ": Cannot import ";
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(DefaultHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultHandler.class);
 
-	private String collectionNodetype = JcrConstants.NT_FOLDER;
+    private String collectionNodetype = JcrConstants.NT_FOLDER;
 
-	private String defaultNodetype = JcrConstants.NT_FILE;
+    private String defaultNodetype = JcrConstants.NT_FILE;
 
-	/*
-	 * IMPORTANT NOTES: for webDAV compliancy the default nodetype of the
-	 * content node has been changed from nt:resource to nt:unstructured.
-	 */
-	private String contentNodetype = JcrConstants.NT_UNSTRUCTURED;
+    /*
+     * IMPORTANT NOTES: for webDAV compliancy the default nodetype of the
+     * content node has been changed from nt:resource to nt:unstructured.
+     */
+    private String contentNodetype = JcrConstants.NT_UNSTRUCTURED;
 
-	@jakarta.annotation.Resource(name = "resourceService")
-	private ResourceService resourceService;
+    @jakarta.annotation.Resource(name = "resourceService")
+    private ResourceService resourceService;
 
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
+    public void setResourceService(ResourceService resourceService) {
+        this.resourceService = resourceService;
+    }
 
-	private IOManager ioManager;
+    private IOManager ioManager;
 
-	public DefaultHandler() {
-	}
+    public DefaultHandler() {
+    }
 
-	public DefaultHandler(IOManager ioManager) {
-		this.ioManager = ioManager;
-	}
+    public DefaultHandler(IOManager ioManager) {
+        this.ioManager = ioManager;
+    }
 
-	public DefaultHandler(IOManager ioManager, String collectionNodetype, String defaultNodetype,
-			String contentNodetype) {
-		this.ioManager = ioManager;
+    public DefaultHandler(IOManager ioManager, String collectionNodetype, String defaultNodetype,
+            String contentNodetype) {
+        this.ioManager = ioManager;
 
-		this.collectionNodetype = collectionNodetype;
-		this.defaultNodetype = defaultNodetype;
-		this.contentNodetype = contentNodetype;
-	}
+        this.collectionNodetype = collectionNodetype;
+        this.defaultNodetype = defaultNodetype;
+        this.contentNodetype = contentNodetype;
+    }
 
-	public IOManager getIOManager() {
-		return ioManager;
-	}
+    public IOManager getIOManager() {
+        return ioManager;
+    }
 
-	public void setIOManager(IOManager ioManager) {
-		this.ioManager = ioManager;
-	}
+    public void setIOManager(IOManager ioManager) {
+        this.ioManager = ioManager;
+    }
 
-	public String getName() {
-		return getClass().getName();
-	}
+    public String getName() {
+        return getClass().getName();
+    }
 
-	public boolean canImport(ImportContext context, boolean isCollection) {
-		if (context == null || context.isCompleted()) {
-			return false;
-		}
-		Resource resource = context.getResource();
-		return resource != null;
-	}
+    public boolean canImport(ImportContext context, boolean isCollection) {
+        if (context == null || context.isCompleted()) {
+            return false;
+        }
+        Resource resource = context.getResource();
+        return resource != null;
+    }
 
-	public boolean canImport(ImportContext context, DavResource resource) {
-		if (resource == null) {
-			return false;
-		}
-		return canImport(context, resource.isCollection());
-	}
+    public boolean canImport(ImportContext context, DavResource resource) {
+        if (resource == null) {
+            return false;
+        }
+        return canImport(context, resource.isCollection());
+    }
 
-	public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException {
-		if (!canImport(context, isCollection)) {
-			final String message = getName() + CANNOT_IMPORT + context.getSystemId();
-			log.warn(message);
-			throw new IOException(message);
-		}
+    public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException {
+        if (!canImport(context, isCollection)) {
+            final String message = getName() + CANNOT_IMPORT + context.getSystemId();
+            log.warn(message);
+            throw new IOException(message);
+        }
 
-		boolean success = false;
-		try {
-			success = setContentData(context, isCollection);
-			if (log.isDebugEnabled())
-				log.debug("success = {}", success);
-		} catch (DavException e) {
-			throw e;
-		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
-		}
+        boolean success = false;
+        try {
+            success = setContentData(context, isCollection);
+            if (log.isDebugEnabled())
+                log.debug("success = {}", success);
+        } catch (DavException e) {
+            throw e;
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
 
-		return success;
-	}
+        return success;
+    }
 
-	public boolean importContent(ImportContext context, DavResource resource) throws IOException, DavException {
-		if (!canImport(context, resource)) {
-			throw new IOException(getName() + CANNOT_IMPORT + context.getSystemId());
-		}
-		return importContent(context, resource.isCollection());
-	}
+    public boolean importContent(ImportContext context, DavResource resource) throws IOException, DavException {
+        if (!canImport(context, resource)) {
+            throw new IOException(getName() + CANNOT_IMPORT + context.getSystemId());
+        }
+        return importContent(context, resource.isCollection());
+    }
 
-	public boolean canExport(ExportContext context, boolean isCollection) {
-		return context != null && !context.isCompleted();
-	}
+    public boolean canExport(ExportContext context, boolean isCollection) {
+        return context != null && !context.isCompleted();
+    }
 
-	public boolean canExport(ExportContext context, DavResource resource) {
-		if (resource == null) {
-			return false;
-		}
-		return canExport(context, resource.isCollection());
-	}
+    public boolean canExport(ExportContext context, DavResource resource) {
+        if (resource == null) {
+            return false;
+        }
+        return canExport(context, resource.isCollection());
+    }
 
-	public boolean exportContent(ExportContext context, boolean isCollection) throws IOException {
-		if (!canExport(context, isCollection)) {
-			throw new IOException(getName() + CANNOT_EXPORT);
-		}
+    public boolean exportContent(ExportContext context, boolean isCollection) throws IOException {
+        if (!canExport(context, isCollection)) {
+            throw new IOException(getName() + CANNOT_EXPORT);
+        }
 
-		if (context.hasStream())
-			exportData(context, context.getResource());
+        if (context.hasStream())
+            exportData(context, context.getResource());
 
-		return true;
-	}
+        return true;
+    }
 
-	public boolean exportContent(ExportContext context, DavResource resource) throws IOException {
-		if (!canExport(context, resource)) {
-			throw new IOException(getName() + CANNOT_EXPORT);
-		}
-		return exportContent(context, resource.isCollection());
-	}
+    public boolean exportContent(ExportContext context, DavResource resource) throws IOException {
+        if (!canExport(context, resource)) {
+            throw new IOException(getName() + CANNOT_EXPORT);
+        }
+        return exportContent(context, resource.isCollection());
+    }
 
-	protected void exportData(ExportContext context, Resource resource) throws IOException {
-		try {
-			InputStream is = resourceService.streamOut(resource);
-			if (is != null)
-				IOUtil.spool(is, context.getOutputStream());
-		} catch (DavException | FileNotFoundException e) {
-			throw new IOException("Can't find file " + resource.getName() + "(" + resource.getID() + ")");
-		}
-	}
+    protected void exportData(ExportContext context, Resource resource) throws IOException {
+        try {
+            InputStream is = resourceService.streamOut(resource);
+            if (is != null)
+                IOUtil.spool(is, context.getOutputStream());
+        } catch (DavException | FileNotFoundException e) {
+            throw new IOException("Can't find file '%s' (ID=%s)".formatted(resource.getName(), resource.getID()));
+        }
+    }
 
-	protected synchronized boolean setContentData(ImportContext context, boolean isCollection) throws DavException {
+    protected synchronized boolean setContentData(ImportContext context, boolean isCollection) throws DavException {
 
-		Resource resource = context.getResource();
-		String name = context.getSystemId();
+        Resource resource = context.getResource();
+        String name = context.getSystemId();
 
-		Resource res = resourceService.getChildByName(resource, name);
+        Resource res = resourceService.getChildByName(resource, name);
 
-		if (res == null) {
-			resourceService.createResource(resource, name, isCollection, context, resource.getSession());
-			return true;
-		} else {
-			res.setRequestedPerson(resource.getRequestedPerson());
-			resourceService.updateResource(res, context, res.getSession());
-			return true;
-		}
-	}
+        if (res == null) {
+            resourceService.createResource(resource, name, isCollection, context, resource.getSession());
+            return true;
+        } else {
+            res.setRequestedPerson(resource.getRequestedPerson());
+            resourceService.updateResource(res, context, res.getSession());
+            return true;
+        }
+    }
 
-	protected Resource getContentNode(ExportContext context) {
-		return context.getResource();
-	}
+    protected Resource getContentNode(ExportContext context) {
+        return context.getResource();
+    }
 
-	protected String getCollectionNodeType() {
-		return collectionNodetype;
-	}
+    protected String getCollectionNodeType() {
+        return collectionNodetype;
+    }
 
-	protected String getNodeType() {
-		return defaultNodetype;
-	}
+    protected String getNodeType() {
+        return defaultNodetype;
+    }
 
-	protected String getContentNodeType() {
-		return contentNodetype;
-	}
+    protected String getContentNodeType() {
+        return contentNodetype;
+    }
 
-	public boolean canExport(PropertyExportContext context, boolean isCollection) {
-		return canExport((ExportContext) context, isCollection);
-	}
+    public boolean canExport(PropertyExportContext context, boolean isCollection) {
+        return canExport((ExportContext) context, isCollection);
+    }
 
-	public boolean exportProperties(PropertyExportContext exportContext, boolean isCollection)
-			throws WebDavStorageException {
-		if (!canExport(exportContext, isCollection)) {
-			throw new WebDavStorageException("PropertyHandler " + getName() + " failed to export properties.");
-		}
+    public boolean exportProperties(PropertyExportContext exportContext, boolean isCollection)
+            throws WebDavStorageException {
+        if (!canExport(exportContext, isCollection)) {
+            throw new WebDavStorageException("PropertyHandler %s failed to export properties.".formatted(getName()));
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength)
-			throws IOException {
+    @Override
+    public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength)
+            throws IOException {
 
-		if (!canExport(context, resource)) {
-			throw new IOException(getName() + CANNOT_EXPORT);
-		}
+        if (!canExport(context, resource)) {
+            throw new IOException(getName() + CANNOT_EXPORT);
+        }
 
-		return exportContent(context, resource.isCollection(), left, rangeLength);
-	}
+        return exportContent(context, resource.isCollection(), left, rangeLength);
+    }
 
-	private boolean exportContent(ExportContext context, boolean isCollection, Long left, Long rangeLength)
-			throws IOException {
+    private boolean exportContent(ExportContext context, boolean isCollection, Long left, Long rangeLength)
+            throws IOException {
 
-		if (!canExport(context, isCollection)) {
-			throw new IOException(getName() + CANNOT_EXPORT);
-		}
+        if (!canExport(context, isCollection)) {
+            throw new IOException(getName() + CANNOT_EXPORT);
+        }
 
-		if (context.hasStream())
-			exportData(context, context.getResource(), left, rangeLength);
+        if (context.hasStream())
+            exportData(context, context.getResource(), left, rangeLength);
 
-		return true;
-	}
+        return true;
+    }
 
-	protected void exportData(ExportContext context, Resource resource, Long left, Long rangeLength)
-			throws IOException {
-		try {
-			InputStream is = resourceService.streamOut(resource);
-			if (is != null) {
-				IOUtils.copyLarge(is, context.getOutputStream(), left, rangeLength);
-			}
-		} catch (DavException | FileNotFoundException e) {
-			throw new IOException("Can't find file " + resource.getName() + "(" + resource.getID() + ")");
-		}
-	}
+    protected void exportData(ExportContext context, Resource resource, Long left, Long rangeLength)
+            throws IOException {
+        try {
+            InputStream is = resourceService.streamOut(resource);
+            if (is != null) {
+                IOUtils.copyLarge(is, context.getOutputStream(), left, rangeLength);
+            }
+        } catch (DavException | FileNotFoundException e) {
+            throw new IOException("Can't find file %s(%s)".formatted(resource.getName(), resource.getID()));
+        }
+    }
 
 }

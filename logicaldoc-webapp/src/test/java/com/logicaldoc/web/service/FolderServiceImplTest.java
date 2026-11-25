@@ -138,10 +138,10 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
     @Test
     public void testSetFolderPagination() throws ServerException {
         testSubject.setFolderPagination(1200L, 10, 10);
-        assertSame(10, session.getDictionary().get(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + 1200));
+        assertSame(10, session.getDictionary().get("%s:%d".formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, 1200)));
 
         testSubject.setFolderPagination(1200L, null, null);
-        assertNull(session.getDictionary().get(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + 1200));
+        assertNull(session.getDictionary().get("%s:%d".formatted(FoldersDataServlet.FOLDER_PAGE_SIZE, 1200)));
     }
 
     @Test
@@ -498,18 +498,21 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 
     @Test
     public void testDeleteFromTrash() throws Exception {
-        assertEquals(1, folderDao.queryForInt("select ld_deleted from ld_folder where ld_id=" + 8));
+        assertEquals(1, folderDao.queryForInt("select ld_deleted from ld_folder where ld_id = %d".formatted(8)));
 
         testSubject.deleteFromTrash(List.of(8L));
 
-        assertEquals(2, folderDao.queryForInt("select ld_deleted from ld_folder where ld_id=" + 8));
+        assertEquals(2, folderDao.queryForInt("select ld_deleted from ld_folder where ld_id = %d".formatted(8)));
     }
 
     @Test
     public void testRestore() throws Exception {
-        assertEquals(8L, folderDao.queryForLong("select ld_id from ld_folder where ld_id=" + 8L + " and ld_deleted=1"));
+        assertEquals(8L,
+                folderDao.queryForLong(
+                        "select ld_id from ld_folder where ld_id = %d and ld_deleted = 1".formatted(8L)));
 
         testSubject.restore(List.of(8L), 1200L);
+
         Folder folder = folderDao.findById(8L, true);
         assertNotNull(folder);
         assertEquals(1200L, folder.getParentId());

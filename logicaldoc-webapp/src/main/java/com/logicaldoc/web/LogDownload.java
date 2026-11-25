@@ -174,7 +174,7 @@ public class LogDownload extends HttpServlet {
 			 * Now create a file with the environment
 			 */
 			String env = SystemUtil.printEnvironment();
-			env += "\n\n" + printDatabaseEnvironment();
+			env += "\n\n%s".formatted(printDatabaseEnvironment());
 			File buf = FileUtil.createTempFile("environment", ".txt");
 			FileUtil.writeFile(env, buf.getPath());
 

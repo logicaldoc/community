@@ -260,7 +260,7 @@ public class ServletUtil {
         // finally served
         Value<String> targetFilename = new Value<>(fileName);
         File targetContent = FileUtil.createTempFile("DownloadFilter", null);
-        
+
         try {
             // Prepare the current transaction information
             DocumentHistory transaction = new DocumentHistory();
@@ -273,7 +273,7 @@ public class ServletUtil {
                 String param = e.nextElement();
                 dict.put(param, request.getParameter(param));
             }
-            
+
             ResourceFilterManager.get().filter(resource, "download", transaction, targetFilename, targetContent, dict);
         } catch (NoSuchBeanDefinitionException nbe) {
             // It's OK, this means no listener has been configured
@@ -677,7 +677,7 @@ public class ServletUtil {
             asAttachment = !"true".equals(request.getAttribute("open"));
 
         response.setHeader("Content-Disposition",
-                (asAttachment ? "attachment" : "inline") + "; filename=\"" + encodedFileName + "\"");
+                "%s; filename=\"%s\"".formatted(asAttachment ? "attachment" : "inline", encodedFileName));
 
         // Avoid resource caching
         response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
@@ -857,7 +857,7 @@ public class ServletUtil {
     }
 
     public static String getFullURL(HttpServletRequest request) {
-        if(request.getRequestURL()==null)
+        if (request.getRequestURL() == null)
             return "";
         StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
         String queryString = request.getQueryString();
@@ -868,7 +868,7 @@ public class ServletUtil {
             return requestURL.append('?').append(queryString).toString();
         }
     }
-    
+
     /**
      * This class represents a byte range
      */

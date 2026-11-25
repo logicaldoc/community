@@ -738,8 +738,12 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         assertEquals(0, doc.getIndexed());
         assertEquals("test.txt", doc.getFileName());
 
-        FileUtil.copyResource("New error indexing documents.eml",
-                new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
+        FileUtil.copyResource(
+                "New error indexing documents.eml",
+                new File("%s/docs/%s/doc/%s".formatted(
+                        repositoryDir.getPath(),
+                        doc.getId(),
+                        doc.getFileVersion())));
 
         testSubject.indexDocuments(List.of(doc.getId()));
         doc = testSubject.getById(doc.getId());
@@ -761,8 +765,12 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         assertEquals(0, doc.getIndexed());
         assertEquals("test.txt", doc.getFileName());
 
-        FileUtil.copyResource("New error indexing documents.eml",
-                new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
+        FileUtil.copyResource(
+                "New error indexing documents.eml",
+                new File("%s/docs/%s/doc/%s".formatted(
+                        repositoryDir.getPath(),
+                        doc.getId(),
+                        doc.getFileVersion())));
         assertTrue(testSubject.getContentAsString(doc.getId()).contains("Gracias por tu pronta respuesta"));
     }
 
@@ -1649,7 +1657,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
     public void testGetEnabledPermissions() throws ServerException {
         GUIAccessControlEntry permissions = testSubject.getAllowedPermissions(List.of(2L, 3L, 4L));
         for (Permission permission : Permission.all())
-            assertTrue("Does not allow " + permission.name(),
+            assertTrue("Does not allow %s".formatted(permission.name()),
                     permissions.isPermissionAllowed(permission.name().toLowerCase()));
 
         prepareSession("boss", "admin");

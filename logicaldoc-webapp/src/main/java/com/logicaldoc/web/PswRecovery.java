@@ -101,7 +101,7 @@ public class PswRecovery extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            
+
             log.error(e.getMessage(), e);
 
             writeResponse(response, "Request not correctly processed");
@@ -154,9 +154,8 @@ public class PswRecovery extends HttpServlet {
          * Prepare the template
          */
         Map<String, Object> dictionary = new HashMap<>();
-        String address = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-                + request.getContextPath();
-        dictionary.put("url", address);
+        dictionary.put("url", "%s://%s:%d%s".formatted(request.getScheme(), request.getServerName(),
+                request.getServerPort(), request.getContextPath()));
         dictionary.put("user", user);
         dictionary.put("password", password);
         dictionary.put(Automation.LOCALE, locale);

@@ -60,7 +60,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 			String version = null;
 			if (matcher.matches()) {
 				version = matcher.group(1);
-				resourcePath = resourcePath.replaceFirst("/vstore/" + version, "");
+				resourcePath = resourcePath.replaceFirst("/vstore/%s".formatted(version), "");
 			}
 
 			DavResource resource;

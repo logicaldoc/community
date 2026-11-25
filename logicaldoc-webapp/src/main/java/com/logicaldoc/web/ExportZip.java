@@ -77,7 +77,7 @@ public class ExportZip extends HttpServlet {
 
                 response.setContentType("application/zip");
                 response.setContentLength(bos.size());
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + exportName + ".zip\"");
+                response.setHeader("Content-Disposition", "attachment; filename=\"%s.zip\"".formatted(exportName));
 
                 // Headers required by MS Internet Explorer
                 response.setHeader("Pragma", "public");
@@ -126,9 +126,9 @@ public class ExportZip extends HttpServlet {
         if (folderId != null) {
             Folder folder = folderDao.findById(Long.parseLong(folderId));
             if (folder.getName().matches("[\\p{Punct}\\p{Space}\\p{IsLatin}\\p{Digit}]+"))
-                exportName += "-" + folder.getName();
+                exportName += "-%s".formatted(folder.getName());
             else
-                exportName += "-" + folder.getId();
+                exportName += "-%d".formatted(folder.getId());
         }
         return exportName;
     }

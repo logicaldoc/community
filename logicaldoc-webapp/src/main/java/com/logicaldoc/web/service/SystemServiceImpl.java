@@ -85,8 +85,6 @@ import jakarta.persistence.Table;
  */
 public class SystemServiceImpl extends AbstractRemoteService implements SystemService {
 
-    private static final String AND = " and ";
-
     private static final String SECONDS = "seconds";
 
     private static final String TRASH = "trash";
@@ -104,7 +102,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
         Task task = getTask(taskName);
 
         if (task == null)
-            throw new ServerException("Cannot find task named " + taskName);
+            throw new ServerException("Cannot find task named %s".formatted(taskName));
 
         task.getScheduling().setEnabled(false);
         try {
@@ -121,7 +119,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
         Task task = getTask(taskName);
         if (task == null)
-            throw new ServerException("Cannot find task named " + taskName);
+            throw new ServerException("Cannot find task named %s".formatted(taskName));
 
         try {
             TaskScheduling scheduling = task.getScheduling();
@@ -363,8 +361,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
             scheduling.setSimple(true);
             scheduling.setDelay(task.getScheduling().getDelaySeconds());
             scheduling.setInterval(task.getScheduling().getIntervalSeconds());
-            guiTask.setSchedulingLabel(I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds()
-                    + " " + I18N.message(SECONDS, locale).toLowerCase());
+            guiTask.setSchedulingLabel("%s %d %s".formatted(I18N.message("each", locale),
+                    task.getScheduling().getIntervalSeconds(), I18N.message(SECONDS, locale).toLowerCase()));
         } else {
             scheduling.setSimple(false);
             scheduling.setCronExpression(task.getScheduling().getCronExpression());
@@ -419,9 +417,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
                 guiScheduling.setSimple(true);
                 guiScheduling.setDelay(task.getScheduling().getDelay());
                 guiScheduling.setInterval(task.getScheduling().getIntervalSeconds());
-                guiTask.setSchedulingLabel(
-                        I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds() + " "
-                                + I18N.message(SECONDS, locale).toLowerCase());
+                guiTask.setSchedulingLabel("%s %d %s".formatted(I18N.message("each", locale),
+                        task.getScheduling().getIntervalSeconds(), I18N.message(SECONDS, locale).toLowerCase()));
             } else if (task.getScheduling().getMode().equals(TaskTrigger.MODE_CRON)) {
                 guiScheduling.setSimple(false);
                 guiScheduling.setCronExpression(task.getScheduling().getCronExpression());
@@ -464,9 +461,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
                 task.getScheduling().setDelay(guiTask.getScheduling().getDelay() * 1000);
                 task.getScheduling().setInterval(guiTask.getScheduling().getInterval() * 1000);
                 task.getScheduling().setIntervalSeconds(guiTask.getScheduling().getInterval());
-                guiTask.setSchedulingLabel(
-                        I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds() + " "
-                                + I18N.message(SECONDS, locale).toLowerCase());
+                guiTask.setSchedulingLabel("%s %d %s".formatted(I18N.message("each", locale),
+                        task.getScheduling().getIntervalSeconds(), I18N.message(SECONDS, locale).toLowerCase()));
             } else {
                 task.getScheduling().setMode(TaskTrigger.MODE_CRON);
 
@@ -525,7 +521,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
         Session session = validateSession();
 
         ContextProperties conf = Context.get().getConfig();
-        conf.setProperty(session.getTenantName() + ".lang." + language + ".gui", active ? "enabled" : "disabled");
+        conf.setProperty("%s.lang.%s.gui".formatted(session.getTenantName(), language),
+                active ? "enabled" : "disabled");
         try {
             conf.write();
         } catch (IOException e) {
@@ -576,7 +573,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
         try {
             log.info("Launching the restart");
-            new Exec().fork(new File(commandFile.getParent(),"restart.out") , commandFile.getAbsolutePath());
+            new Exec().fork(new File(commandFile.getParent(), "restart.out"), commandFile.getAbsolutePath());
         } catch (IOException e) {
             throwServerException(session, log, e);
         }
@@ -623,7 +620,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
             if (rootFolderId != null && !(AbstractDocumentHistory.class.isAssignableFrom(getClassByTable(table))))
                 continue;
 
-            String tableAlias = "A" + (i++);
+            String tableAlias = "A%d".formatted(i++);
 
             appendUnion(query);
 
@@ -710,7 +707,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
     private void appendEventsCondition(String tableAlias, List<String> events, StringBuilder query) {
         if (CollectionUtils.isNotEmpty(events)) {
             query.append(" and (");
-            query.append(events.stream().map(e -> " " + tableAlias + ".ld_event = '" + SqlUtil.doubleQuotes(e) + "'")
+            query.append(events.stream().map(e -> " %s.ld_event = '%s'".formatted(tableAlias, SqlUtil.doubleQuotes(e)))
                     .collect(Collectors.joining(" or ")));
             query.append(" ) ");
         }
@@ -719,7 +716,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
     private void appendDatesCondition(String tableAlias, Date from, Date till, StringBuilder query) {
         if (from != null) {
             from = DateUtil.truncateToDay(from);
-            query.append(AND + tableAlias + ".ld_date >= '" + new Timestamp(from.getTime()) + "' ");
+            query.append(" and %s.ld_date >= '%s' ".formatted(tableAlias, new Timestamp(from.getTime())));
         }
 
         if (till != null) {
@@ -728,20 +725,21 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
             till = DateUtils.addMinutes(till, 59);
             till = DateUtils.addSeconds(till, 59);
             till = DateUtils.addMilliseconds(till, 999);
-            query.append(AND + tableAlias + ".ld_date <= '" + new Timestamp(till.getTime()) + "' ");
+            query.append(" and %s.ld_date <= '%s' ".formatted(tableAlias, new Timestamp(till.getTime())));
         }
     }
 
     private void appendSessionCondition(String tableAlias, String historySid, StringBuilder query) {
-        if (historySid != null && StringUtils.isNotEmpty(historySid))
-            query.append(AND + tableAlias + ".ld_sessionid='%s' ".formatted(historySid));
+        if (StringUtils.isNotEmpty(historySid))
+            query.append(" and %s.ld_sessionid='%s' ".formatted(tableAlias, historySid));
     }
 
     private void appendUserCondition(String tableAlias, Long userId, String impersonator, StringBuilder query) {
         if (userId != null)
-            query.append(AND + tableAlias + ".ld_userid = %d ".formatted(userId));
+            query.append(" and %s.ld_userid = %d ".formatted(tableAlias, userId));
+
         if (impersonator != null)
-            query.append(AND + tableAlias + ".ld_impersonator = '%s' ".formatted(impersonator));
+            query.append(" and %s.ld_impersonator = '%s' ".formatted(tableAlias, impersonator));
     }
 
     private List<GUIHistory> executeQuery(String query, int maxResult, Session session) throws PersistenceException {
@@ -787,22 +785,23 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
         StringBuilder folderPredicate = new StringBuilder();
         FolderDAO fDao = FolderDAO.get();
         Collection<Long> tree = fDao.findFolderIdInTree(rootFolderId, false);
+
         if (fDao.isOracle()) {
             /*
              * In Oracle The limit of 1000 elements applies to sets of single
              * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
              * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
              */
-            folderPredicate.append(" and (" + tableAlias + ".ld_folderid,0) in ( ");
-            folderPredicate
-                    .append(tree.stream().map(id -> "(" + Long.toString(id) + ",0)").collect(Collectors.joining(",")));
+            folderPredicate.append(" and (%s.ld_folderid,0) in ( ".formatted(tableAlias));
+            folderPredicate.append(tree.stream().map(id -> "(%d,0)".formatted(id)).collect(Collectors.joining(",")));
             folderPredicate.append(" )");
         } else {
-            folderPredicate.append(AND + tableAlias + ".ld_folderid in ( ");
-            folderPredicate.append(tree.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
+            folderPredicate.append(" and %s.ld_folderid in ( ".formatted(tableAlias));
+            folderPredicate.append(tree.stream().map(String::valueOf).collect(Collectors.joining(",")));
             folderPredicate.append(" )");
         }
-        query.append(folderPredicate.toString());
+
+        query.append(folderPredicate);
     }
 
     @Override

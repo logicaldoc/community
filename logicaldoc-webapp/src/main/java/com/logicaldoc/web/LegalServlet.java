@@ -34,43 +34,43 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class LegalServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(LegalServlet.class);
+    private static final Logger log = LoggerFactory.getLogger(LegalServlet.class);
 
-	/**
-	 * Constructor of the object.
-	 */
-	public LegalServlet() {
-		super();
-	}
+    /**
+     * Constructor of the object.
+     */
+    public LegalServlet() {
+        super();
+    }
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
-	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
-			String legal = request.getParameter("legal");
+    /**
+     * The doGet method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to get.
+     * 
+     * @param request the request send by the client to the server
+     * @param response the response send by the server to the client
+     * @throws ServletException if an error occurred
+     * @throws IOException if an error occurred
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            String legal = request.getParameter("legal");
 
-			if (StringUtils.isNotEmpty(legal))
-				downloadLegal(request, response, legal);
-			else
-				listConfirmedLegals(request, response);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			ServletUtil.sendError(response, e.getMessage());
-		}
-	}
+            if (StringUtils.isNotEmpty(legal))
+                downloadLegal(request, response, legal);
+            else
+                listConfirmedLegals(request, response);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            ServletUtil.sendError(response, e.getMessage());
+        }
+    }
 
-	private void listConfirmedLegals(HttpServletRequest request, HttpServletResponse response)
+    private void listConfirmedLegals(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, PersistenceException {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
@@ -94,10 +94,10 @@ public class LegalServlet extends HttpServlet {
 
 						while (rows.next()) {
 							writer.print("<legal>");
-							writer.print("<name><![CDATA[" + rows.getString(1) + "]]></name>");
-							writer.print("<category><![CDATA[" + rows.getString(2) + "]]></category>");
-							writer.print("<title><![CDATA[" + rows.getString(3) + "]]></title>");
-							writer.print("<confirmed>" + df.format(rows.getTimestamp(4)) + "</confirmed>");
+							writer.print(String.format("<name><![CDATA[%s]]></name>", rows.getString(1)));
+							writer.print(String.format("<category><![CDATA[%s]]></category>", rows.getString(2)));
+							writer.print(String.format("<title><![CDATA[%s]]></title>", rows.getString(3)));
+							writer.print(String.format("<confirmed>%s</confirmed>", df.format(rows.getTimestamp(4))));
 							writer.print("</legal>");
 						}
 					}
@@ -106,15 +106,15 @@ public class LegalServlet extends HttpServlet {
 		writer.write("</list>");
 	}
 
-	private void downloadLegal(HttpServletRequest request, HttpServletResponse response, String legal)
-			throws PersistenceException, IOException {
-		String content = DocumentDAO.get()
-				.queryForString("select ld_content from ld_legal where ld_name = :legal", Map.of("legal", legal));
-		ServletUtil.setContentDisposition(request, response, legal + ".pdf");
-		Decoder decoder = Base64.getDecoder();
-		byte[] legalBytes = decoder.decode(content);
-		try (ByteArrayInputStream bis = new ByteArrayInputStream(legalBytes)) {
-			bis.transferTo(response.getOutputStream());
-		}
-	}
+    private void downloadLegal(HttpServletRequest request, HttpServletResponse response, String legal)
+            throws PersistenceException, IOException {
+        String content = DocumentDAO.get().queryForString("select ld_content from ld_legal where ld_name = :legal",
+                Map.of("legal", legal));
+        ServletUtil.setContentDisposition(request, response, "%s.pdf".formatted(legal));
+        Decoder decoder = Base64.getDecoder();
+        byte[] legalBytes = decoder.decode(content);
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(legalBytes)) {
+            bis.transferTo(response.getOutputStream());
+        }
+    }
 }

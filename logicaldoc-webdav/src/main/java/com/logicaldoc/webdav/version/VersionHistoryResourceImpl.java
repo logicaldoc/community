@@ -37,81 +37,81 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements VersionHistoryResource {
 
-	private static final Logger log = LoggerFactory.getLogger(VersionHistoryResourceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(VersionHistoryResourceImpl.class);
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public VersionHistoryResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfiguration config, Resource resource) throws DavException {
-		super(locator, factory, session, config, resource);
-	}
+    public VersionHistoryResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
+            ResourceConfiguration config, Resource resource) throws DavException {
+        super(locator, factory, session, config, resource);
+    }
 
-	@Override
-	public DavResourceIterator getMembers() {
-		return new DavResourceIteratorImpl(new ArrayList<>());
-	}
+    @Override
+    public DavResourceIterator getMembers() {
+        return new DavResourceIteratorImpl(new ArrayList<>());
+    }
 
-	@Override
-	public void addMember(DavResource member, InputContext inputContext) throws DavException {
-		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
-	}
+    @Override
+    public void addMember(DavResource member, InputContext inputContext) throws DavException {
+        throw new DavException(HttpServletResponse.SC_FORBIDDEN);
+    }
 
-	@Override
-	public void removeMember(DavResource member) throws DavException {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void removeMember(DavResource member) throws DavException {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void setProperty(DavProperty<?> property) throws DavException {
-		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
-	}
+    @Override
+    public void setProperty(DavProperty<?> property) throws DavException {
+        throw new DavException(HttpServletResponse.SC_FORBIDDEN);
+    }
 
-	@Override
-	public void removeProperty(DavPropertyName propertyName) throws DavException {
-		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
-	}
+    @Override
+    public void removeProperty(DavPropertyName propertyName) throws DavException {
+        throw new DavException(HttpServletResponse.SC_FORBIDDEN);
+    }
 
-	@Override
-	public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
-			throws DavException {
-		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
-	}
+    @Override
+    public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
+            throws DavException {
+        throw new DavException(HttpServletResponse.SC_FORBIDDEN);
+    }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public MultiStatusResponse alterProperties(List changeList) throws DavException {
-		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
-	}
+    @SuppressWarnings("rawtypes")
+    @Override
+    public MultiStatusResponse alterProperties(List changeList) throws DavException {
+        throw new DavException(HttpServletResponse.SC_FORBIDDEN);
+    }
 
-	@Override
-	public VersionResource[] getVersions() throws DavException {
+    @Override
+    public VersionResource[] getVersions() throws DavException {
 
-		List<Resource> resourceVersions = resourceService.getHistory(resource);
+        List<Resource> resourceVersions = resourceService.getHistory(resource);
 
-		List<VersionResource> versions = new ArrayList<>();
+        List<VersionResource> versions = new ArrayList<>();
 
-		for (Resource resource : resourceVersions) {
-			DavResourceLocator loc = locator.getFactory().createResourceLocator(locator.getPrefix(),
-					locator.getResourcePath() + "/vstore/" + resource.getVersionLabel() + "/" + resource.getName());
-			versions.add(new VersionResourceImpl(loc, factory, session, config, resource));
-		}
+        for (Resource resource : resourceVersions) {
+            DavResourceLocator loc = locator.getFactory().createResourceLocator(locator.getPrefix(), "%s/vstore/%s/%s"
+                    .formatted(locator.getResourcePath(), resource.getVersionLabel(), resource.getName()));
+            versions.add(new VersionResourceImpl(loc, factory, session, config, resource));
+        }
 
-		return versions.toArray(new VersionResource[versions.size()]);
+        return versions.toArray(new VersionResource[versions.size()]);
 
-	}
+    }
 
-	@Override
-	protected void initProperties() {
-		if (!propsInitialized) {
-			super.initProperties();
+    @Override
+    protected void initProperties() {
+        if (!propsInitialized) {
+            super.initProperties();
 
-			properties.add(new ResourceType(new int[] { ResourceType.COLLECTION, ResourceType.VERSION_HISTORY }));
+            properties.add(new ResourceType(new int[] { ResourceType.COLLECTION, ResourceType.VERSION_HISTORY }));
 
-			try {
-				properties.add(new HrefProperty(VersionHistoryResource.ROOT_VERSION, "", false));
-			} catch (Exception e) {
-				log.error(e.getMessage());
-			}
-		}
-	}
+            try {
+                properties.add(new HrefProperty(VersionHistoryResource.ROOT_VERSION, "", false));
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
 }

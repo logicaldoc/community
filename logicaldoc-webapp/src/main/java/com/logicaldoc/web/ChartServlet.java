@@ -121,7 +121,8 @@ public abstract class ChartServlet extends HttpServlet {
             cal.add(Calendar.MONTH, -i);
             String month = dfNumber.format(cal.getTime());
             String monthName = dfName.format(cal.getTime());
-            dataset.addValue(SequenceDAO.get().getCurrentValue(sequencePrefix() + "-" + month, objectId, tenantId),
+            dataset.addValue(
+                    SequenceDAO.get().getCurrentValue("%s-%s".formatted(sequencePrefix(), month), objectId, tenantId),
                     I18N.message(messageTitle(), locale), monthName);
         }
 

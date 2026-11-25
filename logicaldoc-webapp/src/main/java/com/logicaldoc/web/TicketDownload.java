@@ -134,7 +134,7 @@ public class TicketDownload extends HttpServlet {
                     throw new IOException(e);
                 }
             } else {
-                response.setHeader("WWW-Authenticate", "Basic realm=\"Ticket " + ticket.getTicketId() + "\"");
+                response.setHeader("WWW-Authenticate", "Basic realm=\"Ticket %s\"".formatted(ticket.getTicketId()));
                 response.sendError(401, "Unauthorized");
                 return false;
             }
@@ -177,7 +177,7 @@ public class TicketDownload extends HttpServlet {
     }
 
     protected String getPreviewAttributeName(String ticketId) {
-        return "preview-" + ticketId;
+        return "preview-%s".formatted(ticketId);
     }
 
     private String getSuffix(Ticket ticket, Document document, HttpServletRequest request)

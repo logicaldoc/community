@@ -86,7 +86,7 @@ public class ImportContextImpl implements ImportContext {
 		} else if (inputFile != null) {
 			return inputFile.length();
 		} else {
-			log.debug("Unable to determine content length -> default value = " + IOUtil.UNDEFINED_LENGTH);
+			log.debug("Unable to determine content length -> default value = %d".formatted(IOUtil.UNDEFINED_LENGTH));
 			return IOUtil.UNDEFINED_LENGTH;
 		}
 	}

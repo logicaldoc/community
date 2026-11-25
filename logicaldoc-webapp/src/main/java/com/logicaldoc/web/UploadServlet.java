@@ -310,8 +310,10 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
                     checkIfAllowedForUpload(tenant, fileName);
 
-                    File file = new File(uploadDir.getAbsolutePath() + "/" + UUID.randomUUID().toString() + "."
-                            + FileUtil.getExtension(fileName));
+                    File file = new File("%s/%s.%s".formatted(
+                            uploadDir.getAbsolutePath(),
+                            UUID.randomUUID(),
+                            FileUtil.getExtension(fileName)));
                     fi.write(file);
                     if (uploadedFiles != null)
                         uploadedFiles.put(fileName, file);
