@@ -86,7 +86,7 @@ public class TagsDataServlet extends AbstractDataServlet {
              * the folder's tags
              */
             for (String tag : tags) {
-                tagsMap.computeIfAbsent(tag, k -> 1L);
+                tagsMap.computeIfAbsent(tag, _ -> 1L);
                 if (!words.contains(tag))
                     words.add(tag);
             }
@@ -104,7 +104,7 @@ public class TagsDataServlet extends AbstractDataServlet {
              * the document's tags
              */
             for (String tag : tags) {
-                tagsMap.computeIfAbsent(tag, k -> 1L);
+                tagsMap.computeIfAbsent(tag, _ -> 1L);
                 if (!words.contains(tag))
                     words.add(tag);
             }

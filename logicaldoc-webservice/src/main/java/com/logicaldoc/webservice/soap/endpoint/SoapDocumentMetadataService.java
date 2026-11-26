@@ -322,7 +322,8 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
         TemplateDAO templateDAO = TemplateDAO.get();
         // Check if the session user has the Write Permission of this template
         if (!templateDAO.isWriteEnable(templateId, sessionUser.getId()))
-            throw new PermissionException(sessionUser.getUsername(), "Template " + templateId, Permission.WRITE);
+            throw new PermissionException(sessionUser.getUsername(), "Template %d".formatted(templateId),
+                    Permission.WRITE);
 
         Template template = templateDAO.findById(templateId, true);
         template.getAccessControlList().clear();

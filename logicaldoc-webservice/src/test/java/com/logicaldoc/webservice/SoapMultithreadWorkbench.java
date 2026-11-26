@@ -26,258 +26,273 @@ import com.logicaldoc.webservice.soap.client.SoapSystemClient;
  * @since 8.4.1
  */
 public class SoapMultithreadWorkbench extends SoapWorkbench {
-	private static int threads = 5;
+    private static int threads = 5;
 
-	private static ExecutorService executorService = Executors.newFixedThreadPool(threads);
+    private static ExecutorService executorService = Executors.newFixedThreadPool(threads);
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
+        SoapAuthClient auth = new SoapAuthClient("%s/Auth".formatted(BASE));
 
-		SoapAuthClient auth = new SoapAuthClient(BASE + "/Auth");
+        SoapSystemClient systemClient = new SoapSystemClient("%s/System".formatted(BASE));
 
-		SoapSystemClient systemClient = new SoapSystemClient(BASE + "/System");
+        // Open a session
+        String sid = auth.login("admin", "12345678");
 
-		// Open a session
-		String sid = auth.login("admin", "12345678");
-		System.out.println("Server date: " + systemClient.getInfo().getDate());
-		System.out.println("Sid: " + sid);
+        System.out.println("Server date: %s".formatted(systemClient.getInfo().getDate()));
 
-		List<TestCallable> tasks = new ArrayList<TestCallable>();
-		for (int i = 0; i < threads; i++) {
-			// tasks.add(updateMetadata(sid));
-			// tasks.add(moveToFolder(sid));
-			// tasks.add(createDocument(sid));
-			// tasks.add(lockDocument(sid));
-			// tasks.add(checkinkDocument(sid));
-			tasks.add(renameDocument(sid));
-		}
+        System.out.println("Sid: %s".formatted(sid));
 
-		executorService.invokeAll(tasks);
+        List<TestCallable> tasks = new ArrayList<>();
 
-		boolean allDone = false;
-		while (!allDone) {
-			allDone = true;
-			for (TestCallable task : tasks) {
-				if (!task.isFinished())
-					allDone = false;
-			}
+        for (int i = 0; i < threads; i++) {
+            // tasks.add(updateMetadata(sid));
+            // tasks.add(moveToFolder(sid));
+            // tasks.add(createDocument(sid));
+            // tasks.add(lockDocument(sid));
+            // tasks.add(checkinkDocument(sid));
+            tasks.add(renameDocument(sid));
+        }
 
-			System.out.println("alldone: " + allDone);
-		}
+        executorService.invokeAll(tasks);
 
-		executorService.shutdown();
-	}
+        boolean allDone = false;
 
-	private static TestCallable moveToFolder(String sid) throws Exception {
-		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder", 1, false, 50);
+        while (!allDone) {
+            allDone = true;
 
-		final WSFolder folder1 = folderClient.getFolder(sid, 4L);
-		final WSFolder folder2 = folderClient.getFolder(sid, 717511364L);
+            for (TestCallable task : tasks) {
+                if (!task.isFinished())
+                    allDone = false;
+            }
 
-		return new TestCallable(sid) {
-			@Override
-			public String call() throws Exception {
-				long docId = 723655194L;
-				try {
-					SoapDocumentClient documentClient = new SoapDocumentClient(
-							SoapMultithreadWorkbench.BASE + "/Document");
+            System.out.println("allDone: %s".formatted(allDone));
+        }
 
-					for (int i = 0; i < 100; i++) {
-						WSDocument wsDoc = documentClient.getDocument(sid, docId);
-						documentClient.move(sid, docId,
-								wsDoc.getFolderId() == folder1.getId() ? folder2.getId() : folder1.getId());
+        executorService.shutdown();
+    }
 
-						System.out.println("++ move " + i);
-					}
-				} catch (Exception t) {
-					if (t.getMessage().contains("org.hibernate"))
-						t.printStackTrace();
-				}
+    private static TestCallable moveToFolder(String sid) throws Exception {
+        SoapFolderClient folderClient = folderClient();
 
-				return super.call();
-			}
-		};
-	}
+        final WSFolder folder1 = folderClient.getFolder(sid, 4L);
+        final WSFolder folder2 = folderClient.getFolder(sid, 717511364L);
 
-	private static TestCallable checkinkDocument(String sid) throws Exception {
-		SoapDocumentClient documentClient = new SoapDocumentClient(SoapMultithreadWorkbench.BASE + "/Document");
+        return new TestCallable(sid) {
+            @Override
+            public String call() throws Exception {
+                long docId = 723655194L;
+                try {
+                    SoapDocumentClient documentClient = new SoapDocumentClient(
+                            "%s/Document".formatted(SoapMultithreadWorkbench.BASE));
 
-		return new TestCallable(sid) {
-			@Override
-			public String call() throws Exception {
-				long docId = 723655194L;
-				try {
-					for (int i = 0; i < 100; i++) {
-						WSDocument wsDoc = documentClient.getDocument(sid, docId);
-						if (wsDoc.getStatus() == WSDocument.DOC_UNLOCKED) {
-							System.out.println("## checkout " + i);
-							documentClient.checkout(sid, docId);
-						} else {
-							File tmp = FileUtil.createTempFile("wstest", wsDoc.getFileName());
-							try {
-								System.out.println("## checkin " + i);
-								documentClient.downloadContent(sid, docId, tmp);
-								documentClient.checkin(sid, docId, "soap massive test", wsDoc.getFileName(), false,
-										tmp);
-							} finally {
-								FileUtil.delete(tmp);
-							}
-						}
+                    for (int i = 0; i < 100; i++) {
+                        WSDocument wsDoc = documentClient.getDocument(sid, docId);
+                        documentClient.move(sid, docId,
+                                wsDoc.getFolderId() == folder1.getId() ? folder2.getId() : folder1.getId());
 
-					}
-				} catch (Exception t) {
-					if (t.getMessage().contains("org.hibernate"))
-						t.printStackTrace();
-				}
+                        System.out.println("++ move %d".formatted(i));
+                    }
+                } catch (Exception t) {
+                    if (t.getMessage().contains("org.hibernate"))
+                        t.printStackTrace();
+                }
 
-				return super.call();
-			}
-		};
-	}
+                return super.call();
+            }
+        };
+    }
 
-	private static TestCallable renameDocument(String sid) throws Exception {
-		SoapDocumentClient documentClient = new SoapDocumentClient(SoapMultithreadWorkbench.BASE + "/Document");
+    private static SoapFolderClient folderClient() {
+        return new SoapFolderClient("%s/Folder".formatted(SoapMultithreadWorkbench.BASE), 1, false, 50);
+    }
 
-		return new TestCallable(sid) {
-			@Override
-			public String call() throws Exception {
-				long docId = 723655194L;
-				try {
-					for (int i = 0; i < 100; i++) {
-						WSDocument wsDoc = documentClient.getDocument(sid, docId);
-						documentClient.rename(sid, docId,
-								wsDoc.getFileName().contains("10_29") ? "quietanza_2019_11_29.pdf"
-										: "quietanza_2019_10_29.pdf");
+    private static TestCallable checkinkDocument(String sid) throws Exception {
+        SoapDocumentClient documentClient = documentClient();
 
-						System.out.println("-- rename " + i);
-					}
-				} catch (Exception t) {
-					if (t.getMessage().contains("org.hibernate"))
-						t.printStackTrace();
-				}
+        return new TestCallable(sid) {
+            @Override
+            public String call() throws Exception {
+                long docId = 723655194L;
 
-				return super.call();
-			}
-		};
-	}
+                try {
+                    for (int i = 0; i < 100; i++) {
+                        WSDocument wsDoc = documentClient.getDocument(sid, docId);
 
-	private static TestCallable lockDocument(String sid) throws Exception {
-		SoapDocumentClient documentClient = new SoapDocumentClient(SoapMultithreadWorkbench.BASE + "/Document");
+                        if (wsDoc.getStatus() == WSDocument.DOC_UNLOCKED) {
+                            System.out.println("## checkout %d".formatted(i));
+                            documentClient.checkout(sid, docId);
+                        } else {
+                            File tmp = FileUtil.createTempFile("wstest", wsDoc.getFileName());
 
-		return new TestCallable(sid) {
-			@Override
-			public String call() throws Exception {
-				long docId = 723655194L;
-				try {
-					for (int i = 0; i < 100; i++) {
-						WSDocument wsDoc = documentClient.getDocument(sid, docId);
-						if (wsDoc.getStatus() == WSDocument.DOC_UNLOCKED)
-							documentClient.checkout(sid, docId);
-						else
-							documentClient.unlock(sid, docId);
+                            try {
+                                System.out.println("## checkin %d".formatted(i));
+                                documentClient.downloadContent(sid, docId, tmp);
 
-						System.out.println("++ lock " + i);
-					}
-				} catch (Exception t) {
-					if (t.getMessage().contains("org.hibernate"))
-						t.printStackTrace();
-				}
+                                documentClient.checkin(sid, docId, "soap massive test", wsDoc.getFileName(), false,
+                                        tmp);
+                            } finally {
+                                FileUtil.delete(tmp);
+                            }
+                        }
+                    }
+                } catch (Exception t) {
+                    if (t.getMessage().contains("org.hibernate"))
+                        t.printStackTrace();
+                }
 
-				return super.call();
-			}
-		};
-	}
+                return super.call();
+            }
+        };
+    }
 
-	private static TestCallable updateMetadata(String sid) throws Exception {
-		SoapDocumentClient documentClient = new SoapDocumentClient(SoapMultithreadWorkbench.BASE + "/Document");
+    private static TestCallable renameDocument(String sid) throws Exception {
+        SoapDocumentClient documentClient = documentClient();
 
-		return new TestCallable(sid) {
-			@Override
-			public String call() throws Exception {
-				long docId = 723655194L;
-				try {
-					for (int i = 0; i < 100; i++) {
-						WSDocument wsDoc = documentClient.getDocument(sid, docId);
-						Double value = null;
-						for (WSAttribute att : wsDoc.getAttributes()) {
-							if (att.getName().equals("Total")) {
-								WSAttribute.setValue(att, att.getDoubleValue() + 1);
-								value = att.getDoubleValue();
-							}
-						}
+        return new TestCallable(sid) {
+            @Override
+            public String call() throws Exception {
+                long docId = 723655194L;
+                try {
+                    for (int i = 0; i < 100; i++) {
+                        WSDocument wsDoc = documentClient.getDocument(sid, docId);
+                        documentClient.rename(sid, docId,
+                                wsDoc.getFileName().contains("10_29") ? "quietanza_2019_11_29.pdf"
+                                        : "quietanza_2019_10_29.pdf");
 
-						documentClient.update(sid, wsDoc);
+                        System.out.println("-- rename %d".formatted(i));
+                    }
+                } catch (Exception t) {
+                    if (t.getMessage().contains("org.hibernate"))
+                        t.printStackTrace();
+                }
 
-						System.out.println("++ update " + i + ": " + value);
-					}
-				} catch (Exception t) {
-					if (t.getMessage().contains("org.hibernate"))
-						t.printStackTrace();
-				}
+                return super.call();
+            }
+        };
+    }
 
-				return super.call();
-			}
-		};
-	}
+    private static TestCallable lockDocument(String sid) throws Exception {
+        SoapDocumentClient documentClient = documentClient();
 
-	private static TestCallable createDocument(String sid) throws Exception {
-		SoapDocumentClient documentClient = new SoapDocumentClient(SoapMultithreadWorkbench.BASE + "/Document");
+        return new TestCallable(sid) {
+            @Override
+            public String call() throws Exception {
+                long docId = 723655194L;
+                try {
+                    for (int i = 0; i < 100; i++) {
+                        WSDocument wsDoc = documentClient.getDocument(sid, docId);
+                        if (wsDoc.getStatus() == WSDocument.DOC_UNLOCKED)
+                            documentClient.checkout(sid, docId);
+                        else
+                            documentClient.unlock(sid, docId);
 
-		return new TestCallable(sid) {
-			@Override
-			public String call() throws Exception {
-				try {
-					for (int i = 0; i < 10; i++) {
-						SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder", 1, false, 50);
-						WSFolder folder = folderClient.createPath(sid, Folder.DEFAULTWORKSPACEID, "Test");
+                        System.out.println("++ lock %d".formatted(i));
+                    }
+                } catch (Exception t) {
+                    if (t.getMessage().contains("org.hibernate"))
+                        t.printStackTrace();
+                }
 
-						WSDocument wsDoc = new WSDocument();
-						wsDoc.setFileName("pom.xml");
-						wsDoc.setFolderId(folder.getId());
-						wsDoc.setTemplateId(547815424L);
+                return super.call();
+            }
+        };
+    }
 
-						WSAttribute att1 = new WSAttribute();
-						att1.setName("industries");
-						WSAttribute.setValue(att1, "Banking");
-						wsDoc.addAttribute(att1);
+    private static TestCallable updateMetadata(String sid) throws Exception {
+        SoapDocumentClient documentClient = documentClient();
 
-						WSAttribute att2 = new WSAttribute();
-						att2.setName("industries-001");
-						WSAttribute.setValue(att2, "Accounting");
-						att2.setParent("industries");
-						wsDoc.addAttribute(att2);
+        return new TestCallable(sid) {
+            @Override
+            public String call() throws Exception {
+                long docId = 723655194L;
+                try {
+                    for (int i = 0; i < 100; i++) {
+                        WSDocument wsDoc = documentClient.getDocument(sid, docId);
+                        Double value = null;
+                        for (WSAttribute att : wsDoc.getAttributes()) {
+                            if (att.getName().equals("Total")) {
+                                WSAttribute.setValue(att, att.getDoubleValue() + 1);
+                                value = att.getDoubleValue();
+                            }
+                        }
 
-						documentClient.create(sid, wsDoc, new File("pom.xml"));
+                        documentClient.update(sid, wsDoc);
 
-						System.out.println("++ create " + i);
-					}
-				} catch (Exception t) {
-					if (t.getMessage().contains("org.hibernate"))
-						t.printStackTrace();
-				}
+                        System.out.println("++ update %d: %s".formatted(i, value));
+                    }
+                } catch (Exception t) {
+                    if (t.getMessage().contains("org.hibernate"))
+                        t.printStackTrace();
+                }
 
-				return super.call();
-			}
-		};
-	}
+                return super.call();
+            }
+        };
+    }
 
-	static class TestCallable implements Callable<String> {
-		protected String sid;
+    private static TestCallable createDocument(String sid) throws Exception {
+        SoapDocumentClient documentClient = documentClient();
+        SoapFolderClient folderClient = folderClient();
 
-		protected boolean finished = false;
+        return new TestCallable(sid) {
+            @Override
+            public String call() throws Exception {
+                try {
+                    for (int i = 0; i < 10; i++) {
+                        WSFolder folder = folderClient.createPath(sid, Folder.DEFAULTWORKSPACEID, "Test");
 
-		public boolean isFinished() {
-			return finished;
-		}
+                        WSDocument wsDoc = new WSDocument();
+                        wsDoc.setFileName("pom.xml");
+                        wsDoc.setFolderId(folder.getId());
+                        wsDoc.setTemplateId(547815424L);
 
-		public TestCallable(String sid) {
-			super();
-			this.sid = sid;
-		}
+                        WSAttribute att1 = new WSAttribute();
+                        att1.setName("industries");
+                        WSAttribute.setValue(att1, "Banking");
+                        wsDoc.addAttribute(att1);
 
-		@Override
-		public String call() throws Exception {
-			finished = true;
-			return "ok";
-		}
-	}
+                        WSAttribute att2 = new WSAttribute();
+                        att2.setName("industries-001");
+                        WSAttribute.setValue(att2, "Accounting");
+                        att2.setParent("industries");
+                        wsDoc.addAttribute(att2);
+
+                        documentClient.create(sid, wsDoc, new File("pom.xml"));
+
+                        System.out.println("++ create %s".formatted(i));
+                    }
+                } catch (Exception t) {
+                    if (t.getMessage().contains("org.hibernate"))
+                        t.printStackTrace();
+                }
+
+                return super.call();
+            }
+        };
+    }
+
+    private static SoapDocumentClient documentClient() {
+        return new SoapDocumentClient("%s/Document".formatted(SoapMultithreadWorkbench.BASE));
+    }
+
+    static class TestCallable implements Callable<String> {
+        protected String sid;
+
+        protected boolean finished = false;
+
+        public boolean isFinished() {
+            return finished;
+        }
+
+        public TestCallable(String sid) {
+            super();
+            this.sid = sid;
+        }
+
+        @Override
+        public String call() throws Exception {
+            finished = true;
+            return "ok";
+        }
+    }
 }

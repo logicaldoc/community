@@ -19,76 +19,79 @@ import jakarta.activation.DataHandler;
 
 public class TstFolderRecursiveDownload extends BaseTestCase {
 
-	private static final Logger log = LoggerFactory.getLogger(TstFolderRecursiveDownload.class);
+    private static final Logger log = LoggerFactory.getLogger(TstFolderRecursiveDownload.class);
 
-	private SoapFolderClient folderClient;
+    private SoapFolderClient folderClient;
 
-	private SoapDocumentClient documentClient;
+    private SoapDocumentClient documentClient;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-		folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
-		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
-	}
+        folderClient = new SoapFolderClient("%s/services/Folder".formatted(settings.getProperty("url")));
 
-	@Test
-	public void testFolderRecursiveDownload() throws Exception {
+        documentClient = new SoapDocumentClient("%s/services/Document".formatted(settings.getProperty("url")));
+    }
 
-		// This is the ID of the initial folder to explore
-		long folderID = 25165829L;
-		// $folderID = 5; // start from the default workspace
-		String basePath = "C:/tmp";
+    @Test
+    public void testFolderRecursiveDownload() throws Exception {
 
-		listFoldersRecursive(folderID, basePath);
-	}
+        // This is the ID of the initial folder to explore
+        long folderID = 25165829L;
+        // $folderID = 5; // start from the default workspace
+        String basePath = "C:/tmp";
 
-	private void listFoldersRecursive(long parentFolderID, String basePath) throws Exception {
-		WSFolder fcreated = folderClient.getFolder(sid, parentFolderID);
+        listFoldersRecursive(folderID, basePath);
+    }
 
-		// Create path for the current folder
-		String parentPath = basePath + "/" + fcreated.getName();
-		// check if the dir exists on the filesystem
+    private void listFoldersRecursive(long parentFolderID, String basePath) throws Exception {
+        WSFolder fcreated = folderClient.getFolder(sid, parentFolderID);
 
-		File file = new File(parentPath);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
+        // Create path for the current folder
+        String parentPath = "%s/%s".formatted(basePath, fcreated.getName());
 
-		// Download documents in the current folder to disk
-		downloadDocumentsInFolder(parentFolderID, parentPath);
+        // check if the dir exists on the filesystem
+        File file = new File(parentPath);
 
-		// Get folder children
-		List<WSFolder> children = folderClient.listChildren(sid, parentFolderID);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
 
-		// Cycle over the results and download all the documents to their
-		// folders
-		for (WSFolder child : children) {
-			System.out.println("folderId: " + child.getId());
-			System.out.println("Name: " + child.getName());
-			System.out.println("----------------");
-			listFoldersRecursive(child.getId(), parentPath);
-		}
-	}
+        // Download documents in the current folder to disk
+        downloadDocumentsInFolder(parentFolderID, parentPath);
 
-	private void downloadDocumentsInFolder(long parentFolderID, String parentPath) throws Exception {
+        // Get folder children
+        List<WSFolder> children = folderClient.listChildren(sid, parentFolderID);
 
-		// Download all the documents in Default Workspace folder (id=4,
-		// name='Default')
-		long folderId = parentFolderID;
-		List<WSDocument> docs = documentClient.listDocuments(sid, folderId, null);
+        // Cycle over the results and download all the documents to their
+        // folders
+        for (WSFolder child : children) {
+            System.out.println("folderId: %s".formatted(child.getId()));
+            System.out.println("Name: %s".formatted(child.getName()));
+            System.out.println("----------------");
 
-		for (WSDocument wsDocument : docs) {
-			long docId = wsDocument.getId();
-			System.out.println(docId + " : " + wsDocument.getFileName());
+            listFoldersRecursive(child.getId(), parentPath);
+        }
+    }
 
-			DataHandler dh = documentClient.getContent(sid, docId);
+    private void downloadDocumentsInFolder(long parentFolderID, String parentPath) throws Exception {
 
-			File outFile = new File(parentPath, wsDocument.getFileName());
-			try (OutputStream os = new FileOutputStream(outFile)) {
-				IOUtils.copy(dh.getInputStream(), os);
-			}
-		}
-	}
+        // Download all the documents in Default Workspace folder (id=4,
+        // name='Default')
+        long folderId = parentFolderID;
+        List<WSDocument> docs = documentClient.listDocuments(sid, folderId, null);
+
+        for (WSDocument wsDocument : docs) {
+            long docId = wsDocument.getId();
+            System.out.println("%d : %s".formatted(docId, wsDocument.getFileName()));
+
+            DataHandler dh = documentClient.getContent(sid, docId);
+
+            File outFile = new File(parentPath, wsDocument.getFileName());
+            try (OutputStream os = new FileOutputStream(outFile)) {
+                IOUtils.copy(dh.getInputStream(), os);
+            }
+        }
+    }
 }

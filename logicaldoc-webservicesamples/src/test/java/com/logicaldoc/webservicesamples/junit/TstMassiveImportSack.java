@@ -28,194 +28,206 @@ import jakarta.activation.FileDataSource;
 
 public class TstMassiveImportSack extends BaseTestCase {
 
-	private static final int TIME_ATTENTION_TRESHOLD = 30000;
+    private static final int TIME_ATTENTION_TRESHOLD = 30000;
 
-	private static final int MAX_DOCUMENTS_TOBE_INSERTED = 15000;
+    private static final int MAX_DOCUMENTS_TOBE_INSERTED = 15000;
 
-	private static final Logger log = LoggerFactory.getLogger(TstMassiveImportSack.class);
+    private static final Logger log = LoggerFactory.getLogger(TstMassiveImportSack.class);
 
-	private long startTime;
+    private long startTime;
 
-	public int docsInserted = 0;
+    public int docsInserted = 0;
 
-	public int foldersCreated = 0;
+    public int foldersCreated = 0;
 
-	private SoapFolderClient folderClient;
+    private SoapFolderClient folderClient;
 
-	private SoapDocumentClient documentClient;
+    private SoapDocumentClient documentClient;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-		folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
-		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
-	}
+        folderClient = new SoapFolderClient("%s/services/Folder".formatted(settings.getProperty("url")));
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+        documentClient = new SoapDocumentClient("%s/services/Document".formatted(settings.getProperty("url")));
+    }
 
-		log.error("Time: " + new java.util.Date());
-		log.error("Inserted Documents: " + docsInserted);
-		log.error("Created Folders: " + foldersCreated);
-		long elapsedTime = System.currentTimeMillis() - startTime;
-		double seconds = elapsedTime / 1000;
-		log.error("Job ended in: " + Math.round(seconds) + " seconds");
-		log.error("Job started at: " + new java.util.Date(startTime));
-		log.error("Job ended at: " + new java.util.Date());
-	}
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
 
-	@Test
-	public void testMassiveImportSack() {
-		docsInserted = 0;
-		startTime = System.currentTimeMillis();
-		try {
-			// String sDir = "C:/Users/Cecio/Documents/Logical"; // 1866
-			// documents, 270 folders
-			String sDir = "C:/Users/alle/Documents/Logical"; // 9220 files,
-																// 1096
-																// folders
-			importFolderSack(sDir, DEFAULT_WORKSPACE);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("Documents currently Created: " + docsInserted);
-		}
-	}
+        log.error("Time: {}", new Date());
+        log.error("Inserted Documents: {}", docsInserted);
+        log.error("Created Folders: {}", foldersCreated);
 
-	private void importFolderSack(String sDir, long parentId) throws AuthenticationException, PermissionException,
-			PersistenceException, WebserviceException, IOException {
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        double seconds = elapsedTime / 1000D;
 
-		File[] faFiles = new File(sDir).listFiles();
+        log.error("Job ended in: {} seconds", Math.round(seconds));
+        log.error("Job started at: {}", new Date(startTime));
+        log.error("Job ended at: {}", new Date());
+    }
 
-		for (File file : faFiles) {
-			if (docsInserted >= MAX_DOCUMENTS_TOBE_INSERTED) {
-				System.err.println("Reached limit of " + MAX_DOCUMENTS_TOBE_INSERTED + " document imported");
-				return;
-			}
+    @Test
+    public void testMassiveImportSack() {
+        docsInserted = 0;
+        startTime = System.currentTimeMillis();
+        try {
+            // String sDir = "C:/Users/Cecio/Documents/Logical"; // 1866
+            // documents, 270 folders
+            String sDir = "C:/Users/alle/Documents/Logical"; // 9220 files,
+                                                             // 1096
+                                                             // folders
+            importFolderSack(sDir, DEFAULT_WORKSPACE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Documents currently Created: %d".formatted(docsInserted));
+        }
+    }
 
-			if (file.isDirectory()) {
-				// System.out.println("FOLDER: " + file.getName());
-				// Creation of the folder tree
-				long childFolder = createFolder(file.getName(), parentId);
-				importFolderSack(file.getAbsolutePath(), childFolder);
-			} else {
-				// if (file.length() < 31615) {
-				// }
-				if (docsInserted % 100 == 0)
-					System.err.println("Documents currently Created: " + docsInserted);
+    private void importFolderSack(String sDir, long parentId) throws AuthenticationException, PermissionException,
+            PersistenceException, WebserviceException, IOException {
 
-				// ****************************************************
-				// Add file to document repository
-				// ****************************************************
-				System.out.println(file.getAbsolutePath());
-				// Import document
-				long templateid = 2L;
+        File[] faFiles = new File(sDir).listFiles();
 
-				createDocumentSack(parentId, file, templateid, getAttributes(templateid));
-				docsInserted++;
-			}
-		}
-	}
+        for (File file : faFiles) {
+            if (docsInserted >= MAX_DOCUMENTS_TOBE_INSERTED) {
+                System.err.println("Reached limit of %d document imported".formatted(MAX_DOCUMENTS_TOBE_INSERTED));
+                return;
+            }
 
-	private List<WSAttribute> getAttributes(long templateid) {
+            if (file.isDirectory()) {
+                // Creation of the folder tree
+                long childFolder = createFolder(file.getName(), parentId);
+                importFolderSack(file.getAbsolutePath(), childFolder);
+            } else {
+                // if (file.length() < 31615) {
+                // }
 
-		List<WSAttribute> attributes = new ArrayList<WSAttribute>();
-		Date deldate = new Date();
-		String fPattern2 = new String("yyyy-MM-dd");
-		SimpleDateFormat dateFmtyyyyMMdd = new SimpleDateFormat(fPattern2);
+                if (docsInserted % 100 == 0) {
+                    System.err.println("Documents currently Created: %d".formatted(docsInserted));
+                }
 
-		if (templateid == 2) {
-			WSAttribute attr1 = new WSAttribute();
-			attr1.setName("docid");
-			attr1.setType(WSAttribute.TYPE_STRING);
-			attr1.setStringValue("09XM0050093");
-			attributes.add(attr1);
+                // ****************************************************
+                // Add file to document repository
+                // ****************************************************
+                System.out.println(file.getAbsolutePath());
 
-			WSAttribute attr2 = new WSAttribute();
-			attr2.setName("deldate");
-			attr2.setType(WSAttribute.TYPE_DATE);
-			attr2.setDateValue(dateFmtyyyyMMdd.format(deldate));
-			attributes.add(attr2);
+                // Import document
+                long templateid = 2L;
 
-			WSAttribute attr3 = new WSAttribute();
-			attr3.setName("delroute");
-			attr3.setType(WSAttribute.TYPE_STRING);
-			attr3.setStringValue("005");
-			attributes.add(attr3);
+                createDocumentSack(parentId, file, templateid, getAttributes(templateid));
 
-			WSAttribute attr4 = new WSAttribute();
-			attr4.setName("outlet");
-			attr4.setType(WSAttribute.TYPE_INT);
-			attr4.setIntValue(Long.valueOf(966838L));
-			attributes.add(attr4);
+                docsInserted++;
+            }
+        }
 
-			WSAttribute attr5 = new WSAttribute();
-			attr5.setName("salesrep");
-			attr5.setType(WSAttribute.TYPE_STRING);
-			attr5.setStringValue("D288");
-			attributes.add(attr5);
+    }
 
-			WSAttribute attr6 = new WSAttribute();
-			attr6.setName("driver");
-			attr6.setType(WSAttribute.TYPE_STRING);
-			attr6.setStringValue("D288");
-			attributes.add(attr6);
-		}
+    private List<WSAttribute> getAttributes(long templateid) {
 
-		return attributes;
-	}
+        List<WSAttribute> attributes = new ArrayList<WSAttribute>();
+        Date deldate = new Date();
+        String fPattern2 = new String("yyyy-MM-dd");
+        SimpleDateFormat dateFmtyyyyMMdd = new SimpleDateFormat(fPattern2);
 
-	private void createDocumentSack(long targetFolder, File file, long templateid, List<WSAttribute> attributes)
-			throws AuthenticationException, PermissionException, PersistenceException, IOException,
-			WebserviceException {
+        if (templateid == 2) {
+            WSAttribute attr1 = new WSAttribute();
+            attr1.setName("docid");
+            attr1.setType(WSAttribute.TYPE_STRING);
+            attr1.setStringValue("09XM0050093");
+            attributes.add(attr1);
 
-		// DataSource ds = new FileDataSource(file);
-		DataSource ds = new FileDataSource(new File("C:/tmp/DEL_01X06180519_07-01-2011.pdf"));
-		DataHandler content = new DataHandler(ds);
+            WSAttribute attr2 = new WSAttribute();
+            attr2.setName("deldate");
+            attr2.setType(WSAttribute.TYPE_DATE);
+            attr2.setDateValue(dateFmtyyyyMMdd.format(deldate));
+            attributes.add(attr2);
 
-		WSDocument document = new WSDocument();
-		// document.setFileName(file.getName());
-		String baseName = FilenameUtils.getBaseName(file.getName());
-		document.setFileName(baseName + ".pdf");
+            WSAttribute attr3 = new WSAttribute();
+            attr3.setName("delroute");
+            attr3.setType(WSAttribute.TYPE_STRING);
+            attr3.setStringValue("005");
+            attributes.add(attr3);
 
-		document.setFolderId(targetFolder);
-		document.setLanguage("en");
+            WSAttribute attr4 = new WSAttribute();
+            attr4.setName("outlet");
+            attr4.setType(WSAttribute.TYPE_INT);
+            attr4.setIntValue(Long.valueOf(966838L));
+            attributes.add(attr4);
 
-		if (attributes != null && attributes.size() > 0) {
-			document.setTemplateId(templateid);
-			document.setAttributes(attributes);
-		}
+            WSAttribute attr5 = new WSAttribute();
+            attr5.setName("salesrep");
+            attr5.setType(WSAttribute.TYPE_STRING);
+            attr5.setStringValue("D288");
+            attributes.add(attr5);
 
-		long startTime = System.currentTimeMillis();
-		WSDocument docRes = documentClient.create(sid, document, content);
-		System.out.println("Created documentID = " + docRes.getId());
-		long timeElapsed = System.currentTimeMillis() - startTime;
-		if (timeElapsed > TIME_ATTENTION_TRESHOLD)
-			System.err.println("Document created in: " + timeElapsed + " ms");
+            WSAttribute attr6 = new WSAttribute();
+            attr6.setName("driver");
+            attr6.setType(WSAttribute.TYPE_STRING);
+            attr6.setStringValue("D288");
+            attributes.add(attr6);
+        }
 
-	}
+        return attributes;
+    }
 
-	private long createFolder(String name, long parentId)
-			throws AuthenticationException, PermissionException, PersistenceException, WebserviceException {
+    private void createDocumentSack(long targetFolder, File file, long templateid, List<WSAttribute> attributes)
+            throws AuthenticationException, PermissionException, PersistenceException, IOException,
+            WebserviceException {
 
-		// Check if a subfolder of the parent folder has the same name
-		List<WSFolder> children = folderClient.listChildren(sid, parentId);
-		for (WSFolder wsFolder : children) {
-			if (wsFolder.getName().equals(name)) {
-				return wsFolder.getId();
-			}
-		}
+        // DataSource ds = new FileDataSource(file);
+        DataSource ds = new FileDataSource(new File("C:/tmp/DEL_01X06180519_07-01-2011.pdf"));
+        DataHandler content = new DataHandler(ds);
 
-		// Folder Creation
-		// result is the string "error" or the newly created folderId
-		WSFolder folder = new WSFolder();
-		folder.setName(name);
-		folder.setParentId(parentId);
+        WSDocument document = new WSDocument();
+        // document.setFileName(file.getName());
+        String baseName = FilenameUtils.getBaseName(file.getName());
+        document.setFileName(baseName + ".pdf");
 
-		WSFolder createdFolder = folderClient.create(sid, folder);
-		foldersCreated++;
-		System.out.println("Created folderID = " + createdFolder.getId());
-		return createdFolder.getId();
-	}
+        document.setFolderId(targetFolder);
+        document.setLanguage("en");
+
+        if (attributes != null && attributes.size() > 0) {
+            document.setTemplateId(templateid);
+            document.setAttributes(attributes);
+        }
+
+        long startTime = System.currentTimeMillis();
+
+        WSDocument docRes = documentClient.create(sid, document, content);
+
+        System.out.println("Created documentID = %d".formatted(docRes.getId()));
+
+        long timeElapsed = System.currentTimeMillis() - startTime;
+
+        if (timeElapsed > TIME_ATTENTION_TRESHOLD) {
+            System.err.println("Document created in: %d ms".formatted(timeElapsed));
+        }
+
+    }
+
+    private long createFolder(String name, long parentId)
+            throws AuthenticationException, PermissionException, PersistenceException, WebserviceException {
+
+        // Check if a subfolder of the parent folder has the same name
+        List<WSFolder> children = folderClient.listChildren(sid, parentId);
+        for (WSFolder wsFolder : children) {
+            if (wsFolder.getName().equals(name)) {
+                return wsFolder.getId();
+            }
+        }
+
+        // Folder Creation
+        // result is the string "error" or the newly created folderId
+        WSFolder folder = new WSFolder();
+        folder.setName(name);
+        folder.setParentId(parentId);
+
+        WSFolder createdFolder = folderClient.create(sid, folder);
+        foldersCreated++;
+        System.out.println("Created folderID = %d".formatted(createdFolder.getId()));
+        return createdFolder.getId();
+    }
 }

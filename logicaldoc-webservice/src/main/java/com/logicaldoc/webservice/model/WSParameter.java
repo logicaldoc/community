@@ -11,28 +11,28 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "WSParameter")
 public class WSParameter {
 
-	private String name;
+    private String name;
 
-	private String value;
-	
-	public String getName() {
-		return name;
-	}
+    private String value;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	@Override
-	public String toString() {
-		return getName() + " - " + getValue();
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "%s - %s".formatted(getName(), getValue());
+    }
 }

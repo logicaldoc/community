@@ -164,7 +164,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
         Folder folder = folderDao.findById(folderId, true);
         if (folder == null)
             return null;
-        return WSFolder.fromFolder(folder);
+        return WSFolder.fromFolder(folder, true);
     }
 
     @Override

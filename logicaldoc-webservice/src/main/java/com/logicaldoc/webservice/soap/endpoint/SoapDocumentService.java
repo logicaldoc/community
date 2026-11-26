@@ -511,7 +511,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
         DocumentDAO docDao = DocumentDAO.get();
 
         checkFolderPermission(Permission.WRITE, user, folderId);
-        
+
         DocumentHistory transaction = new DocumentHistory();
         transaction.setUser(user);
         transaction.setSessionId(sid);
@@ -656,12 +656,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
     public List<WSDocument> getRecentDocuments(String sid, Integer max)
             throws AuthenticationException, WebserviceException, PersistenceException {
         User user = validateSession(sid);
-
-        StringBuilder query = new StringBuilder(
-                "select docId from DocumentHistory where deleted=0 and (docId is not NULL) and userId=" + user.getId());
-        query.append(" order by date desc");
-        List<Long> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null,
-                Long.class, max);
+        List<Long> records = DocumentHistoryDAO.get().findByQuery(
+                "select docId from DocumentHistory where deleted = 0 and (docId is not NULL) and userId = :userId order by date desc",
+                Map.of("userId", user.getId()), Long.class, max);
 
         List<Long> docIds = new ArrayList<>();
 
@@ -838,19 +835,18 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
             throws AuthenticationException, WebserviceException, PersistenceException {
         User user = validateSession(sid);
         Collection<Long> folderIds = null;
-        if (!user.isMemberOf(Group.GROUP_ADMIN)) {
-            FolderDAO fdao = FolderDAO.get();
-            folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
-        }
+        if (!user.isMemberOf(Group.GROUP_ADMIN))
+            folderIds = FolderDAO.get().findFolderIdByUserId(user.getId(), null, true);
 
         DocumentDAO docDao = DocumentDAO.get();
         List<Document> docs = new ArrayList<>();
         if (user.isMemberOf(Group.GROUP_ADMIN))
-            docs = docDao.findByWhere("_entity.docRef=" + docId, null, null);
-        else if (folderIds != null) {
-            String idsStr = folderIds.toString().replace('[', '(').replace(']', ')');
-            docs = docDao.findByWhere("_entity.docRef=" + docId + " and _entity.id in " + idsStr, null, null);
-        }
+            docs = docDao.findByWhere("_entity.docRef = %d".formatted(docId), null, null);
+        else if (folderIds != null)
+            docs = docDao.findByWhere(
+                    "_entity.docRef = %d and _entity.id in (%s)".formatted(docId,
+                            folderIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","))),
+                    null, null);
 
         List<WSDocument> wsDocs = new ArrayList<>();
         for (Document doc : docDao.initialize(docs)) {
@@ -949,11 +945,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
     public void deleteLink(String sid, long id)
             throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         User user = validateSession(sid);
-        
+
         DocumentLink link = DocumentLinkDAO.get().findById(id);
         checkDocumentPermission(Permission.WRITE, user, link.getDocument1().getId());
         checkDocumentPermission(Permission.WRITE, user, link.getDocument2().getId());
-        
+
         DocumentLinkDAO.get().delete(id);
     }
 
@@ -961,9 +957,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
     public String getExtractedText(String sid, long docId)
             throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         User user = validateSession(sid);
-        
+
         checkDocumentPermission(Permission.READ, user, docId);
-        
+
         return SearchEngine.get().getHit(docId).getContent();
     }
 

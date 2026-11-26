@@ -10,77 +10,77 @@ import com.logicaldoc.webservice.rest.client.RestDocumentClient;
 
 public class RestWorkbench {
 
-	private static ContextProperties settings;
+    private static ContextProperties settings;
 
-	static {
-		try {
-			settings = new ContextProperties();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    static {
+        try {
+            settings = new ContextProperties();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public static void checkin() throws Exception {
-		RestDocumentClient documentClient = instantiateDocumentClient();
+    public static void checkin() throws Exception {
+        RestDocumentClient documentClient = instantiateDocumentClient();
 
-		long docID = 100L;
-		documentClient.checkout(docID);
-		System.out.println("Checkout performed");
+        long docID = 100L;
+        documentClient.checkout(docID);
+        System.out.println("Checkout performed");
 
-		File file = new File("C:/tmp/Taylor Swift - I Knew You Were Trouble (1080P 24Fps Av1-128Kbit Aac)-1b.m4v");
+        File file = new File("C:/tmp/Taylor Swift - I Knew You Were Trouble (1080P 24Fps Av1-128Kbit Aac)-1b.m4v");
 
-		// get the filesize in order to check
-		long fsize = file.length();
-		System.out.println("FileSize of the new file version: " + fsize);
+        // get the filesize in order to check
+        long fsize = file.length();
+        System.out.println("FileSize of the new file version: %d".formatted(fsize));
 
-		documentClient.checkin(docID, "rest checkin", false, file);
-		System.out.println("Operation completed");
+        documentClient.checkin(docID, "rest checkin", false, file);
+        System.out.println("Operation completed");
 
-		// Checks the filesize after the check-in operation
-		WSDocument doc = documentClient.getDocument(docID);
-		System.out.println("FileSize after checkin: " + doc.getFileSize());
-	}
+        // Checks the filesize after the check-in operation
+        WSDocument doc = documentClient.getDocument(docID);
+        System.out.println("FileSize after checkin: %d".formatted(doc.getFileSize()));
+    }
 
-	private static RestDocumentClient instantiateDocumentClient() {
-		RestDocumentClient rclient = new RestDocumentClient(settings.getProperty("url")+ "/services/rest/document", settings.getProperty("apiKey"));
-		return rclient;
-	}
+    private static RestDocumentClient instantiateDocumentClient() {
+        return new RestDocumentClient("%s/services/rest/document".formatted(settings.getProperty("url")),
+                settings.getProperty("apiKey"));
+    }
 
-	public static void main(String[] args) throws Exception {
-		createDocument();
-		checkin();
-		logout();
-	}
+    public static void main(String[] args) throws Exception {
+        createDocument();
+        checkin();
+        logout();
+    }
 
-	private static void createDocument() throws Exception {
-		RestDocumentClient documentClient = instantiateDocumentClient();
+    private static void createDocument() throws Exception {
+        RestDocumentClient documentClient = instantiateDocumentClient();
 
-		File file = new File("C:/tmp/1989 Style - 720Suq-1.m4v");
-		if (!file.exists()) {
-			throw new Exception("upload File not found!");
-		}
+        File file = new File("C:/tmp/1989 Style - 720Suq-1.m4v");
+        if (!file.exists()) {
+            throw new Exception("upload File not found!");
+        }
 
-		// get the filesize in order to check
-		long fsize = file.length();
-		System.out.println("FileSize of the source file: " + fsize);
+        // get the filesize in order to check
+        long fsize = file.length();
+        System.out.println("FileSize of the source file: %d".formatted(fsize));
 
-		long folderID = 4L; // Default workspace folder
+        long folderID = 4L; // Default workspace folder
 
-		WSDocument wsdocument = new WSDocument();
-		wsdocument.setFolderId(folderID);
-		wsdocument.setFileName(file.getName());
+        WSDocument wsdocument = new WSDocument();
+        wsdocument.setFolderId(folderID);
+        wsdocument.setFileName(file.getName());
 
-		WSDocument createdDoc = documentClient.create(wsdocument, file);
-		System.out.println("Operation completed");
-		System.out.println("Document created with ID: " + createdDoc.getId());
+        WSDocument createdDoc = documentClient.create(wsdocument, file);
+        System.out.println("Operation completed");
+        System.out.println("Document created with ID: %d".formatted(createdDoc.getId()));
 
-		// Checks the filesize after the upload operation [OPTIONAL]
-		System.out.println("FileSize of the created doc: " + createdDoc.getFileSize());
-	}
+        // Checks the filesize after the upload operation [OPTIONAL]
+        System.out.println("FileSize of the created doc: %d".formatted(createdDoc.getFileSize()));
+    }
 
-	public static void logout() throws Exception {
-		RestAuthClient auth = new RestAuthClient(settings.getProperty("url")+ "/services/rest/auth");
-		auth.logout(auth.getSid());
-	}
+    public static void logout() throws Exception {
+        RestAuthClient auth = new RestAuthClient("%s/services/rest/auth".formatted(settings.getProperty("url")));
+        auth.logout(auth.getSid());
+    }
 
 }

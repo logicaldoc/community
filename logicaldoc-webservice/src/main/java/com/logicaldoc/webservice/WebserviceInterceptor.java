@@ -57,360 +57,361 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
-	public static final String THREADPOOL_CALL_COUNTER = "WebserviceCallCounter";
+    public static final String THREADPOOL_CALL_COUNTER = "WebserviceCallCounter";
 
-	public static final String THREADPOOL_CALL_STORE = "WebserviceCallStore";
+    public static final String THREADPOOL_CALL_STORE = "WebserviceCallStore";
 
-	public static final String WSCALL = "wscall";
+    public static final String WSCALL = "wscall";
 
-	public static final String WSCALL_HYPHEN = WSCALL + "-";
+    public static final String WSCALL_HYPHEN = WSCALL + "-";
 
-	private static final Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
+    private static final Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
 
-	@Resource(name = "sequenceDAO")
-	protected SequenceDAO sequenceDAO;
+    @Resource(name = "sequenceDAO")
+    protected SequenceDAO sequenceDAO;
 
-	@Resource(name = "config")
-	protected ContextProperties config;
+    @Resource(name = "config")
+    protected ContextProperties config;
 
-	/**
-	 * A cache of counters: key=countername-tenantId name value=actual total
-	 * calls
-	 */
-	protected static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<>();
+    /**
+     * A cache of counters: key=countername-tenantId name value=actual total
+     * calls
+     */
+    protected static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<>();
 
-	/**
-	 * Last time a database synchronization of the counters has done
-	 */
-	protected Instant lastSync = Instant.MIN;
+    /**
+     * Last time a database synchronization of the counters has done
+     */
+    protected Instant lastSync = Instant.MIN;
 
-	private ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService syncExecutor = Executors.newSingleThreadScheduledExecutor();
 
-	/**
-	 * Last time the oldest calls were cleaned
-	 */
-	private Date lastClean;
+    /**
+     * Last time the oldest calls were cleaned
+     */
+    private Date lastClean;
 
-	public WebserviceInterceptor() {
-		super(Phase.RECEIVE);
-	}
+    public WebserviceInterceptor() {
+        super(Phase.RECEIVE);
+    }
 
-	@Override
-	public void handleMessage(Message message) throws Fault {
-		if (!config.getBoolean("webservice.enabled", false)) {
-			throw new Fault(new IOException("Webservices not enabled"));
-		}
+    @Override
+    public void handleMessage(Message message) throws Fault {
+        if (!config.getBoolean("webservice.enabled", false)) {
+            throw new Fault(new IOException("Webservices not enabled"));
+        }
 
-		String payload = getPayload(message, 2048L);
+        String payload = getPayload(message, 2048L);
 
-		Session session = null;
-		try {
-			session = getSession(message, payload);
-		} catch (Exception t) {
-			log.warn(t.getMessage(), t);
-		}
+        Session session = null;
+        try {
+            session = getSession(message, payload);
+        } catch (Exception t) {
+            log.warn(t.getMessage(), t);
+        }
 
-		validateCall(message, payload, session);
+        validateCall(message, payload, session);
 
-		/**
-		 * Increase the counters
-		 */
-		try {
-			increaseCounters(session);
-		} catch (Exception t) {
-			log.warn(t.getMessage(), t);
-		}
+        /**
+         * Increase the counters
+         */
+        try {
+            increaseCounters(session);
+        } catch (Exception t) {
+            log.warn(t.getMessage(), t);
+        }
 
-		try {
-			recordWebserviceCall(message, session);
-		} catch (Exception t) {
-			log.warn(t.getMessage(), t);
-		}
-	}
+        try {
+            recordWebserviceCall(message, session);
+        } catch (Exception t) {
+            log.warn(t.getMessage(), t);
+        }
+    }
 
-	/**
-	 * Put here your own logic that validates the incoming call
-	 * 
-	 * @param message the current message
-	 * @param session current session
-	 * @param payload the call's payload
-	 * 
-	 * @throws Fault raised incase the validation did not pass
-	 */
-	protected void validateCall(Message message, String payload, Session session) throws Fault {
-		// Nothing to do by default
-	}
+    /**
+     * Put here your own logic that validates the incoming call
+     * 
+     * @param message the current message
+     * @param session current session
+     * @param payload the call's payload
+     * 
+     * @throws Fault raised incase the validation did not pass
+     */
+    protected void validateCall(Message message, String payload, Session session) throws Fault {
+        // Nothing to do by default
+    }
 
-	private void recordWebserviceCall(Message message, Session session) {
-		String payload;
-		if (RunLevel.current().aspectEnabled(Aspect.SAVEAPICALL)
-				&& config.getBoolean("webservice.call.record", false)) {
-			WebserviceCall call = new WebserviceCall();
+    private void recordWebserviceCall(Message message, Session session) {
+        String payload;
+        if (RunLevel.current().aspectEnabled(Aspect.SAVEAPICALL)
+                && config.getBoolean("webservice.call.record", false)) {
+            WebserviceCall call = new WebserviceCall();
 
-			if (Context.get().getConfig().getBoolean("webservice.call.record.payload", false)) {
-				/*
-				 * Retrieve the full payload
-				 */
-				payload = getPayload(message, null);
-				call.setPayload(payload);
-			} else
-				call.setPayload(null);
+            if (Context.get().getConfig().getBoolean("webservice.call.record.payload", false)) {
+                /*
+                 * Retrieve the full payload
+                 */
+                payload = getPayload(message, null);
+                call.setPayload(payload);
+            } else
+                call.setPayload(null);
 
-			HttpServletRequest req = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-			if (req != null)
-				call.setIp(req.getRemoteAddr());
+            HttpServletRequest req = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
+            if (req != null)
+                call.setIp(req.getRemoteAddr());
 
-			call.setTenantId(Tenant.SYSTEM_ID);
-			if (session != null)
-				call.setSession(session);
+            call.setTenantId(Tenant.SYSTEM_ID);
+            if (session != null)
+                call.setSession(session);
 
-			saveCall(call, message);
-		}
-	}
+            saveCall(call, message);
+        }
+    }
 
-	private void saveCall(WebserviceCall call, Message message) {
-		call.setProtocol(message instanceof SoapMessage ? WebserviceCall.SOAP : WebserviceCall.REST);
-		call.setUri(getURI(message));
+    private void saveCall(WebserviceCall call, Message message) {
+        call.setProtocol(message instanceof SoapMessage ? WebserviceCall.SOAP : WebserviceCall.REST);
+        call.setUri(getURI(message));
 
-		// Strip the <content> tags in the payload and mask the credentials
-		if (call.getPayload() != null) {
-			call.setPayload(stripFileContent(call.getPayload()));
-			call.setPayload(maskCredentials(call.getPayload()));
-		}
+        // Strip the <content> tags in the payload and mask the credentials
+        if (call.getPayload() != null) {
+            call.setPayload(stripFileContent(call.getPayload()));
+            call.setPayload(maskCredentials(call.getPayload()));
+        }
 
-		if (call.getPayload() != null && call.getPayload().length() > 4000)
-			call.setPayload(StringUtils.abbreviate(call.getPayload(), 4000));
+        if (call.getPayload() != null && call.getPayload().length() > 4000)
+            call.setPayload(StringUtils.abbreviate(call.getPayload(), 4000));
 
-		if (call.getSessionId() != null) {
-			String sid = call.getSessionId();
-			String maskedSid = StringUtils.overlay(sid, StringUtils.repeat("X", sid.length() - 6), 0, sid.length() - 6);
-			if (call.getUri() != null)
-				call.setUri(call.getUri().replace(sid, maskedSid));
-			if (call.getPayload() != null)
-				call.setPayload(call.getPayload().replace(sid, maskedSid));
-		}
+        if (call.getSessionId() != null) {
+            String sid = call.getSessionId();
+            String maskedSid = StringUtils.overlay(sid, StringUtils.repeat("X", sid.length() - 6), 0, sid.length() - 6);
+            if (call.getUri() != null)
+                call.setUri(call.getUri().replace(sid, maskedSid));
+            if (call.getPayload() != null)
+                call.setPayload(call.getPayload().replace(sid, maskedSid));
+        }
 
-		if (call.getUri() != null)
-			call.setUri(maskCredentials(call.getUri()));
+        if (call.getUri() != null)
+            call.setUri(maskCredentials(call.getUri()));
 
-		ThreadPools.get().schedule(new WebserviceCallStore(call), THREADPOOL_CALL_STORE, 5000);
-	}
+        ThreadPools.get().schedule(new WebserviceCallStore(call), THREADPOOL_CALL_STORE, 5000);
+    }
 
-	private String getURI(Message message) {
-		String uri = (String) message.get(Message.REQUEST_URL);
-		if (uri != null) {
-			String query = (String) message.get(Message.QUERY_STRING);
-			if (query != null)
-				uri += "?" + query;
-		}
-		return uri;
-	}
+    private String getURI(Message message) {
+        String uri = (String) message.get(Message.REQUEST_URL);
 
-	static String maskCredentials(String originalString) {
-		String maskedString = originalString;
+        if (uri == null)
+            return null;
 
-		String pattern = "<password(.*)>([\\w\\-\\d]*)</password>";
-		Pattern regPat = Pattern.compile(pattern);
-		Matcher matcher = regPat.matcher(maskedString);
-		while (matcher.find()) {
-			String matchedText = matcher.group();
-			if (!matchedText.equals(originalString))
-				maskedString = maskedString.replace(matchedText, "<password>XXXX</password>");
-		}
+        String query = (String) message.get(Message.QUERY_STRING);
 
-		pattern = "password=[^&.]*";
-		regPat = Pattern.compile(pattern);
-		matcher = regPat.matcher(maskedString);
-		while (matcher.find()) {
-			String matchedText = matcher.group();
-			if (!matchedText.equals(maskedString))
-				maskedString = maskedString.replace(matchedText, "password=XXXX");
-		}
+        return query != null ? "%s?%s".formatted(uri, query) : uri;
+    }
 
-		return maskedString;
-	}
+    static String maskCredentials(String originalString) {
+        String maskedString = originalString;
 
-	/**
-	 * Strips the file contents, generally encapsulated in an element called
-	 * <content>
-	 * 
-	 * @param originalString the original XML content
-	 * 
-	 * @return the stripped XML
-	 */
-	static String stripFileContent(String originalString) {
-		return originalString.replaceAll("<content[^>]*>.*</content>", "<content>...</content>");
-	}
+        String pattern = "<password(.*)>([\\w\\-\\d]*)</password>";
+        Pattern regPat = Pattern.compile(pattern);
+        Matcher matcher = regPat.matcher(maskedString);
+        while (matcher.find()) {
+            String matchedText = matcher.group();
+            if (!matchedText.equals(originalString))
+                maskedString = maskedString.replace(matchedText, "<password>XXXX</password>");
+        }
 
-	/**
-	 * Increases the counters
-	 * 
-	 * @param session the current session if any
-	 */
-	protected void increaseCounters(Session session) {
-		increaseCounter(WSCALL, Tenant.SYSTEM_ID);
-		increaseCounter(currentMonthSequenceName(), Tenant.SYSTEM_ID);
-		if (session != null) {
-			increaseCounter(WSCALL, session.getTenantId());
-			increaseCounter(currentMonthSequenceName(), session.getTenantId());
-		}
-	}
+        pattern = "password=[^&.]*";
+        regPat = Pattern.compile(pattern);
+        matcher = regPat.matcher(maskedString);
+        while (matcher.find()) {
+            String matchedText = matcher.group();
+            if (!matchedText.equals(maskedString))
+                maskedString = maskedString.replace(matchedText, "password=XXXX");
+        }
 
-	private int syncFrequency() {
-		int freq = config.getInt("webservice.call.syncfreq", 300);
-		if (freq > 1200)
-			freq = 1200;
-		if (freq < 1)
-			freq = 1;
-		return freq;
-	}
+        return maskedString;
+    }
 
-	protected void syncCounters() throws PersistenceException {
-		for (Map.Entry<Pair<String, Long>, AtomicLong> entry : counters.entrySet()) {
-			AtomicLong counter = entry.getValue();
-			sequenceDAO.next(entry.getKey().getKey(), 0L, entry.getKey().getValue(), counter.get());
+    /**
+     * Strips the file contents, generally encapsulated in an element called
+     * <content>
+     * 
+     * @param originalString the original XML content
+     * 
+     * @return the stripped XML
+     */
+    static String stripFileContent(String originalString) {
+        return originalString.replaceAll("<content[^>]*>.*</content>", "<content>...</content>");
+    }
 
-			// Reset the counter so it will start counting the new arrivals
-			counter.getAndSet(0L);
-		}
-	}
+    /**
+     * Increases the counters
+     * 
+     * @param session the current session if any
+     */
+    protected void increaseCounters(Session session) {
+        increaseCounter(WSCALL, Tenant.SYSTEM_ID);
+        increaseCounter(currentMonthSequenceName(), Tenant.SYSTEM_ID);
+        if (session != null) {
+            increaseCounter(WSCALL, session.getTenantId());
+            increaseCounter(currentMonthSequenceName(), session.getTenantId());
+        }
+    }
 
-	@PostConstruct
-	public void init() {
-		syncExecutor.scheduleAtFixedRate(() -> {
-			try {
-				// Proceed only in case at least one counter is > 0
-				if (counters.values().stream().anyMatch(v -> v.get() > 0L)) {
-					long timeSinceLastSync = ChronoUnit.SECONDS.between(lastSync, Instant.now());
-					if (timeSinceLastSync >= syncFrequency()) {
-						syncCounters();
-						lastSync = Instant.now();
-					}
-				}
-			} catch (Exception t) {
-				log.warn(t.getMessage(), t);
-			}
-		}, syncFrequency(), syncFrequency(), TimeUnit.SECONDS);
-	}
+    private int syncFrequency() {
+        int freq = config.getInt("webservice.call.syncfreq", 300);
+        if (freq > 1200)
+            freq = 1200;
+        if (freq < 1)
+            freq = 1;
+        return freq;
+    }
 
-	@PreDestroy
-	public void shutdown() {
-		try {
-			syncCounters();
-			syncExecutor.shutdown();
-		} catch (Exception t) {
-			log.warn(t.getMessage(), t);
-		}
-	}
+    protected void syncCounters() throws PersistenceException {
+        for (Map.Entry<Pair<String, Long>, AtomicLong> entry : counters.entrySet()) {
+            AtomicLong counter = entry.getValue();
+            sequenceDAO.next(entry.getKey().getKey(), 0L, entry.getKey().getValue(), counter.get());
 
-	protected void increaseCounter(String counterName, long tenantId) {
-		Pair<String, Long> counterPair = new Pair<>(counterName, tenantId);
+            // Reset the counter so it will start counting the new arrivals
+            counter.getAndSet(0L);
+        }
+    }
 
-		AtomicLong counter = counters.computeIfAbsent(counterPair, k -> new AtomicLong(0L));
-		counter.incrementAndGet();
-	}
+    @PostConstruct
+    public void init() {
+        syncExecutor.scheduleAtFixedRate(() -> {
+            try {
+                // Proceed only in case at least one counter is > 0
+                if (counters.values().stream().anyMatch(v -> v.get() > 0L)) {
+                    long timeSinceLastSync = ChronoUnit.SECONDS.between(lastSync, Instant.now());
+                    if (timeSinceLastSync >= syncFrequency()) {
+                        syncCounters();
+                        lastSync = Instant.now();
+                    }
+                }
+            } catch (Exception t) {
+                log.warn(t.getMessage(), t);
+            }
+        }, syncFrequency(), syncFrequency(), TimeUnit.SECONDS);
+    }
 
-	static Session getSession(Message message, String payload) {
-		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-		Session session = SessionManager.get().getSession(request);
-		if (session != null)
-			return session;
+    @PreDestroy
+    public void shutdown() {
+        try {
+            syncCounters();
+            syncExecutor.shutdown();
+        } catch (Exception t) {
+            log.warn(t.getMessage(), t);
+        }
+    }
 
-		if (StringUtils.isEmpty(payload))
-			payload = getPayload(message, 2048L);
-		if (StringUtils.isNotEmpty(payload)) {
-			String pattern = "<sid(.*)>([\\w\\-]*)</sid>";
-			Pattern regPat = Pattern.compile(pattern);
-			Matcher matcher = regPat.matcher(payload);
-			if (matcher.find()) {
-				String matchedText = matcher.group();
-				String sid = matchedText.substring(matchedText.indexOf('>') + 1, matchedText.lastIndexOf('<'));
-				session = SessionManager.get().get(sid);
-			}
+    protected void increaseCounter(String counterName, long tenantId) {
+        Pair<String, Long> counterPair = new Pair<>(counterName, tenantId);
 
-		}
-		return session;
-	}
+        AtomicLong counter = counters.computeIfAbsent(counterPair, k -> new AtomicLong(0L));
+        counter.incrementAndGet();
+    }
 
-	static String getPayload(Message message, Long maxlength) throws Fault {
-		Object contentType = message.getContextualProperty(Message.CONTENT_TYPE);
-		if (contentType == null || !contentType.toString().toLowerCase().startsWith("text/"))
-			return null;
+    static Session getSession(Message message, String payload) {
+        HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
+        Session session = SessionManager.get().getSession(request);
+        if (session != null)
+            return session;
 
-		try (InputStream is = message.getContent(InputStream.class);
-				CachedOutputStream bos = new CachedOutputStream()) {
-			if (is != null) {
-				IOUtils.copy(is, bos);
+        if (StringUtils.isEmpty(payload))
+            payload = getPayload(message, 2048L);
+        if (StringUtils.isNotEmpty(payload)) {
+            String pattern = "<sid(.*)>([\\w\\-]*)</sid>";
+            Pattern regPat = Pattern.compile(pattern);
+            Matcher matcher = regPat.matcher(payload);
+            if (matcher.find()) {
+                String matchedText = matcher.group();
+                String sid = matchedText.substring(matchedText.indexOf('>') + 1, matchedText.lastIndexOf('<'));
+                session = SessionManager.get().get(sid);
+            }
 
-				bos.flush();
+        }
+        return session;
+    }
 
-				StringBuilder sb = new StringBuilder();
-				message.setContent(InputStream.class, bos.getInputStream());
-				if (maxlength != null)
-					bos.writeCacheTo(sb, maxlength);
-				else
-					bos.writeCacheTo(sb);
+    static String getPayload(Message message, Long maxlength) throws Fault {
+        Object contentType = message.getContextualProperty(Message.CONTENT_TYPE);
+        if (contentType == null || !contentType.toString().toLowerCase().startsWith("text/"))
+            return null;
 
-				return sb.toString();
-			}
-		} catch (Exception e) {
-			throw new Fault(e);
-		}
-		return null;
-	}
+        try (InputStream is = message.getContent(InputStream.class);
+                CachedOutputStream bos = new CachedOutputStream()) {
+            if (is != null) {
+                IOUtils.copy(is, bos);
 
-	public static String currentMonthSequenceName() {
-		return WSCALL_HYPHEN + getCurrentMonth();
-	}
+                bos.flush();
 
-	protected static String getCurrentMonth() {
-		LocalDate date = LocalDate.now(ZoneId.systemDefault());
-		StringBuilder sb = new StringBuilder(Integer.toString(date.getYear()));
-		int month = date.getMonthValue();
-		if (month < 10)
-			sb.append("0");
-		sb.append(Integer.toString(month));
-		return sb.toString();
-	}
+                StringBuilder sb = new StringBuilder();
+                message.setContent(InputStream.class, bos.getInputStream());
+                if (maxlength != null)
+                    bos.writeCacheTo(sb, maxlength);
+                else
+                    bos.writeCacheTo(sb);
 
-	/**
-	 * This runnable takes care of writing a call into the database
-	 */
-	class WebserviceCallStore implements Callable<Void> {
+                return sb.toString();
+            }
+        } catch (Exception e) {
+            throw new Fault(e);
+        }
+        return null;
+    }
 
-		private WebserviceCall wsCall;
+    public static String currentMonthSequenceName() {
+        return WSCALL_HYPHEN + getCurrentMonth();
+    }
 
-		public WebserviceCallStore(WebserviceCall wsCall) {
-			super();
-			this.wsCall = wsCall;
-		}
+    protected static String getCurrentMonth() {
+        LocalDate date = LocalDate.now(ZoneId.systemDefault());
+        StringBuilder sb = new StringBuilder(Integer.toString(date.getYear()));
+        int month = date.getMonthValue();
+        if (month < 10)
+            sb.append("0");
+        sb.append(Integer.toString(month));
+        return sb.toString();
+    }
 
-		@Override
-		public Void call() {
-			try {
-				WebserviceCallDAO dao = WebserviceCallDAO.get();
-				Date now = new Date();
+    /**
+     * This runnable takes care of writing a call into the database
+     */
+    class WebserviceCallStore implements Callable<Void> {
 
-				if (lastClean == null)
-					lastClean = now;
+        private WebserviceCall wsCall;
 
-				long timeSinceLastClean = TimeDiff.getTimeDifference(lastClean, now, TimeField.HOUR);
-				if (timeSinceLastClean >= 24)
-					dao.cleanOldCalls(config.getInt("webservice.call.ttl", 90));
+        public WebserviceCallStore(WebserviceCall wsCall) {
+            super();
+            this.wsCall = wsCall;
+        }
 
-				dao.store(wsCall);
-			} catch (Exception t) {
-				log.warn(t.getMessage(), t);
-			}
-			return null;
-		}
-	}
+        @Override
+        public Void call() {
+            try {
+                WebserviceCallDAO dao = WebserviceCallDAO.get();
+                Date now = new Date();
 
-	public void setSequenceDAO(SequenceDAO sequenceDAO) {
-		this.sequenceDAO = sequenceDAO;
-	}
+                if (lastClean == null)
+                    lastClean = now;
 
-	public void setSettings(ContextProperties settings) {
-		this.config = settings;
-	}
+                long timeSinceLastClean = TimeDiff.getTimeDifference(lastClean, now, TimeField.HOUR);
+                if (timeSinceLastClean >= 24)
+                    dao.cleanOldCalls(config.getInt("webservice.call.ttl", 90));
+
+                dao.store(wsCall);
+            } catch (Exception t) {
+                log.warn(t.getMessage(), t);
+            }
+            return null;
+        }
+    }
+
+    public void setSequenceDAO(SequenceDAO sequenceDAO) {
+        this.sequenceDAO = sequenceDAO;
+    }
+
+    public void setSettings(ContextProperties settings) {
+        this.config = settings;
+    }
 }

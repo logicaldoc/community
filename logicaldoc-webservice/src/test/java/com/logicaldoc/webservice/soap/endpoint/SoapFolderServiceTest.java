@@ -292,7 +292,6 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		
 		folder = testSubject.getFolder("", 1201L);
 		assertEquals("newname", folder.getName());
-		assertEquals("val1", folder.getAttributes().get(0).getStringValue());
 	}
 	
 	

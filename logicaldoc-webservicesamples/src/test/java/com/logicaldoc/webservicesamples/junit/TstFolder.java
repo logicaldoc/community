@@ -16,75 +16,80 @@ import com.logicaldoc.webservice.soap.client.SoapFolderClient;
 
 public class TstFolder extends BaseTestCase {
 
-	private static final Logger log = LoggerFactory.getLogger(TstFolder.class);
+    private static final Logger log = LoggerFactory.getLogger(TstFolder.class);
 
-	private SoapFolderClient folderClient;
+    private SoapFolderClient folderClient;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-		folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
-	}
+        folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
+    }
 
-	@Test
-	public void testFolderPath() throws IOException, AuthenticationException, PermissionException, PersistenceException,
-			WebserviceException {
+    @Test
+    public void testFolderPath() throws IOException, AuthenticationException, PermissionException, PersistenceException,
+            WebserviceException {
 
-		// The parent folder is default workspace folder: 4L
-		long parentFolderId = DEFAULT_WORKSPACE;
-		// Folder Creation
-		// result is the newly created folder or exception
-		String path = "2012/004/16/doctype";
-		WSFolder createdFolder = folderClient.createPath(sid, parentFolderId, path);
-		System.out.println(createdFolder.getId());
-		System.out.println(createdFolder.getName());
+        // The parent folder is default workspace folder: 4L
+        long parentFolderId = DEFAULT_WORKSPACE;
+        // Folder Creation
+        // result is the newly created folder or exception
+        String path = "2012/004/16/doctype";
+        WSFolder createdFolder = folderClient.createPath(sid, parentFolderId, path);
+        System.out.println(createdFolder.getId());
+        System.out.println(createdFolder.getName());
 
-		assertEquals("doctype", createdFolder.getName());
+        assertEquals("doctype", createdFolder.getName());
 
-		// Get the path of a folder
-		List<WSFolder> folders = folderClient.getPath(sid, createdFolder.getId());
-		for (WSFolder wsFolder : folders) {
-			System.out.println(wsFolder.getName());
-		}
-	}
+        // Get the path of a folder
+        List<WSFolder> folders = folderClient.getPath(sid, createdFolder.getId());
+        for (WSFolder wsFolder : folders) {
+            System.out.println(wsFolder.getName());
+        }
+    }
 
-	@Test
-	public void testFolderCRUD() throws IOException, AuthenticationException, PermissionException, PersistenceException,
-			WebserviceException {
-		// The parent folder is default workspace folder: 4L
-		long parentFolderId = DEFAULT_WORKSPACE;
+    @Test
+    public void testFolderCRUD() throws IOException, AuthenticationException, PermissionException, PersistenceException,
+            WebserviceException {
+        // The parent folder is default workspace folder: 4L
+        long parentFolderId = DEFAULT_WORKSPACE;
 
-		// Folder Creation
-		// result is the string "error" or the newly created folderId
-		WSFolder folder = new WSFolder();
-		folder.setName("myFirstFolder");
-		folder.setParentId(parentFolderId);
-		WSFolder createdFolder = folderClient.create(sid, folder);
+        // Folder Creation
+        // result is the string "error" or the newly created folderId
+        WSFolder folder = new WSFolder();
+        folder.setName("myFirstFolder");
+        folder.setParentId(parentFolderId);
 
-		System.out.println(createdFolder.getId());
-		log.error("createdFolder.getId(): " + createdFolder.getId());
+        WSFolder createdFolder = folderClient.create(sid, folder);
 
-		// Folder Retrieval
-		long createdFolderId = createdFolder.getId();
-		WSFolder childFolder = folderClient.getFolder(sid, createdFolderId);
+        System.out.println(createdFolder.getId());
+        log.error("createdFolder.getId(): %d".formatted(createdFolder.getId()));
 
-		System.out.println(childFolder.getName());
-		log.error("childFolder.getName(): " + childFolder.getName());
-		assertEquals("myFirstFolder", childFolder.getName());
+        // Folder Retrieval
+        long createdFolderId = createdFolder.getId();
 
-		// Folder Rename
-		folderClient.rename(sid, createdFolderId, "New Folder Name");
+        WSFolder childFolder = folderClient.getFolder(sid, createdFolderId);
 
-		WSFolder verFolder = folderClient.getFolder(sid, createdFolderId);
-		System.out.println(verFolder.getName());
-		log.error("verFolder.getName(): " + verFolder.getName());
+        System.out.println(childFolder.getName());
+        log.error("childFolder.getName(): %s".formatted(childFolder.getName()));
 
-		// Folder Delete
-		folderClient.delete(sid, createdFolderId);
+        assertEquals("myFirstFolder", childFolder.getName());
 
-		// verify the folder deletion
-		WSFolder delFolder = folderClient.getFolder(sid, createdFolderId);
-		fail("folder: " + delFolder + " should not exist");
-	}
+        // Folder Rename
+        folderClient.rename(sid, createdFolderId, "New Folder Name");
+
+        WSFolder verFolder = folderClient.getFolder(sid, createdFolderId);
+
+        System.out.println(verFolder.getName());
+        log.error("verFolder.getName(): %s".formatted(verFolder.getName()));
+
+        // Folder Delete
+        folderClient.delete(sid, createdFolderId);
+
+        // verify the folder deletion
+        WSFolder delFolder = folderClient.getFolder(sid, createdFolderId);
+
+        fail("folder: %s should not exist".formatted(delFolder));
+    }
 }

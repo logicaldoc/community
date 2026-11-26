@@ -18,61 +18,61 @@ import jakarta.activation.DataHandler;
 
 public class TstDownload extends BaseTestCase {
 
-	private static final Logger log = LoggerFactory.getLogger(TstDownload.class);
+    private static final Logger log = LoggerFactory.getLogger(TstDownload.class);
 
-	private SoapDocumentClient documentClient;
+    private SoapDocumentClient documentClient;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
-	}
+        documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
+    }
 
-	@Test
-	public void testDownloadDocument() throws IOException {
+    @Test
+    public void testDownloadDocument() throws IOException {
 
-		OutputStream os = null;
-		try {
-			// Download the document with id 3932160
-			// You should be sure that there is a document on LD with this ID
-			long docId = 24543232L;
+        OutputStream os = null;
+        try {
+            // Download the document with id 3932160
+            // You should be sure that there is a document on LD with this ID
+            long docId = 24543232L;
 
-			WSDocument mydoc = documentClient.getDocument(sid, docId);
+            WSDocument mydoc = documentClient.getDocument(sid, docId);
 
-			System.out.println(mydoc.getFileName());
+            System.out.println(mydoc.getFileName());
 
-			File destFile = new File("C:/tmp", mydoc.getFileName());
-			os = new FileOutputStream(destFile);
+            File destFile = new File("C:/tmp", mydoc.getFileName());
+            os = new FileOutputStream(destFile);
 
-			DataHandler dh = documentClient.getContent(sid, docId);
-			IOUtils.copy(dh.getInputStream(), os);
-		} catch (RuntimeException e) {
-			log.error("Unable to download the document: " + e.getMessage(), e);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			IOUtils.close(os);
-		}
-	}
+            DataHandler dh = documentClient.getContent(sid, docId);
+            IOUtils.copy(dh.getInputStream(), os);
+        } catch (RuntimeException e) {
+            log.error("Unable to download the document: %s".formatted(e.getMessage()), e);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.close(os);
+        }
+    }
 
-	@Test
-	public void testDownloadFolderContent() throws Exception {
-		// Download all the documents in Default Workspace folder (id=4,
-		// name='Default')
-		long folderId = DEFAULT_WORKSPACE;
+    @Test
+    public void testDownloadFolderContent() throws Exception {
+        // Download all the documents in Default Workspace folder (id=4,
+        // name='Default')
+        long folderId = DEFAULT_WORKSPACE;
 
-		List<WSDocument> docs = documentClient.listDocuments(sid, folderId, null);
-		for (WSDocument wsDocument : docs) {
-			long docId = wsDocument.getId();
-			System.out.println(docId + " : " + wsDocument.getFileName());
+        List<WSDocument> docs = documentClient.listDocuments(sid, folderId, null);
+        for (WSDocument wsDocument : docs) {
+            long docId = wsDocument.getId();
+            System.out.println("%s : %s".formatted(docId, wsDocument.getFileName()));
 
-			DataHandler dh = documentClient.getContent(sid, docId);
+            DataHandler dh = documentClient.getContent(sid, docId);
 
-			File outFile = new File("C:/tmp", wsDocument.getFileName());
-			try (OutputStream os = new FileOutputStream(outFile)) {
-				IOUtils.copy(dh.getInputStream(), os);
-			}
-		}
-	}
+            File outFile = new File("C:/tmp", wsDocument.getFileName());
+            try (OutputStream os = new FileOutputStream(outFile)) {
+                IOUtils.copy(dh.getInputStream(), os);
+            }
+        }
+    }
 }

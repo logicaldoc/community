@@ -26,51 +26,56 @@ public class TstDocumentCRUD extends BaseTestCase {
 
 	@Test
 	public void testDocumentCRUD() throws Exception {
-		File file = new File("C:/tmp/Get-started-EN.pdf");
+	    File file = new File("C:/tmp/Get-started-EN.pdf");
 
-		DataSource ds = new FileDataSource(file);
-		DataHandler content = new DataHandler(ds);
+	    DataSource ds = new FileDataSource(file);
+	    DataHandler content = new DataHandler(ds);
 
-		WSDocument document = new WSDocument();
-		document.setLanguage("en");
-		document.setFolderId(DEFAULT_WORKSPACE);
-		document.setFileName(file.getName());
+	    WSDocument document = new WSDocument();
+	    document.setLanguage("en");
+	    document.setFolderId(DEFAULT_WORKSPACE);
+	    document.setFileName(file.getName());
 
-		WSDocument docRes = documentClient.create(sid, document, content);
+	    WSDocument docRes = documentClient.create(sid, document, content);
 
-		System.err.println("documentID = " + docRes.getId());
+	    System.err.println("documentID = %d".formatted(docRes.getId()));
 
-		// Retrieve the metadata of the document created
-		long docId = docRes.getId();
-		WSDocument docInfo = documentClient.getDocument(sid, docId);
+	    // Retrieve the metadata of the document created
+	    long docId = docRes.getId();
+	    WSDocument docInfo = documentClient.getDocument(sid, docId);
 
-		System.out.println(docInfo.getFileName());
+	    System.out.println(docInfo.getFileName());
 
-		// Update the metadata of the document created
-		// in particular we decided to update fields: title and tags
-		try {
-			docInfo.setFileName("MyTitle." + FilenameUtils.getExtension(file.getName()));
-			docInfo.setTags(List.of("tag", "keyword", "test"));
-			documentClient.update(sid, docInfo);
-		} catch (RuntimeException e1) {
-			e1.printStackTrace();
-		}
+	    // Update the metadata of the document created
+	    // in particular we decided to update fields: title and tags
+	    try {
+	        docInfo.setFileName(
+	                "MyTitle.%s".formatted(
+	                        FilenameUtils.getExtension(file.getName())));
 
-		// VERIFY THE CHANGES to the tags
-		WSDocument docInfoUpd = documentClient.getDocument(sid, docId);
-		List<String> tags2 = docInfoUpd.getTags();
-		assertNotNull(tags2);
-		assertEquals(3, tags2.size());
+	        docInfo.setTags(List.of("tag", "keyword", "test"));
 
-		// Delete the document just created
-		documentClient.delete(sid, docId);
+	        documentClient.update(sid, docInfo);
+	    } catch (RuntimeException e1) {
+	        e1.printStackTrace();
+	    }
 
-		// verify the effective deletion of the document
-		try {
-			docInfo = documentClient.getDocument(sid, docId);
-			assertNull(docInfo);
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-		}
+	    // VERIFY THE CHANGES to the tags
+	    WSDocument docInfoUpd = documentClient.getDocument(sid, docId);
+
+	    List<String> tags2 = docInfoUpd.getTags();
+	    assertNotNull(tags2);
+	    assertEquals(3, tags2.size());
+
+	    // Delete the document just created
+	    documentClient.delete(sid, docId);
+
+	    // verify the effective deletion of the document
+	    try {
+	        docInfo = documentClient.getDocument(sid, docId);
+	        assertNull(docInfo);
+	    } catch (RuntimeException e) {
+	        e.printStackTrace();
+	    }
 	}
 }

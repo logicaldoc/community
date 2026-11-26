@@ -17,74 +17,71 @@ import com.logicaldoc.webservice.doc.view.simple.SimpleJavaNameDisplayStrategy;
 
 public class WebserviceDocGen {
 
-	private static final Logger console = LoggerFactory.getLogger("console");
+    private static final Logger console = LoggerFactory.getLogger("console");
 
-	public static void main(String[] args) throws ClassNotFoundException {
-		String release = args[0];
-		File outputDir = new File(args[1]);
+    public static void main(String[] args) throws ClassNotFoundException {
+        String release = args[0];
+        File outputDir = new File(args[1]);
 
-		List<Class<?>> services = new ArrayList<>();
-		for (int i = 2; i < args.length; i++) {
-			try {
-				String name = args[i];
-				if (!name.startsWith("com.logicaldoc."))
-					name = "com.logicaldoc." + args[i];
-				services.add(WebserviceDocGen.class.forName(name));
-			} catch (Exception t) {
-				console.error(t.getMessage());
-			}
-		}
+        List<Class<?>> services = new ArrayList<>();
+        for (int i = 2; i < args.length; i++) {
+            try {
+                String name = args[i];
+                if (!name.startsWith("com.logicaldoc."))
+                    name = "com.logicaldoc.%s".formatted(args[i]);
+                services.add(Class.forName(name));
+            } catch (Exception t) {
+                console.error(t.getMessage());
+            }
+        }
 
-		WebserviceDocGen doc = new WebserviceDocGen();
-		doc.indexPage(release, outputDir, services);
+        WebserviceDocGen doc = new WebserviceDocGen();
+        doc.indexPage(release, outputDir, services);
 
-		for (Class<?> clazz : services) {
-			doc.singleReport(outputDir, clazz);
-		}
-	}
+        for (Class<?> clazz : services) {
+            doc.singleReport(outputDir, clazz);
+        }
+    }
 
-	public void indexPage(String release, File outputDir, List<Class<?>> services) {
-		outputDir.mkdirs();
+    public void indexPage(String release, File outputDir, List<Class<?>> services) {
+        outputDir.mkdirs();
 
-		FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine
-				.createEngine(new SimpleJavaNameDisplayStrategy(), "/wsdocindex.ftl");
+        FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine
+                .createEngine(new SimpleJavaNameDisplayStrategy(), "/wsdocindex.ftl");
 
-		WebServiceStubSet serviceStubSet = new WebServiceStubSet();
-		serviceStubSet.setRelease(release);
-		for (Class<?> clazz : services) {
-			WebMethodStubSet stub = new WebMethodStubSet();
-			String name = clazz.getSimpleName() + ".";
-			name = name.replace("Service.", "");
-			stub.setMethodName(name);
-			WSDoc annotation = clazz.getAnnotation(WSDoc.class);
-			if (annotation != null)
-				stub.setDescription(annotation.description());
-			serviceStubSet.addMethodStub(stub);
-		}
+        WebServiceStubSet serviceStubSet = new WebServiceStubSet();
+        serviceStubSet.setRelease(release);
+        for (Class<?> clazz : services) {
+            WebMethodStubSet stub = new WebMethodStubSet();
+            String name = "%s.".formatted(clazz.getSimpleName());
+            name = name.replace("Service.", "");
+            stub.setMethodName(name);
+            WSDoc annotation = clazz.getAnnotation(WSDoc.class);
+            if (annotation != null)
+                stub.setDescription(annotation.description());
+            serviceStubSet.addMethodStub(stub);
+        }
 
-		String html = displayEngine.displayWebService(serviceStubSet);
-		String fileName = "index.html";
-		File outputFile = new File(outputDir, fileName);
-		FileUtil.writeFile(html, outputFile.getAbsolutePath());
+        String html = displayEngine.displayWebService(serviceStubSet);
+        String fileName = "index.html";
+        File outputFile = new File(outputDir, fileName);
+        FileUtil.writeFile(html, outputFile.getAbsolutePath());
 
-		console.info("Please find the HTML files at {}", outputFile.getAbsolutePath());
-	}
+        console.info("Please find the HTML files at {}", outputFile.getAbsolutePath());
+    }
 
-	public void singleReport(File outputDir, Class<?> webServiceClass) {
-		WebServiceStubSet serviceStubSet = WebServiceStubSetFactory.createWebServiceStubSet(webServiceClass);
+    public void singleReport(File outputDir, Class<?> webServiceClass) {
+        WebServiceStubSet serviceStubSet = WebServiceStubSetFactory.createWebServiceStubSet(webServiceClass);
 
-		outputDir.mkdirs();
+        outputDir.mkdirs();
 
-		FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine
-				.createEngine(new SimpleJavaNameDisplayStrategy(), "/wsdoc.ftl");
+        FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine
+                .createEngine(new SimpleJavaNameDisplayStrategy(), "/wsdoc.ftl");
 
-		String html = displayEngine.displayWebService(serviceStubSet);
-		String fileName = webServiceClass.getSimpleName();
-		fileName += ".html";
-		fileName = fileName.replace("Service.", ".");
-		File outputFile = new File(outputDir, fileName);
-		FileUtil.writeFile(html, outputFile.getAbsolutePath());
+        String html = displayEngine.displayWebService(serviceStubSet);
+        File outputFile = new File(outputDir, "%s.html".formatted(webServiceClass.getSimpleName()).replace("Service.", "."));
+        FileUtil.writeFile(html, outputFile.getAbsolutePath());
 
-		console.info("Please find the HTML files at {}", outputFile.getAbsolutePath());
-	}
+        console.info("Please find the HTML files at {}", outputFile.getAbsolutePath());
+    }
 }

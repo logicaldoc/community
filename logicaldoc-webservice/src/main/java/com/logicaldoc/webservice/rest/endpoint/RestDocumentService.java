@@ -85,9 +85,11 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @ApiResponse(responseCode = "401", description = "Authentication / Authorization failed"),
             @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
     @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = CreateDocumentMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-    public WSDocument create(@Multipart(value = "document", required = true, type = "application/json")
-    WSDocument document, @Multipart(value = "content", required = true, type = "application/octet-stream")
-    Attachment contentDetail) {
+    public WSDocument create(
+            @Multipart(value = "document", required = true, type = "application/json")
+            WSDocument document,
+            @Multipart(value = "content", required = true, type = "application/octet-stream")
+            Attachment contentDetail) {
 
         log.debug("createDocument()");
 
@@ -124,8 +126,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = WSDocument.class))),
             @ApiResponse(responseCode = "401", description = "Authentication / Authorization failed"),
             @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-    public WSDocument getDocument(@QueryParam("docId")
-    long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+    public WSDocument getDocument(
+            @QueryParam("docId")
+            long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
 
         try {
@@ -142,8 +145,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @Path("/checkout")
     @Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
     @Operation(summary = "Checkout a document", description = "Performs the checkout operation on a document. The document status will be changed to checked-out")
-    public void checkout(@FormParam("docId")
-    long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+    public void checkout(
+            @FormParam("docId")
+            long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
         super.checkout(sid, docId);
     }
@@ -157,12 +161,17 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @ApiResponse(responseCode = "401", description = "Authentication failed"),
             @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
     @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = CheckinDocumentMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-    public void checkin(@Multipart(value = "docId", required = true)
-    String docId, @Multipart(value = "comment", required = false)
-    String comment, @Multipart(value = "release", required = false)
-    String releaseStr, @Multipart(value = "filename", required = true)
-    String filename, @Multipart(value = "filedata", required = true)
-    Attachment filedataDetail) {
+    public void checkin(
+            @Multipart(value = "docId", required = true)
+            String docId,
+            @Multipart(value = "comment", required = false)
+            String comment,
+            @Multipart(value = "release", required = false)
+            String releaseStr,
+            @Multipart(value = "filename", required = true)
+            String filename,
+            @Multipart(value = "filedata", required = true)
+            Attachment filedataDetail) {
 
         String sid = validateSessionREST();
 
@@ -209,13 +218,19 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @ApiResponse(responseCode = "401", description = "Authentication failed"),
             @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
     @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadDocumentMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-    public Long upload(@Multipart(value = "docId", required = false)
-    String docId, @Multipart(value = "folderId", required = false)
-    String folderId, @Multipart(value = "release", required = false)
-    String release, @Multipart(value = "filename", required = true)
-    String filename, @Multipart(value = "language", required = false)
-    String language, @Multipart(value = "filedata", required = true)
-    Attachment filedataDetail) {
+    public Long upload(
+            @Multipart(value = "docId", required = false)
+            String docId,
+            @Multipart(value = "folderId", required = false)
+            String folderId,
+            @Multipart(value = "release", required = false)
+            String release,
+            @Multipart(value = "filename", required = true)
+            String filename,
+            @Multipart(value = "language", required = false)
+            String language,
+            @Multipart(value = "filedata", required = true)
+            Attachment filedataDetail) {
 
         String sid = validateSessionREST();
         try {
@@ -278,11 +293,15 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @ApiResponse(responseCode = "401", description = "Authentication failed"),
             @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
     @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = ReplaceFileMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-    public void replaceFile(@Multipart(value = "docId", required = true)
-    String docId, @Multipart(value = "fileVersion", required = false)
-    String fileVersion, @Multipart(value = "comment", required = false)
-    String comment, @Multipart(value = "filedata", required = true)
-    Attachment filedataDetail) {
+    public void replaceFile(
+            @Multipart(value = "docId", required = true)
+            String docId,
+            @Multipart(value = "fileVersion", required = false)
+            String fileVersion,
+            @Multipart(value = "comment", required = false)
+            String comment,
+            @Multipart(value = "filedata", required = true)
+            Attachment filedataDetail) {
 
         String sid = validateSessionREST();
 
@@ -329,8 +348,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @Path("/list")
     @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Lists documents by folder", description = "Lists Documents by folder identifier")
-    public List<WSDocument> list(@QueryParam("folderId")
-    long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+    public List<WSDocument> list(
+            @QueryParam("folderId")
+            long folderId)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
         return super.listDocuments(sid, folderId, null);
     }
@@ -356,12 +377,18 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @GET
     @Path("/listPaginated")
     @Produces({ MediaType.APPLICATION_JSON })
-    public List<WSDocument> listPaginated(@QueryParam("folderId")
-    long folderId, @QueryParam("fileName")
-    String fileName, @QueryParam("sort")
-    String sort, @QueryParam("page")
-    Integer page, @QueryParam("max")
-    Integer max) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+    public List<WSDocument> listPaginated(
+            @QueryParam("folderId")
+            long folderId,
+            @QueryParam("fileName")
+            String fileName,
+            @QueryParam("sort")
+            String sort,
+            @QueryParam("page")
+            Integer page,
+            @QueryParam("max")
+            Integer max)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
         return super.list(sid, folderId, fileName, sort, page, max);
     }
@@ -370,9 +397,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @GET
     @Path("/listDocuments")
     @Operation(summary = "Lists documents by folder and filename", description = "Lists Documents by folder ID filtering the results by filename")
-    public List<WSDocument> listDocuments(@QueryParam("folderId")
-    long folderId, @QueryParam("fileName")
-    String fileName) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+    public List<WSDocument> listDocuments(
+            @QueryParam("folderId")
+            long folderId,
+            @QueryParam("fileName")
+            String fileName)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
         return super.listDocuments(sid, folderId, fileName);
     }
@@ -383,8 +413,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @Operation(summary = "Gets the document content", description = "Returns the content of a document using the document ID in input")
     @ApiResponses(value = {
             @ApiResponse(description = "default response", content = @Content(mediaType = "application/octet-stream", schema = @Schema(type = "string", format = "binary"))) })
-    public DataHandler getContent(@QueryParam("docId")
-    long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+    public DataHandler getContent(
+            @QueryParam("docId")
+            long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
             IOException {
         String sid = validateSessionREST();
         return super.getContent(sid, docId);
@@ -396,10 +427,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @Operation(summary = "Gets the document content by version", description = "Returns the content of a document using the document ID and version")
     @ApiResponses(value = {
             @ApiResponse(description = "default response", content = @Content(mediaType = "application/octet-stream", schema = @Schema(type = "string", format = "binary"))) })
-    public DataHandler getVersionContent(@QueryParam("docId")
-    long docId, @QueryParam("version")
-    String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
-            IOException {
+    public DataHandler getVersionContent(
+            @QueryParam("docId")
+            long docId,
+            @QueryParam("version")
+            String version) throws AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException, IOException {
         String sid = validateSessionREST();
         return super.getVersionContent(sid, docId, version);
     }
@@ -413,7 +446,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
             @Parameter(description = "Document ID", required = true)
             long docId,
             @QueryParam("version")
-            String version) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+            String version)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         return super.deleteVersion(sid, docId, version);
     }
@@ -556,10 +590,13 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @PUT
     @Path("/createThumbnail")
     @Operation(summary = "Creates the thumbail of the given document; if the thumbnail was already created, nothing will happen")
-    public void createThumbnail(@QueryParam("docId")
-    long docId, @QueryParam("fileVersion")
-    String fileVersion, @QueryParam("type")
-    String type) throws AuthenticationException, WebserviceException, PersistenceException, IOException {
+    public void createThumbnail(
+            @QueryParam("docId")
+            long docId,
+            @QueryParam("fileVersion")
+            String fileVersion,
+            @QueryParam("type")
+            String type) throws AuthenticationException, WebserviceException, PersistenceException, IOException {
         String sid = validateSessionREST();
         super.createThumbnail(sid, docId, fileVersion, type);
     }
@@ -568,10 +605,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @PUT
     @Path("/createPdf")
     @Operation(summary = "Creates the PDF conversion of the given document; if the PDF conversion was already created, nothing will happen")
-    public void createPdf(@QueryParam("docId")
-    long docId, @QueryParam("fileVersion")
-    String fileVersion) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
-            IOException {
+    public void createPdf(
+            @QueryParam("docId")
+            long docId,
+            @QueryParam("fileVersion")
+            String fileVersion) throws AuthenticationException, PermissionException, WebserviceException,
+            PersistenceException, IOException {
         String sid = validateSessionREST();
         super.createPdf(sid, docId, fileVersion);
     }
@@ -851,8 +890,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
             long docId,
             @FormParam("content")
             @Parameter(description = "Document ID")
-            String content)
-            throws AuthenticationException, ParsingException, WebserviceException, PersistenceException, PermissionException {
+            String content) throws AuthenticationException, ParsingException, WebserviceException, PersistenceException,
+            PermissionException {
         String sid = validateSessionREST();
         super.reindex(sid, docId, content);
     }
@@ -864,11 +903,15 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @Operation(summary = "Uploads a new resource of the document", description = "Uploads a new resource attached to the given document. If the resource already exists it is overwritten")
     @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "successful operation") })
     @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadResourceMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-    public void uploadResource(@Multipart(value = "docId", required = true)
-    String docId, @Multipart(value = "fileVersion", required = false)
-    String fileVersion, @Multipart(value = "suffix", required = true)
-    String suffix, @Multipart(value = "content", required = true)
-    Attachment contentDetail) throws AuthenticationException, PermissionException, WebserviceException,
+    public void uploadResource(
+            @Multipart(value = "docId", required = true)
+            String docId,
+            @Multipart(value = "fileVersion", required = false)
+            String fileVersion,
+            @Multipart(value = "suffix", required = true)
+            String suffix,
+            @Multipart(value = "content", required = true)
+            Attachment contentDetail) throws AuthenticationException, PermissionException, WebserviceException,
             PersistenceException, IOException {
 
         String sid = validateSessionREST();
@@ -905,7 +948,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
             long docId,
             @QueryParam("folderId")
             @Parameter(description = "Folder ID (target)", required = true)
-            long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+            long folderId)
+            throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         super.restore(sid, docId, folderId);
     }
@@ -1029,14 +1073,14 @@ public class RestDocumentService extends SoapDocumentService implements Document
             PermissionException {
         String sid = validateSessionREST();
 
-        String myPath = "/" + docPath;
+        String myPath = "/%s".formatted(docPath);
 
         User user = validateSession(sid);
         DocumentDAO docDao = DocumentDAO.get();
         Document doc = docDao.findByPath(myPath, user.getTenantId());
 
         if (!type.toLowerCase().endsWith(".png"))
-            type += ".png";
+            type = "%s.png".formatted(type);
 
         DataHandler dh = null;
         try {
@@ -1065,8 +1109,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @GET
     @Path("/isRead")
     @Operation(operationId = "isReadDocument", summary = "Tests if a document is readable")
-    public boolean isRead(@QueryParam("docId")
-    long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+    public boolean isRead(
+            @QueryParam("docId")
+            long docId) throws AuthenticationException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
         return super.isRead(sid, docId);
     }
@@ -1075,8 +1120,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @GET
     @Path("/isDownload")
     @Operation(operationId = "isDownloadDocument", summary = "Tests if a document is downloadable")
-    public boolean isDownload(@QueryParam("docId")
-    long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+    public boolean isDownload(
+            @QueryParam("docId")
+            long docId) throws AuthenticationException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
         return super.isDownload(sid, docId);
     }
@@ -1085,8 +1131,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @GET
     @Path("/isWrite")
     @Operation(operationId = "isWriteDocument", summary = "Tests if a document is writeable")
-    public boolean isWrite(@QueryParam("docId")
-    long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+    public boolean isWrite(
+            @QueryParam("docId")
+            long docId) throws AuthenticationException, WebserviceException, PersistenceException {
         String sid = validateSessionREST();
         return super.isWrite(sid, docId);
     }
@@ -1110,8 +1157,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @PUT
     @Path("/setAccessControlList")
     @Operation(operationId = "setAccessControlList_Document", summary = "Assigns the complete Access Control List")
-    public void setAccessControlList(@QueryParam("docId")
-    long docId, List<WSAccessControlEntry> acl)
+    public void setAccessControlList(
+            @QueryParam("docId")
+            long docId,
+            List<WSAccessControlEntry> acl)
             throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
         String sid = validateSessionREST();
         super.setAccessControlList(sid, docId, acl);
@@ -1121,8 +1170,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
     @GET
     @Path("/getAccessControlList")
     @Operation(operationId = "getAccessControlList_Document", summary = "Retrieves the access control list")
-    public List<WSAccessControlEntry> getAccessControlList(@QueryParam("docId")
-    long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+    public List<WSAccessControlEntry> getAccessControlList(
+            @QueryParam("docId")
+            long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
         String sid = validateSessionREST();
         return super.getAccessControlList(sid, docId);
     }

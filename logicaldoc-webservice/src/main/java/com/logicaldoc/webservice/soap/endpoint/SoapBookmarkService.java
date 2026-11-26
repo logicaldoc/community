@@ -147,7 +147,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
         User user = validateSession(sid);
         Bookmark bookmark = BookmarkDAO.get().findById(bookmarkId);
         if (bookmark == null || bookmark.getUserId() != user.getId())
-            throw new WebserviceException("Bookmark " + bookmarkId + " not found or not accessible");
+            throw new WebserviceException("Bookmark %s not found or not accessible".formatted(bookmarkId));
         BookmarkDAO.get().delete(bookmarkId);
     }
 

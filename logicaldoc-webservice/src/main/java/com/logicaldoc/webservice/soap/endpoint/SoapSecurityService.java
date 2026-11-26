@@ -264,11 +264,11 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
             User usr = dao.findById(userId);
             if (usr.getType() == Type.SYSTEM) {
                 throw new PermissionException(
-                        "You cannot delete user with id " + usr.getId() + " because it is a system user");
+                        "You cannot delete user with id %d because it is a system user".formatted(usr.getId()));
             }
             dao.delete(userId);
         } catch (Exception t) {
-            throw new PersistenceException("Unable to delete the user with id " + userId);
+            throw new PersistenceException("Unable to delete the user with id %d".formatted(userId));
         }
     }
 

@@ -39,8 +39,8 @@ public class RestDocumentClient extends AbstractRestClient<DocumentService> {
         WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
         WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 
-        Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile),
-                new ContentDisposition("form-data; name=\"content\"; filename=\"" + packageFile.getName() + "\""));
+        Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile), new ContentDisposition(
+                "form-data; name=\"content\"; filename=\"%s\"".formatted(packageFile.getName())));
 
         return proxy.create(document, fileAttachment);
     }
@@ -124,8 +124,8 @@ public class RestDocumentClient extends AbstractRestClient<DocumentService> {
     }
 
     public void checkin(long docId, String comment, Boolean release, File packageFile) throws FileNotFoundException {
-        Attachment fileAttachment = new Attachment("filedata", new FileInputStream(packageFile),
-                new ContentDisposition("form-data; name=\"filedata\"; filename=\"" + packageFile.getName() + "\""));
+        Attachment fileAttachment = new Attachment("filedata", new FileInputStream(packageFile), new ContentDisposition(
+                "form-data; name=\"filedata\"; filename=\"%s\"".formatted(packageFile.getName())));
 
         WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
         WebClient.client(proxy).accept(MediaType.TEXT_PLAIN);

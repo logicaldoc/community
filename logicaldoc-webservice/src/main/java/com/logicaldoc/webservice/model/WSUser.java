@@ -235,12 +235,16 @@ public class WSUser {
 
     public String getFullName() {
         String fullName = getFirstName();
+
         if (fullName != null && getName() != null)
-            fullName += " " + getName();
+            fullName = "%s %s".formatted(fullName, getName());
+
         if (fullName == null && getName() != null)
             fullName = getName();
+
         if (fullName == null)
             fullName = getUsername();
+
         return fullName;
     }
 
@@ -352,10 +356,10 @@ public class WSUser {
 
     /**
      * @return the name of the group associated to this user, that is
-     *         '_user_'+id
+     *         '_user_' + id
      */
     public String getUserGroupName() {
-        return "_user_" + getId();
+        return "_user_%d".formatted(getId());
     }
 
     public boolean isEnabled() {
