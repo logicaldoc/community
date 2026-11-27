@@ -63,7 +63,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public static final String WSCALL = "wscall";
 
-    public static final String WSCALL_HYPHEN = WSCALL + "-";
+    public static final String WSCALL_HYPHEN = "%s-".formatted(WSCALL);
 
     private static final Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
 

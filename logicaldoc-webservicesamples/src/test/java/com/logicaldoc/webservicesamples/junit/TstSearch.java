@@ -19,7 +19,7 @@ public class TstSearch extends BaseTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        searchClient = new SoapSearchClient(settings.getProperty("url") + "/services/Search");
+        searchClient = new SoapSearchClient("%s/services/Search".formatted(settings.getProperty("url")));
     }
 
     /**

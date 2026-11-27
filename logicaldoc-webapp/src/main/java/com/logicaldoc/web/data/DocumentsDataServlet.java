@@ -754,7 +754,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
             HttpServletRequest request,
             Session session,
             List<String> extendedAttributes) {
-        String extAttributeNames = Context.get().getConfig().getProperty(session.getTenantName() + ".search.extattr");
+        String extAttributeNames = Context.get().getConfig().getTenantProperty(session.getTenantName(),
+                "search.extattr");
         if (request.getParameter("extattr") != null)
             extAttributeNames = request.getParameter("extattr");
         if (StringUtils.isNotEmpty(extAttributeNames)) {

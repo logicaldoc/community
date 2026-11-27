@@ -25,74 +25,74 @@ import com.logicaldoc.util.spring.Context;
  */
 public class TagServiceImpl extends AbstractRemoteService implements TagService {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(TagServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TagServiceImpl.class);
 
-	@Override
-	public List<GUITag> getTagCloud() throws ServerException {
-		Session session = validateSession();
-		try {
-			ArrayList<GUITag> ret = new ArrayList<>();
-			DocumentDAO dao = DocumentDAO.get();
-			List<TagCloud> list = dao.getTagCloud(session.getSid());
+    @Override
+    public List<GUITag> getTagCloud() throws ServerException {
+        Session session = validateSession();
+        try {
+            ArrayList<GUITag> ret = new ArrayList<>();
+            DocumentDAO dao = DocumentDAO.get();
+            List<TagCloud> list = dao.getTagCloud(session.getSid());
 
-			for (TagCloud tagCloud : list) {
-				GUITag c = new GUITag();
-				c.setScale(tagCloud.getScale());
-				c.setTag(tagCloud.getTag());
-				c.setCount(tagCloud.getCount());
-				ret.add(c);
-			}
+            for (TagCloud tagCloud : list) {
+                GUITag c = new GUITag();
+                c.setScale(tagCloud.getScale());
+                c.setTag(tagCloud.getTag());
+                c.setCount(tagCloud.getCount());
+                ret.add(c);
+            }
 
-			return ret;
-		} catch (Exception t) {
-			return throwServerException(session, log, t);
-		}
-	}
+            return ret;
+        } catch (Exception t) {
+            return throwServerException(session, log, t);
+        }
+    }
 
-	@Override
-	public void delete(String tag) {
-		// Nothing to do
-	}
+    @Override
+    public void delete(String tag) {
+        // Nothing to do
+    }
 
-	@Override
-	public void rename(String tag, String newTag) {
-		// Nothing to do
-	}
+    @Override
+    public void rename(String tag, String newTag) {
+        // Nothing to do
+    }
 
-	class TagCloudComparatorName implements Comparator<TagCloud> {
-		public int compare(TagCloud tc0, TagCloud tc1) {
-			return tc0.getTag().compareTo(tc1.getTag());
-		}
-	}
+    class TagCloudComparatorName implements Comparator<TagCloud> {
+        public int compare(TagCloud tc0, TagCloud tc1) {
+            return tc0.getTag().compareTo(tc1.getTag());
+        }
+    }
 
-	@Override
-	public void addTag(String tag) throws ServerException {
-		// Nothing to do
-	}
+    @Override
+    public void addTag(String tag) throws ServerException {
+        // Nothing to do
+    }
 
-	@Override
-	public void removeTag(String tag) throws ServerException {
-		// Nothing to do
-	}
+    @Override
+    public void removeTag(String tag) throws ServerException {
+        // Nothing to do
+    }
 
-	@Override
-	public List<GUIParameter> getSettings() throws ServerException {
-		Session session = validateSession();
+    @Override
+    public List<GUIParameter> getSettings() throws ServerException {
+        Session session = validateSession();
 
-		ContextProperties conf = Context.get().getConfig();
-		List<GUIParameter> params = new ArrayList<>();
-		for (Object name : conf.keySet()) {
-			if (name.toString().startsWith(session.getTenantName() + ".tag.")
-					|| name.toString().startsWith(session.getTenantName() + ".tagcloud.")) {
-				if (name.equals(session.getTenantName() + ".tag.mode"))
-					params.add(new GUIParameter(name.toString(), "free"));
-				else
-					params.add(new GUIParameter(name.toString(), conf.getProperty(name.toString())));
-			}
-		}
+        ContextProperties conf = Context.get().getConfig();
+        List<GUIParameter> params = new ArrayList<>();
+        for (Object name : conf.keySet()) {
+            if (name.toString().startsWith("%s.tag.".formatted(session.getTenantName()))
+                    || name.toString().startsWith("%s.tagcloud.".formatted(session.getTenantName()))) {
+                if (name.equals("%s.tag.mode".formatted(session.getTenantName())))
+                    params.add(new GUIParameter(name.toString(), "free"));
+                else
+                    params.add(new GUIParameter(name.toString(), conf.getProperty(name.toString())));
+            }
+        }
 
-		return params;
-	}
+        return params;
+    }
 }

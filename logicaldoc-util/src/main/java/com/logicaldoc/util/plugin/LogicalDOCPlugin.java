@@ -251,7 +251,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
             logging.addTextAppender(appender);
             logging.write();
 
-            String appenderWeb = appender + "_WEB";
+            String appenderWeb = "%s_WEB".formatted(appender);
             logging.addHtmlAppender(appenderWeb);
             logging.write();
 
@@ -276,7 +276,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
             logging.addTextAppender(appender);
             logging.write();
 
-            String appenderWeb = appender + "_WEB";
+            String appenderWeb = "%s_WEB".formatted(appender);
             logging.addHtmlAppender(appenderWeb);
             logging.write();
 

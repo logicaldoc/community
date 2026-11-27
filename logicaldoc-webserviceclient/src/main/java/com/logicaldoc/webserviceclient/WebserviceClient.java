@@ -29,231 +29,231 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class WebserviceClient {
 
-	private static final String DOC_ID = "docId";
+    private static final String DOC_ID = "docId";
 
-	private static final String SERVICES_DOCUMENT = "services/Document";
+    private static final String SERVICES_DOCUMENT = "services/Document";
 
-	private static final String INVOKING = "Invoking {}";
+    private static final String INVOKING = "Invoking {}";
 
-	private static final Logger log = LoggerFactory.getLogger(WebserviceClient.class);
+    private static final Logger log = LoggerFactory.getLogger(WebserviceClient.class);
 
-	private static final String WS_NAMESPACE = "http://ws.logicaldoc.com";
+    private static final String WS_NAMESPACE = "http://ws.logicaldoc.com";
 
-	private static final int SOAP_VERSION = SoapEnvelope.VER11;
+    private static final int SOAP_VERSION = SoapEnvelope.VER11;
 
-	private static WebserviceClient instance;
+    private static WebserviceClient instance;
 
-	private String sid;
+    private String sid;
 
-	private String baseUrl;
+    private String baseUrl;
 
-	private int timeout = 120000;
+    private int timeout = 120000;
 
-	public static WebserviceClient get(String sid, String baseUrl) {
-		if (instance == null) {
-			log.info("Connect to remote server {}", baseUrl);
-			instance = new WebserviceClient();
-			instance.sid = sid;
-			instance.baseUrl = baseUrl;
-		}
-		return instance;
-	}
+    public static WebserviceClient get(String sid, String baseUrl) {
+        if (instance == null) {
+            log.info("Connect to remote server {}", baseUrl);
+            instance = new WebserviceClient();
+            instance.sid = sid;
+            instance.baseUrl = baseUrl;
+        }
+        return instance;
+    }
 
-	public static WebserviceClient get() {
-		return instance;
-	}
+    public static WebserviceClient get() {
+        return instance;
+    }
 
-	public String getPath(long folderId) throws IOException, XmlPullParserException {
-		SoapObject request = new SoapObject(WS_NAMESPACE, "getPath");
-		request.addProperty("sid", sid);
-		request.addProperty("folderId", folderId);
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
-		envelope.setOutputSoapObject(request);
+    public String getPath(long folderId) throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(WS_NAMESPACE, "getPath");
+        request.addProperty("sid", sid);
+        request.addProperty("folderId", folderId);
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
+        envelope.setOutputSoapObject(request);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "services/Folder";
-		log.debug(INVOKING, url);
+        String url = "%s%sservices/Folder".formatted(baseUrl, baseUrl.endsWith("/") ? "" : "/");
+        log.debug(INVOKING, url);
 
-		HttpTransportSE transport = new HttpTransportSE(url);
-		transport.call("", envelope);
+        HttpTransportSE transport = new HttpTransportSE(url);
+        transport.call("", envelope);
 
-		AbstractList<SoapObject> response = new ArrayList<>();
-		
-		if (envelope.getResponse() instanceof List) {
-			// We have more elements
-			@SuppressWarnings("unchecked")
-			List<SoapObject> vector = (List<SoapObject>) envelope.getResponse();
-			for (SoapObject soapObject : vector) {
-				response.add(soapObject);
-			}
-		} else if (envelope.getResponse() instanceof SoapObject soapObject) {
-			// We have just one element
-			response.add(soapObject);
-		}
+        AbstractList<SoapObject> response = new ArrayList<>();
 
-		StringBuilder path = new StringBuilder();
+        if (envelope.getResponse() instanceof List) {
+            // We have more elements
+            @SuppressWarnings("unchecked")
+            List<SoapObject> vector = (List<SoapObject>) envelope.getResponse();
+            for (SoapObject soapObject : vector) {
+                response.add(soapObject);
+            }
+        } else if (envelope.getResponse() instanceof SoapObject soapObject) {
+            // We have just one element
+            response.add(soapObject);
+        }
 
-		for (SoapObject element : response) {
-			String name = getProperty(element, "name");
-			if (!"/".equals(name))
-				path.append(name);
-			path.append("/");
-		}
+        StringBuilder path = new StringBuilder();
 
-		String ret = path.toString();
-		if (ret.endsWith("/"))
-			ret = ret.substring(0, ret.length() - 1);
-		return ret;
-	}
+        for (SoapObject element : response) {
+            String name = getProperty(element, "name");
+            if (!"/".equals(name))
+                path.append(name);
+            path.append("/");
+        }
 
-	public void uploadFile(long targetDir, File file, String fileName, String language)
-			throws IOException, XmlPullParserException {
-		SoapObject request = new SoapObject(WS_NAMESPACE, "create");
+        String ret = path.toString();
+        if (ret.endsWith("/"))
+            ret = ret.substring(0, ret.length() - 1);
+        return ret;
+    }
 
-		request.addProperty("sid", sid);
+    public void uploadFile(long targetDir, File file, String fileName, String language)
+            throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(WS_NAMESPACE, "create");
 
-		SoapObject document = new SoapObject("", "document");
-		request.addProperty("document", document);
+        request.addProperty("sid", sid);
 
-		document.addProperty("fileName", fileName);
-		document.addProperty("folderId", targetDir);
-		document.addProperty("language", language);
+        SoapObject document = new SoapObject("", "document");
+        request.addProperty("document", document);
 
-		MarshalBase64 marshal = new MarshalBase64();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		write(file, out);
-		byte[] raw = out.toByteArray();
-		request.addProperty("content", raw);
+        document.addProperty("fileName", fileName);
+        document.addProperty("folderId", targetDir);
+        document.addProperty("language", language);
 
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
-		envelope.implicitTypes = true;
-		envelope.setOutputSoapObject(request);
+        MarshalBase64 marshal = new MarshalBase64();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        write(file, out);
+        byte[] raw = out.toByteArray();
+        request.addProperty("content", raw);
 
-		marshal.register(envelope);
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
+        envelope.implicitTypes = true;
+        envelope.setOutputSoapObject(request);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
-		log.debug(INVOKING, url);
-		HttpTransportSE transport = new HttpTransportSE(url);
+        marshal.register(envelope);
 
-		// Use an empty SOAPAction or CXF will be not able to parse
-		transport.call("", envelope, null);
+        String url = "%s%s%s".formatted(baseUrl, baseUrl.endsWith("/") ? "" : "/", SERVICES_DOCUMENT);
+        log.debug(INVOKING, url);
+        HttpTransportSE transport = new HttpTransportSE(url);
 
-		envelope.getResponse();
-		marshal.register(envelope);
-	}
+        // Use an empty SOAPAction or CXF will be not able to parse
+        transport.call("", envelope, null);
 
-	public String getBaseUrl() {
-		return baseUrl;
-	}
+        envelope.getResponse();
+        marshal.register(envelope);
+    }
 
-	public int getTimeout() {
-		return timeout;
-	}
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
-	private String getProperty(SoapObject object, String name) {
-		if (object == null)
-			return null;
-		PropertyInfo pinfo = new PropertyInfo();
-		for (int i = 0; i < object.getPropertyCount(); i++) {
-			object.getPropertyInfo(i, pinfo);
-			if (pinfo.getName().equals(name)) {
-				String val = object.getProperty(i).toString();
-				if (!"anyType{}".equals(val) && val != null)
-					return val;
-				else
-					return null;
-			}
-		}
-		return null;
-	}
+    public int getTimeout() {
+        return timeout;
+    }
 
-	public Entry getDocument(long id) throws IOException, XmlPullParserException {
-		SoapObject request = new SoapObject(WS_NAMESPACE, "getDocument");
-		request.addProperty("sid", sid);
-		request.addProperty(DOC_ID, Long.toString(id));
+    private String getProperty(SoapObject object, String name) {
+        if (object == null)
+            return null;
+        PropertyInfo pinfo = new PropertyInfo();
+        for (int i = 0; i < object.getPropertyCount(); i++) {
+            object.getPropertyInfo(i, pinfo);
+            if (pinfo.getName().equals(name)) {
+                String val = object.getProperty(i).toString();
+                if (!"anyType{}".equals(val) && val != null)
+                    return val;
+                else
+                    return null;
+            }
+        }
+        return null;
+    }
 
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
-		envelope.setOutputSoapObject(request);
+    public Entry getDocument(long id) throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(WS_NAMESPACE, "getDocument");
+        request.addProperty("sid", sid);
+        request.addProperty(DOC_ID, Long.toString(id));
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
-		log.info(INVOKING, url);
-		HttpTransportSE transport = new HttpTransportSE(url, timeout);
-		transport.call("", envelope);
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
+        envelope.setOutputSoapObject(request);
 
-		SoapObject response = (SoapObject) envelope.getResponse();
-		Entry document = new Entry(Long.parseLong(getProperty(response, "id")));
-		document.setFileName(getProperty(response, "fileName"));
-		document.setVersion(getProperty(response, "version"));
+        String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+        log.info(INVOKING, url);
+        HttpTransportSE transport = new HttpTransportSE(url, timeout);
+        transport.call("", envelope);
 
-		return document;
-	}
+        SoapObject response = (SoapObject) envelope.getResponse();
+        Entry document = new Entry(Long.parseLong(getProperty(response, "id")));
+        document.setFileName(getProperty(response, "fileName"));
+        document.setVersion(getProperty(response, "version"));
 
-	public void checkin(long docId, File file) throws IOException, XmlPullParserException {
-		SoapObject request = new SoapObject(WS_NAMESPACE, "checkin");
-		request.addProperty("sid", sid);
-		request.addProperty(DOC_ID, docId);
-		request.addProperty("filename", file.getName());
-		request.addProperty("release", false);
+        return document;
+    }
 
-		MarshalBase64 marshal = new MarshalBase64();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		write(file, out);
-		byte[] raw = out.toByteArray();
-		request.addProperty("content", raw);
+    public void checkin(long docId, File file) throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(WS_NAMESPACE, "checkin");
+        request.addProperty("sid", sid);
+        request.addProperty(DOC_ID, docId);
+        request.addProperty("filename", file.getName());
+        request.addProperty("release", false);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+        MarshalBase64 marshal = new MarshalBase64();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        write(file, out);
+        byte[] raw = out.toByteArray();
+        request.addProperty("content", raw);
 
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
-		envelope.setOutputSoapObject(request);
-		marshal.register(envelope);
+        String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
 
-		HttpTransportSE transport = new HttpTransportSE(url + "/services/Document", timeout);
-		transport.call("", envelope);
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
+        envelope.setOutputSoapObject(request);
+        marshal.register(envelope);
 
-		envelope.getResponse();
-	}
+        HttpTransportSE transport = new HttpTransportSE("%s/services/Document".formatted(url), timeout);
+        transport.call("", envelope);
 
-	public void checkout(long docId) throws IOException, XmlPullParserException {
-		SoapObject request = new SoapObject(WS_NAMESPACE, "checkout");
-		request.addProperty("sid", sid);
-		request.addProperty(DOC_ID, docId);
+        envelope.getResponse();
+    }
 
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
-		envelope.setOutputSoapObject(request);
+    public void checkout(long docId) throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(WS_NAMESPACE, "checkout");
+        request.addProperty("sid", sid);
+        request.addProperty(DOC_ID, docId);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
-		log.info(INVOKING, url);
-		HttpTransportSE transport = new HttpTransportSE(url, timeout);
-		transport.call("", envelope);
-	}
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
+        envelope.setOutputSoapObject(request);
 
-	public void unlock(long docId) throws IOException, XmlPullParserException {
-		SoapObject request = new SoapObject(WS_NAMESPACE, "unlock");
-		request.addProperty("sid", sid);
-		request.addProperty(DOC_ID, docId);
+        String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+        log.info(INVOKING, url);
+        HttpTransportSE transport = new HttpTransportSE(url, timeout);
+        transport.call("", envelope);
+    }
 
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
-		envelope.setOutputSoapObject(request);
+    public void unlock(long docId) throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(WS_NAMESPACE, "unlock");
+        request.addProperty("sid", sid);
+        request.addProperty(DOC_ID, docId);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
-		log.info(INVOKING, url);
-		HttpTransportSE transport = new HttpTransportSE(url, timeout);
-		transport.call("", envelope);
-	}
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
+        envelope.setOutputSoapObject(request);
 
-	private void write(File in, OutputStream out) throws IOException {
-		try (InputStream is = new FileInputStream(in)) {
-			// initialize
-			byte[] buffer = new byte[2048]; // tweaking this number may increase
-											// performance
-			int len;
-			while ((len = is.read(buffer)) != -1) {
-				out.write(buffer, 0, len);
-			}
-		} finally {
-			if (out != null) {
-				out.flush();
-				out.close();
-			}
-		}
-	}
+        String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+        log.info(INVOKING, url);
+        HttpTransportSE transport = new HttpTransportSE(url, timeout);
+        transport.call("", envelope);
+    }
+
+    private void write(File in, OutputStream out) throws IOException {
+        try (InputStream is = new FileInputStream(in)) {
+            // initialize
+            byte[] buffer = new byte[2048]; // tweaking this number may increase
+                                            // performance
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
+    }
 }

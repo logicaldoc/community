@@ -226,7 +226,7 @@ public class StringUtil {
         if (size <= 0)
             return "0";
         if (size < 1024)
-            return size + " B";
+            return "%d B".formatted(size);
         int z = (63 - Long.numberOfLeadingZeros(size)) / 10;
         double value = (double) size / (1L << (z * 10));
 
@@ -270,6 +270,6 @@ public class StringUtil {
      * @return The string ending in slash
      */
     public static String ensureTrailingSlash(String s) {
-        return s.endsWith("/") ? s : s + "/";
+        return s.endsWith("/") ? s : "%s/".formatted(s);
     }
 }

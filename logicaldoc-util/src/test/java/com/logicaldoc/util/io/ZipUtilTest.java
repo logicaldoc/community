@@ -60,7 +60,7 @@ public class ZipUtilTest {
 			testSubject.unzip(file, folder);
 
 			assertTrue(new File(folder, "index.xml").exists());
-			assertTrue(new File(folder.getPath() + "/abc/test.txt").exists());
+			assertTrue(new File("%s/abc/test.txt".formatted(folder.getPath())).exists());
 
 			testSubject.unzip(ResourceUtil.getInputStream("test.zip"), "abc/test.txt", test);
 			assertTrue(test.exists());

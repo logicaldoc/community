@@ -36,172 +36,172 @@ import com.logicaldoc.webservice.soap.TagService;
  */
 public class SoapTagService extends AbstractService implements TagService {
 
-	private SoapDocumentService getDocumentService() {
-		SoapDocumentService docService = new SoapDocumentService();
-		docService.setValidateSession(isValidateSession());
-		return docService;
-	}
+    private SoapDocumentService getDocumentService() {
+        SoapDocumentService docService = new SoapDocumentService();
+        docService.setValidateSession(isValidateSession());
+        return docService;
+    }
 
-	private SoapFolderService getFolderService() {
-		SoapFolderService folderService = new SoapFolderService();
-		folderService.setValidateSession(isValidateSession());
-		return folderService;
-	}
+    private SoapFolderService getFolderService() {
+        SoapFolderService folderService = new SoapFolderService();
+        folderService.setValidateSession(isValidateSession());
+        return folderService;
+    }
 
-	@Override
-	public void setDocumentTags(String sid, long docId, List<String> tags) throws AuthenticationException,
-			PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
-		SoapDocumentService docService = getDocumentService();
-		WSDocument doc = docService.getDocument(sid, docId);
-		if (doc == null)
-			return;
+    @Override
+    public void setDocumentTags(String sid, long docId, List<String> tags) throws AuthenticationException,
+            PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
+        SoapDocumentService docService = getDocumentService();
+        WSDocument doc = docService.getDocument(sid, docId);
+        if (doc == null)
+            return;
 
-		checkDocumentPermission(Permission.WRITE, validateSession(sid), doc.getId());
+        checkDocumentPermission(Permission.WRITE, validateSession(sid), doc.getId());
 
-		doc.setTags(tags);
-		docService.update(sid, doc);
-	}
+        doc.setTags(tags);
+        docService.update(sid, doc);
+    }
 
-	@Override
-	public void addDocumentTags(String sid, long docId, List<String> tags) throws AuthenticationException,
-			PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
-		SoapDocumentService docService = getDocumentService();
-		WSDocument doc = docService.getDocument(sid, docId);
-		if (doc == null)
-			return;
+    @Override
+    public void addDocumentTags(String sid, long docId, List<String> tags) throws AuthenticationException,
+            PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
+        SoapDocumentService docService = getDocumentService();
+        WSDocument doc = docService.getDocument(sid, docId);
+        if (doc == null)
+            return;
 
-		checkDocumentPermission(Permission.WRITE, validateSession(sid), doc.getId());
-		for (String tag : tags)
-			doc.addTag(tag);
-		docService.update(sid, doc);
-	}
+        checkDocumentPermission(Permission.WRITE, validateSession(sid), doc.getId());
+        for (String tag : tags)
+            doc.addTag(tag);
+        docService.update(sid, doc);
+    }
 
-	@Override
-	public List<String> getDocumentTags(String sid, long docId) throws PermissionException, PersistenceException,
-			AuthenticationException, WebserviceException, UnexistingResourceException {
-		SoapDocumentService docService = getDocumentService();
-		WSDocument doc = docService.getDocument(sid, docId);
-		if (doc == null)
-			return new ArrayList<>();
+    @Override
+    public List<String> getDocumentTags(String sid, long docId) throws PermissionException, PersistenceException,
+            AuthenticationException, WebserviceException, UnexistingResourceException {
+        SoapDocumentService docService = getDocumentService();
+        WSDocument doc = docService.getDocument(sid, docId);
+        if (doc == null)
+            return new ArrayList<>();
 
-		checkDocumentPermission(Permission.READ, validateSession(sid), doc.getId());
-		return doc.getTags() != null ? doc.getTags() : new ArrayList<>();
-	}
+        checkDocumentPermission(Permission.READ, validateSession(sid), doc.getId());
+        return doc.getTags() != null ? doc.getTags() : new ArrayList<>();
+    }
 
-	@Override
-	public void setFolderTags(String sid, long folderId, List<String> tags)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		SoapFolderService folderService = getFolderService();
-		WSFolder folder = folderService.getFolder(sid, folderId);
-		if (folder == null)
-			return;
+    @Override
+    public void setFolderTags(String sid, long folderId, List<String> tags)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        SoapFolderService folderService = getFolderService();
+        WSFolder folder = folderService.getFolder(sid, folderId);
+        if (folder == null)
+            return;
 
-		checkFolderPermission(Permission.WRITE, validateSession(sid), folderId);
-		folder.setTags(tags);
-		folderService.update(sid, folder);
-	}
+        checkFolderPermission(Permission.WRITE, validateSession(sid), folderId);
+        folder.setTags(tags);
+        folderService.update(sid, folder);
+    }
 
-	@Override
-	public void addFolderTags(String sid, long folderId, List<String> tags)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		SoapFolderService folderService = getFolderService();
-		WSFolder folder = folderService.getFolder(sid, folderId);
-		if (folder == null)
-			return;
+    @Override
+    public void addFolderTags(String sid, long folderId, List<String> tags)
+            throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+        SoapFolderService folderService = getFolderService();
+        WSFolder folder = folderService.getFolder(sid, folderId);
+        if (folder == null)
+            return;
 
-		checkFolderPermission(Permission.WRITE, validateSession(sid), folderId);
-		for (String tag : tags)
-			folder.addTag(tag);
-		folderService.update(sid, folder);
-	}
+        checkFolderPermission(Permission.WRITE, validateSession(sid), folderId);
+        for (String tag : tags)
+            folder.addTag(tag);
+        folderService.update(sid, folder);
+    }
 
-	@Override
-	public List<String> getFolderTags(String sid, long folderId)
-			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException {
-		SoapFolderService folderService = getFolderService();
-		WSFolder folder = folderService.getFolder(sid, folderId);
-		if (folder == null)
-			return new ArrayList<>();
+    @Override
+    public List<String> getFolderTags(String sid, long folderId)
+            throws PermissionException, PersistenceException, AuthenticationException, WebserviceException {
+        SoapFolderService folderService = getFolderService();
+        WSFolder folder = folderService.getFolder(sid, folderId);
+        if (folder == null)
+            return new ArrayList<>();
 
-		checkFolderPermission(Permission.READ, validateSession(sid), folderId);
-		return folder.getTags() != null ? folder.getTags() : new ArrayList<>();
-	}
+        checkFolderPermission(Permission.READ, validateSession(sid), folderId);
+        return folder.getTags() != null ? folder.getTags() : new ArrayList<>();
+    }
 
-	@Override
-	public List<String> getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException {
-		User user = validateSession(sid);
-		return DocumentDAO.get().findAllTags(null, user.getTenantId());
-	}
+    @Override
+    public List<String> getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException {
+        User user = validateSession(sid);
+        return DocumentDAO.get().findAllTags(null, user.getTenantId());
+    }
 
-	@Override
-	public List<String> getTagsPreset(String sid)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		validateSession(sid);
-		Session session = SessionManager.get().get(sid);
-		List<String> tags = new ArrayList<>();
+    @Override
+    public List<String> getTagsPreset(String sid)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        validateSession(sid);
+        Session session = SessionManager.get().get(sid);
+        List<String> tags = new ArrayList<>();
 
-		ContextProperties config = Context.get().getConfig();
-		String mode = config.getProperty(session.getTenantName() + ".tag.mode");
-		if ("preset".equals(mode)) {
-			GenericDAO gDao = GenericDAO.get();
-			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
-			for (Generic generic : buf)
-				tags.add(generic.getSubtype());
-		}
+        ContextProperties config = Context.get().getConfig();
+        String mode = config.getTenantProperty(session.getTenantName(), "tag.mode");
+        if ("preset".equals(mode)) {
+            GenericDAO gDao = GenericDAO.get();
+            List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
+            for (Generic generic : buf)
+                tags.add(generic.getSubtype());
+        }
 
-		return tags;
-	}
+        return tags;
+    }
 
-	@Override
-	public List<WSTagCloud> getTagCloud(String sid)
-			throws PersistenceException, AuthenticationException, WebserviceException {
-		validateSession(sid);
+    @Override
+    public List<WSTagCloud> getTagCloud(String sid)
+            throws PersistenceException, AuthenticationException, WebserviceException {
+        validateSession(sid);
 
-		DocumentDAO dao = DocumentDAO.get();
-		List<TagCloud> list = dao.getTagCloud(sid);
+        DocumentDAO dao = DocumentDAO.get();
+        List<TagCloud> list = dao.getTagCloud(sid);
 
-		List<WSTagCloud> tagClouds = new ArrayList<>();
-		for (TagCloud tag : list)
-			tagClouds.add(WSTagCloud.fromTagCloud(tag));
+        List<WSTagCloud> tagClouds = new ArrayList<>();
+        for (TagCloud tag : list)
+            tagClouds.add(WSTagCloud.fromTagCloud(tag));
 
-		return tagClouds;
-	}
+        return tagClouds;
+    }
 
-	@Override
-	public List<WSDocument> findDocumentsByTag(String sid, String tag)
-			throws PersistenceException, AuthenticationException, WebserviceException {
-		User user = validateSession(sid);
+    @Override
+    public List<WSDocument> findDocumentsByTag(String sid, String tag)
+            throws PersistenceException, AuthenticationException, WebserviceException {
+        User user = validateSession(sid);
 
-		DocumentDAO docDao = DocumentDAO.get();
-		List<Document> docs = docDao.findByUserIdAndTag(user.getId(), tag, null);
-		List<WSDocument> wsDocs = new ArrayList<>();
+        DocumentDAO docDao = DocumentDAO.get();
+        List<Document> docs = docDao.findByUserIdAndTag(user.getId(), tag, null);
+        List<WSDocument> wsDocs = new ArrayList<>();
 
-		for (Document doc : docs) {
-			try {
-				checkPublished(user, doc);
-				checkNotArchived(doc);
-			} catch (Exception e) {
-				continue;
-			}
-			doc = docDao.initialize(doc);
-			wsDocs.add(WSUtil.toWSDocument(doc));
-		}
+        for (Document doc : docs) {
+            try {
+                checkPublished(user, doc);
+                checkNotArchived(doc);
+            } catch (Exception e) {
+                continue;
+            }
+            doc = docDao.initialize(doc);
+            wsDocs.add(WSUtil.toWSDocument(doc));
+        }
 
-		return wsDocs;
-	}
+        return wsDocs;
+    }
 
-	@Override
-	public List<WSFolder> findFoldersByTag(String sid, String tag)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
+    @Override
+    public List<WSFolder> findFoldersByTag(String sid, String tag)
+            throws AuthenticationException, WebserviceException, PersistenceException {
+        User user = validateSession(sid);
 
-		FolderDAO folderDao = FolderDAO.get();
-		List<Folder> folders = folderDao.findByUserIdAndTag(user.getId(), tag, null);
-		List<WSFolder> wsFolders = new ArrayList<>();
-		for (Folder folder : folders) {
-			folder = folderDao.initialize(folder);
-			wsFolders.add(WSFolder.fromFolder(folder));
-		}
-		return wsFolders;
-	}
+        FolderDAO folderDao = FolderDAO.get();
+        List<Folder> folders = folderDao.findByUserIdAndTag(user.getId(), tag, null);
+        List<WSFolder> wsFolders = new ArrayList<>();
+        for (Folder folder : folders) {
+            folder = folderDao.initialize(folder);
+            wsFolders.add(WSFolder.fromFolder(folder));
+        }
+        return wsFolders;
+    }
 }

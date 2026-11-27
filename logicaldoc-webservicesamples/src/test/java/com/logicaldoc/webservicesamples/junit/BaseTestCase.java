@@ -29,7 +29,7 @@ public abstract class BaseTestCase extends TestCase {
 
 		settings = new ContextProperties();
 
-		authClient = new SoapAuthClient(settings.getProperty("url") + "/services/Auth");
+		authClient = new SoapAuthClient("%s/services/Auth".formatted(settings.getProperty("url")));
 
 		// Get session token
 		sid = authClient.loginApiKey(settings.getProperty("apiKey"));

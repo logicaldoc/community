@@ -28,7 +28,8 @@ public class AdvancedProperties extends OrderedProperties {
      * It takes a value and expands the variables referenced in it. You can
      * reference whatever setting in the main configuration file or by using the
      * <code>env.</code> prefix you may reference whatever environment
-     * variable.<br> Eg., suppose a main configuration file like this:
+     * variable.<br>
+     * Eg., suppose a main configuration file like this:
      * 
      * <pre>
      *   default.avatar.size = 144
@@ -40,10 +41,13 @@ public class AdvancedProperties extends OrderedProperties {
      * DB_PASSWORD = abcd
      * </pre>
      * 
-     * Then: <ul> <li>the value <code>${default.avatar.size}</code> will be
-     * expanded to <code>144</code></li> <li>the value
-     * <code>${env.DB_PASSWORD}</code> will be expanded to
-     * <code>abcd</code></li> </ul>
+     * Then:
+     * <ul>
+     * <li>the value <code>${default.avatar.size}</code> will be expanded to
+     * <code>144</code></li>
+     * <li>the value <code>${env.DB_PASSWORD}</code> will be expanded to
+     * <code>abcd</code></li>
+     * </ul>
      * 
      * @param value The string to evaluate
      * 
@@ -229,6 +233,8 @@ public class AdvancedProperties extends OrderedProperties {
     }
 
     private String fullKey(String tenant, String property) {
+        if (property.startsWith("."))
+            property = property.substring(1);
         return "%s.%s".formatted(tenant, property);
     }
 
@@ -280,6 +286,15 @@ public class AdvancedProperties extends OrderedProperties {
         return getTenantProperty(tenant, property, null);
     }
 
+    public float getTenantFloat(String tenant, String property) {
+        return getTenantFloat(tenant, property, 0L);
+    }
+
+    public float getTenantFloat(String tenant, String property, float defaultValue) {
+        String key = fullKey(tenant, property);
+        return getFloat(key, defaultValue);
+    }
+
     public Map<String, String> getTenantProperties(String tenant) {
         return getProperties("%s.".formatted(tenant));
     }
@@ -321,7 +336,7 @@ public class AdvancedProperties extends OrderedProperties {
         List<String> toBeDeleted = new ArrayList<>();
         for (Object key : keySet()) {
             String prop = key.toString();
-            if (prop.startsWith(tenant + "."))
+            if (prop.startsWith("%s.".formatted(tenant)))
                 toBeDeleted.add(prop);
         }
         for (String prop : toBeDeleted)

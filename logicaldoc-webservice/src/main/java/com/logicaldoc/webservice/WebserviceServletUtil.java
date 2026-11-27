@@ -63,9 +63,8 @@ public class WebserviceServletUtil {
             // Used by some LG phones
             encodedFileName = filename;
         } else {
-            encodedFileName = "=?UTF-8?B?"
-                    + new String(Base64.encodeBase64(filename.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8)
-                    + "?=";
+            encodedFileName = "=?UTF-8?B?%s?=".formatted(
+                    new String(Base64.encodeBase64(filename.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
         }
 
         boolean asAttachment = true;
@@ -76,7 +75,7 @@ public class WebserviceServletUtil {
 
         response.setHeader("Content-Disposition",
                 "%s; filename=\"%s\"".formatted(asAttachment ? "attachment" : "inline", encodedFileName));
-        
+
         // Avoid resource caching
         response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
         response.setHeader("Expires", "0");

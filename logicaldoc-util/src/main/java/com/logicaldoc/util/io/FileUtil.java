@@ -400,18 +400,22 @@ public class FileUtil {
     public static String getDisplaySize(long size, Locale locale) {
         String displaySize = "";
         Locale lcl = LocaleUtils.toLocale("en");
+
         if (locale != null)
             lcl = locale;
+
         NumberFormat nf = new DecimalFormat("###,###,###.0", new DecimalFormatSymbols(lcl));
+
         if (size > 1000000000) {
-            displaySize = nf.format((double) size / 1024 / 1024 / 1024) + " GB";
+            displaySize = "%s GB".formatted(nf.format((double) size / 1024 / 1024 / 1024));
         } else if (size > 1000000) {
-            displaySize = nf.format((double) size / 1024 / 1024) + " MB";
+            displaySize = "%s MB".formatted(nf.format((double) size / 1024 / 1024));
         } else if (size > 1000) {
-            displaySize = nf.format((double) size / 1024) + " KB";
+            displaySize = "%s KB".formatted(nf.format((double) size / 1024));
         } else {
-            displaySize = size + " Bytes";
+            displaySize = "%s Bytes".formatted(size);
         }
+
         return displaySize;
     }
 
@@ -431,7 +435,7 @@ public class FileUtil {
         if (StringUtils.isNotEmpty(language))
             locale = LocaleUtils.toLocale(language);
         NumberFormat nf = new DecimalFormat("###,###,##0.0", new DecimalFormatSymbols(locale));
-        displaySize = nf.format((double) size / 1024) + " KB";
+        displaySize = "%s KB".formatted(nf.format((double) size / 1024));
         return displaySize;
     }
 

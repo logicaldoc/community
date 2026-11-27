@@ -60,7 +60,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
     private static final String ENABLED = "enabled";
 
-    private static final String LANG = ".lang.";
+    private static final String LANG = "lang.";
 
     private static final Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
 
@@ -195,7 +195,8 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
         ArrayList<GUIValue> supportedLanguages = new ArrayList<>();
         List<String> installedLocales = I18N.getLocales();
         for (String loc : installedLocales) {
-            if (ENABLED.equals(Context.get().getConfig().getProperty(tenantName + LANG + loc + ".gui"))) {
+            if (ENABLED
+                    .equals(Context.get().getConfig().getTenantProperty(tenantName, "%s%s.gui".formatted(LANG, loc)))) {
                 Locale lc = LocaleUtil.toLocale(loc);
                 GUIValue l = new GUIValue();
                 l.setCode(loc);
@@ -337,8 +338,9 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
         ContextProperties config = Context.get().getConfig();
 
         Locale locale = null;
+
         for (String loc : installedLocales) {
-            if (ENABLED.equals(config.getProperty(tenantName + LANG + loc + ".gui"))
+            if (ENABLED.equals(config.getTenantProperty(tenantName, "%s%s.gui".formatted(LANG, loc)))
                     && loc.equals(proposedLocale.toString())) {
                 locale = LocaleUtil.toLocale(loc);
                 break;
@@ -347,8 +349,10 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
         if (locale == null)
             for (String loc : installedLocales) {
-                if (ENABLED.equals(config.getProperty(tenantName + LANG + loc + ".gui"))) {
+                if (ENABLED.equals(config.getTenantProperty(tenantName, "%s%s.gui".formatted(LANG, loc)))) {
+
                     Locale x = LocaleUtil.toLocale(loc);
+
                     if (proposedLocale.getLanguage().equals(x.getLanguage())) {
                         locale = LocaleUtil.toLocale(loc);
                         break;

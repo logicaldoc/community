@@ -51,228 +51,227 @@ import jakarta.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/wk-event")
 public class EventEndpoint implements EventListener {
 
-	private static final int FIFO_SIZE = 1000;
+    private static final int FIFO_SIZE = 1000;
 
-	// Maintain a fifos for the history IDs. Key is the class name, value is a
-	// FIFO queue
-	private Map<String, Queue<Long>> fifos = new HashMap<>();
+    // Maintain a fifos for the history IDs. Key is the class name, value is a
+    // FIFO queue
+    private Map<String, Queue<Long>> fifos = new HashMap<>();
 
-	private static final Logger log = LoggerFactory.getLogger(EventEndpoint.class);
+    private static final Logger log = LoggerFactory.getLogger(EventEndpoint.class);
 
-	private static final Set<String> MONITORED_EVENTS = new HashSet<>(Arrays.asList(DocumentEvent.STORED.toString(),
-			DocumentEvent.CHANGED.toString(), DocumentEvent.CHECKEDIN.toString(), DocumentEvent.CHECKEDOUT.toString(),
-			DocumentEvent.IMMUTABLE.toString(), DocumentEvent.LOCKED.toString(), DocumentEvent.UNLOCKED.toString(),
-			DocumentEvent.SIGNED.toString(), DocumentEvent.STAMPED.toString(), DocumentEvent.MOVED.toString(),
-			DocumentEvent.DELETED.toString(), DocumentEvent.RENAMED.toString(), DocumentEvent.INDEXED.toString(),
-			DocumentEvent.EMBEDDED.toString(), DocumentEvent.RESTORED.toString(),
-			DocumentEvent.PASSWORD_PROTECTED.toString(), DocumentEvent.MOVED.toString(),
-			DocumentEvent.PASSWORD_UNPROTECTED.toString(), DocumentEvent.READING_CONFIRMED.toString(),
-			DocumentEvent.READING_REQUESTED.toString(), FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(),
-			FolderEvent.CHANGED.toString(), FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(),
-			UserEvent.MESSAGE_RECEIVED.toString(), UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(),
-			UserEvent.TIMEOUT.toString(), "event.chat.newmessage"));
+    private static final Set<String> MONITORED_EVENTS = new HashSet<>(Arrays.asList(DocumentEvent.STORED.toString(),
+            DocumentEvent.CHANGED.toString(), DocumentEvent.CHECKEDIN.toString(), DocumentEvent.CHECKEDOUT.toString(),
+            DocumentEvent.IMMUTABLE.toString(), DocumentEvent.LOCKED.toString(), DocumentEvent.UNLOCKED.toString(),
+            DocumentEvent.SIGNED.toString(), DocumentEvent.STAMPED.toString(), DocumentEvent.MOVED.toString(),
+            DocumentEvent.DELETED.toString(), DocumentEvent.RENAMED.toString(), DocumentEvent.INDEXED.toString(),
+            DocumentEvent.EMBEDDED.toString(), DocumentEvent.RESTORED.toString(),
+            DocumentEvent.PASSWORD_PROTECTED.toString(), DocumentEvent.MOVED.toString(),
+            DocumentEvent.PASSWORD_UNPROTECTED.toString(), DocumentEvent.READING_CONFIRMED.toString(),
+            DocumentEvent.READING_REQUESTED.toString(), FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(),
+            FolderEvent.CHANGED.toString(), FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(),
+            UserEvent.MESSAGE_RECEIVED.toString(), UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(),
+            UserEvent.TIMEOUT.toString(), "event.chat.newmessage"));
 
-	private static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
+    private static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
 
-	private boolean registered = false;
+    private boolean registered = false;
 
-	/**
-	 * Puts the history in the relative FIFO
-	 * 
-	 * @param history
-	 * @return true if it was not remembered already, false otherwise
-	 */
-	private boolean rememberHistory(History history) {
-		Queue<Long> fifo = fifos.get(history.getClass().getName());
-		if (fifo == null) {
-			fifo = new CircularFifoQueue<>(FIFO_SIZE);
-			fifos.put(history.getClass().getName(), fifo);
-		}
+    /**
+     * Puts the history in the relative FIFO
+     * 
+     * @param history
+     * @return true if it was not remembered already, false otherwise
+     */
+    private boolean rememberHistory(History history) {
+        Queue<Long> fifo = fifos.get(history.getClass().getName());
+        if (fifo == null) {
+            fifo = new CircularFifoQueue<>(FIFO_SIZE);
+            fifos.put(history.getClass().getName(), fifo);
+        }
 
-		if (fifo.contains(history.getId()))
-			return false;
-		else {
-			fifo.add(history.getId());
-			return true;
-		}
-	}
+        if (fifo.contains(history.getId()))
+            return false;
+        else {
+            fifo.add(history.getId());
+            return true;
+        }
+    }
 
-	/**
-	 * Returns the number of canched events of the given type
-	 * 
-	 * @param historyClass a class of History
-	 * 
-	 * @return number of cached events
-	 */
-	public <T extends History> int countQueueSize(Class<T> historyClass) {
-		Queue<Long> fifo = fifos.get(historyClass.getName());
-		return fifo != null ? fifo.size() : 0;
-	}
+    /**
+     * Returns the number of canched events of the given type
+     * 
+     * @param historyClass a class of History
+     * 
+     * @return number of cached events
+     */
+    public <T extends History> int countQueueSize(Class<T> historyClass) {
+        Queue<Long> fifo = fifos.get(historyClass.getName());
+        return fifo != null ? fifo.size() : 0;
+    }
 
-	@OnOpen
-	public void onOpen(final Session session) {
-		if (!registered) {
-			Context.get(EventCollector.class).addListener(this);
-			registered = true;
-			log.info("Registered websockets endpoint as events listener");
-		}
+    @OnOpen
+    public void onOpen(final Session session) {
+        if (!registered) {
+            Context.get(EventCollector.class).addListener(this);
+            registered = true;
+            log.info("Registered websockets endpoint as events listener");
+        }
 
-		log.debug("onOpen({})", session.getId());
-		peers.add(session);
-	}
+        log.debug("onOpen({})", session.getId());
+        peers.add(session);
+    }
 
-	@OnClose
-	public void onClose(final Session session) {
-		log.debug("onClose({})", session.getId());
-		peers.remove(session);
-	}
+    @OnClose
+    public void onClose(final Session session) {
+        log.debug("onClose({})", session.getId());
+        peers.remove(session);
+    }
 
-	@OnMessage
-	public void onMessage(final String message, final Session session) {
-		log.debug("onMessage({},{})", message, session.getId());
-	}
+    @OnMessage
+    public void onMessage(final String message, final Session session) {
+        log.debug("onMessage({},{})", message, session.getId());
+    }
 
-	@OnMessage
-	public void onBinaryMessage(final byte[] data, final Session session) {
-		log.debug("onBinaryMessage({})", session.getId());
-	}
+    @OnMessage
+    public void onBinaryMessage(final byte[] data, final Session session) {
+        log.debug("onBinaryMessage({})", session.getId());
+    }
 
-	@Override
-	public void newEvent(History event) {
-		ContextProperties config = Context.get().getConfig();
+    @Override
+    public void newEvent(History event) {
+        ContextProperties config = Context.get().getConfig();
 
-		try {
-			if (event.getTenant() == null)
-				event.setTenant(TenantDAO.get().getTenantName(event.getTenantId()));
-		} catch (PersistenceException e) {
-			log.warn("Cannot retrieve the name of tenant {}", event.getTenantId());
-		}
+        try {
+            if (event.getTenant() == null)
+                event.setTenant(TenantDAO.get().getTenantName(event.getTenantId()));
+        } catch (PersistenceException e) {
+            log.warn("Cannot retrieve the name of tenant {}", event.getTenantId());
+        }
 
-		if (EventCollector.isEnabled() && config.getBoolean(event.getTenant() + ".gui.serverpush", false)
-				&& MONITORED_EVENTS.contains(event.getEvent()) && event.isNotifyEvent()) {
+        if (EventCollector.isEnabled() && config.getTenantBoolean(event.getTenant(), "gui.serverpush", false)
+                && MONITORED_EVENTS.contains(event.getEvent()) && event.isNotifyEvent()) {
 
-			if (!rememberHistory(event))
-				return;
+            if (!rememberHistory(event))
+                return;
 
-			try {
-				WebsocketMessage message = prepareMessage(event);
-				distributeMessage(message);
-			} catch (Exception e) {
-				if (log.isDebugEnabled())
-					log.debug("Skip sending the websocket message related to the event {}", event, e);
-			}
-		}
-	}
+            try {
+                distributeMessage(prepareMessage(event));
+            } catch (Exception e) {
+                if (log.isDebugEnabled())
+                    log.debug("Skip sending the websocket message related to the event {}", event, e);
+            }
+        }
+    }
 
-	private WebsocketMessage prepareMessage(History event) throws PersistenceException, ServerException {
-		WebsocketMessage message = new WebsocketMessage(event.getSessionId(), event.getEvent());
-		message.setUserId(event.getUserId());
-		message.setUsername(event.getUserLogin());
-		message.setComment(event.getComment());
-		message.setDate(event.getDate());
-		message.setId(event.getId());
-		message.setTenantId(event.getTenantId());
+    private WebsocketMessage prepareMessage(History event) throws PersistenceException, ServerException {
+        WebsocketMessage message = new WebsocketMessage(event.getSessionId(), event.getEvent());
+        message.setUserId(event.getUserId());
+        message.setUsername(event.getUserLogin());
+        message.setComment(event.getComment());
+        message.setDate(event.getDate());
+        message.setId(event.getId());
+        message.setTenantId(event.getTenantId());
 
-		if (event instanceof UserHistory userHistory)
-			message.setAuthor(userHistory.getAuthor());
+        if (event instanceof UserHistory userHistory)
+            message.setAuthor(userHistory.getAuthor());
 
-		if (event instanceof AbstractDocumentHistory adh) {
-			message.setFolderId(adh.getFolderId());
-			message.setDocId(adh.getDocId());
+        if (event instanceof AbstractDocumentHistory adh) {
+            message.setFolderId(adh.getFolderId());
+            message.setDocId(adh.getDocId());
 
-			GUIFolder folder = setFolder(message, adh);
+            GUIFolder folder = setFolder(message, adh);
 
-			GUIDocument document = null;
-			if (adh.getDocument() != null && adh.getDocument() instanceof Document doc) {
-				Document clone = new Document(doc);
-				// Report some attributes skipped by the clone method
-				clone.setCustomId(adh.getDocument().getCustomId());
-				clone.setStatus(adh.getDocument().getStatus());
+            GUIDocument document = null;
+            if (adh.getDocument() != null && adh.getDocument() instanceof Document doc) {
+                Document clone = new Document(doc);
+                // Report some attributes skipped by the clone method
+                clone.setCustomId(adh.getDocument().getCustomId());
+                clone.setStatus(adh.getDocument().getStatus());
 
-				// Put ID 0 in order to convert to GUIDocument without
-				// picking up ifos from DB
-				clone.setId(0L);
-				document = DocumentServiceImpl.fromDocument(clone, null, null);
-				document.setId(adh.getDocId());
-			} else if (adh.getDocId() != null) {
-				DocumentDAO docDao = DocumentDAO.get();
-				Document d = docDao.findById(adh.getDocId());
-				if (d != null) {
-					document = DocumentServiceImpl.fromDocument(d, null, null);
-				} else {
-					document = new GUIDocument();
-					document.setId(adh.getDocId());
-					document.setFileName(adh.getFilename());
-					document.setFolder(folder);
-				}
-			}
+                // Put ID 0 in order to convert to GUIDocument without
+                // picking up ifos from DB
+                clone.setId(0L);
+                document = DocumentServiceImpl.fromDocument(clone, null, null);
+                document.setId(adh.getDocId());
+            } else if (adh.getDocId() != null) {
+                DocumentDAO docDao = DocumentDAO.get();
+                Document d = docDao.findById(adh.getDocId());
+                if (d != null) {
+                    document = DocumentServiceImpl.fromDocument(d, null, null);
+                } else {
+                    document = new GUIDocument();
+                    document.setId(adh.getDocId());
+                    document.setFileName(adh.getFilename());
+                    document.setFolder(folder);
+                }
+            }
 
-			if (document != null && (event.getEvent().equals(DocumentEvent.CHECKEDOUT.toString())
-					|| event.getEvent().equals(DocumentEvent.LOCKED.toString()))) {
-				document.setLockUser(event.getUsername());
-				document.setLockUserId(event.getUserId());
-			}
+            if (document != null && (event.getEvent().equals(DocumentEvent.CHECKEDOUT.toString())
+                    || event.getEvent().equals(DocumentEvent.LOCKED.toString()))) {
+                document.setLockUser(event.getUsername());
+                document.setLockUserId(event.getUserId());
+            }
 
-			message.setDocument(document);
-		}
-		return message;
-	}
+            message.setDocument(document);
+        }
+        return message;
+    }
 
-	protected GUIFolder setFolder(WebsocketMessage message, AbstractDocumentHistory adh)
-			throws PersistenceException, ServerException {
-		GUIFolder folder = null;
-		if (adh.getFolder() != null) {
-			String color = adh.getFolder().getColor();
-			folder = new FolderServiceImpl().fromFolder(adh.getFolder(), true);
-			folder.setColor(color);
-		} else if (adh.getFolderId() != null)
-			folder = new FolderServiceImpl().getFolder(null, adh.getFolderId(), true);
-		if (folder != null)
-			message.setFolder(folder);
-		return folder;
-	}
+    protected GUIFolder setFolder(WebsocketMessage message, AbstractDocumentHistory adh)
+            throws PersistenceException, ServerException {
+        GUIFolder folder = null;
+        if (adh.getFolder() != null) {
+            String color = adh.getFolder().getColor();
+            folder = new FolderServiceImpl().fromFolder(adh.getFolder(), true);
+            folder.setColor(color);
+        } else if (adh.getFolderId() != null)
+            folder = new FolderServiceImpl().getFolder(null, adh.getFolderId(), true);
+        if (folder != null)
+            message.setFolder(folder);
+        return folder;
+    }
 
-	@OnError
-	public void error(Session session, Throwable t) {
-		log.warn(t.getMessage());
-		log.debug(t.getMessage(), t);
-	}
+    @OnError
+    public void error(Session session, Throwable t) {
+        log.warn(t.getMessage());
+        log.debug(t.getMessage(), t);
+    }
 
-	/**
-	 * Distributes a message to all the connected clients
-	 * 
-	 * @param message The message to be sent
-	 */
-	public static void distributeMessage(WebsocketMessage message) {
-		try {
-			String serializedMessage = serializeMessage(message);
-			for (Session peer : peers)
-				if (peer.getAsyncRemote() != null)
-					sendMessageToPear(message.getEvent(), serializedMessage, peer);
-		} catch (SerializationException e) {
-			log.error("Error preparing websocket message {}", message.getEvent());
-			log.error(e.getMessage(), e);
-		}
-	}
+    /**
+     * Distributes a message to all the connected clients
+     * 
+     * @param message The message to be sent
+     */
+    public static void distributeMessage(WebsocketMessage message) {
+        try {
+            String serializedMessage = serializeMessage(message);
+            for (Session peer : peers)
+                if (peer.getAsyncRemote() != null)
+                    sendMessageToPear(message.getEvent(), serializedMessage, peer);
+        } catch (SerializationException e) {
+            log.error("Error preparing websocket message {}", message.getEvent());
+            log.error(e.getMessage(), e);
+        }
+    }
 
-	private static synchronized void sendMessageToPear(String event, String serializedMessage, Session peer) {
-		try {
-			peer.getBasicRemote().sendText(serializedMessage);
-		} catch (Exception e) {
-			if (e.getMessage().contains("WebSocket session has been closed")) {
-				log.debug("Cannot send websocket message {} to peer {} because WebSocket session has been closed",
-						event, peer.getRequestURI());
-			} else {
-				log.error("Error sending websocket message {} to peer {}", event, peer.getRequestURI());
-				log.error(e.getMessage(), e);
-			}
-		}
-	}
+    private static synchronized void sendMessageToPear(String event, String serializedMessage, Session peer) {
+        try {
+            peer.getBasicRemote().sendText(serializedMessage);
+        } catch (Exception e) {
+            if (e.getMessage().contains("WebSocket session has been closed")) {
+                log.debug("Cannot send websocket message {} to peer {} because WebSocket session has been closed",
+                        event, peer.getRequestURI());
+            } else {
+                log.error("Error sending websocket message {} to peer {}", event, peer.getRequestURI());
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
 
-	private static String serializeMessage(final WebsocketMessage messageDto) throws SerializationException {
-		ServerSerializationStreamWriter serverSerializationStreamWriter = new ServerSerializationStreamWriter(
-				new SimpleSerializationPolicy());
-		serverSerializationStreamWriter.writeObject(messageDto);
-		return serverSerializationStreamWriter.toString();
-	}
+    private static String serializeMessage(final WebsocketMessage messageDto) throws SerializationException {
+        ServerSerializationStreamWriter serverSerializationStreamWriter = new ServerSerializationStreamWriter(
+                new SimpleSerializationPolicy());
+        serverSerializationStreamWriter.writeObject(messageDto);
+        return serverSerializationStreamWriter.toString();
+    }
 }

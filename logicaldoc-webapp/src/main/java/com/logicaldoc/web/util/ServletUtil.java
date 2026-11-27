@@ -665,9 +665,8 @@ public class ServletUtil {
             // Used by some LG phones
             encodedFileName = filename;
         } else {
-            encodedFileName = "=?UTF-8?B?"
-                    + new String(Base64.encodeBase64(filename.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8)
-                    + "?=";
+            encodedFileName = "=?UTF-8?B?%s?=".formatted(
+                    new String(Base64.encodeBase64(filename.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
         }
 
         boolean asAttachment = true;
@@ -723,7 +722,7 @@ public class ServletUtil {
         // response object
         response.setContentType(mimetype);
 
-        setContentDisposition(request, response, doc.getFileName() + ".txt");
+        setContentDisposition(request, response, "%s.txt".formatted(doc.getFileName()));
 
         if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
             throw new FileNotFoundException("Document not published");

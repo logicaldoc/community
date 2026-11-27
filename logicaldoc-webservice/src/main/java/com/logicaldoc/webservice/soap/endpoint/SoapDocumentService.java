@@ -688,7 +688,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
         mail.setTenantId(user.getTenantId());
         mail.setAccountId(-1);
         mail.setAuthor(user.getUsername());
-        if (config.getBoolean(session.getTenantName() + ".smtp.userasfrom", true))
+        if (config.getTenantBoolean(session.getTenantName(), "smtp.userasfrom", true))
             mail.setAuthorAddress(user.getEmail());
         mail.parseRecipients(recipients);
         for (Recipient recipient : mail.getRecipients()) {

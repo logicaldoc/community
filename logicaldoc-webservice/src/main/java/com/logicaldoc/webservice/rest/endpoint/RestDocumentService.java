@@ -439,8 +439,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
     @DELETE
     @Path("/deleteVersion")
-    @Operation(summary = "Delete the version of a document", description = "Deletes the version of a document using the document ID and version."
-            + " You can not delete the latest version of a document. Returns the latest version of the document")
+    @Operation(summary = "Delete the version of a document", description = """
+                                                                           Deletes the version of a document using the document ID and version.
+                                                                           You can not delete the latest version of a document. Returns the latest version of the document
+                                                                           """)
     public String deleteVersion(
             @QueryParam("docId")
             @Parameter(description = "Document ID", required = true)

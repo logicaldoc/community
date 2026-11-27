@@ -52,8 +52,8 @@ public class TagUtil {
 
         try {
             ContextProperties conf = new ContextProperties();
-            minSize = conf.getInt(tenantName + ".tag.minsize");
-            maxSize = conf.getInt(tenantName + ".tag.maxsize");
+            minSize = conf.getTenantInt(tenantName, "tag.minsize");
+            maxSize = conf.getTenantInt(tenantName, "tag.maxsize");
         } catch (IOException e) {
             // Nothing to do
         }

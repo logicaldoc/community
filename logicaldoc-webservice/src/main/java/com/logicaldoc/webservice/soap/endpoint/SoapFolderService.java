@@ -542,7 +542,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
              * Check if the path contains the workspace specification
              */
             for (WSFolder w : listWorkspaces(sid)) {
-                if (path.startsWith(w.getName() + "/")) {
+                if (path.startsWith("%s/".formatted(w.getName()))) {
                     workspace = folderDao.findById(w.getId(), true);
                     break;
                 }

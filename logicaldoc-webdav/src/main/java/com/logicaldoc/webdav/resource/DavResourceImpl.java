@@ -489,8 +489,8 @@ public class DavResourceImpl implements DavResource, Serializable {
         list = new ArrayList<>();
         if (exists() && isCollection()) {
             try {
-                String path = locator.getResourcePath() == null ? "/" : locator.getResourcePath() + "/";
-
+                String path = locator.getResourcePath() == null ? "/" : "%s/".formatted(locator.getResourcePath());
+                
                 List<Resource> resources = resourceService.getChildResources(this.resource);
                 Iterator<Resource> resourceIterator = resources.iterator();
 

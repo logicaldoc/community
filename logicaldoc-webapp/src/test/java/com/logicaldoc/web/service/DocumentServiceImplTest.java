@@ -147,21 +147,22 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
     }
 
     private void prepareRepository() throws IOException {
-        File file3 = new File(repositoryDir.getPath() + "/docs/3/doc/1.0");
+        File file3 = new File("%s/docs/3/doc/1.0".formatted(repositoryDir.getPath()));
         file3.getParentFile().mkdirs();
         FileUtil.copyResource("test.zip", file3);
 
-        File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
+        File file5 = new File("%s/docs/5/doc/1.0".formatted(repositoryDir.getPath()));
         file5.getParentFile().mkdirs();
         FileUtil.copyResource("Joyce Jinks shared the Bruce Duo post.eml", file5);
-        FileUtil.copyResource("Joyce Jinks shared the Bruce Duo post.eml",
-                new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
 
-        File file6 = new File(repositoryDir.getPath() + "/docs/6/doc/1.0");
+        FileUtil.copyResource("Joyce Jinks shared the Bruce Duo post.eml",
+                new File("%s/docs/5/doc/1.0-conversion.pdf".formatted(repositoryDir.getPath())));
+
+        File file6 = new File("%s/docs/6/doc/1.0".formatted(repositoryDir.getPath()));
         file6.getParentFile().mkdirs();
         FileUtil.copyResource("Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg", file6);
 
-        File file7 = new File(repositoryDir.getPath() + "/docs/7/doc/1.0");
+        File file7 = new File("%s/docs/7/doc/1.0".formatted(repositoryDir.getPath()));
         file7.getParentFile().mkdirs();
         FileUtil.copyResource("New error indexing documents.eml", file7);
 
@@ -451,7 +452,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
         testSubject.enforceFilesIntoFolderStore(1200);
 
-        File movedFile = new File(repositoryDir + "/docs2/5/doc/1.0");
+        File movedFile = new File("%s/docs2/5/doc/1.0".formatted(repositoryDir));
         assertTrue(movedFile.exists());
     }
 
@@ -738,12 +739,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         assertEquals(0, doc.getIndexed());
         assertEquals("test.txt", doc.getFileName());
 
-        FileUtil.copyResource(
-                "New error indexing documents.eml",
-                new File("%s/docs/%s/doc/%s".formatted(
-                        repositoryDir.getPath(),
-                        doc.getId(),
-                        doc.getFileVersion())));
+        FileUtil.copyResource("New error indexing documents.eml",
+                new File("%s/docs/%s/doc/%s".formatted(repositoryDir.getPath(), doc.getId(), doc.getFileVersion())));
 
         testSubject.indexDocuments(List.of(doc.getId()));
         doc = testSubject.getById(doc.getId());
@@ -765,12 +762,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
         assertEquals(0, doc.getIndexed());
         assertEquals("test.txt", doc.getFileName());
 
-        FileUtil.copyResource(
-                "New error indexing documents.eml",
-                new File("%s/docs/%s/doc/%s".formatted(
-                        repositoryDir.getPath(),
-                        doc.getId(),
-                        doc.getFileVersion())));
+        FileUtil.copyResource("New error indexing documents.eml",
+                new File("%s/docs/%s/doc/%s".formatted(repositoryDir.getPath(), doc.getId(), doc.getFileVersion())));
         assertTrue(testSubject.getContentAsString(doc.getId()).contains("Gracias por tu pronta respuesta"));
     }
 

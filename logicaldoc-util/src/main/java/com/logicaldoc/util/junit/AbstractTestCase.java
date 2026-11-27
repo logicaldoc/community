@@ -275,7 +275,7 @@ public abstract class AbstractTestCase {
      */
     private void loadDevelSettingsInEnvironment() throws IOException {
         Properties devSettings = new Properties();
-        try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
+        try (FileReader reader = new FileReader(new File("%s/logicaldoc-dev.properties".formatted(originalUserHome)))) {
             devSettings.load(reader);
             for (Map.Entry<Object, Object> entry : devSettings.entrySet())
                 System.setProperty(entry.getKey().toString(), entry.getValue().toString());
@@ -290,7 +290,7 @@ public abstract class AbstractTestCase {
      */
     private void loadDevelSettingsInContext() throws IOException {
         Properties devSettings = new Properties();
-        try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
+        try (FileReader reader = new FileReader(new File("%s/logicaldoc-dev.properties".formatted(originalUserHome)))) {
             devSettings.load(reader);
             for (Map.Entry<Object, Object> entry : devSettings.entrySet())
                 Context.get().getConfig().setProperty(entry.getKey().toString(), entry.getValue().toString());

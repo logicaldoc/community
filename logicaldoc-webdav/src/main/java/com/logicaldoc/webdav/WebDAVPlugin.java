@@ -25,7 +25,7 @@ public class WebDAVPlugin extends LogicalDOCPlugin {
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();
 
-		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
+		WebConfigurator config = new WebConfigurator("%s/web.xml".formatted(dest.getPath()));
 
 		config.addServlet(SERVLET_NAME, WebdavServlet.class.getName(), 4);
 		config.writeXMLDoc();

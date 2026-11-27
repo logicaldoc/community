@@ -278,7 +278,7 @@ public class TicketDownload extends HttpServlet {
         try (InputStream is = Store.get().getStream(resource)) {
             String filename = document.getFileName();
             if (suffix != null && suffix.contains("pdf"))
-                filename = document.getFileName() + ".pdf";
+                filename = "%s.pdf".formatted(document.getFileName());
 
             long size = Store.get().size(resource);
 

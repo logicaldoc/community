@@ -15,40 +15,43 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class WebservicePlugin extends LogicalDOCPlugin {
 
-	private static final String THREADPOOL = "threadpool.";
+    private static final String THREADPOOL = "threadpool.";
 
-	@Override
-	public void install() throws PluginException {
-		try {
-			ContextProperties pbean = new ContextProperties();
-			pbean.setProperty("webservice.mtom", "false");
-			pbean.setProperty("webservice.enabled", "true");
-			pbean.setProperty("webservice.gzip", "20");
-			pbean.setProperty("webservice.call.gridRecord", "true");
-			pbean.setProperty("webservice.call.ttl", "90");
-			pbean.setProperty("webservice.call.gridRecord", "true");
-			pbean.setProperty("webservice.call.syncfreq", "300");
-			pbean.setProperty("webservice.json.droproot", "true");
-			pbean.setProperty("webservice.json.dropcollectionwrapper", "true");
-			pbean.setProperty("webservice.json.serializeasarray", "true");
-			
-			
-			
-			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_STORE + ".max", "20");
-			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_STORE + ".type", "default");
-			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_COUNTER + ".max", "20");
-			pbean.setProperty(THREADPOOL + WebserviceInterceptor.THREADPOOL_CALL_COUNTER + ".type", "default");
+    @Override
+    public void install() throws PluginException {
+        try {
+            ContextProperties pbean = new ContextProperties();
+            pbean.setProperty("webservice.mtom", "false");
+            pbean.setProperty("webservice.enabled", "true");
+            pbean.setProperty("webservice.gzip", "20");
+            pbean.setProperty("webservice.call.gridRecord", "true");
+            pbean.setProperty("webservice.call.ttl", "90");
+            pbean.setProperty("webservice.call.gridRecord", "true");
+            pbean.setProperty("webservice.call.syncfreq", "300");
+            pbean.setProperty("webservice.json.droproot", "true");
+            pbean.setProperty("webservice.json.dropcollectionwrapper", "true");
+            pbean.setProperty("webservice.json.serializeasarray", "true");
 
-			pbean.write();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
+            pbean.setProperty("%s%s.max".formatted(THREADPOOL, WebserviceInterceptor.THREADPOOL_CALL_STORE), "20");
 
-		addServlet("CXFServlet", WebserviceServlet.class, "/services/*");
-		addServlet("WebserviceChart", WebserviceChartServlet.class, "/webservicechart");
+            pbean.setProperty("%s%s.type".formatted(THREADPOOL, WebserviceInterceptor.THREADPOOL_CALL_STORE),
+                    "default");
 
-		addLogger("org.apache.cxf", true, "error", "WEBSERVICE");
+            pbean.setProperty("%s%s.max".formatted(THREADPOOL, WebserviceInterceptor.THREADPOOL_CALL_COUNTER), "20");
 
-		setRestartRequired();
-	}
+            pbean.setProperty("%s%s.type".formatted(THREADPOOL, WebserviceInterceptor.THREADPOOL_CALL_COUNTER),
+                    "default");
+
+            pbean.write();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        addServlet("CXFServlet", WebserviceServlet.class, "/services/*");
+        addServlet("WebserviceChart", WebserviceChartServlet.class, "/webservicechart");
+
+        addLogger("org.apache.cxf", true, "error", "WEBSERVICE");
+
+        setRestartRequired();
+    }
 }

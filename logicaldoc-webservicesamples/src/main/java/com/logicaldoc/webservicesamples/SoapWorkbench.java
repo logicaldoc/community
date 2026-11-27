@@ -33,14 +33,15 @@ public class SoapWorkbench {
     public static void main(String[] args) throws Exception {
         ContextProperties settings = new ContextProperties();
 
-        SoapAuthClient auth = new SoapAuthClient(settings.getProperty("url") + "/services/Auth");
-        SoapDocumentClient documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
-        SoapFolderClient folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder", 1, false,
-                50);
-        SoapSearchClient searchClient = new SoapSearchClient(settings.getProperty("url") + "/services/Search");
-        SoapSystemClient systemClient = new SoapSystemClient(settings.getProperty("url") + "/services/System");
-        SoapSecurityClient securityClient = new SoapSecurityClient(settings.getProperty("url") + "/services/Security");
-        SoapTagClient tagClient = new SoapTagClient(settings.getProperty("url") + "/services/Tag");
+        String serviceBase = "%s/services".formatted(settings.getProperty("url"));
+
+        SoapAuthClient auth = new SoapAuthClient("%s/Auth".formatted(serviceBase));
+        SoapDocumentClient documentClient = new SoapDocumentClient("%s/Document".formatted(serviceBase));
+        SoapFolderClient folderClient = new SoapFolderClient("%s/Folder".formatted(serviceBase), 1, false, 50);
+        SoapSearchClient searchClient = new SoapSearchClient("%s/Search".formatted(serviceBase));
+        SoapSystemClient systemClient = new SoapSystemClient("%s/System".formatted(serviceBase));
+        SoapSecurityClient securityClient = new SoapSecurityClient("%s/Security".formatted(serviceBase));
+        SoapTagClient tagClient = new SoapTagClient("%s/Tag".formatted(serviceBase));
 
         // Open a session
         String sid = auth.loginApiKey(settings.getProperty("apiKey"));
@@ -384,9 +385,7 @@ public class SoapWorkbench {
         System.out.println("folder id : %s".formatted(newFolder.getId()));
         System.out.println("folder desc: %s".formatted(newFolder.getDescription()));
 
-        List<WSDocument> docs = documentClient.getDocuments(
-                sid,
-                List.of(100L, 101L, 102L, 103L));
+        List<WSDocument> docs = documentClient.getDocuments(sid, List.of(100L, 101L, 102L, 103L));
 
         for (WSDocument wsDocument : docs) {
             System.out.println("doc: %s".formatted(wsDocument.getFileName()));

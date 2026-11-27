@@ -244,8 +244,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
      */
     private void unpackPlugins(ServletContext context) throws IOException {
         File pluginsDir = PluginRegistry.getPluginsDir();
-        File[] archives = pluginsDir.listFiles((dir, fileName) -> fileName.toLowerCase().contains("plugin")
-                && fileName.toLowerCase().endsWith(".zip"));
+        File[] archives = pluginsDir.listFiles(
+                (_, fileName) -> fileName.toLowerCase().contains("plugin") && fileName.toLowerCase().endsWith(".zip"));
         File webappDir = new File(context.getRealPath("/"));
         if (archives != null)
             for (File archive : archives) {
@@ -257,14 +257,15 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
                 // Delete the plugin.xml file
                 FileUtils.deleteQuietly(new File(webappDir, "plugin.xml"));
 
-                FileUtils.moveFile(archive, new File(archive.getParentFile(), archive.getName() + ".installed"));
+                FileUtils.moveFile(archive,
+                        new File(archive.getParentFile(), "%s.installed".formatted(archive.getName())));
 
                 String pluginName = archive.getName().replace("-plugin.zip", "");
                 pluginName = pluginName.substring(0, pluginName.lastIndexOf('-'));
                 log.info("Remove installation marker of plugin {}", pluginName);
                 File pluginDir = new File(pluginsDir, pluginName);
                 File[] installationMarkers = pluginDir
-                        .listFiles((dir, fileName) -> fileName.toLowerCase().startsWith("install-"));
+                        .listFiles((_, fileName) -> fileName.toLowerCase().startsWith("install-"));
                 for (File file : installationMarkers)
                     FileUtils.deleteQuietly(file);
 

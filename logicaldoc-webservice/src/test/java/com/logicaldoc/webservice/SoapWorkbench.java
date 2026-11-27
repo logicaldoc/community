@@ -43,17 +43,16 @@ public class SoapWorkbench {
 
     public static void main(String[] args) throws Exception {
 
-        SoapAuthClient auth = new SoapAuthClient(BASE + "/Auth");
-
-        SoapSystemClient info = new SoapSystemClient(BASE + "/System");
-
-        SoapSystemClient systemClient = new SoapSystemClient(BASE + "/System");
+        SoapAuthClient auth = new SoapAuthClient("%s/Auth".formatted(BASE));
+        SoapSystemClient info = new SoapSystemClient("%s/System".formatted(BASE));
+        SoapSystemClient systemClient = new SoapSystemClient("%s/System".formatted(BASE));
 
         Properties develProps = new Properties();
-        develProps.load(new FileInputStream(new File(System.getProperty("user.home") + "/logicaldoc-dev.properties")));
+        develProps.load(new FileInputStream(
+                new File("%s/logicaldoc-dev.properties".formatted(System.getProperty("user.home")))));
 
         // Open a session
-        String sid = auth.loginApiKey(develProps.getProperty("apikey.Development") + ">marco");
+        String sid = auth.loginApiKey("%s>marco".formatted(develProps.getProperty("apikey.Development")));
         System.out.println("Server date: %s".formatted(systemClient.getInfo().getDate()));
         System.out.println("Sid: %s".formatted(sid));
 

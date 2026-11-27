@@ -24,7 +24,7 @@ public class TstFolder extends BaseTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
+        folderClient = new SoapFolderClient("%s/services/Folder".formatted(settings.getProperty("url")));
     }
 
     @Test

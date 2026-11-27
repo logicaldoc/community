@@ -370,7 +370,7 @@ public class XMLBean {
 
         // Backup the file first
         File src = new File(docPath);
-        File backup = new File(src.getParentFile(), src.getName() + ".back");
+        File backup = new File(src.getParentFile(), "%s.back".formatted(src.getName()));
         try {
             FileUtils.copyFile(src, backup);
         } catch (Exception ex) {

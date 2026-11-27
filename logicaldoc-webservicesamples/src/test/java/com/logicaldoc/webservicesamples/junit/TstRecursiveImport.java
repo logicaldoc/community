@@ -39,8 +39,8 @@ public class TstRecursiveImport extends BaseTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
-        documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
+        folderClient = new SoapFolderClient("%s/services/Folder".formatted(settings.getProperty("url")));
+        documentClient = new SoapDocumentClient("%s/services/Document".formatted(settings.getProperty("url")));
     }
 
     @Test

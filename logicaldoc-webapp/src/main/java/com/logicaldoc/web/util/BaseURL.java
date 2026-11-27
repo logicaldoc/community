@@ -60,7 +60,7 @@ public class BaseURL {
 		if (serverUrl != null) {
 			localURL = serverUrl + getWebAppName(request);
 			if (!localURL.endsWith("/"))
-				localURL = localURL + "/";
+				localURL = "%s/".formatted(localURL);
 		}
 
 		if (localURL == null) {

@@ -34,7 +34,7 @@ public class FileUtilTest {
             dir.mkdirs();
             dir.mkdir();
 
-            FileUtil.copyResource("allowed-commands.txt", new File(root.getPath() + "/1/doc/1.0"));
+            FileUtil.copyResource("allowed-commands.txt", new File( "%s/1/doc/1.0".formatted(root.getPath())));
         }
 
         assertEquals(total, root.listFiles().length);

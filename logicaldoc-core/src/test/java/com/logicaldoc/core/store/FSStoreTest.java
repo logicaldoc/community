@@ -63,13 +63,14 @@ public class FSStoreTest extends AbstractCoreTestCase {
     public void testParentTraversalInSuffix() {
         // Walk up from the container to the store root, where the canary is
         String up = "../".repeat(depthOfContainer());
-        assertRejectedEverywhere("1.0", up + "canary.txt");
+        assertRejectedEverywhere("1.0", "%scanary.txt".formatted(up));
     }
 
     @Test
     public void testBackslashTraversalInSuffix() {
-        String up = "..\\".repeat(depthOfContainer());
-        assertRejectedEverywhere("1.0", up + "canary.txt");
+        String up = "../".repeat(depthOfContainer());
+
+        assertRejectedEverywhere("1.0", "%scanary.txt".formatted(up));
     }
 
     @Test
@@ -91,7 +92,7 @@ public class FSStoreTest extends AbstractCoreTestCase {
         assertRejectedEverywhere("..", null);
         assertRejectedEverywhere(".", null);
         assertRejectedEverywhere("./.", null);
-        assertRejectedEverywhere("../".repeat(depthOfContainer()) + "canary.txt", null);
+        assertRejectedEverywhere("%scanary.txt".formatted("../".repeat(depthOfContainer())), null);
     }
 
     // Separators are stripped, the resource stays inside the container

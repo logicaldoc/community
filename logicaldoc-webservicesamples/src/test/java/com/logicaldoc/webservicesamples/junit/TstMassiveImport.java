@@ -214,19 +214,14 @@ public class TstMassiveImport extends BaseTestCase {
 
         long startTime = System.currentTimeMillis();
 
-        WSDocument docRes = documentClient.create(
-                sid,
-                document,
-                content);
+        WSDocument docRes = documentClient.create(sid, document, content);
 
-        System.out.println("Created documentID = %d".formatted(
-                docRes.getId()));
+        System.out.println("Created documentID = %d".formatted(docRes.getId()));
 
         long timeElapsed = System.currentTimeMillis() - startTime;
 
         if (timeElapsed > TIME_ATTENTION_TRESHOLD) {
-            System.err.println("Document created in: %d ms".formatted(
-                    timeElapsed));
+            System.err.println("Document created in: %d ms".formatted(timeElapsed));
+        }
     }
-
 }

@@ -24,8 +24,10 @@ import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * Abstract test case for the Webdav module. This class initialises a test
- * database and prepares the spring test context. <p> All LogicalDOC's tests
- * must extend this test case in order to find a ready and accessible database.
+ * database and prepares the spring test context.
+ * <p>
+ * All LogicalDOC's tests must extend this test case in order to find a ready
+ * and accessible database.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.3
@@ -73,14 +75,16 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
         repositoryDir.mkdirs();
         repositoryDir.mkdir();
 
-        File file3 = new File(repositoryDir.getPath() + "/docs/1/doc/1.0");
+        File file3 = new File("%s/docs/1/doc/1.0".formatted(repositoryDir.getPath()));
         file3.getParentFile().mkdirs();
         FileUtil.copyResource("pdf1.pdf", file3);
 
-        File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
+        File file5 = new File("%s/docs/5/doc/1.0".formatted(repositoryDir.getPath()));
         file5.getParentFile().mkdirs();
         FileUtil.copyResource("pdf2.pdf", file5);
-        FileUtil.copyResource("pdf2.pdf", new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
+
+        FileUtil.copyResource("pdf2.pdf",
+                new File("%s/docs/5/doc/1.0-conversion.pdf".formatted(repositoryDir.getPath())));
     }
 
     @Override

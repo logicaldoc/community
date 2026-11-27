@@ -24,42 +24,46 @@ import com.logicaldoc.web.junit.AbstractWebappTestCase;
  */
 public abstract class AbstractWPTestCase extends AbstractWebappTestCase {
 
-	protected File repositoryDir = new File(tempDir, "repository");
+    protected File repositoryDir = new File(tempDir, "repository");
 
-	@Override
-	protected ApplicationContext buildApplicationContext() {
-		return new AnnotationConfigApplicationContext(WebappTestContext.class);
-	}
+    @Override
+    protected ApplicationContext buildApplicationContext() {
+        return new AnnotationConfigApplicationContext(WebappTestContext.class);
+    }
 
-	@Override
-	protected String getConfigResource() {
-		return "contexttest.properties";
-	}
+    @Override
+    protected String getConfigResource() {
+        return "contexttest.properties";
+    }
 
-	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
+    @Override
+    public void setUp() throws IOException, SQLException, PluginException {
+        super.setUp();
 
-		repositoryDir.mkdirs();
-		repositoryDir.mkdir();
+        repositoryDir.mkdirs();
+        repositoryDir.mkdir();
 
-		File docs = new File(repositoryDir, "docs");
-		docs.mkdir();
-		File docDir = new File(docs + "/1/doc");
-		docDir.mkdirs();
-		docDir.mkdir();
-		FileUtil.copyResource("pdf1.pdf", new File(docDir, "1.0"));
-		docDir = new File(docs + "/3/doc");
-		docDir.mkdirs();
-		docDir.mkdir();
-		FileUtil.copyResource("pdf2.pdf", new File(docDir, "1.1"));
+        File docs = new File(repositoryDir, "docs");
+        docs.mkdir();
 
-		File docs2 = new File(repositoryDir, "docs2");
-		docs2.mkdir();
-	}
+        File docDir = new File("%s/1/doc".formatted(docs));
+        docDir.mkdirs();
+        docDir.mkdir();
 
-	@Override
-	protected List<String> getDatabaseScripts() {
-		return List.of("sql/logicaldoc-core.sql", "data.sql");
-	}
+        FileUtil.copyResource("pdf1.pdf", new File(docDir, "1.0"));
+
+        docDir = new File("%s/3/doc".formatted(docs));
+        docDir.mkdirs();
+        docDir.mkdir();
+
+        FileUtil.copyResource("pdf2.pdf", new File(docDir, "1.1"));
+
+        File docs2 = new File(repositoryDir, "docs2");
+        docs2.mkdir();
+    }
+
+    @Override
+    protected List<String> getDatabaseScripts() {
+        return List.of("sql/logicaldoc-core.sql", "data.sql");
+    }
 }

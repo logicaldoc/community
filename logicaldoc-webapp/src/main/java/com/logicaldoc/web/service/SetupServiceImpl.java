@@ -170,21 +170,16 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 
         // build phisically the working directory
         // and change settings config
-        String docDir = FilenameUtils.separatorsToUnix(repoFolder.getPath() + "/docs/");
-        FileUtils.forceMkdir(new File(docDir));
-        String indexDir = FilenameUtils.separatorsToUnix(repoFolder.getPath() + "/index/");
-        FileUtils.forceMkdir(new File(indexDir));
-        String userDir = FilenameUtils.separatorsToUnix(repoFolder.getPath() + "/users/");
-        FileUtils.forceMkdir(new File(userDir));
-        String pluginDir = FilenameUtils.separatorsToUnix(repoFolder.getPath() + "/plugins/");
-        FileUtils.forceMkdir(new File(pluginDir));
-        String importDir = FilenameUtils.separatorsToUnix(repoFolder.getPath() + "/impex/in/");
-        FileUtils.forceMkdir(new File(importDir));
-        String exportDir = FilenameUtils.separatorsToUnix(repoFolder.getPath() + "/impex/out/");
-        FileUtils.forceMkdir(new File(exportDir));
-        String logDir = FilenameUtils.separatorsToUnix(repoFolder.getPath() + "/logs/");
-        FileUtils.forceMkdir(new File(logDir));
-        String dbDirectory = FilenameUtils.separatorsToSystem(repoFolder.getPath() + "/db/");
+        String repoPath = repoFolder.getPath();
+
+        String docDir = FilenameUtils.separatorsToUnix("%s/docs/".formatted(repoPath));
+        String indexDir = FilenameUtils.separatorsToUnix("%s/index/".formatted(repoPath));
+        String userDir = FilenameUtils.separatorsToUnix("%s/users/".formatted(repoPath));
+        String pluginDir = FilenameUtils.separatorsToUnix("%s/plugins/".formatted(repoPath));
+        String importDir = FilenameUtils.separatorsToUnix("%s/impex/in/".formatted(repoPath));
+        String exportDir = FilenameUtils.separatorsToUnix("%s/impex/out/".formatted(repoPath));
+        String logDir = FilenameUtils.separatorsToUnix("%s/logs/".formatted(repoPath));
+        String dbDirectory = FilenameUtils.separatorsToSystem("%s/db/".formatted(repoPath));
 
         ContextProperties pbean = Context.get().getConfig();
         pbean.setProperty("store.1.dir", docDir);

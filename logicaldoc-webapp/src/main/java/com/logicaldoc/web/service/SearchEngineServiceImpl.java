@@ -64,19 +64,19 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
             searchEngine.setLocked(indexer.isLocked());
 
             ContextProperties conf = Context.get().getConfig();
-            searchEngine.setExcludePatterns(conf.getProperty(session.getTenantName() + ".index.excludes"));
-            searchEngine.setIncludePatterns(conf.getProperty(session.getTenantName() + ".index.includes"));
-            searchEngine
-                    .setExcludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.excludes.metadata"));
-            searchEngine
-                    .setIncludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.includes.metadata"));
-            searchEngine.setSkipOnError(conf.getBoolean(session.getTenantName() + ".index.skiponerror", false));
+            searchEngine.setExcludePatterns(conf.getTenantProperty(session.getTenantName(), "index.excludes"));
+            searchEngine.setIncludePatterns(conf.getTenantProperty(session.getTenantName(), "index.includes"));
+            searchEngine.setExcludePatternsMetadata(
+                    conf.getTenantProperty(session.getTenantName(), "index.excludes.metadata"));
+            searchEngine.setIncludePatternsMetadata(
+                    conf.getTenantProperty(session.getTenantName(), "index.includes.metadata"));
+            searchEngine.setSkipOnError(conf.getTenantBoolean(session.getTenantName(), "index.skiponerror", false));
             searchEngine.setIgnoreContentError(
-                    conf.getBoolean(session.getTenantName() + ".index.ignorecontenterror", false));
-            searchEngine.setParsingTimeout(conf.getInt(session.getTenantName() + ".parser.timeout", 0));
-            searchEngine
-                    .setParsingTimeoutRetain(conf.getBoolean(session.getTenantName() + ".parser.timeout.retain", true));
-            searchEngine.setMaxTextFileSize(conf.getInt(session.getTenantName() + ".parser.txt.maxsize", 0));
+                    conf.getTenantBoolean(session.getTenantName(), "index.ignorecontenterror", false));
+            searchEngine.setParsingTimeout(conf.getTenantInt(session.getTenantName(), "parser.timeout", 0));
+            searchEngine.setParsingTimeoutRetain(
+                    conf.getTenantBoolean(session.getTenantName(), "parser.timeout.retain", true));
+            searchEngine.setMaxTextFileSize(conf.getTenantInt(session.getTenantName(), "parser.txt.maxsize", 0));
             searchEngine.setDir(conf.getProperty("index.dir"));
             searchEngine.setSorting(conf.getProperty("index.sorting"));
             searchEngine.setCustomSorting(conf.getProperty("index.sorting.custom"));
@@ -150,24 +150,23 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
         try {
             ContextProperties conf = Context.get().getConfig();
-            conf.setProperty(session.getTenantName() + ".index.excludes",
+            conf.setTenantProperty(session.getTenantName(), "index.excludes",
                     searchEngine.getExcludePatters() != null ? searchEngine.getExcludePatters() : "");
-            conf.setProperty(session.getTenantName() + ".index.includes",
+            conf.setTenantProperty(session.getTenantName(), "index.includes",
                     searchEngine.getIncludePatters() != null ? searchEngine.getIncludePatters() : "");
-            conf.setProperty(session.getTenantName() + ".index.excludes.metadata",
+            conf.setTenantProperty(session.getTenantName(), "index.excludes.metadata",
                     searchEngine.getExcludePatternsMetadata() != null ? searchEngine.getExcludePatternsMetadata() : "");
-            conf.setProperty(session.getTenantName() + ".index.includes.metadata",
+            conf.setTenantProperty(session.getTenantName(), "index.includes.metadata",
                     searchEngine.getIncludePattersMetadata() != null ? searchEngine.getIncludePattersMetadata() : "");
-            conf.setProperty(session.getTenantName() + ".index.skiponerror",
+            conf.setTenantProperty(session.getTenantName(), "index.skiponerror",
                     Boolean.toString(searchEngine.isSkipOnError()));
-            conf.setProperty(session.getTenantName() + ".index.ignorecontenterror",
+            conf.setTenantProperty(session.getTenantName(), "index.ignorecontenterror",
                     Boolean.toString(searchEngine.isIgnoreContentError()));
-
-            conf.setProperty(session.getTenantName() + ".parser.timeout",
+            conf.setTenantProperty(session.getTenantName(), "parser.timeout",
                     searchEngine.getParsingTimeout() != null ? Integer.toString(searchEngine.getParsingTimeout()) : "");
-            conf.setProperty(session.getTenantName() + ".parser.timeout.retain",
+            conf.setTenantProperty(session.getTenantName(), "parser.timeout.retain",
                     Boolean.toString(searchEngine.isParsingTimeoutRetain()));
-            conf.setProperty(session.getTenantName() + ".parser.txt.maxsize",
+            conf.setTenantProperty(session.getTenantName(), "parser.txt.maxsize",
                     searchEngine.getMaxTextFileSize() != null ? Integer.toString(searchEngine.getMaxTextFileSize())
                             : "");
 
@@ -233,7 +232,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
             ContextProperties conf = Context.get().getConfig();
             int i = 1;
             for (String filter : filters)
-                conf.setProperty(INDEX_TOKENFILTER + filter + ".position", Integer.toString(i++));
+                conf.setProperty("%s%s.position".formatted(INDEX_TOKENFILTER, filter), Integer.toString(i++));
+
             conf.write();
         } catch (Exception t) {
             throwServerException(session, log, t);
@@ -244,7 +244,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
     public void saveTokenFilterSettings(String filter, List<GUIParameter> settings) throws ServerException {
         Session session = validateSession();
         try {
-            String prefix = INDEX_TOKENFILTER + filter + ".";
+            String prefix = "%s%s.".formatted(INDEX_TOKENFILTER, filter);
             ContextProperties conf = Context.get().getConfig();
             for (GUIParameter setting : settings)
                 conf.setProperty(prefix + setting.getName(), setting.getValue().trim());
@@ -259,7 +259,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
         Session session = validateSession();
         try {
             ContextProperties conf = Context.get().getConfig();
-            conf.setProperty(INDEX_TOKENFILTER + filter, active ? "enabled" : "disabled");
+            conf.setProperty("%s%s".formatted(INDEX_TOKENFILTER, filter), active ? "enabled" : "disabled");
             conf.write();
         } catch (Exception t) {
             throwServerException(session, log, t);

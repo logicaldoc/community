@@ -28,121 +28,121 @@ import com.logicaldoc.webdav.resource.model.Resource;
  */
 public class ExportContextImpl extends AbstractExportContext {
 
-	private static final Logger log = LoggerFactory.getLogger(ExportContextImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ExportContextImpl.class);
 
-	@SuppressWarnings("rawtypes")
-	private final Map properties = new HashMap();
+    @SuppressWarnings("rawtypes")
+    private final Map properties = new HashMap();
 
-	private final OutputContext outputCtx;
+    private final OutputContext outputCtx;
 
-	private File outFile;
+    private File outFile;
 
-	private OutputStream outStream;
+    private OutputStream outStream;
 
-	public ExportContextImpl(Resource resource, OutputContext outputCtx) throws IOException {
-		super(resource, (outputCtx != null) && outputCtx.hasStream());
-		this.outputCtx = outputCtx;
-		if (hasStream()) {
-			// we need a tmp file, since the export could fail
-			outFile = FileUtil.createTempFile("__exportcontext", "tmp");
-		}
-	}
+    public ExportContextImpl(Resource resource, OutputContext outputCtx) throws IOException {
+        super(resource, (outputCtx != null) && outputCtx.hasStream());
+        this.outputCtx = outputCtx;
+        if (hasStream()) {
+            // we need a tmp file, since the export could fail
+            outFile = FileUtil.createTempFile("__exportcontext", "tmp");
+        }
+    }
 
-	public OutputStream getOutputStream() {
-		checkCompleted();
-		if (hasStream()) {
-			try {
-				// clean up the stream retrieved by the preceeding handler, that
-				// did not behave properly and failed to export although
-				// initially willing to handle the export.
-				if (outStream != null) {
-					outStream.close();
-				}
-				outStream = new FileOutputStream(outFile);
-				return outStream;
-			} catch (IOException e) {
-				// unexpected error... ignore and return null
-			}
-		}
-		return null;
-	}
+    public OutputStream getOutputStream() {
+        checkCompleted();
+        if (hasStream()) {
+            try {
+                // clean up the stream retrieved by the preceeding handler, that
+                // did not behave properly and failed to export although
+                // initially willing to handle the export.
+                if (outStream != null) {
+                    outStream.close();
+                }
+                outStream = new FileOutputStream(outFile);
+                return outStream;
+            } catch (IOException e) {
+                // unexpected error... ignore and return null
+            }
+        }
+        return null;
+    }
 
-	@SuppressWarnings("unchecked")
-	public void setContentLanguage(String contentLanguage) {
-		properties.put(DavConstants.HEADER_CONTENT_LANGUAGE, contentLanguage);
-	}
+    @SuppressWarnings("unchecked")
+    public void setContentLanguage(String contentLanguage) {
+        properties.put(DavConstants.HEADER_CONTENT_LANGUAGE, contentLanguage);
+    }
 
-	@SuppressWarnings("unchecked")
-	public void setContentLength(long contentLength) {
-		properties.put(DavConstants.HEADER_CONTENT_LENGTH, contentLength + "");
-	}
+    @SuppressWarnings("unchecked")
+    public void setContentLength(long contentLength) {
+        properties.put(DavConstants.HEADER_CONTENT_LENGTH, Long.toString(contentLength));
+    }
 
-	@SuppressWarnings("unchecked")
-	public void setContentType(String mimeType, String encoding) {
-		properties.put(DavConstants.HEADER_CONTENT_TYPE, IOUtil.buildContentType(mimeType, encoding));
-	}
+    @SuppressWarnings("unchecked")
+    public void setContentType(String mimeType, String encoding) {
+        properties.put(DavConstants.HEADER_CONTENT_TYPE, IOUtil.buildContentType(mimeType, encoding));
+    }
 
-	public void setCreationTime(long creationTime) {
-		// ignore since output-ctx does not understand creation time
-	}
+    public void setCreationTime(long creationTime) {
+        // ignore since output-ctx does not understand creation time
+    }
 
-	@SuppressWarnings("unchecked")
-	public void setModificationTime(long modificationTime) {
-		if (modificationTime <= IOUtil.UNDEFINED_TIME) {
-			modificationTime = new Date().getTime();
-		}
-		String lastMod = IOUtil.getLastModified(modificationTime);
-		properties.put(DavConstants.HEADER_LAST_MODIFIED, lastMod);
-	}
+    @SuppressWarnings("unchecked")
+    public void setModificationTime(long modificationTime) {
+        if (modificationTime <= IOUtil.UNDEFINED_TIME) {
+            modificationTime = new Date().getTime();
+        }
+        String lastMod = IOUtil.getLastModified(modificationTime);
+        properties.put(DavConstants.HEADER_LAST_MODIFIED, lastMod);
+    }
 
-	@SuppressWarnings("unchecked")
-	public void setETag(String etag) {
-		properties.put(DavConstants.HEADER_ETAG, etag);
-	}
+    @SuppressWarnings("unchecked")
+    public void setETag(String etag) {
+        properties.put(DavConstants.HEADER_ETAG, etag);
+    }
 
-	@SuppressWarnings("unchecked")
-	public void setProperty(Object propertyName, Object propertyValue) {
-		properties.put(propertyName, propertyValue);
-	}
+    @SuppressWarnings("unchecked")
+    public void setProperty(Object propertyName, Object propertyValue) {
+        properties.put(propertyName, propertyValue);
+    }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void informCompleted(boolean success) {
-		checkCompleted();
-		completed = true;
-		// make sure the outputStream gets closed (and don't assume the handlers
-		// took care of this.
-		if (outStream != null) {
-			try {
-				outStream.close();
-			} catch (IOException e) {
-				// ignore
-			}
-		}
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void informCompleted(boolean success) {
+        checkCompleted();
+        completed = true;
+        // make sure the outputStream gets closed (and don't assume the handlers
+        // took care of this.
+        if (outStream != null) {
+            try {
+                outStream.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
 
-		// write properties and data to the output-context
-		if (success && outputCtx != null) {
-			Iterator it = properties.keySet().iterator();
-			while (it.hasNext()) {
-				Object name = it.next();
-				Object value = properties.get(name);
-				if (name != null && value != null)
-					outputCtx.setProperty(name.toString(), value.toString());
-			}
+        // write properties and data to the output-context
+        if (success && outputCtx != null) {
+            Iterator it = properties.keySet().iterator();
+            while (it.hasNext()) {
+                Object name = it.next();
+                Object value = properties.get(name);
+                if (name != null && value != null)
+                    outputCtx.setProperty(name.toString(), value.toString());
+            }
 
-			writeFile();
-		}
+            writeFile();
+        }
 
-		FileUtil.delete(outFile);
-	}
+        FileUtil.delete(outFile);
+    }
 
-	private void writeFile() {
-		if (outputCtx.hasStream() && outFile != null) {
-			try (OutputStream out = outputCtx.getOutputStream(); FileInputStream in = new FileInputStream(outFile);) {
-				IOUtil.spool(in, out);
-			} catch (IOException e) {
-				log.error(e.toString());
-			}
-		}
-	}
+    private void writeFile() {
+        if (outputCtx.hasStream() && outFile != null) {
+            try (OutputStream out = outputCtx.getOutputStream(); FileInputStream in = new FileInputStream(outFile);) {
+                IOUtil.spool(in, out);
+            } catch (IOException e) {
+                log.error(e.toString());
+            }
+        }
+    }
 }

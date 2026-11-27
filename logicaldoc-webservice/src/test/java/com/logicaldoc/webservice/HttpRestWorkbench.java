@@ -138,12 +138,12 @@ public class HttpRestWorkbench {
     }
 
     private static String getSid(CloseableHttpClient httpClient) throws ClientProtocolException, IOException {
-        return httpClient.execute(new HttpGet(BASE_PATH + "/services/rest/auth/getSid"),
+        return httpClient.execute(new HttpGet("%s/services/rest/auth/getSid".formatted(BASE_PATH)),
                 new StringHttpClientResponseHandler());
     }
 
     private static void logout(CloseableHttpClient httpClient, String sid) throws ClientProtocolException, IOException {
-        httpClient.execute(new HttpDelete(BASE_PATH + "/services/rest/auth/logout?sid=%s".formatted(sid)),
+        httpClient.execute(new HttpDelete("%s/services/rest/auth/logout?sid=%s".formatted(BASE_PATH, sid)),
                 new StringHttpClientResponseHandler());
     }
 
@@ -154,7 +154,7 @@ public class HttpRestWorkbench {
 
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, StandardCharsets.UTF_8);
 
-        HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/folder/createPath");
+        HttpPost httppost = new HttpPost("%s/services/rest/folder/createPath".formatted(BASE_PATH));
         httppost.setEntity(entity);
 
         httpClient.execute(httppost, new StringHttpClientResponseHandler());
@@ -184,7 +184,7 @@ public class HttpRestWorkbench {
         System.out.println("find");
         // CloseableHttpClient httpclient = HttpClients.createDefault();
 
-        HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/search/find");
+        HttpPost httppost = new HttpPost("%s/services/rest/search/find".formatted(BASE_PATH));
         httppost.addHeader(new BasicHeader("Accept", "application/json"));
 
         // ObjectWriter ow = new
@@ -206,7 +206,7 @@ public class HttpRestWorkbench {
 
         System.out.println("listDocuments");
 
-        URIBuilder uriBuilder = new URIBuilder(BASE_PATH + "/services/rest/document/listDocuments");
+        URIBuilder uriBuilder = new URIBuilder("%s/services/rest/document/listDocuments".formatted(BASE_PATH));
         uriBuilder.setParameter("folderId", String.valueOf(parentId)).setParameter("fileName", "*");
 
         HttpGet get = new HttpGet(uriBuilder.build());
@@ -219,7 +219,7 @@ public class HttpRestWorkbench {
     private static void listChildren(CloseableHttpClient httpclient, long parentId)
             throws ClientProtocolException, IOException, URISyntaxException {
 
-        URIBuilder uriBuilder = new URIBuilder(BASE_PATH + "/services/rest/folder/listChildren");
+        URIBuilder uriBuilder = new URIBuilder("%s/services/rest/folder/listChildren".formatted(BASE_PATH));
         uriBuilder.setParameter("folderId", String.valueOf(parentId)).setParameter("fileName", "*");
 
         HttpGet get = new HttpGet(uriBuilder.build());
@@ -236,7 +236,7 @@ public class HttpRestWorkbench {
 
         // HttpPost httppost = new HttpPost(BASE_PATH +
         // "/services/rest/document/create");
-        HttpPost post = new HttpPost(BASE_PATH + "/services/rest/document/createDocument02");
+        HttpPost post = new HttpPost("%s/services/rest/document/createDocument02".formatted(BASE_PATH));
 
         File f = new File("C:/tmp/InvoiceProcessing01-workflow.png");
         System.out.println(f.getName());
@@ -278,7 +278,7 @@ public class HttpRestWorkbench {
 
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, StandardCharsets.UTF_8);
 
-        HttpPost post = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleForm");
+        HttpPost post = new HttpPost("%s/services/rest/folder/createSimpleForm".formatted(BASE_PATH));
         post.setEntity(entity);
 
         String respoBody = httpClient.execute(post, new StringHttpClientResponseHandler());
@@ -291,7 +291,7 @@ public class HttpRestWorkbench {
         String input = "{ \"folderPath\" : \"%s\" }".formatted(folderPath);
         System.out.println(input);
 
-        HttpPost post = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleJSON");
+        HttpPost post = new HttpPost("%s/services/rest/folder/createSimpleJSON".formatted(BASE_PATH));
         StringEntity entity = new StringEntity(input, ContentType.create("application/json", StandardCharsets.UTF_8));
         post.setEntity(entity);
 
@@ -306,7 +306,7 @@ public class HttpRestWorkbench {
 
             StringEntity entity = new StringEntity(input,
                     ContentType.create("application/json", StandardCharsets.UTF_8));
-            HttpPost post = new HttpPost(BASE_PATH + "/services/rest/auth/login");
+            HttpPost post = new HttpPost( "%s/services/rest/auth/login".formatted(BASE_PATH));
             post.setEntity(entity);
 
             String body = httpclient.execute(post, new StringHttpClientResponseHandler());
@@ -319,7 +319,7 @@ public class HttpRestWorkbench {
 
         System.out.println("uploadDocument(CloseableHttpClient)");
 
-        HttpPost post = new HttpPost(BASE_PATH + "/services/rest/document/upload");
+        HttpPost post = new HttpPost("%s/services/rest/document/upload".formatted(BASE_PATH));
 
         // File file = new File("C:/tmp/InvoiceProcessing01-workflow.png");
         File file = new File("c:/users/shatz/Downloads/SimpleTestProject.zip");
@@ -353,7 +353,7 @@ public class HttpRestWorkbench {
     private static void uploadDocument(CloseableHttpClient httpClient) throws IOException {
         System.out.println("uploadDocument(CloseableHttpClient)");
 
-        HttpPost post = new HttpPost(BASE_PATH + "/services/rest/document/upload");
+        HttpPost post = new HttpPost("%s/services/rest/document/upload".formatted(BASE_PATH));
 
         File file = new File("C:/tmp/serv.txt");
 

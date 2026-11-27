@@ -90,7 +90,7 @@ public class LinksDataServlet extends AbstractDataServlet {
             Long parentDocId,
             String tenant,
             PrintWriter writer) throws PersistenceException {
-        if (!Context.get().getConfig().getBoolean(tenant + ".gui.showdocattrsaslinks", false))
+        if (!Context.get().getConfig().getTenantBoolean(tenant, "gui.showdocattrsaslinks", false))
             return;
 
         // Use the stringValue of the attribute to print the filename of the

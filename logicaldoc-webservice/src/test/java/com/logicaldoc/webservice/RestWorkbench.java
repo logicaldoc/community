@@ -67,16 +67,18 @@ public class RestWorkbench {
         // "<content>...</content>"));
 
         Properties develProps = new Properties();
-        develProps.load(new FileInputStream(new File(System.getProperty("user.home") + "/logicaldoc-dev.properties")));
+        develProps.load(new FileInputStream(
+                new File("%s/logicaldoc-dev.properties".formatted(System.getProperty("user.home")))));
         String apiKey = develProps.getProperty("apikey.Development");
 
-        authClient = new RestAuthClient(BASE_PATH + "/services/rest/auth");
-        docClient = new RestDocumentClient(BASE_PATH + "/services/rest/document", apiKey);
-        fldClient = new RestFolderClient(BASE_PATH + "/services/rest/folder", apiKey);
-        searchClient = new RestSearchClient(BASE_PATH + "/services/rest/search", apiKey);
-        tagClient = new RestTagClient(BASE_PATH + "/services/rest/tag", apiKey);
-        bookmarkClient = new RestBookmarkClient(BASE_PATH + "/services/rest/bookmark", apiKey);
-        docMetadataClient = new RestDocumentMetadataClient(BASE_PATH + "/services/rest/documentMetadata", apiKey);
+        authClient = new RestAuthClient("%s/services/rest/auth".formatted(BASE_PATH));
+        docClient = new RestDocumentClient("%s/services/rest/document".formatted(BASE_PATH), apiKey);
+        fldClient = new RestFolderClient("%s/services/rest/folder".formatted(BASE_PATH), apiKey);
+        searchClient = new RestSearchClient("%s/services/rest/search".formatted(BASE_PATH), apiKey);
+        tagClient = new RestTagClient("%s/services/rest/tag".formatted(BASE_PATH), apiKey);
+        bookmarkClient = new RestBookmarkClient("%s/services/rest/bookmark".formatted(BASE_PATH), apiKey);
+        docMetadataClient = new RestDocumentMetadataClient("%s/services/rest/documentMetadata".formatted(BASE_PATH),
+                apiKey);
 
         String sid = authClient.loginApiKey(apiKey);
         System.err.println(sid);
@@ -131,7 +133,8 @@ public class RestWorkbench {
          * SimpleDateFormat("HH:mm"); System.out.println(
          * sdf.format(cal.getTime()) );
          * 
-         * myDoc.setTitle("document test(%s)".formatted(sdf.format(cal.getTime())));
+         * myDoc.setTitle("document test(%s)".formatted(sdf.format(cal.getTime()
+         * )));
          * 
          * updateDocument(myDoc);
          */
@@ -166,7 +169,8 @@ public class RestWorkbench {
         // SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         // System.out.println( sdf.format(cal.getTime()) );
         //
-        // myDoc.setTitle("document test(%s)".formatted(sdf.format(cal.getTime())));
+        // myDoc.setTitle("document
+        // test(%s)".formatted(sdf.format(cal.getTime())));
         //
         // updateDocument(myDoc);
 

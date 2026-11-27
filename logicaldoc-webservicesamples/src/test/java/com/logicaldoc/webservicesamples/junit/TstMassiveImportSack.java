@@ -184,7 +184,7 @@ public class TstMassiveImportSack extends BaseTestCase {
         WSDocument document = new WSDocument();
         // document.setFileName(file.getName());
         String baseName = FilenameUtils.getBaseName(file.getName());
-        document.setFileName(baseName + ".pdf");
+        document.setFileName("%s.pdf".formatted(baseName));
 
         document.setFolderId(targetFolder);
         document.setLanguage("en");

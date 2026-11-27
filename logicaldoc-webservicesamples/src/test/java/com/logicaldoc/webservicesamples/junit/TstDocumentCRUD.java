@@ -21,7 +21,7 @@ public class TstDocumentCRUD extends BaseTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
+		documentClient = new SoapDocumentClient("%s/services/Document".formatted(settings.getProperty("url") ));
 	}
 
 	@Test

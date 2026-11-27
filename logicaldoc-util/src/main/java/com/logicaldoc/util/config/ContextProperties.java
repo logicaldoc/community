@@ -260,9 +260,8 @@ public class ContextProperties extends AdvancedProperties {
     public List<File> getBackups() throws IOException {
         checkFile();
 
-        File[] oldBackups = file.getParentFile()
-                .listFiles((dir, name) -> name.startsWith("%s.".formatted(file.getName()))
-                        && name.substring(name.lastIndexOf('.') + 1).length() == 8);
+        File[] oldBackups = file.getParentFile().listFiles((_, name) -> name.startsWith("%s.".formatted(file.getName()))
+                && name.substring(name.lastIndexOf('.') + 1).length() == 8);
 
         // Sort old backup by descending date
         Arrays.sort(oldBackups, (f1, f2) -> {
